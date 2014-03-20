@@ -1,0 +1,18 @@
+Package: alsace
+Type: Package
+Title: ALS for the Automatic Chemical Exploration of mixtures
+Version: 0.99.2
+Author: Ron Wehrens
+Maintainer: Ron Wehrens <ron.wehrens@gmail.com>
+Description: Alternating Least Squares (or Multivariate Curve
+        Resolution) for analytical chemical data, in particular
+        hyphenated data where the first direction is a retention time
+        axis, and the second a spectral axis. Package builds on the
+        basic als function from the ALS package and adds functionality
+        for high-throughput analysis, including definition of time
+        windows, clustering of profiles, retention time correction,
+        etcetera.
+License: GPL (>= 2)
+Depends: R (>= 2.10), ALS, ptw (>= 1.0.6)
+Suggests: lattice
+BiocViews: Metabolomics, Preprocessing

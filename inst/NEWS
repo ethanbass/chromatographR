@@ -1,0 +1,12 @@
+Changes in version 0.2 w.r.t. 0.1
+- implement overlapping segments! should be a real novelty _DONE_, Oct 24
+- add quality criteria in summary _DONE_, Oct 20
+- complete pipeline so that the output is an intensity matrix _DONE_
+- add wrapper function for a complete analysis _DONE_ Nov 20
+- add some parallellization support _IN PROGRESS_: some lapply
+  statements have been changed into mclapply but the most
+  time-consuming step, the ALS iterations, will remain slow. Different
+  time windows are done in parallel, but some time windows require
+  very few iterations, others require quite a lot. In addition, the
+  ALS output is annoying. Also the warping can be slow with many components.
+- add estimation of # of components
