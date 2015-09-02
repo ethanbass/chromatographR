@@ -12,6 +12,7 @@ Description: Alternating Least Squares (or Multivariate Curve
         for high-throughput analysis, including definition of time
         windows, clustering of profiles, retention time correction,
         etcetera.
+URL: https://github.com/rwehrens/alsace
 License: GPL (>= 2)
 Depends: R (>= 2.10), ALS, ptw (>= 1.0.6)
 Suggests: lattice
