@@ -15,5 +15,6 @@ Description: Alternating Least Squares (or Multivariate Curve
 URL: https://github.com/rwehrens/alsace
 License: GPL (>= 2)
 Depends: R (>= 2.10), ALS, ptw (>= 1.0.6)
-Suggests: lattice
+Suggests: lattice, knitr
+VignetteBuilder: knitr
 BiocViews: Metabolomics, Preprocessing
