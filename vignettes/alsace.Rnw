@@ -1,6 +1,6 @@
 \documentclass[a4paper]{article}
 %\VignetteIndexEntry{alsace}
-%\VignetteEngine{knitr::knitr}
+%\VignetteEngine{knitr::knitr_notangle}
 
 \usepackage{hyperref}
 \usepackage{natbib}
