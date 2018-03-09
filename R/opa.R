@@ -5,13 +5,13 @@ opa <- function(x, ncomp, initXref = NULL)
 
   lambdas <- colnames(x) ## may be NULL, no problem...
     
-  x <- t(apply(x, 1, function(xx) xx / rep(sqrt(crossprod(xx)), length(xx))))
+  x <- t(apply(x, 1, function(xx) xx / sqrt(crossprod(xx))))
   
   Xref <- matrix(0, ncomp, ncol(x))
 
   if (is.null(initXref)) {
     huhn <- colMeans(x)
-    Xref[1,] <- huhn / rep(sqrt(crossprod(huhn)), length(huhn))
+    Xref[1,] <- huhn / sqrt(crossprod(huhn))
     ncomp.done <- 0
   } else {
     if (ncol(initXref) != ncol(x)) 
@@ -19,7 +19,7 @@ opa <- function(x, ncomp, initXref = NULL)
     
     ncomp.done <- nrow(initXref)
     Xref[1:ncomp.done,] <-             ## normalize to unit length
-      t(apply(initXref, 1, function(x) x / rep(sqrt(crossprod(x)), length(x))))
+      t(apply(initXref, 1, function(x) x / sqrt(crossprod(x))))
   }
 
   for (i in (ncomp.done + 1):ncomp) {
