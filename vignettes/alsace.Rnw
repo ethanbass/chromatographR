@@ -1,6 +1,8 @@
 \documentclass[a4paper]{article}
+%\VignetteEngine{knitr::knitr}
 %\VignetteIndexEntry{alsace}
 
+\usepackage{hyperref}
 \usepackage{natbib}
 \usepackage{geometry}
 \usepackage{layout}
@@ -9,6 +11,8 @@
   includeheadfoot,
   margin=2.54cm
 }
+
+\DeclareGraphicsExtensions{.pdf, .png}
 
 \newcommand{\pkg}[1]{{\normalfont\fontseries{b}\selectfont #1}}
 \newcommand{\proglang}[1]{{\sffamily #1}}
@@ -33,6 +37,18 @@
 \author{Ron Wehrens}
 
 \begin{document}
+
+<<knitrInitialization,echo=FALSE>>=
+require("knitr", quietly=TRUE)
+opts_chunk$set(prompt = TRUE, highlight = FALSE, comment=NA, 
+               background='transparent', size = 'small', 
+               fig.width=6, fig.height=6, out.width='\\textwidth',
+               dev=c('pdf', 'png'))
+@
+
+<<loadAlsace,echo=FALSE>>=
+suppressMessages(require(alsace, quiet=TRUE))
+@ 
 
 \maketitle
 
@@ -82,7 +98,7 @@ concentrations.
 For \R, the basic machinery to analyse such data is available in package
 \pkg{ALS}~\citep{ALS2012} -- however, using the approach in practical
 applications requires quite a lot of additional scripting. This is
-exactly what \pkg{alsace}~\citep{Wehrens2014} aims to provide for the
+exactly what \pkg{alsace}~\citep{Wehrens2015} aims to provide for the
 analysis of HPLC-DAD
 data, especially when applied in a high-throughput context.
 
@@ -104,27 +120,20 @@ conserving agent in these samples. The original publication
 investigated whether addition of TEA was useful (it was). Each
 sample leads to a data matrix of 97 time points and 209 wavelengths.
 Contour plots of the six files are shown in Figure~\ref{fig:data}.
-%% object tea is made from TEA by the following R code:
-%% load("../../Obsolete/TEA.RData")
-%% tpoints <- seq(10.2, 15, by = .05)
-%% tea.raw <- lapply(TEA, preprocess, remove.time.baseline = FALSE,
-%% spec.smooth = FALSE, dim1 = tpoints)
-\begin{figure}[bt]
-  \begin{center}
-\setkeys{Gin}{width=\textwidth}
-<<fig=TRUE,echo=FALSE,height=2.5,width=10>>=
-library(alsace)
+
+\begin{figure}[tb]
+  \centering
+<<teaContour,echo=FALSE,fig.height=5.5,fig.width=10>>=
 data(tea)
 tpoints <- as.numeric(rownames(tea.raw[[1]]))
 lambdas <- as.numeric(colnames(tea.raw[[1]]))
-par(mfrow = c(1,5))
+par(mfrow = c(2,3))
 for (i in 1:5)
     contour(tpoints, lambdas, tea.raw[[i]], col = terrain.colors(15),
             main = names(tea.raw)[i],
             xlab = "Retention time (min.)", ylab = "Wavelength (nm)")
 
 @
-\end{center}
 \caption{Contour plots of the \code{tea} data coming with the
   \pkg{alsace} package.}
 \label{fig:data}
@@ -157,21 +166,17 @@ The basic workflow of an ALS analysis runs as follows:
   combine components, change settings, and rerun;
 \item generate a peak table.
 \end{enumerate}
-A graphical flowchart is shown in Figure~\ref{fig:flowchart}.
+A flowchart is shown in Figure~\ref{fig:flowchart}.
 Each of the steps in this scheme will be discussed briefly below.
-\begin{figure}[tbp]
+
+\begin{figure}[tb]
 \par
 \centerline{
-\includegraphics[width=.4\textwidth]{flowchart.png}}
+\includegraphics[width=.6\textwidth]{flowchart.png}}
 \caption{Flowchart of the alsace functionality. The input is a list
   of data matrices, and the output a table giving peak intensities
   for all features across the samples.}
 \label{fig:flowchart}
-%% Flowchart created in dia; exported to svg file and with gimp
-%% converted to png or pdf. Directly saving from dia did not work :-(
-%% second try: exporting to CAIRO png does work but is
-%% ugly... Something for the final version. Flowchart can be improved,
-%% too.
 \end{figure}
 
 \subsection{Data loading}
@@ -179,11 +184,14 @@ Most probably, the data coming from the spectrometer need to be
 converted into an \R-accessible format such as a \code{csv} file. Once
 all \code{csv} files are gathered in one directory (say, \code{foo}),
 an easy way to load them is to use \code{lapply}:
-<<eval=FALSE>>=
+
+<<readData,eval=FALSE>>=
 allf <- list.files("foo", pattern = "csv", full.names = TRUE)
 mydata <- lapply(allf, read.csv)
 names(mydata) <- paste("f", 1:length(allf), sep = "")
 @ 
+
+\noindent
 This will lead to a list of matrices, each one corresponding to one
 data file --  look at the \code{tea} object to see exactly what is
 meant. Probably it is a good idea to use more meaningful names than
@@ -191,7 +199,8 @@ only the number of the file, as is done here.
 For later ease of interpretation and making plots, it is advisable to
 put the time points and wavelengths as row names and column names,
 respectively. The result should look something like this:
-<<>>=
+
+<<showData>>=
 lapply(tea.raw[1:2], function(x) x[1:4, 1:6])
 @ 
 
@@ -214,14 +223,15 @@ subsampling and subsequent interpolation both one or both axes. This
 can signficantly reduce the data size and computational load in later
 steps. Consider, e.g., doing some preprocessing on the \code{tea.raw}
 data:
-<<>>=
+
+<<preprocData>>=
 new.lambdas <- seq(260, 500, by = 2)
-tea <- lapply(tea.raw,
-              preprocess,
-              dim2 = new.lambdas)
-dim(tea.raw[[1]])
-dim(tea[[1]])
+tea <- lapply(tea.raw, preprocess, dim2 = new.lambdas)
+sapply(tea.raw, dim)
+sapply(tea, dim)
 @ 
+
+\noindent
 The preprocessing by default does baseline subtraction in the temporal
 direction, and smoothing in the spectral direction. This example also
 decreases the spectral resolution. It is also possible to set the maximum
@@ -259,24 +269,28 @@ components is reached; the very first spectrum is the one that is most
 different from the mean spectrum.
 
 The \R\ syntax is very simple indeed:
-<<>>=
+
+<<opa>>=
 tea.opa <- opa(tea, 4)
 @
+
+\noindent
 This leads to the spectra shown in Figure~\ref{fig:opa}. The first
 one, shown in black, does not immediately seem very interesting, but
-the other three are: the red and blue lines show the typical three-peak
-structure of carotenoids, while the green line corresponds to the
-spectrum of tocopherol~\citep{Wehrens2013}.
+the next one, in red, is: it shows the typical three-peak
+structure of carotenoids. The blue line is a kind of difference
+spectrum: adding the blue to the red spectrum will lead to a
+carotenoid-like spectrum, shifted to the right. The green line
+corresponds to the spectrum of tocopherol~\citep{Wehrens2013}.
+
 \begin{figure}[bt]
-\setkeys{Gin}{width=.5\linewidth}
-  \begin{center}
-<<fig=TRUE,echo=TRUE>>=
+\centering
+<<showOpa,fig.height=7,fig.width=7,out.width='.55\\textwidth'>>=
 matplot(new.lambdas, tea.opa, lty = 1, ylab = "Response",
         xlab = expression(lambda), type = "l")
 legend("topright", legend = paste("Comp.", 1:4), bty = "n",
        lty = 1, col = 1:4)
 @
-\end{center}
 \caption{Result of applying OPA to the preprocessed \code{tea} data:
   four components are shown. The code to generate the figure is shown
   on top.}
@@ -311,12 +325,14 @@ some predefined choices:
 \end{itemize}
 The result is an object of class ``\code{ALS}'', for which
 \code{summary}, \code{print} and \code{plot} methods are available.
-
 For our small set of example data, this leads to the following:
-<<>>=
+
+<<doALS>>=
 tea.als <- doALS(tea, tea.opa)
 summary(tea.als)
 @ 
+
+\noindent
 Note that the standard output of the underlying \code{ALS} function,
 showing for the individual iterations the residual sum of squares, and
 at the end printing the ratio of the initial versus the final values,
@@ -324,32 +340,30 @@ is suppressed in \code{doALS}. Instead, the \code{summary} can be
 used after the fitting to obtain more information on the model,
 presenting three common measures of fit.
 
-The \code{plot} method for an \code{ALS} object can show two things:
-the spectra, and the concentration profiles. Figure~\ref{fig:plotALS}
-shows both, where for space-saving reasons only the concentration
-profiles of the first file are shown.
-\begin{figure}[tb]
-\begin{center}
-\setkeys{Gin}{width=.75\linewidth}
-<<fig=true,height=5,width=9>>=
+\begin{figure}[bt]
+\centering
+<<plotMod,echo=FALSE,fig.height=4.5,fig.width=10,out.width='\\textwidth'>>=
 par(mfrow = c(1,2))
 plot(tea.als)
 plot(tea.als, what = "profiles", mat.idx = 1)
 legend("topleft", legend = paste("Comp.", 1:4), bty = "n",
        lty = 1, col = 1:4)
 @ 
-\end{center}
-  \caption{Examples of the generic \code{plot} method for an
-    \code{ALS} object: the left plot shows the spectra, and the right
-    plot shows the concentration profiles in the first of the five
-    \code{tea} samples. The code to generate the plots is shown at the top.}
+\caption{Examples of the generic \code{plot} method for an
+  \code{ALS} object: the left plot shows the spectra, and the right
+  plot shows the concentration profiles in the first of the five
+  \code{tea} samples. The code to generate the plots is shown at the top.}
 \label{fig:plotALS}
 \end{figure}
+
+The \code{plot} method for an \code{ALS} object can show two things:
+the spectra, and the concentration profiles. Figure~\ref{fig:plotALS}
+presents an example, where for space-saving reasons only the concentration
+profiles of the first file are shown.
 Comparing the spectra after application of ALS with the OPA results,
-we see that especially Component 1 has changed. The right plot,
-containing the concentration profiles in the first file, looks not
-very smooth due to the low number of time points. Nevertheless, we can
-see several clear peaks for the carotenoids (blue and red lines), and
+we see that the black and blue components have changed quite
+considerably. In the right plot we can
+see several clear peaks for the carotenoids (red and black lines), and
 one clear peak for tocopherol at approximately 11.1 minutes. Notice
 that around this retention time also two carotenoids elute -- ALS is
 able to resolve such overlap situations because of the difference in
@@ -364,10 +378,13 @@ number of components is too large, this may result in strange spectra,
 or elution profiles with very low intensity values. Components
 corresponding to such low intensities can be identified by the
 function \code{smallComps}:
-<<>>=
+
+<<smallComps>>=
 smallC <- smallComps(tea.als, Ithresh = 10)
 smallC
 @
+
+\noindent
 The function returns those components that never reach the intensity
 threshold, and as extra information also presents maximal intensities
 for all components in all data files. In this case, all four
@@ -438,10 +455,13 @@ span leads to fewer peaks. Note that the \code{span} parameter is
 given in terms of number of points, and not in the retention time scale.
 
 For the \code{tea} data, the function leads to the following result:
-<<>>=
+
+<<fitPeaks>>=
 pks <- getAllPeaks(tea.als$CList, span = 5)
 sapply(pks, function(x) sapply(x, nrow))
 @ 
+
+\noindent
 There is clearly some variation: not all peaks are found in all
 files. Again, it should be 
 stressed that these are low-resolution data, only used for
@@ -472,17 +492,22 @@ as small as possible one could consider choosing a sample somewhere in
 the middle of the measurement sequence, but also other considerations
 apply~\citep{Bloemberg2013}. In the current example, the choice does
 not matter much, and we will simply use the very first sample as a reference.
-<<>>=
-warping.models <- correctRT(tea.als$CList, reference = 1,
-                            what = "models")
+
+<<warping>>=
+warping.models <- correctRT(tea.als$CList, reference = 1, what = "models")
 @ 
+
+\noindent
 This will lead to one global warping function for every sample, a
 function that we can apply to the retention times of the peaks that we
 identified earlier:
-<<>>=
+
+<<timeCorrection>>=
 pks.corrected <- correctPeaks(pks, warping.models)
 pks.corrected[[2]][[1]]
 @ 
+
+\noindent
 The result is stored as an additional column in the peaktable,
 labelled ``\code{rt.corr}''.
 
@@ -496,10 +521,13 @@ retention times for each component. If two peaks from the same sample
 end up in the same cluster, a warning message is given: in such a case
 only the most intense response will be included in the data
 matrix. 
-<<>>=
+
+<<peakTable>>=
 pkTab <- getPeakTable(pks.corrected, response = "height")
 head(pkTab)
 @
+
+\noindent
 Note that the function also gives graphical output when the argument
 \code{plotIt = TRUE} is provided; this may help in identifying
 problems in the alignment. Again, examples of the use of this feature
@@ -546,22 +574,21 @@ data, fitted values, or residuals, is provided by function
 profiles and spectra of the fitted ALS components may be
 visualized. As an example, consider the residual plots of the first
 two TEA samples, shown in Figure~\ref{fig:resids}. 
+
 \begin{figure}[tb]
-\setkeys{Gin}{width=\linewidth}
-\begin{center}
-  
-<<fig=true,height=3.5,width=8>>=
+\centering  
+<<ALSresult,fig.height=3.5,fig.width=8>>=
 maxResid <- max(abs(range(tea.als$resid)))
 showALSresult(tea.als, tea.als$resid, tp = tpoints, wl = new.lambdas,
               logsc = FALSE, img.col = cm.colors(9), 
               mat.idx = 1:2, zlim =c(-maxResid, maxResid))
 @ 
-\end{center}
 \caption{Residual plots for the four-component ALS model on the first
   two matrices of the \code{tea} data. The code to generate the plot
   is shown at the top.}
 \label{fig:resids}
 \end{figure}
+
 Elution profiles
 are shown above the images of the residuals, and spectral components
 to the right. As can be seen, the biggest residuals are found exactly
@@ -582,34 +609,37 @@ Function \code{splitTimeWindow} allows the user to chop up the time
 axis in several smaller chunks. Some overlap between time windows may
 be advisable, to make it more easy to stitch the results for
 individual windows back together:
-<<>>=
+
+<<split>>=
 tea.split <- splitTimeWindow(tea, c(12, 14), overlap = 10)
 @
+
+\noindent
 Next, we can apply \code{ALS} to each of the time windows, and merge
-the results back together.
-<<echo=FALSE,results=hide>>=
+the results back together:
+
+<<alsList>>=
 tea.alslist <- lapply(tea.split,
                        function(Xl) {
                          Xl.opa <- opa(Xl, 4)
                          doALS(Xl, Xl.opa)
                        })
 tea.merged <- mergeTimeWindows(tea.alslist)
-dim(tea.merged$CList[[1]])
 @ 
-Apparently one of the components extends over more than one
-window. Note that there is no real reason to use the same number of
-components in the different time windows; indeed, very often the
-individual time windows are not of the same complexity.
 
-The concentration profiles of each file can be shown using function
-\code{plot.ALS}, as discussed before; the difference is that in addition
-the window borders and overlap areas are shown with gray vertical
+\noindent
+Note that there is no real reason to use
+the same number of components in the different time windows; indeed,
+very often the individual time windows are not of the same
+complexity. The concentration profiles of each file can be shown using
+function \code{plot.ALS}, as discussed before; the window borders and
+overlap areas for merged ALS models are indicated with gray vertical
 lines. The result for the \code{tea.merged} data is shown in
 Figure~\ref{fig:mergeW}.
+
 \begin{figure}[tb]
-\setkeys{Gin}{width=.8\linewidth}
-\begin{center}
-<<fig=true,echo=false,width=10,height=6>>=
+\centering
+<<alsProfile,echo=FALSE,fig.width=10,fig.height=8.5>>=
 myPalette <- colorRampPalette(c("black", "red", "blue", "green"))
 mycols <- myPalette(ncol(tea.merged$S))
 par(mfrow = c(2,2))
@@ -617,26 +647,25 @@ plot(tea.merged, what = "profiles", mat.idx = 1:4, col = mycols)
 legend("topleft", lty = 1, col = mycols, bty = "n", cex = .7,
        legend = paste("C", 1:ncol(tea.merged$S)))
 @ 
-\end{center}
 \caption{Concentration profiles (\code{tea} data), obtained after
   merging the ALS results of the individual time windows. Window
   border and overlap areas are shown with gray vertical lines.}
 \label{fig:mergeW}
 \end{figure}
-We should have a closer look at this: the two components corresponding
-to the main peak just before 14 minutes seem to be \emph{very} highly
-correlated, also in the second peak around 14.6 minutes (at least for
-the second and fourth files).
+
+%% We should have a closer look at this: the two components corresponding
+%% to the main peak just before 14 minutes seem to be \emph{very} highly
+%% correlated, also in the second peak around 14.6 minutes (at least for
+%% the second and fourth files).
 
 For small data files, like the ones used in these examples, the
 difference in speed is not all that big:
-<<results=hide>>=
+
+<<timings>>=
 full.time <- system.time({
   tea.opa <- opa(tea, 4)
   tea.als <- doALS(tea, tea.opa)
 })
-@ 
-<<results=hide>>=
 windows.time <- system.time({
   tea.split <- splitTimeWindow(tea, c(12, 14), overlap = 10)
   tea.alslist <- lapply(tea.split,
@@ -646,24 +675,26 @@ windows.time <- system.time({
                         })
   tea.merged <- mergeTimeWindows(tea.alslist)
 })
-@ 
-<<>>=
 full.time
 windows.time
 @ 
-The difference here is in the order of 15\%; for bigger systems,
-however, time gains will be much more substantial. Note that on POSIX
+
+\noindent
+For bigger systems,
+however, time gains will be substantial. Note that on POSIX
 systems like MacOS and Linux easy parallellization can be obtained
 using the \code{mclapply} function instead of the normal \code{lapply}
 in the previous code fragment.
 
 \section{Reference data sets}
-Currently, upload of the raw data files using the data from
-\citet{Wehrens2013} and \citet{Wehrens2014} to the metabolights
-repository ({\tt http://www.ebi.ac.uk/metabolights}) is in
-progress. Once the necessary database structures have been defined it
-will be possible to obtain the ascii data files and scripts that
-perform the analysis in the two papers mentioned, using \pkg{alsace}. 
+The raw data files from
+\citet{Wehrens2013} and \citet{Wehrens2015} are available from the
+metabolights repository, \url{http://www.ebi.ac.uk/metabolights}. The
+identifiers are MTBLS85 and MTBLS86, respectively -- these can be used
+in the search box at the top right of the page. Both data sets also
+contain scripts to reproduce the analysis in the papers cited
+above. For MTBLS85, a superset of the data used in this vignette, this
+script is called {\tt doTEA.R}; for MTBLS86 {\tt doSolSel.R}.
 
 \clearpage
 
