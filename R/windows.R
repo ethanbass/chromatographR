@@ -100,7 +100,8 @@ mergeTimeWindows <- function(obj, simSThreshold = .9, simCThreshold = .9,
     PsiList <- merge.mats(PsiListList, overlap)
     names(PsiList) <- names(obj[[1]]$CList)
     
-    newObj <- doALS(PsiList, PureS = S, maxiter = 1)
+    newObj <- doALS(PsiList, PureS = S, maxiter = 1, optS1st = FALSE,
+                    normS = .5)
     attr(newObj, "overlap") <- overlap
     attr(newObj, "splitpoints") <-
         as.numeric(sapply(obj[-1],
