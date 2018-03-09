@@ -1,2 +1,8 @@
-Version 1.3.1
+1.15.1
+  * added explicit replication of scalars to obtain a vector of the
+    right length. Several places, usually for normalization
+    purposes. Since R 3.4 this would lead to a warning, an error in the
+    future. 
+
+1.3.1
   * corrected bug in preprocess concerning data matrices without dimnames
