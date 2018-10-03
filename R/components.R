@@ -44,7 +44,8 @@ combineComps <- function(obj, compList, ...) {
                  function(x)
                  rowMeans(scaledS[, x, drop = FALSE]))
   ## scale to unit length
-  newS <- apply(newS, 2, function(xx) xx/sqrt(crossprod(xx)))
+  ## old version, no longer supported:
+  newS <- apply(newS, 2, function(xx) xx/rep(sqrt(crossprod(xx)), length(xx)))
   dimnames(newS) <- list(lambdas, paste("Component", 1:ncol(newS)))
 
   doALS(PsiList, newS, ...)
