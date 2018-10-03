@@ -24,8 +24,10 @@ removeComps <- function(obj, toRemove, ...) {
 ## Suppose that in a set of 8 components the _real_
 ## component number 7 is a combination of comps 2 and 7. compList is
 ## then given like this: compList <- list(1, 2, 3, 4, 5, 6, c(2, 7),
-## 8). Weights are given by the max intensities in the CList elements.
-combineComps <- function(obj, compList, ...) {
+## 8). Weights are given by the max intensities in the CList elements,
+## or explicitly provided by the user.
+
+combineComps <- function(obj, compList, weights, ...) {
   lambdas <- getWavelength(obj)
   ## regenerate the data, should be quick
   PsiList <- lapply(1:length(obj$CList),
@@ -36,15 +38,27 @@ combineComps <- function(obj, compList, ...) {
   CLlength <- sapply(compList, length)
   if (max(CLlength) == 1)
       stop("Nothing to do: no combination of components given")
+
+  if (missing(weights)) {
+    maxCvalues <- apply(sapply(obj$CList[mat.idx],
+                               function(x) apply(x, 2, max)),
+                        1, max)
+    scaledS <- sweep(obj$S, 2, maxCvalues, FUN = "*")
+    newS <- sapply(compList,
+                   function(x)
+                     rowMeans(scaledS[, x, drop = FALSE]))
+  } else {
+    combineS <- function(origS, idx, wght) {
+      rowSums(sweep(origS[,idx, drop = FALSE], 2, wght, FUN = "*"))
+    }
+    ## weights should be as long as compList, individual elements
+    ## should have the same length, too
+    newS <- sapply(seq(along = compList),
+                   function(ii)
+                     combineS(obj$S, compList[[ii]], weights[[ii]]))
+  }
   
-  maxCvalues <- apply(sapply(obj$CList, function(x) apply(x, 2, max)),
-                      1, max)
-  scaledS <- sweep(obj$S, 2, maxCvalues, FUN = "*")
-  newS <- sapply(compList,
-                 function(x)
-                 rowMeans(scaledS[, x, drop = FALSE]))
   ## scale to unit length
-  ## old version, no longer supported:
   newS <- apply(newS, 2, function(xx) xx/rep(sqrt(crossprod(xx)), length(xx)))
   dimnames(newS) <- list(lambdas, paste("Component", 1:ncol(newS)))
 
