@@ -40,7 +40,7 @@ combineComps <- function(obj, compList, weights, ...) {
       stop("Nothing to do: no combination of components given")
 
   if (missing(weights)) {
-    maxCvalues <- apply(sapply(obj$CList[mat.idx],
+    maxCvalues <- apply(sapply(obj$CList,
                                function(x) apply(x, 2, max)),
                         1, max)
     scaledS <- sweep(obj$S, 2, maxCvalues, FUN = "*")

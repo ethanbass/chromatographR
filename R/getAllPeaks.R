@@ -2,7 +2,7 @@
 ## ALS object. For each sample, a list of matrices is returned,
 ## corresponding to the peaks found in each of the components.
 
-getAllPeaks <- function(CList, span = NULL) {
+getAllPeaks <- function(CList, span = NULL, eps = 1e-5) {
   peakPositions <- lapply(CList,
                           function(Cmat)
                           apply(Cmat, 2, findpeaks, span = span))
@@ -36,15 +36,24 @@ getAllPeaks <- function(CList, span = NULL) {
   ## mean must be replaced by the corresponding timepoints, and
   ## columns sd and FWHM must be multiplied by the difference between
   ## consecutive time points
-  lapply(result,
-         function(smpl)
-         lapply(smpl,
-                function(cmpnd) {
-                  x <- cmpnd
-                  x[,1] <- timepoints[x[,1]]
-                  x[,2:3] <- x[,2:3] * tdiff
+  output <- lapply(result,
+                   function(smpl)
+                     lapply(smpl,
+                            function(cmpnd) {
+                              x <- cmpnd
+                              x[,1] <- timepoints[x[,1]]
+                              x[,2:3] <- x[,2:3] * tdiff
+                              
+                              x
+                            }))
 
-                  x
-                }))
+  ## only return those lines that have a width larger
+  ## than zero. Sometimes we see zeros at sd, in those cases also area
+  ## is zero. Perhaps we should check for empty matrices... let's see.
+  lapply(output,
+         function(sample)
+           lapply(sample,
+                  function(peakmat)
+                    peakmat[peakmat[,"sd"] > eps,]))
                 
 }
