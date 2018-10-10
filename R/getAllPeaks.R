@@ -54,6 +54,6 @@ getAllPeaks <- function(CList, span = NULL, eps = 1e-5) {
          function(sample)
            lapply(sample,
                   function(peakmat)
-                    peakmat[peakmat[,"sd"] > eps,]))
+                    peakmat[peakmat[,"sd"] > eps,, drop = FALSE]))
                 
 }
