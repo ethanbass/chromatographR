@@ -1,6 +1,7 @@
 Version 1.17.1
   * replaced deprecated recycling of array of length 1 with vector of
     the correct length
+  * getAllPeaks now no longer returns peaks with zero width
 
 Version 1.17.0
   * sync of version numbers with Bioconductor
