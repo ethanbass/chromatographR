@@ -1,0 +1,15 @@
+# Native R Travis Github
+language: r
+sudo: required
+cache: packages
+
+# Build and check
+install:
+  - Rscript -e 'install.packages("devtools");devtools::install_deps("alsace")'
+script:
+  - Rscript -e 'devtools::check("alsace")'
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
