@@ -7,7 +7,7 @@ cache: packages
 install:
   - Rscript -e 'install.packages("devtools");devtools::install_deps("alsace")'
 script:
-  - Rscript -e 'devtools::check("alsace")'
+  - Rscript -e 'devtools::check(".")'
 
 notifications:
   email:
