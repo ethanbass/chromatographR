@@ -2,7 +2,7 @@
 ## ALS object. For each sample, a list of matrices is returned,
 ## corresponding to the peaks found in each of the components.
 
-getAllPeaks <- function(CList, span = NULL, eps = 1e-5) {
+getAllPeaks <- function(CList, span = NULL, eps = 1e-1) {
   peakPositions <- lapply(CList,
                           function(Cmat)
                           apply(Cmat, 2, findpeaks, span = span))

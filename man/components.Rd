@@ -20,7 +20,7 @@
 \usage{
 smallComps(obj, Ithresh)
 removeComps(obj, toRemove, ...)
-combineComps(obj, compList, ...)
+combineComps(obj, compList, weights, ...)
 suggestCompCombis(obj, indices, Ithresh = 0, corthresh = 0.9,
                   clusterHeight = 0.6)
 }
@@ -37,6 +37,8 @@ suggestCompCombis(obj, indices, Ithresh = 0, corthresh = 0.9,
     combined. Using \code{list(c(1, c(2, 3), 4))} will lead to a
     three-component model, where components 1 and 4 are unchanged and
     components 2 and 3 are combined.}
+  \item{weights}{Weights for the components to be combined. If not
+    provided, equal weights will be assumed.}
   \item{indices}{A list indicating in which (groups of) samples
     correlations will be calculated. See details.}
   \item{corthresh}{Correlation threshold: components with elution
