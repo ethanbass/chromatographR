@@ -2,7 +2,6 @@ Package: alsace
 Type: Package
 Title: ALS for the Automatic Chemical Exploration of mixtures
 Version: 1.19.0
-=======
 Author: Ron Wehrens
 Maintainer: Ron Wehrens <ron.wehrens@gmail.com>
 Description: Alternating Least Squares (or Multivariate Curve
