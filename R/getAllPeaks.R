@@ -2,12 +2,15 @@
 ## ALS object. For each sample, a list of matrices is returned,
 ## corresponding to the peaks found in each of the components.
 
-getAllPeaks <- function(CList, span = NULL, eps = 1e-1) {
+getAllPeaks <- function(CList, columns=NULL, span = NULL, eps = 1e-1) {
+  if (!is.null(columns)){
+    CList <- lapply(CList, function(Cmat) Cmat[,columns,drop=F])
+    }
   peakPositions <- lapply(CList,
-                          function(Cmat)
-                            lapply(1:ncol(Cmat),
-                                   function(ii)
-                                     findpeaks(Cmat[,ii], span = span)))
+                           function(Cmat)
+                             sapply(colnames(Cmat),
+                                    function(ii)
+                                      findpeaks(Cmat[,ii], span = span), simplify=F, USE.NAMES=T))
   
   result <-
     lapply(1:length(CList),
@@ -57,5 +60,4 @@ getAllPeaks <- function(CList, span = NULL, eps = 1e-1) {
            lapply(sample,
                   function(peakmat)
                     peakmat[peakmat[,"sd"] > eps,, drop = FALSE]))
-                
 }
