@@ -19,8 +19,7 @@ getAllPeaks <- function(CList, columns=NULL, span = NULL, eps = 1e-1) {
                               function(cmpnd)
                                 fitpeaks(CList[[smpl]][,cmpnd],
                                          peakPositions[[smpl]][[cmpnd]]))
-             names(ptable) <- paste("Component",
-                                    1:length(peakPositions[[smpl]]))
+             names(ptable) <- names(peakPositions[[smpl]])
              ptable
            })
   names(result) <- names(peakPositions)
