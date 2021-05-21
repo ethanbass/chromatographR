@@ -1,27 +1,17 @@
-## Function to plot spectra of peaks in peak table. Returns chromatogram
-## with "highlighting" of selected peak and/or spectrum.
+## Plot spectrum at a particular time point.
 
-elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
-
-plot_spectrum <- function(peak, peak_table, chrom_list, chr = 'max', lambda = 'max',
-                          ts = new.ts, lambdas = new.lambdas, plot_spectrum = T, 
-                          plot_chrom = T,export_spectrum=FALSE,
-                          spectrum_labels=T, verbose=T, scale_spectrum=F, ...){
-  RT <- round(peak_table['RT',peak],2)
-  peak_table<-peak_table[4:(nrow(peak_table)-3),]
+plot_spectrum_scan <- function(rt, chrom_list, chr = 'max', lambda = 'max',
+                               ts = new.ts, lambdas = new.lambdas, plot_spectrum = T, 
+                               plot_chrom = T,export_spectrum=FALSE,
+                               spectrum_labels=T, ...){
+  RT <- round(as.numeric(rt),2)
   t <- which(elementwise.all.equal(RT,new.ts))
   if (chr == 'max'){
-    chr <- which.max(peak_table[,peak])
+    chr <- which.max(sapply(chrom_list,function(x) max(x[RT,])))
   }
   y=chrom_list[[chr]][t,]
   if (lambda == 'max'){
     lambda = names(which.max(y))
-  } else lambda <- as.character(lambda)
-  if (verbose==T){
-    print(paste0("chrome no. ", chr, "; RT: ", RT, "; lambda = ", lambda, " nm"))}
-  #if (plot_spectrum==T && plot_chrom==T){par(mfrow=c(2,1))} else par(mfrow=c(1,1))
-  if (scale_spectrum == T){
-    y<-scale(y)
   }
   if (plot_spectrum == T){
     matplot(x=lambdas, y=y, type='l',
