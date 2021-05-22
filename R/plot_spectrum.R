@@ -3,6 +3,7 @@
 
 ## Elementwise all equal function from Brian Diggs
 ## (https://stackoverflow.com/questions/9508518/why-are-these-numbers-not-equal)
+
 elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
 
 plot_spectrum <- function(peak, peak_table, chrom_list, chr = 'max', lambda = 'max',
