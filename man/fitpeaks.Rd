@@ -4,19 +4,22 @@
 \title{Fit chromatographic peaks with a gaussian profile}
 \description{
   Find chromatographic peaks, and fit peak parameters using a gaussian
-  profile. The algorithm is extremely simple and could be replaced by a
-  more sophisticated algorithm. In particular one can expect bad fits if
-  peaks are overlapping significantly.}
+  peak fitting. Peaks are located as }
 \usage{
-findpeaks(y, span = NULL)
+findpeaks(y, sd.max = NULL)
 fitpeaks(y, pos)
 }
 \arguments{
   \item{y}{response (numerical vector)}
-  \item{span}{number of points used in the definition of what
-    constitutes a "local" maximum. If not given, a default value of 20
-    percent of the number of time points is used.}
+  \item{smooth_type}{Type of smoothing. (Only gaussian is currently supported).}
+  \item{smooth_window}{Window for smoothing.}
+  \item{smooth_width}{Width for smoothing.}
+  \item{slope_thresh}{Minimum threshold for peak slope.}
+  \item{amp_thresh}{Minimum treshold for peak amplitude.}
   \item{pos}{locations of local maxima in vector y}
+  \item{w}{Width to use for peak search.}
+  \item{sd.max}{Maximum standard deviation of peak.}
+  \item{fit}{Function for peak fitting. (Currently only "gaussian" is supported).}
 }
 \details{
   Finding peaks with function \code{findpeaks} is based on the position
@@ -43,35 +46,13 @@ fitpeaks(y, pos)
   indices, so not in terms of the real retention times. The
   transformation to "real" time is done in function \code{getAllPeaks}.
 }
-\note{Function \code{findpeaks} was modelled after code suggested by
-  Brian Ripley on the R help list.}
-\author{Ron Wehrens}
+\note{Function \code{findpeaks} is adapted from matlab code created by
+  Prof. Tom O'Haver on his website: \link{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}.}
+\note{Function \code{fitpeaks} is adapted from code authored by Ron Wehrens and published in the alsace package as well as code authored by Dr. Robert Morrison and published in the DuffyTools R package: \link{https://github.com/robertdouglasmorrison/DuffyTools}.}
+\author{Ethan Bass}
 \seealso{\code{\link{getAllPeaks}}}
 \examples{
-data(tea)
-new.lambdas <- seq(260, 500, by = 2)
-tea <- lapply(tea.raw, preprocess, dim2 = new.lambdas)
-tea.split <- splitTimeWindow(tea, c(12, 14), overlap = 10)
 
-Xl <- tea.split[[2]]
-Xl.opa <- opa(Xl, 4)
-
-Xl.als <- doALS(Xl, Xl.opa)
-
-tpoints <- getTime(Xl.als)
-plot(tpoints, Xl.als$CList[[2]][,2], type = "l", col = "gray")
-pk.pos <- findpeaks(Xl.als$CList[[2]][,2], span = 11)
-abline(v = tpoints[pk.pos], col = 4)
-
-pks <- fitpeaks(Xl.als$CList[[2]][,2], pk.pos)
-apply(pks, 1,
-      function(pkmodel) {
-        lines(tpoints,
-              dnorm(1:length(tpoints), pkmodel["rt"], pkmodel["sd"]) *
-              pkmodel["area"],
-              col = 2)
-        invisible()
       })
-## reasonably close fit, apart from the small peak in the middle...
-}
+  }
 \keyword{manip}
