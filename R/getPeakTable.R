@@ -1,7 +1,8 @@
-getPeakTable <- function (peakList, response = c("area", "height"),
+getPeakTable <- function(peakList, response = c("area", "height"),
                           use.cor = TRUE, maxdiff = 0.2, plotIt = FALSE,
-                          ask = plotIt) 
-{
+                          ask = plotIt, clust=c("rt","sp.rt"),
+                          sigma.r=1, sigma.t=1, hmax=NULL,
+                          deepSplit=FALSE){
   response <- match.arg(response)
   rt <- ifelse(use.cor, "rt.cor", "rt")
   ncomp <- length(peakList[[1]]) ## all elements should have the same length
@@ -27,8 +28,33 @@ getPeakTable <- function (peakList, response = c("area", "height"),
     names(pkcenters) <- NULL
     if (length(pkcenters) < 2) 
       return(NULL)
+    if (clust == 'rt'){
     pkcenters.hcl <- hclust(dist(pkcenters), method = "complete")
     pkcenters.cl <- cutree(pkcenters.hcl, h = maxdiff)
+    }
+    if (clust == 'sp.rt'){
+      sp <- sapply(1:length(pkcenters), function(i){
+        scales::rescale(t(dat.pr[[file.idx[i]]][pkcenters[i],]))
+      }, simplify=T)
+      c <- cor(sp,sp,method = "pearson")
+      mint <- abs(outer(unlist(pkcenters),unlist(pkcenters), FUN="-"))
+      S<-exp((-(1-abs(c))^2)/(2*sigma.r^2))*exp(-(mint^2)/2*sigma.t^2)
+      D<-1-S
+      library(fastcluster)
+      library(dynamicTreeCut)
+      linkage = "average"
+      
+      pkcenters.cl <- cutree(pkcenters.hcl, h = maxdiff)
+      
+      pkcenters.hcl <- fastcluster::hclust(as.dist(D), 
+                                   method = linkage)
+      if (is.null(hmax)) {
+        hmax <- 0.3
+      }
+      pkcenters.cl <- dynamicTreeCut::cutreeDynamicTree(pkcenters.hcl, maxTreeHeight = hmax, deepSplit = deepSplit, minModuleSize = 2)
+      sing <- which(pkcenters.cl == 0)
+      pkcenters.cl[sing] <- max(pkcenters.cl) + 1:length(sing)
+    }
     cl.centers <- aggregate(pkcenters, list(pkcenters.cl), 
                             "mean")[, 2]
     ncl <- length(cl.centers)
