@@ -48,7 +48,7 @@ fitpeaks(y, pos)
 }
 \note{Function \code{findpeaks} is adapted from matlab code created by
   Prof. Tom O'Haver on his website: \link{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}.}
-\note{Function \code{fitpeaks} is adapted from code authored by Ron Wehrens and published in the \code{/link[alsace]} package, as well as code authored by Dr. Robert Morrison and published in the \code{\link[DuffyTools]} package.}
+\note{Function \code{fitpeaks} is adapted from code authored by Ron Wehrens and published in the \code{\link[alsace]} package, as well as code authored by Dr. Robert Morrison and published in the \code{\link[DuffyTools]} package.}
 \author{Ethan Bass}
 \seealso{\code{\link{getAllPeaks}}}
 \keyword{manip}
