@@ -1,8 +1,8 @@
 ## check peak for false 0s, etc.
 
 compare_spectra <- function(peak, peak_table, chrom_list, ts=new.ts, new.lambdas=new.lambdas,
-                             thresh_auto=0.95, thresh_man=0.75, r=100, plot_it=F,
-                             comp='256', zeros=F, ref='max', order_by = "distance", verbose=T, ...){
+                             thresh_auto=0.95, thresh_man=0.75, w=100, plot_it=F,
+                             lambda='256', zeros=F, ref='max', order_by = "distance", verbose=T, ...){
   par(mfrow=c(2,1))
   if (length(ref)==1){
     ref = plot_spectrum(peak,peak_table,chrom_list,export_spectrum=T,chr=ref)[,2]
@@ -28,36 +28,36 @@ compare_spectra <- function(peak, peak_table, chrom_list, ts=new.ts, new.lambdas
       count=count+1
       # if (length(chrs)%%count){
       #print(count/length(chrs))
-      svMisc::progress(chr, max.value=tail(chrs,1))
+      #svMisc::progress(chr, max.value=tail(chrs,1))
       # }
       ans='n'
       spec <- t(chrom_list[[chr]][c((time-r):(time+r)),])
       spec.s <- scales::rescale(spec)
       cor <- as.numeric(cor(ref.s,spec.s,method='pearson'))
       #cor <- cor(ref.s,spec.s,method='pearson')
-      pks <- alsace::findpeaks(spec[comp,],span=10)-1
+      pks <- findpeaks(spec[lambda,],span=10)-1
       pks <- pks[cor[pks]>thresh_man]
-      #pks <- do.call(pmax,data.frame(t(cor[,pks])))
+      # pks <- do.call(pmax,data.frame(t(cor[,pks])))
       # do.call(which.max,data.frame(t(cor[,pks])))
-      #apply(data.frame(t(cor[,pks])),1,which.max)
+      # apply(data.frame(t(cor[,pks])),1,which.max)
       if (length(pks) > 1){
         if (order_by=='height'){
-          pks <- pks[order(spec[comp,pks],decreasing=T)]}
+          pks <- pks[order(spec[lambda,pks],decreasing=T)]}
         else if (order_by=='distance'){
           pks <- pks[order(abs(c(-r:r)[pks]))]
         }
       }
       for (pk in pks){
-        #matplot(c(-r:r),scales::rescale(comp['254',]),type='l')
-        #matplot(c(-r:r),c(0,scales::rescale(abs(diff(cor)))),type='l',add=T,lty=2)
+        # matplot(c(-r:r),scales::rescale(comp['254',]),type='l')
+        # matplot(c(-r:r),c(0,scales::rescale(abs(diff(cor)))),type='l',add=T,lty=2)
         if (plot_it==T){
-          matplot(c(-r:r),scales::rescale(spec[comp,]),type='l')
-          #matplot(c(-r:r),c(0,(1-scales::rescale(abs(diff(cor))))),type='l',add=T,lty=2)
+          matplot(c(-r:r),scales::rescale(spec[lambda,]),type='l')
+          # matplot(c(-r:r),c(0,(1-scales::rescale(abs(diff(cor))))),type='l',add=T,lty=2)
           matplot(c(-r:r),cor,type='l',add=T,lty=2)
           abline(v=c(-r:r)[pks])
         }
         if (cor[pk] > thresh_auto){
-          peak_table[(chr+3),peak] <- spec[comp,pk]
+          peak_table[(chr+3),peak] <- spec[lambda,pk]
           break
         }
         # else if (cor[pk]<0.5){
@@ -65,11 +65,11 @@ compare_spectra <- function(peak, peak_table, chrom_list, ts=new.ts, new.lambdas
         #   }
         else{
           par(mfrow=c(2,1))
-          matplot(c(-r:r),scales::rescale(spec[comp,]),type='l',xlab='',ylab='')
-          #matplot(c(-r:r),c(0,(1-scales::rescale(abs(diff(cor))))),type='l',add=T,lty=2)
+          matplot(c(-r:r),scales::rescale(spec[lambda,]),type='l',xlab='',ylab='')
+          # matplot(c(-r:r),c(0,(1-scales::rescale(abs(diff(cor))))),type='l',add=T,lty=2)
           matplot(c(-r:r),cor,type='l',add=T,lty=2,col='slategray')
           abline(v=c(-r:r)[pk],lty=3,col='blue')
-          #abline(v=pk)
+          # abline(v=pk)
           mylabel <- substitute(corr == MYVALUE, 
                                 list(MYVALUE = format(cor[pk],dig=2)))
           legend('topleft', legend = mylabel,bty='n',cex=0.6)
@@ -82,9 +82,9 @@ compare_spectra <- function(peak, peak_table, chrom_list, ts=new.ts, new.lambdas
                  col = c(1,4), text.col = c(1,4),cex=0.4,bty='n')
           ans2 <- readline(promp = "accept this peak as a match (y/n)?")
           if (ans2=='y'){
-            peak_table[(chr+3),peak] <- spec[comp,pk]
+            peak_table[(chr+3),peak] <- spec[lambda,pk]
             break
-          } #else if (ans2=='n'){
+          } # else if (ans2=='n'){
         }
       }
     }
