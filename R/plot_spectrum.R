@@ -1,7 +1,7 @@
 ## Function to plot spectra of peaks in peak table. Returns chromatogram
 ## with "highlighting" of selected peak and/or spectrum.
 
-## Function from Brian Diggs
+## Elementwise all equal function from Brian Diggs
 ## (https://stackoverflow.com/questions/9508518/why-are-these-numbers-not-equal)
 elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
 
