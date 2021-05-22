@@ -4,7 +4,7 @@
 \title{Fit chromatographic peaks with a gaussian profile}
 \description{
   Find chromatographic peaks, and fit peak parameters using a gaussian
-  peak fitting. Peaks are located as }
+  peak fitting.}
 \usage{
 findpeaks(y, sd.max = NULL)
 fitpeaks(y, pos)
@@ -22,8 +22,8 @@ fitpeaks(y, pos)
   \item{fit}{Function for peak fitting. (Currently only "gaussian" is supported.)}
 }
 \details{
-  Finding peaks with function \code{findpeaks} is based on the position
-  of local maxima within a window of width \code{span}.
+  Find peaks with function \code{findpeaks} by looking for "zero-crossings" in
+  the smoothed first derivative of a signal that exceed a given slope threshold.
 
   Peak parameters are calculated using \code{fitpeaks}, assuming a
   normal distribution. Peak width is given as a standard deviation,
@@ -31,8 +31,8 @@ fitpeaks(y, pos)
   is given by the ratio of the peak height and the density.
 }
 \value{
-  Function \code{findpeaks} simply returns the locations of the local
-  maxima, expressed as indices.
+  Function \code{findpeaks} simply returns the locations of the peak centers,
+  expressed as indices.
   
   Function \code{fitpeaks} returns a matrix, whose columns contain the
   following information:
@@ -46,9 +46,10 @@ fitpeaks(y, pos)
   indices, so not in terms of the real retention times. The
   transformation to "real" time is done in function \code{getAllPeaks}.
 }
+@md
 \note{Function \code{findpeaks} is adapted from matlab code created by
-  Prof. Tom O'Haver on his website: \link{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}.}
-\note{Function \code{fitpeaks} is adapted from code authored by Ron Wehrens and published in the \code{\link[alsace]} package, as well as code authored by Dr. Robert Morrison and published in the \code{\link[DuffyTools]} package.}
+  Prof. Tom O'Haver on his \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{website}.}
+\note{Function \code{fitpeaks} is adapted from code authored by Ron Wehrens and published in the \code{\link{alsace}} package, as well as code authored by Dr. Robert Morrison and published in the \code{\href{https://github.com/robertdouglasmorrison/DuffyTools}{DuffyTools}} package.}
 \author{Ethan Bass}
 \seealso{\code{\link{getAllPeaks}}}
 \keyword{manip}
