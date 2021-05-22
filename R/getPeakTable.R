@@ -1,8 +1,8 @@
 getPeakTable <- function(peakList, response = c("area", "height"),
                           use.cor = TRUE, maxdiff = 0.2, plotIt = FALSE,
-                          ask = plotIt, clust=c("rt","sp.rt"),
-                          sigma.r=1, sigma.t=1, hmax=NULL,
-                          deepSplit=FALSE){
+                          ask = plotIt, clust = c("rt","sp.rt"),
+                          sigma.t = 2, sigma.r = 0.5, hmax = NULL,
+                          deepSplit = FALSE){
   response <- match.arg(response)
   rt <- ifelse(use.cor, "rt.cor", "rt")
   ncomp <- length(peakList[[1]]) ## all elements should have the same length
