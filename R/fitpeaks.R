@@ -151,13 +151,12 @@ fit.gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height
 ## function to visually check integration accuracy
 ## fit is output of getallpeaks for chrome
 
-plot_peaks <- function(chromes, pks, index=1, lambda='230', r=100, slope=.01, points=F, a=0.5, time=c('rt','raw'),
+plot_peaks <- function(chrome_list, pks, index=1, lambda='230', w=100, slope=.01, points=F, a=0.5, time=c('rt','raw'),
                        fit=c("gaussian","egh")){
-  y<-chromes[[index]][,lambda]
+  y<-chrome_list[[index]][,lambda]
   pks<-data.frame(pks[[index]][[lambda]])
   plot(new.ts,y,type='l',xlab='',ylab='',xaxt='n',yaxt='n')
   if (time=='rt'){
-    #pks$rt <- (pks$rt - new.ts[1])*100
     pks$rt <- (pks$rt - new.ts[1])*100
     pks$sd <- pks$sd*100
   }
@@ -166,8 +165,7 @@ plot_peaks <- function(chromes, pks, index=1, lambda='230', r=100, slope=.01, po
   }
   for (i in 1:nrow(pks)){
     #print(i/nrow(pks))
-    xs<-seq.int((pks$rt[i]-r),(pks$rt[i]+r))
-    #plot(gaussian(xs, center=fit$rt[i], width=fit$sd[i],height = fit$height[i]))
+    xs<-seq.int((pks$rt[i]-w),(pks$rt[i]+w))
     mi <- xs[min(which(abs(diff(gaussian(xs, center=pks$rt[i], width=pks$sd[i],height = pks$height[i])))>h*slope))]
     ma <- xs[max(which(abs(diff(gaussian(xs, center=pks$rt[i], width=pks$sd[i],height = pks$height[i])))>h*slope))]
     if(is.na(mi)|is.na(ma)){
