@@ -19,7 +19,7 @@ fitpeaks(y, pos)
   \item{pos}{locations of local maxima in vector y}
   \item{w}{Width to use for peak search.}
   \item{sd.max}{Maximum standard deviation of peak.}
-  \item{fit}{Function for peak fitting. (Currently only "gaussian" is supported).}
+  \item{fit}{Function for peak fitting. (Currently only "gaussian" is supported.)}
 }
 \details{
   Finding peaks with function \code{findpeaks} is based on the position
@@ -48,11 +48,7 @@ fitpeaks(y, pos)
 }
 \note{Function \code{findpeaks} is adapted from matlab code created by
   Prof. Tom O'Haver on his website: \link{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}.}
-\note{Function \code{fitpeaks} is adapted from code authored by Ron Wehrens and published in the alsace package as well as code authored by Dr. Robert Morrison and published in the DuffyTools R package: \link{https://github.com/robertdouglasmorrison/DuffyTools}.}
+\note{Function \code{fitpeaks} is adapted from code authored by Ron Wehrens and published in the \code{/link[alsace]} package, as well as code authored by Dr. Robert Morrison and published in the \code{\link[DuffyTools]} package.}
 \author{Ethan Bass}
 \seealso{\code{\link{getAllPeaks}}}
-\examples{
-
-      })
-  }
 \keyword{manip}

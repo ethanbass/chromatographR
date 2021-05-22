@@ -21,8 +21,8 @@
   \item{scale_spectrum}{Logical. If TRUE, scales spectrum to unit height.}
 }
 \author{Ethan Bass}
-\seealso{\code{\link{plot_all_spectra}}}
-\seealso{\code{\link{plot_spectrum_scan}}}
 \examples{
 }
 \keyword{manip}
+
+install_github("https://github.com/ethanbass/alsace/tree/dev2")
