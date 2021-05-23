@@ -26,7 +26,7 @@ findpeaks <- function(y, smooth_type='gaussian', smooth_window = 1, smooth_width
   p1 <- which(sign(d[1:(length(d)-1)])>sign(d[2:length(d)])) #detects zero-crossing
   p2 <- which(abs(diff(d)) > slope_thresh) # detects second derivative exceeding slope threshold
   p3 <- which(y > amp_thresh) # detects y vals exceeding amplitude threshold
-  p <- intersect(p1,p2) %>% intersect(p3)
+  p <- intersect(intersect(p1,p2), p3)
   p
 }
 
@@ -183,4 +183,48 @@ plot_peaks <- function(chrome_list, pks, index=1, lambda='230', w=100, slope=.01
       }
     }
   }
+}
+
+fitpeaks_at_max <- function (mat, pos, w=5, sd.max=50, fit=c("gaussian","egh")){
+  #names(y) <- NULL
+  if(fit=="gaussian"){
+    tabnames <- c("rt", "lambda", "sd", "FWHM", "height", "area")
+    noPeaksMat <- matrix(rep(NA, 6), nrow = 1, dimnames = list(NULL, 
+                                                               tabnames))
+    y<-mat[,1]
+    on.edge <- sapply(pos, function(x) y[x + 1] == 0 | y[x - 
+                                                           1] == 0)
+    pos <- pos[!on.edge]
+    if (length(pos) == 0) 
+      return(noPeaksMat)
+    fitpk <- function(xloc){
+      lambda <- which.max(mat[xloc,])
+      y <- mat[,lambda]
+      peak.loc <- seq.int(xloc-w, xloc+w)
+      m <- fit.gaussian(peak.loc, y[peak.loc])
+      #fit <- fit.egh(peak.loc, y[peak.loc])
+      #fit <- egh_optim(peak.loc, y[peak.loc], par=c(1,1,1,1), upper=c(Inf,Inf,Inf,Inf), lower=c(0,0,0,0))
+      c(m$center, colnames(mat)[lambda], m$width, 2.35*m$width, y[xloc], y[xloc]/dnorm(m$center, m$center, 
+                                                                m$width))
+    }
+  }
+  if(fit=="egh"){
+    tabnames <- c("rt", "lambda","sd","tau", "FWHM", "height", "area")
+    noPeaksMat <- matrix(rep(NA, 7), nrow = 1, dimnames = list(NULL, 
+                                                               tabnames))
+    on.edge <- sapply(pos, function(x) y[x + 1] == 0 | y[x - 
+                                                           1] == 0)
+    pos <- pos[!on.edge]
+    if (length(pos) == 0) 
+      return(noPeaksMat)
+    fitpk <- function(xloc){
+      peak.loc<-seq.int(xloc-w, xloc+w)
+      m <- fit.egh(peak.loc, y[peak.loc])
+      c(m$center, m$width, m$tau, 2.35*m$width, y[xloc], y[xloc]/dnorm(m$center, m$center, 
+                                                                       m$width))
+    }
+  }
+  huhn <- data.frame(t(sapply(pos, fitpk)))
+  colnames(huhn) <- tabnames
+  huhn[huhn$sd<sd.max,]
 }

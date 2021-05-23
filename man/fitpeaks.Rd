@@ -47,9 +47,9 @@ fitpeaks(y, pos)
   transformation to "real" time is done in function \code{getAllPeaks}.
 }
 @md
-\note{Function \code{findpeaks} is adapted from matlab code created by
-  Prof. Tom O'Haver on his \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{website}.}
-\note{Function \code{fitpeaks} is adapted from code authored by Ron Wehrens and published in the \code{\link{alsace}} package, as well as code authored by Dr. Robert Morrison and published in the \code{\href{https://github.com/robertdouglasmorrison/DuffyTools}{DuffyTools}} package.}
+\note{Function \code{findpeaks} is adapted from matlab code from
+  Prof. Tom O'Haver's \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{Pragmatic Introduction to Signal Processing}.}
+\note{Function \code{fitpeaks} is adapted from code published in Ron Wehrens' \code{\link{alsace}} package, as well as code from Dr. Robert Morrison's \code{\href{https://github.com/robertdouglasmorrison/DuffyTools}{DuffyTools}} package.}
 \author{Ethan Bass}
 \seealso{\code{\link{getAllPeaks}}}
 \keyword{manip}

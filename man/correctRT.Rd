@@ -45,4 +45,7 @@ for (i in 1:4)
             main = paste("Component", i, "- warped"))
 par(def.par) ## reset defaults
 }
+\references{Eilers, P. H. C. 2004. \href{https://pubs.acs.org/doi/10.1021/ac034800e}{Parametric Time Warping.} \emph{Anal. Chem.} \bold{76}:404–411.
+
+Wehrens, R., T. G. Bloemberg, and P. H. C. Eilers. 2015. \href{https://academic.oup.com/bioinformatics/article/31/18/3063/240579}{Fast parametric time warping of peak lists.} \emph{Bioinformatics} \bold{31}:3063–3065.}
 \keyword{manip}
