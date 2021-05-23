@@ -1,18 +1,18 @@
 \name{getPeakTable}
 \alias{getPeakTable}
-\title{Convert MCR results into an ordered peak table}
+\title{Convert peak list into an ordered peak table}
 \description{
-Function returns a matrix of intensities, where rows correspond to
-(aligned) features and columns to objects (samples, injections,
-...). The function performs a complete linkage clustering of retention
-times across all samples, and cuts at a height given by the user (which
+Function returns a matrix of intensities, where rows correspond to samples
+and columns correspond to aligned features. The function performs a complete linkage
+clustering of retention times across all samples, and cuts at a height given by the user (which
 can be interpreted as the maximal inter-cluster retention time
-difference). If two peaks from the same sample are assigned to the same
-cluster, and error message is given.
+difference) in the simple case based on retention times. If two peaks from the same sample are assigned to the same cluster, a warning message is given.
 }
 \usage{
 getPeakTable(peakList, response = c("area", "height"),
-             use.cor = TRUE, maxdiff = 0.2, plotIt = FALSE, ask = plotIt)
+             use.cor = TRUE, hmax = 0.2, plotIt = FALSE, ask = plotIt,
+             clust = "sp.rt", sigma.t = 2, sigma.r = 0.5,
+                          deepSplit = FALSE, out = "data.frame")
 }
 \arguments{
   \item{peakList}{A nested list of peak tables: the first level is the
@@ -24,23 +24,28 @@ getPeakTable(peakList, response = c("area", "height"),
     used as intensity measure. Default is peak area.}
   \item{use.cor}{Logical, indicating whether to use corrected retention
     times (by default) or raw retention times (not advised!).}
-  \item{maxdiff}{Height at which the complete linkage dendrogram will be
+  \item{hmax}{Height at which the complete linkage dendrogram will be
     cut. Can be interpreted as the maximal inter-cluster retention time
     difference.}
   \item{plotIt}{Logical. If TRUE, for every component a stripplot will
     be shown indicating the clustering.}
   \item{ask}{Logical. Ask before showing new plot?}
+  \item{clust}{Specify whether to perform hierarchical clustering based on spectral similarity
+  and retention time ("sp.rt") or retention time alone ("rt").}
+  \item{sigma.t}{Width of gaussian in retention time distance function. Controls
+  weight of retention time.}
+  \item{sigma.r}{Width of gaussian in spectral similarity function. Controls
+  weight of spectral correlation.}
+  \item{deepSplit}{}
+  \item{out}{Specify "data.frame" or "matrix" as output. Defaults to dataframe.}
 }
 \value{The function returns a data frame where the first couple of
   columns contain meta-information on the features (component, peak,
   retention time) and the other columns contain the intensities of the
   features in the individual injections.}
-\details{If one sees warnings about peaks from the same sample sharing a
-  cluster label, one option is to reduce the \code{maxdiff} variable -
-  this, however, will increase the number of clusters. Another option is
-  to filter the peaks on intensity: perhaps one of the two peaks in the
-  cluster is only a very small feature.}
-\author{Ron Wehrens}
+\details{The clustering based on spectral similarity used a distance function adapted from Broeckling et al., 2014: \deqn{\exp({-\frac{(1-c_{ij})^2}{2\sigma_r^2}})*\exp({-\frac{(1-(t_i - t_j)^2}{2\sigma_t^2}})} If one sees warnings about peaks from the same sample sharing a cluster label, one option is to reduce the \code{maxdiff} variable - this, however, will increase the number of clusters. Another option is to filter the peaks on intensity: perhaps one of the two peaks in the cluster is only a very small feature.}
+\author{Ethan Bass & Ron Wehrens}
+\references{Broeckling, C. D., F. A. Afsar, S. Neumann, A. Ben-Hur, and J. E. Prenni. 2014. RAMClust: A Novel Feature Clustering Method Enables Spectral-Matching-Based Annotation for Metabolomics Data. \emph{Anal. Chem.} \bold{86}:6812–6817.}
 \examples{
 data(teaMerged)
 pks <- getAllPeaks(teaMerged$CList, span = 11)

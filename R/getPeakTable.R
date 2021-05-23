@@ -1,9 +1,21 @@
+# peakList <- pks
+# response = "area"
+# use.cor = F
+# maxdiff = 0.2
+# plotIt = FALSE
+# ask = plotIt
+# rt<-"rt"
+require(fastcluster)
+require(dynamicTreeCut)
+
 getPeakTable <- function(peakList, response = c("area", "height"),
-                          use.cor = TRUE, maxdiff = 0.2, plotIt = FALSE,
-                          ask = plotIt, clust = c("rt","sp.rt"),
-                          sigma.t = 2, sigma.r = 0.5, hmax = NULL,
-                          deepSplit = FALSE){
+                          use.cor = TRUE, hmax = 0.2, plotIt = FALSE,
+                          ask = plotIt, clust = c("sp.rt","rt"),
+                          sigma.t = 2, sigma.r = 0.5,
+                          deepSplit = FALSE, out = c('data.frame', 'matrix')){
   response <- match.arg(response)
+  clust <- match.arg(clust, c('sp.rt','rt'))
+  out <- match.arg(out, c('data.frame', 'matrix'))
   rt <- ifelse(use.cor, "rt.cor", "rt")
   ncomp <- length(peakList[[1]]) ## all elements should have the same length
   if (plotIt) {
@@ -15,7 +27,7 @@ getPeakTable <- function(peakList, response = c("area", "height"),
     on.exit(par(opar))
     myPalette <- colorRampPalette(c("green", "blue", "purple", "red", "orange"))
   }
-  clusterPeaks <- function(comp, pkLst) {
+  clusterPeaks <- function(comp, pkLst){
     pkLst <- lapply(pkLst, function(x) lapply(x, function(y) if (nrow(y) > 0){
       y[!is.na(y[, rt]), , drop = FALSE]
     }
@@ -30,7 +42,7 @@ getPeakTable <- function(peakList, response = c("area", "height"),
       return(NULL)
     if (clust == 'rt'){
     pkcenters.hcl <- hclust(dist(pkcenters), method = "complete")
-    pkcenters.cl <- cutree(pkcenters.hcl, h = maxdiff)
+    pkcenters.cl <- cutree(pkcenters.hcl, h = hmax)
     }
     if (clust == 'sp.rt'){
       sp <- sapply(1:length(pkcenters), function(i){
@@ -40,17 +52,9 @@ getPeakTable <- function(peakList, response = c("area", "height"),
       mint <- abs(outer(unlist(pkcenters),unlist(pkcenters), FUN="-"))
       S<-exp((-(1-abs(c))^2)/(2*sigma.r^2))*exp(-(mint^2)/2*sigma.t^2)
       D<-1-S
-      library(fastcluster)
-      library(dynamicTreeCut)
       linkage = "average"
-      
-      pkcenters.cl <- cutree(pkcenters.hcl, h = maxdiff)
-      
-      pkcenters.hcl <- fastcluster::hclust(as.dist(D), 
-                                   method = linkage)
-      if (is.null(hmax)) {
-        hmax <- 0.3
-      }
+    
+      pkcenters.hcl <- fastcluster::hclust(as.dist(D), method = linkage)
       pkcenters.cl <- dynamicTreeCut::cutreeDynamicTree(pkcenters.hcl, maxTreeHeight = hmax, deepSplit = deepSplit, minModuleSize = 2)
       sing <- which(pkcenters.cl == 0)
       pkcenters.cl[sing] <- max(pkcenters.cl) + 1:length(sing)
@@ -91,5 +95,21 @@ getPeakTable <- function(peakList, response = c("area", "height"),
     cbind(metaInfo, Iinfo)
   }
   result <- lapply(1:ncomp, clusterPeaks, peakList)
-  do.call("rbind", result)
+  result <- t(do.call("rbind", result))
+  if (out == "data.frame"){
+    return(data.frame(result))
+  } else return(result)
 }
+
+# tab <- getPeakTable(pks, response = "area",
+#                           use.cor = F, hmax = 0.2, plotIt = T,
+#                           ask = plotIt, clust="sp.rt",
+#                           sigma.t=2, sigma.r=0.5)
+# 
+# tab <- getPeakTable(pks, response = "area",
+#                     use.cor = F, hmax = 0.2, plotIt = T,
+#                     ask = plotIt, clust="rt",
+#                     sigma.r=1, sigma.t=1)
+
+#?alsace_dev:getPeakTable
+
