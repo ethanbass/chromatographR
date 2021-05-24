@@ -1,5 +1,6 @@
 correctRT <- function(CList, reference='best', what = c("corrected.values", "models"), 
-                      init.coef = c(0, 1, 0), n.traces=NULL, n.zeros, selected.traces, scale=T, ...) 
+                      init.coef = c(0, 1, 0), n.traces=NULL, n.zeros, selected.traces, scale=T,
+                      trwdth=200, ...) 
 {
   what <- match.arg(what)
   CList<-lapply(CList,function(x){
