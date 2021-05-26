@@ -1,7 +1,7 @@
 ## check peak for false 0s, etc.
 
 compare_spectra <- function(peak, peak_table, chrom_list, ts=new.ts, new.lambdas=new.lambdas,
-                             thresh_auto=0.95, thresh_man=0.75, w=100, plot_it=F,
+                             thresh_auto=0.95, thresh_man=0.75, r=100, plot_it=F,
                              lambda='256', zeros=F, ref='max', order_by = "distance", verbose=T, ...){
   par(mfrow=c(2,1))
   if (length(ref)==1){
@@ -35,7 +35,7 @@ compare_spectra <- function(peak, peak_table, chrom_list, ts=new.ts, new.lambdas
       spec.s <- scales::rescale(spec)
       cor <- as.numeric(cor(ref.s,spec.s,method='pearson'))
       #cor <- cor(ref.s,spec.s,method='pearson')
-      pks <- findpeaks(spec[lambda,],span=10)-1
+      pks <- findpeaks(spec[lambda,])-1
       pks <- pks[cor[pks]>thresh_man]
       # pks <- do.call(pmax,data.frame(t(cor[,pks])))
       # do.call(which.max,data.frame(t(cor[,pks])))
