@@ -1,4 +1,4 @@
-Package: alsace_dev
+Package: chromatographR
 Type: Package
 Title: ALS for the Automatic Chemical Exploration of mixtures
 Version: 0.1
