@@ -34,7 +34,8 @@ findpeaks <- function(y, smooth_type='gaussian', smooth_window = 1, smooth_width
 
 fitpeaks <- function (y, pos, w=5, sd.max=50, fit=c("gaussian","egh")){
   #names(y) <- NULL
-  if(fit=="gaussian"){
+  fit <- match.arg(fit,c("gaussian","egh"))
+  if (fit=="gaussian"){
     tabnames <- c("rt", "sd", "FWHM", "height", "area")
     noPeaksMat <- matrix(rep(NA, 5), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
@@ -52,8 +53,7 @@ fitpeaks <- function (y, pos, w=5, sd.max=50, fit=c("gaussian","egh")){
       c(m$center, m$width, 2.35*m$width, y[xloc], y[xloc]/dnorm(m$center, m$center, 
                                                                 m$width))
     }
-  }
-  if(fit=="egh"){
+  } else if(fit == "egh"){
     tabnames <- c("rt", "sd","tau", "FWHM", "height", "area")
     noPeaksMat <- matrix(rep(NA, 6), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
