@@ -1,6 +1,6 @@
 \name{compare_spectra}
 \alias{compare_spectra}
-\title{}
+\title{Function to correct false zeros in peak table.}
 \description{
 Function that tries to correct false zeroes for a particular peak in the peaktable. In each chromatogram, the function compares all peaks within a certain radius around the focal peak on the basis of their spectral similarity to a reference spectrum.}
 \usage{
