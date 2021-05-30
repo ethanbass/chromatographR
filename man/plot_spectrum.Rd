@@ -11,7 +11,7 @@
   \item{peak}{The name of the peak you wish to plot (must be in character format).}
   \item{peak_table}{The peak table (output from \code{\link{getPeakTable}} function).}
   \item{chrom_list}{A list of chromatograms in matrix form (timepoints x wavelengths).
-  \item{chr}{Numerical index of chromatogram you wish to plot, or "max" if you want to automatically plot the chromatogram with the largest signal.}
+  \item{chr}{Numerical index of chromatogram you wish to plot, or 'max' if you want to automatically plot the chromatogram with the largest signal.}
   \item{lambda}{The wavelength you wish to plot the trace at if plot_chrom == T and/or the wavelength to be used for the determination of signal abundance.}
   \item{plot_spectrum}{Logical. If TRUE, plots the spectrum of the chosen peak. Defaults to TRUE.}
   \item{plot_trace}{Logical. If TRUE, plots the trace of the chosen peak at lambda. Defaults to TRUE.}
