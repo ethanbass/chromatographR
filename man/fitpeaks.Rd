@@ -3,10 +3,10 @@
 \alias{fitpeaks}
 \title{Fit chromatographic peaks with a gaussian profile}
 \description{
-  Find chromatographic peaks, and fit peak parameters using a gaussian
+  Find chromatographic peaks, and fit peak parameters using gaussian
   peak fitting.}
 \usage{
-findpeaks(y, sd.max = NULL)
+findpeaks(y, sd.max = 10)
 fitpeaks(y, pos)
 }
 \arguments{
@@ -47,9 +47,9 @@ fitpeaks(y, pos)
   transformation to "real" time is done in function \code{getAllPeaks}.
 }
 @md
-\note{Function \code{findpeaks} is adapted from matlab code from
+\note{The \code{findpeaks} function is adapted from matlab code in
   Prof. Tom O'Haver's \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{Pragmatic Introduction to Signal Processing}.}
-\note{Function \code{fitpeaks} is adapted from code published in Ron Wehrens' \code{\link{alsace}} package, as well as code from Dr. Robert Morrison's \code{\href{https://github.com/robertdouglasmorrison/DuffyTools}{DuffyTools}} package.}
+\note{The \code{fitpeaks} function is adapted from code published in Ron Wehrens' \code{\link{alsace}} package, as well as code from Dr. Robert Morrison's \code{\href{https://github.com/robertdouglasmorrison/DuffyTools}{DuffyTools}} package.}
 \author{Ethan Bass}
 \seealso{\code{\link{getAllPeaks}}}
 \keyword{manip}

@@ -5,7 +5,7 @@
 ## (https://stackoverflow.com/questions/9508518/why-are-these-numbers-not-equal)
 
 elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
-peak_table<-pkTab.rts
+
 plot_spectrum <- function(peak, peak_table, chrom_list, chr = 'max', lambda = 'max',
                           plot_spectrum = T, plot_trace = T, export_spectrum=FALSE,
                           spectrum_labels=T, verbose=T, scale_spectrum=F, ...){

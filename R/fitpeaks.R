@@ -166,8 +166,8 @@ plot_peaks <- function(chrome_list, pks, index=1, lambda='230', w=100, slope=.01
   for (i in 1:nrow(pks)){
     #print(i/nrow(pks))
     xs<-seq.int((pks$rt[i]-w),(pks$rt[i]+w))
-    mi <- xs[min(which(abs(diff(gaussian(xs, center=pks$rt[i], width=pks$sd[i],height = pks$height[i])))>h*slope))]
-    ma <- xs[max(which(abs(diff(gaussian(xs, center=pks$rt[i], width=pks$sd[i],height = pks$height[i])))>h*slope))]
+    mi <- xs[min(which(abs(diff(gaussian(xs, center=pks$rt[i], width=pks$sd[i],height = pks$height[i]))) > h*slope))]
+    ma <- xs[max(which(abs(diff(gaussian(xs, center=pks$rt[i], width=pks$sd[i],height = pks$height[i]))) > h*slope))]
     if(is.na(mi)|is.na(ma)){
       next #skip bad peaks
     } else{
