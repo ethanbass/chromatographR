@@ -46,7 +46,6 @@ fitpeaks(y, pos)
   indices, so not in terms of the real retention times. The
   transformation to "real" time is done in function \code{getAllPeaks}.
 }
-@md
 \note{The \code{findpeaks} function is adapted from matlab code in
   Prof. Tom O'Haver's \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{Pragmatic Introduction to Signal Processing}.}
 \note{The \code{fitpeaks} function is adapted from code published in Ron Wehrens' \code{\link{alsace}} package, as well as code from Dr. Robert Morrison's \code{\href{https://github.com/robertdouglasmorrison/DuffyTools}{DuffyTools}} package.}
