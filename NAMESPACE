@@ -10,7 +10,7 @@ export("splitTimeWindow", "mergeTimeWindows",
        "getTime", "getWavelength",
        "findpeaks", "fitpeaks",
        "filterPeaks", "getAllPeaks", "getPeakTable",
-       "opa", "preprocess", "showALSresult", "import_chromes", 
+       "opa", "preprocess", "showALSresult", "load_chromes", 
 	"plot_spectrum", "plot_all_spectra", "plot_spectrum_scan",
 	"combine_peaks", "compare_spectra", "plot_peaks")
 importFrom("grDevices", "colorRampPalette", "terrain.colors")

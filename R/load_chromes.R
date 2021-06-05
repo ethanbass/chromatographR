@@ -1,6 +1,7 @@
-
-import_chromes <- function(paths){
+load_chromes <- function(paths, dat=NULL){
+  if (is.null(dat)){
   dat<-list()
+  }
   for (path in paths){
     files <- list.files(path=path, pattern = "CSV",full.names = T)
     file_names <- gsub(pattern = ".CSV",x = basename(files), replacement = "")
