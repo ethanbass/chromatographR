@@ -10,11 +10,11 @@ require(dynamicTreeCut)
 
 getPeakTable <- function(peakList, response = c("area", "height"),
                           use.cor = FALSE, hmax = 0.2, plotIt = FALSE,
-                          ask = plotIt, clust = c("sp.rt","rt"),
+                          ask = plotIt, clust = c("rt","sp.rt"),
                           sigma.t = 2, sigma.r = 0.5,
                           deepSplit = FALSE, out = c('data.frame', 'matrix')){
   response <- match.arg(response)
-  clust <- match.arg(clust, c('sp.rt','rt'))
+  clust <- match.arg(clust, c('rt','sp.rt'))
   out <- match.arg(out, c('data.frame', 'matrix'))
   rt <- ifelse(use.cor, "rt.cor", "rt")
   ncomp <- length(peakList[[1]]) ## all elements should have the same length
