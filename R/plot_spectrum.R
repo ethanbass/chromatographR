@@ -33,7 +33,7 @@ plot_spectrum <- function(peak, peak_table, chrom_list, chr = 'max', lambda = 'm
             #ylab = 'Intensity', xlab = 'Wavelength (nm)',
             ylim=c(0,max(y)*1.2), ...)
     if (spectrum_labels == T){
-      pks <- alsace::findpeaks(y)
+      pks <- findpeaks(y)
       pks <- data.frame(names(y)[pks], y[pks],stringsAsFactors = F)
       text(pks[,1],pks[,2],pks[,1],pos=3,offset=.3,cex = .8)
     }

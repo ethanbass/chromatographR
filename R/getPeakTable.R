@@ -9,7 +9,7 @@ require(fastcluster)
 require(dynamicTreeCut)
 
 getPeakTable <- function(peakList, response = c("area", "height"),
-                          use.cor = TRUE, hmax = 0.2, plotIt = FALSE,
+                          use.cor = FALSE, hmax = 0.2, plotIt = FALSE,
                           ask = plotIt, clust = c("sp.rt","rt"),
                           sigma.t = 2, sigma.r = 0.5,
                           deepSplit = FALSE, out = c('data.frame', 'matrix')){

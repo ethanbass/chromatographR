@@ -12,7 +12,7 @@ export("splitTimeWindow", "mergeTimeWindows",
        "filterPeaks", "getAllPeaks", "getPeakTable",
        "opa", "preprocess", "showALSresult", "import_chromes", 
 	"plot_spectrum", "plot_all_spectra", "plot_spectrum_scan",
-	"combine_peaks", "compare_spectra")
+	"combine_peaks", "compare_spectra", "plot_peaks")
 importFrom("grDevices", "colorRampPalette", "terrain.colors")
 importFrom("graphics", "abline", "axTicks", "box", "contour", "image",
            "layout", "matplot", "par", "plot", "rect", "text", "title")

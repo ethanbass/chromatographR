@@ -151,10 +151,10 @@ fit.gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height
 ## function to visually check integration accuracy
 ## fit is output of getallpeaks for chrome
 
-plot_peaks <- function(chrome_list, pks, index=1, lambda='230', w=100, slope=.01, points=F, a=0.5, time=c('rt','raw'),
-                       fit=c("gaussian","egh")){
+plot_peaks <- function(chrome_list, peak_list, index=1, lambda='230', w=100, slope=.01, points=F, a=0.5, time=c('rt','raw'),
+                       fit=c("gaussian","egh"),h=1){
   y<-chrome_list[[index]][,lambda]
-  pks<-data.frame(pks[[index]][[lambda]])
+  pks<-data.frame(peak_list[[index]][[lambda]])
   plot(new.ts,y,type='l',xlab='',ylab='',xaxt='n',yaxt='n')
   if (time=='rt'){
     pks$rt <- (pks$rt - new.ts[1])*100
@@ -166,20 +166,20 @@ plot_peaks <- function(chrome_list, pks, index=1, lambda='230', w=100, slope=.01
   for (i in 1:nrow(pks)){
     #print(i/nrow(pks))
     xs<-seq.int((pks$rt[i]-w),(pks$rt[i]+w))
-    mi <- xs[min(which(abs(diff(gaussian(xs, center=pks$rt[i], width=pks$sd[i],height = pks$height[i]))) > h*slope))]
-    ma <- xs[max(which(abs(diff(gaussian(xs, center=pks$rt[i], width=pks$sd[i],height = pks$height[i]))) > h*slope))]
+    mi <- xs[min(which(abs(diff(chromatographR:::gaussian(xs, center=pks$rt[i], width=pks$sd[i], height = pks$height[i]))) > h*slope))]
+    ma <- xs[max(which(abs(diff(chromatographR:::gaussian(xs, center=pks$rt[i], width=pks$sd[i],height = pks$height[i]))) > h*slope))]
     if(is.na(mi)|is.na(ma)){
       next #skip bad peaks
     } else{
       xs2<-seq.int(mi,ma)
       if(fit=="gaussian"){
-        polygon(new.ts[xs2], gaussian(xs2, center=mean(c(mi,ma)), width=pks$sd[i], height = pks$height[i]),
-                col=alpha('red',a), border=NA)
+        polygon(new.ts[xs2], chromatographR:::gaussian(xs2, center=mean(c(mi,ma)), width=pks$sd[i], height = pks$height[i]),
+                col=scales::alpha('red',a), border=NA)
       }
       if(fit=="egh"){
         
-        polygon(new.ts[xs2], egh(x=xs2, center=mean(c(mi,ma)), width=pks$sd[i], height = pks$height[i], tau=pks$tau[i]),
-                col=alpha('red',a), border=NA)
+        polygon(new.ts[xs2], chromatographR:::egh(x=xs2, center=mean(c(mi,ma)), width=pks$sd[i], height = pks$height[i], tau=pks$tau[i]),
+                col=scales::alpha('red',a), border=NA)
       }
     }
   }
