@@ -32,7 +32,7 @@ findpeaks <- function(y, smooth_type='gaussian', smooth_window = 1, smooth_width
 
 # fit peaks using gaussian distribution (egh setting (exponential gaussian hybrid) doesn't work yet).
 
-fitpeaks <- function (y, pos, w=5, sd.max=50, fit=c("gaussian","egh","emg")){
+fitpeaks <- function (y, pos, w=1, sd.max=50, fit=c("gaussian","egh","emg")){
   #names(y) <- NULL
   fit <- match.arg(fit,c("gaussian","egh","emg"))
   if (fit=="gaussian"){
