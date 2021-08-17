@@ -1,7 +1,6 @@
-correctRT <- function(CList, reference='best', what = c("corrected.values", "models"), 
+correctRT <- function(CList, warpings=NULL, reference='best', what = c("corrected.values", "models"), 
                       init.coef = c(0, 1, 0), n.traces=NULL, n.zeros, selected.traces, scale=T,
-                      trwdth=200, ...) 
-{
+                      trwdth=200, plot_it=T, ...) {
   what <- match.arg(what)
   CList<-lapply(CList,function(x){
     apply(x,2,padzeros,nzeros=n.zeros,side='both')
@@ -34,6 +33,9 @@ correctRT <- function(CList, reference='best', what = c("corrected.values", "mod
   } else {
     ptwmods
   }
+  # if (plot_it==T){
+  #   sapply(ptwmods$
+  # }
 }
 
 

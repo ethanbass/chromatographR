@@ -36,7 +36,7 @@ compare_spectra <- function(peak, peak_table, chrom_list, ts=new.ts, new.lambdas
       cor <- as.numeric(cor(ref.s,spec.s,method='pearson'))
       #cor <- cor(ref.s,spec.s,method='pearson')
       pks <- findpeaks(spec[lambda,])-1
-      pks <- pks[cor[pks]>thresh_man]
+      pks <- pks[cor[pks] > thresh_man]
       # pks <- do.call(pmax,data.frame(t(cor[,pks])))
       # do.call(which.max,data.frame(t(cor[,pks])))
       # apply(data.frame(t(cor[,pks])),1,which.max)

@@ -6,7 +6,7 @@ import(ptw)
 export("splitTimeWindow", "mergeTimeWindows",
        "smallComps", "removeComps", "combineComps",
        "suggestCompCombis",
-       "correctPeaks", "correctRT", "doALS",
+       "correctPeaks", "correctRT", "correctRT5", "doALS",
        "getTime", "getWavelength",
        "findpeaks", "fitpeaks",
        "filterPeaks", "getAllPeaks", "getPeakTable",

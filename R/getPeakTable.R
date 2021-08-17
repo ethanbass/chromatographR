@@ -8,11 +8,12 @@
 require(fastcluster)
 require(dynamicTreeCut)
 
-getPeakTable <- function(peakList, response = c("area", "height"),
+getPeakTable <- function(peakList, chrome_list = NULL, response = c("area", "height"),
                           use.cor = FALSE, hmax = 0.2, plotIt = FALSE,
                           ask = plotIt, clust = c("rt","sp.rt"),
                           sigma.t = 2, sigma.r = 0.5,
                           deepSplit = FALSE, out = c('data.frame', 'matrix')){
+  
   response <- match.arg(response)
   clust <- match.arg(clust, c('rt','sp.rt'))
   out <- match.arg(out, c('data.frame', 'matrix'))
@@ -45,8 +46,11 @@ getPeakTable <- function(peakList, response = c("area", "height"),
     pkcenters.cl <- cutree(pkcenters.hcl, h = hmax)
     }
     if (clust == 'sp.rt'){
+      if (is.null(chrome_list)){
+        return('Error: must provide list of chromatograms for spectral clustering.')
+      }
       sp <- sapply(1:length(pkcenters), function(i){
-        scales::rescale(t(dat.pr[[file.idx[i]]][pkcenters[i],]))
+        scales::rescale(t(chrome_list[[file.idx[i]]][pkcenters[i],]))
       }, simplify=T)
       c <- cor(sp,sp,method = "pearson")
       mint <- abs(outer(unlist(pkcenters),unlist(pkcenters), FUN="-"))

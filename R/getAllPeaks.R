@@ -3,13 +3,18 @@
 ## corresponding to the peaks found in each of the components.
 
 getAllPeaks <- function (CList, wavelengths, ...){
+  if (is.numeric(wavelengths)){
+    wavelenghts <- as.character(wavelengths)
+  }
   peaks<-list()
   CList2 <- lapply(CList, function(Cmat) Cmat[,wavelengths])
   peakPositions <- lapply(CList2, function(Cmat){
     apply(Cmat, 2, function(x) findpeaks(x))})
   Cmat <- CList2[5]
   result <- lapply(1:length(CList2), function(smpl) {
-    ptable <- lapply(1:length(peakPositions[[smpl]]), function(cmpnd) fitpeaks(CList2[[smpl]][,cmpnd], peakPositions[[smpl]][[cmpnd]],...))
+    ptable <- lapply(1:length(peakPositions[[smpl]]), function(cmpnd){
+      fitpeaks2(CList2[[smpl]][,cmpnd], peakPositions[[smpl]][[cmpnd]],...)
+      })
     names(ptable) <- names(peakPositions[[smpl]])
     ptable
   })
