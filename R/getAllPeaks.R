@@ -13,7 +13,7 @@ getAllPeaks <- function (CList, wavelengths, ...){
   Cmat <- CList2[5]
   result <- lapply(1:length(CList2), function(smpl) {
     ptable <- lapply(1:length(peakPositions[[smpl]]), function(cmpnd){
-      fitpeaks2(CList2[[smpl]][,cmpnd], peakPositions[[smpl]][[cmpnd]],...)
+      fitpeaks(CList2[[smpl]][,cmpnd], peakPositions[[smpl]][[cmpnd]],...)
       })
     names(ptable) <- names(peakPositions[[smpl]])
     ptable
