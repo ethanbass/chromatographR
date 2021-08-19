@@ -7,7 +7,7 @@ Function that clusters peaks by spectral similarity.}
 cluster_spectra <- function(pkTab, chrom_list, 
                             deepSplit = FALSE, peak_no=c(5,100),
                             alpha=0.95, nboot=1000, plot_dend=T, plot_spectra=T,
-                            verbose=T, parallel=T)
+                            verbose=T, save=T, parallel=T)
                              }
 \arguments{
   \item{pkTab}{Peak table from \code{\link{getPeakTable}}.}
@@ -19,6 +19,7 @@ cluster_spectra <- function(pkTab, chrom_list,
   \item{plot_dend}{Logical. If TRUE, plots dendrogram with bootstrap values.}
   \item{plot_spectra}{Logical. If TRUE, plots overlapping spectra for each cluster.}
   \item{verbose}{Logical. If TRUE, prints progress report to console.}
+  \item{save}{Logical. If TRUE, saves pvclust object to current directory.}
 }
 \value{S4 "cluster" object.}
 \author{Ethan Bass}
