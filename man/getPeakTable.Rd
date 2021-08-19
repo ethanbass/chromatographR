@@ -3,10 +3,7 @@
 \title{Convert peak list into an ordered peak table}
 \description{
 Function returns a matrix of intensities, where rows correspond to samples
-and columns correspond to aligned features. The function performs a complete linkage
-clustering of retention times across all samples, and cuts at a height given by the user (which
-can be interpreted as the maximal inter-cluster retention time
-difference) in the simple case based on retention times. If two peaks from the same sample are assigned to the same cluster, a warning message is given.
+and columns correspond to aligned features. The function performs a complete linkage clustering of retention times across all samples, and cuts at a height given by the user (which can be interpreted as the maximal inter-cluster retention time difference) in the simple case based on retention times. If two peaks from the same sample are assigned to the same cluster, a warning message is given.
 }
 \usage{
 getPeakTable(peakList, response = c("area", "height"),
