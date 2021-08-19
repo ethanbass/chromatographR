@@ -2,7 +2,8 @@
 \alias{cluster_spectra}
 \title{Function to cluster peaks by spectral similarity.}
 \description{
-Function that clusters peaks by spectral similarity.}
+Function that clusters peaks by spectral similarity. A representative spectrum is selected for each peak in the provided peak table and used to construct a distance matrix based on spectral similarity (pearson correlation) between peaks. Hierarchical clustering with bootstrap resampling is performed on the resulting correlation matrix, as implemented in the \code{\link[pvclust:pvclust]{pvclust}} package. Bootstrap values can be used to select clusters that exceed a certain confidence threshold as defined by alpha.
+}
 \usage{
 cluster_spectra <- function(pkTab, chrom_list, 
                             deepSplit = FALSE, peak_no=c(5,100),
@@ -25,3 +26,7 @@ cluster_spectra <- function(pkTab, chrom_list,
 \author{Ethan Bass}
 
 \seealso{\code{\link{pvclust::pvclust}}}
+
+\references{
+  R. Suzuki, H. Shimodaira: Pvclust: an R package for assessing the uncertainty in hierarchical clustering. Bioinformatics, 22-12:1540-1542 (2006). 
+}

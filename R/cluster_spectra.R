@@ -1,6 +1,5 @@
 require(pvclust)
 require(fastcluster)
-#require(dynamicTreeCut)
 
 cluster_spectra <- function(pkTab, chrom_list, 
                             deepSplit = FALSE, peak_no = c(5,100),
