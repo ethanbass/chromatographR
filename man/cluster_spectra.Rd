@@ -15,17 +15,18 @@ cluster_spectra <- function(pkTab, chrom_list,
   \item{chrom_list}{A list of chromatograms in matrix form (timepoints x wavelengths).}
   \item{peak_no}{Minimum and maximum thresholds for the number of peaks a cluster may have.}
   \item{alpha}{Confidence threshold for inclusion of cluster.}
-  \item{nboot}{Number of bootstrap replicates for \code{\link{pvclust::pvclust}}.}
-  \item{parallel}{Logical. If TRUE, use parallel processing for \code{\link{pvclust::pvclust}}.}
+  \item{nboot}{Number of bootstrap replicates for \code{\link[pvclust::pvclust]{pvclust}}.}
+  \item{parallel}{Logical. If TRUE, use parallel processing for \code{\link[pvclust::pvclust]{pvclust}}.}
   \item{plot_dend}{Logical. If TRUE, plots dendrogram with bootstrap values.}
   \item{plot_spectra}{Logical. If TRUE, plots overlapping spectra for each cluster.}
   \item{verbose}{Logical. If TRUE, prints progress report to console.}
   \item{save}{Logical. If TRUE, saves pvclust object to current directory.}
 }
-\value{S4 "cluster" object.}
+\value{Returns S4 "cluster" object with the following components:
+\item{peaks}{a character vector containing the names of all peaks contained in the given cluster.}
+  \item{pval}{a numeric vector of length 1 containing the boostrap p-value (au) for the given cluster.}
+}
 \author{Ethan Bass}
-
-\seealso{\code{\link{pvclust::pvclust}}}
 
 \references{
   R. Suzuki, H. Shimodaira: Pvclust: an R package for assessing the uncertainty in hierarchical clustering. Bioinformatics, 22-12:1540-1542 (2006). 
