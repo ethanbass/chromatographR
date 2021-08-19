@@ -3,7 +3,7 @@ require(fastcluster)
 #require(dynamicTreeCut)
 
 cluster_spectra <- function(pkTab, chrom_list, 
-                            deepSplit = FALSE, mn=5, mx=100,
+                            deepSplit = FALSE, peak_no = c(5,100),
                             alpha=0.95, nboot=1000, plot_dend=T, plot_spectra=T,
                             verbose=T, parallel=T){
   if (verbose==T) print('...collecting representative spectra')

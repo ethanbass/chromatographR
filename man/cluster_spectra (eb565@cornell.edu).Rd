@@ -1,20 +1,21 @@
-\name{compare_spectra}
-\alias{compare_spectra}
-\title{Function to correct false zeros in peak table.}
+\name{cluster_spectra}
+\alias{cluster_spectra}
+\title{Function to cluster peaks by spectral similarity.}
 \description{
-Function that tries to correct false zeroes for a particular peak in the peaktable. In each chromatogram, the function compares all peaks within a certain radius around the focal peak on the basis of their spectral similarity to a reference spectrum.}
+Function that clusters peaks by spectral similarity.}
 \usage{
-compare_spectra(peak, peak_table, chrom_list, ts=new.ts, new.lambdas=new.lambdas,
-                             thresh_auto=0.95, thresh_man=0.75, w=100, plot_it=F,
-                             lambda='256', zeros=F, ref='max', order_by = "distance", verbose=T)}
+cluster_spectra <- function(pkTab, chrom_list, 
+                            deepSplit = FALSE, mn=5, mx=100,
+                            alpha=0.95, nboot=1000, plot_dend=T, plot_spectra=T,
+                            verbose=T, parallel=T)
+                             }
 \arguments{
-  \item{peak}{Name of peak to be investigated.}
-  \item{peak_table}{Peak table from \code{\link{getPeakTable}}.}
+  \item{pkTab}{Peak table from \code{\link{getPeakTable}}.}
   \item{chrom_list}{A list of chromatograms in matrix form (timepoints x wavelengths).}
-  \item{thresh_auto}{Defines minimum spectral similarity threshold for automatic match.}
+  \item{mn}{Minimum threshold for the number of peaks a cluster may have.}
   \item{thresh_man}{Defines minimum spectral similarity threshold to trigger manual matching process.}
   \item{w}{Defines radius around focal peak to search for matches.}
-  \item{plot_it}{Logical. If TRUE, plots spectra for comparison.}
+  \item{plot_it}{Logical. If TRUE, plots .}
   \item{lambda}{Wavelength for plot.}
   \item{zeros}{Logical. If TRUE, only check zero rows in peak table.}
   \item{ref}{Defines chromatogram for reference spectrum. If "max" choose chromatogram with
