@@ -17,6 +17,6 @@ importFrom("grDevices", "colorRampPalette", "terrain.colors")
 importFrom("graphics", "abline", "axTicks", "box", "contour", "image",
            "layout", "matplot", "par", "plot", "rect", "text", "title")
 importFrom("stats", "aggregate", "approx", "as.dist", "cor", "cutree",
-           "dist", "dnorm", "embed", "hclust", "median", "predict",
+           "dist", "dnorm", "embed", "hclust", "pvclust", "median", "predict",
            "smooth.spline")
 importFrom("utils", "capture.output")      

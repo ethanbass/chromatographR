@@ -5,10 +5,10 @@
   Plot spectrum at the specified retention time.
 }
 \usage{plot_spectrum(peak, peak_table, chrom_list, chr = 'max', lambda = 'max',
-                          plot_spectrum = T, plot_trace = T,export_spectrum = FALSE,
+                          plot_spectrum = T, plot_trace = T, export_spectrum = FALSE,
                           spectrum_labels = T, verbose = T, scale_spectrum = F, ...)}
 \arguments{
-  \item{peak}{The name of the peak you wish to plot (must be in character format)}
+  \item{rt}{The retention time you wish to plot.)}
   \item{chrom_list}{A list of profile matrices, each of the same dimensions
     (timepoints times components).}
   \item{chr}{Index of chromatogram you wish to plot, or "max" if you want to automatically plot the chromatogram with the largest signal.}

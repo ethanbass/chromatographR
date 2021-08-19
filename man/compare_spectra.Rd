@@ -5,7 +5,7 @@
 Function that tries to correct false zeroes for a particular peak in the peaktable. In each chromatogram, the function compares all peaks within a certain radius around the focal peak on the basis of their spectral similarity to a reference spectrum.}
 \usage{
 compare_spectra(peak, peak_table, chrom_list, ts=new.ts, new.lambdas=new.lambdas,
-                             thresh_auto=0.95, thresh_man=0.75, w=100, plot_it=F,
+                             thresh_auto=0.95, thresh_man=0.75, r=100, plot_it=F,
                              lambda='256', zeros=F, ref='max', order_by = "distance", verbose=T)}
 \arguments{
   \item{peak}{Name of peak to be investigated.}
@@ -13,7 +13,7 @@ compare_spectra(peak, peak_table, chrom_list, ts=new.ts, new.lambdas=new.lambdas
   \item{chrom_list}{A list of chromatograms in matrix form (timepoints x wavelengths).}
   \item{thresh_auto}{Defines minimum spectral similarity threshold for automatic match.}
   \item{thresh_man}{Defines minimum spectral similarity threshold to trigger manual matching process.}
-  \item{w}{Defines radius around focal peak to search for matches.}
+  \item{r}{Defines radius around focal peak to search for matches.}
   \item{plot_it}{Logical. If TRUE, plots spectra for comparison.}
   \item{lambda}{Wavelength for plot.}
   \item{zeros}{Logical. If TRUE, only check zero rows in peak table.}

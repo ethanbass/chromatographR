@@ -7,9 +7,9 @@
   span (function \code{\link{findpeaks}}) and at the given positions a
   gaussian curve is fit (function \code{\link{fitpeaks}}).
 }
-\usage{getAllPeaks(CList, span = NULL, eps = 1e-01)}
+\usage{getAllPeaks(chrome_list, span = NULL, eps = 1e-01)}
 \arguments{
-  \item{CList}{A list of profile matrices, each of the same dimensions
+  \item{chrome_list}{A list of profile matrices, each of the same dimensions
     (timepoints times components).}
   \item{span}{The span used for identifying local maxima in the
     individual components. If not given, the default of

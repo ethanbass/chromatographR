@@ -1,9 +1,11 @@
 ## Plot spectrum at a particular time point.
 
 plot_spectrum_scan <- function(rt, chrom_list, chr = 'max', lambda = 'max',
-                               ts = new.ts, lambdas = new.lambdas, plot_spectrum = T, 
-                               plot_chrom = T,export_spectrum=FALSE,
-                               spectrum_labels=T, ...){
+                               plot_spectrum = TRUE, plot_trace = TRUE,
+                               export_spectrum=FALSE, spectrum_labels=TRUE,
+                               verbose=FALSE...){
+  new.ts <- as.numeric(rownames(chrom_list[[1]]))
+  new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
   RT <- round(as.numeric(rt),2)
   t <- which(elementwise.all.equal(RT,new.ts))
   if (chr == 'max'){
@@ -12,6 +14,12 @@ plot_spectrum_scan <- function(rt, chrom_list, chr = 'max', lambda = 'max',
   y=chrom_list[[chr]][t,]
   if (lambda == 'max'){
     lambda = names(which.max(y))
+  }
+  if (verbose==T){
+    print(paste0("chrome no. ", chr, "; RT: ", RT, "; lambda = ", lambda, " nm"))
+  }
+  if (scale_spectrum == T){
+    y<-scales::rescale(y)
   }
   if (plot_spectrum == T){
     matplot(x=lambdas, y=y, type='l',
@@ -24,7 +32,7 @@ plot_spectrum_scan <- function(rt, chrom_list, chr = 'max', lambda = 'max',
       text(pks[,1],pks[,2],pks[,1],pos=3,offset=.3,cex = .8)
     }
   }
-  if (plot_chrom == T){
+  if (plot_trace == T){
     matplot(x=ts, y=chrom_list[[chr]][,lambda],type='l',
             #main=paste(names(chrom_list)[chr], ';','\n', 'RT = ', RT,
             #          '; Wavelength = ', lambda, 'nm'))
@@ -32,5 +40,5 @@ plot_spectrum_scan <- function(rt, chrom_list, chr = 'max', lambda = 'max',
     abline(v=RT,col='red',lty=3)
   } 
   if (export_spectrum==TRUE){
-    return(data.frame(lambdas,y))}
+    return(data.frame(y))}
 }

@@ -16,6 +16,12 @@
     for visual inspection) or the warping models (for further
     programmatic use).}
   \item{init.coef}{Starting values for the optimisation.}
+  \item{n.traces}{Number of traces to use.}
+  \item{n.zeros}{Number of zeros to add.}
+  \item{selected.traces}{Select traces to use by name.}
+  \item{scale}{Logical. If true, scale chromatograms before warping.}
+  \item{trwdth}{}
+  \item{plot_it}{}
   \item{\dots}{Optional arguments for the \code{ptw} function. The only
     argument that cannot be changed is \code{warp.type}: this is always
     equal to \code{"global"}.}

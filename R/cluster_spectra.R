@@ -1,5 +1,6 @@
-cluster_spectra <- function(pkTab, chrom_list, 
-                            deepSplit = FALSE, peak_no = c(5,100),
+setClass("cluster", representation(peaks = "character", pval = "numeric"))
+
+cluster_spectra <- function(pkTab, chrom_list, peak_no = c(5,100),
                             alpha=0.95, nboot=1000, plot_dend=T, plot_spectra=T,
                             verbose=T, save=T, parallel=T){
   if (verbose==T) print('...collecting representative spectra')

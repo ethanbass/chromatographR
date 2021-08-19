@@ -1,5 +1,5 @@
-\name{plot_spectrum}
-\alias{plot_spectrum}
+\name{plot_all_spectra}
+\alias{plot_all_spectra}
 \title{Plot spectrum from peak table}
 \description{
   Plot multiple for a given peak in peak table. Wrapper for \code{\link{plot_spectrum}}.
