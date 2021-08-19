@@ -1,7 +1,8 @@
 ## all functionality of ALS and ptw may be needed for the user, so all
 ## functions imported.
-import(ALS)
+#import(ALS)
 import(ptw)
+import(pvclust)
 
 export("splitTimeWindow", "mergeTimeWindows",
        "smallComps", "removeComps", "combineComps",
@@ -17,6 +18,6 @@ importFrom("grDevices", "colorRampPalette", "terrain.colors")
 importFrom("graphics", "abline", "axTicks", "box", "contour", "image",
            "layout", "matplot", "par", "plot", "rect", "text", "title")
 importFrom("stats", "aggregate", "approx", "as.dist", "cor", "cutree",
-           "dist", "dnorm", "embed", "hclust", "pvclust", "median", "predict",
+           "dist", "dnorm", "embed", "hclust", "median", "predict",
            "smooth.spline")
 importFrom("utils", "capture.output")      
