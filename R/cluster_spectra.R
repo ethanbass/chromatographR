@@ -16,6 +16,7 @@ cluster_spectra <- function(pkTab, chrom_list, peak_no = c(5,100),
   result <- pvclust::pvclust(rep, method.dist="cor", method.hclust="average", nboot=nboot, parallel=parallel)
   
   if (plot_dend==T){
+  plot(result)
   pvclust::pvrect(result, alpha=alpha, max.only = F)
   }
   
