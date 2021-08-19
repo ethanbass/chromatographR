@@ -2,11 +2,10 @@
 \alias{getAllPeaks}
 \title{Extract all peaks from the chromatographic profiles of an ALS object}
 \description{
-  Function to extract all peaks in a list of chromatograms. Peaks are located as local maxima within the given
-  span (function \code{\link{findpeaks}}) and at the given positions a
+  Function to extract all peaks in a list of chromatograms. Peaks are located as local maxima within the given span (function \code{\link{findpeaks}}) and at the given positions a
   gaussian curve is fit (function \code{\link{fitpeaks}}).
 }
-\usage{getAllPeaks(chrome_list, lambdas=c('230,'260'), span = NULL, eps = 1e-01)}
+\usage{getAllPeaks(chrome_list, lambdas=c('230','260'), span = NULL, eps = 1e-01)}
 \arguments{
   \item{chrome_list}{A list of profile matrices, each of the same dimensions
     (timepoints times wavelengths).}
