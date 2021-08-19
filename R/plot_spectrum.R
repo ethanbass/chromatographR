@@ -48,5 +48,5 @@ plot_spectrum <- function(peak, peak_table, chrom_list, chr = 'max', lambda = 'm
     abline(v=RT,col='red',lty=3)
   } 
   if (export_spectrum==TRUE){
-    return(data.frame(new.lambdas,y))}
+    return(data.frame(y))}
 }
