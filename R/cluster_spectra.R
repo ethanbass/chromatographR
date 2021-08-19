@@ -39,15 +39,15 @@ cluster_spectra <- function(pkTab, chrom_list, peak_no = c(5,100),
   return(sub)
 }
 
-dend<-as.dendrogram(result)
-result %>%
-  as.dendrogram() %>%
-  hang.dendrogram() %>%
-  plot(main = "Cluster dendrogram with AU/BP values (%)")
-result %>% text()
-dend %>% set("labels_cex",0.5) %>% plot()
-result %>% as.dendrogram %>% plot(labels=F)
-result %>% pvrect(alpha = 0.95)
+# dend<-as.dendrogram(result)
+# result %>%
+#   as.dendrogram() %>%
+#   hang.dendrogram() %>%
+#   plot(main = "Cluster dendrogram with AU/BP values (%)")
+# result %>% text()
+# dend %>% set("labels_cex",0.5) %>% plot()
+# result %>% as.dendrogram %>% plot(labels=F)
+# result %>% pvrect(alpha = 0.95)
 
 # dend %>%
 #   pvclust_show_signif(result, signif_type = 'au', max.only=F, hang=-1) %>%
