@@ -1,13 +1,10 @@
-## Function to extract all peaks from the concentration profiles of an
-## ALS object. For each sample, a list of matrices is returned,
-## corresponding to the peaks found in each of the components.
 
-getAllPeaks <- function (CList, wavelengths, ...){
-  if (is.numeric(wavelengths)){
-    wavelenghts <- as.character(wavelengths)
+getAllPeaks <- function (CList, lambdas, ...){
+  if (is.numeric(lambdas)){
+    lambdas <- as.character(lambdas)
   }
   peaks<-list()
-  CList2 <- lapply(CList, function(Cmat) Cmat[,wavelengths])
+  CList2 <- lapply(CList, function(Cmat) Cmat[,lambdas])
   peakPositions <- lapply(CList2, function(Cmat){
     apply(Cmat, 2, function(x) findpeaks(x))})
   Cmat <- CList2[5]
@@ -31,10 +28,10 @@ getAllPeaks <- function (CList, wavelengths, ...){
   }))
 }
 
-# getAllPeaks2 <- function (CList, wavelengths, span = NULL, findpeaks=findpeaks_by_slope,
+# getAllPeaks2 <- function (CList, lambdas, span = NULL, findpeaks=findpeaks_by_slope,
 #                          fitpeaks=fitpeaks, ...){
 #   peaks<-list()
-#   CList2 <- lapply(CList, function(Cmat) Cmat[,wavelengths])
+#   CList2 <- lapply(CList, function(Cmat) Cmat[,lambdas])
 #   peakPositions <- lapply(CList2, function(Cmat){
 #     apply(Cmat, 2, function(x) findpeaks(x))})
 #   Cmat <- CList2[5]
