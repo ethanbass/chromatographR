@@ -1,6 +1,3 @@
-require(pvclust)
-require(fastcluster)
-
 cluster_spectra <- function(pkTab, chrom_list, 
                             deepSplit = FALSE, peak_no = c(5,100),
                             alpha=0.95, nboot=1000, plot_dend=T, plot_spectra=T,
@@ -15,14 +12,14 @@ cluster_spectra <- function(pkTab, chrom_list,
   d<-1-abs(cor(rep,method="pearson"))
   
   if (verbose==T) print('...clustering spectra')
-  result <- pvclust(rep, method.dist="cor", method.hclust="average", nboot=nboot, parallel=parallel)
+  result <- pvclust::pvclust(rep, method.dist="cor", method.hclust="average", nboot=nboot, parallel=parallel)
   
   if (plot_dend==T){
-  pvrect(result, alpha=alpha, max.only = F)
+  pvclust::pvrect(result, alpha=alpha, max.only = F)
   }
   
   if (save==T) saveRDS(result, 'pvclust.RDS')
-  p <- pvpick(result, alpha=alpha, max.only=F)
+  p <- pvclust::pvpick(result, alpha=alpha, max.only=F)
   l <- sapply(p$clusters, length)
   sub <- p$clusters[which(l > mn & l < mx)]
   pval<-result$edges[p$edges[which(l > mn & l < mx)],'au']
