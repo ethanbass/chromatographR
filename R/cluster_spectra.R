@@ -16,10 +16,9 @@ cluster_spectra <- function(pkTab, chrom_list, peak_no = c(5,100),
   result <- pvclust::pvclust(rep, method.dist="cor", method.hclust="average", nboot=nboot, parallel=parallel)
   
   if (plot_dend==T){
-  plot(result)
+  plot(result,labels=F, cex.pv=0.5, print.pv='au',print.num = F)
   pvclust::pvrect(result, alpha=alpha, max.only = F)
   }
-  
   if (save==T) saveRDS(result, 'pvclust.RDS')
   p <- pvclust::pvpick(result, alpha=alpha, max.only=F)
   l <- sapply(p$clusters, length)
@@ -39,3 +38,25 @@ cluster_spectra <- function(pkTab, chrom_list, peak_no = c(5,100),
   }
   return(sub)
 }
+
+dend<-as.dendrogram(result)
+result %>%
+  as.dendrogram() %>%
+  hang.dendrogram() %>%
+  plot(main = "Cluster dendrogram with AU/BP values (%)")
+result %>% text()
+dend %>% set("labels_cex",0.5) %>% plot()
+result %>% as.dendrogram %>% plot(labels=F)
+result %>% pvrect(alpha = 0.95)
+
+# dend %>%
+#   pvclust_show_signif(result, signif_type = 'au', max.only=F, hang=-1) %>%
+#   plot()
+# dend %>%
+#   pvclust_show_signif(result, show_type = "lwd") %>%
+#   plot()
+# result %>% text()
+# dend %>% plot()
+# result %>% pvrect(alpha = 0.95, max.only=F)
+# 
+# dendextend::pvclust_show_signif(dend, result)
