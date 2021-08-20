@@ -22,10 +22,10 @@ cluster_spectra <- function(pkTab, chrom_list, peak_no = c(5,100),
   if (save==T) saveRDS(result, 'pvclust.RDS')
   p <- pvclust::pvpick(result, alpha=alpha, max.only=F)
   l <- sapply(p$clusters, length)
-  sub <- p$clusters[which(l > mn & l < mx)]
-  pval<-1-result$edges[p$edges[which(l > mn & l < mx)],'au']
+  sub <- p$clusters[which(l > peak_no[1] & l < peak_no[2])]
+  pval<-1-result$edges[p$edges[which(l > peak_no[1] & l < peak_no[2])],'au']
   sub <- lapply(1:length(sub), function(i) new("cluster", peaks=sub[[i]], pval=pval[i]))
-  pval=format(round(result$edges[p$edges[which(l > mn & l < mx)],'au'],2), nsmall=2)
+  pval=format(round(result$edges[p$edges[which(l > peak_no[1] & l < peak_no[2])],'au'],2), nsmall=2)
   names(sub)<-paste0('c',1:length(sub))
   
   if (plot_spectra==T){

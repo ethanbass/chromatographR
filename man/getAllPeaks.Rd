@@ -1,6 +1,6 @@
 \name{getAllPeaks}
 \alias{getAllPeaks}
-\title{Extract all peaks from the chromatographic profiles of an ALS object}
+\title{Extract all peaks from the chromatographic profiles of a list of chromatograms.}
 \description{
   Function to extract all peaks in a list of chromatograms. Peaks are located as local maxima within the given span (function \code{\link{findpeaks}}) and at the given positions a
   gaussian curve is fit (function \code{\link{fitpeaks}}).
