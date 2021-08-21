@@ -2,7 +2,7 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 
 cluster_spectra <- function(pkTab, chrom_list, peak_no = c(5,100),
                             alpha=0.95, nboot=1000, plot_dend=T, plot_spectra=T,
-                            verbose=T, save=T, parallel=T){
+                            verbose=T, save=T, parallel=T, max.only=F){
   if (verbose==T) print('...collecting representative spectra')
   rep <- sapply(1:ncol(pkTab), function(j){
     sp <- plot_spectrum(peak=j, peak_table=pkTab, chrom_list = dat.pr,
@@ -17,10 +17,10 @@ cluster_spectra <- function(pkTab, chrom_list, peak_no = c(5,100),
   
   if (plot_dend==T){
   plot(result,labels=F, cex.pv=0.5, print.pv='au',print.num = F)
-  pvclust::pvrect(result, alpha=alpha, max.only = F)
+  pvclust::pvrect(result, alpha=alpha, max.only = max.only)
   }
   if (save==T) saveRDS(result, 'pvclust.RDS')
-  p <- pvclust::pvpick(result, alpha=alpha, max.only=F)
+  p <- pvclust::pvpick(result, alpha=alpha, max.only=max.only)
   l <- sapply(p$clusters, length)
   sub <- p$clusters[which(l > peak_no[1] & l < peak_no[2])]
   pval<-1-result$edges[p$edges[which(l > peak_no[1] & l < peak_no[2])],'au']
@@ -30,6 +30,7 @@ cluster_spectra <- function(pkTab, chrom_list, peak_no = c(5,100),
   
   if (plot_spectra==T){
     if (verbose==T) print('...plotting clustered spectra')
+    new.lambdas <- colnames(chrom_list[[1]])
     sapply(1:length(sub), function(i){ 
       matplot(new.lambdas,rep[,as.numeric(gsub('V','',sub[[i]]@peaks))],
               type='l', ylab='', yaxt='n', xlab=expression(lambda),
