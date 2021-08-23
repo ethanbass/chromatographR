@@ -3,11 +3,11 @@ getAllPeaks <- function (CList, lambdas, ...){
   if (is.numeric(lambdas)){
     lambdas <- as.character(lambdas)
   }
+  if (length(lambdas)>1){
   peaks<-list()
   CList2 <- lapply(CList, function(Cmat) Cmat[,lambdas])
   peakPositions <- lapply(CList2, function(Cmat){
     apply(Cmat, 2, function(x) findpeaks(x))})
-  Cmat <- CList2[5]
   result <- lapply(1:length(CList2), function(smpl) {
     ptable <- lapply(1:length(peakPositions[[smpl]]), function(cmpnd){
       fitpeaks(CList2[[smpl]][,cmpnd], peakPositions[[smpl]][[cmpnd]],...)
@@ -15,6 +15,15 @@ getAllPeaks <- function (CList, lambdas, ...){
     names(ptable) <- names(peakPositions[[smpl]])
     ptable
   })
+  } else {
+    peakPositions <- lapply(CList2, function(Cmat){
+      findpeaks(Cmat)})
+    result <- lapply(1:length(CList2), function(smpl){
+        fitpeaks(CList2[[smpl]], peakPositions[[smpl]],...)
+      })
+      #names(ptable) <- names(peakPositions[[smpl]])
+      ptable
+  }
   names(result) <- names(peakPositions)
   result <- lapply(result, function(smpl) lapply(smpl, function(pks) pks[apply(pks, 
                                                                                1, function(x) !any(is.na(x))), , drop = FALSE]))
