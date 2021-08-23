@@ -1,0 +1,79 @@
+---
+title: "chromatographR"
+author: "Ethan Bass"
+date: "8/22/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require("knitr", quietly=TRUE)
+opts_chunk$set(prompt = TRUE, highlight = FALSE, comment=NA, 
+               background='transparent', size = 'small', 
+               fig.width=6, fig.height=6, out.width='\\textwidth',
+               dev=c('pdf', 'png'))
+suppressMessages(require(chromatographR, quiet=TRUE))
+```
+
+```{r}
+data(tea)
+tpoints <- as.numeric(rownames(tea.raw[[1]]))
+lambdas <- as.numeric(colnames(tea.raw[[1]]))
+```
+
+\subsection{Data loading}
+Most probably, the data coming from the spectrometer need to be
+converted into an \R-accessible format such as a \code{csv} file. Once
+all \code{csv} files are gathered in one directory (say, \code{foo}),
+an easy way to load them is to use \code{lapply}:
+
+<<preprocData>>=
+new.lambdas <- seq(260, 500, by = 2)
+tea <- lapply(tea.raw, preprocess, dim2 = new.lambdas)
+sapply(tea.raw, dim)
+sapply(tea, dim)
+@ 
+
+
+\subsection{warping}
+
+\subsection{find peaks}
+```{r}
+pks <- getAllPeaks(dat.pr, span = 5)
+plot_peaks(pks[[1]], dat.pr)
+sapply(pks, function(x) sapply(x, nrow))
+```
+
+
+<<warping>>=
+warping.models <- correctRT(tea.als$CList, reference = 1, what = "models")
+@ 
+
+\noindent
+This will lead to one global warping function for every sample, a
+function that we can apply to the retention times of the peaks that we
+identified earlier:
+
+\subsubsection{Grouping peaks across samples}
+
+<<timeCorrection>>=
+pks.corrected <- correctPeaks(pks, warping.models)
+pks.corrected[[2]][[1]]
+@ 
+
+<<peakTable>>=
+pkTab <- getPeakTable(pks.corrected, response = "height")
+head(pkTab)
+@
+
+\section{Useful additional tools}
+```{r}
+plot_spectrum()
+```
+
+```{r}
+compare_peaks()
+```
+
+```{r}
+cluster_peaks()
+```

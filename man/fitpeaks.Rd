@@ -26,9 +26,7 @@ fitpeaks(y, pos)
   the smoothed first derivative of a signal that exceed a given slope threshold.
 
   Peak parameters are calculated using \code{fitpeaks}, assuming a
-  normal distribution. Peak width is given as a standard deviation,
-  calculated from the full width at half maximum (FWHM); the peak area
-  is given by the ratio of the peak height and the density.
+  normal distribution. 
 }
 \value{
   Function \code{findpeaks} simply returns the locations of the peak centers,
@@ -48,7 +46,7 @@ fitpeaks(y, pos)
 }
 \note{The \code{findpeaks} function is adapted from matlab code in
   Prof. Tom O'Haver's \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{Pragmatic Introduction to Signal Processing}.}
-\note{The \code{fitpeaks} function is adapted from code published in Ron Wehrens' \code{\link{alsace}} package, as well as code from Dr. Robert Morrison's \code{\href{https://github.com/robertdouglasmorrison/DuffyTools}{DuffyTools}} package.}
+\note{The \code{fitpeaks} function is adapted from Dr. Robert Morrison's \code{\href{https://github.com/robertdouglasmorrison/DuffyTools}{DuffyTools}} package as well as code published in Ron Wehrens' \code{\link{alsace}} package.}
 \author{Ethan Bass}
 \seealso{\code{\link{getAllPeaks}}}
 \keyword{manip}
