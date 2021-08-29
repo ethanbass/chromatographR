@@ -63,7 +63,7 @@ fitpeaks <- function (y, pos, w=1, sd.max=50, fit=c("gaussian","egh","emg"), max
     fitpk <- function(xloc){
       peak.loc<-seq.int(xloc-w, xloc+w)
       m <- chromatographR:::fit.egh(peak.loc, y[peak.loc], start.center = xloc,
-                                    start.height = y[which(peak.loc==xloc)])
+                                    start.height = y[xloc])
       c(m$center, m$width, m$tau, 2.35*m$width, y[xloc], y[xloc]/dnorm(m$center, m$center, 
                                                                        m$width))
     }
@@ -80,7 +80,7 @@ fitpeaks <- function (y, pos, w=1, sd.max=50, fit=c("gaussian","egh","emg"), max
       peak.loc<-seq.int(xloc-w, xloc+w)
       #m <- emg::emg.mle(y[peak.loc])
       m <- fit.EMG(peak.loc,y[peak.loc], start.center = xloc,
-                   start.height = y[which(peak.loc==xloc)])
+                   start.height = y[xloc])
       c(m$center, m$width, m$tau, 2.35*m$width, y[xloc], y[xloc]/dnorm(m$center, m$center, 
                                                                        m$width))
     }
