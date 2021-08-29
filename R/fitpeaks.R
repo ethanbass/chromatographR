@@ -36,8 +36,8 @@ fitpeaks <- function (y, pos, w=1, sd.max=50, fit=c("gaussian","egh","emg"), max
   #names(y) <- NULL
   fit <- match.arg(fit,c("gaussian","egh","emg"))
   if (fit=="gaussian"){
-    tabnames <- c("rt", "sd", "FWHM", "height", "area")
-    noPeaksMat <- matrix(rep(NA, 5), nrow = 1, dimnames = list(NULL, 
+    tabnames <- c("rt", "sd", "FWHM", "height", "area","r-squared")
+    noPeaksMat <- matrix(rep(NA, 6), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
     on.edge <- sapply(pos, function(x) y[x + 1] == 0 | y[x - 
                                                            1] == 0)
@@ -48,12 +48,13 @@ fitpeaks <- function (y, pos, w=1, sd.max=50, fit=c("gaussian","egh","emg"), max
       peak.loc<-seq.int(xloc-w, xloc+w)
       m <- fit.gaussian(peak.loc, y[peak.loc], start.center = xloc, 
                         start.height = y[xloc], max.iter=max.iter)
+      r.squared <- summary(lm(m$y ~ y[peak.loc]))$r.squared
       c(m$center, m$width, 2.35*m$width, y[xloc], y[xloc]/dnorm(m$center, m$center, 
-                                                                m$width))
+                                                                m$width), r.squared)
     }
   } else if(fit == "egh"){
-    tabnames <- c("rt", "sd","tau", "FWHM", "height", "area")
-    noPeaksMat <- matrix(rep(NA, 6), nrow = 1, dimnames = list(NULL, 
+    tabnames <- c("rt", "sd","tau", "FWHM", "height", "area","r.squared")
+    noPeaksMat <- matrix(rep(NA, 7), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
     on.edge <- sapply(pos, function(x) y[x + 1] == 0 | y[x - 
                                                            1] == 0)
@@ -64,8 +65,9 @@ fitpeaks <- function (y, pos, w=1, sd.max=50, fit=c("gaussian","egh","emg"), max
       peak.loc<-seq.int(xloc-w, xloc+w)
       m <- chromatographR:::fit.egh(peak.loc, y[peak.loc], start.center = xloc,
                                     start.height = y[xloc])
+      r.squared <- summary(lm(m$y ~ y[peak.loc]))$r.squared
       c(m$center, m$width, m$tau, 2.35*m$width, y[xloc], y[xloc]/dnorm(m$center, m$center, 
-                                                                       m$width))
+                                                                       m$width),r.squared)
     }
   } else if(fit == "emg"){
     tabnames <- c("rt", "sd","lambda", "FWHM", "height", "area")
