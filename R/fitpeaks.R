@@ -32,7 +32,7 @@ findpeaks <- function(y, smooth_type='gaussian', smooth_window = 1, smooth_width
 
 # fit peaks using gaussian distribution (egh setting (exponential gaussian hybrid) doesn't work yet).
 
-fitpeaks <- function (y, pos, w=1, sd.max=50, fit=c("gaussian","egh","emg")){
+fitpeaks <- function (y, pos, w=1, sd.max=50, fit=c("gaussian","egh","emg"), max.iter=100){
   #names(y) <- NULL
   fit <- match.arg(fit,c("gaussian","egh","emg"))
   if (fit=="gaussian"){
@@ -47,7 +47,7 @@ fitpeaks <- function (y, pos, w=1, sd.max=50, fit=c("gaussian","egh","emg")){
     fitpk <- function(xloc){
       peak.loc<-seq.int(xloc-w, xloc+w)
       m <- fit.gaussian(peak.loc, y[peak.loc], start.center = xloc, 
-                        start.height = y[which(peak.loc==xloc)])
+                        start.height = y[xloc], max.iter=max.iter)
       c(m$center, m$width, 2.35*m$width, y[xloc], y[xloc]/dnorm(m$center, m$center, 
                                                                 m$width))
     }
@@ -109,7 +109,7 @@ gaussian <- function( x, center=0, width=1, height=NULL, floor=0) {
 
 
 fit.gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height=NULL,
-                         start.floor=NULL, fit.floor=FALSE) {
+                         start.floor=NULL, fit.floor=FALSE, max.iter) {
   
   # try to find the best gaussian to fit the given data
   
@@ -120,7 +120,7 @@ fit.gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height
   if ( is.null( start.width)) start.width <- sum( y > (start.height/2)) / 2
   
   # call the Nonlinear Least Squares, either fitting the floor too or not
-  controlList <- nls.control( maxiter=100, minFactor=1/512, warnOnly=TRUE)
+  controlList <- nls.control( maxiter = max.iter, minFactor=1/512, warnOnly=TRUE)
   if ( ! fit.floor) {
     starts <- list( "center"=start.center, "width"=start.width, "height"=start.height)
     nlsAns <- try( nls( y ~ gaussian( x, center, width, height), start=starts, control=controlList))

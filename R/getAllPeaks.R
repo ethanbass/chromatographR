@@ -1,5 +1,5 @@
 
-getAllPeaks <- function (CList, lambdas, ...){
+getAllPeaks <- function (CList, lambdas, max.iter=100,...){
   if (is.numeric(lambdas)){
     lambdas <- as.character(lambdas)
   }
@@ -10,7 +10,7 @@ getAllPeaks <- function (CList, lambdas, ...){
     apply(Cmat, 2, function(x) findpeaks(x))})
   result <- lapply(1:length(CList2), function(smpl) {
     ptable <- lapply(1:length(peakPositions[[smpl]]), function(cmpnd){
-      fitpeaks(CList2[[smpl]][,cmpnd], peakPositions[[smpl]][[cmpnd]],...)
+      fitpeaks(CList2[[smpl]][,cmpnd], peakPositions[[smpl]][[cmpnd]],max.iter=max.iter,...)
       })
     names(ptable) <- names(peakPositions[[smpl]])
     ptable
@@ -66,8 +66,11 @@ getAllPeaks <- function (CList, lambdas, ...){
 ## function to visually check integration accuracy
 ## fit is output of getallpeaks for chrome
 
-plot_peaks <- function(chrome_list, peak_list, index=1, lambda='230', w=5, slope=.01, points=F, a=0.5, time=c('rt','raw'),
+plot_peaks <- function(chrome_list, peak_list, index=1, lambda, w=5, slope=.01, points=F, a=0.5, time=c('rt','raw'),
                        fit=c("gaussian","egh"),h=1){
+  if (!(lambda %in% names(peak_list[[1]]))){
+    stop('Error: lambda must match one of the wavelengths in your peak list')
+  }
   y<-chrome_list[[index]][,lambda]
   pks<-data.frame(peak_list[[index]][[lambda]])
   plot(new.ts,y,type='l',xlab='',ylab='',xaxt='n',yaxt='n')
