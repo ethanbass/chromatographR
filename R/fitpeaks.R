@@ -95,7 +95,7 @@ fitpeaks <- function (y, pos, w=10, sd.max=50, fit=c("gaussian","egh","emg"), ma
                                                                        m$width))
     }
   }
-  huhn <- data.frame(t(apppy(pos, 1, fitpk)))
+  huhn <- data.frame(t(apply(pos, 1, fitpk)))
   colnames(huhn) <- tabnames
   huhn[huhn$sd<sd.max,]
 }
