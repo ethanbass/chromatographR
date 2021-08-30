@@ -17,7 +17,7 @@
 ## (see http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm)
 
 findpeaks <- function(y, smooth_type='gaussian', smooth_window = 1, smooth_width = 0.1,
-                               slope_thresh=.05, amp_thresh=0){
+                               slope_thresh=.05, amp_thresh=0, bounds=T){
   if (smooth_type=='gaussian'){
     d <- smoother::smth.gaussian(diff(y),window = smooth_window, alpha=smooth_width)
   } else{
@@ -27,6 +27,12 @@ findpeaks <- function(y, smooth_type='gaussian', smooth_window = 1, smooth_width
   p2 <- which(abs(diff(d)) > slope_thresh) # detects second derivative exceeding slope threshold
   p3 <- which(y > amp_thresh) # detects y vals exceeding amplitude threshold
   p <- intersect(intersect(p1,p2), p3)
+  if (bounds==T){
+    p4 <- which(sign(d[1:(length(d)-1)])<sign(d[2:length(d)]))
+    bl<-sapply(p,function(v) max(p4[p4<v]))
+    bu<-sapply(p,function(v) min(p4[p4>v]))
+    data.frame(pos=p, lower=bl, upper=bu)
+  } else 
   p
 }
 
@@ -39,12 +45,13 @@ fitpeaks <- function (y, pos, w=10, sd.max=50, fit=c("gaussian","egh","emg"), ma
     tabnames <- c("rt", "sd", "FWHM", "height", "area","r-squared")
     noPeaksMat <- matrix(rep(NA, 6), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
-    on.edge <- sapply(pos, function(x) y[x + 1] == 0 | y[x - 
+    on.edge <- sapply(pos$pos, function(x) y[x + 1] == 0 | y[x - 
                                                            1] == 0)
-    pos <- pos[!on.edge]
-    if (length(pos) == 0) 
+    pos$pos <- pos$pos[!on.edge]
+    if (nrow(pos) == 0) 
       return(noPeaksMat)
-    fitpk <- function(xloc){
+    fitpk <- function(pos){
+      xloc<-pos$pos
       peak.loc<-seq.int(xloc-w, xloc+w)
       m <- fit.gaussian(peak.loc, y[peak.loc], start.center = xloc, 
                         start.height = y[xloc], max.iter=max.iter)
@@ -56,12 +63,13 @@ fitpeaks <- function (y, pos, w=10, sd.max=50, fit=c("gaussian","egh","emg"), ma
     tabnames <- c("rt", "sd","tau", "FWHM", "height", "area","r.squared")
     noPeaksMat <- matrix(rep(NA, 7), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
-    on.edge <- sapply(pos, function(x) y[x + 1] == 0 | y[x - 
+    on.edge <- sapply(pos$pos, function(x) y[x + 1] == 0 | y[x - 
                                                            1] == 0)
-    pos <- pos[!on.edge]
-    if (length(pos) == 0) 
+    pos$pos <- pos$pos[!on.edge]
+    if (nrow(pos) == 0) 
       return(noPeaksMat)
-    fitpk <- function(xloc){
+    fitpk <- function(pos){
+      xloc<-pos$pos
       peak.loc<-seq.int(xloc-w, xloc+w)
       m <- chromatographR:::fit.egh(peak.loc, y[peak.loc], start.center = xloc,
                                     start.height = y[xloc])
