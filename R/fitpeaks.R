@@ -67,7 +67,7 @@ fitpeaks <- function (y, pos, w=1, sd.max=50, fit=c("gaussian","egh","emg"), max
                                     start.height = y[xloc])
       r.squared <- summary(lm(m$y ~ y[peak.loc]))$r.squared
       c(m$center, m$width, m$tau, 2.35*m$width, y[xloc],
-        y[xloc]/dnorm(m$center, m$center, m$width),r.squared)
+        y[xloc]/dnorm(m$center, m$center, m$width), r.squared)
     }
   } else if(fit == "emg"){
     tabnames <- c("rt", "sd","lambda", "FWHM", "height", "area")
