@@ -7,7 +7,7 @@ getAllPeaks <- function (CList, lambdas, max.iter=100,...){
   peaks<-list()
   CList2 <- lapply(CList, function(Cmat) Cmat[,lambdas])
   peakPositions <- lapply(CList2, function(Cmat){
-    apply(Cmat, 2, function(x) findpeaks(x))})
+    apply(Cmat, 2, function(x) findpeaks(x, bounds=T))})
   result <- lapply(1:length(CList2), function(smpl) {
     ptable <- lapply(1:length(peakPositions[[smpl]]), function(cmpnd){
       fitpeaks(CList2[[smpl]][,cmpnd], peakPositions[[smpl]][[cmpnd]],max.iter=max.iter,...)
@@ -17,7 +17,7 @@ getAllPeaks <- function (CList, lambdas, max.iter=100,...){
   })
   } else {
     peakPositions <- lapply(CList2, function(Cmat){
-      findpeaks(Cmat)})
+      findpeaks(Cmat, bounds=T)})
     result <- lapply(1:length(CList2), function(smpl){
         fitpeaks(CList2[[smpl]], peakPositions[[smpl]],...)
       })

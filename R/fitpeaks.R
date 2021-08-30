@@ -17,7 +17,7 @@
 ## (see http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm)
 
 findpeaks <- function(y, smooth_type='gaussian', smooth_window = 1, smooth_width = 0.1,
-                               slope_thresh=.05, amp_thresh=0, bounds=T){
+                               slope_thresh=.05, amp_thresh=0, bounds=F){
   if (smooth_type=='gaussian'){
     d <- smoother::smth.gaussian(diff(y),window = smooth_window, alpha=smooth_width)
   } else{
