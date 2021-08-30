@@ -66,13 +66,16 @@ getAllPeaks <- function (CList, lambdas, max.iter=100,...){
 ## function to visually check integration accuracy
 ## fit is output of getallpeaks for chrome
 
-plot_peaks <- function(chrome_list, peak_list, index=1, lambda, w=5, slope=.01, points=F, a=0.5, time=c('rt','raw'),
-                       fit=c("gaussian","egh"),h=1){
+plot_peaks <- function(chrome_list, peak_list, index=1, lambda, w=5, slope=.01,
+                       points=F, a=0.5, time=c('rt','raw'),h=1){
   if (!(lambda %in% names(peak_list[[1]]))){
     stop('Error: lambda must match one of the wavelengths in your peak list')
   }
   y<-chrome_list[[index]][,lambda]
   pks<-data.frame(peak_list[[index]][[lambda]])
+  if ("tau" %in% colnames(pks)){
+    fit<-"egh"
+  } else{ fit<-"gaussian"}
   plot(new.ts,y,type='l',xlab='',ylab='',xaxt='n',yaxt='n')
   if (time=='rt'){
     pks$rt <- (pks$rt - new.ts[1])*100
