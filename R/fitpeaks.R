@@ -51,7 +51,7 @@ fitpeaks <- function (y, pos, w=10, sd.max=50, fit=c("gaussian","egh","emg"), ma
     if (nrow(pos) == 0) 
       return(noPeaksMat)
     fitpk <- function(pos){
-      xloc<-pos$pos
+      xloc<-pos[1]
       peak.loc<-seq.int(xloc-w, xloc+w)
       m <- fit.gaussian(peak.loc, y[peak.loc], start.center = xloc, 
                         start.height = y[xloc], max.iter=max.iter)
@@ -69,7 +69,7 @@ fitpeaks <- function (y, pos, w=10, sd.max=50, fit=c("gaussian","egh","emg"), ma
     if (nrow(pos) == 0) 
       return(noPeaksMat)
     fitpk <- function(pos){
-      xloc<-pos$pos
+      xloc <- pos[1]
       peak.loc<-seq.int(xloc-w, xloc+w)
       m <- chromatographR:::fit.egh(peak.loc, y[peak.loc], start.center = xloc,
                                     start.height = y[xloc])
@@ -95,7 +95,7 @@ fitpeaks <- function (y, pos, w=10, sd.max=50, fit=c("gaussian","egh","emg"), ma
                                                                        m$width))
     }
   }
-  huhn <- data.frame(t(sapply(pos, fitpk)))
+  huhn <- data.frame(t(apppy(pos, 1, fitpk)))
   colnames(huhn) <- tabnames
   huhn[huhn$sd<sd.max,]
 }
