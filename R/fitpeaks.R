@@ -97,7 +97,10 @@ fitpeaks <- function (y, pos, sd.max=50, fit=c("gaussian","egh","emg"), max.iter
   }
   huhn <- data.frame(t(apply(pos, 1, fitpk)))
   colnames(huhn) <- tabnames
-  huhn[huhn$sd<sd.max,]
+  if (!is.null(sd.max)){
+    huhn <- huhn[huhn$sd<sd.max,]
+  }
+  huhn
 }
 ####################################
 # from https://github.com/robertdouglasmorrison/DuffyTools/blob/master/R/gaussian.R
