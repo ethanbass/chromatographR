@@ -52,7 +52,7 @@ fitpeaks <- function (y, pos, w=10, sd.max=50, fit=c("gaussian","egh","emg"), ma
       return(noPeaksMat)
     fitpk <- function(pos){
       xloc<-pos[1]
-      peak.loc<-seq.int(xloc-w, xloc+w)
+      peak.loc<-seq.int(pos[2], pos[3])
       m <- fit.gaussian(peak.loc, y[peak.loc], start.center = xloc, 
                         start.height = y[xloc], max.iter=max.iter)
       r.squared <- summary(lm(m$y ~ y[peak.loc]))$r.squared
@@ -70,7 +70,7 @@ fitpeaks <- function (y, pos, w=10, sd.max=50, fit=c("gaussian","egh","emg"), ma
       return(noPeaksMat)
     fitpk <- function(pos){
       xloc <- pos[1]
-      peak.loc<-seq.int(xloc-w, xloc+w)
+      peak.loc<-seq.int(pos[2], pos[3])
       m <- chromatographR:::fit.egh(peak.loc, y[peak.loc], start.center = xloc,
                                     start.height = y[xloc])
       r.squared <- summary(lm(m$y ~ y[peak.loc]))$r.squared
