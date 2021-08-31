@@ -3,7 +3,7 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 cluster_spectra <- function(pkTab, chrom_list, peak_no = c(5,100),
                             alpha=0.95, nboot=1000, plot_dend=T, plot_spectra=T,
                             verbose=T, save=T, parallel=T, max.only=F,
-                            .__C__.name){
+                            ...){
   if (verbose==T) print('...collecting representative spectra')
   rep <- sapply(1:ncol(pkTab), function(j){
     sp <- plot_spectrum(peak=j, peak_table=pkTab, chrom_list = dat.pr,
