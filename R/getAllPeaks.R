@@ -71,6 +71,7 @@ plot_peaks <- function(chrome_list, peak_list, index=1, lambda, w=5, slope=.01,
   if (!(lambda %in% names(peak_list[[1]]))){
     stop('Error: lambda must match one of the wavelengths in your peak list')
   }
+  new.ts <- as.numeric(rownames(chrome_list[[1]]))
   y<-chrome_list[[index]][,lambda]
   pks<-data.frame(peak_list[[index]][[lambda]])
   if ("tau" %in% colnames(pks)){
