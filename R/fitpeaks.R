@@ -103,7 +103,7 @@ fitpeaks <- function (y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"),
   }
   huhn <- data.frame(t(apply(pos, 1, fitpk)))
   colnames(huhn) <- tabnames
-  huhn <- sapply(huhn, as.numeric)
+  huhn <- data.frame(sapply(huhn, as.numeric))
   if (!is.null(sd.max)) {
     huhn <- huhn[huhn$sd < sd.max, ]
   }
