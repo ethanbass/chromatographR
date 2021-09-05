@@ -107,7 +107,7 @@ fitpeaks <- function (y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"),
   if (!is.null(sd.max)) {
     huhn <- huhn[huhn$sd < sd.max, ]
   }
-  huhn
+  huhn[huhn$rt>0,]
 }
 ####################################
 # from https://github.com/robertdouglasmorrison/DuffyTools/blob/master/R/gaussian.R
