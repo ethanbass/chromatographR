@@ -6,12 +6,10 @@ import(pvclust)
 
 export("splitTimeWindow", "mergeTimeWindows",
        "smallComps", "removeComps", "combineComps",
-       "suggestCompCombis",
-       "correctPeaks", "correctRT", "correctRT5", "doALS",
-       "getTime", "getWavelength",
+       "correctPeaks", "correctRT", "correctRT5",
        "findpeaks", "fitpeaks",
        "filterPeaks", "getAllPeaks", "getPeakTable",
-       "opa", "preprocess", "showALSresult", "load_chromes", 
+       "preprocess", "load_chromes", 
 	"plot_spectrum", "plot_all_spectra", "plot_spectrum_scan",
 	"combine_peaks", "compare_spectra", "plot_peaks", "cluster_spectra")
 importFrom("grDevices", "colorRampPalette", "terrain.colors")
