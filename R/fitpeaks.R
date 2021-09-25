@@ -76,7 +76,7 @@ fitpeaks <- function (y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"),
     fitpk <- function(pos) {
       xloc <- pos[1]
       peak.loc <- seq.int(pos[2], pos[3])
-      m <- fit.egh(peak.loc, y[peak.loc], 
+      m <- chromatographR:::fit.egh(peak.loc, y[peak.loc], 
                                     start.center = xloc, start.height = y[xloc])
       r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=T)
       c(m$center, m$width, m$tau, 2.35 * m$width, y[xloc], 

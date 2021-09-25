@@ -88,19 +88,19 @@ plot_peaks <- function(chrome_list, peak_list, index=1, lambda, w=5, slope=.01,
   for (i in 1:nrow(pks)){
     #print(i/nrow(pks))
     xs<-seq.int((pks$rt[i]-w),(pks$rt[i]+w))
-    mi <- xs[min(which(abs(diff(gaussian(xs, center=pks$rt[i], width=pks$sd[i], height = pks$height[i]))) > h*slope))]
-    ma <- xs[max(which(abs(diff(gaussian(xs, center=pks$rt[i], width=pks$sd[i],height = pks$height[i]))) > h*slope))]
+    mi <- xs[min(which(abs(diff(chromatographR:::gaussian(xs, center=pks$rt[i], width=pks$sd[i], height = pks$height[i]))) > h*slope))]
+    ma <- xs[max(which(abs(diff(chromatographR:::gaussian(xs, center=pks$rt[i], width=pks$sd[i],height = pks$height[i]))) > h*slope))]
     if(is.na(mi)|is.na(ma)){
       next #skip bad peaks
     } else{
       xs2<-seq.int(mi,ma)
       if(fit=="gaussian"){
-        polygon(new.ts[xs2], gaussian(xs2, center=mean(c(mi,ma)), width=pks$sd[i], height = pks$height[i]),
+        polygon(new.ts[xs2], chromatographR:::gaussian(xs2, center=mean(c(mi,ma)), width=pks$sd[i], height = pks$height[i]),
                 col=scales::alpha('red',a), border=NA)
       }
       if(fit=="egh"){
         
-        polygon(new.ts[xs2], egh(x=xs2, center=mean(c(mi,ma)), width=pks$sd[i], height = pks$height[i], tau=pks$tau[i]),
+        polygon(new.ts[xs2], chromatographR:::egh(x=xs2, center=mean(c(mi,ma)), width=pks$sd[i], height = pks$height[i], tau=pks$tau[i]),
                 col=scales::alpha('red',a), border=NA)
       }
     }

@@ -6,7 +6,7 @@ cluster_spectra <- function(pkTab, chrom_list, peak_no = c(5,100),
                             ...){
   if (verbose==T) print('...collecting representative spectra')
   rep <- sapply(1:ncol(pkTab), function(j){
-    sp <- plot_spectrum(peak=j, peak_table=pkTab, chrom_list,
+    sp <- plot_spectrum(peak=j, peak_table=pkTab, chrom_list = dat.pr,
                         scale_spectrum=T, plot_trace=F, export_spectrum = T, plot_spectrum=F,verbose=F)
   })
   rep <- data.frame(do.call(cbind,rep))

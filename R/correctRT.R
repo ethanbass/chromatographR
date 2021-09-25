@@ -1,5 +1,5 @@
 correctRT <- function(CList, warpings=NULL, reference='best', what = c("corrected.values", "models"), 
-                      init.coef = c(0, 1, 0), n.traces=NULL, n.zeros, lambdas, scale=T,
+                      init.coef = c(0, 1, 0), n.traces=NULL, n.zeros, selected.traces, scale=T,
                       trwdth=200, plot_it=T, ...) {
   what <- match.arg(what)
   CList<-lapply(CList,function(x){
@@ -8,10 +8,10 @@ correctRT <- function(CList, warpings=NULL, reference='best', what = c("correcte
   if (scale){
     CList<-lapply(CList,scales::rescale)
   }
-  allmats <- sapply(CList, function(x)x[,lambdas], simplify = "array")
-  allmats.t <- sapply(CList, function(x) t(x[,lambdas]), simplify = "array")
+  allmats <- sapply(CList, function(x)x[,selected.traces], simplify = "array")
+  allmats.t <- sapply(CList, function(x) t(x[,selected.traces]), simplify = "array")
   if (is.null(n.traces)){
-    traces=lambdas
+    traces=selected.traces
   } else{
     traces <- select.traces(X=allmats.t,criterion='coda')
     traces <- traces$trace.nrs[1:n.traces]
@@ -24,7 +24,7 @@ correctRT <- function(CList, warpings=NULL, reference='best', what = c("correcte
   }
   ptwmods <- lapply((1:dim(allmats)[3]), function(ii){
     ptw(allmats.t[,, reference],
-        allmats.t[, , ii], lambdas = traces, init.coef=init.coef, ..., warp.type = "global")})
+        allmats.t[, , ii], selected.traces = traces, init.coef=init.coef, ..., warp.type = "global")})
   if (what == "corrected.values") {
     result <- lapply(ptwmods, function(x) t(x$warped.sample))
     for (i in 1:length(result)) dimnames(result[[i]])[[1]] <- dimnames(CList[[i]])[[1]]
@@ -41,7 +41,7 @@ correctRT <- function(CList, warpings=NULL, reference='best', what = c("correcte
 
 correctRT2 <- function(CList, reference='best', what = c("corrected.values", "models"), 
                        init.coef = c(0, 1, 0), n.traces=NULL, n.zeros,
-                       lambdas, scale=T, ...) 
+                       selected.traces, scale=T, ...) 
 {
   what <- match.arg(what)
   CList<-lapply(CList,function(x){
@@ -51,11 +51,11 @@ correctRT2 <- function(CList, reference='best', what = c("corrected.values", "mo
     CList<-lapply(CList,scale::rescale)
   }
   #allmats <- sapply(CList, identity, simplify = "array")
-  allmats <- sapply(CList, function(x)x[,lambdas], simplify = "array")
+  allmats <- sapply(CList, function(x)x[,selected.traces], simplify = "array")
   #allmats.t <- sapply(CList, t, simplify = "array")
-  allmats.t <- sapply(CList, function(x) t(x[,lambdas]), simplify = "array")
+  allmats.t <- sapply(CList, function(x) t(x[,selected.traces]), simplify = "array")
   if (is.null(n.traces)){
-    traces=lambdas
+    traces=selected.traces
   } else{
     traces <- select.traces(X=allmats.t,criterion='coda')
     traces <- traces$trace.nrs[1:n.traces]
@@ -68,7 +68,7 @@ correctRT2 <- function(CList, reference='best', what = c("corrected.values", "mo
   }
   ptwmods <- lapply((1:dim(allmats)[3]), function(ii){
     ptw(allmats.t[,, reference],
-        allmats.t[, , ii], lambdas = traces, init.coef=init.coef, ..., warp.type = "global")})
+        allmats.t[, , ii], selected.traces = traces, init.coef=init.coef, ..., warp.type = "global")})
   if (what == "corrected.values") {
     result <- lapply(ptwmods, function(x) t(x$warped.sample))
     for (i in 1:length(result)) dimnames(result[[i]])[[1]] <- dimnames(CList[[i]])[[1]]
