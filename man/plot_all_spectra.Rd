@@ -4,7 +4,8 @@
 \description{
   Plot multiple for a given peak in peak table. Wrapper for \code{\link{plot_spectrum}}.
 }
-\usage{plot_all_spectra(peak, peak_table, chrom_list)}
+\usage{plot_all_spectra(peak, peak_table, chrom_list, plot_spectrum = T, plot_chrom = F,
+                             export_spectrum=T, add=F, scale_spectrum=T)}
 \arguments{
   \item{peak}{The name of the peak you wish to plot (must be in character format)}
   \item{peak_table}{The peak table (output from \code{\link{getPeakTable}} function)}

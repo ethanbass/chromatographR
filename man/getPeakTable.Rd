@@ -42,7 +42,7 @@ getPeakTable(peakList, response = c("area", "height"),
   features in the individual injections.}
 \details{The clustering based on spectral similarity used a distance function adapted from Broeckling et al., 2014: \deqn{\exp({-\frac{(1-c_{ij})^2}{2\sigma_r^2}})*\exp({-\frac{(1-(t_i - t_j)^2}{2\sigma_t^2}})} If one sees warnings about peaks from the same sample sharing a cluster label, one option is to reduce the \code{maxdiff} variable - this, however, will increase the number of clusters. Another option is to filter the peaks on intensity: perhaps one of the two peaks in the cluster is only a very small feature.}
 \author{Ethan Bass & Ron Wehrens}
-\references{Broeckling, C. D., F. A. Afsar, S. Neumann, A. Ben-Hur, and J. E. Prenni. 2014. RAMClust: A Novel Feature Clustering Method Enables Spectral-Matching-Based Annotation for Metabolomics Data. \emph{Anal. Chem.} \bold{86}:6812–6817.}
+\references{Broeckling, C. D., F. A. Afsar, S. Neumann, A. Ben-Hur, and J. E. Prenni. 2014. RAMClust: A Novel Feature Clustering Method Enables Spectral-Matching-Based Annotation for Metabolomics Data. \emph{Anal. Chem.} \bold{86}:6812-6817.}
 \examples{
 data(teaMerged)
 pks <- getAllPeaks(teaMerged$CList, span = 11)
