@@ -1,29 +1,18 @@
-
 getAllPeaks <- function (CList, lambdas, max.iter=100,...){
   if (is.numeric(lambdas)){
     lambdas <- as.character(lambdas)
   }
-  if (length(lambdas)>1){
   peaks<-list()
-  CList2 <- lapply(CList, function(Cmat) Cmat[,lambdas])
-  peakPositions <- lapply(CList2, function(Cmat){
+  CList <- lapply(CList, function(Cmat) Cmat[,lambdas, drop=F])
+  peakPositions <- lapply(CList, function(Cmat){
     apply(Cmat, 2, function(x) findpeaks(x, bounds=T))})
-  result <- lapply(1:length(CList2), function(smpl) {
+  result <- lapply(1:length(CList), function(smpl) {
     ptable <- lapply(1:length(peakPositions[[smpl]]), function(cmpnd){
-      fitpeaks(CList2[[smpl]][,cmpnd], peakPositions[[smpl]][[cmpnd]],max.iter=max.iter,...)
+      fitpeaks(CList[[smpl]][,cmpnd], peakPositions[[smpl]][[cmpnd]],max.iter=max.iter,...)
       })
     names(ptable) <- names(peakPositions[[smpl]])
     ptable
   })
-  } else {
-    peakPositions <- lapply(CList2, function(Cmat){
-      findpeaks(Cmat, bounds=T)})
-    result <- lapply(1:length(CList2), function(smpl){
-        fitpeaks(CList2[[smpl]], peakPositions[[smpl]],...)
-      })
-      #names(ptable) <- names(peakPositions[[smpl]])
-      ptable
-  }
   names(result) <- names(peakPositions)
   result <- lapply(result, function(smpl) lapply(smpl, function(pks) pks[apply(pks, 
                                                                                1, function(x) !any(is.na(x))), , drop = FALSE]))
@@ -37,34 +26,8 @@ getAllPeaks <- function (CList, lambdas, max.iter=100,...){
   }))
 }
 
-# getAllPeaks2 <- function (CList, lambdas, span = NULL, findpeaks=findpeaks_by_slope,
-#                          fitpeaks=fitpeaks, ...){
-#   peaks<-list()
-#   CList2 <- lapply(CList, function(Cmat) Cmat[,lambdas])
-#   peakPositions <- lapply(CList2, function(Cmat){
-#     apply(Cmat, 2, function(x) findpeaks(x))})
-#   Cmat <- CList2[5]
-#   result <- lapply(1:length(CList2), function(smpl) {
-#     ptable <- lapply(1:length(peakPositions[[smpl]]), function(cmpnd) fitpeaks(CList2[[smpl]], peakPositions[[smpl]][[cmpnd]],...))
-#     names(ptable) <- names(peakPositions[[smpl]])
-#     ptable
-#   })
-#   names(result) <- names(peakPositions)
-#   result <- lapply(result, function(smpl) lapply(smpl, function(pks) pks[apply(pks, 
-#                                                                                1, function(x) !any(is.na(x))), , drop = FALSE]))
-#   timepoints <- as.numeric(rownames(CList[[1]]))
-#   tdiff <- median(diff(timepoints))
-#   lapply(result, function(smpl) lapply(smpl, function(cmpnd) {
-#     x <- cmpnd
-#     x[, 1] <- timepoints[x[, 1]]
-#     x[, 2:3] <- x[, 2:3] * tdiff
-#     x
-#   }))
-# }
-
-
 ## function to visually check integration accuracy
-## fit is output of getallpeaks for chrome
+## fit is output of getAllpeaks for chrome
 
 plot_peaks <- function(chrome_list, peak_list, index=1, lambda, w=5, slope=.01,
                        points=F, a=0.5, time=c('rt','raw'),h=1){
