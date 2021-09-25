@@ -3,11 +3,11 @@
 plot_spectrum_scan <- function(rt, chrom_list, chr = 'max', lambda = 'max',
                                plot_spectrum = TRUE, plot_trace = TRUE,
                                export_spectrum=FALSE, spectrum_labels=TRUE,
-                               verbose=FALSE...){
-  new.ts <- as.numeric(rownames(chrom_list[[1]]))
-  new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
+                               verbose=FALSE, scale_spectrum=F, ...){
+  ts <- as.numeric(rownames(chrom_list[[1]]))
+  lambdas <- as.numeric(colnames(chrom_list[[1]]))
   RT <- round(as.numeric(rt),2)
-  t <- which(elementwise.all.equal(RT,new.ts))
+  t <- which(elementwise.all.equal(RT,ts))
   if (chr == 'max'){
     chr <- which.max(sapply(chrom_list,function(x) max(x[RT,])))
   }

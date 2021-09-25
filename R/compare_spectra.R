@@ -1,12 +1,14 @@
 ## check peak for false 0s, etc.
 
-compare_spectra <- function(peak, peak_table, chrom_list, ts=new.ts, new.lambdas=new.lambdas,
+compare_spectra <- function(peak, peak_table, chrom_list,
                              thresh_auto=0.95, thresh_man=0.75, r=100, plot_it=F,
                              lambda='256', zeros=F, ref='max', order_by = "distance", verbose=T, ...){
   par(mfrow=c(2,1))
   if (length(ref)==1){
     ref = plot_spectrum(peak,peak_table,chrom_list,export_spectrum=T,chr=ref)[,2]
   }
+  ts <- as.numeric(rownames(chrom_list[[1]]))
+  lambdas <- as.numeric(colnames(chrom_list[[1]]))
   # if (length(ref>1)){
   #   ref <- sapply(ref, function(r){plot_spectrum(peak,peak_table,dat.pr,plot_chrom=F,export_spectrum=T,chr=r)[,2]})
   #   #ref1 = plot_spectrum(peak,peak_table,dat.pr,export_spectrum=T,chr=ref)[,2]
@@ -76,11 +78,11 @@ compare_spectra <- function(peak, peak_table, chrom_list, ts=new.ts, new.lambdas
           legend('topright', legend = c("intensity","corr"),
                  pch = NA, lty = c(1, 3),
                  col = c(1,'slategray'), text.col = c(1,'slategray'),cex=0.4,bty='n')
-          matplot(new.lambdas,cbind(ref.s,spec.s[,pk]),type='l',xlab='',ylab='',col=c(1,4))
+          matplot(lambdas,cbind(ref.s,spec.s[,pk]),type='l',xlab='',ylab='',col=c(1,4))
           legend('topright', legend = c("reference","candidate"),
                  pch = NA, lty = c(1, 3),
                  col = c(1,4), text.col = c(1,4),cex=0.4,bty='n')
-          ans2 <- readline(promp = "accept this peak as a match (y/n)?")
+          ans2 <- readline(prompt = "accept this peak as a match (y/n)?")
           if (ans2=='y'){
             peak_table[(chr+3),peak] <- spec[lambda,pk]
             break
