@@ -4,7 +4,7 @@
 \description{
   Plot spectrum at the specified retention time.
 }
-\usage{plot_spectrum(peak, peak_table, chrom_list, chr = 'max', lambda = 'max',
+\usage{plot_spectrum(rt, chrom_list, chr = 'max', lambda = 'max',
                           plot_spectrum = T, plot_trace = T, export_spectrum = FALSE,
                           spectrum_labels = T, verbose = T, scale_spectrum = F, ...)}
 \arguments{
@@ -18,6 +18,7 @@
   \item{spectrum_labels}{Logical. If TRUE, plots labels on maxima in plot of spectrum}
   \item{verbose}{Logical. If TRUE, prints verbose output to console.}
   \item{scale_spectrum}{Logical. If TRUE, scales spectrum to unit height.}
+  \item{export_spectrum}{Logical. If TRUE, exports spectrum to console. Defaults to FALSE.}
 }
 \author{Ethan Bass}
 \seealso{\code{\link{plot_spectrum}}}
