@@ -6,9 +6,7 @@
   confirm the identity of a peak or check that a particular column in the peak table represents
   a single compound.
 }
-\usage{plot_spectrum(peak, peak_table, chrom_list, chr = 'max', lambda = 'max',
-                          plot_spectrum = T, plot_trace = T, export_spectrum=FALSE,
-                          spectrum_labels=T, verbose=T, scale_spectrum=F)}
+\usage{plot_spectrum(peak, peak_table, chrom_list)}
 \arguments{
   \item{peak}{The name of the peak you wish to plot (must be in character format).}
   \item{peak_table}{The peak table (output from \code{\link{getPeakTable}} function).}

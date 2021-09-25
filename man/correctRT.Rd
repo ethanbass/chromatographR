@@ -7,8 +7,7 @@
 }
 \usage{correctRT(CList, reference,
                  what = c("corrected.values", "models"),
-                 init.coef = c(0, 1, 0), n.traces = 3, n.zeros=0,
-                 lambdas=c('210','260')...)}
+                 init.coef = c(0, 1, 0), ...)}
 \arguments{
   \item{CList}{List of matrices containing concentration profiles.}
   \item{reference}{Index of the sample that is to be considered the
@@ -19,7 +18,7 @@
   \item{init.coef}{Starting values for the optimisation.}
   \item{n.traces}{Number of traces to use.}
   \item{n.zeros}{Number of zeros to add.}
-  \item{lambdas}{Select wavelengths to use by name.}
+  \item{selected.traces}{Select traces to use by name.}
   \item{scale}{Logical. If true, scale chromatograms before warping.}
   \item{trwdth}{}
   \item{plot_it}{}
@@ -52,9 +51,7 @@ for (i in 1:4)
             main = paste("Component", i, "- warped"))
 par(def.par) ## reset defaults
 }
-\references{
-Eilers, P.H.C. 2004. \href{https://pubs.acs.org/doi/10.1021/ac034800e}{Parametric Time Warping.} \emph{Anal. Chem.} \bold{76}:404-411.
+\references{Eilers, P. H. C. 2004. \href{https://pubs.acs.org/doi/10.1021/ac034800e}{Parametric Time Warping.} \emph{Anal. Chem.} \bold{76}:404–411.
 
-Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. \href{https://academic.oup.com/bioinformatics/article/31/18/3063/240579}{Fast parametric time warping of peak lists.} \emph{Bioinformatics} \bold{31}:3063-3065.
-}
+Wehrens, R., T. G. Bloemberg, and P. H. C. Eilers. 2015. \href{https://academic.oup.com/bioinformatics/article/31/18/3063/240579}{Fast parametric time warping of peak lists.} \emph{Bioinformatics} \bold{31}:3063–3065.}
 \keyword{manip}

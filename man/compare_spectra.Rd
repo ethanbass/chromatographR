@@ -4,9 +4,9 @@
 \description{
 Function that tries to correct false zeroes for a particular peak in the peaktable. In each chromatogram, the function compares all peaks within a certain radius around the focal peak on the basis of their spectral similarity to a reference spectrum.}
 \usage{
-compare_spectra(peak, peak_table, chrom_list,
-                  thresh_auto=0.95, thresh_man=0.75, r=100, plot_it=F,
-                  lambda='256', zeros=F, ref='max', order_by = "distance", verbose=T)}
+compare_spectra(peak, peak_table, chrom_list, ts=new.ts, new.lambdas=new.lambdas,
+                             thresh_auto=0.95, thresh_man=0.75, r=100, plot_it=F,
+                             lambda='256', zeros=F, ref='max', order_by = "distance", verbose=T)}
 \arguments{
   \item{peak}{Name of peak to be investigated.}
   \item{peak_table}{Peak table from \code{\link{getPeakTable}}.}

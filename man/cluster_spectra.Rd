@@ -2,10 +2,10 @@
 \alias{cluster_spectra}
 \title{Function to cluster peaks by spectral similarity.}
 \description{
-Function that clusters peaks by spectral similarity. A representative spectrum is selected for each peak in the provided peak table and used to construct a distance matrix based on spectral similarity (pearson correlation) between peaks. Currently, representative spectrum is just selected from the chromatogram with the highest absorbance at lambda max. Hierarchical clustering with bootstrap resampling is performed on the resulting correlation matrix, as implemented in the \code{\link[pvclust::pvclust]{pvclust}} package. Bootstrap values can be used to select clusters that exceed a certain confidence threshold as defined by alpha.
-}
+Function that clusters peaks by spectral similarity. A representative spectrum is selected for each peak in the provided peak table and used to construct a distance matrix based on spectral similarity (pearson correlation) between peaks. Currently, representative spectrum is just selected from the chromatogram with the highest absorbance at lambda max. Hierarchical clustering with bootstrap resampling is performed on the resulting correlation matrix, as implemented in the \code{\link[pvclust:pvclust]{pvclust}} package. Bootstrap values can be used to select clusters that exceed a certain confidence threshold as defined by alpha.
+}`
 \usage{
-cluster_spectra <- function(pkTab=pkTab, chrom_list=dat.pr, 
+cluster_spectra <- function(pkTab, chrom_list, 
                             deepSplit = FALSE, peak_no=c(5,100),
                             alpha=0.95, nboot=1000, plot_dend=T, plot_spectra=T,
                             verbose=T, save=T, parallel=T)

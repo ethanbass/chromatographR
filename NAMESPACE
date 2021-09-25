@@ -19,8 +19,5 @@ importFrom("graphics", "abline", "axTicks", "box", "contour", "image",
            "layout", "matplot", "par", "plot", "rect", "text", "title")
 importFrom("stats", "aggregate", "approx", "as.dist", "cor", "cutree",
            "dist", "dnorm", "embed", "hclust", "median", "predict",
-           "smooth.spline", "coef", "deriv", "fitted", "lm", "nls",
-               "nls.control", "pnorm", "quantile", "residuals")
-importFrom("utils", "capture.output", "read.csv")
-importFrom("graphics", "legend", "polygon")
-importFrom("methods", "new")
+           "smooth.spline")
+importFrom("utils", "capture.output")      

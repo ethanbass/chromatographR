@@ -17,9 +17,9 @@ fitpeaks(y, pos)
   \item{slope_thresh}{Minimum threshold for peak slope.}
   \item{amp_thresh}{Minimum treshold for peak amplitude.}
   \item{pos}{locations of local maxima in vector y}
+  \item{w}{Width to use for peak search.}
   \item{sd.max}{Maximum standard deviation of peak.}
-  \item{fit}{Function for peak fitting. (Currently "gaussian" and 
-  exponential gaussian hybrid ("egh") are supported.)}
+  \item{fit}{Function for peak fitting. (Currently only "gaussian" is supported.)}
 }
 \details{
   Find peaks with function \code{findpeaks} by looking for "zero-crossings" in
@@ -46,7 +46,7 @@ fitpeaks(y, pos)
 }
 \note{The \code{findpeaks} function is adapted from matlab code in
   Prof. Tom O'Haver's \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{Pragmatic Introduction to Signal Processing}.}
-\note{The \code{fitpeaks} function is adapted from Dr. Robert Morrison's \href{https://github.com/robertdouglasmorrison/DuffyTools}{DuffyTools} package as well as code published in Ron Wehrens' \code{\link{alsace}} package.}
+\note{The \code{fitpeaks} function is adapted from Dr. Robert Morrison's \code{\href{https://github.com/robertdouglasmorrison/DuffyTools}{DuffyTools}} package as well as code published in Ron Wehrens' \code{\link{alsace}} package.}
 \author{Ethan Bass}
 \seealso{\code{\link{getAllPeaks}}}
 \keyword{manip}
