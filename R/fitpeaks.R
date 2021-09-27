@@ -93,8 +93,9 @@ fitpeaks <- function (y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"),
   }
   huhn[huhn$rt>0,]
 }
-####################################
-# from https://github.com/robertdouglasmorrison/DuffyTools/blob/master/R/gaussian.R
+#################################################################################################
+### gaussian
+## from https://github.com/robertdouglasmorrison/DuffyTools/blob/master/R/gaussian.R
 
 gaussian <- function( x, center=0, width=1, height=NULL, floor=0) {
   
@@ -166,10 +167,9 @@ fit.gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height
 }
 
 
-####################################
-
-egh <- 
-  function(x, center, width,  height, tau, floor=0){
+###########################################################################################
+### expontential-gaussian hybrid
+egh <- function(x, center, width,  height, tau, floor=0){
     result <- rep(0, length(x))
     index <- which(2*width^2 + tau*(x-center)>0)
     result[index] <- height*exp(-(x[index]-center)^2/(2*width^2 + tau*(x[index]-center)))

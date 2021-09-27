@@ -24,7 +24,7 @@ correctRT <- function(CList, warpings=NULL, reference='best', what = c("correcte
   }
   ptwmods <- lapply((1:dim(allmats)[3]), function(ii){
     ptw(allmats.t[,, reference],
-        allmats.t[, , ii], lambdas = traces, init.coef=init.coef, ..., warp.type = "global")})
+        allmats.t[, , ii], selected.traces = traces, init.coef=init.coef, ..., warp.type = "global")})
   if (what == "corrected.values") {
     result <- lapply(ptwmods, function(x) t(x$warped.sample))
     for (i in 1:length(result)) dimnames(result[[i]])[[1]] <- dimnames(CList[[i]])[[1]]
@@ -68,7 +68,7 @@ correctRT2 <- function(CList, reference='best', what = c("corrected.values", "mo
   }
   ptwmods <- lapply((1:dim(allmats)[3]), function(ii){
     ptw(allmats.t[,, reference],
-        allmats.t[, , ii], lambdas = traces, init.coef=init.coef, ..., warp.type = "global")})
+        allmats.t[, , ii], selected.traces = traces, init.coef=init.coef, ..., warp.type = "global")})
   if (what == "corrected.values") {
     result <- lapply(ptwmods, function(x) t(x$warped.sample))
     for (i in 1:length(result)) dimnames(result[[i]])[[1]] <- dimnames(CList[[i]])[[1]]
