@@ -1,21 +1,4 @@
 
-
-## legacy peak-finding function. detects local maximum within windows of width determined by "span"
-# 
-# findpeaks <- function(y, span = NULL)
-# {
-#   if (is.null(span)) span <- round(.2 * length(y))
-#   
-#   z <- embed(y, span)
-#   s <- span %/% 2
-#   v <- max.col(z, ties.method = "first") == 1 + s
-# 
-#   which(c(rep(FALSE, s), v, rep(FALSE, s)))
-# }
-
-## new peak finding function ported from matlab
-## (see http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm)
-
 findpeaks <- function(y, smooth_type='gaussian', smooth_window = 1, smooth_width = 0.1,
                                slope_thresh=.05, amp_thresh=0, bounds=F){
   if (smooth_type=='gaussian'){
@@ -386,3 +369,19 @@ fitpeaks_at_max <- function (mat, pos, w=5, sd.max=50, fit=c("gaussian","egh")){
   huhn[huhn$sd<sd.max,]
 }
 
+
+## legacy peak-finding function. detects local maximum within windows of width determined by "span"
+# 
+# findpeaks <- function(y, span = NULL)
+# {
+#   if (is.null(span)) span <- round(.2 * length(y))
+#   
+#   z <- embed(y, span)
+#   s <- span %/% 2
+#   v <- max.col(z, ties.method = "first") == 1 + s
+# 
+#   which(c(rep(FALSE, s), v, rep(FALSE, s)))
+# }
+
+## new peak finding function ported from matlab
+## (see http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm)

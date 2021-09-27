@@ -8,7 +8,7 @@ getAllPeaks <- function (CList, lambdas, max.iter=100,...){
     apply(Cmat, 2, function(x) findpeaks(x, bounds=T))})
   result <- lapply(1:length(CList), function(smpl) {
     ptable <- lapply(1:length(peakPositions[[smpl]]), function(cmpnd){
-      fitpeaks(CList[[smpl]][,cmpnd], peakPositions[[smpl]][[cmpnd]],max.iter=max.iter,...)
+      fitpeaks(CList[[smpl]][,cmpnd], peakPositions[[smpl]][[cmpnd]], max.iter=max.iter, ...)
       })
     names(ptable) <- names(peakPositions[[smpl]])
     ptable
@@ -20,8 +20,9 @@ getAllPeaks <- function (CList, lambdas, max.iter=100,...){
   tdiff <- median(diff(timepoints))
   lapply(result, function(smpl) lapply(smpl, function(cmpnd) {
     x <- cmpnd
-    x[, 1] <- timepoints[x[, 1]]
-    x[, 2:3] <- x[, 2:3] * tdiff
+    x[, c('rt', 'start', 'end')] <- sapply(c('rt', 'start', 'end'), function(j) timepoints[x[,j]])
+    x[, c('sd', 'FWHM')] <- x[, c('sd', 'FWHM')] * tdiff
+    if (!is.null(x$tau)){x[, c('tau')] <- x[, c('tau')] * tdiff} 
     x
   }))
 }
@@ -48,16 +49,11 @@ plot_peaks <- function(chrome_list, peak_list, index=1, lambda=NULL, w=100, slop
   if (points==T){
     points(pks$rt, pks$height, pch=20, cex=0.5, col='red')
   }
-  # if (time=='rt'){
-  #   pks$rt <- (pks$rt - new.ts[1])*100
-  #   pks$sd <- pks$sd*100
-  # }
   for (i in 1:nrow(pks)){
-    #print(i/nrow(pks))
-    w <- pks[i,'FWHM']
     xs<-seq.int((pks$rt[i]-w),(pks$rt[i]+w), by = .01)
-    mi <- xs[min(which(abs(diff(gaussian(xs, center=pks$rt[i], width=pks$sd[i], height = pks$height[i]))) > h*slope))]
-    ma <- xs[max(which(abs(diff(gaussian(xs, center=pks$rt[i], width=pks$sd[i], height = pks$height[i]))) > h*slope))]
+    m <- gaussian(xs, center=pks$rt[i], width=pks$sd[i], height = pks$height[i])
+    mi <- xs[min(which(abs(diff(m)) > h*slope))]
+    ma <- xs[max(which(abs(diff(m)) > h*slope))]
     if(is.na(mi)|is.na(ma)){
       next #skip bad peaks
     } else{
