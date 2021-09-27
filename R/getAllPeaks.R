@@ -10,7 +10,7 @@ getAllPeaks <- function (CList, lambdas, max.iter=100,
     apply(Cmat, 2, function(x) findpeaks(x, bounds=T))})
   result <- lapply(1:length(CList), function(smpl) {
     ptable <- lapply(1:length(peakPositions[[smpl]]), function(cmpnd){
-      fitpeaks(CList[[smpl]][,cmpnd], peakPositions[[smpl]][[cmpnd]], max.iter=max.iter, ...)
+      fitpeaks(CList[[smpl]][,cmpnd], peakPositions[[smpl]][[cmpnd]], fit=fit, max.iter=max.iter, ...)
       })
     names(ptable) <- names(peakPositions[[smpl]])
     ptable
