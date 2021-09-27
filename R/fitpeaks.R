@@ -38,14 +38,15 @@ findpeaks <- function(y, smooth_type='gaussian', smooth_window = 1, smooth_width
   p
 }
 
-# fit peaks using gaussian distribution (egh setting (exponential gaussian hybrid) doesn't work yet).
+# fit peaks using gaussian or exponential-gaussian hybrid ('egh') distribution
+# (emg setting doesn't work yet).
 
 fitpeaks <- function (y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"), 
                       max.iter = 100) 
 {
   fit <- match.arg(fit, c("gaussian", "egh", "emg"))
   if (fit == "gaussian") {
-    tabnames <- c("rt", "sd", "FWHM", "height", "area", "r-squared")
+    tabnames <- c("rt","start","end", "sd", "FWHM", "height", "area", "r-squared")
     noPeaksMat <- matrix(rep(NA, 6), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
     on.edge <- sapply(pos$pos, function(x) y[x + 1] == 0 | 
@@ -59,12 +60,12 @@ fitpeaks <- function (y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"),
       m <- fit.gaussian(peak.loc, y[peak.loc], start.center = xloc, 
                         start.height = y[xloc], max.iter = max.iter)
       r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=T)
-      c(m$center, m$width, 2.35 * m$width, y[xloc], y[xloc]/dnorm(m$center, 
+      c(m$center, pos[2], pos[3], m$width, 2.35 * m$width, y[xloc], y[xloc]/dnorm(m$center, 
                                                                   m$center, m$width), r.squared)
     }
   }
   else if (fit == "egh") {
-    tabnames <- c("rt", "sd", "tau", "FWHM", "height", "area", 
+    tabnames <- c("rt","start","end", "sd", "tau", "FWHM", "height", "area", 
                   "r.squared")
     noPeaksMat <- matrix(rep(NA, 7), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
@@ -79,7 +80,7 @@ fitpeaks <- function (y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"),
       m <- fit.egh(peak.loc, y[peak.loc], 
                                     start.center = xloc, start.height = y[xloc])
       r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=T)
-      c(m$center, m$width, m$tau, 2.35 * m$width, y[xloc], 
+      c(m$center, pos[2], pos[3], m$width, m$tau, 2.35 * m$width, y[xloc], 
         y[xloc]/dnorm(m$center, m$center, m$width), r.squared)
     }
   }
