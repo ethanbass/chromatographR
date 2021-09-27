@@ -29,41 +29,46 @@ getAllPeaks <- function (CList, lambdas, max.iter=100,...){
 ## function to visually check integration accuracy
 ## fit is output of getAllpeaks for chrome
 
-plot_peaks <- function(chrome_list, peak_list, index=1, lambda, w=5, slope=.01,
+plot_peaks <- function(chrome_list, peak_list, index=1, lambda=NULL, w=100, slope=.01,
                        points=F, a=0.5, time=c('rt','raw'),h=1){
+  if (is.null(lambda)){
+    lambda <- names(peak_list[[1]])[1]
+  }
   if (!(lambda %in% names(peak_list[[1]]))){
     stop('Error: lambda must match one of the wavelengths in your peak list')
   }
+  if (is.numeric(lambda)){lambda <- as.character(lambda)}
   new.ts <- as.numeric(rownames(chrome_list[[1]]))
   y<-chrome_list[[index]][,lambda]
   pks<-data.frame(peak_list[[index]][[lambda]])
   if ("tau" %in% colnames(pks)){
     fit<-"egh"
   } else{ fit<-"gaussian"}
-  plot(new.ts,y,type='l',xlab='',ylab='',xaxt='n',yaxt='n')
-  if (time=='rt'){
-    pks$rt <- (pks$rt - new.ts[1])*100
-    pks$sd <- pks$sd*100
-  }
+  plot(new.ts, y, type='l', xlab='', ylab='', xaxt='n', yaxt='n')
   if (points==T){
-    points(new.ts[pks$rt],pks$height,pch=20,cex=0.5,col='red')
+    points(pks$rt, pks$height, pch=20, cex=0.5, col='red')
   }
+  # if (time=='rt'){
+  #   pks$rt <- (pks$rt - new.ts[1])*100
+  #   pks$sd <- pks$sd*100
+  # }
   for (i in 1:nrow(pks)){
     #print(i/nrow(pks))
-    xs<-seq.int((pks$rt[i]-w),(pks$rt[i]+w))
+    w <- pks[i,'FWHM']
+    xs<-seq.int((pks$rt[i]-w),(pks$rt[i]+w), by = .01)
     mi <- xs[min(which(abs(diff(gaussian(xs, center=pks$rt[i], width=pks$sd[i], height = pks$height[i]))) > h*slope))]
-    ma <- xs[max(which(abs(diff(gaussian(xs, center=pks$rt[i], width=pks$sd[i],height = pks$height[i]))) > h*slope))]
+    ma <- xs[max(which(abs(diff(gaussian(xs, center=pks$rt[i], width=pks$sd[i], height = pks$height[i]))) > h*slope))]
     if(is.na(mi)|is.na(ma)){
       next #skip bad peaks
     } else{
-      xs2<-seq.int(mi,ma)
+      xs2<-seq.int(mi,ma, by = .01)
       if(fit=="gaussian"){
-        polygon(new.ts[xs2], gaussian(xs2, center=mean(c(mi,ma)), width=pks$sd[i], height = pks$height[i]),
+        polygon(xs2, gaussian(xs2, center=mean(c(mi,ma)), width=pks$sd[i], height = pks$height[i]),
                 col=scales::alpha('red',a), border=NA)
       }
       if(fit=="egh"){
         
-        polygon(new.ts[xs2], egh(x=xs2, center=mean(c(mi,ma)), width=pks$sd[i], height = pks$height[i], tau=pks$tau[i]),
+        polygon(xs2, egh(x=xs2, center=mean(c(mi,ma)), width=pks$sd[i], height = pks$height[i], tau=pks$tau[i]),
                 col=scales::alpha('red',a), border=NA)
       }
     }

@@ -26,20 +26,20 @@ converted into an \R-accessible format such as a \code{csv} file. Once
 all \code{csv} files are gathered in one directory (say, \code{foo}),
 an easy way to load them is to use \code{lapply}:
 
-<<preprocData>>=
+```{r}
 new.lambdas <- seq(260, 500, by = 2)
-tea <- lapply(tea.raw, preprocess, dim2 = new.lambdas)
+dat.pr <- lapply(tea.raw, preprocess, dim2 = new.lambdas)
 sapply(tea.raw, dim)
 sapply(tea, dim)
-@ 
+```
 
 
 \subsection{warping}
 
 \subsection{find peaks}
 ```{r}
-pks <- getAllPeaks(dat.pr, span = 5)
-plot_peaks(pks[[1]], dat.pr)
+pks <- getAllPeaks(dat.pr, lambdas=c('260','460'))
+plot_peaks(dat.pr, pks, index=1, w = 50, lambda = '260')
 sapply(pks, function(x) sapply(x, nrow))
 ```
 
