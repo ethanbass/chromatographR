@@ -1,5 +1,5 @@
 correctRT <- function(CList, warpings=NULL, reference='best', what = c("corrected.values", "models"), 
-                      init.coef = c(0, 1, 0), n.traces=NULL, n.zeros, lambdas, scale=T,
+                      init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, lambdas, scale=T,
                       trwdth=200, plot_it=T, ...) {
   what <- match.arg(what)
   CList<-lapply(CList,function(x){
@@ -40,7 +40,7 @@ correctRT <- function(CList, warpings=NULL, reference='best', what = c("correcte
 
 
 correctRT2 <- function(CList, reference='best', what = c("corrected.values", "models"), 
-                       init.coef = c(0, 1, 0), n.traces=NULL, n.zeros,
+                       init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0,
                        lambdas, scale=T, ...) 
 {
   what <- match.arg(what)
