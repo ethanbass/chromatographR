@@ -1,4 +1,6 @@
-getAllPeaks <- function (CList, lambdas, max.iter=100,...){
+getAllPeaks <- function (CList, lambdas, max.iter=100,
+                         fit = c("egh", "gaussian", "emg"), ...){
+  fit <- match.arg(fit, c("egh", "gaussian", "emg"))
   if (is.numeric(lambdas)){
     lambdas <- as.character(lambdas)
   }
@@ -30,8 +32,8 @@ getAllPeaks <- function (CList, lambdas, max.iter=100,...){
 ## function to visually check integration accuracy
 ## fit is output of getAllpeaks for chrome
 
-plot_peaks <- function(chrome_list, peak_list, index=1, lambda=NULL, w=100, slope=.01,
-                       points=F, a=0.5, time=c('rt','raw'),h=1){
+plot_peaks <- function(chrome_list, peak_list, index=1, lambda=NULL, w=0.5, slope=.01,
+                       points=F, a=0.5, time=c('rt','raw'), h=1){
   if (is.null(lambda)){
     lambda <- names(peak_list[[1]])[1]
   }
@@ -59,13 +61,12 @@ plot_peaks <- function(chrome_list, peak_list, index=1, lambda=NULL, w=100, slop
     } else{
       xs2<-seq.int(mi,ma, by = .01)
       if(fit=="gaussian"){
-        polygon(xs2, gaussian(xs2, center=mean(c(mi,ma)), width=pks$sd[i], height = pks$height[i]),
+        polygon(xs2, gaussian(xs2, center=pks$rt[i], width=pks$sd[i], height = pks$height[i]),
                 col=scales::alpha('red',a), border=NA)
       }
       if(fit=="egh"){
-        
-        polygon(xs2, egh(x=xs2, center=mean(c(mi,ma)), width=pks$sd[i], height = pks$height[i], tau=pks$tau[i]),
-                col=scales::alpha('red',a), border=NA)
+        polygon(xs2, egh(x=xs2, center=pks$rt[i], width=pks$sd[i], height = pks$height[i], tau=pks$tau[i]),
+                col=scales::alpha('purple',a), border=NA)
       }
     }
   }
