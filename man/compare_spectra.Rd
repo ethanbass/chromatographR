@@ -25,6 +25,5 @@ compare_spectra(peak, peak_table, chrom_list,
 \value{A peak table similar to the input peak table, but with changes to entries selected column
 as defined by the algorithm.}
 \author{Ethan Bass}
-
 \seealso{\code{\link{getAllPeaks}}}
 \keyword{manip}

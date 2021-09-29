@@ -48,5 +48,8 @@ fitpeaks(y, pos)
   Prof. Tom O'Haver's \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{Pragmatic Introduction to Signal Processing}.}
 \note{The \code{fitpeaks} function is adapted from Dr. Robert Morrison's \href{https://github.com/robertdouglasmorrison/DuffyTools}{DuffyTools} package as well as code published in Ron Wehrens' \code{\link{alsace}} package.}
 \author{Ethan Bass}
+\references{
+Lan, K. & Jorgenson, J. W. A hybrid of exponential and gaussian functions as a simple model of asymmetric chromatographic peaks. Journal of Chromatography A 915, 1–13 (2001).
+}
 \seealso{\code{\link{getAllPeaks}}}
 \keyword{manip}
