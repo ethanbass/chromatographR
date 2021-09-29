@@ -1,6 +1,6 @@
 ## Plot spectrum at a particular time point.
 
-plot_spectrum_scan <- function(rt, chrom_list, chr = 'max', lambda = 'max',
+scan_spectrum <- function(rt, chrom_list, chr = 'max', lambda = 'max',
                                plot_spectrum = TRUE, plot_trace = TRUE,
                                export_spectrum=FALSE, spectrum_labels=TRUE,
                                verbose=FALSE, scale_spectrum=F, ...){

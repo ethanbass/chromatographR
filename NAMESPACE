@@ -4,8 +4,7 @@
 import(ptw)
 import(pvclust)
 
-export("splitTimeWindow", "mergeTimeWindows",
-       "correctPeaks", "correctRT", "correctRT5", "correct_rt",
+export("correctPeaks", "correctRT", "correctRT5", "correct_rt",
        "find_peaks", "fit_peaks", "getAllPeaks", "get_peaks",
        "getPeakTable", "get_peaktable",
        "preprocess", "load_chromes", 
