@@ -1,10 +1,10 @@
-\name{plot_spectrum_scan}
-\alias{plot_spectrum_scan}
+\name{scan_spectrum}
+\alias{scan_spectrum}
 \title{Plot spectrum at given retention time}
 \description{
   Plot spectrum at the specified retention time.
 }
-\usage{plot_spectrum(rt, chrom_list, chr = 'max', lambda = 'max',
+\usage{scan_spectrum(rt, chrom_list, chr = 'max', lambda = 'max',
                           plot_spectrum = T, plot_trace = T, export_spectrum = FALSE,
                           spectrum_labels = T, verbose = T, scale_spectrum = F, ...)}
 \arguments{

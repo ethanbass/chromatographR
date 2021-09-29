@@ -1,4 +1,4 @@
-getAllPeaks <- function (CList, lambdas, max.iter=100,
+get_peaks <- function (CList, lambdas, max.iter=100,
                          fit = c("egh", "gaussian", "emg"), ...){
   fit <- match.arg(fit, c("egh", "gaussian", "emg"))
   if (is.numeric(lambdas)){
@@ -7,10 +7,44 @@ getAllPeaks <- function (CList, lambdas, max.iter=100,
   peaks<-list()
   CList <- lapply(CList, function(Cmat) Cmat[,lambdas, drop=F])
   peakPositions <- lapply(CList, function(Cmat){
-    apply(Cmat, 2, function(x) findpeaks(x, bounds=T))})
+    apply(Cmat, 2, function(x) find_peaks(x, bounds=T))})
   result <- lapply(1:length(CList), function(smpl) {
     ptable <- lapply(1:length(peakPositions[[smpl]]), function(cmpnd){
-      fitpeaks(CList[[smpl]][,cmpnd], peakPositions[[smpl]][[cmpnd]], fit=fit, max.iter=max.iter, ...)
+      fit_peaks(CList[[smpl]][,cmpnd], peakPositions[[smpl]][[cmpnd]], fit=fit, max.iter=max.iter, ...)
+    })
+    names(ptable) <- names(peakPositions[[smpl]])
+    ptable
+  })
+  names(result) <- names(peakPositions)
+  result <- lapply(result, function(smpl) lapply(smpl, function(pks) pks[apply(pks, 
+                                                                               1, function(x) !any(is.na(x))), , drop = FALSE]))
+  timepoints <- as.numeric(rownames(CList[[1]]))
+  tdiff <- median(diff(timepoints))
+  lapply(result, function(smpl) lapply(smpl, function(cmpnd) {
+    x <- cmpnd
+    x[, c('rt', 'start', 'end')] <- sapply(c('rt', 'start', 'end'), function(j) timepoints[x[,j]])
+    x[, c('sd', 'FWHM')] <- x[, c('sd', 'FWHM')] * tdiff
+    if (!is.null(x$tau)){x[, c('tau')] <- x[, c('tau')] * tdiff} 
+    x
+  }))
+}
+
+getAllPeaks <- function (CList, lambdas, max.iter=100,
+                         fit = c("egh", "gaussian", "emg"), ...){
+  msg<-"The getAllPeaks function is deprecated. Please use get_peaks instead"
+  .Deprecated(getAllPeaks, package="chromatographR", msg,
+              old = as.character(sys.call(sys.parent()))[1L])
+  fit <- match.arg(fit, c("egh", "gaussian", "emg"))
+  if (is.numeric(lambdas)){
+    lambdas <- as.character(lambdas)
+  }
+  peaks<-list()
+  CList <- lapply(CList, function(Cmat) Cmat[,lambdas, drop=F])
+  peakPositions <- lapply(CList, function(Cmat){
+    apply(Cmat, 2, function(x) find_peaks(x, bounds=T))})
+  result <- lapply(1:length(CList), function(smpl) {
+    ptable <- lapply(1:length(peakPositions[[smpl]]), function(cmpnd){
+      fit_peaks(CList[[smpl]][,cmpnd], peakPositions[[smpl]][[cmpnd]], fit=fit, max.iter=max.iter, ...)
       })
     names(ptable) <- names(peakPositions[[smpl]])
     ptable

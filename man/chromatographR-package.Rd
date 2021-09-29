@@ -1,6 +1,6 @@
-\name{alsace-package}
-\alias{alsace-package}
-\alias{alsace}
+\name{chromatographR-package}
+\alias{chromatographR-package}
+\alias{chromatographR}
 \docType{package}
 \title{Alternating Least Squares in an Analytic Chemistry Environment}
 \description{Add-on to the ALS package that implements Alternating Least
@@ -35,14 +35,9 @@ only be obtained by either careful definition of additional constraints,
 or the addition of more data.
 }
 \author{
-Ron Wehrens
+Ethan Bass
 
-Maintainer: Ron Wehrens <ron.wehrens@fmach.it>
+Maintainer: Ethan Bass <ron.wehrens@fmach.it>
 }
-\references{
-  R. Wehrens: Chemometrics with R. Springer Verlag, Heidelberg (2011)
 
-  R. Wehrens, E. Carvalho et al.: High-throughput carotenoid profiling using
-  multivariate curve resolution. Anal. Bioanal. Chem., 15:5075-5086 (2013)
-}
 \keyword{ package }

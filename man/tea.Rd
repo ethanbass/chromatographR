@@ -4,14 +4,10 @@
 \docType{data}
 \title{HLPC-DAD data for grape extracts conserved with TEA}
 \description{
-Five (very much compressed) HPLC-DAD data matrices of grape extracts
-after several storage times. All extracts come from the same pooled
-sample. Since the raw data are given (no smoothing or
-baseline subtraction has been done, only subsetting of the time and
-wavelength axes), the object is called \code{tea.raw}.
-
+Five HPLC-DAD data matrices of *Solidago altissima* roots. Since the raw data are given (no smoothing or baseline subtraction has been done, only subsetting of the time and
+wavelength axes), the object is called \code{Sa.raw}.
 }
-\usage{data(tea)}
+\usage{data(Sa.raw)}
 \format{The UV-Vis data (\code{tea.raw}) are given as a list of five
   matrices, each of dimension 97 times 209 (time x wavelength). The
   names of the list indicate the day of measurement - day 0 is

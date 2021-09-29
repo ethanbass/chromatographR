@@ -1,5 +1,5 @@
 
-findpeaks <- function(y, smooth_type='gaussian', smooth_window = 1, smooth_width = 0.1,
+find_peaks <- function(y, smooth_type='gaussian', smooth_window = 1, smooth_width = 0.1,
                                slope_thresh=.05, amp_thresh=0, bounds=F){
   if (smooth_type=='gaussian'){
     d <- smoother::smth.gaussian(diff(y),window = smooth_window, alpha=smooth_width)
@@ -24,7 +24,7 @@ findpeaks <- function(y, smooth_type='gaussian', smooth_window = 1, smooth_width
 # fit peaks using gaussian or exponential-gaussian hybrid ('egh') distribution
 # (emg setting doesn't work yet).
 
-fitpeaks <- function (y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"), 
+fit_peaks <- function (y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"), 
                       max.iter = 100) 
 {
   fit <- match.arg(fit, c("gaussian", "egh", "emg"))
@@ -40,7 +40,7 @@ fitpeaks <- function (y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"),
     fitpk <- function(pos) {
       xloc <- pos[1]
       peak.loc <- seq.int(pos[2], pos[3])
-      m <- fit.gaussian(peak.loc, y[peak.loc], start.center = xloc, 
+      m <- fit_gaussian(peak.loc, y[peak.loc], start.center = xloc, 
                         start.height = y[xloc], max.iter = max.iter)
       r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=T)
       c(m$center, pos[2], pos[3], m$width, 2.35 * m$width, y[xloc], y[xloc]/dnorm(m$center, 
@@ -60,7 +60,7 @@ fitpeaks <- function (y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"),
     fitpk <- function(pos) {
       xloc <- pos[1]
       peak.loc <- seq.int(pos[2], pos[3])
-      m <- fit.egh(peak.loc, y[peak.loc], 
+      m <- fit_egh(peak.loc, y[peak.loc], 
                                     start.center = xloc, start.height = y[xloc])
       r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=T)
       c(m$center, pos[2], pos[3], m$width, m$tau, 2.35 * m$width, y[xloc], 
@@ -113,7 +113,7 @@ gaussian <- function( x, center=0, width=1, height=NULL, floor=0) {
 }
 
 
-fit.gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height=NULL,
+fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height=NULL,
                          start.floor=NULL, fit.floor=FALSE, max.iter) {
   
   # try to find the best gaussian to fit the given data
@@ -176,7 +176,7 @@ egh <- function(x, center, width,  height, tau, floor=0){
     return(result)
   }
 
-fit.egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL, start.height=NULL,
+fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL, start.height=NULL,
                     start.floor=NULL, fit.floor=FALSE) {
   
   # try to find the best egh to fit the given data
@@ -341,8 +341,8 @@ fitpeaks_at_max <- function (mat, pos, w=5, sd.max=50, fit=c("gaussian","egh")){
       lambda <- which.max(mat[xloc,])
       y <- mat[,lambda]
       peak.loc <- seq.int(xloc-w, xloc+w)
-      m <- fit.gaussian(peak.loc, y[peak.loc])
-      #fit <- fit.egh(peak.loc, y[peak.loc])
+      m <- fit_gaussian(peak.loc, y[peak.loc])
+      #fit <- fit_egh(peak.loc, y[peak.loc])
       #fit <- egh_optim(peak.loc, y[peak.loc], par=c(1,1,1,1), upper=c(Inf,Inf,Inf,Inf), lower=c(0,0,0,0))
       c(m$center, colnames(mat)[lambda], m$width, 2.35*m$width, y[xloc], y[xloc]/dnorm(m$center, m$center, 
                                                                 m$width))
@@ -359,7 +359,7 @@ fitpeaks_at_max <- function (mat, pos, w=5, sd.max=50, fit=c("gaussian","egh")){
       return(noPeaksMat)
     fitpk <- function(xloc){
       peak.loc<-seq.int(xloc-w, xloc+w)
-      m <- fit.egh(peak.loc, y[peak.loc])
+      m <- fit_egh(peak.loc, y[peak.loc])
       c(m$center, m$width, m$tau, 2.35*m$width, y[xloc], y[xloc]/dnorm(m$center, m$center, 
                                                                        m$width))
     }
