@@ -1,5 +1,5 @@
 correctRT5 <- function(CList, warpings, reference=1, ...){
-  msg<-"The correctRT5 function is deprecated. You can now use the 'models' argument in correctRT to warp chromatograms according to an existing model"
+  msg<-"The correctRT5 function is deprecated. You can use the 'models' argument in correctRT to warp chromatograms according to an existing model"
   .Deprecated(correctRT, package="chromatographR", msg,
               old = as.character(sys.call(sys.parent()))[1L])
   allmats <- sapply(CList, identity, simplify = "array")
