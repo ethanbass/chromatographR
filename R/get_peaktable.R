@@ -1,4 +1,4 @@
-get_peaktable <- function(peakList, chrome_list = NULL, response = c("area", "height"),
+get_peaktable <- function(peak_list, chrome_list = NULL, response = c("area", "height"),
                           use.cor = FALSE, hmax = 0.2, plotIt = FALSE,
                           ask = plotIt, clust = c("rt","sp.rt"),
                           sigma.t = 2, sigma.r = 0.5,
@@ -8,7 +8,7 @@ get_peaktable <- function(peakList, chrome_list = NULL, response = c("area", "he
   clust <- match.arg(clust, c('rt','sp.rt'))
   out <- match.arg(out, c('data.frame', 'matrix'))
   rt <- ifelse(use.cor, "rt.cor", "rt")
-  ncomp <- length(peakList[[1]]) ## all elements should have the same length
+  ncomp <- length(peak_list[[1]]) ## all elements should have the same length
   if (plotIt) {
     if (!require(lattice)) {
       plotIt <- FALSE
@@ -88,14 +88,14 @@ get_peaktable <- function(peakList, chrome_list = NULL, response = c("area", "he
                                                                             file.idx[i]])
     cbind(metaInfo, Iinfo)
   }
-  result <- lapply(1:ncomp, clusterPeaks, peakList)
+  result <- lapply(1:ncomp, clusterPeaks, peak_list)
   result <- t(do.call("rbind", result))
   if (out == "data.frame"){
     return(data.frame(result))
   } else return(result)
 }
 
-getPeakTable <- function(peakList, chrome_list = NULL, response = c("area", "height"),
+getPeakTable <- function(peak_list, chrome_list = NULL, response = c("area", "height"),
                           use.cor = FALSE, hmax = 0.2, plotIt = FALSE,
                           ask = plotIt, clust = c("rt","sp.rt"),
                           sigma.t = 2, sigma.r = 0.5,
@@ -107,7 +107,7 @@ getPeakTable <- function(peakList, chrome_list = NULL, response = c("area", "hei
   clust <- match.arg(clust, c('rt','sp.rt'))
   out <- match.arg(out, c('data.frame', 'matrix'))
   rt <- ifelse(use.cor, "rt.cor", "rt")
-  ncomp <- length(peakList[[1]]) ## all elements should have the same length
+  ncomp <- length(peak_list[[1]]) ## all elements should have the same length
   if (plotIt) {
     if (!require(lattice)) {
       plotIt <- FALSE
@@ -187,7 +187,7 @@ getPeakTable <- function(peakList, chrome_list = NULL, response = c("area", "hei
                                                                             file.idx[i]])
     cbind(metaInfo, Iinfo)
   }
-  result <- lapply(1:ncomp, clusterPeaks, peakList)
+  result <- lapply(1:ncomp, clusterPeaks, peak_list)
   result <- t(do.call("rbind", result))
   if (out == "data.frame"){
     return(data.frame(result))

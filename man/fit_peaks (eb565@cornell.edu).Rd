@@ -41,14 +41,14 @@ fit_peaks(y, pos)
 
   Again, the first three elements (rt, sd and FWHM) are expressed as
   indices, so not in terms of the real retention times. The
-  transformation to "real" time is done in function \code{get_peaks}.
+  transformation to "real" time is done in function \code{getAllPeaks}.
 }
-\note{The \code{find_peaks} function is adapted from matlab code in
+\note{The \code{findpeaks} function is adapted from matlab code in
   Prof. Tom O'Haver's \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{Pragmatic Introduction to Signal Processing}.}
-\note{The \code{fit_peaks} function is adapted from Dr. Robert Morrison's \href{https://github.com/robertdouglasmorrison/DuffyTools}{DuffyTools} package as well as code published in Ron Wehrens' \code{\link{alsace}} package.}
+\note{The \code{fitpeaks} function is adapted from Dr. Robert Morrison's \href{https://github.com/robertdouglasmorrison/DuffyTools}{DuffyTools} package as well as code published in Ron Wehrens' \code{\link{alsace}} package.}
 \author{Ethan Bass}
 \references{
 Lan, K. & Jorgenson, J. W. A hybrid of exponential and gaussian functions as a simple model of asymmetric chromatographic peaks. Journal of Chromatography A 915, 1–13 (2001).
 }
-\seealso{\code{\link{getAllPeaks}}}
+\seealso{\code{\link{get_peaks}}}
 \keyword{manip}

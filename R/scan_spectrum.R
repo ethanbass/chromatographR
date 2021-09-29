@@ -27,7 +27,7 @@ plot_spectrum_scan <- function(rt, chrom_list, chr = 'max', lambda = 'max',
             #ylab = 'Intensity', xlab = 'Wavelength (nm)',
             ylim=c(0,max(y)*1.2), ...)
     if (spectrum_labels == T){
-      pks <- alsace::findpeaks(y,span=3)
+      pks <- find_peaks(y)
       pks <- data.frame(names(y)[pks], y[pks],stringsAsFactors = F)
       text(pks[,1],pks[,2],pks[,1],pos=3,offset=.3,cex = .8)
     }

@@ -5,7 +5,7 @@ compare_spectra <- function(peak, peak_table, chrom_list,
                              lambda='256', zeros=F, ref='max', order_by = "distance", verbose=T, ...){
   par(mfrow=c(2,1))
   if (length(ref)==1){
-    ref = plot_spectrum(peak,peak_table,chrom_list,export_spectrum=T,chr=ref)[,2]
+    ref = plot_spectrum(peak, peak_table, chrom_list, export_spectrum=T, chr=ref)[,2]
   }
   ts <- as.numeric(rownames(chrom_list[[1]]))
   lambdas <- as.numeric(colnames(chrom_list[[1]]))
@@ -13,7 +13,7 @@ compare_spectra <- function(peak, peak_table, chrom_list,
   #   ref <- sapply(ref, function(r){plot_spectrum(peak,peak_table,dat.pr,plot_chrom=F,export_spectrum=T,chr=r)[,2]})
   #   #ref1 = plot_spectrum(peak,peak_table,dat.pr,export_spectrum=T,chr=ref)[,2]
   # }
-  ref.s <- scales::rescale(ref)
+  ref.s <- rescale(ref)
   ans1 <- readline('accept peak as reference (y/n)?')
   if (ans1=='y'){
     #elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
@@ -34,10 +34,10 @@ compare_spectra <- function(peak, peak_table, chrom_list,
       # }
       ans='n'
       spec <- t(chrom_list[[chr]][c((time-r):(time+r)),])
-      spec.s <- scales::rescale(spec)
-      cor <- as.numeric(cor(ref.s,spec.s,method='pearson'))
+      spec.s <- rescale(spec)
+      cor <- as.numeric(cor(ref.s, spec.s, method='pearson'))
       #cor <- cor(ref.s,spec.s,method='pearson')
-      pks <- findpeaks(spec[lambda,])-1
+      pks <- find_peaks(spec[lambda,])-1
       pks <- pks[cor[pks] > thresh_man]
       # pks <- do.call(pmax,data.frame(t(cor[,pks])))
       # do.call(which.max,data.frame(t(cor[,pks])))
@@ -50,11 +50,11 @@ compare_spectra <- function(peak, peak_table, chrom_list,
         }
       }
       for (pk in pks){
-        # matplot(c(-r:r),scales::rescale(comp['254',]),type='l')
-        # matplot(c(-r:r),c(0,scales::rescale(abs(diff(cor)))),type='l',add=T,lty=2)
+        # matplot(c(-r:r),rescale(comp['254',]),type='l')
+        # matplot(c(-r:r),c(0,rescale(abs(diff(cor)))),type='l',add=T,lty=2)
         if (plot_it==T){
-          matplot(c(-r:r),scales::rescale(spec[lambda,]),type='l')
-          # matplot(c(-r:r),c(0,(1-scales::rescale(abs(diff(cor))))),type='l',add=T,lty=2)
+          matplot(c(-r:r),rescale(spec[lambda,]),type='l')
+          # matplot(c(-r:r),c(0,(1-rescale(abs(diff(cor))))),type='l',add=T,lty=2)
           matplot(c(-r:r),cor,type='l',add=T,lty=2)
           abline(v=c(-r:r)[pks])
         }
@@ -67,8 +67,8 @@ compare_spectra <- function(peak, peak_table, chrom_list,
         #   }
         else{
           par(mfrow=c(2,1))
-          matplot(c(-r:r),scales::rescale(spec[lambda,]),type='l',xlab='',ylab='')
-          # matplot(c(-r:r),c(0,(1-scales::rescale(abs(diff(cor))))),type='l',add=T,lty=2)
+          matplot(c(-r:r),rescale(spec[lambda,]),type='l',xlab='',ylab='')
+          # matplot(c(-r:r),c(0,(1-rescale(abs(diff(cor))))),type='l',add=T,lty=2)
           matplot(c(-r:r),cor,type='l',add=T,lty=2,col='slategray')
           abline(v=c(-r:r)[pk],lty=3,col='blue')
           # abline(v=pk)

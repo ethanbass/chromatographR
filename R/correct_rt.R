@@ -1,20 +1,20 @@
-correct_rt <- function(CList, models=NULL, reference='best', what = c("corrected.values", "models"), 
+correct_rt <- function(chrome_list, models=NULL, reference='best', what = c("corrected.values", "models"), 
                        init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, lambdas, scale=T,
                        trwdth=200, plot_it=T, ...){
   if (is.null(models)){
     what <- match.arg(what)
-    CList<-lapply(CList,function(x){
-      apply(x,2,padzeros,nzeros=n.zeros,side='both')
+    chrome_list <- lapply(chrome_list,function(x){
+      apply(x, 2, padzeros, nzeros=n.zeros, side='both')
     })
     if (scale){
-      CList<-lapply(CList,scales::rescale)
+      chrome_list<-lapply(chrome_list, rescale)
     }
-    allmats <- sapply(CList, function(x)x[,lambdas], simplify = "array")
-    allmats.t <- sapply(CList, function(x) t(x[,lambdas]), simplify = "array")
+    allmats <- sapply(chrome_list, function(x)x[,lambdas], simplify = "array")
+    allmats.t <- sapply(chrome_list, function(x) t(x[,lambdas]), simplify = "array")
     if (is.null(n.traces)){
       traces=lambdas
     } else{
-      traces <- select.traces(X=allmats.t,criterion='coda')
+      traces <- select.traces(X=allmats.t, criterion='coda')
       traces <- traces$trace.nrs[1:n.traces]
     }
     if (reference=='best'){
@@ -27,7 +27,7 @@ correct_rt <- function(CList, models=NULL, reference='best', what = c("corrected
       ptw(allmats.t[,, reference],
           allmats.t[, , ii], selected.traces = traces, init.coef=init.coef, ..., warp.type = "global")})
   } else {
-    allmats <- sapply(CList, identity, simplify = "array")
+    allmats <- sapply(chrome_list, identity, simplify = "array")
     warp.coef <- lapply(models,FUN=function(x){
       x$warp.coef[1,]
     })
@@ -37,8 +37,8 @@ correct_rt <- function(CList, models=NULL, reference='best', what = c("corrected
   }
   if (what == "corrected.values" | !is.null(models)) {
     result <- lapply(ptwmods, function(x) t(x$warped.sample))
-    for (i in 1:length(result)) dimnames(result[[i]])[[1]] <- dimnames(CList[[i]])[[1]]
-    names(result) <- names(CList)
+    for (i in 1:length(result)) dimnames(result[[i]])[[1]] <- dimnames(chrome_list[[i]])[[1]]
+    names(result) <- names(chrome_list)
     result
   } else {
     ptwmods
@@ -49,7 +49,7 @@ correct_rt <- function(CList, models=NULL, reference='best', what = c("corrected
 #   sapply(ptwmods$
 # }
 
-correctRT <- function(CList, models=NULL, reference='best', what = c("corrected.values", "models"), 
+correctRT <- function(chrome_list, models=NULL, reference='best', what = c("corrected.values", "models"), 
                       init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, lambdas, scale=T,
                       trwdth=200, plot_it=T, ...){
   msg<-"The correctRT function is deprecated. Please use correct_rt instead"
@@ -57,14 +57,14 @@ correctRT <- function(CList, models=NULL, reference='best', what = c("corrected.
               old = as.character(sys.call(sys.parent()))[1L])
   if (is.null(models)){
   what <- match.arg(what)
-  CList<-lapply(CList,function(x){
-    apply(x,2,padzeros,nzeros=n.zeros,side='both')
+  chrome_list<-lapply(chrome_list,function(x){
+    apply(x,2,padzeros, nzeros=n.zeros, side='both')
   })
   if (scale){
-    CList<-lapply(CList,scales::rescale)
+    chrome_list<-lapply(chrome_list,rescale)
   }
-  allmats <- sapply(CList, function(x)x[,lambdas], simplify = "array")
-  allmats.t <- sapply(CList, function(x) t(x[,lambdas]), simplify = "array")
+  allmats <- sapply(chrome_list, function(x)x[,lambdas], simplify = "array")
+  allmats.t <- sapply(chrome_list, function(x) t(x[,lambdas]), simplify = "array")
   if (is.null(n.traces)){
     traces=lambdas
   } else{
@@ -81,7 +81,7 @@ correctRT <- function(CList, models=NULL, reference='best', what = c("corrected.
     ptw(allmats.t[,, reference],
         allmats.t[, , ii], selected.traces = traces, init.coef=init.coef, ..., warp.type = "global")})
   } else {
-    allmats <- sapply(CList, identity, simplify = "array")
+    allmats <- sapply(chrome_list, identity, simplify = "array")
     warp.coef <- lapply(models,FUN=function(x){
       x$warp.coef[1,]
     })
@@ -91,19 +91,19 @@ correctRT <- function(CList, models=NULL, reference='best', what = c("corrected.
   }
   if (what == "corrected.values" | !is.null(models)) {
     result <- lapply(ptwmods, function(x) t(x$warped.sample))
-    for (i in 1:length(result)) dimnames(result[[i]])[[1]] <- dimnames(CList[[i]])[[1]]
-    names(result) <- names(CList)
+    for (i in 1:length(result)) dimnames(result[[i]])[[1]] <- dimnames(chrome_list[[i]])[[1]]
+    names(result) <- names(chrome_list)
     result
   } else {
     ptwmods
   }
 }
 
-correctRT5 <- function(CList, warpings, reference=1, ...){
+correctRT5 <- function(chrome_list, warpings, reference=1, ...){
   msg<-"The correctRT5 function is deprecated. You can use the 'models' argument in correct_rt to warp chromatograms according to an existing model"
   .Deprecated(correctRT, package="chromatographR", msg,
               old = as.character(sys.call(sys.parent()))[1L])
-  allmats <- sapply(CList, identity, simplify = "array")
+  allmats <- sapply(chrome_list, identity, simplify = "array")
   warp.coef <- lapply(warpings,FUN=function(x){
     x$warp.coef[1,]
   })
@@ -113,7 +113,7 @@ correctRT5 <- function(CList, warpings, reference=1, ...){
         try=TRUE, warp.type = "global")})
   
   result <- lapply(ptwmods, function(x) t(x$warped.sample))
-  for (i in 1:length(result)) dimnames(result[[i]])[[1]] <- dimnames(CList[[i]])[[1]]
-  names(result) <- names(CList)
+  for (i in 1:length(result)) dimnames(result[[i]])[[1]] <- dimnames(chrome_list[[i]])[[1]]
+  names(result) <- names(chrome_list)
   result
 }

@@ -25,7 +25,7 @@ plot_spectrum <- function(peak, peak_table, chrom_list, chr = 'max', lambda = 'm
     print(paste0("chrome no. ", chr, "; RT: ", RT, "; lambda = ", lambda, " nm"))
     }
   if (scale_spectrum == T){
-    y<-scales::rescale(y)
+    y<-rescale(y)
   }
   if (plot_spectrum == T){
     matplot(x=new.lambdas, y=y, type='l',
@@ -33,7 +33,7 @@ plot_spectrum <- function(peak, peak_table, chrom_list, chr = 'max', lambda = 'm
             #ylab = 'Intensity', xlab = 'Wavelength (nm)',
             ylim=c(0,max(y)*1.2), ...)
     if (spectrum_labels == T){
-      pks <- findpeaks(y)
+      pks <- find_peaks(y)
       if (length(pks)>0){
       pks <- data.frame(names(y)[pks], y[pks],stringsAsFactors = F)
       text(pks[,1],pks[,2],pks[,1],pos=3,offset=.3,cex = .8)
