@@ -35,7 +35,7 @@ correct_rt <- function(chrome_list, models=NULL, reference='best', what = c("cor
       ptw(t(allmats[,,1]), t(allmats[, , ii]), init.coef=warp.coef[[ii]],
           try=TRUE, warp.type = "global")})
   }
-  if (what == "corrected.values" | !is.null(models)) {
+  if (what == "corrected.values" || !is.null(models)) {
     result <- lapply(ptwmods, function(x) t(x$warped.sample))
     for (i in 1:length(result)) dimnames(result[[i]])[[1]] <- dimnames(chrome_list[[i]])[[1]]
     names(result) <- names(chrome_list)
@@ -89,7 +89,7 @@ correctRT <- function(chrome_list, models=NULL, reference='best', what = c("corr
       ptw(t(allmats[,,1]), t(allmats[, , ii]), init.coef=warp.coef[[ii]],
           try=TRUE, warp.type = "global")})
   }
-  if (what == "corrected.values" | !is.null(models)) {
+  if (what == "corrected.values" || !is.null(models)) {
     result <- lapply(ptwmods, function(x) t(x$warped.sample))
     for (i in 1:length(result)) dimnames(result[[i]])[[1]] <- dimnames(chrome_list[[i]])[[1]]
     names(result) <- names(chrome_list)
