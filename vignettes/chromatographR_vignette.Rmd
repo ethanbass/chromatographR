@@ -99,13 +99,13 @@ The `correct_rt` function is a wrapper around the `ptw` function. For each chrom
 warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360'), n.zeros = 250)
 ```
 
-The same function can then be used to warp each chromatogram according to the corresponding model.
+The same function can then be used to warp each chromatogram according to the corresponding model, by setting the `models` parameter.
 
 ```{r}
 warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
 ```
 
-You can see that the alignment is considerably better after warping.
+You can see that, in this case, the alignment is considerably better after warping.
 
 ```{r, alignment_plot, fig.height=6}
 par(mfrow=c(2,1))
@@ -163,7 +163,7 @@ head(pkTab[,1:6])
 
 The `plot_spectrum` function allows you to easily plot or record the spectra associated with a particular peak in your peak table. This is useful for interpreting your results and/or checking for errors in your peak table. For example, you may want to check if the spectra match for a particular peak in your peak table. Or you may just want to have a look at the spectrum for a peak of interest. The `plot_spectrum` function can be used to plot only the spectrum or only the chromatographic trace using the arguments `plot_spectrum` and `plot_trace`. By default it will plot data from the chromatogram with the biggest peak in the peak table, but you can choose the chromatogram (and the wavelength for the trace) using the `chr` and `lambda` arguments.
 
-```{r, plot spectra}
+```{r, plot spectra,fig.height=6}
 par(mfrow=c(2,1))
 peak="X35"
 plot_spectrum(peak, peak_table=pkTab, chrom_list = warp)
