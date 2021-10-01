@@ -1,15 +1,5 @@
 ## check peak for false 0s, etc.
 
-peak='X70'
-chrom_list = dat.pr
-peak_table = pkTab_nw
-thresh_auto = .95
-ref="max"
-peak="X72"
-
-pkTab2 <- compare_spectra(peak=peak,chrom_list = dat.pr, peak_table = pkTab_nw, thresh_auto = .8,
-                          plot_it=T, plot_diff=T,zeros = F)
-
 compare_spectra <- function(peak, peak_table, chrom_list,
                              thresh_auto=0.95, thresh_man=NULL, r=100, plot_it=F,
                              lambda='256', zeros=F, ref='max', order_by = "distance", verbose=T,
