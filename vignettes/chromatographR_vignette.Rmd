@@ -164,27 +164,24 @@ head(pkTab[,1:6])
 The `plot_spectrum` function allows you to easily plot or record the spectra associated with a particular peak in your peak table. This is useful for interpreting your results and/or checking for errors in your peak table. For example, you may want to check if the spectra match for a particular peak in your peak table. Or you may just want to have a look at the spectrum for a peak of interest. The `plot_spectrum` function can be used to plot only the spectrum or only the chromatographic trace using the arguments `plot_spectrum` and `plot_trace`. By default it will plot data from the chromatogram with the biggest peak in the peak table, but you can choose the chromatogram (and the wavelength for the trace) using the `chr` and `lambda` arguments.
 
 ```{r, plot spectra}
-peak="X100"
+par(mfrow=c(2,1))
+peak="X35"
 plot_spectrum(peak, peak_table=pkTab, chrom_list = warp)
 
-peak="X80"
-plot_spectrum(peak, peak_table=pkTab, chrom_list = warp)
-
-peak="X70"
+peak="X73"
 plot_spectrum(peak, peak_table=pkTab, chrom_list = warp)
 ```
 
 The `plot_all_spectra` function can be used to visually compare peaks at a given column of the peak table to confirm that they match.
 
-```{r, plot_all, fig.height=6}
-par(mfrow=c(3,2))
-peak="X70"
+```{r, plot_all}
+peak="X73"
 plot_all_spectra(peak, peak_table=pkTab, chrom_list = warp, export=F, overlapping=T)
 ```
 
 ### Clustering peaks by spectral similarity
 
-The `cluster_spectra` function groups peaks according to their spectral similarity, using hierarchical clustering, as implemented in the *pvclust* R package [@suzuki2006]. It returns a list of clusters, along with a p-value for each cluster, calculated through multi-scale bootstrap resampling. These clusters may be useful in downstream analyses (i.e. for loosely grouping peaks by chemical class). For actual use, the number of bootstraps (`nboot`) should be set higher (probably at least 1000, or even 10000 as recommended by the developers of `pvclust`).
+The `cluster_spectra` function groups peaks according to their spectral similarity, using hierarchical clustering, as implemented in the *pvclust* R package [@suzuki2006]. It returns a list of clusters, along with a p-value for each cluster, calculated through multi-scale bootstrap resampling. These clusters may be useful in downstream analyses (i.e. for loosely grouping peaks by chemical class). For actual use, the number of bootstraps (`nboot`) should be set higher (probably at least 1000, or even 10,000 as recommended by the developers of `pvclust`).
 
 ```{r, cluster}
 cl1 <- cluster_spectra(pkTab, warp, nboot=100, max.only = F,save = F)
