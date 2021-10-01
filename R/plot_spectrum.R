@@ -30,7 +30,7 @@ plot_spectrum <- function(peak, peak_table, chrom_list, chr = 'max', lambda = 'm
   if (plot_spectrum == T){
     matplot(x=new.lambdas, y=y, type='l',
             #main=paste(peak, '\n', names(chrom_list)[chr], ';','\n', 'RT = ', RT, 'mins','; ',chr),
-            #ylab = 'Intensity', xlab = 'Wavelength (nm)',
+            ylab = 'Intensity', xlab = 'Wavelength (nm)',
             ylim=c(0,max(y)*1.2), ...)
     if (spectrum_labels == T){
       pks <- find_peaks(y)
@@ -49,4 +49,25 @@ plot_spectrum <- function(peak, peak_table, chrom_list, chr = 'max', lambda = 'm
   } 
   if (export_spectrum==TRUE){
     return(data.frame(y))}
+}
+
+## Function to plot all spectra of chosen peaks in peak table.
+plot_all_spectra <- function(peak, peak_table, chrom_list, plot_spectrum = T,
+                             export_spectrum=T, scale_spectrum=T, overlapping=T, verbose=F, ...){
+  sp <- sapply(1:length(chrom_list), function(chr){
+    plot_spectrum(peak=peak, peak_table=peak_table, chrom_list=chrom_list, chr=chr,
+                  plot_spectrum=F, plot_trace=F, export_spectrum = T,
+                  scale_spectrum=scale_spectrum, verbose=verbose)
+  })
+  sp<-do.call(cbind, sp)
+  if(overlapping==T){
+    matplot(new.lambdas, sp, type='l', xlab='wavelength', ylab='intensity',las=2)
+  } else{
+    apply(sp, 2,function(spp){
+      plot(new.lambdas, spp, type='l', xlab='', ylab='',las=2)
+    })
+  }
+  if(export_spectrum==T){
+    sp
+  }
 }

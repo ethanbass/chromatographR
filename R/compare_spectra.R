@@ -1,28 +1,44 @@
 ## check peak for false 0s, etc.
 
+peak='X70'
+chrom_list = dat.pr
+peak_table = pkTab_nw
+thresh_auto = .95
+ref="max"
+peak="X72"
+
+pkTab2 <- compare_spectra(peak=peak,chrom_list = dat.pr, peak_table = pkTab_nw, thresh_auto = .8,
+                          plot_it=T, plot_diff=T,zeros = F)
+
 compare_spectra <- function(peak, peak_table, chrom_list,
-                             thresh_auto=0.95, thresh_man=0.75, r=100, plot_it=F,
-                             lambda='256', zeros=F, ref='max', order_by = "distance", verbose=T, ...){
+                             thresh_auto=0.95, thresh_man=NULL, r=100, plot_it=F,
+                             lambda='256', zeros=F, ref='max', order_by = "distance", verbose=T,
+                            plot_diff=T, ...){
   par(mfrow=c(2,1))
   if (length(ref)==1){
-    ref = plot_spectrum(peak, peak_table, chrom_list, export_spectrum=T, chr=ref)[,2]
+    ref = plot_spectrum(peak, peak_table, chrom_list, export_spectrum=T, chr=ref)
   }
   ts <- as.numeric(rownames(chrom_list[[1]]))
   lambdas <- as.numeric(colnames(chrom_list[[1]]))
+  peak_tab_old <- peak_table
+  if (is.null(thresh_man)){
+    thresh_man <- thresh_auto
+  }
   # if (length(ref>1)){
   #   ref <- sapply(ref, function(r){plot_spectrum(peak,peak_table,dat.pr,plot_chrom=F,export_spectrum=T,chr=r)[,2]})
   #   #ref1 = plot_spectrum(peak,peak_table,dat.pr,export_spectrum=T,chr=ref)[,2]
   # }
-  ref.s <- rescale(ref)
-  ans1 <- readline('accept peak as reference (y/n)?')
+  ref.s <- rescale(ref[,1])
+  #ans1 <- readline('accept peak as reference (y/n)?')
+  ans1='y'
   if (ans1=='y'){
-    #elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
     RT <- round(peak_table['RT',peak],2)
     time <- which(elementwise.all.equal(RT,ts))+3
-    #time <- which(ts==RT)+3
     if(zeros=='T'){
       chrs <- which(peak_table[,peak]==0)-3  
-    } else {chrs <- (1:length(chrom_list))}
+    } else {
+      chrs <- (1:length(chrom_list))
+      }
     #progress_bar = txtProgressBar(min=0, max=length(chrs), style = 1, char="=")
     count=0
     for (chr in chrs){
@@ -38,7 +54,7 @@ compare_spectra <- function(peak, peak_table, chrom_list,
       cor <- as.numeric(cor(ref.s, spec.s, method='pearson'))
       #cor <- cor(ref.s,spec.s,method='pearson')
       pks <- find_peaks(spec[lambda,])-1
-      pks <- pks[cor[pks] > thresh_man]
+      pks <- pks[cor[pks] > max(thresh_man,thresh_auto)]
       # pks <- do.call(pmax,data.frame(t(cor[,pks])))
       # do.call(which.max,data.frame(t(cor[,pks])))
       # apply(data.frame(t(cor[,pks])),1,which.max)
@@ -50,15 +66,13 @@ compare_spectra <- function(peak, peak_table, chrom_list,
         }
       }
       for (pk in pks){
-        # matplot(c(-r:r),rescale(comp['254',]),type='l')
-        # matplot(c(-r:r),c(0,rescale(abs(diff(cor)))),type='l',add=T,lty=2)
         if (plot_it==T){
-          matplot(c(-r:r),rescale(spec[lambda,]),type='l')
-          # matplot(c(-r:r),c(0,(1-rescale(abs(diff(cor))))),type='l',add=T,lty=2)
-          matplot(c(-r:r),cor,type='l',add=T,lty=2)
-          abline(v=c(-r:r)[pks])
+          matplot(c(-r:r), rescale(spec[lambda,]), type='l', 
+                  xlab="", ylab='',las=2)
+          matplot(c(-r:r), cor, type='l',add=T, lty=2)
+          abline(v=c(-r:r)[pks], lty=3, col='lightgray')
         }
-        if (cor[pk] > thresh_auto){
+        if (cor[pk] >= thresh_auto){
           peak_table[(chr+3),peak] <- spec[lambda,pk]
           break
         }
@@ -68,10 +82,8 @@ compare_spectra <- function(peak, peak_table, chrom_list,
         else{
           par(mfrow=c(2,1))
           matplot(c(-r:r),rescale(spec[lambda,]),type='l',xlab='',ylab='')
-          # matplot(c(-r:r),c(0,(1-rescale(abs(diff(cor))))),type='l',add=T,lty=2)
           matplot(c(-r:r),cor,type='l',add=T,lty=2,col='slategray')
-          abline(v=c(-r:r)[pk],lty=3,col='blue')
-          # abline(v=pk)
+          abline(v=c(-r:r)[pk],lty=3,col='lightgray')
           mylabel <- substitute(corr == MYVALUE, 
                                 list(MYVALUE = format(cor[pk],dig=2)))
           legend('topleft', legend = mylabel,bty='n',cex=0.6)
@@ -90,6 +102,9 @@ compare_spectra <- function(peak, peak_table, chrom_list,
         }
       }
     }
+  }
+  if (plot_diff==T){
+    matplot(4:nrow(peak_table),data.frame(peak_table[-c(1:3),peak],peak_tab_old[-c(1:3),peak]), pch=20, xlab='old',ylab='new')
   }
   return(peak_table)
 }

@@ -20,6 +20,6 @@
   file, and containing data for the fitted peaks for each of the ALS
   components. Note that this function presents the "rt", "sd" and "FWHM"
   fields in real time units.}
-\author{Ethan Bass}
+\author{Ethan Bass & Ron Wehrens}
 \note{Function is adapted from the \code{\link[alsace::get_peaks]{get_peaks}} function authored by Ron Wehrens.}
 \keyword{manip}

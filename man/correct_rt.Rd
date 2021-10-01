@@ -29,7 +29,7 @@
 }
 \value{A list of warped concentration profiles, mirroring the
   \code{CList} list element from the ALS object.}
-\author{Ron Wehrens}
+\author{Ron Wehrens, Ethan Bass}
 \seealso{\code{\link{ptw}}, \code{\link{correctPeaks}}}
 \examples{
 data(teaMerged)

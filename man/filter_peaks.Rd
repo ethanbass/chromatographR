@@ -1,5 +1,5 @@
-\name{filterPeaks}
-\alias{filterPeaks}
+\name{filter_peaks}
+\alias{filter_peaks}
 \title{Filter peak lists}
 \description{
 Utility function to remove peaks from a peak list, e.g. because their
