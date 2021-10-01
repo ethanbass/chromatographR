@@ -1,79 +1,198 @@
 ---
-title: "chromatographR"
+title: "Introduction to chromatographR"
 author: "Ethan Bass"
-date: "8/22/2021"
-output: html_document
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+bibliography: references.bib
+vignette: >
+  %\VignetteIndexEntry{Introduction to chromatographR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
 require("knitr", quietly=TRUE)
 opts_chunk$set(prompt = TRUE, highlight = FALSE, comment=NA, 
-               background='transparent', size = 'small', 
-               fig.width=6, fig.height=6, out.width='\\textwidth',
-               dev=c('pdf', 'png'))
+               #background='transparent', size = 'small', 
+               fig.width=6,
+               #fig.height=6, out.width='\\textwidth',
+               dev='svg')
 suppressMessages(require(chromatographR, quiet=TRUE))
 ```
 
-```{r}
-data(tea)
-tpoints <- as.numeric(rownames(tea.raw[[1]]))
-lambdas <- as.numeric(colnames(tea.raw[[1]]))
+*chromatographR* is a package for the reproducible analysis of HPLC-DAD data in `R`. Liquid chromatography coupled to diode-array detection (DAD) remains one of the most popular analytical methodologies due to its convenience and low-cost. However, there are currently few open-source tools for analyzing HPLC-DAD chromatograms. The use of proprietary software for the analysis of HPLC-DAD data is a significant barrier to reproducible science, not only because of the inaccessibility of these tools, but also because these tools often involve the selection of complicated options through a graphical user interface which cannot easily be repeated. Reproducibility is of course much higher in command line workflows because the entire analysis is stored and can be repeated by anyone using publicly available software.
+
+The *chromatographR* package draws inspiration from the previously published *alsace* package [@wehrens2015], but with improved functions for peak-finding, fitting and peak table generation as well as a number of new tools for data visualization. Unlike *alsace*, *chromatographR* focuses on a more conventional workflow that may seem more familiar to users of standard software tools for HPLC-DAD analysis, such as ChemStation®, foregoing the alternating-least squares approach emphasized in *alsace*. *chromatographR* includes tools for automatic a) preprocessing, b) retention time alignment, c) peak-finding, d) peak-integration and e) peak table generation.
+
+## Loading data
+
+In most cases, the data coming from the spectrometer need to be converted into an `R`-accessible format such as a `csv` file. Once all `csv` files are gathered in one directory (e.g. `foo`), the `load_chromes` function provides a simple interface to import your chromatograms.
+
+```{r,eval=F}
+# single folder
+load_chromes(paths = path)
+
+# multiple folders
+path = 'foo'
+folders <- list.files(path = path, pattern = "EXPORT3D")
+dat <- import_chromes(folders)
 ```
 
-\subsection{Data loading}
-Most probably, the data coming from the spectrometer need to be
-converted into an \R-accessible format such as a \code{csv} file. Once
-all \code{csv} files are gathered in one directory (say, \code{foo}),
-an easy way to load them is to use \code{lapply}:
-
-```{r}
-new.lambdas <- seq(260, 500, by = 2)
-dat.pr <- lapply(tea.raw, preprocess, dim2 = new.lambdas)
-sapply(tea.raw, dim)
-sapply(tea, dim)
+```{r, data}
+data(Sa)
+lambdas <- as.numeric(colnames(Sa[[1]]))
 ```
 
+## Pre-processing data
 
-\subsection{warping}
+Experimental data can suffer from a number of non-informative defects, such as noise (random or non- random), a shifting baseline, or missing values. In addition, the wavelength range or time range may be larger than we need. Since HPLC-DAD data are fairly smooth, it is usually relatively easy to correct these issues. For example, smoothing can remove much of the noise in the spectral direction and baseline subtraction can remove a shifting baseline. Selection and interpolation can be used to select the time and wavelength ranges and resolutions we want. All of these functions are available through the `preprocess` function. Smoothing and baseline subtraction are enabled by default, and providing alternative sets of time points and/or wavelengths will lead to a sub-sampling and subsequent interpolation along one or both axes. This can significantly reduce the computational load in later steps.
 
-\subsection{find peaks}
-```{r}
-pks <- getAllPeaks(dat.pr, lambdas=c('260','460'))
-plot_peaks(dat.pr, pks, index=1, w = 50, lambda = '260')
-sapply(pks, function(x) sapply(x, nrow))
+The `baseline_cor` function from the *ptw* package [@bloemberg2010] takes arguments `p` (an asymmetry parameter) and `lambda` (a smoothing parameter). You can read more about these in the documentation for `ptw::asysm`.  You may want to experiment with these parameters before choosing values to use on your whole dataset.
+
+```{r, choosing parameters}
+i=2 # chromatogram number in list of data
+tpoints <- as.numeric(rownames(Sa[[i]]))
+lambda='200.00000'
+
+matplot(x=tpoints, y=Sa[[i]][,lambda],
+       type='l', ylab='Abs (mAU)', xlab='Time (min)')
+matplot(x=tpoints, y=baseline.corr(Sa[[i]][,lambda],p=.001,lambda=1e5),
+       type='l', add=T, col='blue', lty = 3)
 ```
 
-
-<<warping>>=
-warping.models <- correctRT(tea.als$CList, reference = 1, what = "models")
-@ 
-
-\noindent
-This will lead to one global warping function for every sample, a
-function that we can apply to the retention times of the peaks that we
-identified earlier:
-
-\subsubsection{Grouping peaks across samples}
-
-<<timeCorrection>>=
-pks.corrected <- correctPeaks(pks, warping.models)
-pks.corrected[[2]][[1]]
-@ 
-
-<<peakTable>>=
-pkTab <- getPeakTable(pks.corrected, response = "height")
-head(pkTab)
-@
-
-\section{Useful additional tools}
-```{r}
-plot_spectrum()
+```{r, preprocessing}
+new.ts <- seq(1,38,by=.01) # choose time-points
+new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
 ```
 
-```{r}
-compare_peaks()
+```{r, preprocessing2, eval=F}
+dat.pr <- lapply(X=Sa,
+                 FUN=preprocess,
+                 dim1=new.ts,
+                 dim2=new.lambdas,
+                 p=.001,lambda=1e5)
 ```
 
-```{r}
-cluster_peaks()
+If you have a large dataset, you may be able to accelerate this process through the use of parallel processing:
+
+```{r, parallel preprocessing}
+new.ts <- seq(1,38,by=.01) # choose time-points
+new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
+
+dat.pr <- parallel::mclapply(X=Sa,
+                 FUN=preprocess,
+                 dim1=new.ts,
+                 dim2=new.lambdas,
+                 p=.001,lambda=1e5)
 ```
+
+This could be a good time to load meta-data and normalize your chromatograms (e.g. by sample mass). You could also normalize after assembling the peak table.
+
+## Loading meta-data and normalization
+```{r}
+
+```
+
+## Dealing with retention time shifts
+
+In many cases, HPLC data can suffer from retention time shifts (e.g. due to temperature fluctuations, column degradation, or subtle changes in mobile-phase composition). Parametric time warping (as implemented in the *ptw* package can be quite effective for correcting subtle retention time shifts [@eilers2004]. If you have severe retention time shifts this technique will be considerably less effective (and you should consider checking your HPLC for leaks). If your chromatograms are already perfectly aligned you can skip this step.
+
+```{r, warping}
+warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360'), n.zeros = 250)
+```
+
+This will produce a "global" warping function (i.e. a common warping function for all wavelengths in `lambdas`) for each sample. The goal of the warping function is to produce a better alignment of retention times by "warping" the time-axis of each chromatogram to match a reference chromatogram. The reference chromatogram can be selected manually or determined algorithmically by setting the `reference` argument.
+
+
+```{r}
+warp <- correct_rt(chrome_list=dat.pr, models=warping.models)
+```
+
+You can see that the alignment is considerably better after warping.
+
+```{r, alignment_plot, fig.height=6}
+par(mfrow=c(2,1))
+lambdas=c('210','260')
+plot.new()
+plot.window(xlim=c(1,tail(new.ts,1)),ylim=c(0,1000))
+for (i in 1:length(warp)){
+  matplot(new.ts, warp[[i]][,lambdas],type='l',add=T)
+}
+legend("topright", legend="warped", cex=0.7, bty = "n")
+
+plot.new()
+plot.window(xlim=c(1,tail(new.ts,1)),ylim=c(0,1000))
+for (i in 1:length(dat.pr)){
+  matplot(new.ts, dat.pr[[i]][,lambdas],type='l',add=T)
+}
+legend("topright", legend="raw", cex=0.7, bty = "n")
+```
+
+It can sometimes be informative to also plot the warping coefficients (e.g. to find outliers), which you can be easily accomplished using the method shown below:
+
+```{r, plot coefficients, fig.height=6}
+par(mfrow=c(3,1))
+coef <- sapply(warping.models,function(x) x$warp.coef)
+plot(coef[1,],pch=20,xlab='',ylab='')
+plot(coef[2,],pch=20,xlab='',ylab='')
+plot(coef[3,],pch=20,xlab='',ylab='')
+```
+
+## Peak finding and fitting
+
+The `get_peaks` function loops through your chromatograms at the specified wavelengths, finds peaks, and attempts to fit them using the specified peak-fitting function -- the current options are `gaussian` and `egh` (exponential-gaussian hybrid) [@lan2001]. The function will return a nested list of dataframes containing information about the peaks in each chromatogram.
+
+```{r, get_peaks, message=F, warning=F}
+pks <- get_peaks(warp, lambdas = c('210','260'), sd.max=20, fit="gaussian")
+pks_egh <- get_peaks(warp, lambdas = c('210', '260'), sd.max=20, fit="egh")
+```
+
+The `plot_peaks` function allows you to visually assess the peak integration accuracy. Below we compare the peaks fitted for the second chromatogram (`index=2`) using the two algorithms. Often the egh function performs slightly better for asymmetrical peaks.
+
+```{r, plot_peaks, warning=F, fig.height=6}
+par(mfrow=c(2,1))
+plot_peaks(chrome_list = warp, peak_list = pks, index=2, lambda='210', time='raw')
+plot_peaks(chrome_list = warp, peak_list = pks_egh, index=2, lambda='210', time='rt')
+```
+
+```{r, get_peaktable}
+pkTab <- get_peaktable(pks_egh, response = "area")
+head(pkTab[,1:6])
+```
+
+## Additional useful tools
+
+### Plotting spectra
+
+The `plot_spectrum` function allows you to easily plot or record the spectra associated with a particular peak in your peak table. This is useful for interpreting your results and/or checking for errors in your peak table. For example, you may want to check if the spectra match for a particular peak in your peak table. Or you may just want to have a look at the spectrum for a peak of interest. The `plot_spectrum` function can be used to plot only the spectrum or only the chromatographic trace using the arguments `plot_spectrum` and `plot_trace`. By default it will plot data from the chromatogram with the biggest peak in the peak table, but you can choose the chromatogram (and the wavelength for the trace) using the `chr` and `lambda` arguments.
+
+```{r, plot spectra}
+peak="X100"
+plot_spectrum(peak, peak_table=pkTab, chrom_list = warp)
+
+peak="X80"
+plot_spectrum(peak, peak_table=pkTab, chrom_list = warp)
+
+peak="X70"
+plot_spectrum(peak, peak_table=pkTab, chrom_list = warp)
+```
+
+The `plot_all_spectra` function can be used to visually compare peaks at a given column of the peak table to confirm that they match.
+
+```{r, plot_all, fig.height=6}
+par(mfrow=c(3,2))
+peak="X70"
+plot_all_spectra(peak, peak_table=pkTab, chrom_list = warp, export=F, overlapping=T)
+```
+
+### Clustering peaks by spectral similarity
+
+The `cluster_spectra` function groups peaks according to their spectral similarity, using hierarchical clustering, as implemented in the *pvclust* R package [@suzuki2006]. It returns a list of clusters, along with a p-value for each cluster, calculated through multi-scale bootstrap resampling. These clusters may be useful in downstream analyses (i.e. for loosely grouping peaks by chemical class). 
+
+```{r, cluster, eval=F}
+cl1 <- cluster_spectra(pkTab, warp, nboot=1000, max.only = F)
+```
+
+## References
+
+<div id="refs"></div>
