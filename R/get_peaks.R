@@ -66,8 +66,8 @@ getAllPeaks <- function (chrome_list, lambdas, max.iter=100,
 ## function to visually check integration accuracy
 ## fit is output of getAllpeaks for chrome
 
-plot_peaks <- function(chrome_list, peak_list, index=1, lambda=NULL, w=0.5, slope=.01,
-                       points=F, a=0.5, time=c('rt','raw'), h=1){
+plot_peaks <- function(chrom_list, peak_list, index=1, lambda=NULL, w=0.5, slope=.01, h=1,
+                       points=F, a=0.5){
   if (is.null(lambda)){
     lambda <- names(peak_list[[1]])[1]
   }

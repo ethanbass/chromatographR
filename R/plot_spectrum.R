@@ -54,6 +54,7 @@ plot_spectrum <- function(peak, peak_table, chrom_list, chr = 'max', lambda = 'm
 ## Function to plot all spectra of chosen peaks in peak table.
 plot_all_spectra <- function(peak, peak_table, chrom_list, plot_spectrum = T,
                              export_spectrum=T, scale_spectrum=T, overlapping=T, verbose=F, ...){
+  new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
   sp <- sapply(1:length(chrom_list), function(chr){
     plot_spectrum(peak=peak, peak_table=peak_table, chrom_list=chrom_list, chr=chr,
                   plot_spectrum=F, plot_trace=F, export_spectrum = T,

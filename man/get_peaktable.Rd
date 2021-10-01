@@ -1,4 +1,4 @@
-\name{getPeakTable}
+\name{get_peaktable}
 \alias{getPeakTable}
 \title{Convert peak list into an ordered peak table}
 \description{

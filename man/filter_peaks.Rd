@@ -6,7 +6,7 @@ Utility function to remove peaks from a peak list, e.g. because their
 intensity is too low. Currently one can filter on peak height, peak
 area, and width at half maximum.}
 \usage{
-filterPeaks(peakList, minHeight, minArea, minWHM, maxWHM)
+filter_peaks(peakList, minHeight, minArea, minWHM, maxWHM)
 }
 \arguments{
   \item{peakList}{A nested list of peak tables: the first level is the

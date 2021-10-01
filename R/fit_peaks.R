@@ -1,3 +1,5 @@
+# peak finding function adapted from matlab function by Prof. Tom O'Haver
+## (see http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm)
 
 find_peaks <- function(y, smooth_type='gaussian', smooth_window = 1, smooth_width = 0.1,
                                slope_thresh=.05, amp_thresh=0, bounds=F){
@@ -78,8 +80,9 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"),
     if (length(pos) == 0) 
       return(noPeaksMat)
     fitpk <- function(xloc) {
-      peak.loc <- seq.int(xloc - w, xloc + w)
-      m <- fit.EMG(peak.loc, y[peak.loc], start.center = xloc, 
+      xloc <- pos[1]
+      peak.loc <- seq.int(pos[2], pos[3])
+      m <- fit_EMG(peak.loc, y[peak.loc], start.center = xloc, 
                    start.height = y[xloc])
       c(m$center, m$width, m$tau, 2.35 * m$width, y[xloc], 
         y[xloc]/dnorm(m$center, m$center, m$width))
@@ -192,10 +195,6 @@ fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
   if (is.null(start.width)){
     start.width <- sum(y1 > (start.height/2)) / 2
   }
-  #A<-which.max(which(y[1:start.center] < (start.height/2)))
-  #B<-which(y[start.center:length(y)] < (start.height/2))[1]+start.center
-  #if (is.null(start.tau)) start.tau <- y<(start.height/2)
-  #if (is.null(start.tau)) start.tau <- (B-A)/(-log(.5))
   if (is.null(start.tau)){
     start.tau <- 0
   }
@@ -218,7 +217,7 @@ fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
     heightAns <- start.height
     tauAns <- start.tau
     floorAns <- if ( fit.floor) start.floor else 0
-    yAns <- egh( x, centerAns, widthAns, heightAns, tauAns, floorAns)
+    yAns <- egh(x, centerAns, widthAns, heightAns, tauAns, floorAns)
     residualAns <- y - yAns
   } else {
     coefs <-coef(nlsAns)
@@ -261,7 +260,7 @@ EMG <- function (x, mu = 0, sigma = 1, height = 1, alpha = 1){
                                                            mu)
 }
 
-fit.EMG <- function(x1, y1, start.center=NULL, start.width=NULL, start.alpha=NULL, start.height=NULL,
+fit_EMG <- function(x1, y1, start.center=NULL, start.width=NULL, start.alpha=NULL, start.height=NULL,
                     start.floor=NULL, fit.floor=FALSE) {
   # make some rough estimates from the values of Y
   who.max <- which.max(y1)

@@ -19,5 +19,5 @@ combine_peaks(peak_table, digits=2, min.cor=0.9, choose='max')
   combined according to the specified criteria.}
 \author{Ethan Bass}
 
-\seealso{\code{\link{getAllPeaks}}}
+\seealso{\code{\link{get_peaks}}}
 \keyword{manip}

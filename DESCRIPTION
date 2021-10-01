@@ -7,10 +7,10 @@ Maintainer: Ethan Bass <ethanbass@gmail.com>
 Description: R package for high throughput analysis of HPLC-DAD chromatograms or other chromatographic data. Forked from alsace packaged authored by Ron Wehrens.
 URL: https://github.com/ethanbass/chromatographR
 License: GPL (>= 2)
-Depends: R (>= 2.10), ptw (>= 1.0.6), pvclust, fastcluster, dynamicTreeCut, scales
-Imports: methods
+Depends: R (>= 3.5.0), ptw (>= 1.0.6), lattice
+Imports: methods, pvclust, fastcluster, dynamicTreeCut, scales
 LazyData: true
-Suggests: lattice, knitr, mathjaxr
+Suggests: rmarkdown, mathjaxr
 RdMacros: mathjaxr
 VignetteBuilder: knitr
 BiocViews: Metabolomics, Preprocessing

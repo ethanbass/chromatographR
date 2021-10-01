@@ -1,16 +1,16 @@
-\name{correctRT}
+\name{correct_rt}
 \alias{correctRT}
-\title{Retention time correction for ALS chromatographic profiles}
+\alias{correctRT5}
+\title{Retention time correction}
 \description{
-  Correction of retention time differences of ALS concentration profiles
-  using parametric time warping.
+  Correction of retention time differences using parametric time warping.
 }
-\usage{correctRT(CList, reference,
+\usage{correct_rt(chrom_list, reference,
                  what = c("corrected.values", "models"),
                  init.coef = c(0, 1, 0), n.traces = 3, n.zeros=0,
-                 lambdas=c('210','260')...)}
+                 lambdas=c('210','260'), ...)}
 \arguments{
-  \item{CList}{List of matrices containing concentration profiles.}
+  \item{chrom_list}{List of matrices containing concentration profiles.}
   \item{reference}{Index of the sample that is to be considered the
     reference sample.}
   \item{what}{What to return: either the time-corrected profiles (useful

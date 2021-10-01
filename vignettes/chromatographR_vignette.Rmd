@@ -105,7 +105,7 @@ This will produce a "global" warping function (i.e. a common warping function fo
 
 
 ```{r}
-warp <- correct_rt(chrome_list=dat.pr, models=warping.models)
+warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
 ```
 
 You can see that the alignment is considerably better after warping.
@@ -151,8 +151,8 @@ The `plot_peaks` function allows you to visually assess the peak integration acc
 
 ```{r, plot_peaks, warning=F, fig.height=6}
 par(mfrow=c(2,1))
-plot_peaks(chrome_list = warp, peak_list = pks, index=2, lambda='210', time='raw')
-plot_peaks(chrome_list = warp, peak_list = pks_egh, index=2, lambda='210', time='rt')
+plot_peaks(chrom_list = warp, peak_list = pks, index=2, lambda='210')
+plot_peaks(chrom_list = warp, peak_list = pks_egh, index=2, lambda='210')
 ```
 
 ```{r, get_peaktable}

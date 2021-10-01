@@ -2,6 +2,7 @@
 ## functions imported.
 #import(ALS)
 import(ptw)
+import(lattice)
 #import(pvclust)
 
 export("correctPeaks", "correctRT", "correctRT5", "correct_rt",
@@ -14,7 +15,7 @@ importFrom("grDevices", "colorRampPalette", "terrain.colors")
 importFrom("graphics", "abline", "axTicks", "box", "contour", "image",
            "layout", "matplot", "par", "plot", "rect", "text", "title")
 importFrom("stats", "aggregate", "approx", "as.dist", "cor", "cutree",
-           "dist", "dnorm", "embed", "hclust", "median", "predict",
+           "dist", "dnorm", "embed", "median", "predict",
            "smooth.spline", "coef", "deriv", "fitted", "lm", "nls",
                "nls.control", "pnorm", "quantile", "residuals")
 importFrom("utils", "capture.output", "read.csv")
@@ -24,3 +25,4 @@ importFrom("fastcluster", "hclust")
 importFrom("dynamicTreeCut", "cutreeDynamicTree")
 importFrom("scales", "rescale")
 importFrom("pvclust", "pvclust", "pvpick", "pvrect")
+#importFrom("lattice", "panel.functions", "panel.stripplot")

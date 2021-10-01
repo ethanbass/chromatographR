@@ -1,5 +1,5 @@
 \name{get_peaks}
-\alias{get_peaks}
+\alias{getAllPeaks}
 \title{Extract all peaks from the chromatographic profiles of a list of chromatograms.}
 \description{
   Function to extract all peaks in a list of chromatograms. Peaks are located as local maxima within the given span (function \code{\link{find_peaks}}) and at the given positions a
@@ -21,5 +21,5 @@
   components. Note that this function presents the "rt", "sd" and "FWHM"
   fields in real time units.}
 \author{Ethan Bass & Ron Wehrens}
-\note{Function is adapted from the \code{\link[alsace::get_peaks]{get_peaks}} function authored by Ron Wehrens.}
+\note{Function is adapted from the \code{\link[alsace::getAllPeaks]{getAllPeaks}} function authored by Ron Wehrens.}
 \keyword{manip}

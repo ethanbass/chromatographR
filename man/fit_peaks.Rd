@@ -6,7 +6,8 @@
   Find chromatographic peaks, and fit peak parameters using gaussian or exponential-gaussian hybrid peak fitting.}
 \usage{
 find_peaks(y, sd.max = 10)
-fit_peaks(y, pos)
+fit_peaks(y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"), 
+                      max.iter = 100)
 }
 \arguments{
   \item{y}{response (numerical vector)}
@@ -48,7 +49,7 @@ fit_peaks(y, pos)
 \note{The \code{fit_peaks} function is adapted from Dr. Robert Morrison's \href{https://github.com/robertdouglasmorrison/DuffyTools}{DuffyTools} package as well as code published in Ron Wehrens' \code{\link{alsace}} package.}
 \author{Ethan Bass}
 \references{
-Lan, K. & Jorgenson, J. W. A hybrid of exponential and gaussian functions as a simple model of asymmetric chromatographic peaks. Journal of Chromatography A 915, 1–13 (2001).
+Lan, K. & Jorgenson, J. W. A hybrid of exponential and gaussian functions as a simple model of asymmetric chromatographic peaks. Journal of Chromatography A 915, 1-13 (2001).
 }
-\seealso{\code{\link{getAllPeaks}}}
+\seealso{\code{\link{get_peaks}}}
 \keyword{manip}
