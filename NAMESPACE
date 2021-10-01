@@ -4,12 +4,12 @@
 import(ptw)
 import(lattice)
 
-export("correctPeaks", "correctRT", "correctRT5", "correct_rt",
-       "find_peaks", "fit_peaks", "getAllPeaks", "get_peaks",
-       "getPeakTable", "get_peaktable",
-       "preprocess", "load_chromes", 
-	"plot_spectrum", "plot_all_spectra", "scan_spectrum",
-	"combine_peaks", "compare_spectra", "plot_peaks", "cluster_spectra")
+export("load_chromes", "preprocess",
+       "correctRT", "correctRT5", "correct_rt",
+       "find_peaks", "fit_peaks", "filter_peaks",
+       "getAllPeaks", "get_peaks", "plot_peaks", "getPeakTable", "get_peaktable",
+       "plot_spectrum", "plot_all_spectra", "scan_spectrum",
+       "combine_peaks", "compare_spectra", "cluster_spectra")
 importFrom("grDevices", "colorRampPalette", "terrain.colors")
 importFrom("graphics", "abline", "axTicks", "box", "contour", "image",
            "layout", "matplot", "par", "plot", "rect", "text", "title")
