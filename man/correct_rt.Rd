@@ -1,16 +1,18 @@
 \name{correct_rt}
+\alias{correct_rt}
 \alias{correctRT}
 \alias{correctRT5}
 \title{Retention time correction}
 \description{
   Correction of retention time differences using parametric time warping.
 }
-\usage{correct_rt(chrom_list, reference,
+\usage{correct_rt(chrom_list, models=NULL, lambdas, reference="best", lambdas,
                  what = c("corrected.values", "models"),
-                 init.coef = c(0, 1, 0), n.traces = 3, n.zeros=0,
-                 lambdas=c('210','260'), ...)}
+                 init.coef = c(0, 1, 0), n.traces = NULL, n.zeros=0, ...)}
 \arguments{
   \item{chrom_list}{List of matrices containing concentration profiles.}
+  \item{models}{List of models to warp by.}
+  \item{lambdas}{Select wavelengths to use by name.}
   \item{reference}{Index of the sample that is to be considered the
     reference sample.}
   \item{what}{What to return: either the time-corrected profiles (useful
@@ -19,7 +21,6 @@
   \item{init.coef}{Starting values for the optimisation.}
   \item{n.traces}{Number of traces to use.}
   \item{n.zeros}{Number of zeros to add.}
-  \item{lambdas}{Select wavelengths to use by name.}
   \item{scale}{Logical. If true, scale chromatograms before warping.}
   \item{trwdth}{}
   \item{plot_it}{}
@@ -27,8 +28,7 @@
     argument that cannot be changed is \code{warp.type}: this is always
     equal to \code{"global"}.}
 }
-\value{A list of warped concentration profiles, mirroring the
-  \code{CList} list element from the ALS object.}
+\value{A list of `ptw` objects or a list of warped absorbance profiles.}
 \author{Ron Wehrens, Ethan Bass}
 \seealso{\code{\link{ptw}}, \code{\link{correctPeaks}}}
 \examples{

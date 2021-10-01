@@ -10,7 +10,7 @@ License: GPL (>= 2)
 Depends: R (>= 3.5.0), ptw (>= 1.0.6), lattice
 Imports: methods, pvclust, fastcluster, dynamicTreeCut, scales
 LazyData: true
-Suggests: rmarkdown, mathjaxr
+Suggests: rmarkdown, mathjaxr, knitr
 RdMacros: mathjaxr
 VignetteBuilder: knitr
 BiocViews: Metabolomics, Preprocessing

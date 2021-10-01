@@ -6,32 +6,30 @@ Utility function to remove peaks from a peak list, e.g. because their
 intensity is too low. Currently one can filter on peak height, peak
 area, and width at half maximum.}
 \usage{
-filter_peaks(peakList, minHeight, minArea, minWHM, maxWHM)
+filter_peaks(peak_list, min_height, min_area, min_sd, max_sd)
 }
 \arguments{
-  \item{peakList}{A nested list of peak tables: the first level is the
+  \item{peak_list}{A nested list of peak tables: the first level is the
     sample, and the second level is the component. Every component is
     described by a matrix where every row is one peak, and the columns
     contain information on retention time, full width at half maximum
     (FWHM), peak width, height, and area.}
-  \item{minHeight}{Minimum peak height.}
-  \item{minArea}{Minimum peak area.}
-  \item{minWHM}{Minimal width at half maximum.}
-  \item{maxWHM}{Maximum width at half maximum.}
+  \item{min_height}{Minimum peak height.}
+  \item{min_area}{Minimum peak area.}
+  \item{min_sd}{Minimal standard deviation.}
+  \item{max_sd}{Maximum standard deviation.}
 }
 \value{A peak list similar to the input peakList, but with all rows
   removed from the peak tables that are not satisfying the criteria.}
-\author{Ron Wehrens}
+\author{Ron Wehrens, EthanBass}
 
-\seealso{\code{\link{getAllPeaks}}}
+\seealso{\code{\link{get_peaks}}}
 \examples{
-data(teaMerged)
-pks <- getAllPeaks(teaMerged$CList, span = 11)
+data(Sa)
+pks <- get_peaks(warp, lambdas = c('210'))
 ## only retain peaks with a peak height of at least 2
-pks.filtered <- filterPeaks(pks, minHeight = 2)
-plot(teaMerged, mat.idx = 3, what = "profiles", comp.idx = 2,
-     showWindows = FALSE, col = "blue")
-abline(v = pks[[3]][[2]][,"rt"], col = "gray", lty = 2)
-abline(v = pks.filtered[[3]][[2]][,"rt"])
+plot_peaks(chrom_list = warp, peak_list = pks, index=2, lambda='210')
+pks_filtered <- filter_peaks(pks, min_height = 10)
+plot_peaks(chrom_list = warp, peak_list = pks_filtered, index=2, lambda='210')
 }
 \keyword{manip}

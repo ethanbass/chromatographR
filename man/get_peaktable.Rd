@@ -1,4 +1,5 @@
 \name{get_peaktable}
+\alias{get_peaktable}
 \alias{getPeakTable}
 \title{Convert peak list into an ordered peak table}
 \description{
@@ -6,17 +7,18 @@ Function returns a matrix of intensities, where rows correspond to samples
 and columns correspond to aligned features. The function performs a complete linkage clustering of retention times across all samples, and cuts at a height given by the user (which can be interpreted as the maximal inter-cluster retention time difference) in the simple case based on retention times. If two peaks from the same sample are assigned to the same cluster, a warning message is given.
 }
 \usage{
-getPeakTable(peakList, response = c("area", "height"),
-             use.cor = TRUE, hmax = 0.2, plotIt = FALSE, ask = plotIt,
-             clust = "sp.rt", sigma.t = 2, sigma.r = 0.5,
-                          deepSplit = FALSE, out = "data.frame")
+get_peaktable(peak_list, chrom_list, response = c("area", "height"),
+             use.cor = FALSE, hmax = 0.2, plotIt = FALSE, ask = plotIt,
+             clust = c("rt","sp.rt"), sigma.t = 2, sigma.r = 0.5,
+                          deepSplit = FALSE, out = c("data.frame","matrix"))
 }
 \arguments{
-  \item{peakList}{A nested list of peak tables: the first level is the
+  \item{peak_list}{A nested list of peak tables: the first level is the
     sample, and the second level is the component. Every component is
     described by a matrix where every row is one peak, and the columns
     contain information on retention time, full width at half maximum
     (FWHM), peak width, height, and area.}
+    \item{chrom_list}{A list of chromatographic matrices.}
   \item{response}{An indicator whether peak area or peak height is to be
     used as intensity measure. Default is peak area.}
   \item{use.cor}{Logical, indicating whether to use corrected retention

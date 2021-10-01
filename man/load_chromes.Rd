@@ -5,10 +5,10 @@
 Convenience function to import chromatograms from a list of folders. Chromatograms must be in CSV format.}
 \usage{
 folders <- list.files(path, pattern = "EXPORT3D", full.names = T, dat=NULL)
-load_chromes(paths=folders)}
+load_chromes(paths, dat=NULL)}
 \arguments{
   \item{paths}{Paths of folders where chromatograms are stored.}
-  \item{dat}{Optional list of chromatograms. If list is provided, the function will append chromes in path to the existing list of chromatograms.}
+  \item{dat}{Optional list of chromatograms. If list is provided, the function will append chromatograms in path to the existing list of chromatograms.}
 }
 \value{A list of chromatograms in matrix format.}
 \author{Ethan Bass}

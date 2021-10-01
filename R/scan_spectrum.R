@@ -1,9 +1,9 @@
 ## Plot spectrum at a particular time point.
 
 scan_spectrum <- function(rt, chrom_list, chr = 'max', lambda = 'max',
-                               plot_spectrum = TRUE, plot_trace = TRUE,
-                               export_spectrum=FALSE, spectrum_labels=TRUE,
-                               verbose=FALSE, scale_spectrum=F, ...){
+                               plot_spectrum = T, plot_trace = T,
+                               export_spectrum=F, spectrum_labels=T,
+                               verbose=F, scale_spectrum=F, ...){
   ts <- as.numeric(rownames(chrom_list[[1]]))
   lambdas <- as.numeric(colnames(chrom_list[[1]]))
   RT <- round(as.numeric(rt),2)

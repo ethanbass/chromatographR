@@ -143,8 +143,8 @@ plot(coef[3,],pch=20,xlab='',ylab='')
 The `get_peaks` function loops through your chromatograms at the specified wavelengths, finds peaks, and attempts to fit them using the specified peak-fitting function -- the current options are `gaussian` and `egh` (exponential-gaussian hybrid) [@lan2001]. The function will return a nested list of dataframes containing information about the peaks in each chromatogram.
 
 ```{r, get_peaks, message=F, warning=F}
-pks <- get_peaks(warp, lambdas = c('210','260'), sd.max=20, fit="gaussian")
-pks_egh <- get_peaks(warp, lambdas = c('210', '260'), sd.max=20, fit="egh")
+pks <- get_peaks(warp, lambdas = c('210','260'), sd.max=40, fit="gaussian")
+pks_egh <- get_peaks(warp, lambdas = c('210', '260'), sd.max=40, fit="egh")
 ```
 
 The `plot_peaks` function allows you to visually assess the peak integration accuracy. Below we compare the peaks fitted for the second chromatogram (`index=2`) using the two algorithms. Often the egh function performs slightly better for asymmetrical peaks.

@@ -1,8 +1,8 @@
-correct_rt <- function(chrom_list, models=NULL, reference='best', what = c("corrected.values", "models"), 
-                       init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, lambdas, scale=T,
+correct_rt <- function(chrom_list, models=NULL, lambdas, reference='best', what = c("models", "corrected.values"), 
+                       init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, scale=T,
                        trwdth=200, plot_it=T, ...){
+  what <- match.arg(what, c("models", "corrected.values"))
   if (is.null(models)){
-    what <- match.arg(what)
     chrom_list <- lapply(chrom_list,function(x){
       apply(x, 2, padzeros, nzeros=n.zeros, side='both')
     })
@@ -52,11 +52,11 @@ correct_rt <- function(chrom_list, models=NULL, reference='best', what = c("corr
 correctRT <- function(chrom_list, models=NULL, reference='best', what = c("corrected.values", "models"), 
                       init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, lambdas, scale=T,
                       trwdth=200, plot_it=T, ...){
-  msg<-"The correctRT function is deprecated. Please use correct_rt instead"
+  msg<-"The function `correctRT` is deprecated. Please use `correct_rt` instead"
   .Deprecated(correct_rt, package="chromatographR", msg,
               old = as.character(sys.call(sys.parent()))[1L])
+  what <- match.arg(what, c("models", "corrected.values"))
   if (is.null(models)){
-  what <- match.arg(what)
   chrom_list<-lapply(chrom_list,function(x){
     apply(x,2,padzeros, nzeros=n.zeros, side='both')
   })
@@ -100,7 +100,7 @@ correctRT <- function(chrom_list, models=NULL, reference='best', what = c("corre
 }
 
 correctRT5 <- function(chrom_list, warpings, reference=1, ...){
-  msg<-"The correctRT5 function is deprecated. You can use the 'models' argument in correct_rt to warp chromatograms according to an existing model"
+  msg<-"The `correctRT5` function is deprecated. You can use the 'models' argument in `correct_rt` to warp chromatograms according to an existing model"
   .Deprecated(correctRT, package="chromatographR", msg,
               old = as.character(sys.call(sys.parent()))[1L])
   allmats <- sapply(chrom_list, identity, simplify = "array")

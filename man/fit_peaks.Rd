@@ -5,7 +5,8 @@
 \description{
   Find chromatographic peaks, and fit peak parameters using gaussian or exponential-gaussian hybrid peak fitting.}
 \usage{
-find_peaks(y, sd.max = 10)
+find_peaks(y, smooth_type='gaussian', smooth_window = 1, smooth_width = 0.1,
+                               slope_thresh=.05, amp_thresh=0, bounds=F)
 fit_peaks(y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"), 
                       max.iter = 100)
 }
@@ -20,6 +21,9 @@ fit_peaks(y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"),
   \item{sd.max}{Maximum standard deviation of peak.}
   \item{fit}{Function for peak fitting. (Currently "gaussian" and 
   exponential gaussian hybrid ("egh") are supported.)}
+  \item{bounds}{Logical. If TRUE, includes boundaries of peak in dataframe.}
+  \item{max.iter}{Maximum number of iterations to use in nonlinear least squares peak-fitting.}
+
 }
 \details{
   Find peaks with function \code{find_peaks} by looking for "zero-crossings" in

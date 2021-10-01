@@ -1,16 +1,16 @@
-get_peaks <- function (chrome_list, lambdas, max.iter=100,
+get_peaks <- function (chrom_list, lambdas, max.iter=100,
                          fit = c("egh", "gaussian", "emg"), ...){
   fit <- match.arg(fit, c("egh", "gaussian", "emg"))
   if (is.numeric(lambdas)){
     lambdas <- as.character(lambdas)
   }
   peaks<-list()
-  chrome_list <- lapply(chrome_list, function(c_mat) c_mat[,lambdas, drop=F])
-  peak_positions <- lapply(chrome_list, function(c_mat){
+  chrom_list <- lapply(chrom_list, function(c_mat) c_mat[,lambdas, drop=F])
+  peak_positions <- lapply(chrom_list, function(c_mat){
     apply(c_mat, 2, function(x) find_peaks(x, bounds=T))})
-  result <- lapply(1:length(chrome_list), function(smpl) {
+  result <- lapply(1:length(chrom_list), function(smpl) {
     ptable <- lapply(1:length(peak_positions[[smpl]]), function(cmpnd){
-      fit_peaks(chrome_list[[smpl]][,cmpnd], peak_positions[[smpl]][[cmpnd]], fit=fit, max.iter=max.iter, ...)
+      fit_peaks(chrom_list[[smpl]][,cmpnd], peak_positions[[smpl]][[cmpnd]], fit=fit, max.iter=max.iter, ...)
     })
     names(ptable) <- names(peak_positions[[smpl]])
     ptable
@@ -18,7 +18,7 @@ get_peaks <- function (chrome_list, lambdas, max.iter=100,
   names(result) <- names(peak_positions)
   result <- lapply(result, function(smpl) lapply(smpl, function(pks) pks[apply(pks, 
                                                                                1, function(x) !any(is.na(x))), , drop = FALSE]))
-  timepoints <- as.numeric(rownames(chrome_list[[1]]))
+  timepoints <- as.numeric(rownames(chrom_list[[1]]))
   tdiff <- median(diff(timepoints))
   lapply(result, function(smpl) lapply(smpl, function(cmpnd) {
     x <- cmpnd
@@ -29,9 +29,9 @@ get_peaks <- function (chrome_list, lambdas, max.iter=100,
   }))
 }
 
-getAllPeaks <- function (chrome_list, lambdas, max.iter=100,
+getAllPeaks <- function (chrom_list, lambdas, max.iter=100,
                          fit = c("egh", "gaussian", "emg"), ...){
-  msg<-"The getAllPeaks function is deprecated. Please use get_peaks instead"
+  msg<-"The function `getAllPeaks` is deprecated. Please use `get_peaks` instead"
   .Deprecated(getAllPeaks, package="chromatographR", msg,
               old = as.character(sys.call(sys.parent()))[1L])
   fit <- match.arg(fit, c("egh", "gaussian", "emg"))
@@ -39,12 +39,12 @@ getAllPeaks <- function (chrome_list, lambdas, max.iter=100,
     lambdas <- as.character(lambdas)
   }
   peaks<-list()
-  chrome_list <- lapply(chrome_list, function(c_mat) c_mat[,lambdas, drop=F])
-  peak_positions <- lapply(chrome_list, function(c_mat){
+  chrom_list <- lapply(chrom_list, function(c_mat) c_mat[,lambdas, drop=F])
+  peak_positions <- lapply(chrom_list, function(c_mat){
     apply(c_mat, 2, function(x) find_peaks(x, bounds=T))})
-  result <- lapply(1:length(chrome_list), function(smpl) {
+  result <- lapply(1:length(chrom_list), function(smpl) {
     ptable <- lapply(1:length(peak_positions[[smpl]]), function(cmpnd){
-      fit_peaks(chrome_list[[smpl]][,cmpnd], peak_positions[[smpl]][[cmpnd]], fit=fit, max.iter=max.iter, ...)
+      fit_peaks(chrom_list[[smpl]][,cmpnd], peak_positions[[smpl]][[cmpnd]], fit=fit, max.iter=max.iter, ...)
       })
     names(ptable) <- names(peak_positions[[smpl]])
     ptable
@@ -52,7 +52,7 @@ getAllPeaks <- function (chrome_list, lambdas, max.iter=100,
   names(result) <- names(peak_positions)
   result <- lapply(result, function(smpl) lapply(smpl, function(pks) pks[apply(pks, 
                                                                                1, function(x) !any(is.na(x))), , drop = FALSE]))
-  timepoints <- as.numeric(rownames(chrome_list[[1]]))
+  timepoints <- as.numeric(rownames(chrom_list[[1]]))
   tdiff <- median(diff(timepoints))
   lapply(result, function(smpl) lapply(smpl, function(cmpnd) {
     x <- cmpnd
@@ -75,8 +75,8 @@ plot_peaks <- function(chrom_list, peak_list, index=1, lambda=NULL, w=0.5, slope
     stop('Error: lambda must match one of the wavelengths in your peak list')
   }
   if (is.numeric(lambda)){lambda <- as.character(lambda)}
-  new.ts <- as.numeric(rownames(chrome_list[[1]]))
-  y<-chrome_list[[index]][,lambda]
+  new.ts <- as.numeric(rownames(chrom_list[[1]]))
+  y<-chrom_list[[index]][,lambda]
   pks<-data.frame(peak_list[[index]][[lambda]])
   if ("tau" %in% colnames(pks)){
     fit<-"egh"
