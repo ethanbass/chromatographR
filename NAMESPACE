@@ -1,6 +1,5 @@
 ## all functionality of ALS and ptw may be needed for the user, so all
 ## functions imported.
-#import(ALS)
 import(ptw)
 import(lattice)
 
