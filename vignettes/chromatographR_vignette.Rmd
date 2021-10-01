@@ -20,13 +20,13 @@ opts_chunk$set(prompt = TRUE, highlight = FALSE, comment=NA,
 suppressMessages(require(chromatographR, quiet=TRUE))
 ```
 
-*chromatographR* is a package for the reproducible analysis of HPLC-DAD data in `R`. Liquid chromatography coupled to diode-array detection (DAD) remains one of the most popular analytical methodologies due to its convenience and low-cost. However, there are currently few open-source tools for analyzing HPLC-DAD chromatograms. The use of proprietary software for the analysis of HPLC-DAD data is a significant barrier to reproducible science, not only because of the inaccessibility of these tools, but also because these tools often involve the selection of complicated options through a graphical user interface which cannot easily be repeated. Reproducibility is of course much higher in command line workflows because the entire analysis is stored and can be repeated by anyone using publicly available software.
+*chromatographR* is a package for the reproducible analysis of HPLC-DAD data in `R`. Liquid chromatography coupled to diode-array detection (HPLC-DAD) remains one of the most popular analytical methodologies due to its convenience and low-cost. However, there are currently few open-source tools for analyzing HPLC-DAD chromatograms. The use of proprietary software for the analysis of HPLC-DAD data is a significant barrier to reproducible science, not only because these tools are inaccessible, but also because they often involve the selection of complicated options through a graphical user interface which cannot easily be repeated, even by the same operator. Reproducibility is of course much higher in command line workflows where the entire analysis is stored and can be repeated by anyone using publicly available software.
 
-The *chromatographR* package draws inspiration from the previously published *alsace* package [@wehrens2015], but with improved functions for peak-finding, fitting and peak table generation as well as a number of new tools for data visualization. Unlike *alsace*, *chromatographR* focuses on a more conventional workflow that may seem more familiar to users of standard software tools for HPLC-DAD analysis, such as ChemStation®, foregoing the alternating-least squares approach emphasized in *alsace*. *chromatographR* includes tools for automatic a) preprocessing, b) retention time alignment, c) peak-finding, d) peak-integration and e) peak table generation.
+The *chromatographR* package draws inspiration from the previously published *alsace* package [@wehrens2015], but with improved functions for peak-finding, fitting and peak table generation as well as a number of new tools for data visualization. Unlike *alsace*, *chromatographR* focuses on a more conventional workflow that may seem more familiar to users of standard software tools for HPLC-DAD analysis, such as ChemStation®, foregoing the alternating-least squares approach emphasized in *alsace*. *chromatographR* includes tools for automatic a) pre-processing, b) retention-time alignment, c) peak-finding, d) peak-integration and e) peak-table construction, as well as additional functions useful in analysis of the resulting peaktable.
 
 ## Loading data
 
-In most cases, the data coming from the spectrometer need to be converted into an `R`-accessible format such as a `csv` file. Once all `csv` files are gathered in one directory (e.g. `foo`), the `load_chromes` function provides a simple interface to import your chromatograms.
+In most cases, the data coming from the spectrometer must first be converted into an `R`-accessible format such as a `csv` file. Once all `csv` files are gathered in one directory (e.g. `foo`), the `load_chromes` function provides a simple interface to import your chromatograms.
 
 ```{r,eval=F}
 # single folder
@@ -45,7 +45,7 @@ lambdas <- as.numeric(colnames(Sa[[1]]))
 
 ## Pre-processing data
 
-Experimental data can suffer from a number of non-informative defects, such as noise (random or non- random), a shifting baseline, or missing values. In addition, the wavelength range or time range may be larger than we need. Since HPLC-DAD data are fairly smooth, it is usually relatively easy to correct these issues. For example, smoothing can remove much of the noise in the spectral direction and baseline subtraction can remove a shifting baseline. Selection and interpolation can be used to select the time and wavelength ranges and resolutions we want. All of these functions are available through the `preprocess` function. Smoothing and baseline subtraction are enabled by default, and providing alternative sets of time points and/or wavelengths will lead to a sub-sampling and subsequent interpolation along one or both axes. This can significantly reduce the computational load in later steps.
+Experimental data can suffer from a number of non-informative defects, such as noise (random or non- random), a shifting baseline, or missing values. In addition, the wavelength range or time range may be larger than we need. Since HPLC-DAD data are fairly smooth, it should be relatively easy to correct these issues in most cases. For example, smoothing can remove much of the noise in the spectral direction and baseline subtraction can remove a shifting baseline. Selection and interpolation can be used to select the time and wavelength ranges and resolutions we want. All of these functions are available through the `preprocess` function. Smoothing and baseline subtraction are enabled by default, and providing alternative sets of time points and/or wavelengths will lead to a sub-sampling and subsequent interpolation along one or both axes. This can significantly reduce the computational load in later steps.
 
 The `baseline_cor` function from the *ptw* package [@bloemberg2010] takes arguments `p` (an asymmetry parameter) and `lambda` (a smoothing parameter). You can read more about these in the documentation for `ptw::asysm`.  You may want to experiment with these parameters before choosing values to use on your whole dataset.
 
@@ -60,12 +60,12 @@ matplot(x=tpoints, y=baseline.corr(Sa[[i]][,lambda],p=.001,lambda=1e5),
        type='l', add=T, col='blue', lty = 3)
 ```
 
-```{r, preprocessing}
+```{r, choosing dimensions}
 new.ts <- seq(1,38,by=.01) # choose time-points
 new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
 ```
 
-```{r, preprocessing2, eval=F}
+```{r, preprocessing, eval=F}
 dat.pr <- lapply(X=Sa,
                  FUN=preprocess,
                  dim1=new.ts,
@@ -88,21 +88,18 @@ dat.pr <- parallel::mclapply(X=Sa,
 
 This could be a good time to load meta-data and normalize your chromatograms (e.g. by sample mass). You could also normalize after assembling the peak table.
 
-## Loading meta-data and normalization
-```{r}
-
-```
-
 ## Dealing with retention time shifts
 
-In many cases, HPLC data can suffer from retention time shifts (e.g. due to temperature fluctuations, column degradation, or subtle changes in mobile-phase composition). Parametric time warping (as implemented in the *ptw* package can be quite effective for correcting subtle retention time shifts [@eilers2004]. If you have severe retention time shifts this technique will be considerably less effective (and you should consider checking your HPLC for leaks). If your chromatograms are already perfectly aligned you can skip this step.
+In many cases, HPLC data can suffer from retention time shifts (e.g. due to temperature fluctuations, column degradation, or subtle changes in mobile-phase composition). Parametric time warping (as implemented in the *ptw* package can be quite an effective technique for correcting subtle retention time shifts [@eilers2004]. If your chromatograms are already perfectly aligned you can skip this step. If you have severe shifts in retention time this technique will be considerably less effective (and you should consider checking your HPLC for leaks). 
 
-```{r, warping}
+The `correct_rt` function is a wrapper around the `ptw` function. For each chromatogram, it produces a "global" warping function across all wavelengths included in `lambdas`). The goal of the warping function is to produce a better alignment of retention times by "warping" the time-axis of each chromatogram to match a reference chromatogram. The reference chromatogram can be selected manually or determined algorithmically by setting the `reference` argument. The code below creates warping models for the samples in the provided list of data matrices.
+
+
+```{r, warp model}
 warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360'), n.zeros = 250)
 ```
 
-This will produce a "global" warping function (i.e. a common warping function for all wavelengths in `lambdas`) for each sample. The goal of the warping function is to produce a better alignment of retention times by "warping" the time-axis of each chromatogram to match a reference chromatogram. The reference chromatogram can be selected manually or determined algorithmically by setting the `reference` argument.
-
+The same function can then be used to warp each chromatogram according to the corresponding model.
 
 ```{r}
 warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
@@ -187,10 +184,10 @@ plot_all_spectra(peak, peak_table=pkTab, chrom_list = warp, export=F, overlappin
 
 ### Clustering peaks by spectral similarity
 
-The `cluster_spectra` function groups peaks according to their spectral similarity, using hierarchical clustering, as implemented in the *pvclust* R package [@suzuki2006]. It returns a list of clusters, along with a p-value for each cluster, calculated through multi-scale bootstrap resampling. These clusters may be useful in downstream analyses (i.e. for loosely grouping peaks by chemical class). 
+The `cluster_spectra` function groups peaks according to their spectral similarity, using hierarchical clustering, as implemented in the *pvclust* R package [@suzuki2006]. It returns a list of clusters, along with a p-value for each cluster, calculated through multi-scale bootstrap resampling. These clusters may be useful in downstream analyses (i.e. for loosely grouping peaks by chemical class). For actual use, the number of bootstraps (`nboot`) should be set higher (probably at least 1000, or even 10000 as recommended by the developers of `pvclust`).
 
-```{r, cluster, eval=F}
-cl1 <- cluster_spectra(pkTab, warp, nboot=1000, max.only = F)
+```{r, cluster}
+cl1 <- cluster_spectra(pkTab, warp, nboot=100, max.only = F,save = F)
 ```
 
 ## References
