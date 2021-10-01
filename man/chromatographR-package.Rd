@@ -2,8 +2,8 @@
 \alias{chromatographR-package}
 \alias{chromatographR}
 \docType{package}
-\title{}
-\description{
+\title{chromatographR}
+\description{chromatographR
 }
 \details{
 \tabular{ll}{
