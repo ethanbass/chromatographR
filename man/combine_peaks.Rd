@@ -18,6 +18,5 @@ combine_peaks(peak_table, digits=2, min.cor=0.9, choose='max')
 \value{A peak table similar to the input peak table, but with duplicate columns
   combined according to the specified criteria.}
 \author{Ethan Bass}
-
 \seealso{\code{\link{get_peaks}}}
 \keyword{manip}

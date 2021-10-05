@@ -76,11 +76,11 @@ plot_peaks <- function(chrom_list, peak_list, index=1, lambda=NULL, w=0.5, slope
   }
   if (is.numeric(lambda)){lambda <- as.character(lambda)}
   new.ts <- as.numeric(rownames(chrom_list[[1]]))
-  y<-chrom_list[[index]][,lambda]
-  pks<-data.frame(peak_list[[index]][[lambda]])
+  y <- chrom_list[[index]][,lambda]
+  pks <- data.frame(peak_list[[index]][[lambda]])
   if ("tau" %in% colnames(pks)){
-    fit<-"egh"
-  } else{ fit<-"gaussian"}
+    fit <- "egh"
+  } else{ fit <- "gaussian"}
   plot(new.ts, y, type='l', xlab='', ylab='', xaxt='n', yaxt='n')
   if (points==T){
     points(pks$rt, pks$height, pch=20, cex=0.5, col='red')

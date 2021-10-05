@@ -6,9 +6,9 @@
 \description{
   Correction of retention time differences using parametric time warping.
 }
-\usage{correct_rt(chrom_list, models=NULL, lambdas, reference="best", lambdas,
-                 what = c("corrected.values", "models"),
-                 init.coef = c(0, 1, 0), n.traces = NULL, n.zeros=0, ...)}
+\usage{correct_rt(chrom_list, models=NULL, lambdas, reference='best', 
+        what = c("models", "corrected.values"), init.coef = c(0, 1, 0), n.traces=NULL,
+        n.zeros=0, scale=T, trwdth=200, ...)}
 \arguments{
   \item{chrom_list}{List of matrices containing concentration profiles.}
   \item{models}{List of models to warp by.}
@@ -22,8 +22,7 @@
   \item{n.traces}{Number of traces to use.}
   \item{n.zeros}{Number of zeros to add.}
   \item{scale}{Logical. If true, scale chromatograms before warping.}
-  \item{trwdth}{}
-  \item{plot_it}{}
+  \item{trwdth}{width of the triangle in the WCC criterion.}
   \item{\dots}{Optional arguments for the \code{ptw} function. The only
     argument that cannot be changed is \code{warp.type}: this is always
     equal to \code{"global"}.}

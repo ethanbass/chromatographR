@@ -35,8 +35,8 @@ get_peaktable(peak_list, chrom_list, response = c("area", "height"),
   weight of retention time.}
   \item{sigma.r}{Width of gaussian in spectral similarity function. Controls
   weight of spectral correlation.}
-  \item{deepSplit}{}
-  \item{out}{Specify "data.frame" or "matrix" as output. Defaults to dataframe.}
+  \item{deepSplit}{Logical. Controls sensitivity to cluster splitting. If TRUE, will return more smaller clusters. See documentation for \code{\link{cutreeDynamic}}.}
+  \item{out}{Specify "data.frame" or "matrix" as output. Defaults to `data.frame`.}
 }
 \value{The function returns a data frame where the first couple of
   columns contain meta-information on the features (component, peak,
@@ -46,11 +46,15 @@ get_peaktable(peak_list, chrom_list, response = c("area", "height"),
 \author{Ethan Bass & Ron Wehrens}
 \references{Broeckling, C. D., F. A. Afsar, S. Neumann, A. Ben-Hur, and J. E. Prenni. 2014. RAMClust: A Novel Feature Clustering Method Enables Spectral-Matching-Based Annotation for Metabolomics Data. \emph{Anal. Chem.} \bold{86}:6812-6817.}
 \examples{
-data(teaMerged)
-pks <- getAllPeaks(teaMerged$CList, span = 11)
-warping.models <- correctRT(teaMerged$CList, reference = 2,
-                            what = "models")
-pks.corrected <- correctPeaks(pks, warping.models)
-pkTab <- getPeakTable(pks.corrected, response = "area")
+data(Sa)
+new.ts <- seq(1,38,by=.01) # choose time-points
+new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
+dat.pr <- lapply(X=Sa,FUN=preprocess,
+                 dim1=new.ts,
+                 dim2=new.lambdas)
+warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360'))
+warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
+pks <- get_peaks(warp, lambdas="210")
+pkTab <- get_peaktable(pks, response = "area")
 }
 \keyword{manip}

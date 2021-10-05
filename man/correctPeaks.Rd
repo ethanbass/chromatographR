@@ -20,23 +20,4 @@ correctPeaks(peakList, modList)
   containing the corrected retention time.}
 \author{Ron Wehrens}
 \seealso{\code{\link{correctRT}}}
-\examples{
-data(teaMerged)
-pks <- getAllPeaks(teaMerged$CList, span = 11)
-warping.models <- correctRT(teaMerged$CList, reference = 2,
-                            what = "models")
-pks.corrected <- correctPeaks(pks, warping.models)
-
-## original profiles and peaks, in black and gray
-plot(teaMerged, mat.idx = 3, what = "profiles", comp.idx = 2,
-     showWindows = FALSE, col = "gray")
-abline(v = pks[[3]][[2]][,"rt"])
-## shifted profiles and peaks, in red and pink
-CList.corrected <- correctRT(teaMerged$CList, reference = 2)
-lines(as.numeric(rownames(CList.corrected[[3]])),
-      CList.corrected[[3]][,2], col = "pink")
-abline(v = pks.corrected[[3]][[2]][,"rt.cor"], col = "red")
-## note that the rightmost peak in the uncorrected data is no longer
-## within the range of the data
-}
 \keyword{manip}

@@ -1,6 +1,6 @@
 correct_rt <- function(chrom_list, models=NULL, lambdas, reference='best', what = c("models", "corrected.values"), 
                        init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, scale=T,
-                       trwdth=200, plot_it=T, ...){
+                       trwdth=200, ...){
   what <- match.arg(what, c("models", "corrected.values"))
   if (is.null(models)){
     chrom_list <- lapply(chrom_list,function(x){

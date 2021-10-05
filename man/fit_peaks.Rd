@@ -7,12 +7,12 @@
 \usage{
 find_peaks(y, smooth_type='gaussian', smooth_window = 1, smooth_width = 0.1,
                                slope_thresh=.05, amp_thresh=0, bounds=F)
-fit_peaks(y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"), 
+fit_peaks(y, pos, sd.max = 50, fit = c("egh", "gaussian", "emg"), 
                       max.iter = 100)
 }
 \arguments{
   \item{y}{response (numerical vector)}
-  \item{smooth_type}{Type of smoothing. (Only gaussian is currently supported).}
+  \item{smooth_type}{Type of smoothing. (Only "gaussian" is currently supported).}
   \item{smooth_window}{Window for smoothing.}
   \item{smooth_width}{Width for smoothing.}
   \item{slope_thresh}{Minimum threshold for peak slope.}
@@ -29,8 +29,7 @@ fit_peaks(y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"),
   Find peaks with function \code{find_peaks} by looking for "zero-crossings" in
   the smoothed first derivative of a signal that exceed a given slope threshold.
 
-  Peak parameters are calculated using \code{fit_peaks}, assuming a
-  normal distribution or exponential-gaussian hybrid. 
+  Peak parameters are calculated using \code{fit_peaks}, which fits the data to a gaussian or exponential-gaussian hybrid curve using non-linear least squares estimation as implemented in \code{\link{stats::nls}}. 
 }
 \value{
   Function \code{find_peaks} simply returns the locations of the peak centers,
@@ -39,10 +38,14 @@ fit_peaks(y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"),
   Function \code{fit_peaks} returns a matrix, whose columns contain the
   following information:
   \item{rt}{location of the maximum of the peak (x)}
+  \item{start}{start of peak (only included in table if `bounds==T`)}
+  \item{end}{end of peak (only included in table if `bounds==T`)}
   \item{sd}{width of the peak (x)}
+  \item{tau}{tau parameter (only included in table if `fit=="egh"`)}
   \item{FWHM}{full width at half maximum (x)}
   \item{height}{height of the peak (y)}
   \item{area}{peak area}
+  \item{r.squared}{r-squared value for fit of model to data.}
 
   Again, the first three elements (rt, sd and FWHM) are expressed as
   indices, so not in terms of the real retention times. The
@@ -54,6 +57,8 @@ fit_peaks(y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"),
 \author{Ethan Bass}
 \references{
 Lan, K. & Jorgenson, J. W. A hybrid of exponential and gaussian functions as a simple model of asymmetric chromatographic peaks. Journal of Chromatography A 915, 1-13 (2001).
+
+Naish, P. J. & Hartwell, S. Exponentially Modified Gaussian functions - A good model for chromatographic peaks in isocratic HPLC? Chromatographia 26, 285-296 (1988).
 }
 \seealso{\code{\link{get_peaks}}}
 \keyword{manip}

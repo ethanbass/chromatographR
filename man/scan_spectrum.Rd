@@ -23,6 +23,4 @@
 }
 \author{Ethan Bass}
 \seealso{\code{\link{plot_spectrum}}}
-\examples{
-}
 \keyword{manip}

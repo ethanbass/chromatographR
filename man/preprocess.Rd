@@ -22,13 +22,13 @@ preprocess(X, dim1, dim2, remove.time.baseline = TRUE,
   \item{dim2}{A new, usually shorter, set of wavelengths (numerical). The
     range of these should not be outside the range of the original
     wavelengths, otherwise the function stops with an error message.}
-  \item{remove.time.baseline}{logical, indicating whether baseline
-    correction should be done in the time direction. Default is TRUE.}
-  \item{spec.smooth}{logical, indicating whether smoothing should be
-    done in the spectral direction. Default is TRUE.}
+  \item{remove.time.baseline}{Logical, indicating whether baseline
+    correction should be done in the time direction, according to \code{\link{ptw::baseline.corr}}. Default is TRUE.}
+  \item{spec.smooth}{Logical, indicating whether smoothing should be
+    done in the spectral direction, according to \code{\link{stats::smooth.spline}}. Default is TRUE.}
   \item{maxI}{if given, the maximum intensity in the matrix is set to
     this value.}
-  \item{\dots}{further optional arguments to the \code{baseline.corr}
+  \item{\dots}{Further optional arguments to the \code{baseline.corr}
     function.}
 }
 \value{
@@ -37,33 +37,23 @@ preprocess(X, dim1, dim2, remove.time.baseline = TRUE,
 }
 \author{Ron Wehrens}
 \examples{
-data(tea)
-tpoints <- as.numeric(rownames(tea.raw[[1]]))
-lambdas <- as.numeric(colnames(tea.raw[[1]]))
+data(Sa)
+tpoints <- as.numeric(rownames(Sa[[1]]))
+lambdas <- as.numeric(colnames(Sa[[1]]))
 
 ## limit retention time and wavelength ranges, and do smoothing and
 ## baseline correction
-new.time <- seq(13, 14.1, by = .05)
-new.wavelengths <- seq(400, 500, by = 2)
-tea.raw1.processed <-
-  preprocess(tea.raw[[1]], dim1 = new.time, dim2 = new.wavelengths)
+new.ts <- seq(1,38,by=.01) # choose time-points
+new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
+Sa1.processed <-
+  preprocess(Sa[[1]], dim1 = new.ts, dim2 = new.lambdas)
 
-plot(tpoints, tea.raw[[1]][,lambdas == 470],
-     xlim = range(new.time), type = "l", col = "gray",
-     main = "Chromatogram at 470 nm", xlab = "Time (min.)",
+plot(tpoints, Sa[[1]][,lambdas == '210'],
+     xlim = range(new.ts), type = "l", col = "gray",
+     main = "Chromatogram at 210 nm", xlab = "Time (min.)",
      ylab = "")
-lines(new.time, tea.raw1.processed[,new.wavelengths == 470], col = "red")
-legend("topleft", lty = 1, col = c("gray", "red"), bty = "n",
-       legend = c("Original data", "Preprocessed data"))
-
-plot(lambdas, tea.raw[[1]][tpoints == 13.7,],
-     xlim = range(new.wavelengths),
-     ylim = c(0, max(tea.raw[[1]][tpoints == 13.7,])),
-     type = "l", col = "gray",
-     main = "Spectrum at 13.7 min.", xlab = expression(lambda),
-     ylab = "")
-lines(new.wavelengths, tea.raw1.processed[new.time == 13.7,], col = "red")
-legend("topleft", lty = 1, col = c("gray", "red"), bty = "n",
+lines(new.ts, Sa1.processed[,new.lambdas == 210], col = "blue")
+legend("topleft", lty = 1, col = c("gray", "blue"), bty = "n",
        legend = c("Original data", "Preprocessed data"))
 }
 \keyword{manip}

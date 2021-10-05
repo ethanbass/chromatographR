@@ -24,6 +24,4 @@
   \item{...}{Additional arguments.}
 }
 \author{Ethan Bass}
-\examples{
-}
 \keyword{manip}

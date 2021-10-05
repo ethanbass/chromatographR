@@ -1,7 +1,7 @@
 # peak finding function adapted from matlab function by Prof. Tom O'Haver
 ## (see http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm)
 
-find_peaks <- function(y, smooth_type='gaussian', smooth_window = 1, smooth_width = 0.1,
+find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_width = 0.1,
                                slope_thresh=.05, amp_thresh=0, bounds=F){
   if (smooth_type=='gaussian'){
     d <- smoother::smth.gaussian(diff(y),window = smooth_window, alpha=smooth_width)
@@ -26,10 +26,10 @@ find_peaks <- function(y, smooth_type='gaussian', smooth_window = 1, smooth_widt
 # fit peaks using gaussian or exponential-gaussian hybrid ('egh') distribution
 # (emg setting doesn't work yet).
 
-fit_peaks <- function (y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"), 
+fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian", "emg"), 
                       max.iter = 100) 
 {
-  fit <- match.arg(fit, c("gaussian", "egh", "emg"))
+  fit <- match.arg(fit, c("egh", "gaussian", "emg"))
   if (fit == "gaussian") {
     tabnames <- c("rt","start","end", "sd", "FWHM", "height", "area", "r-squared")
     noPeaksMat <- matrix(rep(NA, length(tabnames)), nrow = 1, dimnames = list(NULL, 
@@ -70,8 +70,9 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"),
     }
   }
   else if (fit == "emg") {
-    tabnames <- c("rt", "sd", "lambda", "FWHM", "height", 
-                  "area")
+    tabnames <- c("rt","start","end", "sd", "tau", "FWHM", "height", "area", 
+                  "r.squared")
+    #tabnames <- c("rt", "sd", "lambda", "FWHM", "height", "area")
     noPeaksMat <- matrix(rep(NA, length(tabnames)), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
     on.edge <- sapply(pos, function(x) y[x + 1] == 0 | y[x - 
@@ -84,8 +85,9 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("gaussian", "egh", "emg"),
       peak.loc <- seq.int(pos[2], pos[3])
       m <- fit_EMG(peak.loc, y[peak.loc], start.center = xloc, 
                    start.height = y[xloc])
-      c(m$center, m$width, m$tau, 2.35 * m$width, y[xloc], 
-        y[xloc]/dnorm(m$center, m$center, m$width))
+      r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=T)
+      c(m$center, pos[2], pos[3], m$width, m$tau, 2.35 * m$width, y[xloc], 
+        y[xloc]/dnorm(m$center, m$center, m$width), r.squared)
     }
   }
   huhn <- data.frame(t(apply(pos, 1, fitpk)))
@@ -230,7 +232,7 @@ fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
     residualAns <- residuals( nlsAns)
   }
   
-  # always report the SD as a possitive value
+  # always report the SD as a positive value
   widthAns <- abs( widthAns) #width = SD
   
   out <- list( "center"=centerAns, "width"=widthAns, "height"=heightAns, "tau"=tauAns, "y"=yAns,
@@ -282,14 +284,14 @@ fit_EMG <- function(x1, y1, start.center=NULL, start.width=NULL, start.alpha=NUL
     starts <- list("mu"=start.center, "sigma"=start.width, "height"=start.height, "alpha"=start.alpha)
     #nlsAns <- try(nls(y1 ~ EMG(x1, mu, sigma, height, alpha), start=starts, control=controlList))
     nlsAns <- try(nls(y1 ~ EMG(x1, mu, sigma, height, alpha), start=starts, control=controlList,
-                      lower = lowers, upper=c(Inf,Inf,Inf,Inf), algorithm="port"))
+                      lower = c(0,0,0,0), upper=c(Inf,Inf,Inf,Inf), algorithm="port"))
   }else {
     if (is.null( start.floor)) start.floor <- quantile( y, seq(0,1,0.1))[2]
     starts <- list( "mu"=start.center, "sigma"=start.width, "height"=start.height, "alpha"=start.alpha, 
                     "floor"=start.floor)
     #nlsAns <- try(nls(y ~ EMG(x, mu, sigma, height, alpha, floor), start=starts, control=controlList))
     nlsAns <- try(nls(y ~ EMG(x, mu, sigma, height, alpha), start=starts, control=controlList,
-               lower = lowers, upper=c(Inf,Inf,Inf,Inf), algorithm="port"))
+               lower = c(0,0,0,0), upper=c(Inf,Inf,Inf,Inf), algorithm="port"))
   }
   
   # package up the results to pass back
@@ -384,3 +386,6 @@ fitpeaks_at_max <- function (mat, pos, w=5, sd.max=50, fit=c("gaussian","egh")){
 
 ## new peak finding function ported from matlab
 ## (see http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm)
+
+
+#emg::emg.mle()

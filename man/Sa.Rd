@@ -9,9 +9,4 @@ Five HPLC-DAD data matrices of *Solidago altissima* roots extracted in 90 percen
 \format{The UV-Vis data (\code{Sa}) are given as a list of five
   matrices (time x wavelength).
 }
-\examples{
-data(tea)
-tpoints <- as.numeric(rownames(Sa[[1]]))
-lambdas <- as.numeric(colnames(Sa[[1]]))
-}
 \keyword{datasets}

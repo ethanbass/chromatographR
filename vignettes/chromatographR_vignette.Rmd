@@ -1,11 +1,11 @@
 ---
-title: "Introduction to chromatographR"
+title: "chromatographR"
 author: "Ethan Bass"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 bibliography: references.bib
 vignette: >
-  %\VignetteIndexEntry{Introduction to chromatographR}
+  %\VignetteIndexEntry{chromatographR}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -20,13 +20,13 @@ opts_chunk$set(prompt = TRUE, highlight = FALSE, comment=NA,
 suppressMessages(require(chromatographR, quiet=TRUE))
 ```
 
-*chromatographR* is a package for the reproducible analysis of HPLC-DAD data in `R`. Liquid chromatography coupled to diode-array detection (HPLC-DAD) remains one of the most popular analytical methodologies due to its convenience and low-cost. However, there are currently few open-source tools for analyzing HPLC-DAD chromatograms. The use of proprietary software for the analysis of HPLC-DAD data is a significant barrier to reproducible science, not only because these tools are inaccessible, but also because they often involve the selection of complicated options through a graphical user interface which cannot easily be repeated, even by the same operator. Reproducibility is of course much higher in command line workflows where the entire analysis is stored and can be repeated by anyone using publicly available software.
+*chromatographR* is a package for the reproducible analysis of HPLC-DAD data in `R`. Liquid chromatography coupled to diode-array detection (HPLC-DAD) remains one of the most popular analytical methodologies due to its convenience and low-cost. However, there are currently few open-source tools available for analyzing HPLC-DAD chromatograms. The use of proprietary software for the analysis of HPLC-DAD data is currently a significant barrier to reproducible science, since these tools are not widely accessible, but also because such tools often require the user to select complicated options through a graphical interface which cannot easily be repeated. Reproducibility is of course much higher in command line workflows, like *chromatographR* where the entire analysis can be stored and easily repeated by anyone using publicly available software.
 
-The *chromatographR* package draws inspiration from the previously published *alsace* package [@wehrens2015], but with improved functions for peak-finding, fitting and peak table generation as well as a number of new tools for data visualization. Unlike *alsace*, *chromatographR* focuses on a more conventional workflow that may seem more familiar to users of standard software tools for HPLC-DAD analysis, such as ChemStation®, foregoing the alternating-least squares approach emphasized in *alsace*. *chromatographR* includes tools for automatic a) pre-processing, b) retention-time alignment, c) peak-finding, d) peak-integration and e) peak-table construction, as well as additional functions useful in analysis of the resulting peaktable.
+The *chromatographR* package draws inspiration from the previously published *alsace* package [@wehrens2015], but with improved functions for peak-finding, integration and peak table generation as well as a number of new tools for data visualization. Unlike *alsace*, which emphasized multivariate curve resolution through alternating least squares (MCR-ALS), *chromatographR* focuses on a more conventional workflow that may seem more familiar to users of standard software tools for HPLC-DAD analysis, such as ChemStation®. *chromatographR* includes tools for a) pre-processing, b) retention-time alignment, c) peak-finding, d) peak-integration and e) peak-table construction, as well as additional functions useful in analysis of the resulting peak table.
 
 ## Loading data
 
-In most cases, the data coming from the spectrometer must first be converted into an `R`-accessible format such as a `csv` file. Once all `csv` files are gathered in one directory (e.g. `foo`), the `load_chromes` function provides a simple interface to import your chromatograms.
+In most cases, the data coming from the spectrometer must first be converted into an `R`-accessible format such as a `csv` file. Once all `csv` files are gathered into a single directory (e.g. `foo`), the `load_chromes` function provides a simple interface to import your chromatograms.
 
 ```{r,eval=F}
 # single folder
@@ -45,7 +45,7 @@ lambdas <- as.numeric(colnames(Sa[[1]]))
 
 ## Pre-processing data
 
-Experimental data can suffer from a number of non-informative defects, such as noise (random or non- random), a shifting baseline, or missing values. In addition, the wavelength range or time range may be larger than we need. Since HPLC-DAD data are fairly smooth, it should be relatively easy to correct these issues in most cases. For example, smoothing can remove much of the noise in the spectral direction and baseline subtraction can remove a shifting baseline. Selection and interpolation can be used to select the time and wavelength ranges and resolutions we want. All of these functions are available through the `preprocess` function. Smoothing and baseline subtraction are enabled by default, and providing alternative sets of time points and/or wavelengths will lead to a sub-sampling and subsequent interpolation along one or both axes. This can significantly reduce the computational load in later steps.
+Experimental data can suffer from a number of non-informative artifacts, such as noise (random or non- random), a shifting baseline, or missing values. In addition, the data produced by the instrument may have longer wavelength or time ranges (or higher resolution) than we need. Since HPLC-DAD data are fairly smooth, it is relatively easy to correct these issues in most cases. For example, smoothing can remove much of the noise in the spectral direction and baseline subtraction can correct a shifting baseline. Selection and interpolation can be used to select the time and wavelength ranges and resolutions we want. All of these functions are available through the `preprocess` function. Smoothing and baseline subtraction are enabled by default, and providing alternative sets of time points and/or wavelengths will lead to sub-sampling and subsequent interpolation along one or both axes. This can significantly reduce the computational load in later steps.
 
 The `baseline_cor` function from the *ptw* package [@bloemberg2010] takes arguments `p` (an asymmetry parameter) and `lambda` (a smoothing parameter). You can read more about these in the documentation for `ptw::asysm`.  You may want to experiment with these parameters before choosing values to use on your whole dataset.
 
@@ -73,7 +73,7 @@ dat.pr <- lapply(X=Sa,
                  p=.001,lambda=1e5)
 ```
 
-If you have a large dataset, you may be able to accelerate this process through the use of parallel processing:
+If you have a large dataset, you may want to accelerate this process through the use of parallel processing:
 
 ```{r, parallel preprocessing}
 new.ts <- seq(1,38,by=.01) # choose time-points
@@ -90,10 +90,9 @@ This could be a good time to load meta-data and normalize your chromatograms (e.
 
 ## Dealing with retention time shifts
 
-In many cases, HPLC data can suffer from retention time shifts (e.g. due to temperature fluctuations, column degradation, or subtle changes in mobile-phase composition). Parametric time warping (as implemented in the *ptw* package can be quite an effective technique for correcting subtle retention time shifts [@eilers2004]. If your chromatograms are already perfectly aligned you can skip this step. If you have severe shifts in retention time this technique will be considerably less effective (and you should consider checking your HPLC for leaks). 
+In many cases, HPLC data can suffer from retention time shifts (e.g. due to temperature fluctuations, column degradation, or subtle changes in mobile-phase composition). Parametric time warping (as implemented in the *ptw* package can be quite an effective technique for correcting subtle retention time shifts [@eilers2004]. If your chromatograms are already perfectly aligned you can skip this step. If you have severe retention time shifts this technique will be considerably less effective (and you should consider checking your HPLC for leaks). 
 
 The `correct_rt` function is a wrapper around the `ptw` function. For each chromatogram, it produces a "global" warping function across all wavelengths included in `lambdas`). The goal of the warping function is to produce a better alignment of retention times by "warping" the time-axis of each chromatogram to match a reference chromatogram. The reference chromatogram can be selected manually or determined algorithmically by setting the `reference` argument. The code below creates warping models for the samples in the provided list of data matrices.
-
 
 ```{r, warp model}
 warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360'), n.zeros = 250)

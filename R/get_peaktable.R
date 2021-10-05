@@ -40,7 +40,7 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
         return('Error: must provide list of chromatograms for spectral clustering.')
       }
       sp <- sapply(1:length(pkcenters), function(i){
-        scales::rescale(t(chrom_list[[file.idx[i]]][pkcenters[i],]))
+        rescale(t(chrom_list[[file.idx[i]]][pkcenters[i],]))
       }, simplify=T)
       c <- cor(sp,sp,method = "pearson")
       mint <- abs(outer(unlist(pkcenters),unlist(pkcenters), FUN="-"))

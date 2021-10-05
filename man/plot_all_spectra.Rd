@@ -5,17 +5,18 @@
   Plot multiple for a given peak in peak table. Wrapper for \code{\link{plot_spectrum}}.
 }
 \usage{plot_all_spectra(peak, peak_table, chrom_list, plot_spectrum = T,
-export_spectrum=T, scale_spectrum=T, overlapping=T, ...)}
+export_spectrum=T, scale_spectrum=T, overlapping=T, verbose=F, ...)}
+
 \arguments{
   \item{peak}{The name of the peak you wish to plot (must be in character format)}
   \item{peak_table}{The peak table (output from \code{\link{getPeakTable}} function)}
   \item{chrom_list}{A list of profile matrices, each of the same dimensions
-    (timepoints times components).}
-  \item{chr}{Index of chromatograms you wish to plot, or "max" if you want to automatically plot the chromatogram with the largest signal.} #could i just make it so you can put multiple indices
-  \item{lambda}{The wavelength you wish to plot the trace at if plot_chrom == T and/or the wavelength to be used for the determination of signal abundance.}
+    (timepoints x components).}
   \item{plot_spectrum}{Logical. If TRUE, plots the spectrum of the chosen peak.}
+  \item{export_spectrum}{Logical. If TRUE, exports spectrum to console. Defaults to FALSE.}
   \item{scale_spectrum}{Logical. If TRUE, scales spectrum to unit height.}
   \item{overlapping}{Logical. If TRUE, plot spectra in single plot.}
+  \item{verbose}{Logical. If TRUE, print verbose output to console.}
   \item{\dots}{Additional arguments to plot_spectrum.}
 }
 \author{Ethan Bass}
