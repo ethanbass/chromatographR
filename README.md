@@ -7,7 +7,7 @@
 You can install chromatographR from GitHub:
 ```
 # install.packages("devtools")
-devtools::install_github("ethanbass/chromatographR")
+devtools::install_github("https://github.com/ethanbass/chromatographR/")
 ```
 
 Or to build the vignette, include the argument `build_vignettes=TRUE` (note: this will take considerably longer than loading the package without building the vignette).
