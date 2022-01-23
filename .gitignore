@@ -2,6 +2,4 @@
 .Rhistory
 .RData
 .Ruserdata
-pvclust.RDS
-/doc/
-/Meta/
+.html
