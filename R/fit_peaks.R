@@ -133,12 +133,12 @@ fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height
   controlList <- nls.control( maxiter = max.iter, minFactor=1/512, warnOnly=TRUE)
   if ( ! fit.floor) {
     starts <- list( "center"=start.center, "width"=start.width, "height"=start.height)
-    nlsAns <- try( nls( y ~ gaussian( x, center, width, height), start=starts, control=controlList))
+    nlsAns <- try( nlsLM( y ~ gaussian( x, center, width, height), start=starts, control=controlList))
   } else {
     if (is.null( start.floor)) start.floor <- quantile( y, seq(0,1,0.1))[2]
     starts <- list( "center"=start.center, "width"=start.width, "height"=start.height,
                     "floor"=start.floor)
-    nlsAns <- try(nls( y ~ gaussian( x, center, width, height, floor), start=starts, control=controlList))
+    nlsAns <- try(nlsLM( y ~ gaussian( x, center, width, height, floor), start=starts, control=controlList))
   }
   
   # package up the results to pass back
@@ -204,12 +204,12 @@ fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
   controlList <- nls.control( maxiter=100, minFactor=1/512, warnOnly=TRUE)
   if (!fit.floor){
     starts <- list("center"=start.center, "width"=start.width, "height"=start.height, "tau"=start.tau)
-    nlsAns <- try(nls(y1 ~ egh(x1, center, width, height, tau), start=starts, control=controlList))
+    nlsAns <- try(nlsLM(y1 ~ egh(x1, center, width, height, tau), start=starts, control=controlList))
   }else {
     if (is.null( start.floor)) start.floor <- quantile( y, seq(0,1,0.1))[2]
     starts <- list( "center"=start.center, "width"=start.width, "height"=start.height, "tau"=start.tau, 
                     "floor"=start.floor)
-    nlsAns <- try(nls( y ~ egh(x, center, width, height, tau, floor), start=starts, control=controlList))
+    nlsAns <- try(nlsLM( y ~ egh(x, center, width, height, tau, floor), start=starts, control=controlList))
   }
   
   # package up the results to pass back
@@ -283,14 +283,14 @@ fit_EMG <- function(x1, y1, start.center=NULL, start.width=NULL, start.alpha=NUL
   if (!fit.floor){
     starts <- list("mu"=start.center, "sigma"=start.width, "height"=start.height, "alpha"=start.alpha)
     #nlsAns <- try(nls(y1 ~ EMG(x1, mu, sigma, height, alpha), start=starts, control=controlList))
-    nlsAns <- try(nls(y1 ~ EMG(x1, mu, sigma, height, alpha), start=starts, control=controlList,
+    nlsAns <- try(nlsLM(y1 ~ EMG(x1, mu, sigma, height, alpha), start=starts, control=controlList,
                       lower = c(0,0,0,0), upper=c(Inf,Inf,Inf,Inf), algorithm="port"))
   }else {
     if (is.null( start.floor)) start.floor <- quantile( y, seq(0,1,0.1))[2]
     starts <- list( "mu"=start.center, "sigma"=start.width, "height"=start.height, "alpha"=start.alpha, 
                     "floor"=start.floor)
     #nlsAns <- try(nls(y ~ EMG(x, mu, sigma, height, alpha, floor), start=starts, control=controlList))
-    nlsAns <- try(nls(y ~ EMG(x, mu, sigma, height, alpha), start=starts, control=controlList,
+    nlsAns <- try(nlsLM(y ~ EMG(x, mu, sigma, height, alpha), start=starts, control=controlList,
                lower = c(0,0,0,0), upper=c(Inf,Inf,Inf,Inf), algorithm="port"))
   }
   
