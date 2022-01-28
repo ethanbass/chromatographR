@@ -28,9 +28,9 @@ preprocess <- function(X,
 
   if (remove.time.baseline)
       X <- apply(X, 2, baseline.corr, ...)
-
   if (min(X) < 0)
-      X <- X - min(X)
+      # X <- X - min(X)
+      X[X<0] <- 0
   if (!missing(maxI))
       X <- maxI * X / max(X)
 

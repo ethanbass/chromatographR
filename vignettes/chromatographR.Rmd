@@ -11,7 +11,9 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
+devtools::install_github("ethanbass/chromatographR")
 require("knitr", quietly=TRUE)
+require(chromatographR)
 opts_chunk$set(prompt = TRUE, highlight = FALSE, comment=NA, 
                #background='transparent', size = 'small', 
                fig.width=6,
@@ -80,9 +82,6 @@ dat.pr <- lapply(X=Sa,
 If you have a large dataset, you may want to accelerate this process through the use of parallel processing:
 
 ```{r, parallel preprocessing}
-new.ts <- seq(1,38,by=.01) # choose time-points
-new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
-
 dat.pr <- parallel::mclapply(X=Sa,
                  FUN=preprocess,
                  dim1=new.ts,
@@ -108,7 +107,7 @@ The same function can then be used to warp each chromatogram according to the co
 warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
 ```
 
-You can see that, in this case, the alignment is considerably better after warping.
+You can see that, in this case, the alignment is considerably improved after warping.
 
 ```{r, alignment_plot, fig.height=6}
 par(mfrow=c(2,1))
@@ -140,7 +139,7 @@ plot(coef[3,],pch=20,xlab='',ylab='')
 
 ### Peak finding and fitting
 
-The `get_peaks` function loops through your chromatograms at the specified wavelengths, finds peaks, and attempts to fit them using the specified peak-fitting function -- the current options are `gaussian` and `egh` (exponential-gaussian hybrid) [@lan2001]. The function will return a nested list of dataframes containing information about the peaks in each chromatogram.
+The `get_peaks` function loops through your chromatograms at the specified wavelengths, finds peaks, and attempts to fit them to the specified function using non-linear least squares -- the current options are `gaussian` and `egh` (exponential-gaussian hybrid) [@lan2001]. The function will return a nested list of dataframes containing information about the peaks in each chromatogram.
 
 ```{r, get_peaks, message=F, warning=F}
 pks <- get_peaks(warp, lambdas = c('210','260'), sd.max=40, fit="gaussian")
@@ -153,6 +152,9 @@ The `plot_peaks` function allows you to visually assess the peak integration acc
 par(mfrow=c(2,1))
 plot_peaks(chrom_list = warp, peak_list = pks, index=2, lambda='210')
 plot_peaks(chrom_list = warp, peak_list = pks_egh, index=2, lambda='210')
+
+plot_peaks(chrom_list = warp, peak_list = pks, index=2, lambda='260')
+plot_peaks(chrom_list = warp, peak_list = pks_egh, index=2, lambda='260')
 ```
 
 ```{r, get_peaktable}
@@ -171,14 +173,14 @@ par(mfrow=c(2,1))
 peak="X35"
 plot_spectrum(peak, peak_table=pkTab, chrom_list = warp)
 
-peak="X73"
+peak="X77"
 plot_spectrum(peak, peak_table=pkTab, chrom_list = warp)
 ```
 
 The `plot_all_spectra` function can be used to visually compare peaks at a given column of the peak table to confirm that they match.
 
 ```{r, plot_all}
-peak="X73"
+peak="X77"
 plot_all_spectra(peak, peak_table=pkTab, chrom_list = warp, export=F, overlapping=T)
 ```
 
