@@ -142,7 +142,7 @@ plot(coef[3,],pch=20,xlab='',ylab='')
 The `get_peaks` function loops through your chromatograms at the specified wavelengths, finds peaks, and attempts to fit them to the specified function using non-linear least squares -- the current options are `gaussian` and `egh` (exponential-gaussian hybrid) [@lan2001]. The function will return a nested list of dataframes containing information about the peaks in each chromatogram.
 
 ```{r, get_peaks, message=F, warning=F}
-pks <- get_peaks(warp, lambdas = c('210','260'), sd.max=40, fit="gaussian")
+pks_gauss <- get_peaks(warp, lambdas = c('210','260'), sd.max=40, fit="gaussian")
 pks_egh <- get_peaks(warp, lambdas = c('210', '260'), sd.max=40, fit="egh")
 ```
 
@@ -150,10 +150,10 @@ The `plot_peaks` function allows you to visually assess the peak integration acc
 
 ```{r, plot_peaks, warning=F, fig.height=6}
 par(mfrow=c(2,1))
-plot_peaks(chrom_list = warp, peak_list = pks, index=2, lambda='210')
+plot_peaks(chrom_list = warp, peak_list = pks_gauss, index=2, lambda='210')
 plot_peaks(chrom_list = warp, peak_list = pks_egh, index=2, lambda='210')
 
-plot_peaks(chrom_list = warp, peak_list = pks, index=2, lambda='260')
+plot_peaks(chrom_list = warp, peak_list = pks_gauss, index=2, lambda='260')
 plot_peaks(chrom_list = warp, peak_list = pks_egh, index=2, lambda='260')
 ```
 
