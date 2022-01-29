@@ -26,9 +26,7 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
 
 # fit peaks to gaussian or exponential-gaussian hybrid ('egh') function using nlsLM
 
-fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian"), 
-                      max.iter = 100) 
-{
+fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian"), max.iter = 1000){
   fit <- match.arg(fit, c("egh", "gaussian"))
   if (fit == "gaussian") {
     tabnames <- c("rt", "start", "end", "sd", "FWHM", "height", "area", "r-squared")
@@ -64,8 +62,7 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian"),
     fitpk <- function(pos){
       xloc <- pos[1]
       peak.loc <- seq.int(pos[2], pos[3])
-      m <- fit_egh(peak.loc, y[peak.loc], 
-                                    start.center = xloc, start.height = y[xloc])
+      m <- fit_egh(peak.loc, y[peak.loc], start.center = xloc, start.height = y[xloc], max.iter = max.iter)
       r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=T)
       area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
       c("rt" = m$center, "start" = pos[2], "end" = pos[3], "sd" = m$width, "tau" = m$tau, "FWHM" = 2.35 * m$width,
@@ -101,7 +98,7 @@ gaussian <- function( x, center=0, width=1, height=NULL, floor=0) {
 
 
 fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height=NULL,
-                         start.floor=NULL, fit.floor=FALSE, max.iter) {
+                         start.floor=NULL, fit.floor=FALSE, max.iter=1000) {
   # estimate starting values
   who.max <- which.max(y)
   if ( is.null( start.center)) start.center <- x[ who.max]
@@ -110,21 +107,21 @@ fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height
   
   # call the Nonlinear Least Squares, either fitting the floor too or not
   controlList <- nls.control( maxiter = max.iter, minFactor=1/512, warnOnly=TRUE)
+  starts <- list( "center"=start.center, "width"=start.width, "height"=start.height)
   if ( ! fit.floor) {
-    starts <- list( "center"=start.center, "width"=start.width, "height"=start.height)
     nlsAns <- try(nlsLM( y ~ gaussian( x, center, width, height), start=starts, control=controlList), silent=T)
-  } else {
+  } else{
     if (is.null( start.floor)) start.floor <- quantile( y, seq(0,1,0.1))[2]
-    starts <- list( "center"=start.center, "width"=start.width, "height"=start.height,
-                    "floor"=start.floor)
+    starts <- c(starts,"floor"=start.floor)
     nlsAns <- try(nlsLM( y ~ gaussian( x, center, width, height, floor), start=starts, control=controlList), silent=T)
   }
   
   # package up the results to pass back
   
     if (class( nlsAns) == "try-error") {
+      yAns <- gaussian(x1, start.center, start.width, start.height, start.floor)
       out <- list("center"=start.center, "width"=start.width, "height"=start.height,
-                  "y"=gaussian(x, centerAns, widthAns, heightAns, floorAns), "residual"= y - yAns)
+                  "y"=yAns, "residual"= y - yAns)
       floorAns <- if ( fit.floor) start.floor else 0
     } else {
       coefs <-coef(nlsAns)
@@ -149,7 +146,7 @@ egh <- function(x, center, width,  height, tau, floor=0){
   }
 
 fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL, start.height=NULL,
-                    start.floor=NULL, fit.floor=FALSE) {
+                    start.floor=NULL, fit.floor=FALSE, max.iter=1000) {
   
   # try to find the best egh to fit the given data
   
@@ -168,21 +165,21 @@ fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
     start.tau <- 0
   }
   # call the Nonlinear Least Squares, either fitting the floor too or not
-  controlList <- nls.control( maxiter=100, minFactor=1/512, warnOnly=TRUE)
+  controlList <- nls.control(maxiter=max.iter, minFactor=1/512, warnOnly=TRUE)
+  starts <- list("center"=start.center, "width"=start.width, "height"=start.height, "tau"=start.tau)
   if (!fit.floor){
-    starts <- list("center"=start.center, "width"=start.width, "height"=start.height, "tau"=start.tau)
     nlsAns <- try(nlsLM(y1 ~ egh(x1, center, width, height, tau), start=starts, control=controlList), silent=T)
-  }else {
+  } else{
     if (is.null( start.floor)) start.floor <- quantile( y, seq(0,1,0.1))[2]
-    starts <- list( "center"=start.center, "width"=start.width, "height"=start.height, "tau"=start.tau, 
-                    "floor"=start.floor)
-    nlsAns <- try(nlsLM( y ~ egh(x, center, width, height, tau, floor), start=starts, control=controlList), silent=T)
+    starts <- c(starts, "floor"=start.floor)
+    nlsAns <- try(nlsLM(y1 ~ egh(x1, center, width, height, tau, floor), start=starts, control=controlList), silent=T)
   }
   
   # package up the results to pass back
   if ( class( nlsAns) == "try-error") {
+    yAns <- egh(x1, start.center, start.width, start.height, start.tau, start.floor)
     out <- list("center"=start.center, "width"=start.width, "height"=start.height, "tau"=start.tau,
-                "y"=egh(x, centerAns, widthAns, heightAns, tauAns, floorAns), "residual"= y - yAns)
+                "y"=yAns, "residual"= y1 - yAns)
     floorAns <- if ( fit.floor) start.floor else 0
   } else {
     coefs <-coef(nlsAns)
