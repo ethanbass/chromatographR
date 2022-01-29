@@ -34,9 +34,9 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian", "emg"),
     tabnames <- c("rt","start","end", "sd", "FWHM", "height", "area", "r-squared")
     noPeaksMat <- matrix(rep(NA, length(tabnames)), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
-    # on.edge <- sapply(pos$pos, function(x) y[x + 1] == 0 | 
-    #                     y[x - 1] == 0)
-    # pos$pos <- pos$pos[!on.edge]
+    on.edge <- sapply(pos$pos, function(x) y[x + 1] == 0 |
+                        y[x - 1] == 0)
+    pos <- pos[!on.edge,]
     if (nrow(pos) == 0) 
       return(noPeaksMat)
     fitpk <- function(pos) {
@@ -56,9 +56,9 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian", "emg"),
                   "r.squared")
     noPeaksMat <- matrix(rep(NA, length(tabnames)), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
-    # on.edge <- sapply(pos$pos, function(x) y[x + 1] == 0 | 
-    #                     y[x - 1] == 0)
-    # pos$pos <- pos$pos[!on.edge]
+    on.edge <- sapply(pos$pos, function(x) y[x + 1] == 0 |
+                        y[x - 1] == 0)
+    pos <- pos[!on.edge,]
     if (nrow(pos) == 0) 
       return(noPeaksMat)
     fitpk <- function(pos){
@@ -78,9 +78,9 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian", "emg"),
     #tabnames <- c("rt", "sd", "lambda", "FWHM", "height", "area")
     noPeaksMat <- matrix(rep(NA, length(tabnames)), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
-    # on.edge <- sapply(pos, function(x) y[x + 1] == 0 | y[x - 
-    #                                                        1] == 0)
-    # pos <- pos[!on.edge]
+    on.edge <- sapply(pos, function(x) y[x + 1] == 0 | y[x -
+                                                           1] == 0)
+    pos <- pos[!on.edge,]
     if (length(pos) == 0) 
       return(noPeaksMat)
     fitpk <- function(xloc) {
@@ -333,7 +333,7 @@ fitpeaks_at_max <- function (mat, pos, w=5, sd.max=50, fit=c("gaussian","egh")){
     y<-mat[,1]
     on.edge <- sapply(pos, function(x) y[x + 1] == 0 | y[x - 
                                                            1] == 0)
-    pos <- pos[!on.edge]
+    pos <- pos[!on.edge,]
     if (length(pos) == 0) 
       return(noPeaksMat)
     fitpk <- function(xloc){
@@ -353,7 +353,7 @@ fitpeaks_at_max <- function (mat, pos, w=5, sd.max=50, fit=c("gaussian","egh")){
                                                                tabnames))
     on.edge <- sapply(pos, function(x) y[x + 1] == 0 | y[x - 
                                                            1] == 0)
-    pos <- pos[!on.edge]
+    pos <- pos[!on.edge,]
     if (length(pos) == 0) 
       return(noPeaksMat)
     fitpk <- function(xloc){
