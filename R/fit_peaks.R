@@ -31,7 +31,7 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian", "emg"),
 {
   fit <- match.arg(fit, c("egh", "gaussian", "emg"))
   if (fit == "gaussian") {
-    tabnames <- c("rt","start","end", "sd", "FWHM", "height", "area", "r-squared")
+    tabnames <- c("rt", "start", "end", "sd", "FWHM", "height", "area", "r-squared")
     noPeaksMat <- matrix(rep(NA, length(tabnames)), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
     on.edge <- sapply(pos$pos, function(x) y[x + 1] == 0 |
@@ -47,12 +47,12 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian", "emg"),
       area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
       # area <- y[xloc]/dnorm(m$center, m$center, m$width)
       r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=T)
-      c("rt" = m$center, "start" = pos[1], "end" = pos[2], "sd" = m$width, "FWHM" = 2.35 * m$width,
+      c("rt" = m$center, "start" = pos[2], "end" = pos[3], "sd" = m$width, "FWHM" = 2.35 * m$width,
         "height" = y[xloc], "area" = area, "r.squared" = r.squared)
     }
   }
   else if (fit == "egh") {
-    tabnames <- c("rt","start","end", "sd", "tau", "FWHM", "height", "area", 
+    tabnames <- c("rt", "start", "end", "sd", "tau", "FWHM", "height", "area", 
                   "r.squared")
     noPeaksMat <- matrix(rep(NA, length(tabnames)), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
@@ -68,7 +68,7 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian", "emg"),
                                     start.center = xloc, start.height = y[xloc])
       r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=T)
       area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
-      c("rt" = m$center, "start" = pos[1], "end" = pos[2], "sd" = m$width, "tau" = m$tau, "FWHM" = 2.35 * m$width,
+      c("rt" = m$center, "start" = pos[2], "end" = pos[3], "sd" = m$width, "tau" = m$tau, "FWHM" = 2.35 * m$width,
         "height" = y[xloc], "area" = area, "r.squared" = r.squared)
     }
   }
