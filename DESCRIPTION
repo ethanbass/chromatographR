@@ -8,7 +8,7 @@ Description: R package for high throughput analysis of HPLC-DAD chromatograms or
 URL: https://github.com/ethanbass/chromatographR
 License: GPL (>= 2)
 Depends: R (>= 3.5.0), ptw (>= 1.0.6), lattice
-Imports: methods, pvclust, fastcluster, dynamicTreeCut, scales
+Imports: methods, pvclust, fastcluster, dynamicTreeCut, scales, minpack.lm
 LazyData: true
 Suggests: rmarkdown, mathjaxr, knitr
 RdMacros: mathjaxr

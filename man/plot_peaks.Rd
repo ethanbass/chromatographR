@@ -13,10 +13,8 @@ plot_peaks(chrom_list, peak_list, index=1, lambda=NULL, w=0.5,
   \item{peak_list}{Output from the \code{findpeaks} function.}
   \item{index}{Index of chromatogram to be plotted.}
   \item{lambda}{Wavelength for plotting.}
-  \item{w}{Width of search window.}
-  \item{slope}{Slope threshold defining peaks.}
-  \item{h}{}
   \item{points}{Logical. If TRUE, plot peak maxima. Defaults to FALSE.}
+  \item{ticks}{Logical. If TRUE, mark beginning and end of each peak. Defaults to FALSE.}
   \item{a}{Select "alpha"" parameter controlling transparency of shapes.}
 }
 \author{Ethan Bass}
