@@ -122,31 +122,20 @@ fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height
   
   # package up the results to pass back
   if (class( nlsAns) == "try-error") {
-    centerAns <- start.center
-    widthAns <- start.width
-    heightAns <- start.height
-    floorAns <- if ( fit.floor) start.floor else 0
-    yAns <- gaussian( x, centerAns, widthAns, heightAns, floorAns)
-    residualAns <- y - yAns
-  } else {
-    coefs <-coef(nlsAns)
-    centerAns <- coefs[1]
-    widthAns <- coefs[2]
-    heightAns <- coefs[3]
-    floorAns <- if ( fit.floor) coefs[4] else 0
-    yAns <- fitted( nlsAns)
-    residualAns <- residuals( nlsAns)
+    if ( class( nlsAns) == "try-error") {
+      out <- list("center"=start.center, "width"=start.width, "height"=start.height,
+                  "y"=gaussian(x, centerAns, widthAns, heightAns, floorAns), "residual"= y - yAns)
+      floorAns <- if ( fit.floor) start.floor else 0
+    } else {
+      coefs <-coef(nlsAns)
+      out <- list( "center"=coefs[1], "width"=coefs[2], "height"=coefs[3],
+                   "y"=fitted( nlsAns), "residual"=residuals(nlsAns))
+      floorAns <- if ( fit.floor) coefs[4] else 0
+    }
+    if (fit.floor) {
+      out <- c( out, "floor"=floorAns)
+    }
   }
-  
-  # always report the SD as a possitive value
-  widthAns <- abs( widthAns) #width = SD
-  
-  out <- list( "center"=centerAns, "width"=widthAns, "height"=heightAns, "y"=yAns,
-               "residual"=residualAns)
-  if ( fit.floor) {
-    out <- c( out, "floor"=floorAns)
-  }
-  
   return( out)
 }
 
@@ -193,33 +182,19 @@ fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
   
   # package up the results to pass back
   if ( class( nlsAns) == "try-error") {
-    centerAns <- start.center
-    widthAns <- start.width
-    heightAns <- start.height
-    tauAns <- start.tau
+    out <- list("center"=start.center, "width"=start.width, "height"=start.height, "tau"=start.tau,
+                "y"=egh(x, centerAns, widthAns, heightAns, tauAns, floorAns), "residual"= y - yAns)
     floorAns <- if ( fit.floor) start.floor else 0
-    yAns <- egh(x, centerAns, widthAns, heightAns, tauAns, floorAns)
-    residualAns <- y - yAns
   } else {
     coefs <-coef(nlsAns)
-    centerAns <- coefs[1]
-    widthAns <- coefs[2]
-    heightAns <- coefs[3]
-    tauAns <- coefs[4]
+    out <- list( "center"=coefs[1], "width"=coefs[2], "height"=coefs[3], "tau"=coefs[4],
+                 "y"=fitted( nlsAns), "residual"=residuals(nlsAns))
     floorAns <- if ( fit.floor) coefs[5] else 0
-    yAns <- fitted( nlsAns)
-    residualAns <- residuals( nlsAns)
   }
   
-  # always report the SD as a positive value
-  widthAns <- abs( widthAns) #width = SD
-  
-  out <- list( "center"=centerAns, "width"=widthAns, "height"=heightAns, "tau"=tauAns, "y"=yAns,
-               "residual"=residualAns)
-  if ( fit.floor) {
+  if (fit.floor) {
     out <- c( out, "floor"=floorAns)
   }
-  
   return(out)
 }
 
