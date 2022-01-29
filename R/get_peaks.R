@@ -66,7 +66,7 @@ getAllPeaks <- function (chrom_list, lambdas, max.iter=100,
 ## function to visually check integration accuracy
 ## fit is output of get_peaks for chrome
 
-plot_peaks <- function(chrom_list, peak_list, index=1, lambda=NULL, w=0.5, slope=.01, h=1,
+plot_peaks <- function(chrom_list, peak_list, index=1, lambda=NULL,
                        points=F, ticks=F, a=0.5){
   if (is.null(lambda)){
     lambda <- names(peak_list[[1]])[1]
@@ -88,25 +88,17 @@ plot_peaks <- function(chrom_list, peak_list, index=1, lambda=NULL, w=0.5, slope
     arrows(pks$end, y[which(new.ts %in% pks$end)]-5, pks$end, y[which(new.ts %in% pks$end)]+5, col="blue", length=0)
   }
   for (i in 1:nrow(pks)){
-    xs<-seq.int((pks$start[i]),(pks$end[i]), by = .01)
-    m <- gaussian(xs, center=pks$rt[i], width=pks$sd[i], height = pks$height[i])
-    mi <- xs[min(which(abs(diff(m)) > h*slope))]
-    ma <- xs[max(which(abs(diff(m)) > h*slope))]
-    if(is.na(mi)|is.na(ma)){
-      next #skip bad peaks
-    } else{
-      xs2<-seq.int(mi,ma, by = .01)
+    peak.loc<-seq.int((pks$start[i]),(pks$end[i]), by = .01)
       if (fit=="gaussian"){
-        yvals <- gaussian(xs2, center=pks$rt[i], width=pks$sd[i], height = pks$height[i])
+        yvals <- gaussian(peak.loc, center=pks$rt[i], width=pks$sd[i], height = pks$height[i])
         color <- "red"
       }
       else if (fit == "egh"){
-        yvals <- egh(x=xs2, center=pks$rt[i], width=pks$sd[i], height = pks$height[i], tau=pks$tau[i])
+        yvals <- egh(x=peak.loc, center=pks$rt[i], width=pks$sd[i], height = pks$height[i], tau=pks$tau[i])
         color <- "purple"
       }
-      sapply(1:(length(xs2)-1), function(i){
-        polygon(xs2[c(i,i,(i+1),(i+1))], c(0,yvals[i:(i+1)],0),col=scales::alpha(color,a), lty=3,border=NA)
+      sapply(1:(length(peak.loc)-1), function(i){
+        polygon(peak.loc[c(i,i,(i+1),(i+1))], c(0,yvals[i:(i+1)],0),col=scales::alpha(color,a), lty=3,border=NA)
       })
-    }
   }
 }
