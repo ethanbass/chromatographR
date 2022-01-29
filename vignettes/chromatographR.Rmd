@@ -11,7 +11,7 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-devtools::install_github("ethanbass/chromatographR")
+#devtools::install_github("ethanbass/chromatographR")
 require("knitr", quietly=TRUE)
 require(chromatographR)
 opts_chunk$set(prompt = TRUE, highlight = FALSE, comment=NA, 
@@ -150,11 +150,11 @@ The `plot_peaks` function allows you to visually assess the peak integration acc
 
 ```{r, plot_peaks, warning=F, fig.height=6}
 par(mfrow=c(2,1))
-plot_peaks(chrom_list = warp, peak_list = pks_gauss, index=2, lambda='210')
-plot_peaks(chrom_list = warp, peak_list = pks_egh, index=2, lambda='210')
+plot_peaks(chrom_list = warp, peak_list = pks_gauss, index=4, lambda='210')
+plot_peaks(chrom_list = warp, peak_list = pks_egh, index=4, lambda='210')
 
-plot_peaks(chrom_list = warp, peak_list = pks_gauss, index=2, lambda='260')
-plot_peaks(chrom_list = warp, peak_list = pks_egh, index=2, lambda='260')
+plot_peaks(chrom_list = warp, peak_list = pks_gauss, index=4, lambda='260')
+plot_peaks(chrom_list = warp, peak_list = pks_egh, index=4, lambda='260')
 ```
 
 ```{r, get_peaktable}
