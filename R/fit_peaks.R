@@ -121,8 +121,8 @@ fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height
   }
   
   # package up the results to pass back
-  if (class( nlsAns) == "try-error") {
-    if ( class( nlsAns) == "try-error") {
+  
+    if (class( nlsAns) == "try-error") {
       out <- list("center"=start.center, "width"=start.width, "height"=start.height,
                   "y"=gaussian(x, centerAns, widthAns, heightAns, floorAns), "residual"= y - yAns)
       floorAns <- if ( fit.floor) start.floor else 0
@@ -135,7 +135,6 @@ fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height
     if (fit.floor) {
       out <- c( out, "floor"=floorAns)
     }
-  }
   return( out)
 }
 
