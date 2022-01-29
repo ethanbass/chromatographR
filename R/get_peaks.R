@@ -1,5 +1,5 @@
 get_peaks <- function (chrom_list, lambdas, max.iter=100,
-                         fit = c("egh", "gaussian", "emg"), silent=T, ...){
+                         fit = c("egh", "gaussian", "emg"), ...){
   fit <- match.arg(fit, c("egh", "gaussian", "emg"))
   if (is.numeric(lambdas)){
     lambdas <- as.character(lambdas)
