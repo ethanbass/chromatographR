@@ -3,28 +3,28 @@
 
 find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_width = 0.1,
                                slope_thresh=.05, amp_thresh=0, bounds=F){
+  #compute derivative (with or without smoothing)
   if (smooth_type=='gaussian'){
     d <- smoother::smth.gaussian(diff(y),window = smooth_window, alpha=smooth_width)
   } else{
     d=deriv(y)
   }
-  p1 <- which(sign(d[1:(length(d)-1)])>sign(d[2:length(d)])) #detects zero-crossing
+  p1 <- which(sign(d[1:(length(d)-1)])>sign(d[2:length(d)])) # detects zero-crossing of first derivative (peak apex)
   p2 <- which(abs(diff(d)) > slope_thresh) # detects second derivative exceeding slope threshold
   p3 <- which(y > amp_thresh) # detects y-vals exceeding amplitude threshold
   p <- intersect(intersect(p1,p2), p3)
   if (bounds==T){
     p4 <- which(sign(d[1:(length(d)-1)]) < sign(d[2:length(d)]))
-    bl <- sapply(p,function(v) max(p4[p4 < v]))
-    bl[which(bl==-Inf)]<-0
-    bu <- sapply(p,function(v) min(p4[p4 > v]))
-    bu[which(bu==Inf)]<-length(y)
+    bl <- sapply(p, function(v) max(p4[p4 < v])) # lower bound
+    bl[which(bl == -Inf)]<-0
+    bu <- sapply(p,function(v) min(p4[p4 > v])) # upper bound
+    bu[which(bu==Inf)] <- length(y)
     data.frame(pos=p, lower=bl, upper=bu)
   } else 
   p
 }
 
-# fit peaks using gaussian or exponential-gaussian hybrid ('egh') distribution
-# (emg setting doesn't work yet).
+# fit peaks to gaussian or exponential-gaussian hybrid ('egh') function using nlsLM
 
 fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian", "emg"), 
                       max.iter = 100) 
@@ -34,9 +34,9 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian", "emg"),
     tabnames <- c("rt","start","end", "sd", "FWHM", "height", "area", "r-squared")
     noPeaksMat <- matrix(rep(NA, length(tabnames)), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
-    on.edge <- sapply(pos$pos, function(x) y[x + 1] == 0 | 
-                        y[x - 1] == 0)
-    pos$pos <- pos$pos[!on.edge]
+    # on.edge <- sapply(pos$pos, function(x) y[x + 1] == 0 | 
+    #                     y[x - 1] == 0)
+    # pos$pos <- pos$pos[!on.edge]
     if (nrow(pos) == 0) 
       return(noPeaksMat)
     fitpk <- function(pos) {
@@ -44,9 +44,11 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian", "emg"),
       peak.loc <- seq.int(pos[2], pos[3])
       m <- fit_gaussian(peak.loc, y[peak.loc], start.center = xloc, 
                         start.height = y[xloc], max.iter = max.iter)
+      area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
+      # area <- y[xloc]/dnorm(m$center, m$center, m$width)
       r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=T)
-      c(m$center, pos[2], pos[3], m$width, 2.35 * m$width, y[xloc], y[xloc]/dnorm(m$center, 
-                                                                  m$center, m$width), r.squared)
+      c("rt" = m$center, "start" = pos[1], "end" = pos[2], "sd" = m$width, "FWHM" = 2.35 * m$width,
+        "height" = y[xloc], "area" = area, "r.squared" = r.squared)
     }
   }
   else if (fit == "egh") {
@@ -54,19 +56,20 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian", "emg"),
                   "r.squared")
     noPeaksMat <- matrix(rep(NA, length(tabnames)), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
-    on.edge <- sapply(pos$pos, function(x) y[x + 1] == 0 | 
-                        y[x - 1] == 0)
-    pos$pos <- pos$pos[!on.edge]
+    # on.edge <- sapply(pos$pos, function(x) y[x + 1] == 0 | 
+    #                     y[x - 1] == 0)
+    # pos$pos <- pos$pos[!on.edge]
     if (nrow(pos) == 0) 
       return(noPeaksMat)
-    fitpk <- function(pos) {
+    fitpk <- function(pos){
       xloc <- pos[1]
       peak.loc <- seq.int(pos[2], pos[3])
       m <- fit_egh(peak.loc, y[peak.loc], 
                                     start.center = xloc, start.height = y[xloc])
       r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=T)
-      c(m$center, pos[2], pos[3], m$width, m$tau, 2.35 * m$width, y[xloc], 
-        y[xloc]/dnorm(m$center, m$center, m$width), r.squared)
+      area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
+      c("rt" = m$center, "start" = pos[1], "end" = pos[2], "sd" = m$width, "tau" = m$tau, "FWHM" = 2.35 * m$width,
+        "height" = y[xloc], "area" = area, "r.squared" = r.squared)
     }
   }
   else if (fit == "emg") {
@@ -75,9 +78,9 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian", "emg"),
     #tabnames <- c("rt", "sd", "lambda", "FWHM", "height", "area")
     noPeaksMat <- matrix(rep(NA, length(tabnames)), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
-    on.edge <- sapply(pos, function(x) y[x + 1] == 0 | y[x - 
-                                                           1] == 0)
-    pos <- pos[!on.edge]
+    # on.edge <- sapply(pos, function(x) y[x + 1] == 0 | y[x - 
+    #                                                        1] == 0)
+    # pos <- pos[!on.edge]
     if (length(pos) == 0) 
       return(noPeaksMat)
     fitpk <- function(xloc) {
@@ -120,10 +123,7 @@ gaussian <- function( x, center=0, width=1, height=NULL, floor=0) {
 
 fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height=NULL,
                          start.floor=NULL, fit.floor=FALSE, max.iter) {
-  
-  # try to find the best gaussian to fit the given data
-  
-  # make some rough estimates from the values of Y
+  # estimate starting values
   who.max <- which.max(y)
   if ( is.null( start.center)) start.center <- x[ who.max]
   if ( is.null( start.height)) start.height <- y[ who.max]
@@ -133,16 +133,16 @@ fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height
   controlList <- nls.control( maxiter = max.iter, minFactor=1/512, warnOnly=TRUE)
   if ( ! fit.floor) {
     starts <- list( "center"=start.center, "width"=start.width, "height"=start.height)
-    nlsAns <- try( nlsLM( y ~ gaussian( x, center, width, height), start=starts, control=controlList))
+    nlsAns <- try(nlsLM( y ~ gaussian( x, center, width, height), start=starts, control=controlList), silent=T)
   } else {
     if (is.null( start.floor)) start.floor <- quantile( y, seq(0,1,0.1))[2]
     starts <- list( "center"=start.center, "width"=start.width, "height"=start.height,
                     "floor"=start.floor)
-    nlsAns <- try(nlsLM( y ~ gaussian( x, center, width, height, floor), start=starts, control=controlList))
+    nlsAns <- try(nlsLM( y ~ gaussian( x, center, width, height, floor), start=starts, control=controlList), silent=T)
   }
   
   # package up the results to pass back
-  if ( class( nlsAns) == "try-error") {
+  if (class( nlsAns) == "try-error") {
     centerAns <- start.center
     widthAns <- start.width
     heightAns <- start.height
@@ -204,12 +204,12 @@ fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
   controlList <- nls.control( maxiter=100, minFactor=1/512, warnOnly=TRUE)
   if (!fit.floor){
     starts <- list("center"=start.center, "width"=start.width, "height"=start.height, "tau"=start.tau)
-    nlsAns <- try(nlsLM(y1 ~ egh(x1, center, width, height, tau), start=starts, control=controlList))
+    nlsAns <- try(nlsLM(y1 ~ egh(x1, center, width, height, tau), start=starts, control=controlList), silent=T)
   }else {
     if (is.null( start.floor)) start.floor <- quantile( y, seq(0,1,0.1))[2]
     starts <- list( "center"=start.center, "width"=start.width, "height"=start.height, "tau"=start.tau, 
                     "floor"=start.floor)
-    nlsAns <- try(nlsLM( y ~ egh(x, center, width, height, tau, floor), start=starts, control=controlList))
+    nlsAns <- try(nlsLM( y ~ egh(x, center, width, height, tau, floor), start=starts, control=controlList), silent=T)
   }
   
   # package up the results to pass back
@@ -282,16 +282,14 @@ fit_EMG <- function(x1, y1, start.center=NULL, start.width=NULL, start.alpha=NUL
   controlList <- nls.control( maxiter=100, minFactor=1/512, warnOnly=TRUE)
   if (!fit.floor){
     starts <- list("mu"=start.center, "sigma"=start.width, "height"=start.height, "alpha"=start.alpha)
-    #nlsAns <- try(nls(y1 ~ EMG(x1, mu, sigma, height, alpha), start=starts, control=controlList))
     nlsAns <- try(nlsLM(y1 ~ EMG(x1, mu, sigma, height, alpha), start=starts, control=controlList,
-                      lower = c(0,0,0,0), upper=c(Inf,Inf,Inf,Inf), algorithm="port"))
+                      lower = c(0,0,0,0), upper=c(Inf,Inf,Inf,Inf), algorithm="port"), silent=T)
   }else {
     if (is.null( start.floor)) start.floor <- quantile( y, seq(0,1,0.1))[2]
     starts <- list( "mu"=start.center, "sigma"=start.width, "height"=start.height, "alpha"=start.alpha, 
                     "floor"=start.floor)
-    #nlsAns <- try(nls(y ~ EMG(x, mu, sigma, height, alpha, floor), start=starts, control=controlList))
     nlsAns <- try(nlsLM(y ~ EMG(x, mu, sigma, height, alpha), start=starts, control=controlList,
-               lower = c(0,0,0,0), upper=c(Inf,Inf,Inf,Inf), algorithm="port"))
+               lower = c(0,0,0,0), upper=c(Inf,Inf,Inf,Inf), algorithm="port"), silent=T)
   }
   
   # package up the results to pass back

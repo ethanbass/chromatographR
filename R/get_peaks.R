@@ -1,5 +1,5 @@
 get_peaks <- function (chrom_list, lambdas, max.iter=100,
-                         fit = c("egh", "gaussian", "emg"), ...){
+                         fit = c("egh", "gaussian", "emg"), silent=T, ...){
   fit <- match.arg(fit, c("egh", "gaussian", "emg"))
   if (is.numeric(lambdas)){
     lambdas <- as.character(lambdas)
@@ -8,7 +8,7 @@ get_peaks <- function (chrom_list, lambdas, max.iter=100,
   chrom_list <- lapply(chrom_list, function(c_mat) c_mat[,lambdas, drop=F])
   peak_positions <- lapply(chrom_list, function(c_mat){
     apply(c_mat, 2, function(x) find_peaks(x, bounds=T))})
-  result <- lapply(1:length(chrom_list), function(smpl) {
+  result <- lapply(1:length(chrom_list), function(smpl){
     ptable <- lapply(1:length(peak_positions[[smpl]]), function(cmpnd){
       fit_peaks(chrom_list[[smpl]][,cmpnd], peak_positions[[smpl]][[cmpnd]], fit=fit, max.iter=max.iter, ...)
     })
@@ -64,10 +64,10 @@ getAllPeaks <- function (chrom_list, lambdas, max.iter=100,
 }
 
 ## function to visually check integration accuracy
-## fit is output of getAllpeaks for chrome
+## fit is output of get_peaks for chrome
 
 plot_peaks <- function(chrom_list, peak_list, index=1, lambda=NULL, w=0.5, slope=.01, h=1,
-                       points=F, a=0.5){
+                       points=F, ticks=F, a=0.5){
   if (is.null(lambda)){
     lambda <- names(peak_list[[1]])[1]
   }
@@ -78,15 +78,17 @@ plot_peaks <- function(chrom_list, peak_list, index=1, lambda=NULL, w=0.5, slope
   new.ts <- as.numeric(rownames(chrom_list[[1]]))
   y <- chrom_list[[index]][,lambda]
   pks <- data.frame(peak_list[[index]][[lambda]])
-  if ("tau" %in% colnames(pks)){
-    fit <- "egh"
-  } else{ fit <- "gaussian"}
+  fit <- ifelse("tau" %in% colnames(pks), "egh", "gaussian")
   plot(new.ts, y, type='l', xlab='', ylab='', xaxt='n', yaxt='n')
   if (points==T){
     points(pks$rt, pks$height, pch=20, cex=0.5, col='red')
   }
+  if (ticks==T){
+    arrows(pks$start, y[which(new.ts %in% pks$start)]-5, pks$start, y[which(new.ts %in% pks$start)]+5, col="blue", length=0)
+    arrows(pks$end, y[which(new.ts %in% pks$end)]-5, pks$end, y[which(new.ts %in% pks$end)]+5, col="blue", length=0)
+  }
   for (i in 1:nrow(pks)){
-    xs<-seq.int((pks$rt[i]-w),(pks$rt[i]+w), by = .01)
+    xs<-seq.int((pks$start[i]),(pks$end[i]), by = .01)
     m <- gaussian(xs, center=pks$rt[i], width=pks$sd[i], height = pks$height[i])
     mi <- xs[min(which(abs(diff(m)) > h*slope))]
     ma <- xs[max(which(abs(diff(m)) > h*slope))]
@@ -94,15 +96,17 @@ plot_peaks <- function(chrom_list, peak_list, index=1, lambda=NULL, w=0.5, slope
       next #skip bad peaks
     } else{
       xs2<-seq.int(mi,ma, by = .01)
-      if(fit=="gaussian"){
-        polygon(xs2, gaussian(xs2, center=pks$rt[i], width=pks$sd[i], height = pks$height[i]),
-                col=scales::alpha('red',a), border=NA)
+      if (fit=="gaussian"){
+        yvals <- gaussian(xs2, center=pks$rt[i], width=pks$sd[i], height = pks$height[i])
+        color <- "red"
       }
-      if(fit=="egh"){
-        polygon(xs2, egh(x=xs2, center=pks$rt[i], width=pks$sd[i], height = pks$height[i], tau=pks$tau[i]),
-                col=scales::alpha('purple',a), border=NA)
+      else if (fit == "egh"){
+        yvals <- egh(x=xs2, center=pks$rt[i], width=pks$sd[i], height = pks$height[i], tau=pks$tau[i])
+        color <- "purple"
       }
+      sapply(1:(length(xs2)-1), function(i){
+        polygon(xs2[c(i,i,(i+1),(i+1))], c(0,yvals[i:(i+1)],0),col=scales::alpha(color,a), lty=3,border=NA)
+      })
     }
   }
 }
-
