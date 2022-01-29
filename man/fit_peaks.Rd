@@ -7,7 +7,7 @@
 \usage{
 find_peaks(y, smooth_type='gaussian', smooth_window = 1, smooth_width = 0.1,
                                slope_thresh=.05, amp_thresh=0, bounds=F)
-fit_peaks(y, pos, sd.max = 50, fit = c("egh", "gaussian", "emg"), 
+fit_peaks(y, pos, sd.max = 50, fit = c("egh", "gaussian"), 
                       max.iter = 100)
 }
 \arguments{

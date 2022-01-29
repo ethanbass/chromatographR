@@ -26,10 +26,10 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
 
 # fit peaks to gaussian or exponential-gaussian hybrid ('egh') function using nlsLM
 
-fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian", "emg"), 
+fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian"), 
                       max.iter = 100) 
 {
-  fit <- match.arg(fit, c("egh", "gaussian", "emg"))
+  fit <- match.arg(fit, c("egh", "gaussian"))
   if (fit == "gaussian") {
     tabnames <- c("rt", "start", "end", "sd", "FWHM", "height", "area", "r-squared")
     noPeaksMat <- matrix(rep(NA, length(tabnames)), nrow = 1, dimnames = list(NULL, 
@@ -216,8 +216,6 @@ fitpeaks_at_max <- function (mat, pos, w=5, sd.max=50, fit=c("gaussian","egh")){
       y <- mat[,lambda]
       peak.loc <- seq.int(xloc-w, xloc+w)
       m <- fit_gaussian(peak.loc, y[peak.loc])
-      #fit <- fit_egh(peak.loc, y[peak.loc])
-      #fit <- egh_optim(peak.loc, y[peak.loc], par=c(1,1,1,1), upper=c(Inf,Inf,Inf,Inf), lower=c(0,0,0,0))
       c(m$center, colnames(mat)[lambda], m$width, 2.35*m$width, y[xloc], y[xloc]/dnorm(m$center, m$center, 
                                                                 m$width))
     }
@@ -242,23 +240,3 @@ fitpeaks_at_max <- function (mat, pos, w=5, sd.max=50, fit=c("gaussian","egh")){
   colnames(huhn) <- tabnames
   huhn[huhn$sd<sd.max,]
 }
-
-
-## legacy peak-finding function. detects local maximum within windows of width determined by "span"
-# 
-# findpeaks <- function(y, span = NULL)
-# {
-#   if (is.null(span)) span <- round(.2 * length(y))
-#   
-#   z <- embed(y, span)
-#   s <- span %/% 2
-#   v <- max.col(z, ties.method = "first") == 1 + s
-# 
-#   which(c(rep(FALSE, s), v, rep(FALSE, s)))
-# }
-
-## new peak finding function ported from matlab
-## (see http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm)
-
-
-#emg::emg.mle()
