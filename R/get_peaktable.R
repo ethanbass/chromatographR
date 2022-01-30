@@ -10,10 +10,6 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
   rt <- ifelse(use.cor, "rt.cor", "rt")
   ncomp <- length(peak_list[[1]]) ## all elements should have the same length
   if (plotIt) {
-    if (!require(lattice)) {
-      plotIt <- FALSE
-      warning("Install the lattice package for the plots...")
-    }
     opar <- par(ask = ask, no.readonly = TRUE)
     on.exit(par(opar))
     myPalette <- colorRampPalette(c("green", "blue", "purple", "red", "orange"))
@@ -109,10 +105,6 @@ getPeakTable <- function(peak_list, chrom_list = NULL, response = c("area", "hei
   rt <- ifelse(use.cor, "rt.cor", "rt")
   ncomp <- length(peak_list[[1]]) ## all elements should have the same length
   if (plotIt) {
-    if (!require(lattice)) {
-      plotIt <- FALSE
-      warning("Install the lattice package for the plots...")
-    }
     opar <- par(ask = ask, no.readonly = TRUE)
     on.exit(par(opar))
     myPalette <- colorRampPalette(c("green", "blue", "purple", "red", "orange"))

@@ -24,12 +24,4 @@ filter_peaks(peak_list, min_height, min_area, min_sd, max_sd)
 \author{Ron Wehrens, EthanBass}
 
 \seealso{\code{\link{get_peaks}}}
-\examples{
-data(Sa)
-pks <- get_peaks(warp, lambdas = c('210'))
-## only retain peaks with a peak height of at least 2
-plot_peaks(chrom_list = warp, peak_list = pks, index=2, lambda='210')
-pks_filtered <- filter_peaks(pks, min_height = 10)
-plot_peaks(chrom_list = warp, peak_list = pks_filtered, index=2, lambda='210')
-}
 \keyword{manip}

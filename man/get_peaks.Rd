@@ -21,5 +21,5 @@
   components. Note that this function presents the "rt", "sd" and "FWHM"
   fields in real time units.}
 \author{Ethan Bass & Ron Wehrens}
-\note{Function is adapted from the \code{\link[alsace::getAllPeaks]{getAllPeaks}} function authored by Ron Wehrens.}
+\note{Function is adapted from the \url{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks} function authored by Ron Wehrens.}
 \keyword{manip}

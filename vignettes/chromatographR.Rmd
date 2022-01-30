@@ -11,7 +11,6 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-#devtools::install_github("ethanbass/chromatographR")
 require("knitr", quietly=TRUE)
 require(chromatographR)
 opts_chunk$set(prompt = TRUE, highlight = FALSE, comment=NA, 
@@ -139,22 +138,22 @@ plot(coef[3,],pch=20,xlab='',ylab='')
 
 ### Peak finding and fitting
 
-The `get_peaks` function loops through your chromatograms at the specified wavelengths, finds peaks, and attempts to fit them to the specified function using non-linear least squares -- the current options are `gaussian` and `egh` (exponential-gaussian hybrid) [@lan2001]. The function will return a nested list of dataframes containing information about the peaks in each chromatogram.
+The `get_peaks` function loops through your chromatograms at the specified wavelengths, finds peaks, and attempts to fit them to the specified function using non-linear least squares -- the current options are `gaussian` and `egh` (exponential-gaussian hybrid) [@lan2001]. The area under the curve for each peak is then estimated using a trapezoidal approximation method. The function returns a nested list of dataframes containing information about the peaks in each chromatogram.
 
 ```{r, get_peaks, message=F, warning=F}
 pks_gauss <- get_peaks(warp, lambdas = c('210','260'), sd.max=40, fit="gaussian")
 pks_egh <- get_peaks(warp, lambdas = c('210', '260'), sd.max=40, fit="egh")
 ```
 
-The `plot_peaks` function allows you to visually assess the peak integration accuracy. Below we compare the peaks fitted for the second chromatogram (`index=2`) using the two algorithms. Often the egh function performs slightly better for asymmetrical peaks.
+The `plot_peaks` function allows you to visually assess the peak integration accuracy. Below we compare the peaks fitted for the first chromatogram (`index=1`) using the two algorithms. Usually the egh function performs slightly better for asymmetrical peaks.
 
 ```{r, plot_peaks, warning=F, fig.height=6}
 par(mfrow=c(2,1))
-plot_peaks(chrom_list = warp, peak_list = pks_gauss, index=4, lambda='210')
-plot_peaks(chrom_list = warp, peak_list = pks_egh, index=4, lambda='210')
+plot_peaks(chrom_list = warp, peak_list = pks_gauss, index=1, lambda='210')
+plot_peaks(chrom_list = warp, peak_list = pks_egh, index=1, lambda='210')
 
-plot_peaks(chrom_list = warp, peak_list = pks_gauss, index=4, lambda='260')
-plot_peaks(chrom_list = warp, peak_list = pks_egh, index=4, lambda='260')
+plot_peaks(chrom_list = warp, peak_list = pks_gauss, index=1, lambda='260')
+plot_peaks(chrom_list = warp, peak_list = pks_egh, index=1, lambda='260')
 ```
 
 ```{r, get_peaktable}

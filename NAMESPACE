@@ -1,7 +1,7 @@
 ## all functionality of ALS and ptw may be needed for the user, so all
 ## functions imported.
-import(ptw)
 import(lattice)
+import(ptw)
 
 export("load_chromes", "preprocess",
        "correctRT", "correctRT5", "correct_rt",
@@ -9,18 +9,19 @@ export("load_chromes", "preprocess",
        "getAllPeaks", "get_peaks", "plot_peaks", "getPeakTable", "get_peaktable",
        "plot_spectrum", "plot_all_spectra", "scan_spectrum",
        "combine_peaks", "compare_spectra", "cluster_spectra")
-importFrom("grDevices", "colorRampPalette", "terrain.colors")
+importFrom("dynamicTreeCut", "cutreeDynamicTree")
+importFrom("fastcluster", "hclust")
 importFrom("graphics", "abline", "axTicks", "box", "contour", "image",
-           "layout", "matplot", "par", "plot", "rect", "text", "title")
+           "layout", "matplot", "par", "plot", "rect", "text", "title",
+	   "legend", "polygon", "arrows")
+importFrom("grDevices", "colorRampPalette", "terrain.colors")
+importFrom("methods", "new")
+importFrom("minpack.lm", "nlsLM")
+importFrom("pvclust", "pvclust", "pvpick", "pvrect")
+importFrom("scales", "rescale")
+importFrom("smoother", "smth.gaussian")
 importFrom("stats", "aggregate", "approx", "as.dist", "cor", "cutree",
            "dist", "dnorm", "embed", "median", "predict",
            "smooth.spline", "coef", "deriv", "fitted", "lm", "nls",
                "nls.control", "pnorm", "quantile", "residuals")
-importFrom("utils", "capture.output", "read.csv")
-importFrom("graphics", "legend", "polygon")
-importFrom("methods", "new")
-importFrom("fastcluster", "hclust")
-importFrom("dynamicTreeCut", "cutreeDynamicTree")
-importFrom("scales", "rescale")
-importFrom("pvclust", "pvclust", "pvpick", "pvrect")
-importFrom("minpack.lm", "nlsLM")
+importFrom("utils", "capture.output", "read.csv", "tail")

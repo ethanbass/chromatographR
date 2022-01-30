@@ -5,7 +5,7 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
                                slope_thresh=.05, amp_thresh=0, bounds=F){
   #compute derivative (with or without smoothing)
   if (smooth_type=='gaussian'){
-    d <- smoother::smth.gaussian(diff(y),window = smooth_window, alpha=smooth_width)
+    d <- smth.gaussian(diff(y),window = smooth_window, alpha=smooth_width)
   } else{
     d=deriv(y)
   }
@@ -119,7 +119,7 @@ fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height
   # package up the results to pass back
   
     if (class( nlsAns) == "try-error") {
-      yAns <- gaussian(x1, start.center, start.width, start.height, start.floor)
+      yAns <- gaussian(x, start.center, start.width, start.height, start.floor)
       out <- list("center"=start.center, "width"=start.width, "height"=start.height,
                   "y"=yAns, "residual"= y - yAns)
       floorAns <- if ( fit.floor) start.floor else 0
@@ -170,7 +170,7 @@ fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
   if (!fit.floor){
     nlsAns <- try(nlsLM(y1 ~ egh(x1, center, width, height, tau), start=starts, control=controlList), silent=T)
   } else{
-    if (is.null( start.floor)) start.floor <- quantile( y, seq(0,1,0.1))[2]
+    if (is.null( start.floor)) start.floor <- quantile( y1, seq(0,1,0.1))[2]
     starts <- c(starts, "floor"=start.floor)
     nlsAns <- try(nlsLM(y1 ~ egh(x1, center, width, height, tau, floor), start=starts, control=controlList), silent=T)
   }
