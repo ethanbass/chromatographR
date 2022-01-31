@@ -16,6 +16,8 @@ plot_peaks(chrom_list, peak_list, index=1, lambda=NULL, w=0.5,
   \item{points}{Logical. If TRUE, plot peak maxima. Defaults to FALSE.}
   \item{ticks}{Logical. If TRUE, mark beginning and end of each peak. Defaults to FALSE.}
   \item{a}{Select "alpha"" parameter controlling transparency of shapes.}
+  \item{cex.points}{Size of points. Defaults to 0.5}
+  \item{\dots}{Additional arguments to plot function.}
 }
 \author{Ethan Bass}
 \seealso{\code{\link{get_peaks}}}
