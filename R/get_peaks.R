@@ -1,16 +1,16 @@
 get_peaks <- function (chrom_list, lambdas, max.iter=100,
-                         fit = c("egh", "gaussian", "emg"), ...){
-  fit <- match.arg(fit, c("egh", "gaussian", "emg"))
+                         fit = c("egh", "gaussian"), sd.max=50, ...){
+  fit <- match.arg(fit, c("egh", "gaussian"))
   if (is.numeric(lambdas)){
     lambdas <- as.character(lambdas)
   }
   peaks<-list()
   chrom_list <- lapply(chrom_list, function(c_mat) c_mat[,lambdas, drop=F])
   peak_positions <- lapply(chrom_list, function(c_mat){
-    apply(c_mat, 2, function(x) find_peaks(x, bounds=T))})
+    apply(c_mat, 2, function(x) find_peaks(x, ...))})
   result <- lapply(1:length(chrom_list), function(smpl){
     ptable <- lapply(1:length(peak_positions[[smpl]]), function(cmpnd){
-      fit_peaks(chrom_list[[smpl]][,cmpnd], peak_positions[[smpl]][[cmpnd]], fit=fit, max.iter=max.iter, ...)
+      fit_peaks(chrom_list[[smpl]][,cmpnd], peak_positions[[smpl]][[cmpnd]], fit=fit, max.iter=max.iter, sd.max=sd.max)
     })
     names(ptable) <- names(peak_positions[[smpl]])
     ptable
@@ -29,23 +29,24 @@ get_peaks <- function (chrom_list, lambdas, max.iter=100,
   }))
 }
 
+
 getAllPeaks <- function (chrom_list, lambdas, max.iter=100,
-                         fit = c("egh", "gaussian", "emg"), ...){
+                       fit = c("egh", "gaussian"), sd.max=50, ...){
   msg<-"The function `getAllPeaks` is deprecated. Please use `get_peaks` instead"
   .Deprecated(getAllPeaks, package="chromatographR", msg,
               old = as.character(sys.call(sys.parent()))[1L])
-  fit <- match.arg(fit, c("egh", "gaussian", "emg"))
+  fit <- match.arg(fit, c("egh", "gaussian"))
   if (is.numeric(lambdas)){
     lambdas <- as.character(lambdas)
   }
   peaks<-list()
   chrom_list <- lapply(chrom_list, function(c_mat) c_mat[,lambdas, drop=F])
   peak_positions <- lapply(chrom_list, function(c_mat){
-    apply(c_mat, 2, function(x) find_peaks(x, bounds=T))})
-  result <- lapply(1:length(chrom_list), function(smpl) {
+    apply(c_mat, 2, function(x) find_peaks(x, ...))})
+  result <- lapply(1:length(chrom_list), function(smpl){
     ptable <- lapply(1:length(peak_positions[[smpl]]), function(cmpnd){
-      fit_peaks(chrom_list[[smpl]][,cmpnd], peak_positions[[smpl]][[cmpnd]], fit=fit, max.iter=max.iter, ...)
-      })
+      fit_peaks(chrom_list[[smpl]][,cmpnd], peak_positions[[smpl]][[cmpnd]], fit=fit, max.iter=max.iter, sd.max=sd.max)
+    })
     names(ptable) <- names(peak_positions[[smpl]])
     ptable
   })
@@ -67,7 +68,7 @@ getAllPeaks <- function (chrom_list, lambdas, max.iter=100,
 ## fit is output of get_peaks for chrome
 
 plot_peaks <- function(chrom_list, peak_list, index=1, lambda=NULL,
-                       points=F, ticks=F, a=0.5){
+                       points=F, ticks=F, a=0.5, cex.points=0.5, ...){
   if (is.null(lambda)){
     lambda <- names(peak_list[[1]])[1]
   }
@@ -79,9 +80,9 @@ plot_peaks <- function(chrom_list, peak_list, index=1, lambda=NULL,
   y <- chrom_list[[index]][,lambda]
   pks <- data.frame(peak_list[[index]][[lambda]])
   fit <- ifelse("tau" %in% colnames(pks), "egh", "gaussian")
-  plot(new.ts, y, type='l', xlab='', ylab='', xaxt='n', yaxt='n')
+  plot(new.ts, y, type='l', xlab='', ylab='', xaxt='n', yaxt='n', ...)
   if (points==T){
-    points(pks$rt, pks$height, pch=20, cex=0.5, col='red')
+    points(pks$rt, pks$height, pch=20, cex=cex.points, col='red')
   }
   if (ticks==T){
     arrows(pks$start, y[which(new.ts %in% pks$start)]-5, pks$start, y[which(new.ts %in% pks$start)]+5, col="blue", length=0)
