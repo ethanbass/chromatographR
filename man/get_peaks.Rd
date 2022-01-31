@@ -14,7 +14,7 @@
   \item{lambdas}{Character vector of wavelengths to find peaks at.}
   \item{max.iter}{Maximum number of interations for non-linear least squares in    \code{\link{fit_peaks}}.}
   \item{fit}{What type of fit to use. Current options are gaussian and exponential gaussian hybrid.}
-  \item{\dots}{Additional arguments to \code{\link{fit_peaks}}.}
+  \item{\dots}{Additional arguments to \code{\link{find_peaks}}.}
 }
 \value{The result is a list, with each element corresponding to one data
   file, and containing data for the fitted peaks for each of the ALS
