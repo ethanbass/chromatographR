@@ -68,7 +68,7 @@ getAllPeaks <- function (chrom_list, lambdas, max.iter=100,
 ## fit is output of get_peaks for chrome
 
 plot_peaks <- function(chrom_list, peak_list, index=1, lambda=NULL,
-                       points=F, ticks=F, a=0.5){
+                       points=F, ticks=F, a=0.5, cex.points=0.5){
   if (is.null(lambda)){
     lambda <- names(peak_list[[1]])[1]
   }
@@ -82,7 +82,7 @@ plot_peaks <- function(chrom_list, peak_list, index=1, lambda=NULL,
   fit <- ifelse("tau" %in% colnames(pks), "egh", "gaussian")
   plot(new.ts, y, type='l', xlab='', ylab='', xaxt='n', yaxt='n')
   if (points==T){
-    points(pks$rt, pks$height, pch=20, cex=0.5, col='red')
+    points(pks$rt, pks$height, pch=20, cex=cex.points, col='red')
   }
   if (ticks==T){
     arrows(pks$start, y[which(new.ts %in% pks$start)]-5, pks$start, y[which(new.ts %in% pks$start)]+5, col="blue", length=0)
