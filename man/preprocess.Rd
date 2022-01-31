@@ -23,13 +23,12 @@ preprocess(X, dim1, dim2, remove.time.baseline = TRUE,
     range of these should not be outside the range of the original
     wavelengths, otherwise the function stops with an error message.}
   \item{remove.time.baseline}{Logical, indicating whether baseline
-    correction should be done in the time direction, according to \code{\link{ptw::baseline.corr}}. Default is TRUE.}
+    correction should be done in the time direction, according to \code{\link[ptw:baseline.corr]{baseline.corr}}. Default is TRUE.}
   \item{spec.smooth}{Logical, indicating whether smoothing should be
-    done in the spectral direction, according to \code{\link{stats::smooth.spline}}. Default is TRUE.}
+    done in the spectral direction, according to \code{\link[stats:smooth.spline]{smooth.spline}}. Default is TRUE.}
   \item{maxI}{if given, the maximum intensity in the matrix is set to
     this value.}
-  \item{\dots}{Further optional arguments to the \code{baseline.corr}
-    function.}
+  \item{\dots}{Further optional arguments to  \code{\link[ptw:baseline.corr]{baseline.corr}}.}
 }
 \value{
   The function returns the preprocessed data matrix, with rownames and

@@ -14,10 +14,10 @@ fit_peaks(y, pos, sd.max = 50, fit = c("egh", "gaussian"), max.iter = 1000)
   \item{max.iter}{Maximum number of iterations to use in nonlinear least squares peak-fitting. Defaults to 1000.}
 }
 \details{
-  Find peaks with function \code{find_peaks} by looking for "zero-crossings" in
+  Find peaks with function \code{find_peaks} by looking for zero-crossings in
   the smoothed first derivative of a signal that exceed a given slope threshold.
 
-  Peak parameters are calculated using \code{fit_peaks}, which fits the data to a gaussian or exponential-gaussian hybrid curve using non-linear least squares estimation as implemented in \code{\link{stats::nls}}. 
+  Peak parameters are calculated using \code{fit_peaks}, which fits the data to a gaussian or exponential-gaussian hybrid curve using non-linear least squares estimation as implemented in \code{\link[minpack.lm:nlsLM]{nlsLM}}. Area under the fitted curve is estimated using trapezoidal estimation.
 }
 \value{
   Function \code{fit_peaks} returns a matrix, whose columns contain the
@@ -30,9 +30,9 @@ fit_peaks(y, pos, sd.max = 50, fit = c("egh", "gaussian"), max.iter = 1000)
   \item{FWHM}{full width at half maximum (x)}
   \item{height}{height of the peak (y)}
   \item{area}{peak area}
-  \item{r.squared}{r-squared value for fit of model to data.}
+  \item{r.squared}{r-squared value for linear fit of model to data.}
 
-  Again, the first three elements (rt, sd and FWHM) are expressed as
+  Again, the first five elements (rt, start, end, sd and FWHM) are expressed as
   indices, so not in terms of the real retention times. The
   transformation to "real" time is done in function \code{get_peaks}.
 }

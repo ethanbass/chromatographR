@@ -5,7 +5,7 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
                                slope_thresh=.05, amp_thresh=0, bounds=T){
   #compute derivative (with or without smoothing)
   if (smooth_type=='gaussian'){
-    d <- smoother::smth.gaussian(diff(y),window = smooth_window, alpha=smooth_width)
+    d <- smth.gaussian(diff(y),window = smooth_window, alpha=smooth_width)
   } else{
     d=deriv(y)
   }
@@ -26,9 +26,7 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
 
 # fit peaks to gaussian or exponential-gaussian hybrid ('egh') function using nlsLM
 
-fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian"), 
-                      max.iter = 1000) 
-{
+fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian"), max.iter = 1000){
   fit <- match.arg(fit, c("egh", "gaussian"))
   if (fit == "gaussian") {
     tabnames <- c("rt", "start", "end", "sd", "FWHM", "height", "area", "r-squared")
@@ -121,7 +119,7 @@ fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height
   # package up the results to pass back
   
     if (class( nlsAns) == "try-error") {
-      yAns <- gaussian(x1, start.center, start.width, start.height, start.floor)
+      yAns <- gaussian(x, start.center, start.width, start.height, start.floor)
       out <- list("center"=start.center, "width"=start.width, "height"=start.height,
                   "y"=yAns, "residual"= y - yAns)
       floorAns <- if ( fit.floor) start.floor else 0
@@ -172,7 +170,7 @@ fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
   if (!fit.floor){
     nlsAns <- try(nlsLM(y1 ~ egh(x1, center, width, height, tau), start=starts, control=controlList), silent=T)
   } else{
-    if (is.null( start.floor)) start.floor <- quantile( y, seq(0,1,0.1))[2]
+    if (is.null( start.floor)) start.floor <- quantile( y1, seq(0,1,0.1))[2]
     starts <- c(starts, "floor"=start.floor)
     nlsAns <- try(nlsLM(y1 ~ egh(x1, center, width, height, tau, floor), start=starts, control=controlList), silent=T)
   }
@@ -215,8 +213,6 @@ fitpeaks_at_max <- function (mat, pos, w=5, sd.max=50, fit=c("gaussian","egh")){
       y <- mat[,lambda]
       peak.loc <- seq.int(xloc-w, xloc+w)
       m <- fit_gaussian(peak.loc, y[peak.loc])
-      #fit <- fit_egh(peak.loc, y[peak.loc])
-      #fit <- egh_optim(peak.loc, y[peak.loc], par=c(1,1,1,1), upper=c(Inf,Inf,Inf,Inf), lower=c(0,0,0,0))
       c(m$center, colnames(mat)[lambda], m$width, 2.35*m$width, y[xloc], y[xloc]/dnorm(m$center, m$center, 
                                                                 m$width))
     }
@@ -241,4 +237,3 @@ fitpeaks_at_max <- function (mat, pos, w=5, sd.max=50, fit=c("gaussian","egh")){
   colnames(huhn) <- tabnames
   huhn[huhn$sd<sd.max,]
 }
-

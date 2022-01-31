@@ -5,8 +5,7 @@
   Check integration by overlaying gaussian curves onto chromatogram.
 }
 \usage{
-plot_peaks(chrom_list, peak_list, index=1, lambda=NULL, w=0.5,
-  slope=.01, h=1, points=F, a=0.5)
+plot_peaks(chrom_list, peak_list, index=1, lambda=NULL, points=F,ticks=F, a=0.5)
 }
 \arguments{
   \item{chrom_list}{List of chromatograms (retention time x wavelength matrices)}

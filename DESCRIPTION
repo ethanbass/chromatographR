@@ -4,13 +4,13 @@ Title: chromatographR
 Version: 0.1
 Author: Ethan Bass
 Maintainer: Ethan Bass <ethanbass@gmail.com>
-Description: R package for high throughput analysis of HPLC-DAD chromatograms or other chromatographic data. Forked from alsace packaged authored by Ron Wehrens.
+Description: R package for high throughput analysis of HPLC-DAD chromatograms or other chromatographic data.
 URL: https://github.com/ethanbass/chromatographR
 License: GPL (>= 2)
 Depends: R (>= 3.5.0), ptw (>= 1.0.6), lattice
-Imports: methods, pvclust, fastcluster, dynamicTreeCut, scales, minpack.lm
+Imports: methods, pvclust, fastcluster, dynamicTreeCut, scales, minpack.lm, smoother
 LazyData: true
-Suggests: rmarkdown, mathjaxr, knitr
-RdMacros: mathjaxr
+LazyDataCompression: xz
+Suggests: rmarkdown, knitr
 VignetteBuilder: knitr
 BiocViews: Metabolomics, Preprocessing

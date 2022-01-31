@@ -1,4 +1,5 @@
-\name{compare_spectra}
+\name{check_peak}
+\alias{check_peak}
 \alias{compare_spectra}
 \title{Function to correct false zeros in peak table.}
 \description{

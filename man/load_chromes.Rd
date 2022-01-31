@@ -4,7 +4,6 @@
 \description{
 Convenience function to import chromatograms from a list of folders. Chromatograms must be in CSV format.}
 \usage{
-folders <- list.files(path, pattern = "EXPORT3D", full.names = T, dat=NULL)
 load_chromes(paths, dat=NULL)}
 \arguments{
   \item{paths}{Paths of folders where chromatograms are stored.}
