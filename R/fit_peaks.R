@@ -75,7 +75,8 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian"), max.iter
   if (!is.null(sd.max)) {
     huhn <- huhn[huhn$sd < sd.max, ]
   }
-  huhn[huhn$rt>0,]
+  x <- try(huhn[huhn$rt>0,],silent=T)
+  if(inherits(x,  "try-error")){NA} else {x}
 }
 #################################################################################################
 ### gaussian
