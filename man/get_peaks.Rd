@@ -6,14 +6,15 @@
   Function to extract all peaks in a list of chromatograms. Peaks are located as local maxima within the given span (function \code{\link{find_peaks}}) and at the given positions a
   gaussian curve is fit (function \code{\link{fit_peaks}}).
 }
-\usage{get_peaks(chrom_list, lambdas, max.iter=100,
-                         fit = c("egh", "gaussian", "emg"), ...)}
+\usage{get_peaks(chrom_list, lambdas, fit = c("egh", "gaussian"),
+                                      sd.max=50, max.iter=100,  ...)}
 \arguments{
   \item{chrom_list}{A list of profile matrices, each of the same dimensions
     (timepoints times wavelengths).}
   \item{lambdas}{Character vector of wavelengths to find peaks at.}
-  \item{max.iter}{Maximum number of interations for non-linear least squares in    \code{\link{fit_peaks}}.}
   \item{fit}{What type of fit to use. Current options are gaussian and exponential gaussian hybrid.}
+  \item{sd.max}{Maximum width (standard deviation) for peaks. Defaults to 50.}
+  \item{max.iter}{Maximum number of interations for non-linear least squares in \code{\link{fit_peaks}}.}
   \item{\dots}{Additional arguments to \code{\link{find_peaks}}.}
 }
 \value{The result is a list, with each element corresponding to one data

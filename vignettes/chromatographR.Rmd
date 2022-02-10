@@ -11,6 +11,7 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
+#devtools::install_github("ethanbass/chromatographR")
 require("knitr", quietly=TRUE)
 require(chromatographR)
 opts_chunk$set(prompt = TRUE, highlight = FALSE, comment=NA, 
@@ -24,7 +25,7 @@ suppressMessages(require(chromatographR, quiet=TRUE))
 ## Introduction
 *chromatographR* is a package for the reproducible analysis of HPLC-DAD data in `R`. Liquid chromatography coupled to diode-array detection (HPLC-DAD) remains one of the most popular analytical methodologies due to its convenience and low-cost. However, there are currently few open-source tools available for analyzing HPLC-DAD chromatograms. The use of proprietary software for the analysis of HPLC-DAD data is currently a significant barrier to reproducible science, since these tools are not widely accessible, but also because such tools often require the user to select complicated options through a graphical interface which cannot easily be repeated. Reproducibility is of course much higher in command line workflows, like *chromatographR* where the entire analysis can be stored and easily repeated by anyone using publicly available software.
 
-The *chromatographR* package draws inspiration from the previously published *alsace* package [@wehrens2015], but with improved functions for peak-finding, integration and peak table generation as well as a number of new tools for data visualization. Unlike *alsace*, which emphasized multivariate curve resolution through alternating least squares (MCR-ALS), *chromatographR* focuses on a more conventional workflow that may seem more familiar to users of standard software tools for HPLC-DAD analysis. *chromatographR* includes tools for a) pre-processing, b) retention-time alignment, c) peak-finding, d) peak-integration and e) peak-table construction, as well as additional functions useful in analysis of the resulting peak table.
+The *chromatographR* package draws inspiration from the previously published *alsace* package [@wehrens2015], but with improved functions for peak-finding, integration and peak table generation as well as a number of new tools for data visualization and checking. Unlike *alsace*, which emphasized multivariate curve resolution through alternating least squares (MCR-ALS), *chromatographR* focuses on a more conventional workflow that may seem more familiar to users of standard software tools for HPLC-DAD analysis. *chromatographR* includes tools for a) pre-processing, b) retention-time alignment, c) peak-finding, d) peak-integration and e) peak-table construction, as well as additional functions useful in analysis of the resulting peak table.
 
 ## Workflow
 ### Loading data
@@ -88,7 +89,7 @@ dat.pr <- parallel::mclapply(X=Sa,
                  p=.001,lambda=1e5)
 ```
 
-This could be a good time to load meta-data and normalize your chromatograms (e.g. by sample mass). You could also normalize after assembling the peak table.
+After loading data, you may want to normalize your chromatograms (e.g. by sample mass). However, you can also normalize after assembling the peak table.
 
 ### Dealing with retention time shifts
 
@@ -151,9 +152,6 @@ The `plot_peaks` function allows you to visually assess the peak integration acc
 par(mfrow=c(2,1))
 plot_peaks(chrom_list = warp, peak_list = pks_gauss, index=1, lambda='210')
 plot_peaks(chrom_list = warp, peak_list = pks_egh, index=1, lambda='210')
-
-plot_peaks(chrom_list = warp, peak_list = pks_gauss, index=1, lambda='260')
-plot_peaks(chrom_list = warp, peak_list = pks_egh, index=1, lambda='260')
 ```
 
 ```{r, get_peaktable}
@@ -185,7 +183,7 @@ plot_all_spectra(peak, peak_table=pkTab, chrom_list = warp, export=F, overlappin
 
 #### Clustering peaks by spectral similarity
 
-The `cluster_spectra` function groups peaks according to their spectral similarity, using hierarchical clustering, as implemented in the *pvclust* R package [@suzuki2006]. It returns a list of clusters, along with a p-value for each cluster, calculated through multi-scale bootstrap resampling. These clusters may be useful in downstream analyses (i.e. for loosely grouping peaks by chemical class). For actual use, the number of bootstraps (`nboot`) should be set higher (probably at least 1000, or even 10,000 as recommended by the developers of `pvclust`). There may be some redundancy in the clusters that are returned, or some of the clusters may not correspond to a single chromophore. We recommend that users visually inspect clusters before conducting further analysis in order to remove redundant or unwanted clusters.
+The `cluster_spectra` function groups peaks according to their spectral similarity, using hierarchical clustering, as implemented in the *pvclust* R package [@suzuki2006]. The function returns a list of clusters, along with a p-value for each cluster, calculated through multi-scale bootstrap resampling. These clusters may be useful in downstream analyses (i.e. for loosely grouping peaks by chemical class). For actual use, the number of bootstraps (`nboot`) should be set higher (probably at least 1000, or even 10,000 as recommended by the developers of `pvclust`). There may be some redundancy in the clusters that are returned, or some of the clusters may not correspond to a single chromophore. We recommend that users visually inspect clusters before conducting further analysis in order to remove redundant or unwanted clusters. (This clustering will tend to return better results when applied to data sets with more chromatograms).
 
 ```{r, cluster}
 cl1 <- cluster_spectra(pkTab, warp, nboot=100, max.only = F,save = F)

@@ -8,7 +8,7 @@ fit_peaks(y, pos, sd.max = 50, fit = c("egh", "gaussian"), max.iter = 1000)
 \arguments{
   \item{y}{response (numerical vector)}
   \item{pos}{Locations of peaks in vector y.}
-  \item{sd.max}{Maximum standard deviation of peak. Defaults to 50.}
+  \item{sd.max}{Maximum width (standard deviation) for peaks. Defaults to 50.}
   \item{fit}{Function for peak fitting. (Currently "gaussian" and 
   exponential gaussian hybrid ("egh") are supported. Defaults to egh.)}
   \item{max.iter}{Maximum number of iterations to use in nonlinear least squares peak-fitting. Defaults to 1000.}
