@@ -6,16 +6,29 @@
 
 elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
 
-plot_spectrum <- function(peak, peak_table, chrom_list, chr = 'max', lambda = 'max',
+plot_spectrum <- function(loc, peak_table=NULL, chrom_list, chr = 'max', lambda = 'max',
                           plot_spectrum = T, plot_trace = T, export_spectrum=FALSE,
-                          spectrum_labels=T, verbose=T, scale_spectrum=F, ...){
-  RT <- round(peak_table['RT',peak],2)
-  peak_table<-peak_table[4:(nrow(peak_table)-3),]
+                          spectrum_labels=T, verbose=T, scale_spectrum=F, what=c("peak","rt"), ...){
+  what <- match.arg(what, c("peak", "rt"))
+  if (what=="peak"){
+    if(is.null(peak_table))
+      stop("Peak table is required to locate peak spectrum.")
+    if (!(loc %in% colnames(peak_table)))
+      stop(paste0("No match found for peak \'", loc, "\' in peak table."))
+  }
+  if (what=="rt" & chr=="max"){
+    stop("Must specify chromatogram for scan function.")
+  }
   new.ts <- as.numeric(rownames(chrom_list[[1]]))
   new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
+  sig <- max(sapply(strsplit(rownames(chrom_list[[1]]),".",fixed=T),function(x) nchar(x[2])),na.rm=T)
+  if (what=="peak"){
+  RT <- round(peak_table['RT',loc], sig)
+  peak_table<-peak_table[4:(nrow(peak_table)-3),]
+  } else{RT <- round(as.numeric(loc), sig)}
   t <- which(elementwise.all.equal(RT,new.ts))
   if (chr == 'max'){
-    chr <- which.max(peak_table[,peak])
+    chr <- which.max(peak_table[,loc])
   }
   y=chrom_list[[chr]][t,]
   if (lambda == 'max'){
@@ -57,9 +70,9 @@ plot_all_spectra <- function(peak, peak_table, chrom_list, plot_spectrum = T,
                              export_spectrum=T, scale_spectrum=T, overlapping=T, verbose=F, ...){
   new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
   sp <- sapply(1:length(chrom_list), function(chr){
-    plot_spectrum(peak=peak, peak_table=peak_table, chrom_list=chrom_list, chr=chr,
+    plot_spectrum(loc=peak, peak_table=peak_table, chrom_list=chrom_list, chr=chr,
                   plot_spectrum=F, plot_trace=F, export_spectrum = T,
-                  scale_spectrum=scale_spectrum, verbose=verbose)
+                  scale_spectrum=scale_spectrum, verbose=verbose, what="peak")
   })
   sp<-do.call(cbind, sp)
   if(overlapping==T){

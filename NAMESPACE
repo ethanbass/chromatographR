@@ -7,7 +7,7 @@ export("load_chromes", "preprocess",
        "correctRT", "correctRT5", "correct_rt",
        "find_peaks", "fit_peaks", "filter_peaks",
        "getAllPeaks", "get_peaks", "plot_peaks", "getPeakTable", "get_peaktable",
-       "plot_spectrum", "plot_all_spectra", "scan_spectrum",
+       "plot_spectrum", "plot_all_spectra",
        "combine_peaks", "compare_spectra", "cluster_spectra")
 importFrom("dynamicTreeCut", "cutreeDynamicTree")
 importFrom("fastcluster", "hclust")

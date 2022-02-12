@@ -6,11 +6,12 @@
   confirm the identity of a peak or check that a particular column in the peak table represents
   a single compound.
 }
-\usage{plot_spectrum(peak, peak_table, chrom_list, chr = 'max', lambda = 'max',
-                          plot_spectrum = T, plot_trace = T, export_spectrum=FALSE,
-                          spectrum_labels=T, verbose=T, scale_spectrum=F, ...)}
+\usage{plot_spectrum(loc, peak_table, chrom_list, chr = 'max', lambda = 'max',
+                      plot_spectrum = T, plot_trace = T, export_spectrum=FALSE,
+                      spectrum_labels=T, verbose=T, scale_spectrum=F,
+                      what=c("peak","rt"), ...)}
 \arguments{
-  \item{peak}{The name of the peak you wish to plot (must be in character format).}
+  \item{loc}{The name of the peak or retention time for which you wish to extract spectral data.}
   \item{peak_table}{The peak table (output from \code{\link{getPeakTable}} function).}
   \item{chrom_list}{A list of chromatograms in matrix form (timepoints x wavelengths).}
   \item{chr}{Numerical index of chromatogram you wish to plot, or "max"" if you want to automatically plot the chromatogram with the largest signal.}
@@ -21,6 +22,7 @@
   \item{verbose}{Logical. If TRUE, prints verbose output to console. Defaults to TRUE.}
   \item{scale_spectrum}{Logical. If TRUE, scales spectrum to unit height. Defaults to FALSE.}
   \item{export_spectrum}{Logical. If TRUE, exports spectrum to console. Defaults to FALSE.}
+  \item{what}{What to look for. Either "peak" to extract spectral information for a certain peak or "rt" to scan by retention time. Defaults to "peak" mode.}
   \item{...}{Additional arguments.}
 }
 \author{Ethan Bass}
