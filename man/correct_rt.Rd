@@ -15,8 +15,8 @@
   \item{lambdas}{Select wavelengths to use by name.}
   \item{reference}{Index of the sample that is to be considered the
     reference sample.}
-  \item{what}{What to return: either the time-corrected profiles (useful
-    for visual inspection) or the warping models (for further
+  \item{what}{What to return: either the 'corrected.values' (useful
+    for visual inspection) or the warping 'models' (for further
     programmatic use).}
   \item{init.coef}{Starting values for the optimisation.}
   \item{n.traces}{Number of traces to use.}
