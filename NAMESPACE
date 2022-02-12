@@ -13,7 +13,7 @@ importFrom("dynamicTreeCut", "cutreeDynamicTree")
 importFrom("fastcluster", "hclust")
 importFrom("graphics", "abline", "axTicks", "box", "contour", "image",
            "layout", "matplot", "par", "plot", "rect", "text", "title",
-	   "legend", "polygon", "arrows")
+	   "legend", "polygon", "arrows", "identify")
 importFrom("grDevices", "colorRampPalette", "terrain.colors")
 importFrom("methods", "new")
 importFrom("minpack.lm", "nlsLM")

@@ -8,32 +8,54 @@ elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
 
 plot_spectrum <- function(loc, peak_table=NULL, chrom_list, chr = 'max', lambda = 'max',
                           plot_spectrum = T, plot_trace = T, export_spectrum=FALSE,
-                          spectrum_labels=T, verbose=T, scale_spectrum=F, what=c("peak","rt"), ...){
-  what <- match.arg(what, c("peak", "rt"))
+                          spectrum_labels=T, verbose=T, scale_spectrum=F, what=c("peak", "rt", "click"), ...){
+  what <- match.arg(what, c("peak", "rt", "click"))
   if (what=="peak"){
-    if(is.null(peak_table))
-      stop("Peak table is required to locate peak spectrum.")
-    if (!(loc %in% colnames(peak_table)))
-      stop(paste0("No match found for peak \'", loc, "\' in peak table."))
+    if(is.null(peak_table)){
+      stop("Peak table is required to locate peak spectrum.")}
+    if (!(loc %in% colnames(peak_table))){
+      stop(paste0("No match found for peak \'", loc, "\' in peak table."))}
   }
   if (what=="rt" & chr=="max"){
-    stop("Must specify chromatogram for scan function.")
-  }
+    stop("Must specify chromatogram for scan function.")}
+  if (what=="click" & (!is.numeric(chr) | !(lambda %in% new.lambdas))){
+      stop("Chromatogram ('chr') and wavelength ('lambda') must be specified for manual selection.")}
   new.ts <- as.numeric(rownames(chrom_list[[1]]))
   new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
   sig <- max(sapply(strsplit(rownames(chrom_list[[1]]),".",fixed=T),function(x) nchar(x[2])),na.rm=T)
-  if (what=="peak"){
-  RT <- round(peak_table['RT',loc], sig)
-  peak_table<-peak_table[4:(nrow(peak_table)-3),]
-  } else{RT <- round(as.numeric(loc), sig)}
-  t <- which(elementwise.all.equal(RT,new.ts))
-  if (chr == 'max'){
-    chr <- which.max(peak_table[,loc])
+  if (what=="click"){
+    y<-chrom_list[[chr]][,lambda]
+    matplot(x=new.ts, y=y,type='l',
+            ylab='', xlab='')
+    print("click trace to select timepoint")
+    t <- identify(new.ts, y,n=1, plot=F)
+    RT <- new.ts[t]
+    abline(v=RT,col='red',lty=3)
+    title(paste0("t = ", RT, "; \n", "abs = ", round(y[t],2)),adj=1)
+    y=chrom_list[[chr]][t,]
+  } else {
+    if (what=="peak"){
+    RT <- round(peak_table['RT',loc], sig)
+    peak_table<-peak_table[4:(nrow(peak_table)-3),]
+    } else if (what=="rt"){
+      RT <- round(as.numeric(loc), sig)
+      }
+    t <- which(elementwise.all.equal(RT,new.ts))
+    if (chr == 'max'){
+      chr <- which.max(peak_table[,loc])
+    }
+    y=chrom_list[[chr]][t,]
+    if (lambda == 'max'){
+      lambda = names(which.max(y))
+    } else lambda <- as.character(lambda)
+    if (plot_trace){
+      matplot(x=new.ts, y=chrom_list[[chr]][,lambda],type='l',
+              #main=paste(names(chrom_list)[chr], ';','\n', 'RT = ', RT,
+              #          '; Wavelength = ', lambda, 'nm'))
+              ylab='', xlab='')
+      abline(v=RT,col='red',lty=3)
+    }
   }
-  y=chrom_list[[chr]][t,]
-  if (lambda == 'max'){
-    lambda = names(which.max(y))
-  } else lambda <- as.character(lambda)
   if (verbose==T){
     print(paste0("chrome no. ", chr, "; RT: ", RT, "; lambda = ", lambda, " nm"))
     }
@@ -53,14 +75,7 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list, chr = 'max', lambda 
       }
     }
   }
-  if (plot_trace == T){
-    matplot(x=new.ts, y=chrom_list[[chr]][,lambda],type='l',
-            #main=paste(names(chrom_list)[chr], ';','\n', 'RT = ', RT,
-            #          '; Wavelength = ', lambda, 'nm'))
-            ylab='', xlab='')
-    abline(v=RT,col='red',lty=3)
-  } 
-  if (export_spectrum==TRUE){
+  if (export_spectrum){
     return(data.frame(y))}
 }
 

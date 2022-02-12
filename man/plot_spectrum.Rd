@@ -9,7 +9,7 @@
 \usage{plot_spectrum(loc, peak_table, chrom_list, chr = 'max', lambda = 'max',
                       plot_spectrum = T, plot_trace = T, export_spectrum=FALSE,
                       spectrum_labels=T, verbose=T, scale_spectrum=F,
-                      what=c("peak","rt"), ...)}
+                      what=c("peak","rt","click"), ...)}
 \arguments{
   \item{loc}{The name of the peak or retention time for which you wish to extract spectral data.}
   \item{peak_table}{The peak table (output from \code{\link{getPeakTable}} function).}
@@ -22,7 +22,7 @@
   \item{verbose}{Logical. If TRUE, prints verbose output to console. Defaults to TRUE.}
   \item{scale_spectrum}{Logical. If TRUE, scales spectrum to unit height. Defaults to FALSE.}
   \item{export_spectrum}{Logical. If TRUE, exports spectrum to console. Defaults to FALSE.}
-  \item{what}{What to look for. Either "peak" to extract spectral information for a certain peak or "rt" to scan by retention time. Defaults to "peak" mode.}
+  \item{what}{What to look for. Either "peak" to extract spectral information for a certain peak, "rt" to scan by retention time, or "click" to manually select retention time by clicking on the chromatogram. Defaults to "peak" mode.}
   \item{...}{Additional arguments.}
 }
 \author{Ethan Bass}
