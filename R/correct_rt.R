@@ -18,7 +18,7 @@ correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best', 
     if (scale){
       chrom_list<-lapply(chrom_list, rescale)
     }
-
+    allmats <- sapply(chrom_list, function(x) x[,lambdas], simplify = "array")
     allmats.t <- sapply(chrom_list, function(x) t(x[,lambdas]), simplify = "array")
     if (is.null(n.traces)){
       traces=lambdas
