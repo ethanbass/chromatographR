@@ -90,6 +90,7 @@ plot_all_spectra <- function(peak, peak_table, chrom_list, plot_spectrum = T,
                   scale_spectrum=scale_spectrum, verbose=verbose, what="peak")
   })
   sp<-do.call(cbind, sp)
+  colnames(sp) <- names(chrom_list)
   if(overlapping==T){
     matplot(new.lambdas, sp, type='l', xlab='wavelength', ylab='intensity',las=2)
   } else{
