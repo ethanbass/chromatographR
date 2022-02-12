@@ -1,15 +1,24 @@
-correct_rt <- function(chrom_list, models=NULL, lambdas, reference='best', what = c("models", "corrected.values"), 
+correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best', what = c("models", "corrected.values"), 
                        init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, scale=T,
                        trwdth=200, ...){
   what <- match.arg(what, c("models", "corrected.values"))
   if (is.null(models)){
+    if (is.null(lambdas) & is.null(n.traces)){
+      stop("Must specify 'lambdas' (wavelengths) or 'n.traces' (number of traces) to use for alignment.")
+    }
+    if (is.null(lambdas)){
+      lambdas=colnames(chrom_list[[1]])
+    }
+    lambdas<-as.character(lambdas)
+    if (n.zeros > 0){
     chrom_list <- lapply(chrom_list,function(x){
       apply(x, 2, padzeros, nzeros=n.zeros, side='both')
     })
+    }
     if (scale){
       chrom_list<-lapply(chrom_list, rescale)
     }
-    allmats <- sapply(chrom_list, function(x)x[,lambdas], simplify = "array")
+
     allmats.t <- sapply(chrom_list, function(x) t(x[,lambdas]), simplify = "array")
     if (is.null(n.traces)){
       traces=lambdas
@@ -37,7 +46,7 @@ correct_rt <- function(chrom_list, models=NULL, lambdas, reference='best', what 
   }
   if (what == "corrected.values" || !is.null(models)) {
     result <- lapply(ptwmods, function(x) t(x$warped.sample))
-    for (i in 1:length(result)) dimnames(result[[i]])[[1]] <- dimnames(chrom_list[[i]])[[1]]
+    for (i in 1:length(result)) rownames(result[[i]]) <- rownames(chrom_list[[i]])
     names(result) <- names(chrom_list)
     result
   } else {
