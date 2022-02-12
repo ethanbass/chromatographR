@@ -91,12 +91,14 @@ plot_all_spectra <- function(peak, peak_table, chrom_list, plot_spectrum = T,
   })
   sp<-do.call(cbind, sp)
   colnames(sp) <- names(chrom_list)
-  if(overlapping==T){
-    matplot(new.lambdas, sp, type='l', xlab='wavelength', ylab='intensity',las=2)
-  } else{
-    apply(sp, 2,function(spp){
-      plot(new.lambdas, spp, type='l', xlab='', ylab='',las=2)
-    })
+  if (plot_spectrum==T){
+    if(overlapping==T){
+      matplot(new.lambdas, sp, type='l', xlab='wavelength', ylab='intensity',las=2)
+    } else{
+      apply(sp, 2,function(spp){
+        plot(new.lambdas, spp, type='l', xlab='', ylab='',las=2)
+      })
+  }
   }
   if(export_spectrum==T){
     sp
