@@ -25,14 +25,20 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list, chr = 'max', lambda 
   sig <- max(sapply(strsplit(rownames(chrom_list[[1]]),".",fixed=T),function(x) nchar(x[2])),na.rm=T)
   if (what=="click"){
     y<-chrom_list[[chr]][,lambda]
-    matplot(x=new.ts, y=y,type='l',
-            ylab='', xlab='')
+    matplot(x=new.ts, y=y, type='l', ylab='', xlab='')
     print("click trace to select timepoint")
     t <- identify(new.ts, y,n=1, plot=F)
     RT <- new.ts[t]
     abline(v=RT,col='red',lty=3)
-    title(paste0("t = ", RT, "; \n", "abs = ", round(y[t],2)),adj=1)
+    title(paste0("\n\n chr ", chr,  " ;   rt: ", RT, " ;  abs: ", round(y[t],1)))
     y=chrom_list[[chr]][t,]
+    # closest match
+    if (verbose){
+      print(paste0("chrome no. ", chr, "; RT: ", RT, "; lambda = ", lambda, " nm"))
+    if (!is.null(peak_table)){
+    pk <- names(which.min(abs(pkTab["RT",]-RT)))
+    print(paste("closest match in peak table is",pk))
+    }}
   } else {
     if (what=="peak"){
     RT <- round(peak_table['RT',loc], sig)
@@ -54,11 +60,11 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list, chr = 'max', lambda 
               #          '; Wavelength = ', lambda, 'nm'))
               ylab='', xlab='')
       abline(v=RT,col='red',lty=3)
+      if (verbose==T){
+        print(paste0("chrome no. ", chr, "; RT: ", RT, "; lambda = ", lambda, " nm"))
+      }
     }
   }
-  if (verbose==T){
-    print(paste0("chrome no. ", chr, "; RT: ", RT, "; lambda = ", lambda, " nm"))
-    }
   if (scale_spectrum == T){
     y<-rescale(y)
   }
