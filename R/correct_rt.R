@@ -1,3 +1,37 @@
+#' Retention time correction
+#' 
+#' Correction of retention time differences using parametric time warping.
+#' 
+#' 
+#' @aliases correct_rt correctRT correctRT5
+#' @param chrom_list List of matrices containing concentration profiles.
+#' @param models List of models to warp by.
+#' @param lambdas Select wavelengths to use by name.
+#' @param reference Index of the sample that is to be considered the reference
+#' sample.
+#' @param what What to return: either the 'corrected.values' (useful for visual
+#' inspection) or the warping 'models' (for further programmatic use).
+#' @param init.coef Starting values for the optimisation.
+#' @param n.traces Number of traces to use.
+#' @param n.zeros Number of zeros to add.
+#' @param scale Logical. If true, scale chromatograms before warping.
+#' @param trwdth width of the triangle in the WCC criterion.
+#' @param \dots Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
+#' The only argument that cannot be changed is \code{warp.type}: this is always
+#' equal to \code{"global"}.
+#' @return A list of `ptw` objects or a list of warped absorbance profiles.
+#' @author Ron Wehrens, Ethan Bass
+#' @seealso \code{\link[ptw:ptw]{ptw}}, \code{\link{correctPeaks}}
+#' @references Eilers, P.H.C. 2004.
+#' \href{https://pubs.acs.org/doi/10.1021/ac034800eParametric Time Warping.}
+#' \emph{Anal. Chem.} \bold{76}:404-411.
+#' 
+#' Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015.
+#' \href{https://academic.oup.com/bioinformatics/article/31/18/3063/240579Fast
+#' parametric time warping of peak lists.} \emph{Bioinformatics}
+#' \bold{31}:3063-3065.
+#' @keywords manip
+#' @export correct_rt
 correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best', what = c("models", "corrected.values"), 
                        init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, scale=T,
                        trwdth=200, ...){

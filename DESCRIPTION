@@ -14,3 +14,5 @@ LazyDataCompression: xz
 Suggests: rmarkdown, knitr
 VignetteBuilder: knitr
 BiocViews: Metabolomics, Preprocessing
+RoxygenNote: 7.1.2
+Encoding: UTF-8

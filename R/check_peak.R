@@ -1,5 +1,40 @@
 ## check peak for false 0s, etc.
 
+
+
+#' Function to correct false zeros in peak table.
+#' 
+#' Function that tries to correct false zeroes for a particular peak in the
+#' peaktable. In each chromatogram, the function compares all peaks within a
+#' certain radius around the focal peak on the basis of their spectral
+#' similarity to a reference spectrum.
+#' 
+#' 
+#' @aliases check_peak compare_spectra
+#' @param peak Name of peak to be investigated.
+#' @param peak_table Peak table from \code{\link{getPeakTable}}.
+#' @param chrom_list A list of chromatograms in matrix form (timepoints x
+#' wavelengths).
+#' @param thresh_auto Defines minimum spectral similarity threshold for
+#' automatic match.
+#' @param thresh_man Defines minimum spectral similarity threshold to trigger
+#' manual matching process. Should be set equal or lower to `thresh_auto`.
+#' @param r Defines radius around focal peak to search for matches.
+#' @param plot_it Logical. If TRUE, plots spectra for comparison.
+#' @param lambda Wavelength for plot.
+#' @param zeros Logical. If TRUE, only check zero rows in peak table.
+#' @param ref Defines chromatogram for reference spectrum. If "max" choose
+#' chromatogram with maximum absorbance.
+#' @param order_by If "distance", will order matches by distance from
+#' theoretical retention time.
+#' @param verbose Logical. If TRUE, prints verbose output to console.
+#' @param plot_diff Logical.
+#' @param \dots Additional arguments
+#' @return A peak table similar to the input peak table, but with changes to
+#' entries selected column as defined by the algorithm.
+#' @author Ethan Bass
+#' @seealso \code{\link{get_peaks}}
+#' @keywords manip
 check_peak <- function(peak, peak_table, chrom_list,
                             thresh_auto=0.95, thresh_man=NULL, r=100, plot_it=F,
                             lambda='256', zeros=F, ref='max', order_by = "distance", verbose=T,

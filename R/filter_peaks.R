@@ -1,3 +1,25 @@
+#' Filter peak lists
+#' 
+#' Utility function to remove peaks from a peak list, e.g. because their
+#' intensity is too low. Currently one can filter on peak height, peak area,
+#' and width at half maximum.
+#' 
+#' 
+#' @param peak_list A nested list of peak tables: the first level is the
+#' sample, and the second level is the component. Every component is described
+#' by a matrix where every row is one peak, and the columns contain information
+#' on retention time, full width at half maximum (FWHM), peak width, height,
+#' and area.
+#' @param min_height Minimum peak height.
+#' @param min_area Minimum peak area.
+#' @param min_sd Minimal standard deviation.
+#' @param max_sd Maximum standard deviation.
+#' @return A peak list similar to the input peakList, but with all rows removed
+#' from the peak tables that are not satisfying the criteria.
+#' @author Ron Wehrens, EthanBass
+#' @seealso \code{\link{get_peaks}}
+#' @keywords manip
+#' @export filter_peaks
 filter_peaks <- function(peak_list, min_height, min_area, min_sd, max_sd) {
   if (missing(min_height) & missing(min_area) &
       missing(max_sd) & missing(min_sd)) {

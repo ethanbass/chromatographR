@@ -1,6 +1,37 @@
 # peak finding function adapted from matlab function by Prof. Tom O'Haver
 ## (see http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm)
 
+
+
+#' Find peaks in chromatographic profile
+#' 
+#' Find peaks in chromatographic profile.
+#' 
+#' Find peaks with function \code{find_peaks} by looking for zero-crossings in
+#' the smoothed first derivative of a signal that exceed a given slope
+#' threshold.
+#' 
+#' @param y response (numerical vector)
+#' @param smooth_type Type of smoothing. Defaults to "gaussian".
+#' @param smooth_window Window for smoothing. Defaults to 1.
+#' @param smooth_width Width for smoothing. Defaults to 0.1
+#' @param slope_thresh Minimum threshold for peak slope. Defaults to 0.05
+#' @param amp_thresh Minimum threshold for peak amplitude. Defaults to 0.
+#' @param bounds Logical. If TRUE, includes boundaries of peak in dataframe.
+#' Defaults to TRUE.
+#' @return Function \code{find_peaks} simply returns the locations of the peak
+#' centers, expressed as indices.
+#' @note The \code{find_peaks} function is adapted from matlab code in Prof.
+#' Tom O'Haver's
+#' \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htmPragmatic
+#' Introduction to Signal Processing}.
+#' @author Ethan Bass
+#' @seealso \code{\link{fit_peaks}}, \code{\link{get_peaks}}
+#' @references O'Haver, Tom. Pragmatic Introduction to Signal Processing:
+#' Applications in scientific measurement.
+#' /urlhttps://terpconnect.umd.edu/~toh/spectrum/ (Accessed January, 2022).
+#' @keywords manip
+#' @export find_peaks
 find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_width = 0.1,
                                slope_thresh=.05, amp_thresh=0, bounds=T){
   #compute derivative (with or without smoothing)
@@ -26,6 +57,58 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
 
 # fit peaks to gaussian or exponential-gaussian hybrid ('egh') function using nlsLM
 
+
+
+#' Fit chromatographic peaks with a gaussian or exponential-gaussian hybrid
+#' profile
+#' 
+#' Fit peak parameters using gaussian or exponential-gaussian hybrid peak
+#' fitting.
+#' 
+#' Find peaks with function \code{find_peaks} by looking for zero-crossings in
+#' the smoothed first derivative of a signal that exceed a given slope
+#' threshold.
+#' 
+#' Peak parameters are calculated using \code{fit_peaks}, which fits the data
+#' to a gaussian or exponential-gaussian hybrid curve using non-linear least
+#' squares estimation as implemented in \code{\link[minpack.lm:nlsLM]{nlsLM}}.
+#' Area under the fitted curve is estimated using trapezoidal estimation.
+#' 
+#' @param y response (numerical vector)
+#' @param pos Locations of peaks in vector y.
+#' @param sd.max Maximum width (standard deviation) for peaks. Defaults to 50.
+#' @param fit Function for peak fitting. (Currently "gaussian" and exponential
+#' gaussian hybrid ("egh") are supported. Defaults to egh.)
+#' @param max.iter Maximum number of iterations to use in nonlinear least
+#' squares peak-fitting. Defaults to 1000.
+#' @return Function \code{fit_peaks} returns a matrix, whose columns contain
+#' the following information: \item{rt}{location of the maximum of the peak
+#' (x)} \item{start}{start of peak (only included in table if `bounds==T`)}
+#' \item{end}{end of peak (only included in table if `bounds==T`)}
+#' \item{sd}{width of the peak (x)} \item{tau}{tau parameter (only included in
+#' table if `fit=="egh"`)} \item{FWHM}{full width at half maximum (x)}
+#' \item{height}{height of the peak (y)} \item{area}{peak area}
+#' \item{r.squared}{r-squared value for linear fit of model to data.}
+#' 
+#' Again, the first five elements (rt, start, end, sd and FWHM) are expressed
+#' as indices, so not in terms of the real retention times. The transformation
+#' to "real" time is done in function \code{get_peaks}.
+#' @note The \code{\link{fit_peaks}} function is adapted from Dr. Robert
+#' Morrison's
+#' \url{https://github.com/robertdouglasmorrison/DuffyTools}DuffyTools package
+#' as well as code published in Ron Wehrens'
+#' \url{https://github.com/rwehrens/alsace}alsace package.
+#' @author Ethan Bass
+#' @seealso \code{\link{find_peaks}}, \code{\link{get_peaks}}
+#' @references Lan, K. & Jorgenson, J. W. A hybrid of exponential and gaussian
+#' functions as a simple model of asymmetric chromatographic peaks. Journal of
+#' Chromatography A 915, 1-13 (2001).
+#' 
+#' Naish, P. J. & Hartwell, S. Exponentially Modified Gaussian functions - A
+#' good model for chromatographic peaks in isocratic HPLC? Chromatographia 26,
+#' 285-296 (1988).
+#' @keywords manip
+#' @export fit_peaks
 fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian"), max.iter = 1000){
   fit <- match.arg(fit, c("egh", "gaussian"))
   if (fit == "gaussian") {

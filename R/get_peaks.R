@@ -1,3 +1,32 @@
+#' Extract all peaks from the chromatographic profiles of a list of
+#' chromatograms.
+#' 
+#' Function to extract all peaks in a list of chromatograms. Peaks are located
+#' as local maxima within the given span (function \code{\link{find_peaks}})
+#' and at the given positions a gaussian curve is fit (function
+#' \code{\link{fit_peaks}}).
+#' 
+#' 
+#' @aliases get_peaks getAllPeaks
+#' @param chrom_list A list of profile matrices, each of the same dimensions
+#' (timepoints times wavelengths).
+#' @param lambdas Character vector of wavelengths to find peaks at.
+#' @param fit What type of fit to use. Current options are gaussian and
+#' exponential gaussian hybrid.
+#' @param sd.max Maximum width (standard deviation) for peaks. Defaults to 50.
+#' @param max.iter Maximum number of interations for non-linear least squares
+#' in \code{\link{fit_peaks}}.
+#' @param \dots Additional arguments to \code{\link{find_peaks}}.
+#' @return The result is a list, with each element corresponding to one data
+#' file, and containing data for the fitted peaks for each of the ALS
+#' components. Note that this function presents the "rt", "sd" and "FWHM"
+#' fields in real time units.
+#' @note Function is adapted from the
+#' \url{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}getAllPeaks
+#' function authored by Ron Wehrens.
+#' @author Ethan Bass & Ron Wehrens
+#' @keywords manip
+#' @export get_peaks
 get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"), sd.max=50, max.iter=100, ...){
   fit <- match.arg(fit, c("egh", "gaussian"))
   if (is.numeric(lambdas)){
@@ -66,6 +95,28 @@ getAllPeaks <- function (chrom_list, lambdas, max.iter=100,
 ## function to visually check integration accuracy
 ## fit is output of get_peaks for chrome
 
+
+
+#' Function to visually assess accuracy of integration
+#' 
+#' Check integration by overlaying gaussian curves onto chromatogram.
+#' 
+#' 
+#' @param chrom_list List of chromatograms (retention time x wavelength
+#' matrices)
+#' @param peak_list Output from the \code{findpeaks} function.
+#' @param index Index of chromatogram to be plotted.
+#' @param lambda Wavelength for plotting.
+#' @param points Logical. If TRUE, plot peak maxima. Defaults to FALSE.
+#' @param ticks Logical. If TRUE, mark beginning and end of each peak. Defaults
+#' to FALSE.
+#' @param a Select "alpha"" parameter controlling transparency of shapes.
+#' @param cex.points Size of points. Defaults to 0.5
+#' @param \dots Additional arguments to plot function.
+#' @author Ethan Bass
+#' @seealso \code{\link{get_peaks}}
+#' @keywords manip
+#' @export plot_peaks
 plot_peaks <- function(chrom_list, peak_list, index=1, lambda=NULL,
                        points=F, ticks=F, a=0.5, cex.points=0.5, ...){
   if (is.null(lambda)){

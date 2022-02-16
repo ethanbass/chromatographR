@@ -6,6 +6,46 @@
 
 elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
 
+
+
+#' Plot spectrum from peak table
+#' 
+#' A function to plot the trace and/or spectrum for a given peak in peak table.
+#' Can be used to confirm the identity of a peak or check that a particular
+#' column in the peak table represents a single compound.
+#' 
+#' 
+#' @param loc The name of the peak or retention time for which you wish to
+#' extract spectral data.
+#' @param peak_table The peak table (output from \code{\link{getPeakTable}}
+#' function).
+#' @param chrom_list A list of chromatograms in matrix form (timepoints x
+#' wavelengths).
+#' @param chr Numerical index of chromatogram you wish to plot, or "max"" if
+#' you want to automatically plot the chromatogram with the largest signal.
+#' @param lambda The wavelength you wish to plot the trace at if plot_chrom ==
+#' T and/or the wavelength to be used for the determination of signal
+#' abundance.
+#' @param plot_spectrum Logical. If TRUE, plots the spectrum of the chosen
+#' peak. Defaults to TRUE.
+#' @param plot_trace Logical. If TRUE, plots the trace of the chosen peak at
+#' lambda. Defaults to TRUE.
+#' @param spectrum_labels Logical. If TRUE, plots labels on maxima in spectral
+#' plot. Defaults to TRUE.
+#' @param verbose Logical. If TRUE, prints verbose output to console. Defaults
+#' to TRUE.
+#' @param scale_spectrum Logical. If TRUE, scales spectrum to unit height.
+#' Defaults to FALSE.
+#' @param export_spectrum Logical. If TRUE, exports spectrum to console.
+#' Defaults to FALSE.
+#' @param what What to look for. Either "peak" to extract spectral information
+#' for a certain peak, "rt" to scan by retention time, or "click" to manually
+#' select retention time by clicking on the chromatogram. Defaults to "peak"
+#' mode.
+#' @param ... Additional arguments.
+#' @author Ethan Bass
+#' @keywords manip
+#' @export plot_spectrum
 plot_spectrum <- function(loc, peak_table=NULL, chrom_list, chr = 'max', lambda = 'max',
                           plot_spectrum = T, plot_trace = T, export_spectrum=FALSE,
                           spectrum_labels=T, verbose=T, scale_spectrum=F, what=c("peak", "rt", "click"), ...){
@@ -87,6 +127,32 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list, chr = 'max', lambda 
 
 ## Function to plot all spectra of chosen peaks in peak table.
 
+
+
+#' Plot spectrum from peak table
+#' 
+#' Plot multiple for a given peak in peak table. Wrapper for
+#' \code{\link{plot_spectrum}}.
+#' 
+#' 
+#' @param peak The name of the peak you wish to plot (must be in character
+#' format)
+#' @param peak_table The peak table (output from \code{\link{getPeakTable}}
+#' function)
+#' @param chrom_list A list of profile matrices, each of the same dimensions
+#' (timepoints x components).
+#' @param plot_spectrum Logical. If TRUE, plots the spectrum of the chosen
+#' peak.
+#' @param export_spectrum Logical. If TRUE, exports spectrum to console.
+#' Defaults to FALSE.
+#' @param scale_spectrum Logical. If TRUE, scales spectrum to unit height.
+#' @param overlapping Logical. If TRUE, plot spectra in single plot.
+#' @param verbose Logical. If TRUE, print verbose output to console.
+#' @param \dots Additional arguments to plot_spectrum.
+#' @author Ethan Bass
+#' @seealso \code{\link{plot_spectrum}}
+#' @keywords manip
+#' @export plot_all_spectra
 plot_all_spectra <- function(peak, peak_table, chrom_list, plot_spectrum = T,
                              export_spectrum=T, scale_spectrum=T, overlapping=T, verbose=F, ...){
   new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
