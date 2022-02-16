@@ -51,4 +51,3 @@ function authored by Ron Wehrens.
 \author{
 Ethan Bass & Ron Wehrens
 }
-\keyword{manip}

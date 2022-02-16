@@ -4,7 +4,7 @@
 #' times can be predicted for each peak. These are stored in a separate column
 #' in the list of peak tables.
 #' 
-#' 
+#' @importFrom stats predict
 #' @param peakList A nested list of peak tables: the first level is the sample,
 #' and the second level is the component. Every component is described by a
 #' matrix where every row is one peak, and the columns contain information on

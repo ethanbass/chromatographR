@@ -75,6 +75,5 @@ legend("topleft", lty = 1, col = c("gray", "blue"), bty = "n",
 
 }
 \author{
-Ron Wehrens
+Ron Wehrens, Ethan Bass
 }
-\keyword{manip}

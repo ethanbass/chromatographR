@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_spectrum.R
 \name{plot_all_spectra}
 \alias{plot_all_spectra}
-\title{Plot spectrum from peak table}
+\title{Plot all spectra for chosen peak}
 \usage{
 plot_all_spectra(
   peak,
@@ -50,4 +50,3 @@ Plot multiple for a given peak in peak table. Wrapper for
 \author{
 Ethan Bass
 }
-\keyword{manip}

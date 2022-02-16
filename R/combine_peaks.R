@@ -1,8 +1,3 @@
-## Function to combine peaks that have been integrated at multiple wavelengths,
-## based on retention time and spectral similarity.
-
-
-
 #' Combine peaks in peak table
 #' 
 #' Utility function to combine duplicate peaks in peak table, i.e. peaks that
@@ -19,7 +14,6 @@
 #' columns combined according to the specified criteria.
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaks}}
-#' @keywords manip
 #' @export combine_peaks
 combine_peaks <- function(peak_table, digits=2, min.cor=0.9, choose='max'){
   RTs <- round(as.numeric(peak_table['RT',]), digits = digits)

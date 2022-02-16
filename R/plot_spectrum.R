@@ -1,20 +1,11 @@
-## Function to plot spectra of peaks in peak table. Returns chromatogram
-## with "highlighting" of selected peak and/or spectrum.
-
-## Elementwise all equal function from Brian Diggs
-## (https://stackoverflow.com/questions/9508518/why-are-these-numbers-not-equal)
-
-elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
-
-
-
 #' Plot spectrum from peak table
 #' 
 #' A function to plot the trace and/or spectrum for a given peak in peak table.
 #' Can be used to confirm the identity of a peak or check that a particular
 #' column in the peak table represents a single compound.
 #' 
-#' 
+#' @importFrom scales rescale
+#' @importFrom graphics identify title text
 #' @param loc The name of the peak or retention time for which you wish to
 #' extract spectral data.
 #' @param peak_table The peak table (output from \code{\link{getPeakTable}}
@@ -44,7 +35,6 @@ elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
 #' mode.
 #' @param ... Additional arguments.
 #' @author Ethan Bass
-#' @keywords manip
 #' @export plot_spectrum
 plot_spectrum <- function(loc, peak_table=NULL, chrom_list, chr = 'max', lambda = 'max',
                           plot_spectrum = T, plot_trace = T, export_spectrum=FALSE,
@@ -125,15 +115,16 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list, chr = 'max', lambda 
     return(data.frame(y))}
 }
 
-## Function to plot all spectra of chosen peaks in peak table.
 
+## Elementwise all equal function from Brian Diggs
+## (https://stackoverflow.com/questions/9508518/why-are-these-numbers-not-equal)
+#' @noRd
+elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
 
-
-#' Plot spectrum from peak table
+#' Plot all spectra for chosen peak
 #' 
 #' Plot multiple for a given peak in peak table. Wrapper for
 #' \code{\link{plot_spectrum}}.
-#' 
 #' 
 #' @param peak The name of the peak you wish to plot (must be in character
 #' format)
@@ -151,7 +142,6 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list, chr = 'max', lambda 
 #' @param \dots Additional arguments to plot_spectrum.
 #' @author Ethan Bass
 #' @seealso \code{\link{plot_spectrum}}
-#' @keywords manip
 #' @export plot_all_spectra
 plot_all_spectra <- function(peak, peak_table, chrom_list, plot_spectrum = T,
                              export_spectrum=T, scale_spectrum=T, overlapping=T, verbose=F, ...){

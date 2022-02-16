@@ -45,13 +45,13 @@ threshold.
 \note{
 The \code{find_peaks} function is adapted from matlab code in Prof.
 Tom O'Haver's
-\href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htmPragmatic
+\href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{Pragmatic
 Introduction to Signal Processing}.
 }
 \references{
 O'Haver, Tom. Pragmatic Introduction to Signal Processing:
 Applications in scientific measurement.
-/urlhttps://terpconnect.umd.edu/~toh/spectrum/ (Accessed January, 2022).
+/href{https://terpconnect.umd.edu/~toh/spectrum/} (Accessed January, 2022).
 }
 \seealso{
 \code{\link{fit_peaks}}, \code{\link{get_peaks}}

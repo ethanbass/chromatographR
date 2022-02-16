@@ -15,7 +15,10 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' to select clusters that exceed a certain confidence threshold as defined by
 #' alpha.
 #' 
-#' 
+#' @importFrom pvclust pvclust pvrect pvpick
+#' @importFrom stats cor
+#' @importFrom methods new
+#' @importFrom graphics matplot
 #' @param peak_table Peak table from \code{\link{getPeakTable}}.
 #' @param chrom_list A list of chromatograms in matrix form (timepoints x
 #' wavelengths).
@@ -38,6 +41,8 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' \item{peaks}{a character vector containing the names of all peaks contained
 #' in the given cluster.} \item{pval}{a numeric vector of length 1 containing
 #' the boostrap p-value (au) for the given cluster.}
+#' @example
+#' cluster_spectra(pk_tab, warp, nboot=100, max.only = F,save = F)
 #' @author Ethan Bass
 #' @references R. Suzuki, H. Shimodaira: Pvclust: an R package for assessing
 #' the uncertainty in hierarchical clustering. Bioinformatics, 22-12:1540-1542

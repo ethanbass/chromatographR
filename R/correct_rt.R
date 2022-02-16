@@ -2,8 +2,9 @@
 #' 
 #' Correction of retention time differences using parametric time warping.
 #' 
-#' 
 #' @aliases correct_rt correctRT correctRT5
+#' @import ptw
+#' @importFrom scales rescale
 #' @param chrom_list List of matrices containing concentration profiles.
 #' @param models List of models to warp by.
 #' @param lambdas Select wavelengths to use by name.
@@ -23,11 +24,10 @@
 #' @author Ron Wehrens, Ethan Bass
 #' @seealso \code{\link[ptw:ptw]{ptw}}, \code{\link{correctPeaks}}
 #' @references Eilers, P.H.C. 2004.
-#' \href{https://pubs.acs.org/doi/10.1021/ac034800eParametric Time Warping.}
+#' \href{https://pubs.acs.org/doi/10.1021/ac034800e}{Parametric Time Warping.}
 #' \emph{Anal. Chem.} \bold{76}:404-411.
-#' 
 #' Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015.
-#' \href{https://academic.oup.com/bioinformatics/article/31/18/3063/240579Fast
+#' \href{https://academic.oup.com/bioinformatics/article/31/18/3063/240579}{Fast
 #' parametric time warping of peak lists.} \emph{Bioinformatics}
 #' \bold{31}:3063-3065.
 #' @keywords manip
@@ -55,13 +55,13 @@ correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best', 
     allmats <- sapply(chrom_list, function(x) x[,lambdas], simplify = "array")
     allmats.t <- sapply(chrom_list, function(x) t(x[,lambdas]), simplify = "array")
     if (is.null(n.traces)){
-      traces=lambdas
+      traces <- lambdas
     } else{
       traces <- select.traces(X=allmats.t, criterion='coda')
       traces <- traces$trace.nrs[1:n.traces]
     }
-    if (reference=='best'){
-      best<-bestref(allmats.t)
+    if (reference == 'best'){
+      best <- bestref(allmats.t)
       reference <- as.numeric(names(sort(table(best$best.ref),decreasing=TRUE))[1])
     } else{
       reference <- reference
@@ -87,10 +87,6 @@ correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best', 
     ptwmods
   }
 }
-
-# if (plot_it==T){
-#   sapply(ptwmods$
-# }
 
 correctRT <- function(chrom_list, models=NULL, reference='best', what = c("corrected.values", "models"), 
                       init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, lambdas, scale=T,

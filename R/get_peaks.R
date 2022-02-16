@@ -8,6 +8,7 @@
 #' 
 #' 
 #' @aliases get_peaks getAllPeaks
+#' @importFrom stats median
 #' @param chrom_list A list of profile matrices, each of the same dimensions
 #' (timepoints times wavelengths).
 #' @param lambdas Character vector of wavelengths to find peaks at.
@@ -25,7 +26,6 @@
 #' \url{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}getAllPeaks
 #' function authored by Ron Wehrens.
 #' @author Ethan Bass & Ron Wehrens
-#' @keywords manip
 #' @export get_peaks
 get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"), sd.max=50, max.iter=100, ...){
   fit <- match.arg(fit, c("egh", "gaussian"))
@@ -100,8 +100,9 @@ getAllPeaks <- function (chrom_list, lambdas, max.iter=100,
 #' Function to visually assess accuracy of integration
 #' 
 #' Check integration by overlaying gaussian curves onto chromatogram.
-#' 
-#' 
+#'
+#' @importFrom stats median
+#' @importFrom graphics polygon arrows
 #' @param chrom_list List of chromatograms (retention time x wavelength
 #' matrices)
 #' @param peak_list Output from the \code{findpeaks} function.

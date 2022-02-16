@@ -22,4 +22,3 @@ Chromatograms must be in CSV format.
 \author{
 Ethan Bass
 }
-\keyword{manip}

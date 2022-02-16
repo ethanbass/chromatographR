@@ -6,7 +6,8 @@
 #' the matrix by interpolation. By default, the data are baseline-corrected in
 #' the time direction and smoothed in the spectral dimension.
 #' 
-#' 
+#' @import ptw
+#' @importFrom stats approx smooth.spline
 #' @param X A numerical data matrix, missing values are not allowed. If
 #' rownames or colnames attributes are used, they should be numerical and
 #' signify time points and wavelengths, respectively.
@@ -28,8 +29,7 @@
 #' \code{\link[ptw:baseline.corr]{baseline.corr}}.
 #' @return The function returns the preprocessed data matrix, with rownames and
 #' colnames indicating the time points and wavelengths, respectively.
-#' @author Ron Wehrens
-#' @keywords manip
+#' @author Ron Wehrens, Ethan Bass
 #' @examples
 #' 
 #' data(Sa)

@@ -18,6 +18,11 @@
 #' the cluster is only a very small feature.
 #' 
 #' @aliases get_peaktable getPeakTable
+#' @importFrom dynamicTreeCut cutreeDynamicTree
+#' @importFrom fastcluster hclust
+#' @importFrom stats dist cutree as.dist aggregate
+#' @importFrom lattice panel.stripplot panel.abline stripplot
+#' @importFrom grDevices colorRampPalette 
 #' @param peak_list A nested list of peak tables: the first level is the
 #' sample, and the second level is the component. Every component is described
 #' by a matrix where every row is one peak, and the columns contain information
@@ -143,7 +148,7 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
     }
     if (max(clusCount <- table(file.idx, pkcenters.cl)) > 
         1) 
-      Warning(paste("More than one peak of one injection in the same cluster", 
+      warning(paste("More than one peak of one injection in the same cluster", 
                 paste("for component ", comp, ".", sep = ""), 
                 "Keeping only the most intense one.", "", sep = "\n"))
     allIs <- unlist(lapply(pkLst, function(samp) samp[[comp]][, 

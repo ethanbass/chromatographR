@@ -1,8 +1,3 @@
-# peak finding function adapted from matlab function by Prof. Tom O'Haver
-## (see http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm)
-
-
-
 #' Find peaks in chromatographic profile
 #' 
 #' Find peaks in chromatographic profile.
@@ -10,7 +5,10 @@
 #' Find peaks with function \code{find_peaks} by looking for zero-crossings in
 #' the smoothed first derivative of a signal that exceed a given slope
 #' threshold.
-#' 
+#' @importFrom smoother smth.gaussian
+#' @importFrom minpack.lm nlsLM
+#' @importFrom stats deriv lm
+#' @importFrom utils tail
 #' @param y response (numerical vector)
 #' @param smooth_type Type of smoothing. Defaults to "gaussian".
 #' @param smooth_window Window for smoothing. Defaults to 1.
@@ -23,13 +21,13 @@
 #' centers, expressed as indices.
 #' @note The \code{find_peaks} function is adapted from matlab code in Prof.
 #' Tom O'Haver's
-#' \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htmPragmatic
+#' \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{Pragmatic
 #' Introduction to Signal Processing}.
 #' @author Ethan Bass
 #' @seealso \code{\link{fit_peaks}}, \code{\link{get_peaks}}
 #' @references O'Haver, Tom. Pragmatic Introduction to Signal Processing:
 #' Applications in scientific measurement.
-#' /urlhttps://terpconnect.umd.edu/~toh/spectrum/ (Accessed January, 2022).
+#' /href{https://terpconnect.umd.edu/~toh/spectrum/} (Accessed January, 2022).
 #' @keywords manip
 #' @export find_peaks
 find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_width = 0.1,
@@ -95,9 +93,9 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
 #' to "real" time is done in function \code{get_peaks}.
 #' @note The \code{\link{fit_peaks}} function is adapted from Dr. Robert
 #' Morrison's
-#' \url{https://github.com/robertdouglasmorrison/DuffyTools}DuffyTools package
+#' \href{https://github.com/robertdouglasmorrison/DuffyTools}{DuffyTools package}
 #' as well as code published in Ron Wehrens'
-#' \url{https://github.com/rwehrens/alsace}alsace package.
+#' \href{https://github.com/rwehrens/alsace}{alsace} package.
 #' @author Ethan Bass
 #' @seealso \code{\link{find_peaks}}, \code{\link{get_peaks}}
 #' @references Lan, K. & Jorgenson, J. W. A hybrid of exponential and gaussian
@@ -180,6 +178,8 @@ gaussian <- function( x, center=0, width=1, height=NULL, floor=0) {
   y + floor
 }
 
+#' @importFrom stats coef fitted lm nls.control quantile residuals
+#' @noRd
 
 fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height=NULL,
                          start.floor=NULL, fit.floor=FALSE, max.iter=1000) {
@@ -219,7 +219,6 @@ fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height
   return( out)
 }
 
-
 ###########################################################################################
 ### expontential-gaussian hybrid
 egh <- function(x, center, width,  height, tau, floor=0){
@@ -228,6 +227,9 @@ egh <- function(x, center, width,  height, tau, floor=0){
     result[index] <- height*exp(-(x[index]-center)^2/(2*width^2 + tau*(x[index]-center)))
     return(result)
   }
+
+#' @importFrom stats coef fitted lm nls.control quantile residuals
+#' @noRd
 
 fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL, start.height=NULL,
                     start.floor=NULL, fit.floor=FALSE, max.iter=1000) {
@@ -276,48 +278,4 @@ fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
     out <- c( out, "floor"=floorAns)
   }
   return(out)
-}
-
-#########################
-
-fitpeaks_at_max <- function (mat, pos, w=5, sd.max=50, fit=c("gaussian","egh")){
-  #names(y) <- NULL
-  if(fit=="gaussian"){
-    tabnames <- c("rt", "lambda", "sd", "FWHM", "height", "area")
-    noPeaksMat <- matrix(rep(NA, length(tabnames)), nrow = 1, dimnames = list(NULL, 
-                                                               tabnames))
-    y<-mat[,1]
-    on.edge <- sapply(pos, function(x) y[x + 1] == 0 | y[x - 
-                                                           1] == 0)
-    pos <- pos[!on.edge,]
-    if (length(pos) == 0) 
-      return(noPeaksMat)
-    fitpk <- function(xloc){
-      lambda <- which.max(mat[xloc,])
-      y <- mat[,lambda]
-      peak.loc <- seq.int(xloc-w, xloc+w)
-      m <- fit_gaussian(peak.loc, y[peak.loc])
-      c(m$center, colnames(mat)[lambda], m$width, 2.35*m$width, y[xloc], y[xloc]/dnorm(m$center, m$center, 
-                                                                m$width))
-    }
-  }
-  if(fit=="egh"){
-    tabnames <- c("rt", "lambda","sd","tau", "FWHM", "height", "area")
-    noPeaksMat <- matrix(rep(NA, length(tabnames)), nrow = 1, dimnames = list(NULL, 
-                                                               tabnames))
-    on.edge <- sapply(pos, function(x) y[x + 1] == 0 | y[x - 
-                                                           1] == 0)
-    pos <- pos[!on.edge,]
-    if (length(pos) == 0) 
-      return(noPeaksMat)
-    fitpk <- function(xloc){
-      peak.loc<-seq.int(xloc-w, xloc+w)
-      m <- fit_egh(peak.loc, y[peak.loc])
-      c(m$center, m$width, m$tau, 2.35*m$width, y[xloc], y[xloc]/dnorm(m$center, m$center, 
-                                                                       m$width))
-    }
-  }
-  huhn <- data.frame(t(sapply(pos, fitpk)))
-  colnames(huhn) <- tabnames
-  huhn[huhn$sd<sd.max,]
 }

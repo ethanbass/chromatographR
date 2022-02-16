@@ -11,6 +11,7 @@
 #' 
 #' 
 #' @aliases check_peak compare_spectra
+#' @importFrom graphics par matplot abline legend
 #' @param peak Name of peak to be investigated.
 #' @param peak_table Peak table from \code{\link{getPeakTable}}.
 #' @param chrom_list A list of chromatograms in matrix form (timepoints x

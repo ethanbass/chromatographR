@@ -51,9 +51,9 @@ Area under the fitted curve is estimated using trapezoidal estimation.
 \note{
 The \code{\link{fit_peaks}} function is adapted from Dr. Robert
 Morrison's
-\url{https://github.com/robertdouglasmorrison/DuffyTools}DuffyTools package
+\href{https://github.com/robertdouglasmorrison/DuffyTools}{DuffyTools package}
 as well as code published in Ron Wehrens'
-\url{https://github.com/rwehrens/alsace}alsace package.
+\href{https://github.com/rwehrens/alsace}{alsace} package.
 }
 \references{
 Lan, K. & Jorgenson, J. W. A hybrid of exponential and gaussian

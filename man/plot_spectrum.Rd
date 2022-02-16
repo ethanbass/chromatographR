@@ -70,4 +70,3 @@ column in the peak table represents a single compound.
 \author{
 Ethan Bass
 }
-\keyword{manip}

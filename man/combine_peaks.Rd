@@ -31,4 +31,3 @@ digits to match retention time and minimum spectral correlation for a match.
 \author{
 Ethan Bass
 }
-\keyword{manip}
