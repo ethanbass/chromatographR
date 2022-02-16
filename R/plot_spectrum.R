@@ -36,7 +36,7 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list, chr = 'max', lambda 
     if (verbose){
       print(paste0("chrome no. ", chr, "; RT: ", RT, "; lambda = ", lambda, " nm"))
     if (!is.null(peak_table)){
-    pk <- names(which.min(abs(pkTab["RT",]-RT)))
+    pk <- names(which.min(abs(peak_table["RT",]-RT)))
     print(paste("closest match in peak table is",pk))
     }}
   } else {
