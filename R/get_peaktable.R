@@ -33,7 +33,7 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
     }
     if (clust == 'sp.rt'){
       if (is.null(chrom_list)){
-        return('Error: must provide list of chromatograms for spectral clustering.')
+        stop('Must provide list of chromatograms for spectral clustering.')
       }
       sp <- sapply(1:length(pkcenters), function(i){
         rescale(t(chrom_list[[file.idx[i]]][pkcenters[i],]))
@@ -63,7 +63,7 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
       mycols <- myPalette(length(cl.centers))
       cl.df <- data.frame(peaks = pkcenters, files = factor(file.idx), 
                           cluster = pkcenters.cl)
-      print(stripplot(files ~ peaks, data = cl.df, col = mycols[pkcenters.cl], 
+      message(stripplot(files ~ peaks, data = cl.df, col = mycols[pkcenters.cl], 
                       pch = pkcenters.cl%%14, xlab = "Retention time", 
                       ylab = "", main = paste("Component", comp), panel = function(...) {
                         panel.stripplot(...)
@@ -72,7 +72,7 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
     }
     if (max(clusCount <- table(file.idx, pkcenters.cl)) > 
         1) 
-      cat(paste("Warning!", "More than one peak of one injection in the same cluster", 
+      Warning(paste("More than one peak of one injection in the same cluster", 
                 paste("for component ", comp, ".", sep = ""), 
                 "Keeping only the most intense one.", "", sep = "\n"))
     allIs <- unlist(lapply(pkLst, function(samp) samp[[comp]][, 
@@ -128,7 +128,7 @@ getPeakTable <- function(peak_list, chrom_list = NULL, response = c("area", "hei
     }
     if (clust == 'sp.rt'){
       if (is.null(chrom_list)){
-        return('Error: must provide list of chromatograms for spectral clustering.')
+        stop('Must provide list of chromatograms for spectral clustering.')
       }
       sp <- sapply(1:length(pkcenters), function(i){
         scales::rescale(t(chrom_list[[file.idx[i]]][pkcenters[i],]))
@@ -158,7 +158,7 @@ getPeakTable <- function(peak_list, chrom_list = NULL, response = c("area", "hei
       mycols <- myPalette(length(cl.centers))
       cl.df <- data.frame(peaks = pkcenters, files = factor(file.idx), 
                           cluster = pkcenters.cl)
-      print(stripplot(files ~ peaks, data = cl.df, col = mycols[pkcenters.cl], 
+      message(stripplot(files ~ peaks, data = cl.df, col = mycols[pkcenters.cl], 
                       pch = pkcenters.cl%%14, xlab = "Retention time", 
                       ylab = "", main = paste("Component", comp), panel = function(...) {
                         panel.stripplot(...)
@@ -167,7 +167,7 @@ getPeakTable <- function(peak_list, chrom_list = NULL, response = c("area", "hei
     }
     if (max(clusCount <- table(file.idx, pkcenters.cl)) > 
         1) 
-      cat(paste("Warning!", "More than one peak of one injection in the same cluster", 
+      warning(paste("More than one peak of one injection in the same cluster", 
                 paste("for component ", comp, ".", sep = ""), 
                 "Keeping only the most intense one.", "", sep = "\n"))
     allIs <- unlist(lapply(pkLst, function(samp) samp[[comp]][, 
