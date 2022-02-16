@@ -33,7 +33,7 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
     }
     if (clust == 'sp.rt'){
       if (is.null(chrom_list)){
-        return('Error: must provide list of chromatograms for spectral clustering.')
+        stop('Must provide list of chromatograms for spectral clustering.')
       }
       sp <- sapply(1:length(pkcenters), function(i){
         rescale(t(chrom_list[[file.idx[i]]][pkcenters[i],]))
@@ -128,7 +128,7 @@ getPeakTable <- function(peak_list, chrom_list = NULL, response = c("area", "hei
     }
     if (clust == 'sp.rt'){
       if (is.null(chrom_list)){
-        return('Error: must provide list of chromatograms for spectral clustering.')
+        stop(Must provide list of chromatograms for spectral clustering.')
       }
       sp <- sapply(1:length(pkcenters), function(i){
         scales::rescale(t(chrom_list[[file.idx[i]]][pkcenters[i],]))
