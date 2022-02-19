@@ -83,7 +83,7 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
   response <- match.arg(response, c("area", "height"))
   clust <- match.arg(clust, c("rt","sp.rt"))
   out <- match.arg(out, c('data.frame', 'matrix'))
-  rt <- match.arg(use.cor, c("rt.cor", "rt"))
+  rt <- ifelse(use.cor, "rt.cor", "rt")
   ncomp <- length(peak_list[[1]]) ## all elements should have the same length
   if (plotIt) {
     opar <- par(ask = ask, no.readonly = TRUE)
