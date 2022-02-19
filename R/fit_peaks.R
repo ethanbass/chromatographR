@@ -104,7 +104,6 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
 #' Naish, P. J. & Hartwell, S. Exponentially Modified Gaussian functions - A
 #' good model for chromatographic peaks in isocratic HPLC? Chromatographia 26,
 #' 285-296 (1988).
-#' @keywords manip
 #' @export fit_peaks
 fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian"), max.iter = 1000){
   fit <- match.arg(fit, c("egh", "gaussian"))
@@ -112,8 +111,8 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian"), max.iter
     tabnames <- c("rt", "start", "end", "sd", "FWHM", "height", "area", "r-squared")
     noPeaksMat <- matrix(rep(NA, length(tabnames)), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
-    on.edge <- sapply(pos$pos, function(x) y[x + 1] == 0 |
-                        y[x - 1] == 0)
+    on.edge <- sapply(pos$pos, function(x) is.na(y[x + 1]) |
+                        is.na(y[x - 1]))
     pos <- pos[!on.edge,]
     if (nrow(pos) == 0) 
       return(noPeaksMat)
@@ -133,8 +132,8 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian"), max.iter
                   "r.squared")
     noPeaksMat <- matrix(rep(NA, length(tabnames)), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
-    on.edge <- sapply(pos$pos, function(x) y[x + 1] == 0 |
-                        y[x - 1] == 0)
+    on.edge <- sapply(pos$pos, function(x) is.na(y[x + 1]) |
+                        is.na(y[x - 1]))
     pos <- pos[!on.edge,]
     if (nrow(pos) == 0) 
       return(noPeaksMat)
