@@ -11,7 +11,7 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-#devtools::install_github("ethanbass/chromatographR")
+devtools::install_github("ethanbass/chromatographR")
 require("knitr", quietly=TRUE)
 require(chromatographR)
 opts_chunk$set(prompt = TRUE, highlight = FALSE, comment=NA, 
@@ -155,8 +155,8 @@ plot_peaks(chrom_list = warp, peak_list = pks_egh, index=1, lambda='210')
 ```
 
 ```{r, get_peaktable}
-pkTab <- get_peaktable(pks_egh, response = "area")
-head(pkTab[,1:6])
+pk_tab <- get_peaktable(pks_egh, response = "area")
+head(pk_tab[,1:6])
 ```
 
 ### Additional useful tools
@@ -168,17 +168,17 @@ The `plot_spectrum` function allows you to easily plot or record the spectra ass
 ```{r, plot spectra,fig.height=6}
 par(mfrow=c(2,1))
 peak="X35"
-plot_spectrum(peak, peak_table=pkTab, chrom_list = warp)
+plot_spectrum(peak, peak_table=pk_tab, chrom_list = warp)
 
 peak="X77"
-plot_spectrum(peak, peak_table=pkTab, chrom_list = warp)
+plot_spectrum(peak, peak_table=pk_tab, chrom_list = warp)
 ```
 
 The `plot_all_spectra` function can be used to visually compare peaks at a given column of the peak table to confirm that they match.
 
 ```{r, plot_all}
 peak="X77"
-plot_all_spectra(peak, peak_table=pkTab, chrom_list = warp, export=F, overlapping=T)
+plot_all_spectra(peak, peak_table=pk_tab, chrom_list = warp, export=F, overlapping=T)
 ```
 
 #### Clustering peaks by spectral similarity
@@ -186,7 +186,7 @@ plot_all_spectra(peak, peak_table=pkTab, chrom_list = warp, export=F, overlappin
 The `cluster_spectra` function groups peaks according to their spectral similarity, using hierarchical clustering, as implemented in the *pvclust* R package [@suzuki2006]. The function returns a list of clusters, along with a p-value for each cluster, calculated through multi-scale bootstrap resampling. These clusters may be useful in downstream analyses (i.e. for loosely grouping peaks by chemical class). For actual use, the number of bootstraps (`nboot`) should be set higher (probably at least 1000, or even 10,000 as recommended by the developers of `pvclust`). There may be some redundancy in the clusters that are returned, or some of the clusters may not correspond to a single chromophore. We recommend that users visually inspect clusters before conducting further analysis in order to remove redundant or unwanted clusters. (This clustering will tend to return better results when applied to data sets with more chromatograms).
 
 ```{r, cluster}
-cl1 <- cluster_spectra(pkTab, warp, nboot=100, max.only = F,save = F)
+cl1 <- cluster_spectra(pk_tab, warp, nboot=100, max.only = F,save = F)
 ```
 
 ## References
