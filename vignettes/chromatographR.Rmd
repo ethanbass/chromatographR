@@ -11,7 +11,7 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-#devtools::install_github("ethanbass/chromatographR")
+devtools::install_github("ethanbass/chromatographR", ref = "roxygenize")
 require("knitr", quietly=TRUE)
 require(chromatographR)
 opts_chunk$set(prompt = TRUE, highlight = FALSE, comment=NA, 
@@ -168,16 +168,16 @@ The `plot_spectrum` function allows you to easily plot or record the spectra ass
 ```{r, plot spectra,fig.height=6}
 par(mfrow=c(2,1))
 peak="X35"
-plot_spectrum(peak, peak_table=pkTab, chrom_list = warp)
+plot_spectrum(peak, peak_table=pkTab, chrom_list = warp,chr=5)
 
-peak="X77"
-plot_spectrum(peak, peak_table=pkTab, chrom_list = warp)
+peak="X14"
+plot_spectrum(peak, peak_table=pkTab, chrom_list = warp,chr=5)
 ```
 
 The `plot_all_spectra` function can be used to visually compare peaks at a given column of the peak table to confirm that they match.
 
 ```{r, plot_all}
-peak="X77"
+peak="X14"
 plot_all_spectra(peak, peak_table=pkTab, chrom_list = warp, export=F, overlapping=T)
 ```
 
