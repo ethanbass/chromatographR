@@ -10,13 +10,13 @@
 #' @importFrom stats deriv lm
 #' @importFrom utils tail
 #' @param y response (numerical vector)
-#' @param smooth_type Type of smoothing. Defaults to "gaussian".
-#' @param smooth_window Window for smoothing. Defaults to 1.
-#' @param smooth_width Width for smoothing. Defaults to 0.1
-#' @param slope_thresh Minimum threshold for peak slope. Defaults to 0.05
-#' @param amp_thresh Minimum threshold for peak amplitude. Defaults to 0.
-#' @param bounds Logical. If TRUE, includes boundaries of peak in dataframe.
-#' Defaults to TRUE.
+#' @param smooth_type Type of smoothing. (Defaults to "gaussian").
+#' @param smooth_window Window for smoothing. (Defaults to 1).
+#' @param smooth_width Width for smoothing. (Defaults to 0.1).
+#' @param slope_thresh Minimum threshold for peak slope. (Defaults to 0.05).
+#' @param amp_thresh Minimum threshold for peak amplitude. (Defaults to 0).
+#' @param bounds Logical. If TRUE, includes peak boundaries in dataframe.
+#' (Defaults to TRUE).
 #' @return Function \code{find_peaks} simply returns the locations of the peak
 #' centers, expressed as indices.
 #' @note The \code{find_peaks} function is adapted from matlab code in Prof.
@@ -28,26 +28,25 @@
 #' @references O'Haver, Tom. Pragmatic Introduction to Signal Processing:
 #' Applications in scientific measurement.
 #' /href{https://terpconnect.umd.edu/~toh/spectrum/} (Accessed January, 2022).
-#' @keywords manip
 #' @export find_peaks
 find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_width = 0.1,
-                               slope_thresh=.05, amp_thresh=0, bounds=T){
+                               slope_thresh=.05, amp_thresh=0, bounds=TRUE){
   #compute derivative (with or without smoothing)
   if (smooth_type=='gaussian'){
     d <- smth.gaussian(diff(y),window = smooth_window, alpha=smooth_width)
   } else{
-    d=deriv(y)
+    d <- deriv(y)
   }
-  p1 <- which(sign(d[1:(length(d)-1)])>sign(d[2:length(d)])) # detects zero-crossing of first derivative (peak apex)
+  p1 <- which(sign(d[1:(length(d)-1)]) > sign(d[2:length(d)])) # detects zero-crossing of first derivative (peak apex)
   p2 <- which(abs(diff(d)) > slope_thresh) # detects second derivative exceeding slope threshold
   p3 <- which(y > amp_thresh) # detects y-vals exceeding amplitude threshold
   p <- intersect(intersect(p1,p2), p3)
-  if (bounds==T){
+  if (bounds){
     p4 <- which(sign(d[1:(length(d)-1)]) < sign(d[2:length(d)]))
     bl <- sapply(p, function(v) max(p4[p4 < v])) # lower bound
-    bl[which(bl == -Inf)]<-0
-    bu <- sapply(p,function(v) min(p4[p4 > v])) # upper bound
-    bu[which(bu==Inf)] <- length(y)
+    bl[which(bl == -Inf)] <- 0
+    bu <- sapply(p, function(v) min(p4[p4 > v])) # upper bound
+    bu[which(bu == Inf)] <- length(y)
     data.frame(pos=p, lower=bl, upper=bu)
   } else 
   p
@@ -78,11 +77,11 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
 #' @param fit Function for peak fitting. (Currently "gaussian" and exponential
 #' gaussian hybrid ("egh") are supported. Defaults to egh.)
 #' @param max.iter Maximum number of iterations to use in nonlinear least
-#' squares peak-fitting. Defaults to 1000.
+#' squares peak-fitting. (Defaults to 1000).
 #' @return Function \code{fit_peaks} returns a matrix, whose columns contain
 #' the following information: \item{rt}{location of the maximum of the peak
-#' (x)} \item{start}{start of peak (only included in table if `bounds==T`)}
-#' \item{end}{end of peak (only included in table if `bounds==T`)}
+#' (x)} \item{start}{start of peak (only included in table if `bounds==TRUE`)}
+#' \item{end}{end of peak (only included in table if `bounds==TRUE`)}
 #' \item{sd}{width of the peak (x)} \item{tau}{tau parameter (only included in
 #' table if `fit=="egh"`)} \item{FWHM}{full width at half maximum (x)}
 #' \item{height}{height of the peak (y)} \item{area}{peak area}
@@ -124,7 +123,6 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian"), max.iter
       m <- fit_gaussian(peak.loc, y[peak.loc], start.center = xloc, 
                         start.height = y[xloc], max.iter = max.iter)
       area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
-      # area <- y[xloc]/dnorm(m$center, m$center, m$width)
       r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=T)
       c("rt" = m$center, "start" = pos[2], "end" = pos[3], "sd" = m$width, "FWHM" = 2.35 * m$width,
         "height" = y[xloc], "area" = area, "r.squared" = r.squared)
@@ -163,7 +161,7 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian"), max.iter
 ### gaussian
 ## from https://github.com/robertdouglasmorrison/DuffyTools/blob/master/R/gaussian.R
 
-gaussian <- function( x, center=0, width=1, height=NULL, floor=0) {
+gaussian <- function(x, center=0, width=1, height=NULL, floor=0) {
   
   # adapted from Earl F. Glynn;  Stowers Institute for Medical Research, 2007
   twoVar <- 2 * width * width

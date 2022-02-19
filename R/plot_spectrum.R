@@ -23,12 +23,12 @@
 #' lambda. Defaults to TRUE.
 #' @param spectrum_labels Logical. If TRUE, plots labels on maxima in spectral
 #' plot. Defaults to TRUE.
-#' @param verbose Logical. If TRUE, prints verbose output to console. Defaults
-#' to TRUE.
 #' @param scale_spectrum Logical. If TRUE, scales spectrum to unit height.
 #' Defaults to FALSE.
 #' @param export_spectrum Logical. If TRUE, exports spectrum to console.
 #' Defaults to FALSE.
+#' @param verbose Logical. If TRUE, prints verbose output to console. Defaults
+#' to TRUE.
 #' @param what What to look for. Either "peak" to extract spectral information
 #' for a certain peak, "rt" to scan by retention time, or "click" to manually
 #' select retention time by clicking on the chromatogram. Defaults to "peak"
@@ -36,24 +36,27 @@
 #' @param ... Additional arguments.
 #' @author Ethan Bass
 #' @export plot_spectrum
-plot_spectrum <- function(loc, peak_table=NULL, chrom_list, chr = 'max', lambda = 'max',
-                          plot_spectrum = T, plot_trace = T, export_spectrum=FALSE,
-                          spectrum_labels=T, verbose=T, scale_spectrum=F, what=c("peak", "rt", "click"), ...){
+plot_spectrum <- function(loc, peak_table=NULL, chrom_list,
+                          chr = 'max', lambda = 'max',
+                          plot_spectrum = TRUE, plot_trace = TRUE,
+                          spectrum_labels=TRUE, scale_spectrum=FALSE,
+                          export_spectrum=FALSE, verbose=TRUE, 
+                          what=c("peak", "rt", "click"), ...){
   what <- match.arg(what, c("peak", "rt", "click"))
-  if (what=="peak"){
+  if (what == "peak"){
     if(is.null(peak_table)){
       stop("Peak table is required to locate peak spectrum.")}
     if (!(loc %in% colnames(peak_table))){
       stop(paste0("No match found for peak \'", loc, "\' in peak table."))}
   }
-  if (what=="rt" & chr=="max"){
+  if (what == "rt" & chr == "max"){
     stop("Must specify chromatogram for scan function.")}
   if (what=="click" & (!is.numeric(chr) | !(lambda %in% new.lambdas))){
       stop("Chromatogram ('chr') and wavelength ('lambda') must be specified for manual selection.")}
   new.ts <- as.numeric(rownames(chrom_list[[1]]))
   new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
   sig <- max(sapply(strsplit(rownames(chrom_list[[1]]),".",fixed=T),function(x) nchar(x[2])),na.rm=T)
-  if (what=="click"){
+  if (what == "click"){
     y<-chrom_list[[chr]][,lambda]
     matplot(x=new.ts, y=y, type='l', ylab='', xlab='')
     print("click trace to select timepoint")
@@ -61,7 +64,7 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list, chr = 'max', lambda 
     RT <- new.ts[t]
     abline(v=RT,col='red',lty=3)
     title(paste0("\n\n chr ", chr,  " ;   rt: ", RT, " ;  abs: ", round(y[t],1)))
-    y=chrom_list[[chr]][t,]
+    y <- chrom_list[[chr]][t,]
     # closest match
     if (verbose){
       print(paste0("chrome no. ", chr, "; RT: ", RT, "; lambda = ", lambda, " nm"))
@@ -70,7 +73,7 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list, chr = 'max', lambda 
     print(paste("closest match in peak table is",pk))
     }}
   } else {
-    if (what=="peak"){
+    if (what == "peak"){
     RT <- round(peak_table['RT',loc], sig)
     peak_table<-peak_table[4:(nrow(peak_table)-3),]
     } else if (what=="rt"){
@@ -80,9 +83,9 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list, chr = 'max', lambda 
     if (chr == 'max'){
       chr <- which.max(peak_table[,loc])
     }
-    y=chrom_list[[chr]][t,]
+    y <- chrom_list[[chr]][t,]
     if (lambda == 'max'){
-      lambda = names(which.max(y))
+      lambda <- names(which.max(y))
     } else lambda <- as.character(lambda)
     if (plot_trace){
       matplot(x=new.ts, y=chrom_list[[chr]][,lambda],type='l',
@@ -95,15 +98,15 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list, chr = 'max', lambda 
       }
     }
   }
-  if (scale_spectrum == T){
+  if (scale_spectrum){
     y<-rescale(y)
   }
-  if (plot_spectrum == T){
+  if (plot_spectrum){
     matplot(x=new.lambdas, y=y, type='l',
             #main=paste(peak, '\n', names(chrom_list)[chr], ';','\n', 'RT = ', RT, 'mins','; ',chr),
             ylab = 'Intensity', xlab = 'Wavelength (nm)',
             ylim=c(0,max(y)*1.2), ...)
-    if (spectrum_labels == T){
+    if (spectrum_labels){
       pks <- find_peaks(y,slope_thresh=.00001, bounds=F)
       if (length(pks)>0){
       pks <- data.frame(names(y)[pks], y[pks],stringsAsFactors = F)
@@ -144,17 +147,18 @@ elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
 #' @seealso \code{\link{plot_spectrum}}
 #' @export plot_all_spectra
 plot_all_spectra <- function(peak, peak_table, chrom_list, plot_spectrum = T,
-                             export_spectrum=T, scale_spectrum=T, overlapping=T, verbose=F, ...){
+                             export_spectrum=TRUE, scale_spectrum=TRUE,
+                             overlapping=TRUE, verbose=FALSE, ...){
   new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
-  sp <- sapply(1:length(chrom_list), function(chr){
+  sp <- sapply(seq_along(chrom_list), function(chr){
     plot_spectrum(loc=peak, peak_table=peak_table, chrom_list=chrom_list, chr=chr,
                   plot_spectrum=F, plot_trace=F, export_spectrum = T,
                   scale_spectrum=scale_spectrum, verbose=verbose, what="peak")
   })
   sp<-do.call(cbind, sp)
   colnames(sp) <- names(chrom_list)
-  if (plot_spectrum==T){
-    if(overlapping==T){
+  if (plot_spectrum){
+    if(overlapping){
       matplot(new.lambdas, sp, type='l', xlab='wavelength', ylab='intensity',las=2)
     } else{
       apply(sp, 2,function(spp){
@@ -162,7 +166,7 @@ plot_all_spectra <- function(peak, peak_table, chrom_list, plot_spectrum = T,
       })
   }
   }
-  if(export_spectrum==T){
+  if(export_spectrum){
     sp
   }
 }

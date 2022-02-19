@@ -62,8 +62,8 @@ preprocess <- function(X,
       stop("X should be a matrix!")
   
   ## possibly resize matrix to a lower dimension - faster, noise averaging
-  if (length(tpoints <- as.numeric(rownames(X))) == 0) tpoints <- 1:nrow(X)
-  if (length(lambdas <- as.numeric(colnames(X))) == 0) lambdas <- 1:ncol(X)
+  if (length(tpoints <- as.numeric(rownames(X))) == 0) tpoints <- seq_len(nrow(X))
+  if (length(lambdas <- as.numeric(colnames(X))) == 0) lambdas <- seq_len(ncol(X))
 
   if (min(dim1) < min(tpoints) |
       max(dim1) > max(tpoints))

@@ -10,12 +10,12 @@ plot_spectrum(
   chrom_list,
   chr = "max",
   lambda = "max",
-  plot_spectrum = T,
-  plot_trace = T,
+  plot_spectrum = TRUE,
+  plot_trace = TRUE,
+  spectrum_labels = TRUE,
+  scale_spectrum = FALSE,
   export_spectrum = FALSE,
-  spectrum_labels = T,
-  verbose = T,
-  scale_spectrum = F,
+  verbose = TRUE,
   what = c("peak", "rt", "click"),
   ...
 )
@@ -43,17 +43,17 @@ peak. Defaults to TRUE.}
 \item{plot_trace}{Logical. If TRUE, plots the trace of the chosen peak at
 lambda. Defaults to TRUE.}
 
-\item{export_spectrum}{Logical. If TRUE, exports spectrum to console.
-Defaults to FALSE.}
-
 \item{spectrum_labels}{Logical. If TRUE, plots labels on maxima in spectral
 plot. Defaults to TRUE.}
 
-\item{verbose}{Logical. If TRUE, prints verbose output to console. Defaults
-to TRUE.}
-
 \item{scale_spectrum}{Logical. If TRUE, scales spectrum to unit height.
 Defaults to FALSE.}
+
+\item{export_spectrum}{Logical. If TRUE, exports spectrum to console.
+Defaults to FALSE.}
+
+\item{verbose}{Logical. If TRUE, prints verbose output to console. Defaults
+to TRUE.}
 
 \item{what}{What to look for. Either "peak" to extract spectral information
 for a certain peak, "rt" to scan by retention time, or "click" to manually

@@ -15,7 +15,7 @@ correct_rt(
   init.coef = c(0, 1, 0),
   n.traces = NULL,
   n.zeros = 0,
-  scale = T,
+  scale = TRUE,
   trwdth = 200,
   ...
 )
@@ -68,4 +68,3 @@ parametric time warping of peak lists.} \emph{Bioinformatics}
 \author{
 Ron Wehrens, Ethan Bass
 }
-\keyword{manip}

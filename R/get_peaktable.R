@@ -83,7 +83,7 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
   response <- match.arg(response, c("area", "height"))
   clust <- match.arg(clust, c("rt","sp.rt"))
   out <- match.arg(out, c('data.frame', 'matrix'))
-  rt <- ifelse(use.cor, "rt.cor", "rt")
+  rt <- match.arg(use.cor, c("rt.cor", "rt"))
   ncomp <- length(peak_list[[1]]) ## all elements should have the same length
   if (plotIt) {
     opar <- par(ask = ask, no.readonly = TRUE)
@@ -111,19 +111,19 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
       if (is.null(chrom_list)){
         stop("Must provide list of chromatograms for spectral clustering.")
       }
-      sp <- sapply(1:length(pkcenters), function(i){
+      sp <- sapply(seq_along(pkcenters), function(i){
         rescale(t(chrom_list[[file.idx[i]]][pkcenters[i],]))
       }, simplify=T)
       c <- cor(sp,sp,method = "pearson")
       mint <- abs(outer(unlist(pkcenters),unlist(pkcenters), FUN="-"))
-      S<-exp((-(1-abs(c))^2)/(2*sigma.r^2))*exp(-(mint^2)/2*sigma.t^2)
-      D<-1-S
-      linkage = "average"
+      S <- exp((-(1-abs(c))^2)/(2*sigma.r^2))*exp(-(mint^2)/2*sigma.t^2)
+      D <- 1-S
+      linkage <- "average"
     
       pkcenters.hcl <- hclust(as.dist(D), method = linkage)
       pkcenters.cl <- cutreeDynamicTree(pkcenters.hcl, maxTreeHeight = hmax, deepSplit = deepSplit, minModuleSize = 2)
       sing <- which(pkcenters.cl == 0)
-      pkcenters.cl[sing] <- max(pkcenters.cl) + 1:length(sing)
+      pkcenters.cl[sing] <- max(pkcenters.cl) + seq_along(sing)
     }
     cl.centers <- aggregate(pkcenters, list(pkcenters.cl), 
                             "mean")[, 2]
@@ -206,19 +206,19 @@ getPeakTable <- function(peak_list, chrom_list = NULL, response = c("area", "hei
       if (is.null(chrom_list)){
         stop('Must provide list of chromatograms for spectral clustering.')
       }
-      sp <- sapply(1:length(pkcenters), function(i){
+      sp <- sapply(seq_along(pkcenters), function(i){
         scales::rescale(t(chrom_list[[file.idx[i]]][pkcenters[i],]))
       }, simplify=T)
       c <- cor(sp,sp,method = "pearson")
       mint <- abs(outer(unlist(pkcenters),unlist(pkcenters), FUN="-"))
-      S<-exp((-(1-abs(c))^2)/(2*sigma.r^2))*exp(-(mint^2)/2*sigma.t^2)
-      D<-1-S
-      linkage = "average"
+      S <- exp((-(1-abs(c))^2)/(2*sigma.r^2))*exp(-(mint^2)/2*sigma.t^2)
+      D <- 1-S
+      linkage <- "average"
       
       pkcenters.hcl <- hclust(as.dist(D), method = linkage)
       pkcenters.cl <- cutreeDynamicTree(pkcenters.hcl, maxTreeHeight = hmax, deepSplit = deepSplit, minModuleSize = 2)
       sing <- which(pkcenters.cl == 0)
-      pkcenters.cl[sing] <- max(pkcenters.cl) + 1:length(sing)
+      pkcenters.cl[sing] <- max(pkcenters.cl) + seq_along(sing)
     }
     cl.centers <- aggregate(pkcenters, list(pkcenters.cl), 
                             "mean")[, 2]

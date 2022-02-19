@@ -11,7 +11,7 @@ find_peaks(
   smooth_width = 0.1,
   slope_thresh = 0.05,
   amp_thresh = 0,
-  bounds = T
+  bounds = TRUE
 )
 }
 \arguments{

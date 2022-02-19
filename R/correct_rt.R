@@ -30,10 +30,10 @@
 #' \href{https://academic.oup.com/bioinformatics/article/31/18/3063/240579}{Fast
 #' parametric time warping of peak lists.} \emph{Bioinformatics}
 #' \bold{31}:3063-3065.
-#' @keywords manip
 #' @export correct_rt
+
 correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best', what = c("models", "corrected.values"), 
-                       init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, scale=T,
+                       init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, scale=TRUE,
                        trwdth=200, ...){
   what <- match.arg(what, c("models", "corrected.values"))
   if (is.null(models)){
@@ -41,16 +41,16 @@ correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best', 
       stop("Must specify 'lambdas' (wavelengths) or 'n.traces' (number of traces) to use for alignment.")
     }
     if (is.null(lambdas)){
-      lambdas=colnames(chrom_list[[1]])
+      lambdas <- colnames(chrom_list[[1]])
     }
-    lambdas<-as.character(lambdas)
+    lambdas <- as.character(lambdas)
     if (n.zeros > 0){
     chrom_list <- lapply(chrom_list,function(x){
       apply(x, 2, padzeros, nzeros=n.zeros, side='both')
     })
     }
     if (scale){
-      chrom_list<-lapply(chrom_list, rescale)
+      chrom_list <- lapply(chrom_list, rescale)
     }
     allmats <- sapply(chrom_list, function(x) x[,lambdas], simplify = "array")
     allmats.t <- sapply(chrom_list, function(x) t(x[,lambdas]), simplify = "array")
@@ -80,7 +80,7 @@ correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best', 
   }
   if (what == "corrected.values" || !is.null(models)) {
     result <- lapply(ptwmods, function(x) t(x$warped.sample))
-    for (i in 1:length(result)) rownames(result[[i]]) <- rownames(chrom_list[[i]])
+    for (i in seq_along(result)) rownames(result[[i]]) <- rownames(chrom_list[[i]])
     names(result) <- names(chrom_list)
     result
   } else {
@@ -89,8 +89,8 @@ correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best', 
 }
 
 correctRT <- function(chrom_list, models=NULL, reference='best', what = c("corrected.values", "models"), 
-                      init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, lambdas, scale=T,
-                      trwdth=200, plot_it=T, ...){
+                      init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, lambdas, scale=TRUE,
+                      trwdth=200, plot_it=TRUE, ...){
   msg<-"The function `correctRT` is deprecated. Please use `correct_rt` instead"
   .Deprecated(correct_rt, package="chromatographR", msg,
               old = as.character(sys.call(sys.parent()))[1L])
@@ -105,7 +105,7 @@ correctRT <- function(chrom_list, models=NULL, reference='best', what = c("corre
   allmats <- sapply(chrom_list, function(x)x[,lambdas], simplify = "array")
   allmats.t <- sapply(chrom_list, function(x) t(x[,lambdas]), simplify = "array")
   if (is.null(n.traces)){
-    traces=lambdas
+    traces <- lambdas
   } else{
     traces <- select.traces(X=allmats.t,criterion='coda')
     traces <- traces$trace.nrs[1:n.traces]
@@ -130,7 +130,7 @@ correctRT <- function(chrom_list, models=NULL, reference='best', what = c("corre
   }
   if (what == "corrected.values" || !is.null(models)) {
     result <- lapply(ptwmods, function(x) t(x$warped.sample))
-    for (i in 1:length(result)) dimnames(result[[i]])[[1]] <- dimnames(chrom_list[[i]])[[1]]
+    for (i in seq_along(result)) dimnames(result[[i]])[[1]] <- dimnames(chrom_list[[i]])[[1]]
     names(result) <- names(chrom_list)
     result
   } else {
@@ -152,7 +152,7 @@ correctRT5 <- function(chrom_list, warpings, reference=1, ...){
         try=TRUE, warp.type = "global")})
   
   result <- lapply(ptwmods, function(x) t(x$warped.sample))
-  for (i in 1:length(result)) dimnames(result[[i]])[[1]] <- dimnames(chrom_list[[i]])[[1]]
+  for (i in seq_along(result)) dimnames(result[[i]])[[1]] <- dimnames(chrom_list[[i]])[[1]]
   names(result) <- names(chrom_list)
   result
 }

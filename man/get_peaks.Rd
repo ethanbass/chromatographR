@@ -45,7 +45,7 @@ and at the given positions a gaussian curve is fit (function
 }
 \note{
 Function is adapted from the
-\url{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}getAllPeaks
+\url{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks}
 function authored by Ron Wehrens.
 }
 \author{

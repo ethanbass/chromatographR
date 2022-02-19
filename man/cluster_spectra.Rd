@@ -11,11 +11,11 @@ cluster_spectra(
   alpha = 0.95,
   nboot = 1000,
   plot_dend = T,
-  plot_spectra = T,
-  verbose = T,
-  save = T,
-  parallel = T,
-  max.only = F,
+  plot_spectra = TRUE,
+  verbose = TRUE,
+  save = TRUE,
+  parallel = TRUE,
+  max.only = FALSE,
   ...
 )
 }
@@ -67,6 +67,9 @@ correlation matrix, as implemented in the
 \code{\link[pvclust:pvclust]{pvclust}} package. Bootstrap values can be used
 to select clusters that exceed a certain confidence threshold as defined by
 alpha.
+}
+\examples{
+cluster_spectra(pk_tab, warp, nboot=100, max.only = F,save = F)
 }
 \references{
 R. Suzuki, H. Shimodaira: Pvclust: an R package for assessing

@@ -23,10 +23,11 @@
 #' components. Note that this function presents the "rt", "sd" and "FWHM"
 #' fields in real time units.
 #' @note Function is adapted from the
-#' \url{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}getAllPeaks
+#' \url{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks}
 #' function authored by Ron Wehrens.
 #' @author Ethan Bass & Ron Wehrens
 #' @export get_peaks
+
 get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"), sd.max=50, max.iter=100, ...){
   fit <- match.arg(fit, c("egh", "gaussian"))
   if (is.numeric(lambdas)){
@@ -36,8 +37,8 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"), sd.max=5
   chrom_list <- lapply(chrom_list, function(c_mat) c_mat[,lambdas, drop=F])
   peak_positions <- lapply(chrom_list, function(c_mat){
     apply(c_mat, 2, function(x) find_peaks(x, ...))})
-  result <- lapply(1:length(chrom_list), function(smpl){
-    ptable <- lapply(1:length(peak_positions[[smpl]]), function(cmpnd){
+  result <- lapply(seq_along(chrom_list), function(smpl){
+    ptable <- lapply(seq_along(peak_positions[[smpl]]), function(cmpnd){
       fit_peaks(chrom_list[[smpl]][,cmpnd], peak_positions[[smpl]][[cmpnd]], fit=fit, max.iter=max.iter, sd.max=sd.max)
     })
     names(ptable) <- names(peak_positions[[smpl]])
@@ -71,8 +72,8 @@ getAllPeaks <- function (chrom_list, lambdas, max.iter=100,
   chrom_list <- lapply(chrom_list, function(c_mat) c_mat[,lambdas, drop=F])
   peak_positions <- lapply(chrom_list, function(c_mat){
     apply(c_mat, 2, function(x) find_peaks(x, ...))})
-  result <- lapply(1:length(chrom_list), function(smpl){
-    ptable <- lapply(1:length(peak_positions[[smpl]]), function(cmpnd){
+  result <- lapply(seq_along(chrom_list), function(smpl){
+    ptable <- lapply(seq_along(peak_positions[[smpl]]), function(cmpnd){
       fit_peaks(chrom_list[[smpl]][,cmpnd], peak_positions[[smpl]][[cmpnd]], fit=fit, max.iter=max.iter, sd.max=sd.max)
     })
     names(ptable) <- names(peak_positions[[smpl]])
@@ -119,7 +120,7 @@ getAllPeaks <- function (chrom_list, lambdas, max.iter=100,
 #' @keywords manip
 #' @export plot_peaks
 plot_peaks <- function(chrom_list, peak_list, index=1, lambda=NULL,
-                       points=F, ticks=F, a=0.5, cex.points=0.5, ...){
+                       points=FALSE, ticks=FALSE, a=0.5, cex.points=0.5, ...){
   if (is.null(lambda)){
     lambda <- names(peak_list[[1]])[1]
   }
@@ -132,14 +133,14 @@ plot_peaks <- function(chrom_list, peak_list, index=1, lambda=NULL,
   pks <- data.frame(peak_list[[index]][[lambda]])
   fit <- ifelse("tau" %in% colnames(pks), "egh", "gaussian")
   plot(new.ts, y, type='l', xlab='', ylab='', xaxt='n', yaxt='n', ...)
-  if (points==T){
+  if (points){
     points(pks$rt, pks$height, pch=20, cex=cex.points, col='red')
   }
-  if (ticks==T){
+  if (ticks){
     arrows(pks$start, y[which(new.ts %in% pks$start)]-5, pks$start, y[which(new.ts %in% pks$start)]+5, col="blue", length=0)
     arrows(pks$end, y[which(new.ts %in% pks$end)]-5, pks$end, y[which(new.ts %in% pks$end)]+5, col="blue", length=0)
   }
-  for (i in 1:nrow(pks)){
+  for (i in seq_len(nrow(pks))){
     peak.loc<-seq.int((pks$start[i]),(pks$end[i]), by = .01)
       if (fit=="gaussian"){
         yvals <- gaussian(peak.loc, center=pks$rt[i], width=pks$sd[i], height = pks$height[i])

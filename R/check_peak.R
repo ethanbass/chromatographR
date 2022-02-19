@@ -1,7 +1,5 @@
 ## check peak for false 0s, etc.
 
-
-
 #' Function to correct false zeros in peak table.
 #' 
 #' Function that tries to correct false zeroes for a particular peak in the
@@ -35,14 +33,14 @@
 #' entries selected column as defined by the algorithm.
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaks}}
-#' @keywords manip
+
 check_peak <- function(peak, peak_table, chrom_list,
-                            thresh_auto=0.95, thresh_man=NULL, r=100, plot_it=F,
-                            lambda='256', zeros=F, ref='max', order_by = "distance", verbose=T,
-                            plot_diff=T, ...){
+                          thresh_auto=0.95, thresh_man=NULL, r=100, plot_it=FALSE,
+                          lambda='256', zeros=FALSE, ref='max', order_by = "distance",
+                          verbose=T, plot_diff=TRUE, ...){
   par(mfrow=c(2,1))
   if (length(ref)==1){
-    ref = plot_spectrum(peak, peak_table, chrom_list, export_spectrum=T, chr=ref)
+    ref <- plot_spectrum(peak, peak_table, chrom_list, export_spectrum=T, chr=ref)
   }
   ts <- as.numeric(rownames(chrom_list[[1]]))
   lambdas <- as.numeric(colnames(chrom_list[[1]]))
@@ -51,42 +49,43 @@ check_peak <- function(peak, peak_table, chrom_list,
     thresh_man <- thresh_auto
   }
   # if (length(ref>1)){
-  #   ref <- sapply(ref, function(r){plot_spectrum(peak,peak_table,dat.pr,plot_chrom=F,export_spectrum=T,chr=r)[,2]})
+  #   ref <- sapply(ref, function(r){plot_spectrum(peak,peak_table,dat.pr,
+  #   plot_chrom=F,export_spectrum=T,chr=r)[,2]})
   #   #ref1 = plot_spectrum(peak,peak_table,dat.pr,export_spectrum=T,chr=ref)[,2]
   # }
   ref.s <- rescale(ref[,1])
   #ans1 <- readline('accept peak as reference (y/n)?')
-  ans1='y'
-  if (ans1=='y'){
+  ans1 <- 'y'
+  if (ans1 == 'y'){
     RT <- round(peak_table['RT',peak],2)
     time <- which(elementwise.all.equal(RT,ts))+3
-    if(zeros=='T'){
+    if(zeros){
       chrs <- which(peak_table[,peak]==0)-3  
     } else {
-      chrs <- (1:length(chrom_list))
+      chrs <- seq_along(chrom_list)
     }
-    count=0
+    count <- 0
     for (chr in chrs){
-      count=count+1
-      ans='n'
+      count <- count+1
+      ans <- 'n'
       spec <- t(chrom_list[[chr]][c((time-r):(time+r)),])
       spec.s <- rescale(spec)
       cor <- as.numeric(cor(ref.s, spec.s, method='pearson'))
       #cor <- cor(ref.s,spec.s,method='pearson')
       pks <- find_peaks(spec[lambda,])-1
-      pks <- pks[cor[pks] > max(thresh_man,thresh_auto)]
+      pks <- pks[cor[pks] > max(thresh_man, thresh_auto)]
       # pks <- do.call(pmax,data.frame(t(cor[,pks])))
       # do.call(which.max,data.frame(t(cor[,pks])))
       # apply(data.frame(t(cor[,pks])),1,which.max)
       if (length(pks) > 1){
         if (order_by=='height'){
-          pks <- pks[order(spec[lambda,pks],decreasing=T)]}
+          pks <- pks[order(spec[lambda,pks], decreasing=T)]}
         else if (order_by=='distance'){
           pks <- pks[order(abs(c(-r:r)[pks]))]
         }
       }
       for (pk in pks){
-        if (plot_it==T){
+        if (plot_it){
           matplot(c(-r:r), rescale(spec[lambda,]), type='l', 
                   xlab="", ylab='',las=2)
           matplot(c(-r:r), cor, type='l',add=T, lty=2)
@@ -115,7 +114,7 @@ check_peak <- function(peak, peak_table, chrom_list,
                  pch = NA, lty = c(1, 3),
                  col = c(1,4), text.col = c(1,4),cex=0.4,bty='n')
           ans2 <- readline(prompt = "accept this peak as a match (y/n)?")
-          if (ans2=='y'){
+          if (ans2 == 'y'){
             peak_table[(chr+3),peak] <- spec[lambda,pk]
             break
           } # else if (ans2=='n'){
@@ -123,7 +122,7 @@ check_peak <- function(peak, peak_table, chrom_list,
       }
     }
   }
-  if (plot_diff==T){
+  if (plot_diff){
     matplot(4:nrow(peak_table),data.frame(peak_table[-c(1:3),peak],peak_tab_old[-c(1:3),peak]), pch=20, xlab='old',ylab='new')
   }
   return(peak_table)
@@ -132,12 +131,12 @@ check_peak <- function(peak, peak_table, chrom_list,
 ###########
 compare_spectra <- function(peak, peak_table, chrom_list,
                              thresh_auto=0.95, thresh_man=NULL, r=100, plot_it=F,
-                             lambda='256', zeros=F, ref='max', order_by = "distance", verbose=T,
-                            plot_diff=T, ...){
+                             lambda='256', zeros=FALSE, ref='max', order_by = "distance", verbose=TRUE,
+                            plot_diff=TRUE, ...){
   .Deprecated("check_peak", old="compare_spectra")
   par(mfrow=c(2,1))
-  if (length(ref)==1){
-    ref = plot_spectrum(peak, peak_table, chrom_list, export_spectrum=T, chr=ref)
+  if (length(ref) == 1){
+    ref <- plot_spectrum(peak, peak_table, chrom_list, export_spectrum=T, chr=ref)
   }
   ts <- as.numeric(rownames(chrom_list[[1]]))
   lambdas <- as.numeric(colnames(chrom_list[[1]]))
@@ -151,25 +150,25 @@ compare_spectra <- function(peak, peak_table, chrom_list,
   # }
   ref.s <- rescale(ref[,1])
   #ans1 <- readline('accept peak as reference (y/n)?')
-  ans1='y'
-  if (ans1=='y'){
+  ans1 <- 'y'
+  if (ans1 == 'y'){
     RT <- round(peak_table['RT',peak],2)
     time <- which(elementwise.all.equal(RT,ts))+3
-    if(zeros=='T'){
+    if(zeros){
       chrs <- which(peak_table[,peak]==0)-3  
     } else {
-      chrs <- (1:length(chrom_list))
+      chrs <- seq_along(chrom_list)
       }
     #progress_bar = txtProgressBar(min=0, max=length(chrs), style = 1, char="=")
-    count=0
+    count <- 0
     for (chr in chrs){
       #setTxtProgressBar(progress_bar, value = progress_bar$getVal()+1)
-      count=count+1
+      count <- count+1
       # if (length(chrs)%%count){
       #print(count/length(chrs))
       #svMisc::progress(chr, max.value=tail(chrs,1))
       # }
-      ans='n'
+      ans <- 'n'
       spec <- t(chrom_list[[chr]][c((time-r):(time+r)),])
       spec.s <- rescale(spec)
       cor <- as.numeric(cor(ref.s, spec.s, method='pearson'))
@@ -187,7 +186,7 @@ compare_spectra <- function(peak, peak_table, chrom_list,
         }
       }
       for (pk in pks){
-        if (plot_it==T){
+        if (plot_it){
           matplot(c(-r:r), rescale(spec[lambda,]), type='l', 
                   xlab="", ylab='',las=2)
           matplot(c(-r:r), cor, type='l',add=T, lty=2)
@@ -224,7 +223,7 @@ compare_spectra <- function(peak, peak_table, chrom_list,
       }
     }
   }
-  if (plot_diff==T){
+  if (plot_diff){
     matplot(4:nrow(peak_table),data.frame(peak_table[-c(1:3),peak],peak_tab_old[-c(1:3),peak]), pch=20, xlab='old',ylab='new')
   }
   return(peak_table)

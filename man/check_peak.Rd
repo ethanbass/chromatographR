@@ -12,13 +12,13 @@ check_peak(
   thresh_auto = 0.95,
   thresh_man = NULL,
   r = 100,
-  plot_it = F,
+  plot_it = FALSE,
   lambda = "256",
-  zeros = F,
+  zeros = FALSE,
   ref = "max",
   order_by = "distance",
   verbose = T,
-  plot_diff = T,
+  plot_diff = TRUE,
   ...
 )
 }

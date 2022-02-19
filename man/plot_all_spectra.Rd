@@ -9,10 +9,10 @@ plot_all_spectra(
   peak_table,
   chrom_list,
   plot_spectrum = T,
-  export_spectrum = T,
-  scale_spectrum = T,
-  overlapping = T,
-  verbose = F,
+  export_spectrum = TRUE,
+  scale_spectrum = TRUE,
+  overlapping = TRUE,
+  verbose = FALSE,
   ...
 )
 }

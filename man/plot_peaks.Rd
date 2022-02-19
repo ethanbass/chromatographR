@@ -9,8 +9,8 @@ plot_peaks(
   peak_list,
   index = 1,
   lambda = NULL,
-  points = F,
-  ticks = F,
+  points = FALSE,
+  ticks = FALSE,
   a = 0.5,
   cex.points = 0.5,
   ...

@@ -23,8 +23,8 @@ squares peak-fitting. Defaults to 1000.}
 \value{
 Function \code{fit_peaks} returns a matrix, whose columns contain
 the following information: \item{rt}{location of the maximum of the peak
-(x)} \item{start}{start of peak (only included in table if `bounds==T`)}
-\item{end}{end of peak (only included in table if `bounds==T`)}
+(x)} \item{start}{start of peak (only included in table if `bounds==TRUE`)}
+\item{end}{end of peak (only included in table if `bounds==TRUE`)}
 \item{sd}{width of the peak (x)} \item{tau}{tau parameter (only included in
 table if `fit=="egh"`)} \item{FWHM}{full width at half maximum (x)}
 \item{height}{height of the peak (y)} \item{area}{peak area}
