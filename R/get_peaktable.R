@@ -23,6 +23,7 @@
 #' @importFrom stats dist cutree as.dist aggregate
 #' @importFrom lattice panel.stripplot panel.abline stripplot
 #' @importFrom grDevices colorRampPalette 
+#' @importFrom scales rescale
 #' @param peak_list A nested list of peak tables: the first level is the
 #' sample, and the second level is the component. Every component is described
 #' by a matrix where every row is one peak, and the columns contain information
@@ -59,7 +60,6 @@
 #' E. Prenni. 2014. RAMClust: A Novel Feature Clustering Method Enables
 #' Spectral-Matching-Based Annotation for Metabolomics Data. \emph{Anal. Chem.}
 #' \bold{86}:6812-6817.
-#' @keywords manip
 #' @examples
 #' 
 #' data(Sa)
@@ -77,7 +77,7 @@
 get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "height"),
                           use.cor = FALSE, hmax = 0.2, plotIt = FALSE,
                           ask = plotIt, clust = c("rt","sp.rt"),
-                          sigma.t = 2, sigma.r = 0.5,
+                          sigma.t = NULL, sigma.r = 0.5,
                           deepSplit = FALSE, out = c('data.frame', 'matrix')){
   
   response <- match.arg(response, c("area", "height"))
@@ -98,8 +98,7 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
       y
     }))
     file.idx <- rep(names(pkLst), sapply(pkLst, function(samp) nrow(samp[[comp]])))
-    pkcenters <- unlist(lapply(pkLst, function(samp) samp[[comp]][, 
-                                                                  rt]))
+    pkcenters <- unlist(lapply(pkLst, function(samp) samp[[comp]][,rt]))
     names(pkcenters) <- NULL
     if (length(pkcenters) < 2) 
       return(NULL)
@@ -111,15 +110,18 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
       if (is.null(chrom_list)){
         stop("Must provide list of chromatograms for spectral clustering.")
       }
+      if (is.null(sigma.t)){
+        sigma.t <- .5*mean(do.call(rbind,unlist(pks_egh,recursive = F))$end - do.call(rbind,unlist(pks_egh,recursive = F))$start)
+      }
+      ts<- as.numeric(rownames(chrom_list[[1]]))
       sp <- sapply(seq_along(pkcenters), function(i){
-        rescale(t(chrom_list[[file.idx[i]]][pkcenters[i],]))
+        rescale(t(chrom_list[[file.idx[i]]][which(elementwise.all.equal(ts, pkcenters[i])),]))
       }, simplify=T)
-      c <- cor(sp,sp,method = "pearson")
-      mint <- abs(outer(unlist(pkcenters),unlist(pkcenters), FUN="-"))
-      S <- exp((-(1-abs(c))^2)/(2*sigma.r^2))*exp(-(mint^2)/2*sigma.t^2)
+      cor.matrix <- cor(sp, method = "pearson")
+      mint <- abs(outer(unlist(pkcenters), unlist(pkcenters), FUN="-"))
+      S <- (exp((-(1-abs(cor.matrix))^2)/(2*sigma.r^2)))*exp(-(mint^2)/(2*sigma.t^2))
       D <- 1-S
       linkage <- "average"
-    
       pkcenters.hcl <- hclust(as.dist(D), method = linkage)
       pkcenters.cl <- cutreeDynamicTree(pkcenters.hcl, maxTreeHeight = hmax, deepSplit = deepSplit, minModuleSize = 2)
       sing <- which(pkcenters.cl == 0)
@@ -129,7 +131,6 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
                             "mean")[, 2]
     ncl <- length(cl.centers)
     ## reorder clusters from small to large rt
-    
     pkcenters.cl <- order(order(cl.centers))[pkcenters.cl]
     cl.centers <- sort(cl.centers)
     metaInfo <- cbind(Component = rep(comp, ncl),
@@ -139,7 +140,7 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
       mycols <- myPalette(length(cl.centers))
       cl.df <- data.frame(peaks = pkcenters, files = factor(file.idx), 
                           cluster = pkcenters.cl)
-      message(stripplot(files ~ peaks, data = cl.df, col = mycols[pkcenters.cl], 
+      print(stripplot(files ~ peaks, data = cl.df, col = mycols[pkcenters.cl], 
                       pch = pkcenters.cl%%14, xlab = "Retention time", 
                       ylab = "", main = paste("Component", comp), panel = function(...) {
                         panel.stripplot(...)

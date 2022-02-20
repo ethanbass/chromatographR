@@ -17,18 +17,18 @@ find_peaks(
 \arguments{
 \item{y}{response (numerical vector)}
 
-\item{smooth_type}{Type of smoothing. Defaults to "gaussian".}
+\item{smooth_type}{Type of smoothing. (Defaults to "gaussian").}
 
-\item{smooth_window}{Window for smoothing. Defaults to 1.}
+\item{smooth_window}{Window for smoothing. (Defaults to 1).}
 
-\item{smooth_width}{Width for smoothing. Defaults to 0.1}
+\item{smooth_width}{Width for smoothing. (Defaults to 0.1).}
 
-\item{slope_thresh}{Minimum threshold for peak slope. Defaults to 0.05}
+\item{slope_thresh}{Minimum threshold for peak slope. (Defaults to 0.05).}
 
-\item{amp_thresh}{Minimum threshold for peak amplitude. Defaults to 0.}
+\item{amp_thresh}{Minimum threshold for peak amplitude. (Defaults to 0).}
 
-\item{bounds}{Logical. If TRUE, includes boundaries of peak in dataframe.
-Defaults to TRUE.}
+\item{bounds}{Logical. If TRUE, includes peak boundaries in dataframe.
+(Defaults to TRUE).}
 }
 \value{
 Function \code{find_peaks} simply returns the locations of the peak
@@ -59,4 +59,3 @@ Applications in scientific measurement.
 \author{
 Ethan Bass
 }
-\keyword{manip}

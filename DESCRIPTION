@@ -11,7 +11,7 @@ Depends: R (>= 3.5.0), ptw (>= 1.0.6), lattice
 Imports: methods, pvclust, fastcluster, dynamicTreeCut, scales, minpack.lm, smoother
 LazyData: true
 LazyDataCompression: xz
-Suggests: rmarkdown, knitr
+Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 BiocViews: Metabolomics, Preprocessing
 RoxygenNote: 7.1.2

@@ -18,7 +18,7 @@ fit_peaks(y, pos, sd.max = 50, fit = c("egh", "gaussian"), max.iter = 1000)
 gaussian hybrid ("egh") are supported. Defaults to egh.)}
 
 \item{max.iter}{Maximum number of iterations to use in nonlinear least
-squares peak-fitting. Defaults to 1000.}
+squares peak-fitting. (Defaults to 1000).}
 }
 \value{
 Function \code{fit_peaks} returns a matrix, whose columns contain
@@ -70,4 +70,3 @@ good model for chromatographic peaks in isocratic HPLC? Chromatographia 26,
 \author{
 Ethan Bass
 }
-\keyword{manip}

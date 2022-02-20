@@ -72,4 +72,3 @@ similarity to a reference spectrum.
 \author{
 Ethan Bass
 }
-\keyword{manip}
