@@ -25,6 +25,9 @@
 #' \code{\link[stats:smooth.spline]{smooth.spline}}. Default is TRUE.
 #' @param maxI if given, the maximum intensity in the matrix is set to this
 #' value.
+#' @param parallel Logical, indicating whether to use parallel processing.
+#' Defaults to TRUE.
+#' @param mc.cores How many cores to use for parallel processing. Defaults to 4.
 #' @param \dots Further optional arguments to
 #' \code{\link[ptw:baseline.corr]{baseline.corr}}.
 #' @return The function returns the preprocessed data matrix, with rownames and
@@ -58,7 +61,7 @@ preprocess <- function(X,
                               dim2 = lambdas, ## spectral axis
                               remove.time.baseline = TRUE,
                               spec.smooth = TRUE,
-                              maxI, parallel=T, mc.cores=4, ...){
+                              maxI, parallel=TRUE, mc.cores=4, ...){
   if (!is.list(X) & !is.matrix(X)){
     stop("X should be a matrix or a list of matrices")
   }

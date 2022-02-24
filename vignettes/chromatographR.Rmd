@@ -13,6 +13,7 @@ vignette: >
 ```{r setup, include=FALSE}
 require("knitr", quietly=TRUE)
 require(chromatographR)
+require(parallel)
 opts_chunk$set(prompt = TRUE, highlight = FALSE, comment=NA, 
                #background='transparent', size = 'small', 
                fig.width=6,
@@ -71,9 +72,9 @@ new.ts <- seq(1,38,by=.01) # choose time-points
 new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
 ```
 
-```{r, preprocessing, eval=F}
-preprocess(Sa, dim1=new.ts, dim2=new.lambdas,
-           parallel=T, p=.001, lambda=1e5)
+```{r, preprocessing, eval=T}
+dat.pr <- preprocess(Sa, dim1=new.ts, dim2=new.lambdas,
+           parallel=F, p=.001, lambda=1e5)
 ```
 
 After loading data, you may want to normalize your chromatograms (e.g. by sample mass). However, you can also normalize after assembling the peak table.
@@ -141,8 +142,8 @@ plot_peaks(chrom_list = warp, peak_list = pks_egh, index=1, lambda='210')
 ```
 
 ```{r, get_peaktable}
-pkTab <- get_peaktable(pks_egh, response = "area")
-head(pkTab[,1:6])
+pk_tab <- get_peaktable(pks_egh, response = "area")
+head(pk_tab[,1:6])
 ```
 
 ### Additional useful tools
@@ -154,14 +155,14 @@ The `plot_spectrum` function allows you to easily plot or record the spectra ass
 ```{r, plot spectra,fig.height=6}
 par(mfrow=c(2,1))
 peak="X35"
-plot_spectrum(peak, peak_table=pkTab, chrom_list = warp,chr=5)
+plot_spectrum(peak, peak_table=pk_tab, chrom_list = warp,chr=5)
 ```
 
 The `plot_all_spectra` function can be used to visually compare peaks at a given column of the peak table to assess how well they match.
 
 ```{r, plot_all}
 peak="X35"
-plot_all_spectra(peak, peak_table=pkTab, chrom_list = warp, export=F, overlapping=T)
+plot_all_spectra(peak, peak_table=pk_tab, chrom_list = warp, export=F, overlapping=T)
 ```
 
 #### Clustering peaks by spectral similarity

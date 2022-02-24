@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_peaks.R
 \name{plot_peaks}
 \alias{plot_peaks}
-\title{Function to visually assess accuracy of integration}
+\title{Function to plot fitted peaks}
 \usage{
 plot_peaks(
   chrom_list,
@@ -38,7 +38,7 @@ to FALSE.}
 \item{\dots}{Additional arguments to plot function.}
 }
 \description{
-Check integration by overlaying gaussian curves onto chromatogram.
+Visually assess integration accuracy by fitted peaks onto chromatogram.
 }
 \seealso{
 \code{\link{get_peaks}}
