@@ -19,8 +19,6 @@ wavelengths).}
 \item{ref_criteria}{What criterion to use to select reference spectra.
 Current options are maximum correlation ("max.cor") or maximum signal
 intensity ("max.sig").}
-
-\item{\dots}{Additional arguments}
 }
 \value{
 A matrix consisting of reference spectra for each peak in the

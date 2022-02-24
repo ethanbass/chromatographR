@@ -241,7 +241,6 @@ compare_spectra <- function(peak, peak_table, chrom_list,
 #' @param ref_criteria What criterion to use to select reference spectra.
 #' Current options are maximum correlation ("max.cor") or maximum signal
 #' intensity ("max.sig").
-#' @param \dots Additional arguments
 #' @return A matrix consisting of reference spectra for each peak in the
 #' provided peak table.
 #' @author Ethan Bass

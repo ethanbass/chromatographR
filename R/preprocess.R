@@ -8,9 +8,9 @@
 #' 
 #' @import ptw
 #' @importFrom stats approx smooth.spline
-#' @param X A numerical data matrix, missing values are not allowed. If
-#' rownames or colnames attributes are used, they should be numerical and
-#' signify time points and wavelengths, respectively.
+#' @param X A numerical data matrix, or list of data matrices. Missing values
+#' are not allowed. If rownames or colnames attributes are used, they should be
+#' numerical and signify time points and wavelengths, respectively.
 #' @param dim1 A new, usually shorter, set of time points (numerical). The
 #' range of these should not be outside the range of the original time points,
 #' otherwise the function stops with an error message.
@@ -27,12 +27,14 @@
 #' value.
 #' @param parallel Logical, indicating whether to use parallel processing.
 #' Defaults to TRUE.
-#' @param mc.cores How many cores to use for parallel processing. Defaults to 4.
+#' @param mc.cores How many cores to use for parallel processing. Defaults to 2.
 #' @param \dots Further optional arguments to
 #' \code{\link[ptw:baseline.corr]{baseline.corr}}.
 #' @return The function returns the preprocessed data matrix, with rownames and
 #' colnames indicating the time points and wavelengths, respectively.
-#' @author Ron Wehrens, Ethan Bass
+#' @author Ethan Bass
+#' @note Adapted from the preprocess function authored by Ron Wehrens in the
+#' alsace package.
 #' @examples
 #' 
 #' data(Sa)
@@ -57,11 +59,11 @@
 #' @export preprocess
 
 preprocess <- function(X,
-                              dim1 = tpoints, ## time axis
-                              dim2 = lambdas, ## spectral axis
+                              dim1, ## time axis
+                              dim2, ## spectral axis
                               remove.time.baseline = TRUE,
                               spec.smooth = TRUE,
-                              maxI, parallel=TRUE, mc.cores=4, ...){
+                              maxI, parallel=TRUE, mc.cores=2, ...){
   if (!is.list(X) & !is.matrix(X)){
     stop("X should be a matrix or a list of matrices")
   }
@@ -102,8 +104,8 @@ preprocess <- function(X,
 
 #' @noRd
 preprocess_matrix <- function(X,
-                              dim1 = tpoints, ## time axis
-                              dim2 = lambdas, ## spectral axis
+                              dim1, ## time axis
+                              dim2, ## spectral axis
                               remove.time.baseline = TRUE,
                               spec.smooth = TRUE,
                               maxI, ...) {
