@@ -37,9 +37,12 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
   } else{
     d <- deriv(y)
   }
-  p1 <- which(sign(d[1:(length(d)-1)]) > sign(d[2:length(d)])) # detects zero-crossing of first derivative (peak apex)
-  p2 <- which(abs(diff(d)) > slope_thresh) # detects second derivative exceeding slope threshold
-  p3 <- which(y > amp_thresh) # detects y-vals exceeding amplitude threshold
+  # detect zero-crossing of first derivative (peak apex)
+  p1 <- which(sign(d[1:(length(d)-1)]) > sign(d[2:length(d)]))
+  # detect second derivative exceeding slope threshold
+  p2 <- which(abs(diff(d)) > slope_thresh)
+  # detect y values exceeding amplitude threshold
+  p3 <- which(y > amp_thresh)
   p <- intersect(intersect(p1,p2), p3)
   if (bounds){
     p4 <- which(sign(d[1:(length(d)-1)]) < sign(d[2:length(d)]))
@@ -51,10 +54,6 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
   } else 
   p
 }
-
-# fit peaks to gaussian or exponential-gaussian hybrid ('egh') function using nlsLM
-
-
 
 #' Fit chromatographic peaks with a gaussian or exponential-gaussian hybrid
 #' profile
@@ -158,8 +157,8 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian"), max.iter
 }
 #################################################################################################
 ### gaussian
-## from https://github.com/robertdouglasmorrison/DuffyTools/blob/master/R/gaussian.R
-
+## adapted from https://github.com/robertdouglasmorrison/DuffyTools/blob/master/R/gaussian.R
+#' @noRd
 gaussian <- function(x, center=0, width=1, height=NULL, floor=0) {
   
   # adapted from Earl F. Glynn;  Stowers Institute for Medical Research, 2007
@@ -218,6 +217,7 @@ fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height
 
 ###########################################################################################
 ### expontential-gaussian hybrid
+#' @noRd
 egh <- function(x, center, width,  height, tau, floor=0){
     result <- rep(0, length(x))
     index <- which(2*width^2 + tau*(x-center)>0)

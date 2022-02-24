@@ -72,21 +72,8 @@ new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
 ```
 
 ```{r, preprocessing, eval=F}
-dat.pr <- lapply(X=Sa,
-                 FUN=preprocess,
-                 dim1=new.ts,
-                 dim2=new.lambdas,
-                 p=.001,lambda=1e5)
-```
-
-If you have a large dataset, you may want to accelerate this process through the use of parallel processing:
-
-```{r, parallel preprocessing}
-dat.pr <- parallel::mclapply(X=Sa,
-                 FUN=preprocess,
-                 dim1=new.ts,
-                 dim2=new.lambdas,
-                 p=.001,lambda=1e5)
+preprocess(Sa, dim1=new.ts, dim2=new.lambdas,
+           parallel=T, p=.001, lambda=1e5)
 ```
 
 After loading data, you may want to normalize your chromatograms (e.g. by sample mass). However, you can also normalize after assembling the peak table.

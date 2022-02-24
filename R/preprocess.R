@@ -52,42 +52,88 @@
 #'        legend = c("Original data", "Preprocessed data"))
 #' 
 #' @export preprocess
+
 preprocess <- function(X,
-                       dim1 = tpoints, ## time axis
-                       dim2 = lambdas, ## spectral axis
-                       remove.time.baseline = TRUE,
-                       spec.smooth = TRUE,
-                       maxI, ...) {
+                              dim1 = tpoints, ## time axis
+                              dim2 = lambdas, ## spectral axis
+                              remove.time.baseline = TRUE,
+                              spec.smooth = TRUE,
+                              maxI, parallel=T, mc.cores=4, ...){
+  if (!is.list(X) & !is.matrix(X)){
+    stop("X should be a matrix or a list of matrices")
+  }
+  if (is.list(X)){
+    if (mean(sapply(X,is.matrix)) != 1){
+      stop("X should be a matrix or a list of matrices")
+    }
+    if (parallel){
+      if (length(find.package('parallel', quiet=TRUE))==0){
+        stop("Parallel must be installed to enable parallel processing.")
+      }
+      parallel::mclapply(X, FUN=preprocess_matrix,
+               dim1=dim1,
+               dim2=dim2,
+               remove.time.baseline = remove.time.baseline,
+               spec.smooth = spec.smooth,
+               maxI=maxI, mc.cores=mc.cores,
+               ...)
+    } else{
+      lapply(X, FUN=preprocess_matrix,
+             dim1=dim1,
+             dim2=dim2,
+             remove.time.baseline = remove.time.baseline,
+             spec.smooth = spec.smooth,
+             maxI=maxI,
+             ...)
+    }
+    
+  } else{
+    preprocess_matrix(X, dim1=dim1,
+                      dim2=dim2,
+                      remove.time.baseline = remove.time.baseline,
+                      spec.smooth = spec.smooth,
+                      maxI=maxI,
+                      ...)
+  }
+}
+
+#' @noRd
+preprocess_matrix <- function(X,
+                              dim1 = tpoints, ## time axis
+                              dim2 = lambdas, ## spectral axis
+                              remove.time.baseline = TRUE,
+                              spec.smooth = TRUE,
+                              maxI, ...) {
   if (!is.matrix(X))
-      stop("X should be a matrix!")
+    stop("X should be a matrix!")
   
   ## possibly resize matrix to a lower dimension - faster, noise averaging
   if (length(tpoints <- as.numeric(rownames(X))) == 0) tpoints <- seq_len(nrow(X))
   if (length(lambdas <- as.numeric(colnames(X))) == 0) lambdas <- seq_len(ncol(X))
-
+  
   if (min(dim1) < min(tpoints) |
       max(dim1) > max(tpoints))
-      stop("No extrapolation allowed - check dim1 argument")
+    stop("No extrapolation allowed - check dim1 argument")
   
   X <- apply(X, 2, function(xx) approx(tpoints, xx, dim1)$y)
-
+  
   if (min(dim2) < min(lambdas) |
       max(dim2) > max(lambdas))
-      stop("No extrapolation allowed - check dim2 argument")
+    stop("No extrapolation allowed - check dim2 argument")
   
   X <- t(apply(X, 1, function(xx) approx(lambdas, xx, dim2)$y))
   
   if (spec.smooth)
-      X <- t(apply(X, 1, function(xxx) smooth.spline(xxx)$y))
-
+    X <- t(apply(X, 1, function(xxx) smooth.spline(xxx)$y))
+  
   if (remove.time.baseline)
-      X <- apply(X, 2, baseline.corr, ...)
+    X <- apply(X, 2, baseline.corr, ...)
   if (min(X) < 0)
-      # X <- X - min(X)
-      X[X<0] <- 0
+    # X <- X - min(X)
+    X[X<0] <- 0
   if (!missing(maxI))
-      X <- maxI * X / max(X)
-
+    X <- maxI * X / max(X)
+  
   dimnames(X) <- list(dim1, dim2)
   X
 }
