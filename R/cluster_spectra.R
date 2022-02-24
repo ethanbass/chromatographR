@@ -39,13 +39,15 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' \item{peaks}{a character vector containing the names of all peaks contained
 #' in the given cluster.} \item{pval}{a numeric vector of length 1 containing
 #' the boostrap p-value (au) for the given cluster.}
-#' @examples
-#' cluster_spectra(pk_tab, warp, nboot=100, max.only = F,save = F)
 #' @author Ethan Bass
 #' @references R. Suzuki, H. Shimodaira: Pvclust: an R package for assessing
 #' the uncertainty in hierarchical clustering. Bioinformatics, 22-12:1540-1542
 #' (2006).
 #' @export cluster_spectra
+
+# # @examples
+# cluster_spectra(pk_tab, warp, nboot=100, max.only = F,save = F)
+
 cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
                             alpha=0.95, nboot=1000, plot_dend=T, plot_spectra=TRUE,
                             verbose=TRUE, save=TRUE, parallel=TRUE, max.only=FALSE,

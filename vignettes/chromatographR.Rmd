@@ -11,7 +11,6 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-devtools::install_github("ethanbass/chromatographR", ref = "roxygenize")
 require("knitr", quietly=TRUE)
 require(chromatographR)
 opts_chunk$set(prompt = TRUE, highlight = FALSE, comment=NA, 
@@ -23,9 +22,10 @@ suppressMessages(require(chromatographR, quiet=TRUE))
 ```
 
 ## Introduction
-*chromatographR* is a package for the reproducible analysis of HPLC-DAD data in `R`. Liquid chromatography coupled to diode-array detection (HPLC-DAD) remains one of the most popular analytical methodologies due to its convenience and low-cost. However, there are currently few open-source tools available for analyzing HPLC-DAD chromatograms. The use of proprietary software for the analysis of HPLC-DAD data is currently a significant barrier to reproducible science, since these tools are not widely accessible, but also because such tools often require the user to select complicated options through a graphical interface which cannot easily be repeated. Reproducibility is of course much higher in command line workflows, like *chromatographR* where the entire analysis can be stored and easily repeated by anyone using publicly available software.
 
-The *chromatographR* package draws inspiration from the previously published *alsace* package [@wehrens2015], but with improved functions for peak-finding, integration and peak table generation as well as a number of new tools for data visualization and checking. Unlike *alsace*, which emphasized multivariate curve resolution through alternating least squares (MCR-ALS), *chromatographR* focuses on a more conventional workflow that may seem more familiar to users of standard software tools for HPLC-DAD analysis. *chromatographR* includes tools for a) pre-processing, b) retention-time alignment, c) peak-finding, d) peak-integration and e) peak-table construction, as well as additional functions useful in analysis of the resulting peak table.
+*chromatographR* is a package for the reproducible analysis of HPLC-DAD data in `R`. Liquid chromatography coupled to diode-array detection (HPLC-DAD) remains one of the most popular analytical methodologies due to its convenience and low-cost. However, there are currently few open-source tools available for analyzing HPLC-DAD chromatograms. The use of proprietary software for the analysis of HPLC-DAD data is thus a significant barrier to reproducible science, since such tools are not only difficult to access, but also require users to select complicated options through a graphical interface which cannot easily be repeated. Reproducibility is of course much higher in command line workflows, like *chromatographR* where the entire analysis can be stored and easily repeated by anyone using publicly available software.
+
+The *chromatographR* package draws inspiration from the previously published *alsace* package [@wehrens2015], but with improved functions for peak-finding, integration and peak table generation as well as a number of new tools for data visualization and checking. Unlike *alsace*, which emphasized multivariate curve resolution through alternating least squares (MCR-ALS), *chromatographR* focuses on a more conventional workflow, based on integration at user-selected wavelengths, which may seem more familiar to users of standard software tools for HPLC-DAD analysis. *chromatographR* includes tools for a) pre-processing, b) retention-time alignment, c) peak-finding, d) peak-integration and e) peak-table construction, as well as additional functions useful in analysis of the resulting peak table.
 
 ## Workflow
 ### Loading data
@@ -127,10 +127,9 @@ for (i in 1:length(dat.pr)){
 legend("topright", legend="raw", cex=0.7, bty = "n")
 ```
 
-It can sometimes be informative to also plot the warping coefficients (e.g. to find outliers), which you can be easily accomplished using the method shown below:
+It can sometimes be informative to also plot the warping coefficients (e.g. for the detection of outliers), which you can be easily accomplished using the method shown below:
 
-```{r, plot coefficients, fig.height=6}
-par(mfrow=c(3,1))
+```{r, plot coefficients, fig.height=6, fig.show="hold", out.width="30%"}
 coef <- sapply(warping.models,function(x) x$warp.coef)
 plot(coef[1,],pch=20,xlab='',ylab='')
 plot(coef[2,],pch=20,xlab='',ylab='')
@@ -139,14 +138,14 @@ plot(coef[3,],pch=20,xlab='',ylab='')
 
 ### Peak finding and fitting
 
-The `get_peaks` function loops through your chromatograms at the specified wavelengths, finds peaks, and attempts to fit them to the specified function using non-linear least squares -- the current options are `gaussian` and `egh` (exponential-gaussian hybrid) [@lan2001]. The area under the curve for each peak is then estimated using a trapezoidal approximation method. The function returns a nested list of dataframes containing information about the peaks in each chromatogram.
+The `get_peaks` function loops through your chromatograms at the specified wavelengths, finds peaks, and attempts to fit them to the specified function using non-linear least squares, as implemented in `minpack.lm` [@elzhov2016] -- the current options are `gaussian` and `egh` (exponential-gaussian hybrid) [@lan2001]. The area under the curve for each peak is then estimated using a trapezoidal approximation method. The function returns a nested list of dataframes containing information about the peaks in each chromatogram.
 
 ```{r, get_peaks, message=F, warning=F}
 pks_gauss <- get_peaks(warp, lambdas = c('210','260'), sd.max=40, fit="gaussian")
 pks_egh <- get_peaks(warp, lambdas = c('210', '260'), sd.max=40, fit="egh")
 ```
 
-The `plot_peaks` function allows you to visually assess the peak integration accuracy. Below we compare the peaks fitted for the first chromatogram (`index=1`) using the two algorithms. Usually the egh function performs slightly better for asymmetrical peaks.
+The `plot_peaks` function allows you to visually assess the peak integration accuracy. Below we compare the peaks fitted for the first chromatogram (`index=1`) using the two algorithms. Usually the `egh` method performs slightly better for asymmetrical peaks but the difference may not be profound.
 
 ```{r, plot_peaks, warning=F, fig.height=6}
 par(mfrow=c(2,1))
@@ -163,21 +162,18 @@ head(pkTab[,1:6])
 
 #### Plotting spectra
 
-The `plot_spectrum` function allows you to easily plot or record the spectra associated with a particular peak in your peak table. This is useful for interpreting your results and/or checking for errors in your peak table. For example, you may want to check if the spectra match for a particular peak in your peak table. Or you may just want to have a look at the spectrum for a peak of interest. The `plot_spectrum` function can be used to plot only the spectrum or only the chromatographic trace using the arguments `plot_spectrum` and `plot_trace`. By default it will plot data from the chromatogram with the biggest peak in the peak table, but you can choose the chromatogram (and the wavelength for the trace) using the `chr` and `lambda` arguments.
+The `plot_spectrum` function allows you to easily plot or record the spectra associated with a particular peak in your peak table. This is useful for interpreting your results and/or checking for errors in your peak table. For example, you may want to check if the spectra match for a particular peak in your peak table. Or you may just want to view the spectrum for a peak of interest. The `plot_spectrum` function can be used to plot only the spectrum or only the chromatographic trace using the arguments `plot_spectrum` and `plot_trace`. By default it will plot data from the chromatogram with the biggest peak in the peak table, but you can also choose the chromatogram (and the wavelength for the trace) using the `chr` and `lambda` arguments.
 
 ```{r, plot spectra,fig.height=6}
 par(mfrow=c(2,1))
 peak="X35"
 plot_spectrum(peak, peak_table=pkTab, chrom_list = warp,chr=5)
-
-peak="X14"
-plot_spectrum(peak, peak_table=pkTab, chrom_list = warp,chr=5)
 ```
 
-The `plot_all_spectra` function can be used to visually compare peaks at a given column of the peak table to confirm that they match.
+The `plot_all_spectra` function can be used to visually compare peaks at a given column of the peak table to assess how well they match.
 
 ```{r, plot_all}
-peak="X14"
+peak="X35"
 plot_all_spectra(peak, peak_table=pkTab, chrom_list = warp, export=F, overlapping=T)
 ```
 
@@ -185,8 +181,8 @@ plot_all_spectra(peak, peak_table=pkTab, chrom_list = warp, export=F, overlappin
 
 The `cluster_spectra` function groups peaks according to their spectral similarity, using hierarchical clustering, as implemented in the *pvclust* R package [@suzuki2006]. The function returns a list of clusters, along with a p-value for each cluster, calculated through multi-scale bootstrap resampling. These clusters may be useful in downstream analyses (i.e. for loosely grouping peaks by chemical class). For actual use, the number of bootstraps (`nboot`) should be set higher (probably at least 1000, or even 10,000 as recommended by the developers of `pvclust`). There may be some redundancy in the clusters that are returned, or some of the clusters may not correspond to a single chromophore. We recommend that users visually inspect clusters before conducting further analysis in order to remove redundant or unwanted clusters. (This clustering will tend to return better results when applied to data sets with more chromatograms).
 
-```{r, cluster}
-cl1 <- cluster_spectra(pkTab, warp, nboot=100, max.only = F,save = F)
+```{r, cluster, fig.keep=T}
+cl1 <- cluster_spectra(pk_tab, warp, nboot=100, max.only = T,save = F,alpha = .98)
 ```
 
 ## References

@@ -36,7 +36,7 @@
 #' (by default) or raw retention times (not advised!).
 #' @param hmax Height at which the complete linkage dendrogram will be cut. Can
 #' be interpreted as the maximal inter-cluster retention time difference.
-#' @param plotIt Logical. If TRUE, for every component a stripplot will be
+#' @param plot_it Logical. If TRUE, for every component a stripplot will be
 #' shown indicating the clustering.
 #' @param ask Logical. Ask before showing new plot?
 #' @param clust Specify whether to perform hierarchical clustering based on
@@ -75,8 +75,8 @@
 #' 
 #' @export get_peaktable
 get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "height"),
-                          use.cor = FALSE, hmax = 0.2, plotIt = FALSE,
-                          ask = plotIt, clust = c("rt","sp.rt"),
+                          use.cor = FALSE, hmax = 0.2, plot_it = FALSE,
+                          ask = plot_it, clust = c("rt","sp.rt"),
                           sigma.t = NULL, sigma.r = 0.5,
                           deepSplit = FALSE, out = c('data.frame', 'matrix')){
   
@@ -85,7 +85,7 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
   out <- match.arg(out, c('data.frame', 'matrix'))
   rt <- ifelse(use.cor, "rt.cor", "rt")
   ncomp <- length(peak_list[[1]]) ## all elements should have the same length
-  if (plotIt) {
+  if (plot_it) {
     opar <- par(ask = ask, no.readonly = TRUE)
     on.exit(par(opar))
     myPalette <- colorRampPalette(c("green", "blue", "purple", "red", "orange"))
@@ -111,7 +111,7 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
         stop("Must provide list of chromatograms for spectral clustering.")
       }
       if (is.null(sigma.t)){
-        sigma.t <- .5*mean(do.call(rbind,unlist(pks_egh,recursive = F))$end - do.call(rbind,unlist(pks_egh,recursive = F))$start)
+        sigma.t <- .5*mean(do.call(rbind,unlist(pkLst,recursive = F))$end - do.call(rbind,unlist(pkLst,recursive = F))$start)
       }
       ts<- as.numeric(rownames(chrom_list[[1]]))
       sp <- sapply(seq_along(pkcenters), function(i){
@@ -136,7 +136,7 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
     metaInfo <- cbind(Component = rep(comp, ncl),
                       Peak = 1:ncl, 
                       RT = cl.centers)
-    if (plotIt){
+    if (plot_it){
       mycols <- myPalette(length(cl.centers))
       cl.df <- data.frame(peaks = pkcenters, files = factor(file.idx), 
                           cluster = pkcenters.cl)
@@ -169,8 +169,8 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
 }
 
 getPeakTable <- function(peak_list, chrom_list = NULL, response = c("area", "height"),
-                          use.cor = FALSE, hmax = 0.2, plotIt = FALSE,
-                          ask = plotIt, clust = c("rt","sp.rt"),
+                          use.cor = FALSE, hmax = 0.2, plot_it = FALSE,
+                          ask = plot_it, clust = c("rt","sp.rt"),
                           sigma.t = 2, sigma.r = 0.5,
                           deepSplit = FALSE, out = c('data.frame', 'matrix')){
   msg<-"The getPeakTable function is deprecated. Please use get_peaktable instead"
@@ -181,7 +181,7 @@ getPeakTable <- function(peak_list, chrom_list = NULL, response = c("area", "hei
   out <- match.arg(out, c('data.frame', 'matrix'))
   rt <- ifelse(use.cor, "rt.cor", "rt")
   ncomp <- length(peak_list[[1]]) ## all elements should have the same length
-  if (plotIt) {
+  if (plot_it) {
     opar <- par(ask = ask, no.readonly = TRUE)
     on.exit(par(opar))
     myPalette <- colorRampPalette(c("green", "blue", "purple", "red", "orange"))
@@ -231,7 +231,7 @@ getPeakTable <- function(peak_list, chrom_list = NULL, response = c("area", "hei
     metaInfo <- cbind(Component = rep(comp, ncl),
                       Peak = 1:ncl, 
                       RT = cl.centers)
-    if (plotIt){
+    if (plot_it){
       mycols <- myPalette(length(cl.centers))
       cl.df <- data.frame(peaks = pkcenters, files = factor(file.idx), 
                           cluster = pkcenters.cl)

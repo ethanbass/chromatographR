@@ -11,10 +11,10 @@ get_peaktable(
   response = c("area", "height"),
   use.cor = FALSE,
   hmax = 0.2,
-  plotIt = FALSE,
-  ask = plotIt,
+  plot_it = FALSE,
+  ask = plot_it,
   clust = c("rt", "sp.rt"),
-  sigma.t = 2,
+  sigma.t = NULL,
   sigma.r = 0.5,
   deepSplit = FALSE,
   out = c("data.frame", "matrix")
@@ -38,7 +38,7 @@ as intensity measure. Default is peak area.}
 \item{hmax}{Height at which the complete linkage dendrogram will be cut. Can
 be interpreted as the maximal inter-cluster retention time difference.}
 
-\item{plotIt}{Logical. If TRUE, for every component a stripplot will be
+\item{plot_it}{Logical. If TRUE, for every component a stripplot will be
 shown indicating the clustering.}
 
 \item{ask}{Logical. Ask before showing new plot?}
@@ -108,4 +108,3 @@ Spectral-Matching-Based Annotation for Metabolomics Data. \emph{Anal. Chem.}
 \author{
 Ethan Bass & Ron Wehrens
 }
-\keyword{manip}

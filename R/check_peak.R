@@ -1,5 +1,3 @@
-## check peak for false 0s, etc.
-
 #' Function to correct false zeros in peak table.
 #' 
 #' Function that tries to correct false zeroes for a particular peak in the
@@ -227,4 +225,42 @@ compare_spectra <- function(peak, peak_table, chrom_list,
     matplot(4:nrow(peak_table),data.frame(peak_table[-c(1:3),peak],peak_tab_old[-c(1:3),peak]), pch=20, xlab='old',ylab='new')
   }
   return(peak_table)
+}
+
+#' Function to gather reference spectra.
+#' 
+#' Function that tries to correct false zeroes for a particular peak in the
+#' peaktable. In each chromatogram, the function compares all peaks within a
+#' certain radius around the focal peak on the basis of their spectral
+#' similarity to a reference spectrum.
+#' 
+#' @importFrom stats cor
+#' @param peak_table Peak table from \code{\link{getPeakTable}}.
+#' @param chrom_list A list of chromatograms in matrix form (timepoints x
+#' wavelengths).
+#' @param ref_criteria What criterion to use to select reference spectra.
+#' Current options are maximum correlation ("max.cor") or maximum signal
+#' intensity ("max.sig").
+#' @param \dots Additional arguments
+#' @return A matrix consisting of reference spectra for each peak in the
+#' provided peak table.
+#' @author Ethan Bass
+#' @seealso \code{\link{get_peaks}}
+
+gather_reference_spectra <- function(peak_table, chrom_list, ref_criteria = c("max.cor","max.sig")){
+  ref_criteria <- match.arg(ref_criteria, c("max.cor","max.sig"))
+  X<-colnames(peak_table)
+  sp.l <- lapply(X,function(pk){
+    plot_all_spectra(peak = pk, peak_table, chrom_list, plot_spectrum = F, export_spectrum = T)
+  })
+  if (ref_criteria=="max.cor"){
+    sp.ref <- sapply(1:(ncol(peak_table)), function(i){
+      sp.l[[i]][,which.max(colMeans(cor(sp.l[[i]])))]})
+  } else {
+    w.m <- sapply(peak_table[-c(1:3),], which.max)
+    sp.ref <- sapply(1:(ncol(peak_table)), function(i) sp.l[[i]][,w.m[i]])
+  }
+  colnames(sp.ref) <- colnames(peak_table)
+  rownames(sp.ref) <- colnames(chrom_list[[1]])
+  return(sp.ref)
 }
