@@ -55,7 +55,8 @@
 #' contain meta-information on the features (component, peak, retention time)
 #' and the other columns contain the intensities of the features in the
 #' individual injections.
-#' @author Ethan Bass & Ron Wehrens
+#' @author Ethan Bass
+#' @note Adapted from getPeakTable function in alsace package by Ron Wehrens.
 #' @references Broeckling, C. D., F. A. Afsar, S. Neumann, A. Ben-Hur, and J.
 #' E. Prenni. 2014. RAMClust: A Novel Feature Clustering Method Enables
 #' Spectral-Matching-Based Annotation for Metabolomics Data. \emph{Anal. Chem.}
@@ -71,7 +72,7 @@
 #' warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360'))
 #' warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
 #' pks <- get_peaks(warp, lambdas="210")
-#' pkTab <- get_peaktable(pks, response = "area")
+#' get_peaktable(pks, response = "area")
 #' 
 #' @export get_peaktable
 get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "height"),
@@ -79,11 +80,13 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
                           ask = plot_it, clust = c("rt","sp.rt"),
                           sigma.t = NULL, sigma.r = 0.5,
                           deepSplit = FALSE, out = c('data.frame', 'matrix')){
-  
   response <- match.arg(response, c("area", "height"))
   clust <- match.arg(clust, c("rt","sp.rt"))
   out <- match.arg(out, c('data.frame', 'matrix'))
   rt <- ifelse(use.cor, "rt.cor", "rt")
+  if (is.null(chrom_list)){
+    chrom_list <- get(attr(peak_list, "chrom_list"))
+  }
   ncomp <- length(peak_list[[1]]) ## all elements should have the same length
   if (plot_it) {
     opar <- par(ask = ask, no.readonly = TRUE)
@@ -107,9 +110,6 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
     pkcenters.cl <- cutree(pkcenters.hcl, h = hmax)
     }
     if (clust == 'sp.rt'){
-      if (is.null(chrom_list)){
-        stop("Must provide list of chromatograms for spectral clustering.")
-      }
       if (is.null(sigma.t)){
         sigma.t <- .5*mean(do.call(rbind,unlist(pkLst,recursive = F))$end - do.call(rbind,unlist(pkLst,recursive = F))$start)
       }
@@ -135,7 +135,8 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
     cl.centers <- sort(cl.centers)
     metaInfo <- cbind(Component = rep(comp, ncl),
                       Peak = 1:ncl, 
-                      RT = cl.centers)
+                      RT = round(cl.centers,2)
+                      )
     if (plot_it){
       mycols <- myPalette(length(cl.centers))
       cl.df <- data.frame(peaks = pkcenters, files = factor(file.idx), 
@@ -159,15 +160,29 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
     for (i in seq(along = allIs)) Iinfo[pkcenters.cl[i], 
                                         file.idx[i]] <- max(allIs[i], Iinfo[pkcenters.cl[i], 
                                                                             file.idx[i]])
-    cbind(metaInfo, Iinfo)
+    #cbind(metaInfo, Iinfo)
+    return(list(Iinfo, metaInfo))
   }
   result <- lapply(1:ncomp, clusterPeaks, peak_list)
   result <- t(do.call("rbind", result))
-  if (out == "data.frame"){
-    return(data.frame(result))
-  } else return(result)
-}
+  result <- list(tab=data.frame(t(result[[1]])),
+                 pk_meta=data.frame(t(result[[2]])),
+                 sample_meta=NA,
+                 args=c(peak_list = deparse(substitute(peak_list)),
+                        chrom_list = attr(peak_list,"chrom_list"),
+                        response = response,
+                        use.cor = use.cor,
+                        hmax = hmax,
+                        clust = clust,
+                        sigma.t = sigma.t,
+                        sigma.r = sigma.r,
+                        deepSplit = deepSplit
+                        ))
+  class(result) <- "peak_table"
+  return(result)
+  }
 
+  
 getPeakTable <- function(peak_list, chrom_list = NULL, response = c("area", "height"),
                           use.cor = FALSE, hmax = 0.2, plot_it = FALSE,
                           ask = plot_it, clust = c("rt","sp.rt"),

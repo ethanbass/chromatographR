@@ -28,34 +28,44 @@
 #' @author Ethan Bass & Ron Wehrens
 #' @export get_peaks
 
-get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"), sd.max=50, max.iter=100, ...){
+get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"),
+                       sd.max=50, max.iter=100, ...){
   fit <- match.arg(fit, c("egh", "gaussian"))
   if (is.numeric(lambdas)){
     lambdas <- as.character(lambdas)
   }
   peaks<-list()
+  chrom_list_str <- deparse(substitute(chrom_list))
   chrom_list <- lapply(chrom_list, function(c_mat) c_mat[,lambdas, drop=F])
   peak_positions <- lapply(chrom_list, function(c_mat){
     apply(c_mat, 2, function(x) find_peaks(x, ...))})
   result <- lapply(seq_along(chrom_list), function(smpl){
     ptable <- lapply(seq_along(peak_positions[[smpl]]), function(cmpnd){
-      fit_peaks(chrom_list[[smpl]][,cmpnd], peak_positions[[smpl]][[cmpnd]], fit=fit, max.iter=max.iter, sd.max=sd.max)
+      fit_peaks(chrom_list[[smpl]][,cmpnd], peak_positions[[smpl]][[cmpnd]],
+                fit = fit, max.iter = max.iter, sd.max = sd.max)
     })
     names(ptable) <- names(peak_positions[[smpl]])
     ptable
   })
   names(result) <- names(peak_positions)
-  result <- lapply(result, function(smpl) lapply(smpl, function(pks) pks[apply(pks, 
-                                                                               1, function(x) !any(is.na(x))), , drop = FALSE]))
+  result <- lapply(result, function(smpl) lapply(smpl, function(pks){
+    pks[apply(pks, 1, function(x) !any(is.na(x))), , drop = FALSE]
+    }))
   timepoints <- as.numeric(rownames(chrom_list[[1]]))
   tdiff <- median(diff(timepoints))
-  lapply(result, function(smpl) lapply(smpl, function(cmpnd) {
+  result <- lapply(result, function(smpl) lapply(smpl, function(cmpnd){
     x <- cmpnd
-    x[, c('rt', 'start', 'end')] <- sapply(c('rt', 'start', 'end'), function(j) timepoints[x[,j]])
+    x[, c('rt', 'start', 'end')] <- sapply(c('rt', 'start', 'end'),
+                                           function(j) timepoints[x[,j]])
     x[, c('sd', 'FWHM')] <- x[, c('sd', 'FWHM')] * tdiff
     if (!is.null(x$tau)){x[, c('tau')] <- x[, c('tau')] * tdiff} 
     x
   }))
+  structure(result,
+            chrom_list = chrom_list_str,
+            lambdas = deparse(substitute(lambdas)), fit=fit, sd.max=sd.max,
+            max.iter=max.iter,
+            class="peak_list")
 }
 
 
@@ -104,10 +114,10 @@ getAllPeaks <- function (chrom_list, lambdas, max.iter=100,
 #'
 #' @importFrom stats median
 #' @importFrom graphics polygon arrows
+#' @param peak_list Output from the \code{get_peaks} function.
 #' @param chrom_list List of chromatograms (retention time x wavelength
 #' matrices)
-#' @param peak_list Output from the \code{findpeaks} function.
-#' @param index Index of chromatogram to be plotted.
+#' @param index Index or name of chromatogram to be plotted.
 #' @param lambda Wavelength for plotting.
 #' @param points Logical. If TRUE, plot peak maxima. Defaults to FALSE.
 #' @param ticks Logical. If TRUE, mark beginning and end of each peak. Defaults
@@ -118,9 +128,13 @@ getAllPeaks <- function (chrom_list, lambdas, max.iter=100,
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaks}}
 #' @keywords manip
-#' @export plot_peaks
-plot_peaks <- function(chrom_list, peak_list, index=1, lambda=NULL,
+#' @export
+#' 
+plot.peak_list <- function(peak_list, chrom_list=NULL, index=1, lambda=NULL,
                        points=FALSE, ticks=FALSE, a=0.5, cex.points=0.5, ...){
+  if (is.null(chrom_list)){
+    chrom_list <- get(attr(peak_list, "chrom_list"))
+  }
   if (is.null(lambda)){
     lambda <- names(peak_list[[1]])[1]
   }

@@ -85,6 +85,9 @@ variable - this, however, will increase the number of clusters. Another
 option is to filter the peaks on intensity: perhaps one of the two peaks in
 the cluster is only a very small feature.
 }
+\note{
+Adapted from getPeakTable function in alsace package by Ron Wehrens.
+}
 \examples{
 
 data(Sa)
@@ -96,7 +99,7 @@ dat.pr <- lapply(X=Sa,FUN=preprocess,
 warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360'))
 warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
 pks <- get_peaks(warp, lambdas="210")
-pkTab <- get_peaktable(pks, response = "area")
+get_peaktable(pks, response = "area")
 
 }
 \references{
@@ -106,5 +109,5 @@ Spectral-Matching-Based Annotation for Metabolomics Data. \emph{Anal. Chem.}
 \bold{86}:6812-6817.
 }
 \author{
-Ethan Bass & Ron Wehrens
+Ethan Bass
 }

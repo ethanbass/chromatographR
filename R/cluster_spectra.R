@@ -48,12 +48,15 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 # # @examples
 # cluster_spectra(pk_tab, warp, nboot=100, max.only = F,save = F)
 
-cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
+cluster_spectra <- function(peak_table, chrom_list=NULL, peak_no = c(5,100),
                             alpha=0.95, nboot=1000, plot_dend=T, plot_spectra=TRUE,
                             verbose=TRUE, save=TRUE, parallel=TRUE, max.only=FALSE,
                             ...){
+  if (is.null(chrom_list)){
+    chrom_list <- get(peak_table$args["chrom_list"])
+  }
   if (verbose) print('...collecting representative spectra')
-  rep <- sapply(colnames(peak_table), function(j){
+  rep <- sapply(colnames(peak_table[[1]]), function(j){
     sp <- plot_spectrum(loc=j, peak_table=peak_table, chrom_list,
                         scale_spectrum=T, plot_trace=F, export_spectrum = T, plot_spectrum=F, verbose=F)
   })
@@ -89,25 +92,3 @@ cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
   }
   return(sub)
 }
-
-# dend<-as.dendrogram(result)
-# result %>%
-#   as.dendrogram() %>%
-#   hang.dendrogram() %>%
-#   plot(main = "Cluster dendrogram with AU/BP values (%)")
-# result %>% text()
-# dend %>% set("labels_cex",0.5) %>% plot()
-# result %>% as.dendrogram %>% plot(labels=F)
-# result %>% pvrect(alpha = 0.95)
-
-# dend %>%
-#   pvclust_show_signif(result, signif_type = 'au', max.only=F, hang=-1) %>%
-#   plot()
-# dend %>%
-#   pvclust_show_signif(result, show_type = "lwd") %>%
-#   plot()
-# result %>% text()
-# dend %>% plot()
-# result %>% pvrect(alpha = 0.95, max.only=F)
-# 
-# dendextend::pvclust_show_signif(dend, result)

@@ -6,7 +6,7 @@
 \usage{
 cluster_spectra(
   peak_table,
-  chrom_list,
+  chrom_list = NULL,
   peak_no = c(5, 100),
   alpha = 0.95,
   nboot = 1000,

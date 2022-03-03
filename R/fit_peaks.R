@@ -37,9 +37,12 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
   } else{
     d <- deriv(y)
   }
-  p1 <- which(sign(d[1:(length(d)-1)]) > sign(d[2:length(d)])) # detects zero-crossing of first derivative (peak apex)
-  p2 <- which(abs(diff(d)) > slope_thresh) # detects second derivative exceeding slope threshold
-  p3 <- which(y > amp_thresh) # detects y-vals exceeding amplitude threshold
+  # detect zero-crossing of first derivative (peak apex)
+  p1 <- which(sign(d[1:(length(d)-1)]) > sign(d[2:length(d)]))
+  # detect second derivative exceeding slope threshold
+  p2 <- which(abs(diff(d)) > slope_thresh)
+  # detect y-vals exceeding amplitude threshold
+  p3 <- which(y > amp_thresh) 
   p <- intersect(intersect(p1,p2), p3)
   if (bounds){
     p4 <- which(sign(d[1:(length(d)-1)]) < sign(d[2:length(d)]))
@@ -51,10 +54,6 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
   } else 
   p
 }
-
-# fit peaks to gaussian or exponential-gaussian hybrid ('egh') function using nlsLM
-
-
 
 #' Fit chromatographic peaks with a gaussian or exponential-gaussian hybrid
 #' profile

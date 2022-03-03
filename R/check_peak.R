@@ -234,33 +234,68 @@ compare_spectra <- function(peak, peak_table, chrom_list,
 #' certain radius around the focal peak on the basis of their spectral
 #' similarity to a reference spectrum.
 #' 
-#' @importFrom stats cor
+#' @importFrom stats cor sd
 #' @param peak_table Peak table from \code{\link{getPeakTable}}.
 #' @param chrom_list A list of chromatograms in matrix form (timepoints x
 #' wavelengths).
-#' @param ref_criteria What criterion to use to select reference spectra.
+#' @param ref What criterion to use to select reference spectra.
 #' Current options are maximum correlation ("max.cor") or maximum signal
 #' intensity ("max.sig").
-#' @param \dots Additional arguments
 #' @return A matrix consisting of reference spectra for each peak in the
 #' provided peak table.
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaks}}
+#' @examples 
+#' ref_m <- gather_reference_spectra(pk_tab, ref = "max.sig")
+#' ref_c <- gather_reference_spectra(pk_tab, ref="max.cor")
+#' @noRd
 
-gather_reference_spectra <- function(peak_table, chrom_list, ref_criteria = c("max.cor","max.sig")){
-  ref_criteria <- match.arg(ref_criteria, c("max.cor","max.sig"))
-  X<-colnames(peak_table)
-  sp.l <- lapply(X,function(pk){
-    plot_all_spectra(peak = pk, peak_table, chrom_list, plot_spectrum = F, export_spectrum = T)
-  })
-  if (ref_criteria=="max.cor"){
-    sp.ref <- sapply(1:(ncol(peak_table)), function(i){
-      sp.l[[i]][,which.max(colMeans(cor(sp.l[[i]])))]})
-  } else {
-    w.m <- sapply(peak_table[-c(1:3),], which.max)
-    sp.ref <- sapply(1:(ncol(peak_table)), function(i) sp.l[[i]][,w.m[i]])
+gather_reference_spectra <- function(peak_table, chrom_list=NULL, ref = c("max.cor","max.sig")){
+  if (is.null(chrom_list)){
+    chrom_list <- get(peak_table$args["chrom_list"])
   }
-  colnames(sp.ref) <- colnames(peak_table)
+  ref <- match.arg(ref, c("max.cor", "max.sig"))
+  X<-colnames(peak_table$tab)
+  sp.l <- lapply(X,function(pk){
+    plot_all_spectra(peak = pk, peak_table, chrom_list,
+                     plot_spectrum = FALSE, export_spectrum = TRUE)
+  })
+  if (ref=="max.cor"){
+    sp.ref <- sapply(seq_len(ncol(peak_table$tab)), function(i){
+      sp.l[[i]][,which.max(colMeans(cor(sp.l[[i]][,which(apply((sp.l[[i]]),2,sd)!=0)])))]})
+    sp.ref <- data.frame(do.call(cbind,sp.ref))
+  } else {
+    w.m <- sapply(peak_table$tab, which.max)
+    sp.ref <- sapply(1:(ncol(peak_table$tab)), function(i) sp.l[[i]][,w.m[i]])
+  }
+  colnames(sp.ref) <- colnames(peak_table$tab)
   rownames(sp.ref) <- colnames(chrom_list[[1]])
   return(sp.ref)
 }
+
+#' @importFrom stats sd
+#' @param peak_table Peak table from \code{\link{getPeakTable}}.
+#' @param loc Name of peak to be investigated.
+#' @param chrom_list A list of chromatograms in matrix form (timepoints x
+#' wavelengths).
+#' @param ref Reference criterion. Either maximum correlation ("max.cor") or
+#' maximum intensity ("max.int").
+#' @noRd
+get_reference_spectrum <- function(peak_table, loc, chrom_list=NULL, ref = c("max.cor","max.int")){
+  if (is.null(chrom_list)){
+    try.out <- try(chrom_list <- get(peak_table$args["chrom_list"]))
+    if (class(try.out) == "try-error") stop("Chromatograms not found!")
+  }
+  ref <- match.arg(ref, c("max.cor", "max.int"))
+  sp <- plot_all_spectra(peak = loc, peak_table, chrom_list, plot_spectrum = FALSE, 
+                      plot_trace = FALSE, export_spectrum = TRUE)
+  if (ref=="max.cor"){
+    ref <- which.max(colMeans(cor(sp[,which(apply(sp,2,sd)!=0)])))
+  } else {
+    ref <- which.max(peak_table$tab[,loc])
+  }
+  return(ref)
+}
+
+
+
