@@ -2,7 +2,7 @@
 
 S3method(plot,peak_list)
 S3method(plot,peak_table)
-export(attach_meta)
+export(attach_metadata)
 export(cluster_spectra)
 export(combine_peaks)
 export(correct_rt)

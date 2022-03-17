@@ -1,14 +1,13 @@
 #' Attach experimental metadata
 #' 
-#' Attach experimental metadata to peak table.
+#' Attach experimental meta-data to peak table.
 #' 
 #' @param peak_table Peak table
 #' @param metadata Dataframe
 #' @param column Name of the column with sample names.
-#' @return Peak table with metadata added
+#' @return Peak table with meta-data.
 #' @author Ethan Bass
-#' @seealso \code{\link[ptw:ptw]{ptw}}, \code{\link{correctPeaks}}
-#' @references Eilers, P.H.C. 2004.a
+#' @seealso \code{\link[get_peaktable}}
 #' @export attach_metadata
 
 attach_metadata <- function(peak_table, metadata, column){

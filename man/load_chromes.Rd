@@ -4,7 +4,7 @@
 \alias{load_chromes}
 \title{Import folders of chromatograms in CSV format.}
 \usage{
-load_chromes(paths, pattern = NULL, dat = NULL, ...)
+load_chromes(paths, dat = NULL, ...)
 }
 \arguments{
 \item{paths}{Paths of folders where chromatograms are stored.}
