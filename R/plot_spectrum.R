@@ -48,10 +48,10 @@ plot_spectrum <- function(loc, peak_table, chrom_list=NULL,
       stop("Peak table is required to locate peak spectrum.")}
     if (!(loc %in% colnames(peak_table$tab))){
       stop(paste0("No match found for peak \'", loc, "\' in peak table."))}
-    # if (is.null(chrom_list)){
-    #   try.out <- try(chrom_list <- get(peak_table$args["chrom_list"]))
-    #   if (class(try.out=="try-error")) stop("Chromatograms not found!")
-    # }
+    if (is.null(chrom_list)){
+      chrom_list <- try(get(peak_table$args["chrom_list"]))
+      if (class(chrom_list)=="try-error") stop("Chromatograms not found!")
+    }
   }
   if (what == "rt" | what == "click"){
     if (chr == "max")
@@ -155,14 +155,16 @@ elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
 #' @author Ethan Bass
 #' @seealso \code{\link{plot_spectrum}}
 #' @export plot_all_spectra
-plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, plot_spectrum = T,
-                             export_spectrum=TRUE, scale_spectrum=TRUE,
-                             overlapping=TRUE, verbose=FALSE, ...){
+plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all", 
+                             plot_spectrum = T, export_spectrum=TRUE,
+                             scale_spectrum=TRUE, overlapping=TRUE,
+                             verbose=FALSE, ...){
   if (is.null(chrom_list)){
     chrom_list <- get(peak_table$args["chrom_list"])
   }
   new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
-  sp <- sapply(seq_along(chrom_list), function(chr){
+  if (chrs=="all") chrs <- seq_along(chrom_list)
+  sp <- sapply(chrs, function(chr){
     plot_spectrum(loc = peak, peak_table = peak_table, chrom_list=chrom_list,
                   chr=chr, plot_spectrum=FALSE, plot_trace=FALSE, export_spectrum = TRUE,
                   scale_spectrum=scale_spectrum, verbose=verbose, what="peak")
