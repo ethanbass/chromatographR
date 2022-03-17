@@ -11,7 +11,7 @@
 #' @references Eilers, P.H.C. 2004.a
 #' @export attach_metadata
 
-attach_meta <- function(peak_table, metadata, column){
+attach_metadata <- function(peak_table, metadata, column){
   meta <- data.frame(rownames(peak_table$tab))
   names(meta) <- column
   metadata[,column] <- as.character(metadata[,column])
