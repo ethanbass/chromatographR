@@ -226,8 +226,9 @@ plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all",
 plot.peak_table <- function(peak_table, loc=NULL, chrom_list=NULL,
                           chr = 'max', lambda = 'max',
                           plot_spectrum = TRUE, plot_trace = TRUE,
+                          box_plot = FALSE,
                           spectrum_labels=TRUE, scale_spectrum=FALSE,
-                          export_spectrum=FALSE, verbose=TRUE, ...){
+                          export_spectrum=FALSE, verbose=TRUE, vars=NULL, ...){
   if (is.null(loc)){
     loc <- readline(prompt="Which peak would you like to plot? \n")
     loc <- gsub('\\"','',loc)
@@ -235,16 +236,25 @@ plot.peak_table <- function(peak_table, loc=NULL, chrom_list=NULL,
     if (!(loc %in% colnames(peak_table$tab)))
       stop("Peak not found.")
   }
-  if (chr == "all"){
-    plot_all_spectra(loc, peak_table, chrom_list=NULL,
-                     plot_spectrum = plot_spectrum,
-                     export_spectrum=export_spectrum,
-                     verbose=verbose, ...)
-  } else{
-  plot_spectrum(loc, peak_table, chrom_list, chr=chr,
-                lambda=lambda, plot_spectrum=plot_spectrum,
-                plot_trace=plot_trace, spectrum_labels=spectrum_labels,
-                scale_spectrum=scale_spectrum, export_spectrum=export_spectrum,
-                verbose=verbose, what="peak", ...)
+  if (plot_spectrum == TRUE | plot_trace == TRUE){
+    if (chr == "all"){
+      plot_all_spectra(loc, peak_table, chrom_list=NULL,
+                       plot_spectrum = plot_spectrum,
+                       export_spectrum=export_spectrum,
+                       verbose=verbose, ...)
+    } else{
+    plot_spectrum(loc, peak_table, chrom_list, chr=chr,
+                  lambda=lambda, plot_spectrum=plot_spectrum,
+                  plot_trace=plot_trace, spectrum_labels=spectrum_labels,
+                  scale_spectrum=scale_spectrum, export_spectrum=export_spectrum,
+                  verbose=verbose, what="peak")
+    }
+  }
+  if (box_plot == T){
+    if (is.null(vars))
+      stop("Must provide independent variable or variables for boxplot")
+    boxplot(as.formula(paste("peak_table$tab[,loc]",vars,sep="~")), data = peak_table$sample_meta,
+            main = paste(i, '\n', 'RT = ', round(pktab.rts$pk_meta['RT', loc],2)),
+            ylab="abs", xlab="", ...)
   }
 }

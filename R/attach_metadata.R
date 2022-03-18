@@ -11,6 +11,8 @@
 #' @export attach_metadata
 
 attach_metadata <- function(peak_table, metadata, column){
+  if (!(column %in% colnames(metadata)))
+    stop(paste0("Column, ", column, ", is not found."))
   meta <- data.frame(rownames(peak_table$tab))
   names(meta) <- column
   metadata[,column] <- as.character(metadata[,column])
