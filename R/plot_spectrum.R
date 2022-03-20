@@ -164,7 +164,7 @@ plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all",
     chrom_list <- get(peak_table$args["chrom_list"])
   }
   new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
-  if (chrs=="all") chrs <- seq_along(chrom_list)
+  if ("all" %in% chrs) chrs <- seq_along(chrom_list)
   sp <- sapply(chrs, function(chr){
     plot_spectrum(loc = peak, peak_table = peak_table, chrom_list=chrom_list,
                   chr=chr, plot_spectrum=FALSE, plot_trace=FALSE, export_spectrum = TRUE,
