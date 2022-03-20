@@ -68,46 +68,6 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"),
             class="peak_list")
 }
 
-
-getAllPeaks <- function (chrom_list, lambdas, max.iter=100,
-                       fit = c("egh", "gaussian"), sd.max=50, ...){
-  msg<-"The function `getAllPeaks` is deprecated. Please use `get_peaks` instead"
-  .Deprecated(getAllPeaks, package="chromatographR", msg,
-              old = as.character(sys.call(sys.parent()))[1L])
-  fit <- match.arg(fit, c("egh", "gaussian"))
-  if (is.numeric(lambdas)){
-    lambdas <- as.character(lambdas)
-  }
-  peaks<-list()
-  chrom_list <- lapply(chrom_list, function(c_mat) c_mat[,lambdas, drop=F])
-  peak_positions <- lapply(chrom_list, function(c_mat){
-    apply(c_mat, 2, function(x) find_peaks(x, ...))})
-  result <- lapply(seq_along(chrom_list), function(smpl){
-    ptable <- lapply(seq_along(peak_positions[[smpl]]), function(cmpnd){
-      fit_peaks(chrom_list[[smpl]][,cmpnd], peak_positions[[smpl]][[cmpnd]], fit=fit, max.iter=max.iter, sd.max=sd.max)
-    })
-    names(ptable) <- names(peak_positions[[smpl]])
-    ptable
-  })
-  names(result) <- names(peak_positions)
-  result <- lapply(result, function(smpl) lapply(smpl, function(pks) pks[apply(pks, 
-                                                                               1, function(x) !any(is.na(x))), , drop = FALSE]))
-  timepoints <- as.numeric(rownames(chrom_list[[1]]))
-  tdiff <- median(diff(timepoints))
-  lapply(result, function(smpl) lapply(smpl, function(cmpnd) {
-    x <- cmpnd
-    x[, c('rt', 'start', 'end')] <- sapply(c('rt', 'start', 'end'), function(j) timepoints[x[,j]])
-    x[, c('sd', 'FWHM')] <- x[, c('sd', 'FWHM')] * tdiff
-    if (!is.null(x$tau)){x[, c('tau')] <- x[, c('tau')] * tdiff} 
-    x
-  }))
-}
-
-## function to visually check integration accuracy
-## fit is output of get_peaks for chrome
-
-
-
 #' Function to visually assess accuracy of integration
 #' 
 #' Check integration by overlaying gaussian curves onto chromatogram.
@@ -128,6 +88,7 @@ getAllPeaks <- function (chrom_list, lambdas, max.iter=100,
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaks}}
 #' @keywords manip
+#' @rdname plot.peak_list
 #' @export
 #' 
 plot.peak_list <- function(peak_list, chrom_list=NULL, index=1, lambda=NULL,

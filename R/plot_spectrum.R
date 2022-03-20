@@ -144,6 +144,7 @@ elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
 #' function)
 #' @param chrom_list A list of profile matrices, each of the same dimensions
 #' (timepoints x components).
+#' @param chrs Vector of chromatograms to plot.
 #' @param plot_spectrum Logical. If TRUE, plots the spectrum of the chosen
 #' peak.
 #' @param export_spectrum Logical. If TRUE, exports spectrum to console.
@@ -194,7 +195,8 @@ plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all",
 #' column in the peak table represents a single compound.
 #' 
 #' @importFrom scales rescale
-#' @importFrom graphics identify title text
+#' @importFrom graphics identify title text boxplot
+#' @importFrom stats as.formula
 #' @param loc The name of the peak or retention time for which you wish to
 #' extract spectral data.
 #' @param peak_table The peak table (output from \code{\link{getPeakTable}}
@@ -203,7 +205,7 @@ plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all",
 #' wavelengths).
 #' @param chr Numerical index of chromatogram you wish to plot; "max" to
 #' plot the chromatogram with the largest signal; or "all" to plot spectra
-#' for all chromatograms
+#' for all chromatograms.
 #' @param lambda The wavelength you wish to plot the trace at if
 #' plot_chrom ==T and/or the wavelength to be used for the determination
 #' of signal abundance.
@@ -211,6 +213,8 @@ plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all",
 #' peak. Defaults to TRUE.
 #' @param plot_trace Logical. If TRUE, plots the trace of the chosen peak at
 #' lambda. Defaults to TRUE.
+#' @param box_plot Logical. If TRUE, plots box plot using categories
+#' defined by \code{vars}.
 #' @param spectrum_labels Logical. If TRUE, plots labels on maxima in spectral
 #' plot. Defaults to TRUE.
 #' @param scale_spectrum Logical. If TRUE, scales spectrum to unit height.
@@ -219,8 +223,10 @@ plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all",
 #' Defaults to FALSE.
 #' @param verbose Logical. If TRUE, prints verbose output to console. Defaults
 #' to TRUE.
+#' @param vars Independent variables for boxplot.
 #' @param ... Additional arguments.
 #' @author Ethan Bass
+#' @rdname plot.peak_table
 #' @export
 
 plot.peak_table <- function(peak_table, loc=NULL, chrom_list=NULL,
@@ -254,7 +260,7 @@ plot.peak_table <- function(peak_table, loc=NULL, chrom_list=NULL,
     if (is.null(vars))
       stop("Must provide independent variable or variables for boxplot")
     boxplot(as.formula(paste("peak_table$tab[,loc]",vars,sep="~")), data = peak_table$sample_meta,
-            main = paste(i, '\n', 'RT = ', round(pktab.rts$pk_meta['RT', loc],2)),
+            main = paste(loc, '\n', 'RT = ', round(peak_table$pk_meta['RT', loc],2)),
             ylab="abs", xlab="", ...)
   }
 }
