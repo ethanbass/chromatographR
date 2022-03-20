@@ -5,19 +5,21 @@
 \title{Function to visually assess accuracy of integration}
 \usage{
 \method{plot}{peak_list}(
-  peak_list,
+  x,
+  ...,
   chrom_list = NULL,
   index = 1,
   lambda = NULL,
   points = FALSE,
   ticks = FALSE,
   a = 0.5,
-  cex.points = 0.5,
-  ...
+  cex.points = 0.5
 )
 }
 \arguments{
-\item{peak_list}{Output from the \code{get_peaks} function.}
+\item{x}{Peak_list object. Output from the \code{get_peaks} function.}
+
+\item{\dots}{Additional arguments to plot function.}
 
 \item{chrom_list}{List of chromatograms (retention time x wavelength
 matrices)}
@@ -34,8 +36,6 @@ to FALSE.}
 \item{a}{Select "alpha"" parameter controlling transparency of shapes.}
 
 \item{cex.points}{Size of points. Defaults to 0.5}
-
-\item{\dots}{Additional arguments to plot function.}
 }
 \description{
 Check integration by overlaying gaussian curves onto chromatogram.
@@ -46,4 +46,3 @@ Check integration by overlaying gaussian curves onto chromatogram.
 \author{
 Ethan Bass
 }
-\keyword{manip}

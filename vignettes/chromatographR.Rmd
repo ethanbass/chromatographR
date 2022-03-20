@@ -15,10 +15,7 @@ vignette: >
 require("knitr", quietly=TRUE)
 require(chromatographR)
 opts_chunk$set(prompt = TRUE, highlight = FALSE, comment=NA, 
-               #background='transparent', size = 'small', 
-               fig.width=6,
-               #fig.height=6, out.width='\\textwidth',
-               dev='svg')
+               fig.width=6)
 suppressMessages(require(chromatographR, quiet=TRUE))
 ```
 
@@ -150,8 +147,8 @@ The `plot.peak_list` function allows you to visually assess the peak integration
 
 ```{r, plot_peaks, warning=F, fig.height=6}
 par(mfrow=c(2,1))
-plot(peak_list = pks_gauss, index=1, lambda='210')
-plot(peak_list = pks_egh, index=1, lambda='210')
+plot(pks_gauss, index=1, lambda='210')
+plot(pks_egh, index=1, lambda='210')
 ```
 
 ```{r, get_peaktable}

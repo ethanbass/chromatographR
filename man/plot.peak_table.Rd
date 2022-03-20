@@ -5,7 +5,8 @@
 \title{Plot spectrum from peak table}
 \usage{
 \method{plot}{peak_table}(
-  peak_table,
+  x,
+  ...,
   loc = NULL,
   chrom_list = NULL,
   chr = "max",
@@ -17,13 +18,14 @@
   scale_spectrum = FALSE,
   export_spectrum = FALSE,
   verbose = TRUE,
-  vars = NULL,
-  ...
+  vars = NULL
 )
 }
 \arguments{
-\item{peak_table}{The peak table (output from \code{\link{getPeakTable}}
+\item{x}{The peak table (output from \code{\link{get_peaktable}}
 function).}
+
+\item{...}{Additional arguments.}
 
 \item{loc}{The name of the peak or retention time for which you wish to
 extract spectral data.}
@@ -33,7 +35,7 @@ wavelengths).}
 
 \item{chr}{Numerical index of chromatogram you wish to plot; "max" to
 plot the chromatogram with the largest signal; or "all" to plot spectra
-for all chromatograms}
+for all chromatograms.}
 
 \item{lambda}{The wavelength you wish to plot the trace at if
 plot_chrom ==T and/or the wavelength to be used for the determination
@@ -44,6 +46,9 @@ peak. Defaults to TRUE.}
 
 \item{plot_trace}{Logical. If TRUE, plots the trace of the chosen peak at
 lambda. Defaults to TRUE.}
+
+\item{box_plot}{Logical. If TRUE, plots box plot using categories
+defined by \code{vars}.}
 
 \item{spectrum_labels}{Logical. If TRUE, plots labels on maxima in spectral
 plot. Defaults to TRUE.}
@@ -57,7 +62,7 @@ Defaults to FALSE.}
 \item{verbose}{Logical. If TRUE, prints verbose output to console. Defaults
 to TRUE.}
 
-\item{...}{Additional arguments.}
+\item{vars}{Independent variables for boxplot.}
 }
 \description{
 A function to plot the trace and/or spectrum for a given peak in peak table.

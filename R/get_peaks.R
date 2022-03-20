@@ -74,7 +74,7 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"),
 #'
 #' @importFrom stats median
 #' @importFrom graphics polygon arrows
-#' @param peak_list Output from the \code{get_peaks} function.
+#' @param x Peak_list object. Output from the \code{get_peaks} function.
 #' @param chrom_list List of chromatograms (retention time x wavelength
 #' matrices)
 #' @param index Index or name of chromatogram to be plotted.
@@ -87,25 +87,24 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"),
 #' @param \dots Additional arguments to plot function.
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaks}}
-#' @keywords manip
 #' @rdname plot.peak_list
 #' @export
 #' 
-plot.peak_list <- function(peak_list, chrom_list=NULL, index=1, lambda=NULL,
-                       points=FALSE, ticks=FALSE, a=0.5, cex.points=0.5, ...){
+plot.peak_list <- function(x, ..., chrom_list=NULL, index=1, lambda=NULL,
+                       points=FALSE, ticks=FALSE, a=0.5, cex.points=0.5){
   if (is.null(chrom_list)){
-    chrom_list <- get(attr(peak_list, "chrom_list"))
+    chrom_list <- get(attr(x, "chrom_list"))
   }
   if (is.null(lambda)){
-    lambda <- names(peak_list[[1]])[1]
+    lambda <- names(x[[1]])[1]
   }
-  if (!(lambda %in% names(peak_list[[1]]))){
+  if (!(lambda %in% names(x[[1]]))){
     stop('Error: lambda must match one of the wavelengths in your peak list')
   }
   if (is.numeric(lambda)){lambda <- as.character(lambda)}
   new.ts <- as.numeric(rownames(chrom_list[[1]]))
   y <- chrom_list[[index]][,lambda]
-  pks <- data.frame(peak_list[[index]][[lambda]])
+  pks <- data.frame(x[[index]][[lambda]])
   fit <- ifelse("tau" %in% colnames(pks), "egh", "gaussian")
   plot(new.ts, y, type='l', xlab='', ylab='', xaxt='n', yaxt='n', ...)
   if (points){

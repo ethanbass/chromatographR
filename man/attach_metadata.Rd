@@ -20,7 +20,7 @@ Peak table with meta-data.
 Attach experimental meta-data to peak table.
 }
 \seealso{
-
+\code{\link{get_peaktable}}
 }
 \author{
 Ethan Bass

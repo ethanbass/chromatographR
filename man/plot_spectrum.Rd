@@ -24,7 +24,7 @@ plot_spectrum(
 \item{loc}{The name of the peak or retention time for which you wish to
 extract spectral data.}
 
-\item{peak_table}{The peak table (output from \code{\link{getPeakTable}}
+\item{peak_table}{The peak table (output from \code{\link{get_peaktable}}
 function).}
 
 \item{chrom_list}{A list of chromatograms in matrix form (timepoints x
@@ -33,8 +33,8 @@ wavelengths).}
 \item{chr}{Numerical index of chromatogram you wish to plot, or "max" to
 automatically plot the chromatogram with the largest signal.}
 
-\item{lambda}{The wavelength you wish to plot the trace at if plot_chrom ==
-T and/or the wavelength to be used for the determination of signal
+\item{lambda}{The wavelength you wish to plot the trace at if plot_trace ==
+TRUE and/or the wavelength to be used for the determination of signal
 abundance.}
 
 \item{plot_spectrum}{Logical. If TRUE, plots the spectrum of the chosen

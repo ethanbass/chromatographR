@@ -8,14 +8,14 @@
 #' @importFrom graphics identify title text
 #' @param loc The name of the peak or retention time for which you wish to
 #' extract spectral data.
-#' @param peak_table The peak table (output from \code{\link{getPeakTable}}
+#' @param peak_table The peak table (output from \code{\link{get_peaktable}}
 #' function).
 #' @param chrom_list A list of chromatograms in matrix form (timepoints x
 #' wavelengths).
 #' @param chr Numerical index of chromatogram you wish to plot, or "max" to
 #' automatically plot the chromatogram with the largest signal.
-#' @param lambda The wavelength you wish to plot the trace at if plot_chrom ==
-#' T and/or the wavelength to be used for the determination of signal
+#' @param lambda The wavelength you wish to plot the trace at if plot_trace ==
+#' TRUE and/or the wavelength to be used for the determination of signal
 #' abundance.
 #' @param plot_spectrum Logical. If TRUE, plots the spectrum of the chosen
 #' peak. Defaults to TRUE.
@@ -140,7 +140,7 @@ elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
 #' 
 #' @param peak The name of the peak you wish to plot (must be in character
 #' format)
-#' @param peak_table The peak table (output from \code{\link{getPeakTable}}
+#' @param peak_table The peak table (output from \code{\link{get_peaktable}}
 #' function)
 #' @param chrom_list A list of profile matrices, each of the same dimensions
 #' (timepoints x components).
@@ -186,8 +186,6 @@ plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all",
   }
 }
 
-
-
 #' Plot spectrum from peak table
 #' 
 #' A function to plot the trace and/or spectrum for a given peak in peak table.
@@ -197,10 +195,10 @@ plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all",
 #' @importFrom scales rescale
 #' @importFrom graphics identify title text boxplot
 #' @importFrom stats as.formula
+#' @param x The peak table (output from \code{\link{get_peaktable}}
+#' function).
 #' @param loc The name of the peak or retention time for which you wish to
 #' extract spectral data.
-#' @param peak_table The peak table (output from \code{\link{getPeakTable}}
-#' function).
 #' @param chrom_list A list of chromatograms in matrix form (timepoints x
 #' wavelengths).
 #' @param chr Numerical index of chromatogram you wish to plot; "max" to
@@ -229,27 +227,27 @@ plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all",
 #' @rdname plot.peak_table
 #' @export
 
-plot.peak_table <- function(peak_table, loc=NULL, chrom_list=NULL,
+plot.peak_table <- function(x, ..., loc=NULL, chrom_list=NULL,
                           chr = 'max', lambda = 'max',
                           plot_spectrum = TRUE, plot_trace = TRUE,
                           box_plot = FALSE,
                           spectrum_labels=TRUE, scale_spectrum=FALSE,
-                          export_spectrum=FALSE, verbose=TRUE, vars=NULL, ...){
+                          export_spectrum=FALSE, verbose=TRUE, vars=NULL){
   if (is.null(loc)){
     loc <- readline(prompt="Which peak would you like to plot? \n")
     loc <- gsub('\\"','',loc)
     loc <- gsub("\\'","",loc)
-    if (!(loc %in% colnames(peak_table$tab)))
+    if (!(loc %in% colnames(x$tab)))
       stop("Peak not found.")
   }
   if (plot_spectrum == TRUE | plot_trace == TRUE){
     if (chr == "all"){
-      plot_all_spectra(loc, peak_table, chrom_list=NULL,
+      plot_all_spectra(loc, x, chrom_list=NULL,
                        plot_spectrum = plot_spectrum,
                        export_spectrum=export_spectrum,
                        verbose=verbose, ...)
     } else{
-    plot_spectrum(loc, peak_table, chrom_list, chr=chr,
+    plot_spectrum(loc, x, chrom_list, chr=chr,
                   lambda=lambda, plot_spectrum=plot_spectrum,
                   plot_trace=plot_trace, spectrum_labels=spectrum_labels,
                   scale_spectrum=scale_spectrum, export_spectrum=export_spectrum,
@@ -259,8 +257,8 @@ plot.peak_table <- function(peak_table, loc=NULL, chrom_list=NULL,
   if (box_plot == T){
     if (is.null(vars))
       stop("Must provide independent variable or variables for boxplot")
-    boxplot(as.formula(paste("peak_table$tab[,loc]",vars,sep="~")), data = peak_table$sample_meta,
-            main = paste(loc, '\n', 'RT = ', round(peak_table$pk_meta['RT', loc],2)),
+    boxplot(as.formula(paste("x$tab[,loc]",vars,sep="~")), data = x$sample_meta,
+            main = paste(loc, '\n', 'RT = ', round(x$pk_meta['RT', loc],2)),
             ylab="abs", xlab="", ...)
   }
 }
