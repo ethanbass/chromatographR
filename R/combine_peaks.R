@@ -1,6 +1,20 @@
-## Function to combine peaks that have been integrated at multiple wavelengths,
-## based on retention time and spectral similarity.
-
+#' Combine peaks in peak table
+#' 
+#' Utility function to combine duplicate peaks in peak table, i.e. peaks that
+#' were integrated at more than one wavelength or component. Specify number of
+#' digits to match retention time and minimum spectral correlation for a match.
+#' 
+#' 
+#' @param peak_table Peak table from \code{\link{getPeakTable}}.
+#' @param digits Number of digits to use for retention time matching.
+#' @param min.cor Minimum spectral correlation to confirm a match.
+#' @param choose If "max" will retain peak with highest intensity. Otherwise,
+#' the first column in the dataframe will be retained.
+#' @return A peak table similar to the input peak table, but with duplicate
+#' columns combined according to the specified criteria.
+#' @author Ethan Bass
+#' @seealso \code{\link{get_peaks}}
+#' @export combine_peaks
 combine_peaks <- function(peak_table, digits=2, min.cor=0.9, choose='max'){
   RTs <- round(as.numeric(peak_table['RT',]), digits = digits)
   d <- unique(RTs[duplicated(RTs)])

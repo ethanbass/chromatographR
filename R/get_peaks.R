@@ -1,3 +1,32 @@
+#' Extract all peaks from the chromatographic profiles of a list of
+#' chromatograms.
+#' 
+#' Function to extract all peaks in a list of chromatograms. Peaks are located
+#' as local maxima within the given span (function \code{\link{find_peaks}})
+#' and at the given positions a gaussian curve is fit (function
+#' \code{\link{fit_peaks}}).
+#' 
+#' @aliases get_peaks getAllPeaks
+#' @importFrom stats median
+#' @param chrom_list A list of profile matrices, each of the same dimensions
+#' (timepoints times wavelengths).
+#' @param lambdas Character vector of wavelengths to find peaks at.
+#' @param fit What type of fit to use. Current options are gaussian and
+#' exponential gaussian hybrid.
+#' @param sd.max Maximum width (standard deviation) for peaks. Defaults to 50.
+#' @param max.iter Maximum number of interations for non-linear least squares
+#' in \code{\link{fit_peaks}}.
+#' @param \dots Additional arguments to \code{\link{find_peaks}}.
+#' @return The result is a list, with each element corresponding to one data
+#' file, and containing data for the fitted peaks for each of the ALS
+#' components. Note that this function presents the "rt", "sd" and "FWHM"
+#' fields in real time units.
+#' @note Function is adapted from the
+#' \url{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks}
+#' function authored by Ron Wehrens.
+#' @author Ethan Bass & Ron Wehrens
+#' @export get_peaks
+
 get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"), sd.max=50, max.iter=100, ...){
   fit <- match.arg(fit, c("egh", "gaussian"))
   if (is.numeric(lambdas)){
@@ -7,8 +36,8 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"), sd.max=5
   chrom_list <- lapply(chrom_list, function(c_mat) c_mat[,lambdas, drop=F])
   peak_positions <- lapply(chrom_list, function(c_mat){
     apply(c_mat, 2, function(x) find_peaks(x, ...))})
-  result <- lapply(1:length(chrom_list), function(smpl){
-    ptable <- lapply(1:length(peak_positions[[smpl]]), function(cmpnd){
+  result <- lapply(seq_along(chrom_list), function(smpl){
+    ptable <- lapply(seq_along(peak_positions[[smpl]]), function(cmpnd){
       fit_peaks(chrom_list[[smpl]][,cmpnd], peak_positions[[smpl]][[cmpnd]], fit=fit, max.iter=max.iter, sd.max=sd.max)
     })
     names(ptable) <- names(peak_positions[[smpl]])
@@ -42,8 +71,8 @@ getAllPeaks <- function (chrom_list, lambdas, max.iter=100,
   chrom_list <- lapply(chrom_list, function(c_mat) c_mat[,lambdas, drop=F])
   peak_positions <- lapply(chrom_list, function(c_mat){
     apply(c_mat, 2, function(x) find_peaks(x, ...))})
-  result <- lapply(1:length(chrom_list), function(smpl){
-    ptable <- lapply(1:length(peak_positions[[smpl]]), function(cmpnd){
+  result <- lapply(seq_along(chrom_list), function(smpl){
+    ptable <- lapply(seq_along(peak_positions[[smpl]]), function(cmpnd){
       fit_peaks(chrom_list[[smpl]][,cmpnd], peak_positions[[smpl]][[cmpnd]], fit=fit, max.iter=max.iter, sd.max=sd.max)
     })
     names(ptable) <- names(peak_positions[[smpl]])
@@ -63,11 +92,29 @@ getAllPeaks <- function (chrom_list, lambdas, max.iter=100,
   }))
 }
 
-## function to visually check integration accuracy
-## fit is output of get_peaks for chrome
-
+#' Function to plot fitted peaks
+#' 
+#' Visually assess integration accuracy by fitted peaks onto chromatogram.
+#'
+#' @importFrom stats median
+#' @importFrom graphics polygon arrows
+#' @param chrom_list List of chromatograms (retention time x wavelength
+#' matrices)
+#' @param peak_list Output from the \code{findpeaks} function.
+#' @param index Index of chromatogram to be plotted.
+#' @param lambda Wavelength for plotting.
+#' @param points Logical. If TRUE, plot peak maxima. Defaults to FALSE.
+#' @param ticks Logical. If TRUE, mark beginning and end of each peak. Defaults
+#' to FALSE.
+#' @param a Select "alpha"" parameter controlling transparency of shapes.
+#' @param cex.points Size of points. Defaults to 0.5
+#' @param \dots Additional arguments to plot function.
+#' @author Ethan Bass
+#' @seealso \code{\link{get_peaks}}
+#' @keywords manip
+#' @export plot_peaks
 plot_peaks <- function(chrom_list, peak_list, index=1, lambda=NULL,
-                       points=F, ticks=F, a=0.5, cex.points=0.5, ...){
+                       points=FALSE, ticks=FALSE, a=0.5, cex.points=0.5, ...){
   if (is.null(lambda)){
     lambda <- names(peak_list[[1]])[1]
   }
@@ -80,16 +127,16 @@ plot_peaks <- function(chrom_list, peak_list, index=1, lambda=NULL,
   pks <- data.frame(peak_list[[index]][[lambda]])
   fit <- ifelse("tau" %in% colnames(pks), "egh", "gaussian")
   plot(new.ts, y, type='l', xlab='', ylab='', xaxt='n', yaxt='n', ...)
-  if (points==T){
+  if (points){
     points(pks$rt, pks$height, pch=20, cex=cex.points, col='red')
   }
-  if (ticks==T){
+  if (ticks){
     arrows(pks$start, y[which(new.ts %in% pks$start)]-5, pks$start, y[which(new.ts %in% pks$start)]+5, col="blue", length=0)
     arrows(pks$end, y[which(new.ts %in% pks$end)]-5, pks$end, y[which(new.ts %in% pks$end)]+5, col="blue", length=0)
   }
-  for (i in 1:nrow(pks)){
+  for (i in seq_len(nrow(pks))){
     peak.loc<-seq.int((pks$start[i]),(pks$end[i]), by = .01)
-      if (fit=="gaussian"){
+      if (fit == "gaussian"){
         yvals <- gaussian(peak.loc, center=pks$rt[i], width=pks$sd[i], height = pks$height[i])
         color <- "red"
       }
