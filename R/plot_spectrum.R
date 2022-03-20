@@ -171,7 +171,7 @@ plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all",
                   scale_spectrum=scale_spectrum, verbose=verbose, what="peak")
   })
   sp<-do.call(cbind, sp)
-  colnames(sp) <- names(chrom_list)
+  colnames(sp) <- names(chrom_list)[chrs]
   if (plot_spectrum){
     if(overlapping){
       matplot(new.lambdas, sp, type='l', xlab='wavelength', ylab='intensity',las=2)
