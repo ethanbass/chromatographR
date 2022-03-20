@@ -7,7 +7,7 @@
 #' @param column Name of the column with sample names.
 #' @return Peak table with meta-data.
 #' @author Ethan Bass
-#' @seealso \code{\link[get_peaktable}}
+#' @seealso \code{\link{get_peaktable}}
 #' @export attach_metadata
 
 attach_metadata <- function(peak_table, metadata, column){

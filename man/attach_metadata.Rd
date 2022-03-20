@@ -14,16 +14,13 @@ attach_metadata(peak_table, metadata, column)
 \item{column}{Name of the column with sample names.}
 }
 \value{
-Peak table with metadata added
+Peak table with meta-data.
 }
 \description{
-Attach experimental metadata to peak table.
-}
-\references{
-Eilers, P.H.C. 2004.a
+Attach experimental meta-data to peak table.
 }
 \seealso{
-\code{\link[ptw:ptw]{ptw}}, \code{\link{correctPeaks}}
+
 }
 \author{
 Ethan Bass

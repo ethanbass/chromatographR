@@ -12,10 +12,12 @@
   lambda = "max",
   plot_spectrum = TRUE,
   plot_trace = TRUE,
+  box_plot = FALSE,
   spectrum_labels = TRUE,
   scale_spectrum = FALSE,
   export_spectrum = FALSE,
   verbose = TRUE,
+  vars = NULL,
   ...
 )
 }
