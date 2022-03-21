@@ -229,11 +229,6 @@ compare_spectra <- function(peak, peak_table, chrom_list,
 
 #' Function to gather reference spectra.
 #' 
-#' Function that tries to correct false zeroes for a particular peak in the
-#' peaktable. In each chromatogram, the function compares all peaks within a
-#' certain radius around the focal peak on the basis of their spectral
-#' similarity to a reference spectrum.
-#' 
 #' @importFrom stats cor sd
 #' @param peak_table Peak table from \code{\link{getPeakTable}}.
 #' @param chrom_list A list of chromatograms in matrix form (timepoints x

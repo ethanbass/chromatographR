@@ -183,4 +183,30 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
                         ))
   class(result) <- "peak_table"
   return(result)
-  }
+}
+#' @importFrom utils head
+#' @noRd
+#' @rdname head.peak_table
+#' @export
+head.peak_table <- function(x,...){
+  head(x$tab)
+}
+
+#' @noRd
+#' @export
+tail.peak_table <- function(x,...){
+  tail(x$tab)
+}
+
+#' @noRd
+#' @export
+print.peak_table <- function(x, ...){
+  print(x$tab)
+}
+
+#' @noRd
+#' @export
+dim.peak_table <- function(x){
+  dim(x$tab)
+}
+
