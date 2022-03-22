@@ -192,6 +192,7 @@ head.peak_table <- function(x,...){
   head(x$tab)
 }
 
+#' @importFrom utils tail
 #' @noRd
 #' @export
 tail.peak_table <- function(x,...){

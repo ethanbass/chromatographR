@@ -43,15 +43,15 @@ plot_spectrum <- function(loc, peak_table, chrom_list=NULL,
                           export_spectrum = FALSE, verbose=TRUE, 
                           what=c("peak", "rt", "click"), ...){
   what <- match.arg(what, c("peak", "rt", "click"))
+  if (is.null(chrom_list)){
+    chrom_list <- try(get(peak_table$args["chrom_list"]))
+    if (class(chrom_list)=="try-error") stop("Chromatograms not found!")
+  }
   if (what == "peak"){
     if(is.null(peak_table)){
       stop("Peak table is required to locate peak spectrum.")}
     if (!(loc %in% colnames(peak_table$tab))){
       stop(paste0("No match found for peak \'", loc, "\' in peak table."))}
-    if (is.null(chrom_list)){
-      chrom_list <- try(get(peak_table$args["chrom_list"]))
-      if (class(chrom_list)=="try-error") stop("Chromatograms not found!")
-    }
   }
   if (what == "rt" | what == "click"){
     if (chr == "max")
@@ -65,7 +65,7 @@ plot_spectrum <- function(loc, peak_table, chrom_list=NULL,
   tab <- peak_table$tab
   new.ts <- as.numeric(rownames(chrom_list[[1]]))
   new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
-  sig <- max(sapply(strsplit(rownames(chrom_list[[1]]),".",fixed=T),function(x) nchar(x[2])),na.rm=T)
+  sig <- max(sapply(strsplit(rownames(chrom_list[[1]]),".", fixed=T),function(x) nchar(x[2])),na.rm=T)
   if (what == "click"){
     y<-chrom_list[[chr]][,lambda]
     matplot(x=new.ts, y=y, type='l', ylab='', xlab='')
@@ -73,13 +73,13 @@ plot_spectrum <- function(loc, peak_table, chrom_list=NULL,
     time <- identify(new.ts, y,n=1, plot=F)
     RT <- new.ts[time]
     abline(v=RT,col='red',lty=3)
-    title(paste0("\n\n chr ", chr,  " ;   rt: ", RT, " ;  abs: ", round(y[t],1)))
+    title(paste0("\n\n chr ", chr,  " ;   rt: ", RT, " ;  abs: ", round(y[time],1)))
     y <- chrom_list[[chr]][time,]
     # closest match
     if (verbose){
       print(paste0("chrome no. ", chr, "; RT: ", RT, "; lambda = ", lambda, " nm"))
     if (!is.null(tab)){
-    pk <- names(which.min(abs(tab["RT",] - RT)))
+    pk <- names(which.min(abs(peak_table$pk_meta["RT",] - RT)))
     print(paste("closest match in peak table is", pk))
     }}
   } else {
