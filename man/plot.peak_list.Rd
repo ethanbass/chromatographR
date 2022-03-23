@@ -38,7 +38,7 @@ to FALSE.}
 \item{cex.points}{Size of points. Defaults to 0.5}
 }
 \description{
-Check integration by overlaying gaussian curves onto chromatogram.
+Visually assess integration accuracy by fitted peaks onto chromatogram.
 }
 \seealso{
 \code{\link{get_peaks}}

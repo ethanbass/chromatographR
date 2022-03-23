@@ -6,7 +6,6 @@
 #' and at the given positions a gaussian curve is fit (function
 #' \code{\link{fit_peaks}}).
 #' 
-#' 
 #' @aliases get_peaks getAllPeaks
 #' @importFrom stats median
 #' @param chrom_list A list of profile matrices, each of the same dimensions
@@ -70,7 +69,7 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"),
 
 #' Function to visually assess accuracy of integration
 #' 
-#' Check integration by overlaying gaussian curves onto chromatogram.
+#' Visually assess integration accuracy by fitted peaks onto chromatogram.
 #'
 #' @importFrom stats median
 #' @importFrom graphics polygon arrows
@@ -116,7 +115,7 @@ plot.peak_list <- function(x, ..., chrom_list=NULL, index=1, lambda=NULL,
   }
   for (i in seq_len(nrow(pks))){
     peak.loc<-seq.int((pks$start[i]),(pks$end[i]), by = .01)
-      if (fit=="gaussian"){
+      if (fit == "gaussian"){
         yvals <- gaussian(peak.loc, center=pks$rt[i], width=pks$sd[i], height = pks$height[i])
         color <- "red"
       }

@@ -157,8 +157,8 @@ fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian"), max.iter
 }
 #################################################################################################
 ### gaussian
-## from https://github.com/robertdouglasmorrison/DuffyTools/blob/master/R/gaussian.R
-
+## adapted from https://github.com/robertdouglasmorrison/DuffyTools/blob/master/R/gaussian.R
+#' @noRd
 gaussian <- function(x, center=0, width=1, height=NULL, floor=0) {
   
   # adapted from Earl F. Glynn;  Stowers Institute for Medical Research, 2007
@@ -217,6 +217,7 @@ fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height
 
 ###########################################################################################
 ### expontential-gaussian hybrid
+#' @noRd
 egh <- function(x, center, width,  height, tau, floor=0){
     result <- rep(0, length(x))
     index <- which(2*width^2 + tau*(x-center)>0)

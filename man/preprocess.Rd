@@ -6,11 +6,13 @@
 \usage{
 preprocess(
   X,
-  dim1 = tpoints,
-  dim2 = lambdas,
+  dim1,
+  dim2,
   remove.time.baseline = TRUE,
   spec.smooth = TRUE,
   maxI,
+  parallel = TRUE,
+  mc.cores = 2,
   ...
 )
 }
@@ -37,6 +39,11 @@ the spectral direction, according to
 
 \item{maxI}{if given, the maximum intensity in the matrix is set to this
 value.}
+
+\item{parallel}{Logical, indicating whether to use parallel processing.
+Defaults to TRUE.}
+
+\item{mc.cores}{How many cores to use for parallel processing. Defaults to 2.}
 
 \item{\dots}{Further optional arguments to
 \code{\link[ptw:baseline.corr]{baseline.corr}}.}
