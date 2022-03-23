@@ -7,7 +7,7 @@
 combine_peaks(peak_table, digits = 2, min.cor = 0.9, choose = "max")
 }
 \arguments{
-\item{peak_table}{Peak table from \code{\link{getPeakTable}}.}
+\item{peak_table}{Peak table from \code{\link{get_peaktable}}.}
 
 \item{digits}{Number of digits to use for retention time matching.}
 

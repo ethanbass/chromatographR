@@ -5,7 +5,7 @@
 #' digits to match retention time and minimum spectral correlation for a match.
 #' 
 #' 
-#' @param peak_table Peak table from \code{\link{getPeakTable}}.
+#' @param peak_table Peak table from \code{\link{get_peaktable}}.
 #' @param digits Number of digits to use for retention time matching.
 #' @param min.cor Minimum spectral correlation to confirm a match.
 #' @param choose If "max" will retain peak with highest intensity. Otherwise,

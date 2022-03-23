@@ -167,7 +167,7 @@ plot_all_spectra(peak, peak_table=pk_tab, chrom_list = warp, export=F, overlappi
 The `cluster_spectra` function groups peaks according to their spectral similarity, using hierarchical clustering, as implemented in the *pvclust* R package [@suzuki2006]. The function returns a list of clusters, along with a p-value for each cluster, calculated through multi-scale bootstrap resampling. These clusters may be useful in downstream analyses (i.e. for loosely grouping peaks by chemical class). For actual use, the number of bootstraps (`nboot`) should be set higher (probably at least 1000, or even 10,000 as recommended by the developers of `pvclust`). There may be some redundancy in the clusters that are returned, or some of the clusters may not correspond to a single chromophore. We recommend that users visually inspect clusters before conducting further analysis in order to remove redundant or unwanted clusters. (This clustering will tend to return better results when applied to data sets with more chromatograms).
 
 ```{r, cluster, fig.show="hold", out.width="20%"}
-cl1 <- cluster_spectra(pk_tab, warp, nboot=100, max.only = T, save = F)
+cl1 <- cluster_spectra(pk_tab, nboot=100, max.only = F, save = F, alpha = .97)
 ```
 
 ## References

@@ -25,7 +25,7 @@ times can be predicted for each peak. These are stored in a separate column
 in the list of peak tables.
 }
 \seealso{
-\code{\link{correctRT}}
+\code{\link{correct_rt}}
 }
 \author{
 Ron Wehrens

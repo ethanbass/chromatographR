@@ -17,7 +17,7 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' @importFrom stats cor
 #' @importFrom methods new
 #' @importFrom graphics matplot
-#' @param peak_table Peak table from \code{\link{getPeakTable}}.
+#' @param peak_table Peak table from \code{\link{get_peaktable}}.
 #' @param chrom_list A list of chromatograms in matrix form (timepoints x
 #' wavelengths).
 #' @param peak_no Minimum and maximum thresholds for the number of peaks a

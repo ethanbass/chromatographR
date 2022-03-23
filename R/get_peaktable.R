@@ -17,7 +17,7 @@
 #' option is to filter the peaks on intensity: perhaps one of the two peaks in
 #' the cluster is only a very small feature.
 #' 
-#' @aliases get_peaktable getPeakTable
+#' @aliases get_peaktable
 #' @importFrom dynamicTreeCut cutreeDynamicTree
 #' @importFrom fastcluster hclust
 #' @importFrom stats dist cutree as.dist aggregate

@@ -20,7 +20,7 @@ cluster_spectra(
 )
 }
 \arguments{
-\item{peak_table}{Peak table from \code{\link{getPeakTable}}.}
+\item{peak_table}{Peak table from \code{\link{get_peaktable}}.}
 
 \item{chrom_list}{A list of chromatograms in matrix form (timepoints x
 wavelengths).}

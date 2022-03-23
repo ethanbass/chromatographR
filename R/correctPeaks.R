@@ -14,7 +14,7 @@
 #' @return The input list of peak tables is returned with extra columns
 #' containing the corrected retention time.
 #' @author Ron Wehrens
-#' @seealso \code{\link{correctRT}}
+#' @seealso \code{\link{correct_rt}}
 #' @keywords manip
 correctPeaks <- function(peakList, modList) {
   mapply(function(samp, mod) {

@@ -2,8 +2,6 @@
 % Please edit documentation in R/correct_rt.R
 \name{correct_rt}
 \alias{correct_rt}
-\alias{correctRT}
-\alias{correctRT5}
 \title{Retention time correction}
 \usage{
 correct_rt(
