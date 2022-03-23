@@ -232,26 +232,26 @@ plot.peak_table <- function(x, ..., loc=NULL, chrom_list=NULL,
                           plot_spectrum = TRUE, plot_trace = TRUE,
                           box_plot = FALSE,
                           spectrum_labels=TRUE, scale_spectrum=FALSE,
-                          export_spectrum=FALSE, verbose=TRUE, vars=NULL){
-  if (is.null(loc)){
+                          export_spectrum=FALSE, verbose=TRUE, vars=NULL, what="peak"){
+  if (what == "peak" & is.null(loc)){
     loc <- readline(prompt="Which peak would you like to plot? \n")
-    loc <- gsub('\\"','',loc)
-    loc <- gsub("\\'","",loc)
+    loc <- gsub('\\"', '', loc)
+    loc <- gsub("\\'", "", loc)
     if (!(loc %in% colnames(x$tab)))
       stop("Peak not found.")
   }
   if (plot_spectrum == TRUE | plot_trace == TRUE){
     if (chr == "all"){
-      plot_all_spectra(loc, x, chrom_list=NULL,
+      plot_all_spectra(loc, x, chrom_list = NULL,
                        plot_spectrum = plot_spectrum,
-                       export_spectrum=export_spectrum,
-                       verbose=verbose, ...)
+                       export_spectrum = export_spectrum,
+                       verbose = verbose, what = what)
     } else{
     plot_spectrum(loc, x, chrom_list, chr=chr,
-                  lambda=lambda, plot_spectrum=plot_spectrum,
-                  plot_trace=plot_trace, spectrum_labels=spectrum_labels,
-                  scale_spectrum=scale_spectrum, export_spectrum=export_spectrum,
-                  verbose=verbose, what="peak")
+                  lambda = lambda, plot_spectrum = plot_spectrum,
+                  plot_trace = plot_trace, spectrum_labels = spectrum_labels,
+                  scale_spectrum = scale_spectrum, export_spectrum = export_spectrum,
+                  verbose = verbose, what = what)
     }
   }
   if (box_plot == T){
