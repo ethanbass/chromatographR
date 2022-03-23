@@ -17,9 +17,9 @@ preprocess(
 )
 }
 \arguments{
-\item{X}{A numerical data matrix, missing values are not allowed. If
-rownames or colnames attributes are used, they should be numerical and
-signify time points and wavelengths, respectively.}
+\item{X}{A numerical data matrix, or list of data matrices. Missing values
+are not allowed. If rownames or colnames attributes are used, they should be
+numerical and signify time points and wavelengths, respectively.}
 
 \item{dim1}{A new, usually shorter, set of time points (numerical). The
 range of these should not be outside the range of the original time points,
@@ -59,6 +59,10 @@ smooth data, like UV-VIS data, there is the option to decrease the size of
 the matrix by interpolation. By default, the data are baseline-corrected in
 the time direction and smoothed in the spectral dimension.
 }
+\note{
+Adapted from the preprocess function authored by Ron Wehrens in the
+alsace package.
+}
 \examples{
 
 data(Sa)
@@ -82,5 +86,5 @@ legend("topleft", lty = 1, col = c("gray", "blue"), bty = "n",
 
 }
 \author{
-Ron Wehrens, Ethan Bass
+Ethan Bass
 }

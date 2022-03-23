@@ -2,7 +2,6 @@
 % Please edit documentation in R/get_peaks.R
 \name{get_peaks}
 \alias{get_peaks}
-\alias{getAllPeaks}
 \title{Extract all peaks from the chromatographic profiles of a list of
 chromatograms.}
 \usage{

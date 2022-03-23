@@ -6,7 +6,7 @@
 #' and at the given positions a gaussian curve is fit (function
 #' \code{\link{fit_peaks}}).
 #' 
-#' @aliases get_peaks getAllPeaks
+#' @aliases get_peaks
 #' @importFrom stats median
 #' @param chrom_list A list of profile matrices, each of the same dimensions
 #' (timepoints times wavelengths).

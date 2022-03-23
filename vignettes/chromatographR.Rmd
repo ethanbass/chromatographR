@@ -11,7 +11,7 @@ vignette: >
 ---
 
 ```{r setup, include=FALSE}
-#devtools::install_github("ethanbass/chromatographR", ref="roxygenize")
+# devtools::install_github("ethanbass/chromatographR", ref="s3_class")
 require("knitr", quietly=TRUE)
 require(chromatographR)
 require(parallel)
@@ -80,15 +80,11 @@ After loading data, you may want to normalize your chromatograms (e.g. by sample
 
 In many cases, HPLC data can suffer from retention time shifts (e.g. due to temperature fluctuations, column degradation, or subtle changes in mobile-phase composition). Parametric time warping (as implemented in the *ptw* package can be quite an effective technique for correcting subtle retention time shifts [@eilers2004]. If your chromatograms are already perfectly aligned you can skip this step. If you have severe retention time shifts this technique will be considerably less effective (and you should consider checking your HPLC for leaks). 
 
-The `correct_rt` function is a wrapper around the `ptw` function. For each chromatogram, it produces a "global" warping function across all wavelengths included in `lambdas`). The goal of the warping function is to produce a better alignment of retention times by "warping" the time-axis of each chromatogram to match a reference chromatogram. The reference chromatogram can be selected manually or determined algorithmically by setting the `reference` argument. The code below creates warping models for the samples in the provided list of data matrices.
+The `correct_rt` function is a wrapper around the `ptw` function. For each chromatogram, it produces a "global" warping function across all wavelengths included in `lambdas`). The goal of the warping function is to produce a better alignment of retention times by "warping" the time-axis of each chromatogram to match a reference chromatogram. The reference chromatogram can be selected manually or determined algorithmically by setting the `reference` argument. The code below creates warping models for the samples in the provided list of data matrices. The same function can then be used to warp each chromatogram according to the corresponding model, by setting the `models` parameter.
+
 
 ```{r, warp model}
 warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360'), n.zeros = 250)
-```
-
-The same function can then be used to warp each chromatogram according to the corresponding model, by setting the `models` parameter.
-
-```{r}
 warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
 ```
 
@@ -153,7 +149,7 @@ The `plot_spectrum` function allows you to easily plot or record the spectra ass
 ```{r, plot spectra,fig.height=6}
 par(mfrow=c(2,1))
 peak="X35"
-plot_spectrum(peak, peak_table=pk_tab, chrom_list = warp)
+plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp)
 
 peak="X77"
 plot_spectrum(peak, peak_table=pk_tab, chrom_list = warp)

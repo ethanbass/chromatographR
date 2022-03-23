@@ -1,7 +1,7 @@
 Package: chromatographR
 Type: Package
 Title: chromatographR
-Version: 0.1
+Version: 0.2
 Author: Ethan Bass
 Maintainer: Ethan Bass <ethanbass@gmail.com>
 Description: R package for high throughput analysis of HPLC-DAD chromatograms or other chromatographic data.
