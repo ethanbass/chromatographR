@@ -30,15 +30,22 @@
 #' \href{https://academic.oup.com/bioinformatics/article/31/18/3063/240579}{Fast
 #' parametric time warping of peak lists.} \emph{Bioinformatics}
 #' \bold{31}:3063-3065.
+#' @examples
+#' \dontrun{
+#' warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360'), n.zeros = 250)
+#' warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
+#' }
 #' @export correct_rt
 
-correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best', what = c("models", "corrected.values"), 
-                       init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, scale=TRUE,
-                       trwdth=200, ...){
+correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best',
+                       what = c("models", "corrected.values"), 
+                       init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, 
+                       scale=TRUE, trwdth=200, ...){
   what <- match.arg(what, c("models", "corrected.values"))
   if (is.null(models)){
     if (is.null(lambdas) & is.null(n.traces)){
-      stop("Must specify 'lambdas' (wavelengths) or 'n.traces' (number of traces) to use for alignment.")
+      stop("Must specify wavelengths ('lambdas') or number of traces ('n.traces')
+           to use for alignment.")
     }
     if (is.null(lambdas)){
       lambdas <- colnames(chrom_list[[1]])
@@ -68,7 +75,8 @@ correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best', 
     }
     ptwmods <- lapply((1:dim(allmats)[3]), function(ii){
       ptw(allmats.t[,, reference],
-          allmats.t[, , ii], selected.traces = traces, init.coef=init.coef, ..., warp.type = "global")})
+          allmats.t[, , ii], selected.traces = traces, init.coef=init.coef, ...,
+          warp.type = "global")})
   } else {
     allmats <- sapply(chrom_list, identity, simplify = "array")
     warp.coef <- lapply(models,FUN=function(x){

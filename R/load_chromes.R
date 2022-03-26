@@ -9,6 +9,13 @@
 #' @param ... Additional arguments to \code{\link{read.csv}}.
 #' @return A list of chromatograms in matrix format.
 #' @author Ethan Bass
+#' @examples \dontrun{
+#' ###  import from single folder
+#' dat <- load_chromes(paths = path)
+#' ### import from multiple folders
+#' path = 'foo'
+#' folders <- list.files(path = path, pattern = "EXPORT3D")
+#' dat <- load_chromes(folders)
 #' @export load_chromes
 load_chromes <- function(paths, dat=NULL, ...){
   if (is.null(dat)){

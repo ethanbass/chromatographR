@@ -25,6 +25,10 @@
 #' \url{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks}
 #' function authored by Ron Wehrens.
 #' @author Ethan Bass & Ron Wehrens
+#' @examples
+#' \dontrun{
+#' pks <- get_peaks(dat.pr, lambdas = c('210', '260'), sd.max=50, fit="egh")
+#' }
 #' @export get_peaks
 
 get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"),
@@ -73,6 +77,7 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"),
 #'
 #' @importFrom stats median
 #' @importFrom graphics polygon arrows
+#' @importFrom scales alpha
 #' @param x Peak_list object. Output from the \code{get_peaks} function.
 #' @param chrom_list List of chromatograms (retention time x wavelength
 #' matrices)
@@ -110,21 +115,28 @@ plot.peak_list <- function(x, ..., chrom_list=NULL, index=1, lambda=NULL,
     points(pks$rt, pks$height, pch=20, cex=cex.points, col='red')
   }
   if (ticks){
-    arrows(pks$start, y[which(new.ts %in% pks$start)]-5, pks$start, y[which(new.ts %in% pks$start)]+5, col="blue", length=0)
-    arrows(pks$end, y[which(new.ts %in% pks$end)]-5, pks$end, y[which(new.ts %in% pks$end)]+5, col="blue", length=0)
+    arrows(pks$start, y[which(new.ts %in% pks$start)]-5,
+           pks$start, y[which(new.ts %in% pks$start)]+5,
+           col="blue", length=0)
+    arrows(pks$end, y[which(new.ts %in% pks$end)]-5,
+           pks$end,y[which(new.ts %in% pks$end)]+5,
+           col="blue", length=0)
   }
   for (i in seq_len(nrow(pks))){
     peak.loc<-seq.int((pks$start[i]),(pks$end[i]), by = .01)
       if (fit == "gaussian"){
-        yvals <- gaussian(peak.loc, center=pks$rt[i], width=pks$sd[i], height = pks$height[i])
+        yvals <- gaussian(peak.loc, center=pks$rt[i],
+                          width=pks$sd[i],height = pks$height[i])
         color <- "red"
       }
       else if (fit == "egh"){
-        yvals <- egh(x=peak.loc, center=pks$rt[i], width=pks$sd[i], height = pks$height[i], tau=pks$tau[i])
+        yvals <- egh(x=peak.loc, center=pks$rt[i],
+                     width=pks$sd[i], height = pks$height[i], tau=pks$tau[i])
         color <- "purple"
       }
       sapply(1:(length(peak.loc)-1), function(i){
-        polygon(peak.loc[c(i,i,(i+1),(i+1))], c(0,yvals[i:(i+1)],0),col=scales::alpha(color,a), lty=3,border=NA)
+        polygon(peak.loc[c(i,i,(i+1),(i+1))], c(0,yvals[i:(i+1)],0),
+                col=alpha(color,a), lty=3,border=NA)
       })
   }
 }

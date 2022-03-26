@@ -1,7 +1,7 @@
 #' Function to correct false zeros in peak table.
 #' 
 #' Function that tries to correct false zeroes for a particular peak in the
-#' peaktable. In each chromatogram, the function compares all peaks within a
+#' peak_table. In each chromatogram, the function compares all peaks within a
 #' certain radius around the focal peak on the basis of their spectral
 #' similarity to a reference spectrum.
 #' 
@@ -9,7 +9,7 @@
 #' @aliases check_peak compare_spectra
 #' @importFrom graphics par matplot abline legend
 #' @param peak Name of peak to be investigated.
-#' @param peak_table Peak table from \code{\link{getPeakTable}}.
+#' @param peak_table A peak_table object from \code{\link{get_peaktable}}.
 #' @param chrom_list A list of chromatograms in matrix form (timepoints x
 #' wavelengths).
 #' @param thresh_auto Defines minimum spectral similarity threshold for
@@ -33,9 +33,9 @@
 #' @seealso \code{\link{get_peaks}}
 
 check_peak <- function(peak, peak_table, chrom_list,
-                          thresh_auto=0.95, thresh_man=NULL, r=100, plot_it=FALSE,
-                          lambda='256', zeros=FALSE, ref='max', order_by = "distance",
-                          verbose=T, plot_diff=TRUE, ...){
+                        thresh_auto=0.95, thresh_man=NULL, r=100, plot_it=FALSE,
+                        lambda='256', zeros=FALSE, ref='max',
+                        order_by = "distance", verbose=T, plot_diff=TRUE, ...){
   par(mfrow=c(2,1))
   if (length(ref)==1){
     ref <- plot_spectrum(peak, peak_table, chrom_list, export_spectrum=T, chr=ref)

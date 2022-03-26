@@ -27,8 +27,8 @@ peak_table object with reference spectra attached
 Attach reference spectra
 }
 \examples{
-
-ref_m <- attach_ref_spectra(pk_tab, ref = "max.int")
+\dontrun{
+ref_m <- attach_ref_spectra(pk_tab, ref = "max.int")}
 }
 \seealso{
 \code{\link{get_peaks}}

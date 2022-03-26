@@ -19,6 +19,12 @@ Peak table with meta-data.
 \description{
 Attach experimental meta-data to peak table.
 }
+\examples{
+\dontrun{
+meta <- read.csv("meta.csv")
+pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta,
+column="vial")}
+}
 \seealso{
 \code{\link{get_peaktable}}
 }

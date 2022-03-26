@@ -8,6 +8,10 @@
 #' @return Peak table with meta-data.
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaktable}}
+#' @examples \dontrun{
+#' meta <- read.csv("meta.csv")
+#' pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta,
+#' column="vial")}
 #' @export attach_metadata
 
 attach_metadata <- function(peak_table, metadata, column){
@@ -50,7 +54,7 @@ gather_reference_spectra <- function(peak_table, chrom_list=NULL, ref = c("max.c
     sp.l <- lapply(X,function(pk){
       plot_all_spectra(peak = pk, peak_table, chrom_list,
                        plot_spectrum = FALSE, export_spectrum = TRUE,
-                       scale_spectrum=TRUE)
+                       scale_spectrum = TRUE)
     })
     sp.ref <- sapply(seq_along(sp.l), function(i){
       sp.l[[i]][,which.max(colMeans(cor(sp.l[[i]][,which(apply((sp.l[[i]]),2,sd)!=0)])))]})
@@ -58,8 +62,9 @@ gather_reference_spectra <- function(peak_table, chrom_list=NULL, ref = c("max.c
   } else {
     sp.ref <- sapply(colnames(peak_table$tab), function(pk){
       plot_spectrum(loc = pk, peak_table, plot_trace=FALSE,
-                    plot_spectrum = FALSE, export_spectrum = TRUE, verbose=F,
-                    scale_spectrum=TRUE)})
+                    plot_spectrum = FALSE, export_spectrum = TRUE,
+                    verbose = FALSE,
+                    scale_spectrum = TRUE)})
     sp.ref <- do.call(cbind, sp.ref)
   }
   colnames(sp.ref) <- colnames(peak_table$tab)
@@ -78,9 +83,8 @@ gather_reference_spectra <- function(peak_table, chrom_list=NULL, ref = c("max.c
 #' @return peak_table object with reference spectra attached
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaks}}
-#' @examples
-#' 
-#' ref_m <- attach_ref_spectra(pk_tab, ref = "max.int")
+#' @examples \dontrun{
+#' ref_m <- attach_ref_spectra(pk_tab, ref = "max.int")}
 #' @seealso \code{\link{get_peaktable}}
 #' @export attach_ref_spectra
 attach_ref_spectra <- function(peak_table, chrom_list=NULL, ref = c("max.cor","max.int")){

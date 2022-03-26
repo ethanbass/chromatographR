@@ -43,14 +43,16 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' @references R. Suzuki, H. Shimodaira: Pvclust: an R package for assessing
 #' the uncertainty in hierarchical clustering. Bioinformatics, 22-12:1540-1542
 #' (2006).
+#' @examples
 #' @export cluster_spectra
 
 # # @examples
 # cluster_spectra(pk_tab, warp, nboot=100, max.only = F,save = F)
 
 cluster_spectra <- function(peak_table, chrom_list=NULL, peak_no = c(5,100),
-                            alpha=0.95, nboot=1000, plot_dend=T, plot_spectra=TRUE,
-                            verbose=TRUE, save=TRUE, parallel=TRUE, max.only=FALSE,
+                            alpha=0.95, nboot=1000, plot_dend=T,
+                            plot_spectra=TRUE, verbose=TRUE, save=TRUE,
+                            parallel=TRUE, max.only=FALSE,
                             ...){
   if (is.null(chrom_list)){
     chrom_list <- get(peak_table$args["chrom_list"])
@@ -58,7 +60,8 @@ cluster_spectra <- function(peak_table, chrom_list=NULL, peak_no = c(5,100),
   if (verbose) print('...collecting representative spectra')
   rep <- sapply(colnames(peak_table[[1]]), function(j){
     sp <- plot_spectrum(loc=j, peak_table=peak_table, chrom_list,
-                        scale_spectrum=T, plot_trace=F, export_spectrum = T, plot_spectrum=F, verbose=F)
+                        scale_spectrum=T, plot_trace=F, export_spectrum = T,
+                        plot_spectrum=F, verbose=F)
   })
   rep <- data.frame(do.call(cbind,rep))
   names(rep) <- paste0('V',seq_len(ncol(rep)))
@@ -77,8 +80,11 @@ cluster_spectra <- function(peak_table, chrom_list=NULL, peak_no = c(5,100),
   l <- sapply(p$clusters, length)
   sub <- p$clusters[which(l > peak_no[1] & l < peak_no[2])]
   pval <- 1-result$edges[p$edges[which(l > peak_no[1] & l < peak_no[2])],'au']
-  sub <- lapply(seq_along(sub), function(i) new("cluster", peaks=sub[[i]], pval=pval[i]))
-  pval <- format(round(result$edges[p$edges[which(l > peak_no[1] & l < peak_no[2])],'au'],2), nsmall=2)
+  sub <- lapply(seq_along(sub), function(i){
+    new("cluster", peaks=sub[[i]], pval=pval[i])})
+  pval <- format(round(
+    result$edges[p$edges[which(l > peak_no[1] & l < peak_no[2])],'au'],2),
+    nsmall=2)
   names(sub) <- paste0('c',seq_along(sub))
   
   if (plot_spectra){
@@ -87,7 +93,8 @@ cluster_spectra <- function(peak_table, chrom_list=NULL, peak_no = c(5,100),
     sapply(seq_along(sub), function(i){ 
       matplot(new.lambdas,rep[,as.numeric(gsub('V','',sub[[i]]@peaks))],
               type='l', ylab='', yaxt='n', xlab=expression(lambda),
-              main=paste0('cluster ', i, '; p = ', format(round(sub[[i]]@pval,2),nsmall=2))
+              main=paste0('cluster ', i, '; p = ',
+                          format(round(sub[[i]]@pval,2),nsmall=2))
                           )})
   }
   return(sub)

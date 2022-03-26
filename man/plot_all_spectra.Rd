@@ -47,6 +47,12 @@ Defaults to FALSE.}
 Plot multiple for a given peak in peak table. Wrapper for
 \code{\link{plot_spectrum}}.
 }
+\examples{
+\dontrun{
+#' plot_all_spectra(loc="X55", peak_table = pk_tab, chrom_list=dat.pr,
+overlapping=TRUE)
+}
+}
 \seealso{
 \code{\link{plot_spectrum}}
 }

@@ -67,6 +67,16 @@ A function to plot the trace and/or spectrum for a given peak in peak table.
 Can be used to confirm the identity of a peak or check that a particular
 column in the peak table represents a single compound.
 }
+\examples{
+\dontrun{
+### plot peak
+par(mfrow=c(2,1))
+plot_spectrum(loc="X35", peak_table = pk_tab, chrom_list=dat.pr, what="peak")
+### or click to select retention time
+plot_spectrum(peak_table = pk_tab, chrom_list=dat.pr, chr=1,
+lambda="210", what="click")
+}
+}
 \author{
 Ethan Bass
 }

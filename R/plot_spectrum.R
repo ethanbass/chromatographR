@@ -35,6 +35,14 @@
 #' mode.
 #' @param ... Additional arguments.
 #' @author Ethan Bass
+#' @examples \dontrun{
+#' ### plot peak
+#' par(mfrow=c(2,1))
+#' plot_spectrum(loc="X35", peak_table = pk_tab, chrom_list=dat.pr, what="peak")
+#' ### or click to select retention time
+#' plot_spectrum(peak_table = pk_tab, chrom_list=dat.pr, chr=1,
+#' lambda="210", what="click")
+#' }
 #' @export plot_spectrum
 plot_spectrum <- function(loc, peak_table, chrom_list=NULL,
                           chr = 'max', lambda = 'max',
@@ -155,6 +163,10 @@ elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
 #' @param \dots Additional arguments to plot_spectrum.
 #' @author Ethan Bass
 #' @seealso \code{\link{plot_spectrum}}
+#' @examples \dontrun{
+#' #' plot_all_spectra(loc="X55", peak_table = pk_tab, chrom_list=dat.pr,
+#' overlapping=TRUE)
+#' }
 #' @export plot_all_spectra
 plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all", 
                              plot_spectrum = T, export_spectrum=TRUE,
@@ -167,8 +179,9 @@ plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all",
   if ("all" %in% chrs) chrs <- seq_along(chrom_list)
   sp <- sapply(chrs, function(chr){
     plot_spectrum(loc = peak, peak_table = peak_table, chrom_list=chrom_list,
-                  chr=chr, plot_spectrum=FALSE, plot_trace=FALSE, export_spectrum = TRUE,
-                  scale_spectrum=scale_spectrum, verbose=verbose, what="peak")
+                  chr=chr, plot_spectrum=FALSE, plot_trace=FALSE, 
+                  export_spectrum = TRUE, scale_spectrum=scale_spectrum,
+                  verbose=verbose, what="peak")
   })
   sp<-do.call(cbind, sp)
   colnames(sp) <- names(chrom_list)[chrs]

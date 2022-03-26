@@ -64,26 +64,12 @@ Adapted from the preprocess function authored by Ron Wehrens in the
 alsace package.
 }
 \examples{
-
+\dontrun{
 data(Sa)
-tpoints <- as.numeric(rownames(Sa[[1]]))
-lambdas <- as.numeric(colnames(Sa[[1]]))
-
-## limit retention time and wavelength ranges, and do smoothing and
-## baseline correction
 new.ts <- seq(1,38,by=.01) # choose time-points
 new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
-Sa1.processed <-
-  preprocess(Sa[[1]], dim1 = new.ts, dim2 = new.lambdas)
-
-plot(tpoints, Sa[[1]][,lambdas == '210'],
-     xlim = range(new.ts), type = "l", col = "gray",
-     main = "Chromatogram at 210 nm", xlab = "Time (min.)",
-     ylab = "")
-lines(new.ts, Sa1.processed[,new.lambdas == 210], col = "blue")
-legend("topleft", lty = 1, col = c("gray", "blue"), bty = "n",
-       legend = c("Original data", "Preprocessed data"))
-
+Sa.pr <-preprocess(Sa[[1]], dim1 = new.ts, dim2 = new.lambdas)
+}
 }
 \author{
 Ethan Bass

@@ -69,6 +69,7 @@
 #' Spectral-Matching-Based Annotation for Metabolomics Data. \emph{Anal. Chem.}
 #' \bold{86}:6812-6817.
 #' @examples
+#' \dontrun{
 #' data(Sa)
 #' new.ts <- seq(1,38,by=.01) # choose time-points
 #' new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
@@ -79,6 +80,7 @@
 #' warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
 #' pks <- get_peaks(warp, lambdas="210")
 #' get_peaktable(pks, response = "area")
+#' }
 #' @seealso \code{\link{attach_ref_spectra}} \code{\link{attach_metadata}}
 #' @export get_peaktable
 get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "height"),
@@ -120,11 +122,13 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
     }
     if (clust == 'sp.rt'){
       if (is.null(sigma.t)){
-        sigma.t <- .5*mean(do.call(rbind,unlist(pkLst,recursive = F))$end - do.call(rbind,unlist(pkLst,recursive = F))$start)
+        sigma.t <- .5*mean(do.call(rbind,unlist(pkLst,recursive = F))$end - 
+                             do.call(rbind,unlist(pkLst,recursive = F))$start)
       }
       ts<- as.numeric(rownames(chrom_list[[1]]))
       sp <- sapply(seq_along(pkcenters), function(i){
-        rescale(t(chrom_list[[file.idx[i]]][which(elementwise.all.equal(ts, pkcenters[i])),]))
+        rescale(t(chrom_list[[file.idx[i]]][
+          which(elementwise.all.equal(ts, pkcenters[i])),]))
       }, simplify=T)
       cor.matrix <- cor(sp, method = "pearson")
       mint <- abs(outer(unlist(pkcenters), unlist(pkcenters), FUN="-"))
@@ -132,7 +136,8 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
       D <- 1-S
       linkage <- "average"
       pkcenters.hcl <- hclust(as.dist(D), method = linkage)
-      pkcenters.cl <- cutreeDynamicTree(pkcenters.hcl, maxTreeHeight = hmax, deepSplit = deepSplit, minModuleSize = 2)
+      pkcenters.cl <- cutreeDynamicTree(pkcenters.hcl, maxTreeHeight = hmax, 
+                                      deepSplit = deepSplit, minModuleSize = 2)
       sing <- which(pkcenters.cl == 0)
       pkcenters.cl[sing] <- max(pkcenters.cl) + seq_along(sing)
     }
@@ -152,7 +157,8 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
                           cluster = pkcenters.cl)
       print(stripplot(files ~ peaks, data = cl.df, col = mycols[pkcenters.cl], 
                       pch = pkcenters.cl%%14, xlab = "Retention time", 
-                      ylab = "", main = paste("Component", comp), panel = function(...) {
+                      ylab = "", main = paste("Component", comp),
+                      panel = function(...) {
                         panel.stripplot(...)
                         panel.abline(v = cl.centers, col = mycols)
                       }))
@@ -166,9 +172,8 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
                                                               response]))
     Iinfo <- matrix(0, ncl, length(pkLst), dimnames = list(NULL, 
                                                            names(pkLst)))
-    for (i in seq(along = allIs)) Iinfo[pkcenters.cl[i], 
-                                        file.idx[i]] <- max(allIs[i], Iinfo[pkcenters.cl[i], 
-                                                                            file.idx[i]])
+    for (i in seq(along = allIs)) Iinfo[pkcenters.cl[i],  file.idx[i]] <- 
+      max(allIs[i], Iinfo[pkcenters.cl[i], file.idx[i]])
     #cbind(metaInfo, Iinfo)
     return(list(Iinfo, metaInfo))
   }
@@ -191,6 +196,7 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
   class(result) <- "peak_table"
   return(result)
 }
+
 #' @importFrom utils head
 #' @noRd
 #' @rdname head.peak_table
@@ -285,7 +291,8 @@ plot.peak_table <- function(x, ..., loc=NULL, chrom_list=NULL, what="peak",
       plot_spectrum(loc, x, chrom_list, chr=chr,
                     lambda = lambda, plot_spectrum = plot_spectrum,
                     plot_trace = plot_trace, spectrum_labels = spectrum_labels,
-                    scale_spectrum = scale_spectrum, export_spectrum = export_spectrum,
+                    scale_spectrum = scale_spectrum,
+                    export_spectrum = export_spectrum,
                     verbose = verbose, what = what)
     }
   }

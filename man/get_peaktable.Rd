@@ -95,6 +95,7 @@ the cluster is only a very small feature.
 Adapted from getPeakTable function in alsace package by Ron Wehrens.
 }
 \examples{
+\dontrun{
 data(Sa)
 new.ts <- seq(1,38,by=.01) # choose time-points
 new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
@@ -105,6 +106,7 @@ warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360
 warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
 pks <- get_peaks(warp, lambdas="210")
 get_peaktable(pks, response = "area")
+}
 }
 \references{
 Broeckling, C. D., F. A. Afsar, S. Neumann, A. Ben-Hur, and J.

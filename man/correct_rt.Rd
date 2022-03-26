@@ -51,6 +51,12 @@ A list of `ptw` objects or a list of warped absorbance profiles.
 \description{
 Correction of retention time differences using parametric time warping.
 }
+\examples{
+\dontrun{
+warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360'), n.zeros = 250)
+warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
+}
+}
 \references{
 Eilers, P.H.C. 2004.
 \href{https://pubs.acs.org/doi/10.1021/ac034800e}{Parametric Time Warping.}
