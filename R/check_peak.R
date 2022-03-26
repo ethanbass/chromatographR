@@ -1,10 +1,10 @@
 #' Function to correct false zeros in peak table.
 #' 
 #' Function that tries to correct false zeroes for a particular peak in the
-#' peak_table. In each chromatogram, the function compares all peaks within a
-#' certain radius around the focal peak on the basis of their spectral
-#' similarity to a reference spectrum.
-#' 
+#' peak_table. This can be used as a last resort to automatically (or semi-
+#' automatically) align peak data. In each chromatogram, the function compares
+#' all peaks within a certain radius around the focal peak on the basis of their
+#' spectral similarity to a reference spectrum.
 #' 
 #' @aliases check_peak compare_spectra
 #' @importFrom graphics par matplot abline legend
