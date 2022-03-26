@@ -177,10 +177,11 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
     #cbind(metaInfo, Iinfo)
     return(list(Iinfo, metaInfo))
   }
-  result <- lapply(1:ncomp, clusterPeaks, peak_list)
-  result <- t(do.call("rbind", result))
-  result <- list(tab = data.frame(t(result[[1]])),
-                 pk_meta = data.frame(t(result[[2]])),
+  result <- lapply(seq_len(ncomp), clusterPeaks, peak_list)
+  result <- list(tab = data.frame(t(do.call("rbind", lapply(result,    
+                                                        function(x) x[[1]])))),
+                 pk_meta = data.frame(t(do.call("rbind", lapply(result, 
+                                                        function(x) x[[2]])))),
                  sample_meta = NA,
                  ref_spectra = NA,
                  args = c(peak_list = deparse(substitute(peak_list)),
