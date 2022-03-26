@@ -67,7 +67,7 @@ parametric time warping of peak lists.} \emph{Bioinformatics}
 \bold{31}:3063-3065.
 }
 \seealso{
-\code{\link[ptw:ptw]{ptw}}, \code{\link{correctPeaks}}
+\code{\link[ptw:ptw]{ptw}}, \code{\link{correct_peaks}}
 }
 \author{
 Ron Wehrens, Ethan Bass

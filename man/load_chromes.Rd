@@ -21,6 +21,16 @@ A list of chromatograms in matrix format.
 Convenience function to import chromatograms from a list of folders.
 Chromatograms must be in CSV format.
 }
+\examples{
+\dontrun{
+###  import from single folder
+dat <- load_chromes(paths = path)
+### import from multiple folders
+path = 'foo'
+folders <- list.files(path = path, pattern = "EXPORT3D")
+dat <- load_chromes(folders)
+}
+}
 \author{
 Ethan Bass
 }

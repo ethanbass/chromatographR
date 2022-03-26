@@ -62,9 +62,10 @@ entries selected column as defined by the algorithm.
 }
 \description{
 Function that tries to correct false zeroes for a particular peak in the
-peak_table. In each chromatogram, the function compares all peaks within a
-certain radius around the focal peak on the basis of their spectral
-similarity to a reference spectrum.
+peak_table. This can be used as a last resort to automatically (or semi-
+automatically) align peak data. In each chromatogram, the function compares
+all peaks within a certain radius around the focal peak on the basis of their
+spectral similarity to a reference spectrum.
 }
 \seealso{
 \code{\link{get_peaks}}

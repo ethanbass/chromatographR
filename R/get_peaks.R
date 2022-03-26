@@ -24,7 +24,7 @@
 #' @note Function is adapted from the
 #' \url{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks}
 #' function authored by Ron Wehrens.
-#' @author Ethan Bass & Ron Wehrens
+#' @author Ethan Bass
 #' @examples
 #' \dontrun{
 #' pks <- get_peaks(dat.pr, lambdas = c('210', '260'), sd.max=50, fit="egh")

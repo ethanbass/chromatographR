@@ -22,7 +22,7 @@
 #' equal to \code{"global"}.
 #' @return A list of `ptw` objects or a list of warped absorbance profiles.
 #' @author Ron Wehrens, Ethan Bass
-#' @seealso \code{\link[ptw:ptw]{ptw}}, \code{\link{correctPeaks}}
+#' @seealso \code{\link[ptw:ptw]{ptw}}, \code{\link{correct_peaks}}
 #' @references Eilers, P.H.C. 2004.
 #' \href{https://pubs.acs.org/doi/10.1021/ac034800e}{Parametric Time Warping.}
 #' \emph{Anal. Chem.} \bold{76}:404-411.

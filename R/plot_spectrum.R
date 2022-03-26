@@ -44,13 +44,15 @@
 #' lambda="210", what="click")
 #' }
 #' @export plot_spectrum
-plot_spectrum <- function(loc, peak_table, chrom_list=NULL,
+plot_spectrum <- function(loc, peak_table=NULL, chrom_list=NULL,
                           chr = 'max', lambda = 'max',
                           plot_spectrum = TRUE, plot_trace = TRUE,
                           spectrum_labels=TRUE, scale_spectrum=FALSE,
                           export_spectrum = FALSE, verbose=TRUE, 
                           what=c("peak", "rt", "click"), ...){
   what <- match.arg(what, c("peak", "rt", "click"))
+  if (is.null(chrom_list) & is.null(peak_table))
+    stop("Must provide either a peak_table or a chrom_list.")
   if (is.null(chrom_list)){
     chrom_list <- try(get(peak_table$args["chrom_list"]))
     if (class(chrom_list)=="try-error") stop("Chromatograms not found!")
@@ -139,7 +141,7 @@ plot_spectrum <- function(loc, peak_table, chrom_list=NULL,
 ## Elementwise all equal function from Brian Diggs
 ## (https://stackoverflow.com/questions/9508518/why-are-these-numbers-not-equal)
 #' @noRd
-elementwise.all.equal <- Vectorize(function(x, y) {isTRUE(all.equal(x, y))})
+elementwise.all.equal <- Vectorize(function(x, y, ...) {isTRUE(all.equal(x, y, ...))})
 
 #' Plot all spectra for chosen peak
 #' 
@@ -198,3 +200,39 @@ plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all",
     sp
   }
 }
+
+#' Spectrum scanner function
+#' 
+#' Convenience function to call plot_spectrum with what=="click"
+#' 
+#' @importFrom scales rescale
+#' @importFrom graphics identify title text
+#' @param peak_table The peak table (output from \code{\link{get_peaktable}}
+#' function).
+#' @param chrom_list A list of chromatograms in matrix form (timepoints x
+#' wavelengths).
+#' @param chr Numerical index of chromatogram you wish to plot.
+#' @param lambda The wavelength to plot the trace at.
+#' @param spectrum_labels Logical. If TRUE, plots labels on maxima in spectral
+#' plot. Defaults to TRUE.
+#' @param scale_spectrum Logical. If TRUE, scales spectrum to unit height.
+#' Defaults to FALSE.
+#' @param export_spectrum Logical. If TRUE, exports spectrum to console.
+#' Defaults to FALSE.
+#' @param ... Additional arguments.
+#' @author Ethan Bass
+#' @examples \dontrun{
+#' scan_chrom(dat.pr, lambda="210", chr=2, export_spectrum=T)}
+#' @export scan_chrom
+scan_chrom <- function(chrom_list, lambda, chr=NULL, peak_table=NULL, 
+                       scale_spectrum = FALSE, spectrum_labels = TRUE,
+                       export_spectrum = FALSE, ...){
+  if (is.null(chr)){
+    chr <- as.numeric(readline(
+      prompt="Which chromatogram do you wish to plot? \n"))
+  }
+  plot_spectrum(chrom_list=chrom_list,
+                            chr = chr, lambda = lambda,
+                            what="click", ...)
+}
+

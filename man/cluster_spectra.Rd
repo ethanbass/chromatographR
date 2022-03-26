@@ -68,6 +68,11 @@ correlation matrix, as implemented in the
 to select clusters that exceed a certain confidence threshold as defined by
 alpha.
 }
+\examples{
+\dontrun{
+cl <- cluster_spectra(pk_tab, nboot=100, max.only = F, save = F, alpha = .97)
+}
+}
 \references{
 R. Suzuki, H. Shimodaira: Pvclust: an R package for assessing
 the uncertainty in hierarchical clustering. Bioinformatics, 22-12:1540-1542

@@ -16,6 +16,7 @@
 #' path = 'foo'
 #' folders <- list.files(path = path, pattern = "EXPORT3D")
 #' dat <- load_chromes(folders)
+#' }
 #' @export load_chromes
 load_chromes <- function(paths, dat=NULL, ...){
   if (is.null(dat)){

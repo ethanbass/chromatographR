@@ -53,5 +53,5 @@ pks <- get_peaks(dat.pr, lambdas = c('210', '260'), sd.max=50, fit="egh")
 }
 }
 \author{
-Ethan Bass & Ron Wehrens
+Ethan Bass
 }
