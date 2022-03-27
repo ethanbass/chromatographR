@@ -155,7 +155,7 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
       mycols <- myPalette(length(cl.centers))
       cl.df <- data.frame(peaks = pkcenters, files = factor(file.idx), 
                           cluster = pkcenters.cl)
-      print(stripplot(files ~ peaks, data = cl.df, col = mycols[pkcenters.cl], 
+      message(stripplot(files ~ peaks, data = cl.df, col = mycols[pkcenters.cl], 
                       pch = pkcenters.cl%%14, xlab = "Retention time", 
                       ylab = "", main = paste("Component", comp),
                       panel = function(...) {
