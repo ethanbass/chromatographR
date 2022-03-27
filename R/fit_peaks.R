@@ -41,8 +41,8 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
   p1 <- which(sign(d[1:(length(d)-1)]) > sign(d[2:length(d)]))
   # detect second derivative exceeding slope threshold
   p2 <- which(abs(diff(d)) > slope_thresh)
-  # detect y values exceeding amplitude threshold
-  p3 <- which(y > amp_thresh)
+  # detect y-vals exceeding amplitude threshold
+  p3 <- which(y > amp_thresh) 
   p <- intersect(intersect(p1,p2), p3)
   if (bounds){
     p4 <- which(sign(d[1:(length(d)-1)]) < sign(d[2:length(d)]))

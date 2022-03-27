@@ -4,13 +4,15 @@
 \alias{load_chromes}
 \title{Import folders of chromatograms in CSV format.}
 \usage{
-load_chromes(paths, dat = NULL)
+load_chromes(paths, dat = NULL, ...)
 }
 \arguments{
 \item{paths}{Paths of folders where chromatograms are stored.}
 
 \item{dat}{Optional list of chromatograms. If list is provided, the function
 will append chromatograms in path to the existing list of chromatograms.}
+
+\item{...}{Additional arguments to \code{\link{read.csv}}.}
 }
 \value{
 A list of chromatograms in matrix format.
@@ -18,6 +20,16 @@ A list of chromatograms in matrix format.
 \description{
 Convenience function to import chromatograms from a list of folders.
 Chromatograms must be in CSV format.
+}
+\examples{
+\dontrun{
+###  import from single folder
+dat <- load_chromes(paths = path)
+### import from multiple folders
+path = 'foo'
+folders <- list.files(path = path, pattern = "EXPORT3D")
+dat <- load_chromes(folders)
+}
 }
 \author{
 Ethan Bass

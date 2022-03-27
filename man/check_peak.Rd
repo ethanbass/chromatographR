@@ -25,7 +25,7 @@ check_peak(
 \arguments{
 \item{peak}{Name of peak to be investigated.}
 
-\item{peak_table}{Peak table from \code{\link{getPeakTable}}.}
+\item{peak_table}{A peak_table object from \code{\link{get_peaktable}}.}
 
 \item{chrom_list}{A list of chromatograms in matrix form (timepoints x
 wavelengths).}
@@ -62,9 +62,10 @@ entries selected column as defined by the algorithm.
 }
 \description{
 Function that tries to correct false zeroes for a particular peak in the
-peaktable. In each chromatogram, the function compares all peaks within a
-certain radius around the focal peak on the basis of their spectral
-similarity to a reference spectrum.
+peak_table. This can be used as a last resort to automatically (or semi-
+automatically) align peak data. In each chromatogram, the function compares
+all peaks within a certain radius around the focal peak on the basis of their
+spectral similarity to a reference spectrum.
 }
 \seealso{
 \code{\link{get_peaks}}

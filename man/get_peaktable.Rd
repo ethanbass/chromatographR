@@ -2,7 +2,6 @@
 % Please edit documentation in R/get_peaktable.R
 \name{get_peaktable}
 \alias{get_peaktable}
-\alias{getPeakTable}
 \title{Convert peak list into an ordered peak table}
 \usage{
 get_peaktable(
@@ -61,10 +60,17 @@ TRUE, will return more smaller clusters. See documentation for
 `data.frame`.}
 }
 \value{
-The function returns a data frame where the first couple of columns
-contain meta-information on the features (component, peak, retention time)
-and the other columns contain the intensities of the features in the
-individual injections.
+The function returns a peak_table object, consisting of the following
+elements:
+`tab`: the peak table itself -- a data-frame of intensities in a
+sample x peak configuration.
+peaks (columns).
+`pk_meta`: A data.frame containing peak meta-data (e.g. spectral component,
+peak number, and average retention time).
+`sample_meta`: A data.frame of sample meta-data, added using \code{\link{attach_metadata}})
+`ref_spectra`: A data.frame of reference spectra in a wavelength x peak
+configuration. Must be added using \code{\link{attach_ref_spectra}}
+`args`: Vector of arguments given to \code{\link{get_peaktable}}.
 }
 \description{
 Function returns a matrix of intensities, where rows correspond to samples
@@ -85,8 +91,11 @@ variable - this, however, will increase the number of clusters. Another
 option is to filter the peaks on intensity: perhaps one of the two peaks in
 the cluster is only a very small feature.
 }
+\note{
+Adapted from getPeakTable function in alsace package by Ron Wehrens.
+}
 \examples{
-
+\dontrun{
 data(Sa)
 new.ts <- seq(1,38,by=.01) # choose time-points
 new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
@@ -96,8 +105,8 @@ dat.pr <- lapply(X=Sa,FUN=preprocess,
 warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360'))
 warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
 pks <- get_peaks(warp, lambdas="210")
-pkTab <- get_peaktable(pks, response = "area")
-
+get_peaktable(pks, response = "area")
+}
 }
 \references{
 Broeckling, C. D., F. A. Afsar, S. Neumann, A. Ben-Hur, and J.
@@ -105,6 +114,9 @@ E. Prenni. 2014. RAMClust: A Novel Feature Clustering Method Enables
 Spectral-Matching-Based Annotation for Metabolomics Data. \emph{Anal. Chem.}
 \bold{86}:6812-6817.
 }
+\seealso{
+\code{\link{attach_ref_spectra}} \code{\link{attach_metadata}}
+}
 \author{
-Ethan Bass & Ron Wehrens
+Ethan Bass
 }

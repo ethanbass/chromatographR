@@ -17,9 +17,9 @@ preprocess(
 )
 }
 \arguments{
-\item{X}{A numerical data matrix, missing values are not allowed. If
-rownames or colnames attributes are used, they should be numerical and
-signify time points and wavelengths, respectively.}
+\item{X}{A numerical data matrix, or list of data matrices. Missing values
+are not allowed. If rownames or colnames attributes are used, they should be
+numerical and signify time points and wavelengths, respectively.}
 
 \item{dim1}{A new, usually shorter, set of time points (numerical). The
 range of these should not be outside the range of the original time points,
@@ -59,28 +59,18 @@ smooth data, like UV-VIS data, there is the option to decrease the size of
 the matrix by interpolation. By default, the data are baseline-corrected in
 the time direction and smoothed in the spectral dimension.
 }
+\note{
+Adapted from the preprocess function authored by Ron Wehrens in the
+alsace package.
+}
 \examples{
-
+\dontrun{
 data(Sa)
-tpoints <- as.numeric(rownames(Sa[[1]]))
-lambdas <- as.numeric(colnames(Sa[[1]]))
-
-## limit retention time and wavelength ranges, and do smoothing and
-## baseline correction
 new.ts <- seq(1,38,by=.01) # choose time-points
 new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
-Sa1.processed <-
-  preprocess(Sa[[1]], dim1 = new.ts, dim2 = new.lambdas)
-
-plot(tpoints, Sa[[1]][,lambdas == '210'],
-     xlim = range(new.ts), type = "l", col = "gray",
-     main = "Chromatogram at 210 nm", xlab = "Time (min.)",
-     ylab = "")
-lines(new.ts, Sa1.processed[,new.lambdas == 210], col = "blue")
-legend("topleft", lty = 1, col = c("gray", "blue"), bty = "n",
-       legend = c("Original data", "Preprocessed data"))
-
+Sa.pr <-preprocess(Sa[[1]], dim1 = new.ts, dim2 = new.lambdas)
+}
 }
 \author{
-Ron Wehrens, Ethan Bass
+Ethan Bass
 }

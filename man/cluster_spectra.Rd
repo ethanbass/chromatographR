@@ -6,7 +6,7 @@
 \usage{
 cluster_spectra(
   peak_table,
-  chrom_list,
+  chrom_list = NULL,
   peak_no = c(5, 100),
   alpha = 0.95,
   nboot = 1000,
@@ -20,7 +20,7 @@ cluster_spectra(
 )
 }
 \arguments{
-\item{peak_table}{Peak table from \code{\link{getPeakTable}}.}
+\item{peak_table}{Peak table from \code{\link{get_peaktable}}.}
 
 \item{chrom_list}{A list of chromatograms in matrix form (timepoints x
 wavelengths).}
@@ -67,6 +67,11 @@ correlation matrix, as implemented in the
 \code{\link[pvclust:pvclust]{pvclust}} package. Bootstrap values can be used
 to select clusters that exceed a certain confidence threshold as defined by
 alpha.
+}
+\examples{
+\dontrun{
+cl <- cluster_spectra(pk_tab, nboot=100, max.only = F, save = F, alpha = .97)
+}
 }
 \references{
 R. Suzuki, H. Shimodaira: Pvclust: an R package for assessing

@@ -1,15 +1,15 @@
 #' Function to correct false zeros in peak table.
 #' 
 #' Function that tries to correct false zeroes for a particular peak in the
-#' peaktable. In each chromatogram, the function compares all peaks within a
-#' certain radius around the focal peak on the basis of their spectral
-#' similarity to a reference spectrum.
-#' 
+#' peak_table. This can be used as a last resort to automatically (or semi-
+#' automatically) align peak data. In each chromatogram, the function compares
+#' all peaks within a certain radius around the focal peak on the basis of their
+#' spectral similarity to a reference spectrum.
 #' 
 #' @aliases check_peak compare_spectra
 #' @importFrom graphics par matplot abline legend
 #' @param peak Name of peak to be investigated.
-#' @param peak_table Peak table from \code{\link{getPeakTable}}.
+#' @param peak_table A peak_table object from \code{\link{get_peaktable}}.
 #' @param chrom_list A list of chromatograms in matrix form (timepoints x
 #' wavelengths).
 #' @param thresh_auto Defines minimum spectral similarity threshold for
@@ -33,9 +33,9 @@
 #' @seealso \code{\link{get_peaks}}
 
 check_peak <- function(peak, peak_table, chrom_list,
-                          thresh_auto=0.95, thresh_man=NULL, r=100, plot_it=FALSE,
-                          lambda='256', zeros=FALSE, ref='max', order_by = "distance",
-                          verbose=T, plot_diff=TRUE, ...){
+                        thresh_auto=0.95, thresh_man=NULL, r=100, plot_it=FALSE,
+                        lambda='256', zeros=FALSE, ref='max',
+                        order_by = "distance", verbose=T, plot_diff=TRUE, ...){
   par(mfrow=c(2,1))
   if (length(ref)==1){
     ref <- plot_spectrum(peak, peak_table, chrom_list, export_spectrum=T, chr=ref)
@@ -227,39 +227,32 @@ compare_spectra <- function(peak, peak_table, chrom_list,
   return(peak_table)
 }
 
-#' Function to gather reference spectra.
-#' 
-#' Function that tries to correct false zeroes for a particular peak in the
-#' peaktable. In each chromatogram, the function compares all peaks within a
-#' certain radius around the focal peak on the basis of their spectral
-#' similarity to a reference spectrum.
-#' 
-#' @importFrom stats cor
-#' @param peak_table Peak table from \code{\link{getPeakTable}}.
+
+#' @importFrom stats sd
+#' @param peak_table Peak table from \code{\link{get_peaktable}}.
+#' @param loc Name of peak to be investigated.
 #' @param chrom_list A list of chromatograms in matrix form (timepoints x
 #' wavelengths).
-#' @param ref_criteria What criterion to use to select reference spectra.
-#' Current options are maximum correlation ("max.cor") or maximum signal
-#' intensity ("max.sig").
-#' @return A matrix consisting of reference spectra for each peak in the
-#' provided peak table.
-#' @author Ethan Bass
-#' @seealso \code{\link{get_peaks}}
-
-gather_reference_spectra <- function(peak_table, chrom_list, ref_criteria = c("max.cor","max.sig")){
-  ref_criteria <- match.arg(ref_criteria, c("max.cor","max.sig"))
-  X<-colnames(peak_table)
-  sp.l <- lapply(X,function(pk){
-    plot_all_spectra(peak = pk, peak_table, chrom_list, plot_spectrum = F, export_spectrum = T)
-  })
-  if (ref_criteria=="max.cor"){
-    sp.ref <- sapply(1:(ncol(peak_table)), function(i){
-      sp.l[[i]][,which.max(colMeans(cor(sp.l[[i]])))]})
-  } else {
-    w.m <- sapply(peak_table[-c(1:3),], which.max)
-    sp.ref <- sapply(1:(ncol(peak_table)), function(i) sp.l[[i]][,w.m[i]])
+#' @param ref Reference criterion. Either maximum correlation ("max.cor") or
+#' maximum intensity ("max.int").
+#' @noRd
+get_reference_spectrum <- function(peak_table, loc, chrom_list=NULL, ref = c("max.cor","max.int")){
+  if (is.null(chrom_list)){
+    try.out <- try(chrom_list <- get(peak_table$args["chrom_list"]))
+    if (class(try.out) == "try-error") stop("Chromatograms not found!")
   }
-  colnames(sp.ref) <- colnames(peak_table)
-  rownames(sp.ref) <- colnames(chrom_list[[1]])
-  return(sp.ref)
+  ref <- match.arg(ref, c("max.cor", "max.int"))
+  if (ref=="max.cor"){
+  sp <- plot_all_spectra(peak = loc, peak_table, chrom_list, plot_spectrum = FALSE, 
+                      plot_trace = FALSE, export_spectrum = TRUE,
+                      scale_spectrum = T)
+    ref <- which.max(colMeans(cor(sp[,which(apply(sp,2,sd)!=0)])))
+  } else {
+    ref <- plot_spectrum(loc=loc, peak_table, chrom_list, plot_spectrum = FALSE, 
+    plot_trace = FALSE, export_spectrum = TRUE, scale_spectrum = TRUE)
+  }
+  return(ref)
 }
+
+
+

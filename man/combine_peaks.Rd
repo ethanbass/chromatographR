@@ -4,17 +4,17 @@
 \alias{combine_peaks}
 \title{Combine peaks in peak table}
 \usage{
-combine_peaks(peak_table, digits = 2, min.cor = 0.9, choose = "max")
+combine_peaks(peak_table, tol = 0.01, min.cor = 0.9, choose = "max")
 }
 \arguments{
-\item{peak_table}{Peak table from \code{\link{getPeakTable}}.}
+\item{peak_table}{Peak table from \code{\link{get_peaktable}}.}
 
-\item{digits}{Number of digits to use for retention time matching.}
+\item{tol}{Tolerance for matching retention times.}
 
 \item{min.cor}{Minimum spectral correlation to confirm a match.}
 
 \item{choose}{If "max" will retain peak with highest intensity. Otherwise,
-the first column in the dataframe will be retained.}
+the first column in the data.frame will be retained.}
 }
 \value{
 A peak table similar to the input peak table, but with duplicate
@@ -24,6 +24,10 @@ columns combined according to the specified criteria.
 Utility function to combine duplicate peaks in peak table, i.e. peaks that
 were integrated at more than one wavelength or component. Specify number of
 digits to match retention time and minimum spectral correlation for a match.
+}
+\examples{
+\dontrun{
+combine_peaks(pk_tab, tol = .02, min.cor = .9)}
 }
 \seealso{
 \code{\link{get_peaks}}

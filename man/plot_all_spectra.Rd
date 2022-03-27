@@ -7,7 +7,8 @@
 plot_all_spectra(
   peak,
   peak_table,
-  chrom_list,
+  chrom_list = NULL,
+  chrs = "all",
   plot_spectrum = T,
   export_spectrum = TRUE,
   scale_spectrum = TRUE,
@@ -20,11 +21,13 @@ plot_all_spectra(
 \item{peak}{The name of the peak you wish to plot (must be in character
 format)}
 
-\item{peak_table}{The peak table (output from \code{\link{getPeakTable}}
+\item{peak_table}{The peak table (output from \code{\link{get_peaktable}}
 function)}
 
 \item{chrom_list}{A list of profile matrices, each of the same dimensions
 (timepoints x components).}
+
+\item{chrs}{Vector of chromatograms to plot.}
 
 \item{plot_spectrum}{Logical. If TRUE, plots the spectrum of the chosen
 peak.}
@@ -43,6 +46,12 @@ Defaults to FALSE.}
 \description{
 Plot multiple for a given peak in peak table. Wrapper for
 \code{\link{plot_spectrum}}.
+}
+\examples{
+\dontrun{
+#' plot_all_spectra(loc="X55", peak_table = pk_tab, chrom_list=dat.pr,
+overlapping=TRUE)
+}
 }
 \seealso{
 \code{\link{plot_spectrum}}

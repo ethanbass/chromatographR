@@ -2,8 +2,6 @@
 % Please edit documentation in R/correct_rt.R
 \name{correct_rt}
 \alias{correct_rt}
-\alias{correctRT}
-\alias{correctRT5}
 \title{Retention time correction}
 \usage{
 correct_rt(
@@ -53,6 +51,12 @@ A list of `ptw` objects or a list of warped absorbance profiles.
 \description{
 Correction of retention time differences using parametric time warping.
 }
+\examples{
+\dontrun{
+warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360'), n.zeros = 250)
+warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
+}
+}
 \references{
 Eilers, P.H.C. 2004.
 \href{https://pubs.acs.org/doi/10.1021/ac034800e}{Parametric Time Warping.}
@@ -63,7 +67,7 @@ parametric time warping of peak lists.} \emph{Bioinformatics}
 \bold{31}:3063-3065.
 }
 \seealso{
-\code{\link[ptw:ptw]{ptw}}, \code{\link{correctPeaks}}
+\code{\link[ptw:ptw]{ptw}}, \code{\link{correct_peaks}}
 }
 \author{
 Ron Wehrens, Ethan Bass

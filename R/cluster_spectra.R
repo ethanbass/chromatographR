@@ -17,7 +17,7 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' @importFrom stats cor
 #' @importFrom methods new
 #' @importFrom graphics matplot
-#' @param peak_table Peak table from \code{\link{getPeakTable}}.
+#' @param peak_table Peak table from \code{\link{get_peaktable}}.
 #' @param chrom_list A list of chromatograms in matrix form (timepoints x
 #' wavelengths).
 #' @param peak_no Minimum and maximum thresholds for the number of peaks a
@@ -43,19 +43,27 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' @references R. Suzuki, H. Shimodaira: Pvclust: an R package for assessing
 #' the uncertainty in hierarchical clustering. Bioinformatics, 22-12:1540-1542
 #' (2006).
+#' @examples \dontrun{
+#' cl <- cluster_spectra(pk_tab, nboot=100, max.only = F, save = F, alpha = .97)
+#' }
 #' @export cluster_spectra
 
 # # @examples
 # cluster_spectra(pk_tab, warp, nboot=100, max.only = F,save = F)
 
-cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
-                            alpha=0.95, nboot=1000, plot_dend=T, plot_spectra=TRUE,
-                            verbose=TRUE, save=TRUE, parallel=TRUE, max.only=FALSE,
+cluster_spectra <- function(peak_table, chrom_list=NULL, peak_no = c(5,100),
+                            alpha=0.95, nboot=1000, plot_dend=T,
+                            plot_spectra=TRUE, verbose=TRUE, save=TRUE,
+                            parallel=TRUE, max.only=FALSE,
                             ...){
+  if (is.null(chrom_list)){
+    chrom_list <- get(peak_table$args["chrom_list"])
+  }
   if (verbose) print('...collecting representative spectra')
-  rep <- sapply(colnames(peak_table), function(j){
+  rep <- sapply(colnames(peak_table[[1]]), function(j){
     sp <- plot_spectrum(loc=j, peak_table=peak_table, chrom_list,
-                        scale_spectrum=T, plot_trace=F, export_spectrum = T, plot_spectrum=F, verbose=F)
+                        scale_spectrum=T, plot_trace=F, export_spectrum = T,
+                        plot_spectrum=F, verbose=F)
   })
   rep <- data.frame(do.call(cbind,rep))
   names(rep) <- paste0('V',seq_len(ncol(rep)))
@@ -74,8 +82,11 @@ cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
   l <- sapply(p$clusters, length)
   sub <- p$clusters[which(l > peak_no[1] & l < peak_no[2])]
   pval <- 1-result$edges[p$edges[which(l > peak_no[1] & l < peak_no[2])],'au']
-  sub <- lapply(seq_along(sub), function(i) new("cluster", peaks=sub[[i]], pval=pval[i]))
-  pval <- format(round(result$edges[p$edges[which(l > peak_no[1] & l < peak_no[2])],'au'],2), nsmall=2)
+  sub <- lapply(seq_along(sub), function(i){
+    new("cluster", peaks=sub[[i]], pval=pval[i])})
+  pval <- format(round(
+    result$edges[p$edges[which(l > peak_no[1] & l < peak_no[2])],'au'],2),
+    nsmall=2)
   names(sub) <- paste0('c',seq_along(sub))
   
   if (plot_spectra){
@@ -84,30 +95,9 @@ cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
     sapply(seq_along(sub), function(i){ 
       matplot(new.lambdas,rep[,as.numeric(gsub('V','',sub[[i]]@peaks))],
               type='l', ylab='', yaxt='n', xlab=expression(lambda),
-              main=paste0('cluster ', i, '; p = ', format(round(sub[[i]]@pval,2),nsmall=2))
+              main=paste0('cluster ', i, '; p = ',
+                          format(round(sub[[i]]@pval,2),nsmall=2))
                           )})
   }
   return(sub)
 }
-
-# dend<-as.dendrogram(result)
-# result %>%
-#   as.dendrogram() %>%
-#   hang.dendrogram() %>%
-#   plot(main = "Cluster dendrogram with AU/BP values (%)")
-# result %>% text()
-# dend %>% set("labels_cex",0.5) %>% plot()
-# result %>% as.dendrogram %>% plot(labels=F)
-# result %>% pvrect(alpha = 0.95)
-
-# dend %>%
-#   pvclust_show_signif(result, signif_type = 'au', max.only=F, hang=-1) %>%
-#   plot()
-# dend %>%
-#   pvclust_show_signif(result, show_type = "lwd") %>%
-#   plot()
-# result %>% text()
-# dend %>% plot()
-# result %>% pvrect(alpha = 0.95, max.only=F)
-# 
-# dendextend::pvclust_show_signif(dend, result)

@@ -2,7 +2,6 @@
 % Please edit documentation in R/get_peaks.R
 \name{get_peaks}
 \alias{get_peaks}
-\alias{getAllPeaks}
 \title{Extract all peaks from the chromatographic profiles of a list of
 chromatograms.}
 \usage{
@@ -48,6 +47,11 @@ Function is adapted from the
 \url{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks}
 function authored by Ron Wehrens.
 }
+\examples{
+\dontrun{
+pks <- get_peaks(dat.pr, lambdas = c('210', '260'), sd.max=50, fit="egh")
+}
+}
 \author{
-Ethan Bass & Ron Wehrens
+Ethan Bass
 }

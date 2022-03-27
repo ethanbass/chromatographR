@@ -17,7 +17,7 @@
 #' option is to filter the peaks on intensity: perhaps one of the two peaks in
 #' the cluster is only a very small feature.
 #' 
-#' @aliases get_peaktable getPeakTable
+#' @aliases get_peaktable
 #' @importFrom dynamicTreeCut cutreeDynamicTree
 #' @importFrom fastcluster hclust
 #' @importFrom stats dist cutree as.dist aggregate
@@ -51,17 +51,25 @@
 #' \code{\link{cutreeDynamic}}.
 #' @param out Specify "data.frame" or "matrix" as output. Defaults to
 #' `data.frame`.
-#' @return The function returns a data frame where the first couple of columns
-#' contain meta-information on the features (component, peak, retention time)
-#' and the other columns contain the intensities of the features in the
-#' individual injections.
-#' @author Ethan Bass & Ron Wehrens
+#' @return The function returns a peak_table object, consisting of the following
+#' elements:
+#' `tab`: the peak table itself -- a data-frame of intensities in a
+#' sample x peak configuration.
+#' peaks (columns).
+#' `pk_meta`: A data.frame containing peak meta-data (e.g. spectral component,
+#' peak number, and average retention time).
+#' `sample_meta`: A data.frame of sample meta-data, added using \code{\link{attach_metadata}})
+#' `ref_spectra`: A data.frame of reference spectra in a wavelength x peak
+#' configuration. Must be added using \code{\link{attach_ref_spectra}}
+#' `args`: Vector of arguments given to \code{\link{get_peaktable}}.
+#' @author Ethan Bass
+#' @note Adapted from getPeakTable function in alsace package by Ron Wehrens.
 #' @references Broeckling, C. D., F. A. Afsar, S. Neumann, A. Ben-Hur, and J.
 #' E. Prenni. 2014. RAMClust: A Novel Feature Clustering Method Enables
 #' Spectral-Matching-Based Annotation for Metabolomics Data. \emph{Anal. Chem.}
 #' \bold{86}:6812-6817.
 #' @examples
-#' 
+#' \dontrun{
 #' data(Sa)
 #' new.ts <- seq(1,38,by=.01) # choose time-points
 #' new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
@@ -71,19 +79,25 @@
 #' warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360'))
 #' warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
 #' pks <- get_peaks(warp, lambdas="210")
-#' pkTab <- get_peaktable(pks, response = "area")
-#' 
+#' get_peaktable(pks, response = "area")
+#' }
+#' @seealso \code{\link{attach_ref_spectra}} \code{\link{attach_metadata}}
 #' @export get_peaktable
 get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "height"),
                           use.cor = FALSE, hmax = 0.2, plot_it = FALSE,
                           ask = plot_it, clust = c("rt","sp.rt"),
                           sigma.t = NULL, sigma.r = 0.5,
                           deepSplit = FALSE, out = c('data.frame', 'matrix')){
-  
   response <- match.arg(response, c("area", "height"))
   clust <- match.arg(clust, c("rt","sp.rt"))
   out <- match.arg(out, c('data.frame', 'matrix'))
   rt <- ifelse(use.cor, "rt.cor", "rt")
+  if (class(peak_list) != "peak_list")
+    stop("Peak list must be of the associated class.")
+  if (is.null(chrom_list)){
+    chrom_list <- try(get(attr(peak_list, "chrom_list")))
+    if (class(chrom_list)=="try-error") stop("Chromatograms not found")
+  }
   ncomp <- length(peak_list[[1]]) ## all elements should have the same length
   if (plot_it) {
     opar <- par(ask = ask, no.readonly = TRUE)
@@ -107,15 +121,14 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
     pkcenters.cl <- cutree(pkcenters.hcl, h = hmax)
     }
     if (clust == 'sp.rt'){
-      if (is.null(chrom_list)){
-        stop("Must provide list of chromatograms for spectral clustering.")
-      }
       if (is.null(sigma.t)){
-        sigma.t <- .5*mean(do.call(rbind,unlist(pkLst,recursive = F))$end - do.call(rbind,unlist(pkLst,recursive = F))$start)
+        sigma.t <- .5*mean(do.call(rbind,unlist(pkLst,recursive = F))$end - 
+                             do.call(rbind,unlist(pkLst,recursive = F))$start)
       }
       ts<- as.numeric(rownames(chrom_list[[1]]))
       sp <- sapply(seq_along(pkcenters), function(i){
-        rescale(t(chrom_list[[file.idx[i]]][which(elementwise.all.equal(ts, pkcenters[i])),]))
+        rescale(t(chrom_list[[file.idx[i]]][
+          which(elementwise.all.equal(ts, pkcenters[i])),]))
       }, simplify=T)
       cor.matrix <- cor(sp, method = "pearson")
       mint <- abs(outer(unlist(pkcenters), unlist(pkcenters), FUN="-"))
@@ -123,7 +136,8 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
       D <- 1-S
       linkage <- "average"
       pkcenters.hcl <- hclust(as.dist(D), method = linkage)
-      pkcenters.cl <- cutreeDynamicTree(pkcenters.hcl, maxTreeHeight = hmax, deepSplit = deepSplit, minModuleSize = 2)
+      pkcenters.cl <- cutreeDynamicTree(pkcenters.hcl, maxTreeHeight = hmax, 
+                                      deepSplit = deepSplit, minModuleSize = 2)
       sing <- which(pkcenters.cl == 0)
       pkcenters.cl[sing] <- max(pkcenters.cl) + seq_along(sing)
     }
@@ -135,14 +149,16 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
     cl.centers <- sort(cl.centers)
     metaInfo <- cbind(Component = rep(comp, ncl),
                       Peak = 1:ncl, 
-                      RT = cl.centers)
+                      RT = round(cl.centers,2)
+                      )
     if (plot_it){
       mycols <- myPalette(length(cl.centers))
       cl.df <- data.frame(peaks = pkcenters, files = factor(file.idx), 
                           cluster = pkcenters.cl)
       message(stripplot(files ~ peaks, data = cl.df, col = mycols[pkcenters.cl], 
                       pch = pkcenters.cl%%14, xlab = "Retention time", 
-                      ylab = "", main = paste("Component", comp), panel = function(...) {
+                      ylab = "", main = paste("Component", comp),
+                      panel = function(...) {
                         panel.stripplot(...)
                         panel.abline(v = cl.centers, col = mycols)
                       }))
@@ -156,109 +172,136 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
                                                               response]))
     Iinfo <- matrix(0, ncl, length(pkLst), dimnames = list(NULL, 
                                                            names(pkLst)))
-    for (i in seq(along = allIs)) Iinfo[pkcenters.cl[i], 
-                                        file.idx[i]] <- max(allIs[i], Iinfo[pkcenters.cl[i], 
-                                                                            file.idx[i]])
-    cbind(metaInfo, Iinfo)
+    for (i in seq(along = allIs)) Iinfo[pkcenters.cl[i],  file.idx[i]] <- 
+      max(allIs[i], Iinfo[pkcenters.cl[i], file.idx[i]])
+    #cbind(metaInfo, Iinfo)
+    return(list(Iinfo, metaInfo))
   }
-  result <- lapply(1:ncomp, clusterPeaks, peak_list)
-  result <- t(do.call("rbind", result))
-  if (out == "data.frame"){
-    return(data.frame(result))
-  } else return(result)
+  result <- lapply(seq_len(ncomp), clusterPeaks, peak_list)
+  result <- list(tab = data.frame(t(do.call("rbind", lapply(result,    
+                                                        function(x) x[[1]])))),
+                 pk_meta = data.frame(t(do.call("rbind", lapply(result, 
+                                                        function(x) x[[2]])))),
+                 sample_meta = NA,
+                 ref_spectra = NA,
+                 args = c(peak_list = deparse(substitute(peak_list)),
+                        chrom_list = attr(peak_list,"chrom_list"),
+                        response = response,
+                        use.cor = use.cor,
+                        hmax = hmax,
+                        clust = clust,
+                        sigma.t = sigma.t,
+                        sigma.r = sigma.r,
+                        deepSplit = deepSplit
+                        ))
+  class(result) <- "peak_table"
+  return(result)
 }
 
-getPeakTable <- function(peak_list, chrom_list = NULL, response = c("area", "height"),
-                          use.cor = FALSE, hmax = 0.2, plot_it = FALSE,
-                          ask = plot_it, clust = c("rt","sp.rt"),
-                          sigma.t = 2, sigma.r = 0.5,
-                          deepSplit = FALSE, out = c('data.frame', 'matrix')){
-  msg<-"The getPeakTable function is deprecated. Please use get_peaktable instead"
-  .Deprecated(get_peaktable, package="chromatographR", msg,
-              old = as.character(sys.call(sys.parent()))[1L])
-  response <- match.arg(response)
-  clust <- match.arg(clust, c('rt','sp.rt'))
-  out <- match.arg(out, c('data.frame', 'matrix'))
-  rt <- ifelse(use.cor, "rt.cor", "rt")
-  ncomp <- length(peak_list[[1]]) ## all elements should have the same length
-  if (plot_it) {
-    opar <- par(ask = ask, no.readonly = TRUE)
-    on.exit(par(opar))
-    myPalette <- colorRampPalette(c("green", "blue", "purple", "red", "orange"))
+#' @importFrom utils head
+#' @noRd
+#' @rdname head.peak_table
+#' @export
+head.peak_table <- function(x,...){
+  head(x$tab)
+}
+
+#' @importFrom utils tail
+#' @noRd
+#' @export
+tail.peak_table <- function(x,...){
+  tail(x$tab)
+}
+
+#' @noRd
+#' @export
+print.peak_table <- function(x, ...){
+  print(x$tab)
+}
+
+#' @noRd
+#' @export
+dim.peak_table <- function(x){
+  dim(x$tab)
+}
+
+#' Plot spectrum from peak table
+#' 
+#' A function to plot the trace and/or spectrum for a given peak in peak table.
+#' Can be used to confirm the identity of a peak or check that a particular
+#' column in the peak table represents a single compound.
+#' 
+#' @importFrom scales rescale
+#' @importFrom graphics identify title text boxplot
+#' @importFrom stats as.formula
+#' @param x The peak table (output from \code{\link{get_peaktable}}
+#' function).
+#' @param ... Additional arguments.
+#' @param loc The name of the peak or retention time for which you wish to
+#' extract spectral data.
+#' @param chrom_list A list of chromatograms in matrix form (timepoints x
+#' wavelengths).
+#' @param what What to look for. Either "peak" to extract spectral information
+#' for a certain peak, "rt" to scan by retention time, or "click" to manually
+#' select retention time by clicking on the chromatogram. Defaults to "peak".
+#' @param chr Numerical index of chromatogram you wish to plot; "max" to
+#' plot the chromatogram with the largest signal; or "all" to plot spectra
+#' for all chromatograms.
+#' @param lambda The wavelength you wish to plot the trace at if
+#' plot_chrom ==T and/or the wavelength to be used for the determination
+#' of signal abundance.
+#' @param plot_spectrum Logical. If TRUE, plots the spectrum of the chosen
+#' peak. Defaults to TRUE.
+#' @param plot_trace Logical. If TRUE, plots the trace of the chosen peak at
+#' lambda. Defaults to TRUE.
+#' @param box_plot Logical. If TRUE, plots box plot using categories
+#' defined by \code{vars}.
+#' @param vars Independent variables for boxplot.
+#' @param spectrum_labels Logical. If TRUE, plots labels on maxima in spectral
+#' plot. Defaults to TRUE.
+#' @param scale_spectrum Logical. If TRUE, scales spectrum to unit height.
+#' Defaults to FALSE.
+#' @param export_spectrum Logical. If TRUE, exports spectrum to console.
+#' Defaults to FALSE.
+#' @param verbose Logical. If TRUE, prints verbose output to console. Defaults
+#' to TRUE.
+#' @author Ethan Bass
+#' @rdname plot.peak_table
+#' @export
+
+plot.peak_table <- function(x, ..., loc=NULL, chrom_list=NULL, what="peak",
+                            chr = 'max', lambda = 'max',
+                            plot_spectrum = TRUE, plot_trace = TRUE,
+                            box_plot = FALSE, vars=NULL,
+                            spectrum_labels=TRUE, scale_spectrum=FALSE,
+                            export_spectrum=FALSE, verbose=TRUE){
+  if (what == "peak" & is.null(loc)){
+    loc <- readline(prompt="Which peak would you like to plot? \n")
+    loc <- gsub('\\"', '', loc)
+    loc <- gsub("\\'", "", loc)
+    if (!(loc %in% colnames(x$tab)))
+      stop("Peak not found.")
   }
-  clusterPeaks <- function(comp, pkLst){
-    pkLst <- lapply(pkLst, function(x) lapply(x, function(y) if (nrow(y) > 0){
-      y[!is.na(y[, rt]), , drop = FALSE]
+  if (plot_spectrum == TRUE | plot_trace == TRUE){
+    if (chr == "all"){
+      plot_all_spectra(loc, x, chrom_list = NULL,
+                       plot_spectrum = plot_spectrum,
+                       export_spectrum = export_spectrum,
+                       verbose = verbose, what = what)
+    } else{
+      plot_spectrum(loc, x, chrom_list, chr=chr,
+                    lambda = lambda, plot_spectrum = plot_spectrum,
+                    plot_trace = plot_trace, spectrum_labels = spectrum_labels,
+                    scale_spectrum = scale_spectrum,
+                    export_spectrum = export_spectrum,
+                    verbose = verbose, what = what)
     }
-    else {
-      y
-    }))
-    file.idx <- rep(names(pkLst), sapply(pkLst, function(samp) nrow(samp[[comp]])))
-    pkcenters <- unlist(lapply(pkLst, function(samp) samp[[comp]][, 
-                                                                  rt]))
-    names(pkcenters) <- NULL
-    if (length(pkcenters) < 2) 
-      return(NULL)
-    if (clust == 'rt'){
-      pkcenters.hcl <- hclust(dist(pkcenters), method = "complete")
-      pkcenters.cl <- cutree(pkcenters.hcl, h = hmax)
-    }
-    if (clust == 'sp.rt'){
-      if (is.null(chrom_list)){
-        stop('Must provide list of chromatograms for spectral clustering.')
-      }
-      sp <- sapply(seq_along(pkcenters), function(i){
-        scales::rescale(t(chrom_list[[file.idx[i]]][pkcenters[i],]))
-      }, simplify=T)
-      c <- cor(sp,sp,method = "pearson")
-      mint <- abs(outer(unlist(pkcenters),unlist(pkcenters), FUN="-"))
-      S <- exp((-(1-abs(c))^2)/(2*sigma.r^2))*exp(-(mint^2)/2*sigma.t^2)
-      D <- 1-S
-      linkage <- "average"
-      
-      pkcenters.hcl <- hclust(as.dist(D), method = linkage)
-      pkcenters.cl <- cutreeDynamicTree(pkcenters.hcl, maxTreeHeight = hmax, deepSplit = deepSplit, minModuleSize = 2)
-      sing <- which(pkcenters.cl == 0)
-      pkcenters.cl[sing] <- max(pkcenters.cl) + seq_along(sing)
-    }
-    cl.centers <- aggregate(pkcenters, list(pkcenters.cl), 
-                            "mean")[, 2]
-    ncl <- length(cl.centers)
-    ## reorder clusters from small to large rt
-    
-    pkcenters.cl <- order(order(cl.centers))[pkcenters.cl]
-    cl.centers <- sort(cl.centers)
-    metaInfo <- cbind(Component = rep(comp, ncl),
-                      Peak = 1:ncl, 
-                      RT = cl.centers)
-    if (plot_it){
-      mycols <- myPalette(length(cl.centers))
-      cl.df <- data.frame(peaks = pkcenters, files = factor(file.idx), 
-                          cluster = pkcenters.cl)
-      message(stripplot(files ~ peaks, data = cl.df, col = mycols[pkcenters.cl], 
-                      pch = pkcenters.cl%%14, xlab = "Retention time", 
-                      ylab = "", main = paste("Component", comp), panel = function(...) {
-                        panel.stripplot(...)
-                        panel.abline(v = cl.centers, col = mycols)
-                      }))
-    }
-    if (max(clusCount <- table(file.idx, pkcenters.cl)) > 
-        1) 
-      warning(paste("More than one peak of one injection in the same cluster", 
-                paste("for component ", comp, ".", sep = ""), 
-                "Keeping only the most intense one.", "", sep = "\n"))
-    allIs <- unlist(lapply(pkLst, function(samp) samp[[comp]][, 
-                                                              response]))
-    Iinfo <- matrix(0, ncl, length(pkLst), dimnames = list(NULL, 
-                                                           names(pkLst)))
-    for (i in seq(along = allIs)) Iinfo[pkcenters.cl[i], 
-                                        file.idx[i]] <- max(allIs[i], Iinfo[pkcenters.cl[i], 
-                                                                            file.idx[i]])
-    cbind(metaInfo, Iinfo)
   }
-  result <- lapply(1:ncomp, clusterPeaks, peak_list)
-  result <- t(do.call("rbind", result))
-  if (out == "data.frame"){
-    return(data.frame(result))
-  } else return(result)
+  if (box_plot == T){
+    if (is.null(vars))
+      stop("Must provide independent variable or variables for boxplot")
+    boxplot(as.formula(paste("x$tab[,loc]",vars,sep="~")), data = x$sample_meta,
+            main = paste(loc, '\n', 'RT = ', round(x$pk_meta['RT', loc],2)),
+            ylab="abs", xlab="", ...)
+  }
 }
