@@ -44,7 +44,8 @@ shown indicating the clustering.}
 
 \item{clust}{Specify whether to perform hierarchical clustering based on
 spectral similarity and retention time ("sp.rt") or retention time alone
-("rt").}
+("rt"). Defaults to "rt". The "sp.rt" option is experimental and should be 
+used with some caution.}
 
 \item{sigma.t}{Width of gaussian in retention time distance function.
 Controls weight of retention time.}

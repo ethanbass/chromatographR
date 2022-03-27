@@ -41,7 +41,8 @@
 #' @param ask Logical. Ask before showing new plot?
 #' @param clust Specify whether to perform hierarchical clustering based on
 #' spectral similarity and retention time ("sp.rt") or retention time alone
-#' ("rt").
+#' ("rt"). Defaults to "rt". The "sp.rt" option is experimental and should be 
+#' used with some caution.
 #' @param sigma.t Width of gaussian in retention time distance function.
 #' Controls weight of retention time.
 #' @param sigma.r Width of gaussian in spectral similarity function. Controls

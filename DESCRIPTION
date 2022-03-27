@@ -6,6 +6,7 @@ Author: Ethan Bass
 Maintainer: Ethan Bass <ethanbass@gmail.com>
 Description: R package for high throughput analysis of HPLC-DAD chromatograms or other chromatographic data.
 URL: https://github.com/ethanbass/chromatographR
+BugReports: https://github.com/ethanbass/chromatographR/issues
 License: GPL (>= 2)
 Depends: R (>= 3.5.0), ptw (>= 1.0.6), lattice
 Imports: methods, pvclust, fastcluster, dynamicTreeCut, scales, minpack.lm, smoother
