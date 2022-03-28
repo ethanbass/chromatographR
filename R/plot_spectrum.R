@@ -51,6 +51,10 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list=NULL,
                           export_spectrum = FALSE, verbose=TRUE, 
                           what=c("peak", "rt", "click"), ...){
   what <- match.arg(what, c("peak", "rt", "click"))
+  if (is.matrix(chrom_list)){
+    chrom_list <- list(chrom_list)
+    chr <- 1
+  }
   if (is.null(chrom_list) & is.null(peak_table))
     stop("Must provide either a peak_table or a chrom_list.")
   if (is.null(chrom_list)){
