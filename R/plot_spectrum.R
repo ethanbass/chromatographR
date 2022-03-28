@@ -63,6 +63,9 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list=NULL,
     if (!(loc %in% colnames(peak_table$tab))){
       stop(paste0("No match found for peak \'", loc, "\' in peak table."))}
   }
+  tab <- peak_table$tab
+  new.ts <- as.numeric(rownames(chrom_list[[1]]))
+  new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
   if (what == "rt" | what == "click"){
     if (chr == "max")
       stop("Chromatogram must be specified for scan function.")
@@ -72,9 +75,6 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list=NULL,
       stop("List of chromatograms must be provided for scan function.")
     }
   }
-  tab <- peak_table$tab
-  new.ts <- as.numeric(rownames(chrom_list[[1]]))
-  new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
   sig <- max(sapply(strsplit(rownames(chrom_list[[1]]),".", fixed=T),function(x) nchar(x[2])),na.rm=T)
   if (what == "click"){
     y<-chrom_list[[chr]][,lambda]
