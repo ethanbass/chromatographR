@@ -16,4 +16,4 @@ devtools::install_github("https://github.com/ethanbass/chromatographR/")
 To build the vignette, include the argument `build_vignettes=TRUE` (**Note:** this will take considerably longer than loading the package without building the vignette).
 
 ### Usage
-Please see the vignette included with the package for details on the application of the `chromatographR` package for the analysis of HPLC data. Your data will need to be in `csv` format first. Unfortunately, this can be considerably harder than it sounds, since most HPLC software is not designed to export raw data which is often stored in proprietary, binary formats.
+Please see the vignette included with the package for details on the application of the `chromatographR` package for the analysis of HPLC data. Your data will need to be in `csv` format first. Agilent .uv files can be imported using [chromConverter](https://github.com/ethanbass/chromConverter).
