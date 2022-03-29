@@ -1,10 +1,8 @@
 Package: chromatographR
 Type: Package
 Title: chromatographR
-Version: 0.3
-Author: 
-    person("Ethan", "Bass", , "ethanbass@gmail.com", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0002-6175-6739"))
+Version: 0.2
+Author: Ethan Bass
 Maintainer: Ethan Bass <ethanbass@gmail.com>
 Description: R package for high throughput analysis of HPLC-DAD chromatograms or other chromatographic data.
 URL: https://github.com/ethanbass/chromatographR
@@ -18,10 +16,9 @@ Suggests:
     knitr,
     parallel,
     rmarkdown,
-    testthat (>= 3.0.0),
-    chromConverter
-Additional_repositories: github.com/ethanbass/chromConverter
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
+BiocViews: Metabolomics, Preprocessing
 RoxygenNote: 7.1.2
 Encoding: UTF-8
 Config/testthat/edition: 3
