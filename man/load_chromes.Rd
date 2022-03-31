@@ -4,16 +4,18 @@
 \alias{load_chromes}
 \title{Import folders of chromatograms in CSV format.}
 \usage{
-load_chromes(paths, pattern = "CSV", dat = NULL, ...)
+load_chromes(paths, pattern = "CSV", sep = ",", dat = NULL, ...)
 }
 \arguments{
-\item{paths}{Paths to folders where chromatograms are stored.}
+\item{paths}{Path(s) to folders where chromatograms are stored.}
 
 \item{pattern}{Pattern to identify files (i.e. a file extension).
 Defaults to 'CSV'.}
 
+\item{sep}{Argument provided to \code{read.csv}. Defaults to ",".}
+
 \item{dat}{Optional list of chromatograms. If list is provided, the function
-will append chromatograms in path to the existing list of chromatograms.}
+will append newly imported chromatograms to the existing list.}
 
 \item{...}{Additional arguments to \code{\link{read.csv}}.}
 }

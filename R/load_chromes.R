@@ -6,6 +6,7 @@
 #' @param paths Path(s) to folders where chromatograms are stored.
 #' @param pattern Pattern to identify files (i.e. a file extension).
 #' Defaults to 'CSV'.
+#' @param sep Argument provided to \code{read.csv}. Defaults to ",".
 #' @param dat Optional list of chromatograms. If list is provided, the function
 #' will append newly imported chromatograms to the existing list.
 #' @param ... Additional arguments to \code{\link{read.csv}}.
@@ -20,7 +21,7 @@
 #' dat <- load_chromes(folders)
 #' }
 #' @export load_chromes
-load_chromes <- function(paths, pattern="CSV", dat=NULL, ...){
+load_chromes <- function(paths, pattern = "CSV", sep = ",", dat=NULL, ...){
   if (is.null(dat)){
   dat<-list()
   }
@@ -38,7 +39,7 @@ load_chromes <- function(paths, pattern="CSV", dat=NULL, ...){
     }
     }
     file_names <- gsub(pattern = ".CSV",x = basename(files), replacement = "")
-    mydata <- lapply(X=files, FUN=read.csv, row.names = 1, header=TRUE,
+    mydata <- lapply(X=files, FUN=read.csv, sep = sep, row.names = 1, header=TRUE,
                      fileEncoding="utf-16",check.names = FALSE, ...)
     mydata <- lapply(mydata, FUN=as.matrix)
     names(mydata) <- file_names
