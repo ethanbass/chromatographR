@@ -7,7 +7,7 @@
 load_chromes(
   paths,
   format.in = c("csv", "chemstation", "masshunter"),
-  dat = NULL,
+  sep = ",", dat = NULL,
   ...
 )
 }
@@ -15,6 +15,8 @@ load_chromes(
 \item{paths}{Path(s) to folders where chromatograms are stored.}
 
 \item{format.in}{Format of files.}
+
+\item{sep}{Argument provided to \code{read.csv}. Defaults to ",".}
 
 \item{dat}{Optional list of chromatograms. If list is provided, the function
 will append newly imported chromatograms to the existing list.}

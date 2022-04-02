@@ -71,12 +71,14 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
 #' Area under the fitted curve is estimated using trapezoidal estimation.
 #' 
 #' @param y response (numerical vector)
-#' @param pos Locations of peaks in vector y.
+#' @param pos Locations of peaks in vector y. If NULL, \code{find_peaks} will
+#' run automatically to find peak positions.
 #' @param sd.max Maximum width (standard deviation) for peaks. Defaults to 50.
 #' @param fit Function for peak fitting. (Currently "gaussian" and exponential
 #' gaussian hybrid ("egh") are supported. Defaults to egh.)
 #' @param max.iter Maximum number of iterations to use in nonlinear least
 #' squares peak-fitting. (Defaults to 1000).
+#' @param ... Additional arguments to \code{find_peaks}.
 #' @return Function \code{fit_peaks} returns a matrix, whose columns contain
 #' the following information: \item{rt}{location of the maximum of the peak
 #' (x)} \item{start}{start of peak (only included in table if `bounds==TRUE`)}
@@ -104,8 +106,12 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
 #' good model for chromatographic peaks in isocratic HPLC? Chromatographia 26,
 #' 285-296 (1988).
 #' @export fit_peaks
-fit_peaks <- function (y, pos, sd.max = 50, fit = c("egh", "gaussian"), max.iter = 1000){
+fit_peaks <- function (y, pos=NULL, sd.max = 50, fit = c("egh", "gaussian"), 
+                       max.iter = 1000, ...){
   fit <- match.arg(fit, c("egh", "gaussian"))
+  if (is.null(pos)){
+    pos <- find_peaks(pos, ...)
+  }
   if (fit == "gaussian") {
     tabnames <- c("rt", "start", "end", "sd", "FWHM", "height", "area", "r-squared")
     noPeaksMat <- matrix(rep(NA, length(tabnames)), nrow = 1, dimnames = list(NULL, 

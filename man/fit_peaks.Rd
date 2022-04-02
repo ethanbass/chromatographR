@@ -5,12 +5,20 @@
 \title{Fit chromatographic peaks with a gaussian or exponential-gaussian hybrid
 profile}
 \usage{
-fit_peaks(y, pos, sd.max = 50, fit = c("egh", "gaussian"), max.iter = 1000)
+fit_peaks(
+  y,
+  pos = NULL,
+  sd.max = 50,
+  fit = c("egh", "gaussian"),
+  max.iter = 1000,
+  ...
+)
 }
 \arguments{
 \item{y}{response (numerical vector)}
 
-\item{pos}{Locations of peaks in vector y.}
+\item{pos}{Locations of peaks in vector y. If NULL, \code{find_peaks} will
+run automatically to find peak positions.}
 
 \item{sd.max}{Maximum width (standard deviation) for peaks. Defaults to 50.}
 
@@ -19,6 +27,8 @@ gaussian hybrid ("egh") are supported. Defaults to egh.)}
 
 \item{max.iter}{Maximum number of iterations to use in nonlinear least
 squares peak-fitting. (Defaults to 1000).}
+
+\item{...}{Additional arguments to \code{find_peaks}.}
 }
 \value{
 Function \code{fit_peaks} returns a matrix, whose columns contain

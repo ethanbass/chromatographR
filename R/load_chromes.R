@@ -5,6 +5,7 @@
 #' @importFrom utils read.csv
 #' @param paths Path(s) to folders where chromatograms are stored.
 #' @param format.in Format of files.
+#' @param sep Argument provided to \code{read.csv}. Defaults to ",".
 #' @param dat Optional list of chromatograms. If list is provided, the function
 #' will append newly imported chromatograms to the existing list.
 #' @param ... Additional arguments to \code{\link{read.csv}}.
@@ -19,9 +20,10 @@
 #' dat <- load_chromes(folders)
 #' }
 #' @export load_chromes
+
 load_chromes <- function(paths,
                          format.in=c("csv", "chemstation", "masshunter"),
-                         dat=NULL, ...){
+                         sep = ",", dat=NULL, ...){
   format.in = match.arg(format.in, c("csv", "chemstation", "masshunter"))
   if (is.null(dat)){
     dat<-list()
