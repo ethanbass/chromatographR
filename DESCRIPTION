@@ -12,6 +12,7 @@ BugReports: https://github.com/ethanbass/chromatographR/issues
 License: GPL (>= 2)
 Depends: R (>= 3.5.0), ptw (>= 1.0.6), lattice
 Imports: methods, pvclust, fastcluster, dynamicTreeCut, scales, minpack.lm, smoother
+Remotes: ethanbass/chromConverter
 LazyData: true
 LazyDataCompression: xz
 Suggests: 
@@ -20,7 +21,6 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0),
     chromConverter
-Additional_repositories: github.com/ethanbass/chromConverter
 VignetteBuilder: knitr
 RoxygenNote: 7.1.2
 Encoding: UTF-8
