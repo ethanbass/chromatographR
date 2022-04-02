@@ -4,13 +4,17 @@
 \alias{load_chromes}
 \title{Import folders of chromatograms in CSV format.}
 \usage{
-load_chromes(paths, pattern = "CSV", sep = ",", dat = NULL, ...)
+load_chromes(
+  paths,
+  format.in = c("csv", "chemstation", "masshunter"),
+  sep = ",", dat = NULL,
+  ...
+)
 }
 \arguments{
 \item{paths}{Path(s) to folders where chromatograms are stored.}
 
-\item{pattern}{Pattern to identify files (i.e. a file extension).
-Defaults to 'CSV'.}
+\item{format.in}{Format of files.}
 
 \item{sep}{Argument provided to \code{read.csv}. Defaults to ",".}
 
