@@ -60,8 +60,9 @@ the matrix by interpolation. By default, the data are baseline-corrected in
 the time direction and smoothed in the spectral dimension.
 }
 \note{
-Adapted from the preprocess function authored by Ron Wehrens in the
-alsace package.
+Adapted from
+\url{https://github.com/rwehrens/alsace/blob/master/R/preprocess.R}{preprocess}
+function in the alsace package by Ron Wehrens.
 }
 \examples{
 \dontrun{
@@ -70,6 +71,12 @@ new.ts <- seq(1,38,by=.01) # choose time-points
 new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
 Sa.pr <-preprocess(Sa[[1]], dim1 = new.ts, dim2 = new.lambdas)
 }
+}
+\references{
+Wehrens, R., Carvalho, E., Fraser, P.D. 2015.
+\href{https://doi.org/10.1007/s11306-014-0683-5}{Metabolite profiling in
+LC–DAD using multivariate curve resolution: the alsace package for R.} \emph{
+Metabolomics} \bold{11:1}:143-154.
 }
 \author{
 Ethan Bass

@@ -7,7 +7,8 @@
 load_chromes(
   paths,
   format.in = c("csv", "chemstation", "masshunter"),
-  sep = ",", dat = NULL,
+  sep = ",",
+  dat = NULL,
   ...
 )
 }
@@ -29,6 +30,11 @@ A list of chromatograms in matrix format.
 \description{
 Convenience function to import chromatograms from a list of folders.
 Chromatograms must be in CSV format.
+}
+\note{
+Relies on the file parsers included with the
+\url{https://github.com/bovee/aston}{Aston} package to import chemstation
+\code{.uv} and masshunter \code{.sp} files.
 }
 \examples{
 \dontrun{

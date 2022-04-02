@@ -21,7 +21,10 @@
 #' The only argument that cannot be changed is \code{warp.type}: this is always
 #' equal to \code{"global"}.
 #' @return A list of `ptw` objects or a list of warped absorbance profiles.
-#' @author Ron Wehrens, Ethan Bass
+#' @author Ethan Bass
+#' @note Adapted from
+#' \url{https://github.com/rwehrens/alsace/blob/master/R/correctRT.R}{correctRT}
+#' function in the alsace package by Ron Wehrens.
 #' @seealso \code{\link[ptw:ptw]{ptw}}, \code{\link{correct_peaks}}
 #' @references Eilers, P.H.C. 2004.
 #' \href{https://pubs.acs.org/doi/10.1021/ac034800e}{Parametric Time Warping.}
@@ -30,6 +33,10 @@
 #' \href{https://academic.oup.com/bioinformatics/article/31/18/3063/240579}{Fast
 #' parametric time warping of peak lists.} \emph{Bioinformatics}
 #' \bold{31}:3063-3065.
+#' Wehrens, R., Carvalho, E., Fraser, P.D. 2015.
+#' \href{https://doi.org/10.1007/s11306-014-0683-5}{Metabolite profiling in
+#' LC–DAD using multivariate curve resolution: the alsace package for R.} \emph{
+#' Metabolomics} \bold{11:1}:143-154.
 #' @examples
 #' \dontrun{
 #' warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360'), n.zeros = 250)

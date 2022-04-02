@@ -5,7 +5,7 @@
 #' chromatographR
 #' 
 #' \tabular{ll}{ Package: \tab chromatographR\cr Type: \tab Package\cr Version:
-#' \tab 0.1\cr Date: \tab 2021-09-30\cr License: GPL (>= 2) }
+#' \tab 0.3\cr Date: \tab 2022-04-02\cr License: GPL (>= 2) }
 #' 
 #' @name chromatographR-package
 #' @aliases chromatographR-package chromatographR

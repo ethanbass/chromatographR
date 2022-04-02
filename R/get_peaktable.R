@@ -64,7 +64,9 @@
 #' configuration. Must be added using \code{\link{attach_ref_spectra}}
 #' `args`: Vector of arguments given to \code{\link{get_peaktable}}.
 #' @author Ethan Bass
-#' @note Adapted from getPeakTable function in alsace package by Ron Wehrens.
+#' @note Adapted from
+#' \url{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}{getPeakTable}
+#' function in the alsace package by Ron Wehrens.
 #' @references Broeckling, C. D., F. A. Afsar, S. Neumann, A. Ben-Hur, and J.
 #' E. Prenni. 2014. RAMClust: A Novel Feature Clustering Method Enables
 #' Spectral-Matching-Based Annotation for Metabolomics Data. \emph{Anal. Chem.}

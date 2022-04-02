@@ -93,7 +93,9 @@ option is to filter the peaks on intensity: perhaps one of the two peaks in
 the cluster is only a very small feature.
 }
 \note{
-Adapted from getPeakTable function in alsace package by Ron Wehrens.
+Adapted from
+\url{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}{getPeakTable}
+function in the alsace package by Ron Wehrens.
 }
 \examples{
 \dontrun{

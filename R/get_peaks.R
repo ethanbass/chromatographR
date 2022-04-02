@@ -21,10 +21,14 @@
 #' file, and containing data for the fitted peaks for each of the ALS
 #' components. Note that this function presents the "rt", "sd" and "FWHM"
 #' fields in real time units.
+#' @author Ethan Bass
 #' @note Function is adapted from the
 #' \url{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks}
 #' function authored by Ron Wehrens.
-#' @author Ethan Bass
+#' @references Wehrens, R., Carvalho, E., Fraser, P.D. 2015.
+#' \href{https://doi.org/10.1007/s11306-014-0683-5}{Metabolite profiling in
+#' LC–DAD using multivariate curve resolution: the alsace package for R.} \emph{
+#' Metabolomics} \bold{11:1}:143-154.
 #' @examples
 #' \dontrun{
 #' pks <- get_peaks(dat.pr, lambdas = c('210', '260'), sd.max=50, fit="egh")

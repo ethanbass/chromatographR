@@ -11,6 +11,9 @@
 #' @param ... Additional arguments to \code{\link{read.csv}}.
 #' @return A list of chromatograms in matrix format.
 #' @author Ethan Bass
+#' @note Relies on the file parsers included with the
+#' \url{https://github.com/bovee/aston}{Aston} package to import chemstation
+#' \code{.uv} and masshunter \code{.sp} files.
 #' @examples \dontrun{
 #' ###  import from single folder
 #' dat <- load_chromes(paths = path)
