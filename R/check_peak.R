@@ -239,7 +239,7 @@ compare_spectra <- function(peak, peak_table, chrom_list,
 get_reference_spectrum <- function(peak_table, loc, chrom_list=NULL, ref = c("max.cor","max.int")){
   if (is.null(chrom_list)){
     try.out <- try(chrom_list <- get(peak_table$args["chrom_list"]))
-    if (class(try.out) == "try-error") stop("Chromatograms not found!")
+    if (inherits(try.out, "try-error")) stop("Chromatograms not found!")
   }
   ref <- match.arg(ref, c("max.cor", "max.int"))
   if (ref=="max.cor"){

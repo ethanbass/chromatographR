@@ -46,7 +46,7 @@ attach_metadata <- function(peak_table, metadata, column){
 gather_reference_spectra <- function(peak_table, chrom_list=NULL, ref = c("max.cor","max.int")){
   if (is.null(chrom_list)){
     try.out <- try(chrom_list <- get(peak_table$args["chrom_list"]))
-    if (class(try.out) == "try-error") stop("Chromatograms not found!")
+    if (inherits(try.out, "try-error")) stop("Chromatograms not found!")
   }
   ref <- match.arg(ref, c("max.cor", "max.int"))
   X<-colnames(peak_table$tab)

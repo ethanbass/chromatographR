@@ -33,7 +33,7 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
                                slope_thresh=.05, amp_thresh=0, bounds=TRUE){
   #compute derivative (with or without smoothing)
   if (smooth_type=='gaussian'){
-    d <- smth.gaussian(diff(y),window = smooth_window, alpha=smooth_width)
+    d <- smth.gaussian(diff(y), window = smooth_window, alpha = smooth_width)
   } else{
     d <- deriv(y)
   }
@@ -110,9 +110,9 @@ fit_peaks <- function (y, pos=NULL, sd.max = 50, fit = c("egh", "gaussian"),
                        max.iter = 1000, ...){
   fit <- match.arg(fit, c("egh", "gaussian"))
   if (is.null(pos)){
-    pos <- find_peaks(pos, ...)
+    pos <- find_peaks(y, ...)
   }
-  if (fit == "gaussian") {
+  if (fit == "gaussian"){
     tabnames <- c("rt", "start", "end", "sd", "FWHM", "height", "area", "r-squared")
     noPeaksMat <- matrix(rep(NA, length(tabnames)), nrow = 1, dimnames = list(NULL, 
                                                                tabnames))
@@ -204,7 +204,7 @@ fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height
   
   # package up the results to pass back
   
-    if (class( nlsAns) == "try-error") {
+    if (inherits(nlsAns, "try-error")){
       yAns <- gaussian(x, start.center, start.width, start.height, start.floor)
       out <- list("center"=start.center, "width"=start.width, "height"=start.height,
                   "y"=yAns, "residual"= y - yAns)
@@ -265,7 +265,7 @@ fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
   }
   
   # package up the results to pass back
-  if ( class( nlsAns) == "try-error") {
+  if (inherits(nlsAns, "try-error")) {
     yAns <- egh(x1, start.center, start.width, start.height, start.tau, start.floor)
     out <- list("center"=start.center, "width"=start.width, "height"=start.height, "tau"=start.tau,
                 "y"=yAns, "residual"= y1 - yAns)

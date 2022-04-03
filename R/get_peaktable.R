@@ -99,7 +99,7 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
     stop("Peak list must be of the associated class.")
   if (is.null(chrom_list)){
     chrom_list <- try(get(attr(peak_list, "chrom_list")))
-    if (class(chrom_list)=="try-error") stop("Chromatograms not found")
+    if (inherits(chrom_list, "try-error")) stop("Chromatograms not found")
   }
   ncomp <- length(peak_list[[1]]) ## all elements should have the same length
   if (plot_it) {

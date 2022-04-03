@@ -59,7 +59,7 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list=NULL,
     stop("Must provide either a peak_table or a chrom_list.")
   if (is.null(chrom_list)){
     chrom_list <- try(get(peak_table$args["chrom_list"]))
-    if (class(chrom_list)=="try-error") stop("Chromatograms not found!")
+    if (inherits(chrom_list, "try-error")) stop("Chromatograms not found!")
   }
   if (what == "peak"){
     if(is.null(peak_table)){
