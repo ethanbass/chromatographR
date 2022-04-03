@@ -12,7 +12,7 @@
 #' sample.
 #' @param what What to return: either the 'corrected.values' (useful for visual
 #' inspection) or the warping 'models' (for further programmatic use).
-#' @param init.coef Starting values for the optimisation.
+#' @param init.coef Starting values for the optimization.
 #' @param n.traces Number of traces to use.
 #' @param n.zeros Number of zeros to add.
 #' @param scale Logical. If true, scale chromatograms before warping.

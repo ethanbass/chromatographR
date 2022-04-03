@@ -16,7 +16,7 @@
 #' @keywords package
 NULL
 
-#' HLPC-DAD data of goldenrod root extracts.
+#' HPLC-DAD data of goldenrod root extracts.
 #' 
 #' Five HPLC-DAD data matrices of *Solidago altissima* roots extracted in 90
 #' percent methanol. Since the raw data are given (no smoothing or baseline

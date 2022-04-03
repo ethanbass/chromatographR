@@ -14,7 +14,7 @@
 #' @param fit What type of fit to use. Current options are gaussian and
 #' exponential gaussian hybrid.
 #' @param sd.max Maximum width (standard deviation) for peaks. Defaults to 50.
-#' @param max.iter Maximum number of interations for non-linear least squares
+#' @param max.iter Maximum number of iterations for non-linear least squares
 #' in \code{\link{fit_peaks}}.
 #' @param \dots Additional arguments to \code{\link{find_peaks}}.
 #' @return The result is a list, with each element corresponding to one data

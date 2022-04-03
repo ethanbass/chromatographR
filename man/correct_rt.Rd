@@ -31,7 +31,7 @@ sample.}
 \item{what}{What to return: either the 'corrected.values' (useful for visual
 inspection) or the warping 'models' (for further programmatic use).}
 
-\item{init.coef}{Starting values for the optimisation.}
+\item{init.coef}{Starting values for the optimization.}
 
 \item{n.traces}{Number of traces to use.}
 

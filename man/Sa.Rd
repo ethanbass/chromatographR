@@ -3,7 +3,7 @@
 \docType{data}
 \name{Sa}
 \alias{Sa}
-\title{HLPC-DAD data of goldenrod root extracts.}
+\title{HPLC-DAD data of goldenrod root extracts.}
 \format{
 The UV-Vis data (\code{Sa}) are given as a list of five matrices
 (time x wavelength).

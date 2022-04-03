@@ -2,7 +2,7 @@
 % Please edit documentation in R/load_chromes.R
 \name{load_chromes}
 \alias{load_chromes}
-\title{Import folders of chromatograms in CSV format.}
+\title{Import chromatograms.}
 \usage{
 load_chromes(
   paths,
@@ -29,10 +29,9 @@ A list of chromatograms in matrix format.
 }
 \description{
 Convenience function to import chromatograms from a list of folders.
-Chromatograms must be in CSV format.
 }
 \note{
-Relies on the file parsers included with the
+Relies on the file parsers from the
 \url{https://github.com/bovee/aston}{Aston} package to import chemstation
 \code{.uv} and masshunter \code{.sp} files.
 }

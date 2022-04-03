@@ -1,7 +1,6 @@
-#' Import folders of chromatograms in CSV format.
+#' Import chromatograms.
 #' 
 #' Convenience function to import chromatograms from a list of folders.
-#' Chromatograms must be in CSV format.
 #' @importFrom utils read.csv
 #' @param paths Path(s) to folders where chromatograms are stored.
 #' @param format.in Format of files.
@@ -83,4 +82,3 @@ load_chromes <- function(paths,
   }
   dat
 }
-

@@ -25,7 +25,7 @@ exponential gaussian hybrid.}
 
 \item{sd.max}{Maximum width (standard deviation) for peaks. Defaults to 50.}
 
-\item{max.iter}{Maximum number of interations for non-linear least squares
+\item{max.iter}{Maximum number of iterations for non-linear least squares
 in \code{\link{fit_peaks}}.}
 
 \item{\dots}{Additional arguments to \code{\link{find_peaks}}.}
