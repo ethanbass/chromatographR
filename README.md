@@ -13,7 +13,7 @@ install.packages("devtools")
 devtools::install_github("https://github.com/ethanbass/chromatographR/")
 ```
 
-To build the vignette, include the argument `build_vignettes=TRUE` (**Note:** this will take considerably longer than loading the package without building the vignette).
+To build the vignette, include the argument `build_vignettes=TRUE` (**Note:** this will take considerably longer than building the package without the vignette).
 
 ### Usage
 Please see the vignette included with the package for details on the application of the `chromatographR` package for the analysis of HPLC data. `chromatographR` can now import chemstation and masshunter file formats (using the parsers included with the [Aston](https://github.com/bovee/aston) package for Python) as well as regular `csv` files.
