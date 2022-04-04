@@ -45,24 +45,22 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"),
   peaks<-list()
   chrom_list_str <- deparse(substitute(chrom_list))
   chrom_list <- lapply(chrom_list, function(c_mat) c_mat[,lambdas, drop=F])
-  peak_positions <- lapply(chrom_list, function(c_mat){
-    apply(c_mat, 2, function(x) find_peaks(x, ...))})
   result <- lapply(seq_along(chrom_list), function(smpl){
-    ptable <- lapply(seq_along(peak_positions[[smpl]]), function(cmpnd){
-      fit_peaks(chrom_list[[smpl]][,cmpnd], peak_positions[[smpl]][[cmpnd]],
+    ptable <- lapply(lambdas, function(lambda){
+      fit_peaks(chrom_list[[smpl]][,lambda],
                 fit = fit, max.iter = max.iter, sd.max = sd.max)
     })
-    names(ptable) <- names(peak_positions[[smpl]])
+    names(ptable) <- lambdas
     ptable
   })
-  names(result) <- names(peak_positions)
+  names(result) <- names(chrom_list)
   result <- lapply(result, function(smpl) lapply(smpl, function(pks){
     pks[apply(pks, 1, function(x) !any(is.na(x))), , drop = FALSE]
     }))
   timepoints <- as.numeric(rownames(chrom_list[[1]]))
   tdiff <- median(diff(timepoints))
-  result <- lapply(result, function(smpl) lapply(smpl, function(cmpnd){
-    x <- cmpnd
+  result <- lapply(result, function(smpl) lapply(smpl, function(lambda){
+    x <- lambda
     x[, c('rt', 'start', 'end')] <- sapply(c('rt', 'start', 'end'),
                                            function(j) timepoints[x[,j]])
     x[, c('sd', 'FWHM')] <- x[, c('sd', 'FWHM')] * tdiff
