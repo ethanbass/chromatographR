@@ -14,7 +14,7 @@
 #' @param smooth_type Type of smoothing. (Defaults to "gaussian").
 #' @param smooth_window Window for smoothing. (Defaults to 1).
 #' @param smooth_width Width for smoothing. (Defaults to 0.1).
-#' @param slope_thresh Minimum threshold for peak slope. (Defaults to 0.05).
+#' @param slope_thresh Minimum threshold for peak slope. (Defaults to 0).
 #' @param amp_thresh Minimum threshold for peak amplitude. (Defaults to 0).
 #' @param bounds Logical. If TRUE, includes peak boundaries in data.frame.
 #' (Defaults to TRUE).
@@ -34,8 +34,9 @@
 #' Applications in scientific measurement.
 #' /href{https://terpconnect.umd.edu/~toh/spectrum/} (Accessed January, 2022).
 #' @export find_peaks
-find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_width = 0.1,
-                               slope_thresh=.05, amp_thresh=0, bounds=TRUE){
+find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1,
+                       smooth_width = 0.1, slope_thresh=0, amp_thresh=0,
+                       bounds=TRUE){
   #compute derivative (with or without smoothing)
   if (smooth_type=='gaussian'){
     d <- smth.gaussian(diff(y), window = smooth_window, alpha = smooth_width)

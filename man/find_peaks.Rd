@@ -9,7 +9,7 @@ find_peaks(
   smooth_type = "gaussian",
   smooth_window = 1,
   smooth_width = 0.1,
-  slope_thresh = 0.05,
+  slope_thresh = 0,
   amp_thresh = 0,
   bounds = TRUE
 )
@@ -23,7 +23,7 @@ find_peaks(
 
 \item{smooth_width}{Width for smoothing. (Defaults to 0.1).}
 
-\item{slope_thresh}{Minimum threshold for peak slope. (Defaults to 0.05).}
+\item{slope_thresh}{Minimum threshold for peak slope. (Defaults to 0).}
 
 \item{amp_thresh}{Minimum threshold for peak amplitude. (Defaults to 0).}
 
