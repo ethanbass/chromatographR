@@ -46,7 +46,7 @@ attach_metadata <- function(peak_table, metadata, column){
 #' provided peak table.
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaks}}
-#' @examplesIf \dontrun{
+#' @examples \dontrun{
 #' ref_m <- gather_reference_spectra(pk_tab, ref = "max.int")
 #' ref_c <- gather_reference_spectra(pk_tab, ref="max.cor")
 #' }
