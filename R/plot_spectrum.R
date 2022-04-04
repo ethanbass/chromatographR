@@ -114,6 +114,7 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list=NULL,
     y <- chrom_list[[chr]][time,]
     if (lambda == 'max'){
       lambda <- names(which.max(y))
+      lambda.index <- which(new.lambdas == lambda)
     } else lambda <- as.character(lambda)
     if (plot_trace){
       matplot(x=new.ts, y=chrom_list[[chr]][,lambda.index],type='l',
@@ -179,7 +180,7 @@ elementwise.all.equal <- Vectorize(function(x, y, ...) {isTRUE(all.equal(x, y, .
 #' data(Sa_short_pr)
 #' pks <- get_peaks(Sa_short_pr,lambda="220")
 #' pk_tab <- get_peaktable(pks)
-#' plot_all_spectra(peak="X55", peak_table = pk_tab, overlapping=TRUE)
+#' plot_all_spectra(peak="X6", peak_table = pk_tab, overlapping=TRUE)
 #' @export plot_all_spectra
 #' 
 plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all", 

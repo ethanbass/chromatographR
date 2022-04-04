@@ -49,6 +49,10 @@ Tom O'Haver's
 \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{Pragmatic
 Introduction to Signal Processing}.
 }
+\examples{
+data(Sa_short_pr)
+find_peaks(Sa_short_pr[[1]][,"220"])
+}
 \references{
 O'Haver, Tom. Pragmatic Introduction to Signal Processing:
 Applications in scientific measurement.

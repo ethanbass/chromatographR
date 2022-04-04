@@ -26,6 +26,9 @@
 #' \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{Pragmatic
 #' Introduction to Signal Processing}.
 #' @author Ethan Bass
+#' @examples
+#' data(Sa_short_pr)
+#' find_peaks(Sa_short_pr[[1]][,"220"])
 #' @seealso \code{\link{fit_peaks}}, \code{\link{get_peaks}}
 #' @references O'Haver, Tom. Pragmatic Introduction to Signal Processing:
 #' Applications in scientific measurement.
@@ -48,9 +51,11 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
   p <- intersect(intersect(p1,p2), p3)
   if (bounds){
     p4 <- which(sign(d[1:(length(d)-1)]) < sign(d[2:length(d)]))
-    bl <- sapply(p, function(v) max(p4[p4 < v])) # lower bound
+    # find lower bound
+    suppressWarnings(bl <- sapply(p, function(v) max(p4[p4 < v])))
     bl[which(bl == -Inf)] <- 0
-    bu <- sapply(p, function(v) min(p4[p4 > v])) # upper bound
+    # find upper bound
+    suppressWarnings(bu <- sapply(p, function(v) min(p4[p4 > v])))
     bu[which(bu == Inf)] <- length(y)
     data.frame(pos=p, lower=bl, upper=bu)
   } else 
@@ -94,11 +99,13 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
 #' as well as code published in Ron Wehrens'
 #' \href{https://github.com/rwehrens/alsace}{alsace} package.
 #' @author Ethan Bass
+#' @examples
+#' data(Sa_short_pr)
+#' fit_peaks(Sa_short_pr[[1]][,"220"])
 #' @seealso \code{\link{find_peaks}}, \code{\link{get_peaks}}
 #' @references Lan, K. & Jorgenson, J. W. A hybrid of exponential and gaussian
 #' functions as a simple model of asymmetric chromatographic peaks. Journal of
 #' Chromatography A 915, 1-13 (2001).
-#' 
 #' Naish, P. J. & Hartwell, S. Exponentially Modified Gaussian functions - A
 #' good model for chromatographic peaks in isocratic HPLC? Chromatographia 26,
 #' 285-296 (1988).
@@ -121,8 +128,11 @@ fit_peaks <- function (y, pos=NULL, sd.max = 50, fit = c("egh", "gaussian"),
     fitpk <- function(pos) {
       xloc <- pos[1]
       peak.loc <- seq.int(pos[2], pos[3])
-      m <- fit_gaussian(peak.loc, y[peak.loc], start.center = xloc, 
-                        start.height = y[xloc], max.iter = max.iter)
+      suppressWarnings(m <- fit_gaussian(peak.loc, y[peak.loc],
+                                         start.center = xloc,
+                                         start.height = y[xloc],
+                                         max.iter = max.iter)
+      )
       area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
       r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=T)
       c("rt" = m$center, "start" = pos[2], "end" = pos[3], "sd" = m$width, "FWHM" = 2.35 * m$width,
@@ -142,7 +152,9 @@ fit_peaks <- function (y, pos=NULL, sd.max = 50, fit = c("egh", "gaussian"),
     fitpk <- function(pos){
       xloc <- pos[1]
       peak.loc <- seq.int(pos[2], pos[3])
-      m <- fit_egh(peak.loc, y[peak.loc], start.center = xloc, start.height = y[xloc], max.iter = max.iter)
+      suppressWarnings(m <- fit_egh(peak.loc, y[peak.loc], start.center = xloc,
+                                    start.height = y[xloc], max.iter = max.iter)
+                       )
       r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=T)
       area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
       c("rt" = m$center, "start" = pos[2], "end" = pos[3], "sd" = m$width, "tau" = m$tau, "FWHM" = 2.35 * m$width,
@@ -231,8 +243,9 @@ egh <- function(x, center, width,  height, tau, floor=0){
 #' @importFrom stats coef fitted lm nls.control quantile residuals
 #' @noRd
 
-fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL, start.height=NULL,
-                    start.floor=NULL, fit.floor=FALSE, max.iter=1000) {
+fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
+                    start.height=NULL, start.floor=NULL, fit.floor=FALSE,
+                    max.iter=1000) {
   
   # try to find the best egh to fit the given data
   

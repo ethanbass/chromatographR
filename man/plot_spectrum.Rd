@@ -77,9 +77,7 @@ data(Sa_short_pr)
 pks <- get_peaks(Sa_short_pr,lambda="220")
 pk_tab <- get_peaktable(pks)
 par(mfrow=c(2,1))
-plot_spectrum(loc = "X35", peak_table = pk_tab, what="peak")
-### or click to select retention time
-plot_spectrum(peak_table = pk_tab, chr=1, lambda="210", what="click")
+plot_spectrum(loc = "X5", peak_table = pk_tab, what="peak")
 \dontshow{\}) # examplesIf}
 }
 \author{
