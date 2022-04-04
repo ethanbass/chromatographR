@@ -48,7 +48,7 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"),
   result <- lapply(seq_along(chrom_list), function(smpl){
     ptable <- lapply(lambdas, function(lambda){
       fit_peaks(chrom_list[[smpl]][,lambda],
-                fit = fit, max.iter = max.iter, sd.max = sd.max)
+                fit = fit, max.iter = max.iter, sd.max = sd.max, ...)
     })
     names(ptable) <- lambdas
     ptable
