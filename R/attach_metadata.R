@@ -1,6 +1,8 @@
 #' Attach experimental metadata
 #' 
-#' Attach experimental meta-data to peak table.
+#' Attaches experimental meta-data to peak_table object. One of the columns in
+#' the supplied meta-data must match exactly the rownames of the peak_table.
+#' 
 #' @aliases attach_metadata
 #' @param peak_table Peak table
 #' @param metadata Dataframe
@@ -11,7 +13,8 @@
 #' @examples \dontrun{
 #' meta <- read.csv("meta.csv")
 #' pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta,
-#' column="vial")}
+#' column="vial")
+#' }
 #' @export attach_metadata
 
 attach_metadata <- function(peak_table, metadata, column){
@@ -25,7 +28,12 @@ attach_metadata <- function(peak_table, metadata, column){
   return(peak_table)
 }
 
-#' Function to gather reference spectra.
+#' Gather reference spectra.
+#' 
+#' Defines reference spectra. Reference spectra are defined either as the spectrum
+#' with the highest intensity ('ref == "max.int"') or as the spectrum with the 
+#' highest average correlation to the rest of the spectra in the peak_table
+#' (ref == "max.cor"').
 #' 
 #' @importFrom stats cor sd
 #' @param peak_table Peak table from \code{\link{get_peaktable}}.
@@ -38,9 +46,10 @@ attach_metadata <- function(peak_table, metadata, column){
 #' provided peak table.
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaks}}
-#' @examples 
+#' @examplesIf \dontrun{
 #' ref_m <- gather_reference_spectra(pk_tab, ref = "max.int")
 #' ref_c <- gather_reference_spectra(pk_tab, ref="max.cor")
+#' }
 #' @noRd
 
 gather_reference_spectra <- function(peak_table, chrom_list=NULL, ref = c("max.cor","max.int")){
@@ -73,6 +82,12 @@ gather_reference_spectra <- function(peak_table, chrom_list=NULL, ref = c("max.c
 }
 
 #' Attach reference spectra
+#' 
+#' Gathers reference spectra and attaches them to peak_table object. Reference 
+#' spectra are defined either as the spectrum with the highest intensity (if 
+#' 'ref == "max.int"') or as the spectrum with the  highest average correlation
+#' to the other spectra in the peak_table (if ref == "max.cor"').
+#' 
 #' @aliases attach_ref_spectra
 #' @param peak_table Peak table from \code{\link{get_peaktable}}.
 #' @param chrom_list A list of chromatograms in matrix form (timepoints x
@@ -84,9 +99,11 @@ gather_reference_spectra <- function(peak_table, chrom_list=NULL, ref = c("max.c
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaks}}
 #' @examples \dontrun{
-#' ref_m <- attach_ref_spectra(pk_tab, ref = "max.int")}
+#' ref_m <- attach_ref_spectra(pk_tab, ref = "max.int")
+#' }
 #' @seealso \code{\link{get_peaktable}}
 #' @export attach_ref_spectra
+#' 
 attach_ref_spectra <- function(peak_table, chrom_list=NULL, ref = c("max.cor","max.int")){
   peak_table$ref_spectra <- gather_reference_spectra(peak_table, chrom_list, ref)
   return(peak_table)

@@ -24,11 +24,15 @@ intensity ("max.int").}
 peak_table object with reference spectra attached
 }
 \description{
-Attach reference spectra
+Gathers reference spectra and attaches them to peak_table object. Reference 
+spectra are defined either as the spectrum with the highest intensity (if 
+'ref == "max.int"') or as the spectrum with the  highest average correlation
+to the other spectra in the peak_table (if ref == "max.cor"').
 }
 \examples{
 \dontrun{
-ref_m <- attach_ref_spectra(pk_tab, ref = "max.int")}
+ref_m <- attach_ref_spectra(pk_tab, ref = "max.int")
+}
 }
 \seealso{
 \code{\link{get_peaks}}

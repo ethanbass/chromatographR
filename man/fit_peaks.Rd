@@ -2,7 +2,7 @@
 % Please edit documentation in R/fit_peaks.R
 \name{fit_peaks}
 \alias{fit_peaks}
-\title{Fit chromatographic peaks with a gaussian or exponential-gaussian hybrid
+\title{Fit chromatographic peaks to an exponential-gaussian hybrid or gaussian
 profile}
 \usage{
 fit_peaks(
@@ -45,14 +45,9 @@ as indices, so not in terms of the real retention times. The transformation
 to "real" time is done in function \code{get_peaks}.
 }
 \description{
-Fit peak parameters using gaussian or exponential-gaussian hybrid peak
-fitting.
+Fit peak parameters using exponential-gaussian hybrid or gaussian function.
 }
 \details{
-Find peaks with function \code{find_peaks} by looking for zero-crossings in
-the smoothed first derivative of a signal that exceed a given slope
-threshold.
-
 Peak parameters are calculated using \code{fit_peaks}, which fits the data
 to a gaussian or exponential-gaussian hybrid curve using non-linear least
 squares estimation as implemented in \code{\link[minpack.lm:nlsLM]{nlsLM}}.

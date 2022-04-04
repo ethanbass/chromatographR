@@ -1,6 +1,7 @@
 #' Import chromatograms.
 #' 
 #' Convenience function to import chromatograms from a list of folders.
+#' @name load_chroms
 #' @importFrom utils read.csv
 #' @param paths Path(s) to folders where chromatograms are stored.
 #' @param format.in Format of files.
@@ -19,11 +20,11 @@
 #' ### import from multiple folders
 #' path = 'foo'
 #' folders <- list.files(path = path, pattern = "EXPORT3D")
-#' dat <- load_chromes(folders)
+#' dat <- load_chroms(folders)
 #' }
-#' @export load_chromes
+#' @export load_chroms
 
-load_chromes <- function(paths,
+load_chroms <- function(paths,
                          format.in=c("csv", "chemstation", "masshunter"),
                          sep = ",", dat=NULL, ...){
   format.in = match.arg(format.in, c("csv", "chemstation", "masshunter"))

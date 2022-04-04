@@ -5,6 +5,7 @@
 #' Find peaks with function \code{find_peaks} by looking for zero-crossings in
 #' the smoothed first derivative of a signal that exceed a given slope
 #' threshold.
+#' 
 #' @importFrom smoother smth.gaussian
 #' @importFrom minpack.lm nlsLM
 #' @importFrom stats deriv lm
@@ -15,10 +16,11 @@
 #' @param smooth_width Width for smoothing. (Defaults to 0.1).
 #' @param slope_thresh Minimum threshold for peak slope. (Defaults to 0.05).
 #' @param amp_thresh Minimum threshold for peak amplitude. (Defaults to 0).
-#' @param bounds Logical. If TRUE, includes peak boundaries in dataframe.
+#' @param bounds Logical. If TRUE, includes peak boundaries in data.frame.
 #' (Defaults to TRUE).
-#' @return Function \code{find_peaks} simply returns the locations of the peak
-#' centers, expressed as indices.
+#' @return If bounds == T, returns a data.frame containing the center, start,
+#' and end of each identified peak. Otherwise, returns a numeric vector of peak
+#' centers. All locations are expressed as indices.
 #' @note The \code{find_peaks} function is adapted from matlab code in Prof.
 #' Tom O'Haver's
 #' \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{Pragmatic
@@ -55,15 +57,10 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1, smooth_widt
   p
 }
 
-#' Fit chromatographic peaks with a gaussian or exponential-gaussian hybrid
+#' Fit chromatographic peaks to an exponential-gaussian hybrid or gaussian
 #' profile
 #' 
-#' Fit peak parameters using gaussian or exponential-gaussian hybrid peak
-#' fitting.
-#' 
-#' Find peaks with function \code{find_peaks} by looking for zero-crossings in
-#' the smoothed first derivative of a signal that exceed a given slope
-#' threshold.
+#' Fit peak parameters using exponential-gaussian hybrid or gaussian function.
 #' 
 #' Peak parameters are calculated using \code{fit_peaks}, which fits the data
 #' to a gaussian or exponential-gaussian hybrid curve using non-linear least

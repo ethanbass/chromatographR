@@ -2,8 +2,7 @@
 % Please edit documentation in R/get_peaks.R
 \name{get_peaks}
 \alias{get_peaks}
-\title{Extract all peaks from the chromatographic profiles of a list of
-chromatograms.}
+\title{Extract all peaks from a list of chromatograms.}
 \usage{
 get_peaks(
   chrom_list,
@@ -16,7 +15,7 @@ get_peaks(
 }
 \arguments{
 \item{chrom_list}{A list of profile matrices, each of the same dimensions
-(timepoints times wavelengths).}
+(timepoints x wavelengths).}
 
 \item{lambdas}{Character vector of wavelengths to find peaks at.}
 
@@ -37,10 +36,14 @@ components. Note that this function presents the "rt", "sd" and "FWHM"
 fields in real time units.
 }
 \description{
-Function to extract all peaks in a list of chromatograms. Peaks are located
-as local maxima within the given span (function \code{\link{find_peaks}})
-and at the given positions a gaussian curve is fit (function
-\code{\link{fit_peaks}}).
+Extracts all peaks in a list of chromatograms.
+}
+\details{
+Peaks are located by finding zero-crossings in the smoothed first derivative
+of the specified chromatographic traces (function \code{\link{find_peaks}}).
+At the given positions, an exponential-gaussian hybrid (or regular gaussian)
+function is fit to the signal using \code{\link{fit_peaks}}). The area is then
+calculated using a trapezoidal approximation.
 }
 \note{
 Function is adapted from the
@@ -48,9 +51,10 @@ Function is adapted from the
 function authored by Ron Wehrens.
 }
 \examples{
-\dontrun{
-pks <- get_peaks(dat.pr, lambdas = c('210', '260'), sd.max=50, fit="egh")
-}
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+data(Sa_short_pr)
+pks <- get_peaks(Sa_short_pr, lambdas = c('210'), sd.max=50, fit="egh")
+\dontshow{\}) # examplesIf}
 }
 \references{
 Wehrens, R., Carvalho, E., Fraser, P.D. 2015.

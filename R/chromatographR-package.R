@@ -19,15 +19,12 @@ NULL
 #' HPLC-DAD data of goldenrod root extracts.
 #' 
 #' Five HPLC-DAD data matrices of *Solidago altissima* roots extracted in 90
-#' percent methanol. Since the raw data are given (no smoothing or baseline
-#' subtraction has been done, only subsetting of the time and wavelength axes).
+#' percent methanol.
 #' 
 #' 
 #' @name Sa
 #' @docType data
-#' @format The UV-Vis data (\code{Sa}) are given as a list of five matrices
-#' (time x wavelength).
-#' @keywords datasets
+#' @format  A list of five matrices (time x wavelength).
 NULL
 
 

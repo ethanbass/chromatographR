@@ -63,19 +63,24 @@ mode.}
 \item{...}{Additional arguments.}
 }
 \description{
-A function to plot the trace and/or spectrum for a given peak in peak table.
+Plots the trace and/or spectrum for a given peak in peak.table object, or
+plots the spectrum a particular retention time for a given chromatogram.
+}
+\details{
 Can be used to confirm the identity of a peak or check that a particular
-column in the peak table represents a single compound.
+column in the peak table represents a single compound. Retention times can
+also be selected by clicking on the plotted trace if what == 'click'.
 }
 \examples{
-\dontrun{
-### plot peak
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+data(Sa_short_pr)
+pks <- get_peaks(Sa_short_pr,lambda="220")
+pk_tab <- get_peaktable(pks)
 par(mfrow=c(2,1))
-plot_spectrum(loc="X35", peak_table = pk_tab, chrom_list=dat.pr, what="peak")
+plot_spectrum(loc = "X35", peak_table = pk_tab, what="peak")
 ### or click to select retention time
-plot_spectrum(peak_table = pk_tab, chrom_list=dat.pr, chr=1,
-lambda="210", what="click")
-}
+plot_spectrum(peak_table = pk_tab, chr=1, lambda="210", what="click")
+\dontshow{\}) # examplesIf}
 }
 \author{
 Ethan Bass

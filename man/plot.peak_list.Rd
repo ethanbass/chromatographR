@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_peaks.R
 \name{plot.peak_list}
 \alias{plot.peak_list}
-\title{Function to visually assess accuracy of integration}
+\title{Plot fitted peak shapes.}
 \usage{
 \method{plot}{peak_list}(
   x,
@@ -38,7 +38,7 @@ to FALSE.}
 \item{cex.points}{Size of points. Defaults to 0.5}
 }
 \description{
-Visually assess integration accuracy by fitted peaks onto chromatogram.
+Visually assess integration accuracy by plotting fitted peaks onto trace.
 }
 \seealso{
 \code{\link{get_peaks}}

@@ -66,31 +66,34 @@ elements:
 `tab`: the peak table itself -- a data-frame of intensities in a
 sample x peak configuration.
 peaks (columns).
-`pk_meta`: A data.frame containing peak meta-data (e.g. spectral component,
+`pk_meta`: A data.frame containing peak meta-data (e.g. the spectral component,
 peak number, and average retention time).
-`sample_meta`: A data.frame of sample meta-data, added using \code{\link{attach_metadata}})
-`ref_spectra`: A data.frame of reference spectra in a wavelength x peak
-configuration. Must be added using \code{\link{attach_ref_spectra}}
-`args`: Vector of arguments given to \code{\link{get_peaktable}}.
+`sample_meta`: A data.frame of sample meta-data. Must be added using
+\code{\link{attach_metadata}})
+`ref_spectra`: A data.frame of reference spectra (in a wavelength x peak
+configuration). Must be added using \code{\link{attach_ref_spectra}}
+`args`: A vector of arguments given to \code{\link{get_peaktable}}.
 }
 \description{
-Function returns a matrix of intensities, where rows correspond to samples
-and columns correspond to aligned features. The function performs a complete
-linkage clustering of retention times across all samples, and cuts at a
-height given by the user (which can be interpreted as the maximal
-inter-cluster retention time difference) in the simple case based on
-retention times. If two peaks from the same sample are assigned to the same
-cluster, a warning message is given.
+Function returns a peak_table object. The first slot contains a matrix of
+intensities, where rows correspond to samples and columns correspond to
+aligned features. The rest of the slots contain various meta-data about peaks,
+samples, and experimental settings.
 }
 \details{
-The clustering based on spectral similarity used a distance function adapted
-from Broeckling et al., 2014:
-\deqn{\exp({-\frac{(1-c_{ij})^2}{2\sigma_r^2}})*\exp({-\frac{(1-(t_i -
-t_j)^2}{2\sigma_t^2}})} If one sees warnings about peaks from the same
-sample sharing a cluster label, one option is to reduce the \code{maxdiff}
-variable - this, however, will increase the number of clusters. Another
-option is to filter the peaks on intensity: perhaps one of the two peaks in
-the cluster is only a very small feature.
+The function performs a complete linkage clustering of retention times across
+all samples, and cuts at a height given by the user (which can be understood
+as the maximal inter-cluster retention time difference) in the simple case
+based on retention times. Clustering can also incorporate information about
+spectral similarity using a distance function adapted from Broeckling et al.,
+2014: \deqn{\exp({-\frac{(1-c_{ij})^2}{2\sigma_r^2}})*\exp({-\frac{(1-(t_i -
+t_j)^2}{2\sigma_t^2}})}.
+
+If two peaks from the same sample are assigned to the same cluster, a warning
+message is printed to the console. These warnings can usually be ignored, but
+one could also consider reducing the \code{hmax} variable. However, this may 
+lead to splitting of peaks across multiple clusters. Another option is to
+filter the peaks by intensity to remove small features.
 }
 \note{
 Adapted from
@@ -98,18 +101,11 @@ Adapted from
 function in the alsace package by Ron Wehrens.
 }
 \examples{
-\dontrun{
-data(Sa)
-new.ts <- seq(1,38,by=.01) # choose time-points
-new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
-dat.pr <- lapply(X=Sa,FUN=preprocess,
-                 dim1=new.ts,
-                 dim2=new.lambdas)
-warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360'))
-warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
-pks <- get_peaks(warp, lambdas="210")
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+data(Sa_short_pr)
+pks <- get_peaks(Sa_short_pr, lambdas = c('210'))
 get_peaktable(pks, response = "area")
-}
+\dontshow{\}) # examplesIf}
 }
 \references{
 Broeckling, C. D., F. A. Afsar, S. Neumann, A. Ben-Hur, and J.

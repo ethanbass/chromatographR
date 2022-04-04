@@ -17,13 +17,15 @@ attach_metadata(peak_table, metadata, column)
 Peak table with meta-data.
 }
 \description{
-Attach experimental meta-data to peak table.
+Attaches experimental meta-data to peak_table object. One of the columns in
+the supplied meta-data must match exactly the rownames of the peak_table.
 }
 \examples{
 \dontrun{
 meta <- read.csv("meta.csv")
 pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta,
-column="vial")}
+column="vial")
+}
 }
 \seealso{
 \code{\link{get_peaktable}}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_spectrum.R
 \name{plot_all_spectra}
 \alias{plot_all_spectra}
-\title{Plot all spectra for chosen peak}
+\title{Plot all spectra for chosen peak.}
 \usage{
 plot_all_spectra(
   peak,
@@ -18,7 +18,7 @@ plot_all_spectra(
 )
 }
 \arguments{
-\item{peak}{The name of the peak you wish to plot (must be in character
+\item{peak}{The name of a peak to plot (in character
 format)}
 
 \item{peak_table}{The peak table (output from \code{\link{get_peaktable}}
@@ -48,10 +48,12 @@ Plot multiple for a given peak in peak table. Wrapper for
 \code{\link{plot_spectrum}}.
 }
 \examples{
-\dontrun{
-#' plot_all_spectra(loc="X55", peak_table = pk_tab, chrom_list=dat.pr,
-overlapping=TRUE)
-}
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+#' data(Sa_short_pr)
+pks <- get_peaks(Sa_short_pr,lambda="220")
+pk_tab <- get_peaktable(pks)
+plot_all_spectra(loc="X55", peak_table = pk_tab, overlapping=TRUE)
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{plot_spectrum}}

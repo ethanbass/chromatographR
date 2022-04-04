@@ -1,6 +1,6 @@
-#' Function to correct false zeros in peak table.
+#' Correct false zeros in peak table.
 #' 
-#' Function that tries to correct false zeroes for a particular peak in the
+#' Tries to correct false zeroes for a particular peak in the
 #' peak_table. This can be used as a last resort to automatically (or semi-
 #' automatically) align peak data. In each chromatogram, the function compares
 #' all peaks within a certain radius around the focal peak on the basis of their
@@ -31,6 +31,7 @@
 #' entries selected column as defined by the algorithm.
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaks}}
+#' @noRd
 
 check_peak <- function(peak, peak_table, chrom_list,
                         thresh_auto=0.95, thresh_man=NULL, r=100, plot_it=FALSE,
@@ -227,7 +228,7 @@ compare_spectra <- function(peak, peak_table, chrom_list,
   return(peak_table)
 }
 
-
+#' Get reference spectrum
 #' @importFrom stats sd
 #' @param peak_table Peak table from \code{\link{get_peaktable}}.
 #' @param loc Name of peak to be investigated.

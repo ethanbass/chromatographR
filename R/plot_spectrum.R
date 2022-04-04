@@ -1,8 +1,11 @@
 #' Plot spectrum from peak table
 #' 
-#' A function to plot the trace and/or spectrum for a given peak in peak table.
+#' Plots the trace and/or spectrum for a given peak in peak.table object, or
+#' plots the spectrum a particular retention time for a given chromatogram.
+#' 
 #' Can be used to confirm the identity of a peak or check that a particular
-#' column in the peak table represents a single compound.
+#' column in the peak table represents a single compound. Retention times can
+#' also be selected by clicking on the plotted trace if what == 'click'.
 #' 
 #' @importFrom scales rescale
 #' @importFrom graphics identify title text
@@ -35,14 +38,12 @@
 #' mode.
 #' @param ... Additional arguments.
 #' @author Ethan Bass
-#' @examples \dontrun{
-#' ### plot peak
+#' @examplesIf interactive()
+#' data(Sa_short_pr)
+#' pks <- get_peaks(Sa_short_pr,lambda="220")
+#' pk_tab <- get_peaktable(pks)
 #' par(mfrow=c(2,1))
-#' plot_spectrum(loc="X35", peak_table = pk_tab, chrom_list=dat.pr, what="peak")
-#' ### or click to select retention time
-#' plot_spectrum(peak_table = pk_tab, chrom_list=dat.pr, chr=1,
-#' lambda="210", what="click")
-#' }
+#' plot_spectrum(loc = "X5", peak_table = pk_tab, what="peak")
 #' @export plot_spectrum
 plot_spectrum <- function(loc, peak_table=NULL, chrom_list=NULL,
                           chr = 'max', lambda = 'max',
@@ -70,18 +71,22 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list=NULL,
   tab <- peak_table$tab
   new.ts <- as.numeric(rownames(chrom_list[[1]]))
   new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
+  if(lambda!="max"){
+    lambda <- as.numeric(lambda)
+    lambda.index <- which(new.lambdas == lambda) 
+  }
   if (what == "rt" | what == "click"){
     if (chr == "max")
       stop("Chromatogram must be specified for scan function.")
     if (!(lambda %in% new.lambdas))
-      stop("Lambda must be specified for scan function")
+      stop("Lambda not found!")
     if (is.null(chrom_list)){
       stop("List of chromatograms must be provided for scan function.")
     }
   }
   sig <- max(sapply(strsplit(rownames(chrom_list[[1]]),".", fixed=T),function(x) nchar(x[2])),na.rm=T)
   if (what == "click"){
-    y<-chrom_list[[chr]][,lambda]
+    y<-chrom_list[[chr]][,lambda.index]
     matplot(x=new.ts, y=y, type='l', ylab='', xlab='')
     print("Click trace to select timepoint")
     time <- identify(new.ts, y,n=1, plot=F)
@@ -111,7 +116,7 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list=NULL,
       lambda <- names(which.max(y))
     } else lambda <- as.character(lambda)
     if (plot_trace){
-      matplot(x=new.ts, y=chrom_list[[chr]][,lambda],type='l',
+      matplot(x=new.ts, y=chrom_list[[chr]][,lambda.index],type='l',
               #main=paste(names(chrom_list)[chr], ';','\n', 'RT = ', RT,
               #          '; Wavelength = ', lambda, 'nm'))
               ylab='', xlab='')
@@ -142,17 +147,18 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list=NULL,
 }
 
 
-## Elementwise all equal function from Brian Diggs
-## (https://stackoverflow.com/questions/9508518/why-are-these-numbers-not-equal)
+#' Elementwise all equal function
+#' @author Brian Diggs
+#' @references https://stackoverflow.com/questions/9508518/why-are-these-numbers-not-equal
 #' @noRd
 elementwise.all.equal <- Vectorize(function(x, y, ...) {isTRUE(all.equal(x, y, ...))})
 
-#' Plot all spectra for chosen peak
+#' Plot all spectra for chosen peak.
 #' 
 #' Plot multiple for a given peak in peak table. Wrapper for
 #' \code{\link{plot_spectrum}}.
 #' 
-#' @param peak The name of the peak you wish to plot (must be in character
+#' @param peak The name of a peak to plot (in character
 #' format)
 #' @param peak_table The peak table (output from \code{\link{get_peaktable}}
 #' function)
@@ -169,11 +175,13 @@ elementwise.all.equal <- Vectorize(function(x, y, ...) {isTRUE(all.equal(x, y, .
 #' @param \dots Additional arguments to plot_spectrum.
 #' @author Ethan Bass
 #' @seealso \code{\link{plot_spectrum}}
-#' @examples \dontrun{
-#' #' plot_all_spectra(loc="X55", peak_table = pk_tab, chrom_list=dat.pr,
-#' overlapping=TRUE)
-#' }
+#' @examplesIf interactive()
+#' data(Sa_short_pr)
+#' pks <- get_peaks(Sa_short_pr,lambda="220")
+#' pk_tab <- get_peaktable(pks)
+#' plot_all_spectra(peak="X55", peak_table = pk_tab, overlapping=TRUE)
 #' @export plot_all_spectra
+#' 
 plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all", 
                              plot_spectrum = T, export_spectrum=TRUE,
                              scale_spectrum=TRUE, overlapping=TRUE,
@@ -205,9 +213,9 @@ plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all",
   }
 }
 
-#' Spectrum scanner function
+#' Scan spectrum
 #' 
-#' Convenience function to call plot_spectrum with what=="click"
+#' Convenience function to call plot_spectrum with what = "click".
 #' 
 #' @importFrom scales rescale
 #' @importFrom graphics identify title text
@@ -225,8 +233,9 @@ plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all",
 #' Defaults to FALSE.
 #' @param ... Additional arguments.
 #' @author Ethan Bass
-#' @examples \dontrun{
-#' scan_chrom(dat.pr, lambda="210", chr=2, export_spectrum=T)}
+#' @examplesIf interactive()
+#' data(Sa_short_pr)
+#' scan_chrom(Sa_short_pr, lambda="210", chr=2, export_spectrum=T)
 #' @export scan_chrom
 scan_chrom <- function(chrom_list, lambda, chr=NULL, peak_table=NULL, 
                        scale_spectrum = FALSE, spectrum_labels = TRUE,

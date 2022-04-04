@@ -27,12 +27,13 @@ find_peaks(
 
 \item{amp_thresh}{Minimum threshold for peak amplitude. (Defaults to 0).}
 
-\item{bounds}{Logical. If TRUE, includes peak boundaries in dataframe.
+\item{bounds}{Logical. If TRUE, includes peak boundaries in data.frame.
 (Defaults to TRUE).}
 }
 \value{
-Function \code{find_peaks} simply returns the locations of the peak
-centers, expressed as indices.
+If bounds == T, returns a data.frame containing the center, start,
+and end of each identified peak. Otherwise, returns a numeric vector of peak
+centers. All locations are expressed as indices.
 }
 \description{
 Find peaks in chromatographic profile.

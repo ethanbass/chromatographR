@@ -32,12 +32,12 @@ In most cases, the data coming from the spectrometer must first be converted int
 
 ```{r,eval=F}
 # single folder
-load_chromes(paths = path)
+load_chroms(paths = path)
 
 # multiple folders
 path = 'foo'
 folders <- list.files(path = path, pattern = "EXPORT3D")
-dat <- import_chromes(folders)
+dat <- load_chroms(folders)
 ```
 
 ### Example data
@@ -60,8 +60,8 @@ lambda='200.00000'
 
 matplot(x=tpoints, y=Sa[[i]][,lambda],
        type='l', ylab='Abs (mAU)', xlab='Time (min)')
-matplot(x=tpoints, y=baseline.corr(Sa[[i]][,lambda],p=.001,lambda=1e5),
-       type='l', add=T, col='blue', lty = 3)
+matplot(x=tpoints, y = ptw::baseline.corr(Sa[[i]][,lambda],p=.001,lambda=1e5),
+       type='l', add = T, col='blue', lty = 3)
 ```
 
 ```{r, choosing dimensions}

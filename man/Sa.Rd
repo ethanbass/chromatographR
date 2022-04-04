@@ -5,12 +5,9 @@
 \alias{Sa}
 \title{HPLC-DAD data of goldenrod root extracts.}
 \format{
-The UV-Vis data (\code{Sa}) are given as a list of five matrices
-(time x wavelength).
+A list of five matrices (time x wavelength).
 }
 \description{
 Five HPLC-DAD data matrices of *Solidago altissima* roots extracted in 90
-percent methanol. Since the raw data are given (no smoothing or baseline
-subtraction has been done, only subsetting of the time and wavelength axes).
+percent methanol.
 }
-\keyword{datasets}

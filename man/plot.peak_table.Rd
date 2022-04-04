@@ -70,9 +70,13 @@ Defaults to FALSE.}
 to TRUE.}
 }
 \description{
-A function to plot the trace and/or spectrum for a given peak in peak table.
+Plots the trace and/or spectrum for a given peak in peak table.
+}
+\details{
 Can be used to confirm the identity of a peak or check that a particular
-column in the peak table represents a single compound.
+column in the peak table represents a single compound. Can also be used
+to create simple box-plots to examine the distribution of a peak with respect
+to variables defined in sample metadata.
 }
 \author{
 Ethan Bass

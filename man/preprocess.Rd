@@ -2,7 +2,7 @@
 % Please edit documentation in R/preprocess.R
 \name{preprocess}
 \alias{preprocess}
-\title{Preprocessing smooth time-wavelength data}
+\title{Preprocess time/wavelength data}
 \usage{
 preprocess(
   X,
@@ -53,11 +53,11 @@ The function returns the preprocessed data matrix, with rownames and
 colnames indicating the time points and wavelengths, respectively.
 }
 \description{
-Standard preprocessing of response matrices where the first axis is a time
-axis, and the second a spectral axis. An example is HPLC-DAD data. For
-smooth data, like UV-VIS data, there is the option to decrease the size of
-the matrix by interpolation. By default, the data are baseline-corrected in
-the time direction and smoothed in the spectral dimension.
+Standard pre-processing of response matrices, consisting of a time axis and
+a spectral axis (e.g. HPLC-DAD/UV data). For smooth data, like UV-VIS data,
+the size of the matrix can be reduced by interpolation. By default,
+the data are baseline-corrected in the time direction and smoothed in the 
+spectral dimension.
 }
 \note{
 Adapted from
@@ -65,12 +65,12 @@ Adapted from
 function in the alsace package by Ron Wehrens.
 }
 \examples{
-\dontrun{
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 data(Sa)
 new.ts <- seq(1,38,by=.01) # choose time-points
 new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
 Sa.pr <-preprocess(Sa[[1]], dim1 = new.ts, dim2 = new.lambdas)
-}
+\dontshow{\}) # examplesIf}
 }
 \references{
 Wehrens, R., Carvalho, E., Fraser, P.D. 2015.

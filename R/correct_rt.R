@@ -1,6 +1,7 @@
-#' Retention time correction
+#' Correct retention time
 #' 
-#' Correction of retention time differences using parametric time warping.
+#' Corrects retention time differences using parametric time warping as 
+#' implemented in \code{\link[ptw:ptw]{ptw}}.
 #' 
 #' @aliases correct_rt
 #' @import ptw
@@ -37,11 +38,11 @@
 #' \href{https://doi.org/10.1007/s11306-014-0683-5}{Metabolite profiling in
 #' LC–DAD using multivariate curve resolution: the alsace package for R.} \emph{
 #' Metabolomics} \bold{11:1}:143-154.
-#' @examples
-#' \dontrun{
-#' warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360'), n.zeros = 250)
-#' warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
-#' }
+#' @examplesIf interactive()
+#' data(Sa_short_pr)
+#' warping.models <- correct_rt(Sa_short_pr, what = "models",
+#' lambdas=c('210','260','360'), n.zeros = 250)
+#' warp <- correct_rt(chrom_list = Sa_short_pr, models = warping.models)
 #' @export correct_rt
 
 correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best',

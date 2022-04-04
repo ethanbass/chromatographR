@@ -1,15 +1,17 @@
-#' Extract all peaks from the chromatographic profiles of a list of
-#' chromatograms.
+#' Extract all peaks from a list of chromatograms.
 #' 
-#' Function to extract all peaks in a list of chromatograms. Peaks are located
-#' as local maxima within the given span (function \code{\link{find_peaks}})
-#' and at the given positions a gaussian curve is fit (function
-#' \code{\link{fit_peaks}}).
+#' Extracts all peaks in a list of chromatograms.
+#' 
+#' Peaks are located by finding zero-crossings in the smoothed first derivative
+#' of the specified chromatographic traces (function \code{\link{find_peaks}}).
+#' At the given positions, an exponential-gaussian hybrid (or regular gaussian)
+#' function is fit to the signal using \code{\link{fit_peaks}}). The area is then
+#' calculated using a trapezoidal approximation.
 #' 
 #' @aliases get_peaks
 #' @importFrom stats median
 #' @param chrom_list A list of profile matrices, each of the same dimensions
-#' (timepoints times wavelengths).
+#' (timepoints x wavelengths).
 #' @param lambdas Character vector of wavelengths to find peaks at.
 #' @param fit What type of fit to use. Current options are gaussian and
 #' exponential gaussian hybrid.
@@ -29,10 +31,9 @@
 #' \href{https://doi.org/10.1007/s11306-014-0683-5}{Metabolite profiling in
 #' LC–DAD using multivariate curve resolution: the alsace package for R.} \emph{
 #' Metabolomics} \bold{11:1}:143-154.
-#' @examples
-#' \dontrun{
-#' pks <- get_peaks(dat.pr, lambdas = c('210', '260'), sd.max=50, fit="egh")
-#' }
+#' @examplesIf interactive()
+#' data(Sa_short_pr)
+#' pks <- get_peaks(Sa_short_pr, lambdas = c('210'), sd.max=50, fit="egh")
 #' @export get_peaks
 
 get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"),
@@ -75,9 +76,9 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"),
             class="peak_list")
 }
 
-#' Function to visually assess accuracy of integration
+#' Plot fitted peak shapes.
 #' 
-#' Visually assess integration accuracy by fitted peaks onto chromatogram.
+#' Visually assess integration accuracy by plotting fitted peaks onto trace.
 #'
 #' @importFrom stats median
 #' @importFrom graphics polygon arrows

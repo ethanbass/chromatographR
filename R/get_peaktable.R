@@ -1,22 +1,25 @@
 #' Convert peak list into an ordered peak table
 #' 
-#' Function returns a matrix of intensities, where rows correspond to samples
-#' and columns correspond to aligned features. The function performs a complete
-#' linkage clustering of retention times across all samples, and cuts at a
-#' height given by the user (which can be interpreted as the maximal
-#' inter-cluster retention time difference) in the simple case based on
-#' retention times. If two peaks from the same sample are assigned to the same
-#' cluster, a warning message is given.
+#' Function returns a peak_table object. The first slot contains a matrix of
+#' intensities, where rows correspond to samples and columns correspond to
+#' aligned features. The rest of the slots contain various meta-data about peaks,
+#' samples, and experimental settings. 
 #' 
-#' The clustering based on spectral similarity used a distance function adapted
-#' from Broeckling et al., 2014:
-#' \deqn{\exp({-\frac{(1-c_{ij})^2}{2\sigma_r^2}})*\exp({-\frac{(1-(t_i -
-#' t_j)^2}{2\sigma_t^2}})} If one sees warnings about peaks from the same
-#' sample sharing a cluster label, one option is to reduce the \code{maxdiff}
-#' variable - this, however, will increase the number of clusters. Another
-#' option is to filter the peaks on intensity: perhaps one of the two peaks in
-#' the cluster is only a very small feature.
+#' The function performs a complete linkage clustering of retention times across
+#' all samples, and cuts at a height given by the user (which can be understood
+#' as the maximal inter-cluster retention time difference) in the simple case
+#' based on retention times. Clustering can also incorporate information about
+#' spectral similarity using a distance function adapted from Broeckling et al.,
+#' 2014: \deqn{\exp({-\frac{(1-c_{ij})^2}{2\sigma_r^2}})*\exp({-\frac{(1-(t_i -
+#' t_j)^2}{2\sigma_t^2}})}.
 #' 
+#' If two peaks from the same sample are assigned to the same cluster, a warning
+#' message is printed to the console. These warnings can usually be ignored, but
+#' one could also consider reducing the \code{hmax} variable. However, this may 
+#' lead to splitting of peaks across multiple clusters. Another option is to
+#' filter the peaks by intensity to remove small features.
+#' 
+#' @name get_peaktable
 #' @aliases get_peaktable
 #' @importFrom dynamicTreeCut cutreeDynamicTree
 #' @importFrom fastcluster hclust
@@ -57,12 +60,13 @@
 #' `tab`: the peak table itself -- a data-frame of intensities in a
 #' sample x peak configuration.
 #' peaks (columns).
-#' `pk_meta`: A data.frame containing peak meta-data (e.g. spectral component,
+#' `pk_meta`: A data.frame containing peak meta-data (e.g. the spectral component,
 #' peak number, and average retention time).
-#' `sample_meta`: A data.frame of sample meta-data, added using \code{\link{attach_metadata}})
-#' `ref_spectra`: A data.frame of reference spectra in a wavelength x peak
-#' configuration. Must be added using \code{\link{attach_ref_spectra}}
-#' `args`: Vector of arguments given to \code{\link{get_peaktable}}.
+#' `sample_meta`: A data.frame of sample meta-data. Must be added using
+#' \code{\link{attach_metadata}})
+#' `ref_spectra`: A data.frame of reference spectra (in a wavelength x peak
+#' configuration). Must be added using \code{\link{attach_ref_spectra}}
+#' `args`: A vector of arguments given to \code{\link{get_peaktable}}.
 #' @author Ethan Bass
 #' @note Adapted from
 #' \url{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}{getPeakTable}
@@ -71,21 +75,13 @@
 #' E. Prenni. 2014. RAMClust: A Novel Feature Clustering Method Enables
 #' Spectral-Matching-Based Annotation for Metabolomics Data. \emph{Anal. Chem.}
 #' \bold{86}:6812-6817.
-#' @examples
-#' \dontrun{
-#' data(Sa)
-#' new.ts <- seq(1,38,by=.01) # choose time-points
-#' new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
-#' dat.pr <- lapply(X=Sa,FUN=preprocess,
-#'                  dim1=new.ts,
-#'                  dim2=new.lambdas)
-#' warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360'))
-#' warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
-#' pks <- get_peaks(warp, lambdas="210")
+#' @examplesIf interactive()
+#' data(Sa_short_pr)
+#' pks <- get_peaks(Sa_short_pr, lambdas = c('210'))
 #' get_peaktable(pks, response = "area")
-#' }
 #' @seealso \code{\link{attach_ref_spectra}} \code{\link{attach_metadata}}
 #' @export get_peaktable
+#' 
 get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "height"),
                           use.cor = FALSE, hmax = 0.2, plot_it = FALSE,
                           ask = plot_it, clust = c("rt","sp.rt"),
@@ -230,9 +226,12 @@ dim.peak_table <- function(x){
 
 #' Plot spectrum from peak table
 #' 
-#' A function to plot the trace and/or spectrum for a given peak in peak table.
+#' Plots the trace and/or spectrum for a given peak in peak table. 
+#' 
 #' Can be used to confirm the identity of a peak or check that a particular
-#' column in the peak table represents a single compound.
+#' column in the peak table represents a single compound. Can also be used
+#' to create simple box-plots to examine the distribution of a peak with respect
+#' to variables defined in sample metadata.
 #' 
 #' @importFrom scales rescale
 #' @importFrom graphics identify title text boxplot

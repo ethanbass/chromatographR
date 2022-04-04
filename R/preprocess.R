@@ -1,10 +1,10 @@
-#' Preprocessing smooth time-wavelength data
+#' Preprocess time/wavelength data
 #' 
-#' Standard preprocessing of response matrices where the first axis is a time
-#' axis, and the second a spectral axis. An example is HPLC-DAD data. For
-#' smooth data, like UV-VIS data, there is the option to decrease the size of
-#' the matrix by interpolation. By default, the data are baseline-corrected in
-#' the time direction and smoothed in the spectral dimension.
+#' Standard pre-processing of response matrices, consisting of a time axis and
+#' a spectral axis (e.g. HPLC-DAD/UV data). For smooth data, like UV-VIS data,
+#' the size of the matrix can be reduced by interpolation. By default,
+#' the data are baseline-corrected in the time direction and smoothed in the 
+#' spectral dimension.
 #' 
 #' @import ptw
 #' @importFrom stats approx smooth.spline
@@ -40,21 +40,18 @@
 #' \href{https://doi.org/10.1007/s11306-014-0683-5}{Metabolite profiling in
 #' LC–DAD using multivariate curve resolution: the alsace package for R.} \emph{
 #' Metabolomics} \bold{11:1}:143-154.
-#' @examples
-#' \dontrun{
+#' @examplesIf interactive()
 #' data(Sa)
 #' new.ts <- seq(1,38,by=.01) # choose time-points
 #' new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
 #' Sa.pr <-preprocess(Sa[[1]], dim1 = new.ts, dim2 = new.lambdas)
-#' }
 #' @export preprocess
 
-preprocess <- function(X,
-                              dim1, ## time axis
-                              dim2, ## spectral axis
-                              remove.time.baseline = TRUE,
-                              spec.smooth = TRUE,
-                              maxI, parallel=TRUE, mc.cores=2, ...){
+preprocess <- function(X, dim1, ## time axis
+                          dim2, ## spectral axis
+                          remove.time.baseline = TRUE,
+                          spec.smooth = TRUE,
+                          maxI, parallel=TRUE, mc.cores=2, ...){
   if (!is.list(X) & !is.matrix(X)){
     stop("X should be a matrix or a list of matrices")
   }
@@ -66,6 +63,10 @@ preprocess <- function(X,
       if (length(find.package('parallel', quiet=TRUE))==0){
         stop("Parallel must be installed to enable parallel processing.")
       }
+    if (!exists("dim1") | !exists("dim2")){
+      stop("Times and wavelengths for interpolation must be defined. Please 
+      supply arguments 'dim1' and 'dim2' before proceeding.")
+    }
       parallel::mclapply(X, FUN=preprocess_matrix,
                dim1=dim1,
                dim2=dim2,

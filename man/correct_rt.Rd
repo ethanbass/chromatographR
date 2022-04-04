@@ -2,7 +2,7 @@
 % Please edit documentation in R/correct_rt.R
 \name{correct_rt}
 \alias{correct_rt}
-\title{Retention time correction}
+\title{Correct retention time}
 \usage{
 correct_rt(
   chrom_list,
@@ -49,7 +49,8 @@ equal to \code{"global"}.}
 A list of `ptw` objects or a list of warped absorbance profiles.
 }
 \description{
-Correction of retention time differences using parametric time warping.
+Corrects retention time differences using parametric time warping as 
+implemented in \code{\link[ptw:ptw]{ptw}}.
 }
 \note{
 Adapted from
@@ -57,10 +58,12 @@ Adapted from
 function in the alsace package by Ron Wehrens.
 }
 \examples{
-\dontrun{
-warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360'), n.zeros = 250)
-warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
-}
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+data(Sa_short_pr)
+warping.models <- correct_rt(Sa_short_pr, what = "models",
+lambdas=c('210','260','360'), n.zeros = 250)
+warp <- correct_rt(chrom_list = Sa_short_pr, models = warping.models)
+\dontshow{\}) # examplesIf}
 }
 \references{
 Eilers, P.H.C. 2004.

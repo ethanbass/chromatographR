@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_spectrum.R
 \name{scan_chrom}
 \alias{scan_chrom}
-\title{Spectrum scanner function}
+\title{Scan spectrum}
 \usage{
 scan_chrom(
   chrom_list,
@@ -38,11 +38,13 @@ Defaults to FALSE.}
 \item{...}{Additional arguments.}
 }
 \description{
-Convenience function to call plot_spectrum with what=="click"
+Convenience function to call plot_spectrum with what = "click".
 }
 \examples{
-\dontrun{
-scan_chrom(dat.pr, lambda="210", chr=2, export_spectrum=T)}
+\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+data(Sa_short_pr)
+scan_chrom(Sa_short_pr, lambda="210", chr=2, export_spectrum=T)
+\dontshow{\}) # examplesIf}
 }
 \author{
 Ethan Bass

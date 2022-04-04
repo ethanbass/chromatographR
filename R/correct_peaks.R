@@ -15,6 +15,7 @@
 #' containing the corrected retention time.
 #' @author Ron Wehrens
 #' @seealso \code{\link{correct_rt}}
+#' @export correct_peaks
 correct_peaks <- function(peak_list, mod_list){
   mapply(function(samp, mod){
     lapply(samp,
