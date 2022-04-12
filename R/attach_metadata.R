@@ -20,6 +20,9 @@
 attach_metadata <- function(peak_table, metadata, column){
   if (!(column %in% colnames(metadata)))
     stop(paste0("Column, ", column, ", is not found."))
+  if (sum((duplicated(metadata[,column]))) > 0)
+    stop(paste0("Sample names must be unique. Please check column '", column,
+    "' for duplicates."))
   meta <- data.frame(rownames(peak_table$tab))
   names(meta) <- column
   metadata[,column] <- as.character(metadata[,column])
