@@ -30,10 +30,14 @@ A list of chromatograms in matrix format.
 \description{
 Convenience function to import chromatograms from a list of folders.
 }
+\details{
+Chromatograms may be CSVs, ChemStation \code{.uv} files, or MassHunter \code{
+.sp} files.
+}
 \note{
 Relies on the file parsers from the
-\url{https://github.com/bovee/aston}{Aston} package to import chemstation
-\code{.uv} and masshunter \code{.sp} files.
+\url{https://github.com/bovee/aston}{Aston} package to import ChemStation
+\code{.uv} and MassHunter \code{.sp} files.
 }
 \examples{
 \dontrun{
