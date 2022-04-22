@@ -6,6 +6,7 @@
 \usage{
 load_chroms(
   paths,
+  find_files = TRUE,
   format.in = c("csv", "chemstation", "masshunter"),
   sep = ",",
   dat = NULL,
@@ -13,7 +14,11 @@ load_chroms(
 )
 }
 \arguments{
-\item{paths}{Path(s) to folders where chromatograms are stored.}
+\item{paths}{Path(s) to chromatograms or the folders containing the files}
+
+\item{find_files}{Logical. Set to \code{TRUE} (default) if you are providing
+the function with a folder or vector of folders containing the files.
+Otherwise, set to\code{FALSE}.}
 
 \item{format.in}{Format of files.}
 

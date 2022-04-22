@@ -7,7 +7,11 @@
 #' 
 #' @name load_chroms
 #' @importFrom utils read.csv
-#' @param paths Path(s) to folders where chromatograms are stored.
+#' @import chromConverter
+#' @param paths Path(s) to chromatograms or the folders containing the files
+#' @param find_files Logical. Set to \code{TRUE} (default) if you are providing
+#' the function with a folder or vector of folders containing the files.
+#' Otherwise, set to\code{FALSE}.
 #' @param format.in Format of files.
 #' @param sep Argument provided to \code{read.csv}. Defaults to ",".
 #' @param dat Optional list of chromatograms. If list is provided, the function
@@ -28,17 +32,18 @@
 #' }
 #' @export load_chroms
 
-load_chroms <- function(paths,
+load_chroms <- function(paths, find_files = TRUE,
                          format.in=c("csv", "chemstation", "masshunter"),
                          sep = ",", dat=NULL, ...){
   format.in = match.arg(format.in, c("csv", "chemstation", "masshunter"))
+  exists <- dir.exists(paths) | file.exists(paths)
+  if (mean(exists) == 0){
+    stop("Cannot locate files. None of the provided paths exist.")
+  }
   if (is.null(dat)){
     dat<-list()
   }
-  exists <- dir.exists(paths)
-  if (mean(exists) == 0){
-    stop("None of the provided paths exist.")
-  }
+  # choose converter
   if (format.in=="csv"){
     pattern <- ".csv|.CSV"
     get_names <- function(files){
@@ -63,27 +68,44 @@ load_chroms <- function(paths,
   }
   if (format.in == "chemstation"){
     pattern <- ".uv"
-    converter <- chromConverter:::trace_converter
+    converter <- uv_converter
   }
   if (format.in == "masshunter"){
     pattern <- ".sp"
-    converter <- chromConverter:::sp_converter
+    converter <- sp_converter
   }
-  for (path in paths){
-    files <- list.files(path=path, pattern = pattern, full.names = TRUE,
-                        recursive=TRUE)
-    file_names <- get_names(files)
-    if (length(files)==0){
-      if (!dir.exists(path)){
-        warning(paste0("The directory '", basename(path), "' does not exist."))
-    } else{
-      warning(paste0("No files matching the pattern '", pattern, "' were found in '", basename(path), "'"))
+  if (find_files){
+    files <- unlist(lapply(paths, function(path){
+      files <- list.files(path = path, pattern = pattern,
+                          full.names = TRUE, recursive = TRUE)
+      if (length(files)==0){
+        if (!dir.exists(path)){
+          warning(paste0("The directory '", basename(path), "' does not exist."))
+        } else{
+          warning(paste0("No files matching the pattern '", pattern,
+                         "' were found in '", basename(path), "'"))
+        }
+      }
+      files
+    }))
+  } else{
+    files <- paths
+    match <- grep(pattern, files)
+    if (length(match)==0){
+      warning("The provided files do not match the expected file extension.
+      Please confirm that the specified format ('format.in') is correct.",
+              immediate. = TRUE)
+    } else if (length(match) < length(files)){
+      warning(paste("Some of the files do not have the expected file extension:",
+                    files[match]), immediate. = TRUE)
     }
-    }
-    data <- lapply(X=files, FUN=converter)
-    data <- lapply(data, FUN=as.matrix)
-    names(data) <- file_names
-    dat <- append(dat,data)
   }
+  data <- lapply(X=files, function(f){
+    as.matrix(converter(f))
+  })
+  names(data) <- lapply(X=files, function(f){
+    get_names(f)
+  })
+  dat <- append(dat,data)
   dat
 }
