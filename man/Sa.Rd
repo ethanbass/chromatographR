@@ -5,9 +5,9 @@
 \alias{Sa}
 \title{HPLC-DAD data of goldenrod root extracts.}
 \format{
-A list of five matrices (time x wavelength).
+A list of four matrices (time x wavelength).
 }
 \description{
-Five HPLC-DAD data matrices of *Solidago altissima* roots extracted in 90
+Four HPLC-DAD data matrices of *Solidago altissima* roots extracted in 90
 percent methanol.
 }

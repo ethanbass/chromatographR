@@ -49,10 +49,10 @@ Plot multiple for a given peak in peak table. Wrapper for
 }
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-data(Sa_short_pr)
-pks <- get_peaks(Sa_short_pr,lambda="220")
+data(Sa_warp)
+pks <- get_peaks(Sa_warp, lambda="220")
 pk_tab <- get_peaktable(pks)
-plot_all_spectra(peak="X6", peak_table = pk_tab, overlapping=TRUE)
+plot_all_spectra(peak="X13", peak_table = pk_tab, overlapping=TRUE)
 \dontshow{\}) # examplesIf}
 }
 \seealso{

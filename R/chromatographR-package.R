@@ -18,31 +18,30 @@ NULL
 
 #' HPLC-DAD data of goldenrod root extracts.
 #' 
-#' Five HPLC-DAD data matrices of *Solidago altissima* roots extracted in 90
+#' Four HPLC-DAD data matrices of *Solidago altissima* roots extracted in 90
 #' percent methanol.
 #' 
 #' @name Sa
 #' @docType data
-#' @format  A list of five matrices (time x wavelength).
+#' @format  A list of four matrices (time x wavelength).
 NULL
 
 #' HPLC-DAD data of goldenrod root extracts.
 #' 
-#' Subset of two HPLC-DAD data matrices of *Solidago altissima* roots samples.
+#' Pre-processed chromatograms.
 #'
-#' @name Sa_short
+#' @name Sa_pr
 #' @docType data
-#' @format  Two small matrices (time x wavelength) for use in examples.
+#' @format  Four pre-processed matrices (time x wavelength) to use in examples.
 NULL
 
 #' HPLC-DAD data of goldenrod root extracts.
 #' 
-#' Subset of two HPLC-DAD data matrices of *Solidago altissima* roots samples
-#' with pre-processing.
+#' Pre-processed and warped chromatograms.
 #'
-#' @name Sa_short_pr
+#' @name Sa_warp
 #' @docType data
-#' @format  Two small (pre-processed) matrices (time x wavelength) to use in
+#' @format  Four pre-processed and warped matrices (time x wavelength) to use in
 #' examples.
 NULL
 

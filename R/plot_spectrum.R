@@ -39,11 +39,11 @@
 #' @param ... Additional arguments.
 #' @author Ethan Bass
 #' @examplesIf interactive()
-#' data(Sa_short_pr)
-#' pks <- get_peaks(Sa_short_pr,lambda="220")
+#' data(Sa)
+#' pks <- get_peaks(Sa,lambda="220.00000")
 #' pk_tab <- get_peaktable(pks)
 #' par(mfrow=c(2,1))
-#' plot_spectrum(loc = "X5", peak_table = pk_tab, what="peak")
+#' plot_spectrum(loc = "X10", peak_table = pk_tab, what="peak")
 #' @export plot_spectrum
 plot_spectrum <- function(loc, peak_table=NULL, chrom_list=NULL,
                           chr = 'max', lambda = 'max',
@@ -69,7 +69,7 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list=NULL,
       stop(paste0("No match found for peak \'", loc, "\' in peak table."))}
   }
   tab <- peak_table$tab
-  new.ts <- as.numeric(rownames(chrom_list[[1]]))
+  new.ts <- round(as.numeric(rownames(chrom_list[[1]])),2)
   new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
   if(lambda!="max"){
     lambda <- as.numeric(lambda)
@@ -89,7 +89,7 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list=NULL,
     y<-chrom_list[[chr]][,lambda.index]
     matplot(x=new.ts, y=y, type='l', ylab='', xlab='')
     print("Click trace to select timepoint")
-    time <- identify(new.ts, y,n=1, plot=F)
+    time <- identify(new.ts, y, n=1, plot=F)
     RT <- new.ts[time]
     abline(v=RT,col='red',lty=3)
     title(paste0("\n\n chr ", chr,  " ;   rt: ", RT, " ;  abs: ", round(y[time],1)))
@@ -107,7 +107,7 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list=NULL,
     } else if (what == "rt"){
       RT <- round(as.numeric(loc), sig)
       }
-    time <- which(elementwise.all.equal(RT, new.ts))
+    time <- which(elementwise.all.equal(RT, new.ts))[1]
     if (chr == 'max'){
       chr <- which.max(tab[,loc])
     }
@@ -136,9 +136,9 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list=NULL,
             ylab = 'Intensity', xlab = 'Wavelength (nm)',
             ylim=c(0,max(y)*1.2), ...)
     if (spectrum_labels){
-      pks <- find_peaks(y,slope_thresh=.00001, bounds=F)
+      suppressWarnings(pks <- find_peaks(y,slope_thresh=.00001, bounds=F))
       if (length(pks)>0){
-      pks <- data.frame(names(y)[pks], y[pks],stringsAsFactors = F)
+      pks <- data.frame(round(as.numeric(names(y)[pks]),0), y[pks],stringsAsFactors = F)
       text(pks[,1],pks[,2],pks[,1],pos=3,offset=.3,cex = .8)
       }
     }
@@ -177,10 +177,10 @@ elementwise.all.equal <- Vectorize(function(x, y, ...) {isTRUE(all.equal(x, y, .
 #' @author Ethan Bass
 #' @seealso \code{\link{plot_spectrum}}
 #' @examplesIf interactive()
-#' data(Sa_short_pr)
-#' pks <- get_peaks(Sa_short_pr,lambda="220")
+#' data(Sa_warp)
+#' pks <- get_peaks(Sa_warp, lambda="220")
 #' pk_tab <- get_peaktable(pks)
-#' plot_all_spectra(peak="X6", peak_table = pk_tab, overlapping=TRUE)
+#' plot_all_spectra(peak="X13", peak_table = pk_tab, overlapping=TRUE)
 #' @export plot_all_spectra
 #' 
 plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all", 
@@ -235,8 +235,8 @@ plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all",
 #' @param ... Additional arguments.
 #' @author Ethan Bass
 #' @examplesIf interactive()
-#' data(Sa_short_pr)
-#' scan_chrom(Sa_short_pr, lambda="210", chr=2, export_spectrum=T)
+#' data(Sa_pr)
+#' scan_chrom(Sa_pr, lambda="210", chr=2, export_spectrum=T)
 #' @export scan_chrom
 scan_chrom <- function(chrom_list, lambda, chr=NULL, peak_table=NULL, 
                        scale_spectrum = FALSE, spectrum_labels = TRUE,

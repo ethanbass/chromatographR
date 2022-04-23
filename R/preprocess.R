@@ -42,9 +42,9 @@
 #' Metabolomics} \bold{11:1}:143-154.
 #' @examplesIf interactive()
 #' data(Sa)
-#' new.ts <- seq(1,38,by=.01) # choose time-points
-#' new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
-#' Sa.pr <-preprocess(Sa[[1]], dim1 = new.ts, dim2 = new.lambdas)
+#' new.ts <- seq(10,18.66,by=.01) # choose time-points
+#' new.lambdas <- seq(200, 318, by = 2) # choose wavelengths
+#' Sa_pr <- preprocess(Sa[[1]], dim1 = new.ts, dim2 = new.lambdas)
 #' @export preprocess
 
 preprocess <- function(X, dim1, ## time axis

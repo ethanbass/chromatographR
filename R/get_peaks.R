@@ -32,8 +32,8 @@
 #' LC–DAD using multivariate curve resolution: the alsace package for R.} \emph{
 #' Metabolomics} \bold{11:1}:143-154.
 #' @examplesIf interactive()
-#' data(Sa_short_pr)
-#' pks <- get_peaks(Sa_short_pr, lambdas = c('210'), sd.max=50, fit="egh")
+#' data(Sa_pr)
+#' pks <- get_peaks(Sa_pr, lambdas = c('210'), sd.max=50, fit="egh")
 #' @export get_peaks
 
 get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"),

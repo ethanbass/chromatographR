@@ -27,8 +27,8 @@
 #' Introduction to Signal Processing}.
 #' @author Ethan Bass
 #' @examples
-#' data(Sa_short_pr)
-#' find_peaks(Sa_short_pr[[1]][,"220"])
+#' data(Sa_pr)
+#' find_peaks(Sa_pr[[1]][,"220"])
 #' @seealso \code{\link{fit_peaks}}, \code{\link{get_peaks}}
 #' @references O'Haver, Tom. Pragmatic Introduction to Signal Processing:
 #' Applications in scientific measurement.
@@ -101,8 +101,8 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1,
 #' \href{https://github.com/rwehrens/alsace}{alsace} package.
 #' @author Ethan Bass
 #' @examples
-#' data(Sa_short_pr)
-#' fit_peaks(Sa_short_pr[[1]][,"220"])
+#' data(Sa_pr)
+#' fit_peaks(Sa_pr[[1]][,"220"])
 #' @seealso \code{\link{find_peaks}}, \code{\link{get_peaks}}
 #' @references Lan, K. & Jorgenson, J. W. A hybrid of exponential and gaussian
 #' functions as a simple model of asymmetric chromatographic peaks. Journal of

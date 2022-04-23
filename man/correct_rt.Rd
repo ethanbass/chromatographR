@@ -59,10 +59,9 @@ function in the alsace package by Ron Wehrens.
 }
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-data(Sa_short_pr)
-warping.models <- correct_rt(Sa_short_pr, what = "models",
-lambdas=c('210','260','360'), n.zeros = 250)
-warp <- correct_rt(chrom_list = Sa_short_pr, models = warping.models)
+data(Sa_pr)
+warping.models <- correct_rt(Sa_pr, what = "models", lambdas=c("210"))
+warp <- correct_rt(chrom_list = Sa_pr, models = warping.models)
 \dontshow{\}) # examplesIf}
 }
 \references{

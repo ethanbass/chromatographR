@@ -73,11 +73,11 @@ also be selected by clicking on the plotted trace if what == 'click'.
 }
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-data(Sa_short_pr)
-pks <- get_peaks(Sa_short_pr,lambda="220")
+data(Sa)
+pks <- get_peaks(Sa,lambda="220.00000")
 pk_tab <- get_peaktable(pks)
 par(mfrow=c(2,1))
-plot_spectrum(loc = "X5", peak_table = pk_tab, what="peak")
+plot_spectrum(loc = "X10", peak_table = pk_tab, what="peak")
 \dontshow{\}) # examplesIf}
 }
 \author{

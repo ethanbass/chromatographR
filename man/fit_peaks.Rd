@@ -61,8 +61,8 @@ as well as code published in Ron Wehrens'
 \href{https://github.com/rwehrens/alsace}{alsace} package.
 }
 \examples{
-data(Sa_short_pr)
-fit_peaks(Sa_short_pr[[1]][,"220"])
+data(Sa_pr)
+fit_peaks(Sa_pr[[1]][,"220"])
 }
 \references{
 Lan, K. & Jorgenson, J. W. A hybrid of exponential and gaussian

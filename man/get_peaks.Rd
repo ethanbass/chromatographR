@@ -52,8 +52,8 @@ function authored by Ron Wehrens.
 }
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-data(Sa_short_pr)
-pks <- get_peaks(Sa_short_pr, lambdas = c('210'), sd.max=50, fit="egh")
+data(Sa_pr)
+pks <- get_peaks(Sa_pr, lambdas = c('210'), sd.max=50, fit="egh")
 \dontshow{\}) # examplesIf}
 }
 \references{

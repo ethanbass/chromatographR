@@ -39,10 +39,9 @@
 #' LC–DAD using multivariate curve resolution: the alsace package for R.} \emph{
 #' Metabolomics} \bold{11:1}:143-154.
 #' @examplesIf interactive()
-#' data(Sa_short_pr)
-#' warping.models <- correct_rt(Sa_short_pr, what = "models",
-#' lambdas=c('210','260','360'), n.zeros = 250)
-#' warp <- correct_rt(chrom_list = Sa_short_pr, models = warping.models)
+#' data(Sa_pr)
+#' warping.models <- correct_rt(Sa_pr, what = "models", lambdas=c("210"))
+#' warp <- correct_rt(chrom_list = Sa_pr, models = warping.models)
 #' @export correct_rt
 
 correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best',
@@ -67,10 +66,10 @@ correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best',
     if (scale){
       chrom_list <- lapply(chrom_list, rescale)
     }
-    allmats <- sapply(chrom_list, function(x) x[,lambdas], simplify = "array")
-    allmats.t <- sapply(chrom_list, function(x) t(x[,lambdas]), simplify = "array")
+    allmats <- sapply(chrom_list, function(x) x[,lambdas,drop=FALSE], simplify = "array")
+    allmats.t <- sapply(chrom_list, function(x) t(x[,lambdas,drop=F]), simplify = "array")
     if (is.null(n.traces)){
-      traces <- lambdas
+      traces <- ifelse(length(lambdas) == 1, 1, lambdas)
     } else{
       traces <- select.traces(X=allmats.t, criterion='coda')
       traces <- traces$trace.nrs[1:n.traces]
@@ -81,7 +80,7 @@ correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best',
     } else{
       reference <- reference
     }
-    ptwmods <- lapply((1:dim(allmats)[3]), function(ii){
+    ptwmods <- lapply(seq_len(dim(allmats)[3]), function(ii){
       ptw(allmats.t[,, reference],
           allmats.t[, , ii], selected.traces = traces, init.coef=init.coef, ...,
           warp.type = "global")})
@@ -90,7 +89,7 @@ correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best',
     warp.coef <- lapply(models,FUN=function(x){
       x$warp.coef[1,]
     })
-    ptwmods <- lapply((1:dim(allmats)[3]), function(ii){
+    ptwmods <- lapply(seq_len(dim(allmats)[3]), function(ii){
       ptw(t(allmats[,,1]), t(allmats[, , ii]), init.coef=warp.coef[[ii]],
           try=TRUE, warp.type = "global")})
   }

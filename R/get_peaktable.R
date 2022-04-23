@@ -76,8 +76,8 @@
 #' Spectral-Matching-Based Annotation for Metabolomics Data. \emph{Anal. Chem.}
 #' \bold{86}:6812-6817.
 #' @examplesIf interactive()
-#' data(Sa_short_pr)
-#' pks <- get_peaks(Sa_short_pr, lambdas = c('210'))
+#' data(Sa_pr)
+#' pks <- get_peaks(Sa_pr, lambdas = c('210'))
 #' get_peaktable(pks, response = "area")
 #' @seealso \code{\link{attach_ref_spectra}} \code{\link{attach_metadata}}
 #' @export get_peaktable

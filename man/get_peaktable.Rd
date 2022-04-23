@@ -102,8 +102,8 @@ function in the alsace package by Ron Wehrens.
 }
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-data(Sa_short_pr)
-pks <- get_peaks(Sa_short_pr, lambdas = c('210'))
+data(Sa_pr)
+pks <- get_peaks(Sa_pr, lambdas = c('210'))
 get_peaktable(pks, response = "area")
 \dontshow{\}) # examplesIf}
 }

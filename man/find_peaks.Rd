@@ -50,8 +50,8 @@ Tom O'Haver's
 Introduction to Signal Processing}.
 }
 \examples{
-data(Sa_short_pr)
-find_peaks(Sa_short_pr[[1]][,"220"])
+data(Sa_pr)
+find_peaks(Sa_pr[[1]][,"220"])
 }
 \references{
 O'Haver, Tom. Pragmatic Introduction to Signal Processing:

@@ -3,8 +3,8 @@
 ### test preprocess ###
 
 data("Sa")
-new.ts <- seq(1,38,by=.01) # choose time-points
-new.lambdas <- seq(200, 400, by = 2) # choose wavelengths
+new.ts <- seq(10,18.66,by=.01) # choose time-points
+new.lambdas <- seq(200, 318, by = 2) # choose wavelengths
 
 out <- preprocess(X = Sa[[1]], dim1 = new.ts, dim2 = new.lambdas)
 
@@ -29,7 +29,7 @@ test_that("preprocess works on a list", {
 
 ### test correct_rt ###
 
-warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','360'), n.zeros = 250)
+warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','318'))
 warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
 
 test_that("correct_rt works", {

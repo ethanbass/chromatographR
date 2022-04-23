@@ -42,8 +42,8 @@ Convenience function to call plot_spectrum with what = "click".
 }
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-data(Sa_short_pr)
-scan_chrom(Sa_short_pr, lambda="210", chr=2, export_spectrum=T)
+data(Sa_pr)
+scan_chrom(Sa_pr, lambda="210", chr=2, export_spectrum=T)
 \dontshow{\}) # examplesIf}
 }
 \author{
