@@ -1,0 +1,15 @@
+citHeader("To cite chromatographR in publications, please use:")
+
+citEntry(
+  entry    = "manual",
+  title    = "chromatographR",
+  author   = "Ethan Bass",
+  year     = "2022",
+  note   = "version 0.3.0",
+  url      = "https://github.com/ethanbass/chromatographR",
+  textVersion = paste("Bass, E. (2022).",
+        "chromatographR.",
+        "version 0.3.0",
+        "https://github.com/ethanbass/chromatographR"
+        )
+  )
