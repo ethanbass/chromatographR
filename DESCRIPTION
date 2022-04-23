@@ -9,7 +9,7 @@ Description: R package for high-throughput analysis of HPLC-DAD/UV
     chromatograms or similar data. Includes functions for preprocessing, peak-finding and fitting, peak-table construction, etc.
 License: GPL (>= 2)
 URL: https://github.com/ethanbass/chromatographR,
-    https://ethanbass.github.io/chromatographR/
+    https://ethanbass.github.io/chromatographR/docs/index.html
 BugReports: https://github.com/ethanbass/chromatographR/issues
 Imports: 
     chromConverter,
