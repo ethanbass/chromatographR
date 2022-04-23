@@ -3,8 +3,28 @@ pkgdown: 2.0.2
 pkgdown_sha: ~
 articles:
   chromatographR: chromatographR.html
-home:
-  sidebar:
-    structure: [links, license, citation, authors]
+navbar:
+  structure:
+    left:
+    - home
+    - intro
+    - reference
+    right: github
+  components:
+    home:
+      icon: fas fa-home fa-lg
+      href: index.html
+    intro:
+    	text: Intro
+    	href: docs/articles/chromatographR.html
+    reference:
+      text: Reference
+      href: docs/reference/index.html
+    github:
+      icon: fab fa-github fa-lg
+      href: https://github.com/ethanbass/chromatographR/
+  home:
+  	sidebar:
+    	structure: [links, license, citation, authors]
 last_built: 2022-04-23T22:10Z
 
