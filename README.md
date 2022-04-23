@@ -3,7 +3,7 @@
   [![R-CMD-check](https://github.com/ethanbass/chromatographR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ethanbass/chromatographR/actions/workflows/R-CMD-check.yaml)
   <!-- badges: end -->
 
-_chromatographR_ is a package for the reproducible analysis of HPLC-DAD chromatographic data in R.
+`chromatographR` is a package for the reproducible analysis of HPLC-DAD chromatographic data in R.
   
 ### Installation
 
