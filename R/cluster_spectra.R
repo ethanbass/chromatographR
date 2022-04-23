@@ -38,7 +38,7 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' @return Returns S4 "cluster" object with the following components:
 #' \item{peaks}{a character vector containing the names of all peaks contained
 #' in the given cluster.} \item{pval}{a numeric vector of length 1 containing
-#' the boostrap p-value (au) for the given cluster.}
+#' the bootstrap p-value (au) for the given cluster.}
 #' @author Ethan Bass
 #' @references R. Suzuki, H. Shimodaira: Pvclust: an R package for assessing
 #' the uncertainty in hierarchical clustering. Bioinformatics, 22-12:1540-1542
