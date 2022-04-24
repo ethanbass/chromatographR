@@ -1,30 +1,10 @@
 pandoc: 2.14.0.3
-pkgdown: 2.0.2
-pkgdown_sha: ~
+pkgdown: 2.0.2.9000
+pkgdown_sha: bb864aa6edf4e03038ada3e9224871dff50a6f5e
 articles:
   chromatographR: chromatographR.html
-navbar:
-  structure:
-    left:
-    - home
-    - intro
-    - reference
-    right: github
-  components:
-    home:
-      icon: fas fa-home fa-lg
-      href: index.html
-    intro:
-    	text: Intro
-    	href: docs/articles/chromatographR.html
-    reference:
-      text: Reference
-      href: docs/reference/index.html
-    github:
-      icon: fab fa-github fa-lg
-      href: https://github.com/ethanbass/chromatographR/
-  home:
-  	sidebar:
-    	structure: [links, license, citation, authors]
-last_built: 2022-04-23T22:10Z
+last_built: 2022-04-24T00:09Z
+urls:
+  reference: https://ethanbass.github.io/chromatographR/reference
+  article: https://ethanbass.github.io/chromatographR/articles
 
