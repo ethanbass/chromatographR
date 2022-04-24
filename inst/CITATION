@@ -6,9 +6,9 @@ citEntry(
   author   = "Ethan Bass",
   year     = "2022",
   note   = "version 0.3.0",
-  url      = "https://github.com/ethanbass/chromatographR",
+  url      = "https://ethanbass.github.io/chromatographR/docs/index.html",
   textVersion = paste("Bass, E. (2022).",
         "chromatographR (version 0.3.0).",
-        "https://github.com/ethanbass/chromatographR"
+        "https://ethanbass.github.io/chromatographR/docs/index.html"
         )
   )
