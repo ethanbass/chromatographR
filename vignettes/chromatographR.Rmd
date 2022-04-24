@@ -43,7 +43,7 @@ dat <- load_chroms(folders)
 We have included some example data consisting of root extracts from tall goldenrod (*Solidago altissima*).
 
 ```{r, data}
-data(sa_shorter)
+data(Sa)
 ```
 
 ### Pre-processing data
@@ -147,17 +147,17 @@ The `plot_spectrum` function allows you to easily plot or record the spectra ass
 
 ```{r, plot spectra,fig.height=6}
 par(mfrow=c(2,1))
-peak="X8"
+peak="X7"
 plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp)
 
-peak="X23"
+peak="X13"
 plot_spectrum(peak, peak_table=pk_tab, chrom_list = warp)
 ```
 
 The `plot_all_spectra` function can be used to visually compare peaks at a given column of the peak table to confirm that they match.
 
 ```{r, plot_all}
-peak="X8"
+peak="X13"
 plot_all_spectra(peak, peak_table=pk_tab, chrom_list = warp, export=F, overlapping=T)
 ```
 
