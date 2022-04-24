@@ -53,6 +53,8 @@
 #' @param deepSplit Logical. Controls sensitivity to cluster splitting. If
 #' TRUE, will return more smaller clusters. See documentation for
 #' \code{\link{cutreeDynamic}}.
+#' @param verbose Logical. Whether to print warning when combining peaks into 
+#' single time window. Defaults to FALSE.
 #' @param out Specify "data.frame" or "matrix" as output. Defaults to
 #' `data.frame`.
 #' @return The function returns a peak_table object, consisting of the following
@@ -86,7 +88,8 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
                           use.cor = FALSE, hmax = 0.2, plot_it = FALSE,
                           ask = plot_it, clust = c("rt","sp.rt"),
                           sigma.t = NULL, sigma.r = 0.5,
-                          deepSplit = FALSE, out = c('data.frame', 'matrix')){
+                          deepSplit = FALSE, verbose = FALSE,
+                          out = c('data.frame', 'matrix')){
   response <- match.arg(response, c("area", "height"))
   clust <- match.arg(clust, c("rt","sp.rt"))
   out <- match.arg(out, c('data.frame', 'matrix'))
@@ -162,8 +165,7 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
                         panel.abline(v = cl.centers, col = mycols)
                       }))
     }
-    if (max(clusCount <- table(file.idx, pkcenters.cl)) > 
-        1) 
+    if (verbose & max(clusCount <- table(file.idx, pkcenters.cl)) > 1) 
       warning(paste("More than one peak of one injection in the same cluster", 
                 paste("for component ", comp, ".", sep = ""), 
                 "Keeping only the most intense one.", "", sep = "\n"))
@@ -274,9 +276,9 @@ dim.peak_table <- function(x){
 plot.peak_table <- function(x, ..., loc=NULL, chrom_list=NULL, what="peak",
                             chr = 'max', lambda = 'max',
                             plot_spectrum = TRUE, plot_trace = TRUE,
-                            box_plot = FALSE, vars=NULL,
-                            spectrum_labels=TRUE, scale_spectrum=FALSE,
-                            export_spectrum=FALSE, verbose=TRUE){
+                            box_plot = FALSE, vars = NULL,
+                            spectrum_labels = TRUE, scale_spectrum = FALSE,
+                            export_spectrum = FALSE, verbose = TRUE){
   if (what == "peak" & is.null(loc)){
     loc <- readline(prompt="Which peak would you like to plot? \n")
     loc <- gsub('\\"', '', loc)

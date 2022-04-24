@@ -16,6 +16,7 @@ get_peaktable(
   sigma.t = NULL,
   sigma.r = 0.5,
   deepSplit = FALSE,
+  verbose = FALSE,
   out = c("data.frame", "matrix")
 )
 }
@@ -56,6 +57,9 @@ weight of spectral correlation.}
 \item{deepSplit}{Logical. Controls sensitivity to cluster splitting. If
 TRUE, will return more smaller clusters. See documentation for
 \code{\link{cutreeDynamic}}.}
+
+\item{verbose}{Logical. Whether to print warning when combining peaks into 
+single time window. Defaults to FALSE.}
 
 \item{out}{Specify "data.frame" or "matrix" as output. Defaults to
 `data.frame`.}

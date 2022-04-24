@@ -54,7 +54,7 @@ dendrograms.}
 Returns S4 "cluster" object with the following components:
 \item{peaks}{a character vector containing the names of all peaks contained
 in the given cluster.} \item{pval}{a numeric vector of length 1 containing
-the boostrap p-value (au) for the given cluster.}
+the bootstrap p-value (au) for the given cluster.}
 }
 \description{
 Function to cluster peaks by spectral similarity. A representative spectrum
