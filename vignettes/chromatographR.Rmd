@@ -107,6 +107,16 @@ for (i in 1:length(dat.pr)){
 legend("topright", legend="raw", cex=0.7, bty = "n")
 ```
 
+It can sometimes be informative to also plot the warping coefficients (e.g. to find outliers), which you can be easily accomplished using the method shown below:
+
+```{r, plot coefficients, fig.height=6, fig.show="hold", out.width="30%"}
+#par(mfrow=c(3,1))
+coef <- sapply(warping.models,function(x) x$warp.coef)
+plot(coef[1,],pch=20,xlab='',ylab='')
+plot(coef[2,],pch=20,xlab='',ylab='')
+plot(coef[3,],pch=20,xlab='',ylab='')
+```
+
 ### Peak finding and fitting
 
 The `get_peaks` function loops through your chromatograms at the specified wavelengths, finds peaks, and attempts to fit them to the specified function using non-linear least squares -- the current options are `gaussian` and `egh` (exponential-gaussian hybrid) [@lan2001]. The area under the curve for each peak is then estimated using a trapezoidal approximation method. The function returns a nested list of dataframes containing information about the peaks in each chromatogram.
