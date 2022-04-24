@@ -70,7 +70,7 @@ Eilers, P.H.C. 2004. Parametric Time Warping.
 
 Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast
 parametric time warping of peak lists. \emph{Bioinformatics}
-\bold{31}:3063-3065. \doi{10.1021/ac034800e}.
+\bold{31}:3063-3065. \doi{10.1093/bioinformatics/btv299}.
 
 Wehrens, R., Carvalho, E., Fraser, P.D. 2015.
 Metabolite profiling in
