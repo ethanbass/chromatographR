@@ -83,11 +83,11 @@ The `correct_rt` function is a wrapper around the `ptw` function. For each chrom
 
 
 ```{r, warp model}
-warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','318'))
+warping.models <- correct_rt(dat.pr, what = "models", lambdas=c("210"))
 warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
 ```
 
-You can see that, in this case, the alignment is considerably improved after warping.
+You can see that, in this case, the alignment is considerably improved after warping. You can also do a global alignment on multiple wavelengths at the same time, but it will not always improve the results.
 
 ```{r, alignment_plot, fig.height=6}
 par(mfrow=c(2,1))
@@ -105,16 +105,6 @@ for (i in 1:length(dat.pr)){
   matplot(new.ts, dat.pr[[i]][,lambdas],type='l',add=T)
 }
 legend("topright", legend="raw", cex=0.7, bty = "n")
-```
-
-It can sometimes be informative to also plot the warping coefficients (e.g. to find outliers), which you can be easily accomplished using the method shown below:
-
-```{r, plot coefficients, fig.height=6, fig.show="hold", out.width="30%"}
-#par(mfrow=c(3,1))
-coef <- sapply(warping.models,function(x) x$warp.coef)
-plot(coef[1,],pch=20,xlab='',ylab='')
-plot(coef[2,],pch=20,xlab='',ylab='')
-plot(coef[3,],pch=20,xlab='',ylab='')
 ```
 
 ### Peak finding and fitting

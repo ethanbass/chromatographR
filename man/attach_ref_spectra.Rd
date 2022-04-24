@@ -17,20 +17,22 @@ attach_ref_spectra(
 wavelengths).}
 
 \item{ref}{What criterion to use to select reference spectra.
-Current options are maximum correlation ("max.cor") or maximum signal
-intensity ("max.int").}
+Current options are maximum correlation (\code{max.cor}) or maximum signal
+intensity (\code{max.int}).}
 }
 \value{
-peak_table object with reference spectra attached
+A `peak_table` object with reference spectra attached
 }
 \description{
 Gathers reference spectra and attaches them to peak_table object. Reference 
-spectra are defined either as the spectrum with the highest intensity (if 
-'ref == "max.int"') or as the spectrum with the  highest average correlation
-to the other spectra in the peak_table (if ref == "max.cor"').
+spectra are defined either as the spectrum with the highest intensity (
+\code{max.int}) or as the spectrum with the  highest average correlation
+to the other spectra in the peak_table (\code{max.cor}).
 }
 \examples{
 \dontrun{
+data(pk_tab)
+data(Sa_warp)
 ref_m <- attach_ref_spectra(pk_tab, ref = "max.int")
 }
 }

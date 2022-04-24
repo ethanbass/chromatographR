@@ -21,18 +21,18 @@ get_peaktable(
 )
 }
 \arguments{
-\item{peak_list}{A nested list of peak tables: the first level is the
-sample, and the second level is the component. Every component is described
-by a matrix where every row is one peak, and the columns contain information
-on retention time, full width at half maximum (FWHM), peak width, height,
-and area.}
+\item{peak_list}{A \code{peak_list} object created by \code{\link{get_peaks}},
+containing a nested list of peak tables: the first level is the
+sample, and the second level is the spectral component. Every component is
+described by a data.frame where every row is one peak, and the columns contain
+information on various peak parameters.}
 
 \item{chrom_list}{A list of chromatographic matrices.}
 
-\item{response}{An indicator whether peak area or peak height is to be used
-as intensity measure. Default is peak area.}
+\item{response}{Indicates whether peak area or peak height is to be used
+as intensity measure. Defaults to \code{area} setting.}
 
-\item{use.cor}{Logical, indicating whether to use corrected retention times
+\item{use.cor}{Logical. Indicates whether to use corrected retention times
 (by default) or raw retention times (not advised!).}
 
 \item{hmax}{Height at which the complete linkage dendrogram will be cut. Can
@@ -44,39 +44,41 @@ shown indicating the clustering.}
 \item{ask}{Logical. Ask before showing new plot?}
 
 \item{clust}{Specify whether to perform hierarchical clustering based on
-spectral similarity and retention time ("sp.rt") or retention time alone
-("rt"). Defaults to "rt". The "sp.rt" option is experimental and should be 
-used with some caution.}
+spectral similarity and retention time (\code{sp.rt}) or retention time alone
+(\code{rt}). Defaults to \code{rt}. The \code{sp.rt} option is experimental
+and should be used with caution.}
 
 \item{sigma.t}{Width of gaussian in retention time distance function.
-Controls weight of retention time.}
+Controls weight given to retention time if \code{sp.rt} is selected.}
 
 \item{sigma.r}{Width of gaussian in spectral similarity function. Controls
-weight of spectral correlation.}
+weight given to spectral correlation if \code{sp.rt} is selected.}
 
 \item{deepSplit}{Logical. Controls sensitivity to cluster splitting. If
-TRUE, will return more smaller clusters. See documentation for
-\code{\link{cutreeDynamic}}.}
+\code{TRUE}, function will return more smaller clusters. See documentation for
+\code{\link{cutreeDynamic}} for additional information.}
 
-\item{verbose}{Logical. Whether to print warning when combining peaks into 
-single time window. Defaults to FALSE.}
+\item{verbose}{Logical. Whether to print warning when combining peaks into
+single time window. Defaults to \code{FALSE}.}
 
-\item{out}{Specify "data.frame" or "matrix" as output. Defaults to
-`data.frame`.}
+\item{out}{Specify \code{data.frame} or \code{matrix} as output. Defaults to
+\code{data.frame}.}
 }
 \value{
-The function returns a peak_table object, consisting of the following
+The function returns a \code{peak_table} object, consisting of the following
 elements:
-`tab`: the peak table itself -- a data-frame of intensities in a
+\itemize{
+\item \code{tab}: the peak table itself -- a data-frame of intensities in a
 sample x peak configuration.
-peaks (columns).
-`pk_meta`: A data.frame containing peak meta-data (e.g. the spectral component,
+\item \code{pk_meta}: A data.frame containing peak meta-data (e.g. the spectral component,
 peak number, and average retention time).
-`sample_meta`: A data.frame of sample meta-data. Must be added using
-\code{\link{attach_metadata}})
-`ref_spectra`: A data.frame of reference spectra (in a wavelength x peak
+\item \code{sample_meta}: A data.frame of sample meta-data. Must be added using
+\code{\link{attach_metadata}}).
+\item \code{ref_spectra}: A data.frame of reference spectra (in a wavelength x peak
 configuration). Must be added using \code{\link{attach_ref_spectra}}
-`args`: A vector of arguments given to \code{\link{get_peaktable}}.
+\item \code{args}: A vector of arguments given to \code{\link{get_peaktable}} to generate
+the peak table.
+}
 }
 \description{
 Function returns a peak_table object. The first slot contains a matrix of
@@ -90,12 +92,11 @@ all samples, and cuts at a height given by the user (which can be understood
 as the maximal inter-cluster retention time difference) in the simple case
 based on retention times. Clustering can also incorporate information about
 spectral similarity using a distance function adapted from Broeckling et al.,
-2014: \deqn{\exp({-\frac{(1-c_{ij})^2}{2\sigma_r^2}})*\exp({-\frac{(1-(t_i -
-t_j)^2}{2\sigma_t^2}})}.
-
+2014:
+\deqn{latexascii}{e^{-\frac{(1-c_{ij})^2}{2\sigma_r^2}}* e^{-\frac{(1-(t_i-t_j)^2}{2\sigma_t^2}}}
 If two peaks from the same sample are assigned to the same cluster, a warning
 message is printed to the console. These warnings can usually be ignored, but
-one could also consider reducing the \code{hmax} variable. However, this may 
+one could also consider reducing the \code{hmax} variable. However, this may
 lead to splitting of peaks across multiple clusters. Another option is to
 filter the peaks by intensity to remove small features.
 }

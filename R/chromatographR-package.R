@@ -45,3 +45,13 @@ NULL
 #' examples.
 NULL
 
+#' Goldenrod peak table
+#' 
+#' Peak table generated from example goldenrod extracts for examples.
+#'
+#' @name pk_tab
+#' @docType data
+#' @format  A \code{peak_table} object.
+NULL
+
+

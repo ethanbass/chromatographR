@@ -9,23 +9,22 @@ attach_metadata(peak_table, metadata, column)
 \arguments{
 \item{peak_table}{Peak table}
 
-\item{metadata}{Dataframe}
+\item{metadata}{A `data.frame` containing the sample meta-data.}
 
-\item{column}{Name of the column with sample names.}
+\item{column}{The name of the column containing the sample names.}
 }
 \value{
-Peak table with meta-data.
+A \code{peak_table} object with attached meta-data.
 }
 \description{
-Attaches experimental meta-data to peak_table object. One of the columns in
-the supplied meta-data must match exactly the rownames of the peak_table.
+Attaches experimental meta-data to `peak_table` object. One of the columns in
+the supplied meta-data must match exactly the row names of the peak table.
 }
 \examples{
-\dontrun{
-meta <- read.csv("meta.csv")
-pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta,
-column="vial")
-}
+data(pk_tab)
+path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
+meta <- read.csv(path)
+pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
 }
 \seealso{
 \code{\link{get_peaktable}}

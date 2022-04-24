@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_peaks.R
 \name{get_peaks}
 \alias{get_peaks}
-\title{Extract all peaks from a list of chromatograms.}
+\title{Find and fit peaks from a list of chromatograms.}
 \usage{
 get_peaks(
   chrom_list,
@@ -20,7 +20,7 @@ get_peaks(
 \item{lambdas}{Character vector of wavelengths to find peaks at.}
 
 \item{fit}{What type of fit to use. Current options are gaussian and
-exponential gaussian hybrid.}
+exponential gaussian hybrid (\code{egh}).}
 
 \item{sd.max}{Maximum width (standard deviation) for peaks. Defaults to 50.}
 
@@ -30,13 +30,18 @@ in \code{\link{fit_peaks}}.}
 \item{\dots}{Additional arguments to \code{\link{find_peaks}}.}
 }
 \value{
-The result is a list, with each element corresponding to one data
-file, and containing data for the fitted peaks for each of the ALS
-components. Note that this function presents the "rt", "sd" and "FWHM"
-fields in real time units.
+The result is an S3 object of class `peak_list`, containing a nested
+list of data.frames containing information about the peaks fitted for each
+chromatogram at each specified wavelength. The data.frame includes information
+about the retention time (`rt`), `start` and `end` of each peak, as well as the
+standard deviation (`sd`), `tau` (if `egh` is selected), full width at half 
+maximum (`FWHM`), `height`, `area`, and `r.squared` (coefficient of determination).
+This last parameter is determined from a linear model of the fitted peak values
+to the raw data.
 }
 \description{
-Extracts all peaks in a list of chromatograms.
+Finds and fits peaks and extracts peak parameters from a list of chromatograms
+at the specified wavelengths.
 }
 \details{
 Peaks are located by finding zero-crossings in the smoothed first derivative

@@ -10,9 +10,8 @@
 #' as the maximal inter-cluster retention time difference) in the simple case
 #' based on retention times. Clustering can also incorporate information about
 #' spectral similarity using a distance function adapted from Broeckling et al.,
-#' 2014: \deqn{\exp({-\frac{(1-c_{ij})^2}{2\sigma_r^2}})*\exp({-\frac{(1-(t_i -
-#' t_j)^2}{2\sigma_t^2}})}.
-#' 
+#' 2014:
+#' \deqn{latexascii}{e^{-\frac{(1-c_{ij})^2}{2\sigma_r^2}}* e^{-\frac{(1-(t_i-t_j)^2}{2\sigma_t^2}}}
 #' If two peaks from the same sample are assigned to the same cluster, a warning
 #' message is printed to the console. These warnings can usually be ignored, but
 #' one could also consider reducing the \code{hmax} variable. However, this may 
@@ -27,15 +26,15 @@
 #' @importFrom lattice panel.stripplot panel.abline stripplot
 #' @importFrom grDevices colorRampPalette 
 #' @importFrom scales rescale
-#' @param peak_list A nested list of peak tables: the first level is the
-#' sample, and the second level is the component. Every component is described
-#' by a matrix where every row is one peak, and the columns contain information
-#' on retention time, full width at half maximum (FWHM), peak width, height,
-#' and area.
+#' @param peak_list A `peak_list` object created by \code{\link{get_peaks}},
+#' containing a nested list of peak tables: the first level is the
+#' sample, and the second level is the spectral component. Every component is
+#' described by a data.frame where every row is one peak, and the columns contain
+#' information on various peak parameters.
 #' @param chrom_list A list of chromatographic matrices.
-#' @param response An indicator whether peak area or peak height is to be used
-#' as intensity measure. Default is peak area.
-#' @param use.cor Logical, indicating whether to use corrected retention times
+#' @param response Indicates whether peak area or peak height is to be used
+#' as intensity measure. Defaults to `area` setting.
+#' @param use.cor Logical. Indicates whether to use corrected retention times
 #' (by default) or raw retention times (not advised!).
 #' @param hmax Height at which the complete linkage dendrogram will be cut. Can
 #' be interpreted as the maximal inter-cluster retention time difference.
@@ -43,32 +42,33 @@
 #' shown indicating the clustering.
 #' @param ask Logical. Ask before showing new plot?
 #' @param clust Specify whether to perform hierarchical clustering based on
-#' spectral similarity and retention time ("sp.rt") or retention time alone
-#' ("rt"). Defaults to "rt". The "sp.rt" option is experimental and should be 
-#' used with some caution.
+#' spectral similarity and retention time (\code{sp.rt}) or retention time alone
+#' (\code{rt}). Defaults to \code{rt}. The \code{sp.rt} option is experimental
+#' and should be used with caution.
 #' @param sigma.t Width of gaussian in retention time distance function.
-#' Controls weight of retention time.
+#' Controls weight given to retention time if \code{sp.rt} is selected.
 #' @param sigma.r Width of gaussian in spectral similarity function. Controls
-#' weight of spectral correlation.
+#' weight given to spectral correlation if \code{sp.rt} is selected.
 #' @param deepSplit Logical. Controls sensitivity to cluster splitting. If
-#' TRUE, will return more smaller clusters. See documentation for
-#' \code{\link{cutreeDynamic}}.
+#' \code{TRUE}, function will return more smaller clusters. See documentation for
+#' \code{\link{cutreeDynamic}} for additional information.
 #' @param verbose Logical. Whether to print warning when combining peaks into 
-#' single time window. Defaults to FALSE.
-#' @param out Specify "data.frame" or "matrix" as output. Defaults to
+#' single time window. Defaults to \code{FALSE}.
+#' @param out Specify `data.frame` or `matrix` as output. Defaults to
 #' `data.frame`.
-#' @return The function returns a peak_table object, consisting of the following
+#' @md
+#' @return The function returns a `peak_table` object, consisting of the following
 #' elements:
-#' `tab`: the peak table itself -- a data-frame of intensities in a
+#' * `tab`: the peak table itself -- a data-frame of intensities in a
 #' sample x peak configuration.
-#' peaks (columns).
-#' `pk_meta`: A data.frame containing peak meta-data (e.g. the spectral component,
+#' * `pk_meta`: A data.frame containing peak meta-data (e.g. the spectral component,
 #' peak number, and average retention time).
-#' `sample_meta`: A data.frame of sample meta-data. Must be added using
-#' \code{\link{attach_metadata}})
-#' `ref_spectra`: A data.frame of reference spectra (in a wavelength x peak
+#' * `sample_meta`: A data.frame of sample meta-data. Must be added using
+#' \code{\link{attach_metadata}}).
+#' * `ref_spectra`: A data.frame of reference spectra (in a wavelength x peak
 #' configuration). Must be added using \code{\link{attach_ref_spectra}}
-#' `args`: A vector of arguments given to \code{\link{get_peaktable}}.
+#' * `args`: A vector of arguments given to \code{\link{get_peaktable}} to generate
+#' the peak table.
 #' @author Ethan Bass
 #' @note Adapted from
 #' \href{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}{getPeakTable}
@@ -224,6 +224,12 @@ print.peak_table <- function(x, ...){
 #' @export
 dim.peak_table <- function(x){
   dim(x$tab)
+}
+
+#' @noRd
+#' @export
+row.names.peak_table <- function(x){
+  row.names(x$tab)
 }
 
 #' Plot spectrum from peak table

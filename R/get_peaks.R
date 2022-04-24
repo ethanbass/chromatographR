@@ -1,6 +1,7 @@
-#' Extract all peaks from a list of chromatograms.
+#' Find and fit peaks from a list of chromatograms.
 #' 
-#' Extracts all peaks in a list of chromatograms.
+#' Finds and fits peaks and extracts peak parameters from a list of chromatograms
+#' at the specified wavelengths.
 #' 
 #' Peaks are located by finding zero-crossings in the smoothed first derivative
 #' of the specified chromatographic traces (function \code{\link{find_peaks}}).
@@ -14,15 +15,19 @@
 #' (timepoints x wavelengths).
 #' @param lambdas Character vector of wavelengths to find peaks at.
 #' @param fit What type of fit to use. Current options are gaussian and
-#' exponential gaussian hybrid.
+#' exponential gaussian hybrid (\code{egh}).
 #' @param sd.max Maximum width (standard deviation) for peaks. Defaults to 50.
 #' @param max.iter Maximum number of iterations for non-linear least squares
 #' in \code{\link{fit_peaks}}.
 #' @param \dots Additional arguments to \code{\link{find_peaks}}.
-#' @return The result is a list, with each element corresponding to one data
-#' file, and containing data for the fitted peaks for each of the ALS
-#' components. Note that this function presents the "rt", "sd" and "FWHM"
-#' fields in real time units.
+#' @return The result is an S3 object of class `peak_list`, containing a nested
+#' list of data.frames containing information about the peaks fitted for each
+#' chromatogram at each specified wavelength. The data.frame includes information
+#' about the retention time (`rt`), `start` and `end` of each peak, as well as the
+#' standard deviation (`sd`), `tau` (if `egh` is selected), full width at half 
+#' maximum (`FWHM`), `height`, `area`, and `r.squared` (coefficient of determination).
+#' This last parameter is determined from a linear model of the fitted peak values
+#' to the raw data.
 #' @author Ethan Bass
 #' @note Function is adapted from the
 #' \href{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks}
