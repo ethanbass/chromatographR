@@ -147,13 +147,6 @@
 + }
 &gt; legend("topright", legend="raw", cex=0.7, bty = "n")</code></pre>
 <p><img src="chromatographR_files/figure-html/alignment_plot-1.png" width="576"></p>
-<p>It can sometimes be informative to also plot the warping coefficients (e.g. to find outliers), which you can be easily accomplished using the method shown below:</p>
-<pre class="text"><code>&gt; #par(mfrow=c(3,1))
-&gt; coef &lt;- sapply(warping.models,function(x) x$warp.coef)
-&gt; plot(coef[1,],pch=20,xlab='',ylab='')
-&gt; plot(coef[2,],pch=20,xlab='',ylab='')
-&gt; plot(coef[3,],pch=20,xlab='',ylab='')</code></pre>
-<p><img src="chromatographR_files/figure-html/plot%20coefficients-1.png" width="30%"><img src="chromatographR_files/figure-html/plot%20coefficients-2.png" width="30%"><img src="chromatographR_files/figure-html/plot%20coefficients-3.png" width="30%"></p>
 </div>
 <div class="section level3">
 <h3 id="peak-finding-and-fitting">Peak finding and fitting<a class="anchor" aria-label="anchor" href="#peak-finding-and-fitting"></a>
