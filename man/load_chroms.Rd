@@ -41,7 +41,7 @@ Chromatograms may be CSVs, ChemStation \code{.uv} files, or MassHunter \code{
 }
 \note{
 Relies on the file parsers from the
-\url{https://github.com/bovee/aston}{Aston} package to import ChemStation
+\href{https://github.com/bovee/aston}{Aston} package to import ChemStation
 \code{.uv} and MassHunter \code{.sp} files.
 }
 \examples{

@@ -71,12 +71,12 @@
 #' `args`: A vector of arguments given to \code{\link{get_peaktable}}.
 #' @author Ethan Bass
 #' @note Adapted from
-#' \url{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}{getPeakTable}
+#' \href{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}{getPeakTable}
 #' function in the alsace package by Ron Wehrens.
 #' @references Broeckling, C. D., F. A. Afsar, S. Neumann, A. Ben-Hur, and J.
 #' E. Prenni. 2014. RAMClust: A Novel Feature Clustering Method Enables
 #' Spectral-Matching-Based Annotation for Metabolomics Data. \emph{Anal. Chem.}
-#' \bold{86}:6812-6817.
+#' \bold{86}:6812-6817. \doi{10.1021/ac501530d}
 #' @examplesIf interactive()
 #' data(Sa_pr)
 #' pks <- get_peaks(Sa_pr, lambdas = c('210'))

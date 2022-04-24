@@ -20,7 +20,7 @@
 #' @return A list of chromatograms in matrix format.
 #' @author Ethan Bass
 #' @note Relies on the file parsers from the
-#' \url{https://github.com/bovee/aston}{Aston} package to import ChemStation
+#' \href{https://github.com/bovee/aston}{Aston} package to import ChemStation
 #' \code{.uv} and MassHunter \code{.sp} files.
 #' @examples \dontrun{
 #' ###  import from single folder

@@ -34,12 +34,11 @@
 #' colnames indicating the time points and wavelengths, respectively.
 #' @author Ethan Bass
 #' @note Adapted from
-#' \url{https://github.com/rwehrens/alsace/blob/master/R/preprocess.R}{preprocess}
+#' \href{https://github.com/rwehrens/alsace/blob/master/R/preprocess.R}{preprocess}
 #' function in the alsace package by Ron Wehrens.
-#' @references Wehrens, R., Carvalho, E., Fraser, P.D. 2015.
-#' \href{https://doi.org/10.1007/s11306-014-0683-5}{Metabolite profiling in
-#' LC–DAD using multivariate curve resolution: the alsace package for R.} \emph{
-#' Metabolomics} \bold{11:1}:143-154.
+#' @references Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
+#' LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
+#' Metabolomics} \bold{11:1}:143-154. \doi{10.1007/s11306-014-0683-5}.
 #' @examplesIf interactive()
 #' data(Sa)
 #' new.ts <- seq(10,18.66,by=.01) # choose time-points

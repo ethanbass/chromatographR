@@ -101,7 +101,7 @@ filter the peaks by intensity to remove small features.
 }
 \note{
 Adapted from
-\url{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}{getPeakTable}
+\href{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}{getPeakTable}
 function in the alsace package by Ron Wehrens.
 }
 \examples{
@@ -115,7 +115,7 @@ get_peaktable(pks, response = "area")
 Broeckling, C. D., F. A. Afsar, S. Neumann, A. Ben-Hur, and J.
 E. Prenni. 2014. RAMClust: A Novel Feature Clustering Method Enables
 Spectral-Matching-Based Annotation for Metabolomics Data. \emph{Anal. Chem.}
-\bold{86}:6812-6817.
+\bold{86}:6812-6817. \doi{10.1021/ac501530d}
 }
 \seealso{
 \code{\link{attach_ref_spectra}} \code{\link{attach_metadata}}

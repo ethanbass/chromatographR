@@ -54,7 +54,7 @@ implemented in \code{\link[ptw:ptw]{ptw}}.
 }
 \note{
 Adapted from
-\url{https://github.com/rwehrens/alsace/blob/master/R/correctRT.R}{correctRT}
+\href{https://github.com/rwehrens/alsace/blob/master/R/correctRT.R}{correctRT}
 function in the alsace package by Ron Wehrens.
 }
 \examples{
@@ -65,17 +65,17 @@ warp <- correct_rt(chrom_list = Sa_pr, models = warping.models)
 \dontshow{\}) # examplesIf}
 }
 \references{
-Eilers, P.H.C. 2004.
-\href{https://pubs.acs.org/doi/10.1021/ac034800e}{Parametric Time Warping.}
-\emph{Anal. Chem.} \bold{76}:404-411.
-Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015.
-\href{https://academic.oup.com/bioinformatics/article/31/18/3063/240579}{Fast
-parametric time warping of peak lists.} \emph{Bioinformatics}
-\bold{31}:3063-3065.
+Eilers, P.H.C. 2004. Parametric Time Warping.
+\emph{Anal. Chem.} \bold{76}:404-411. \doi{10.1021/ac034800e}.
+
+Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast
+parametric time warping of peak lists. \emph{Bioinformatics}
+\bold{31}:3063-3065. \doi{10.1021/ac034800e}.
+
 Wehrens, R., Carvalho, E., Fraser, P.D. 2015.
-\href{https://doi.org/10.1007/s11306-014-0683-5}{Metabolite profiling in
-LC–DAD using multivariate curve resolution: the alsace package for R.} \emph{
-Metabolomics} \bold{11:1}:143-154.
+Metabolite profiling in
+LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
+Metabolomics} \bold{11:1}:143-154. \doi{10.1007/s11306-014-0683-5}
 }
 \seealso{
 \code{\link[ptw:ptw]{ptw}}, \code{\link{correct_peaks}}

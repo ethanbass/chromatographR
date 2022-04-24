@@ -47,7 +47,7 @@ calculated using a trapezoidal approximation.
 }
 \note{
 Function is adapted from the
-\url{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks}
+\href{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks}
 function authored by Ron Wehrens.
 }
 \examples{
@@ -57,10 +57,9 @@ pks <- get_peaks(Sa_pr, lambdas = c('210'), sd.max=50, fit="egh")
 \dontshow{\}) # examplesIf}
 }
 \references{
-Wehrens, R., Carvalho, E., Fraser, P.D. 2015.
-\href{https://doi.org/10.1007/s11306-014-0683-5}{Metabolite profiling in
-LC–DAD using multivariate curve resolution: the alsace package for R.} \emph{
-Metabolomics} \bold{11:1}:143-154.
+Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
+LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
+Metabolomics} \bold{11:1}:143-154. \doi{https://doi.org/10.1007/s11306-014-0683-5}.
 }
 \author{
 Ethan Bass
