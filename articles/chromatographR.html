@@ -140,14 +140,14 @@
 &gt; for (i in 1:length(warp)){
 +   matplot(new.ts, warp[[i]][,lambdas],type='l',add=T)
 + }
-&gt; legend("topright", legend="warped", cex=0.7, bty = "n")
+&gt; legend("topright", legend="warped", bty = "n")
 &gt; 
 &gt; plot.new()
 &gt; plot.window(xlim=c(head(new.ts,1),tail(new.ts,1)),ylim=c(0,1000))
 &gt; for (i in 1:length(dat.pr)){
 +   matplot(new.ts, dat.pr[[i]][,lambdas],type='l',add=T)
 + }
-&gt; legend("topright", legend="raw", cex=0.7, bty = "n")</code></pre>
+&gt; legend("topright", legend="raw", bty = "n")</code></pre>
 <p><img src="chromatographR_files/figure-html/alignment_plot-1.png" width="576"></p>
 </div>
 <div class="section level3">
@@ -184,17 +184,24 @@
 </h4>
 <p>The <code>mirror_plot</code> function provides a quick way to visually compare treatment groups.</p>
 <pre class="text"><code>&gt; mirror_plot(pk_tab, lambdas = c("210","260"), var = "trt", legend_size=3)</code></pre>
-<p><img src="chromatographR_files/figure-html/unnamed-chunk-3-1.png" width="576"> The plot <code>peak_table</code> function provides an easy interface to various options for plotting peaks. Plot spectra or make a quick boxplot comparing an arbitrary number of treatments.</p>
-<pre class="text"><code>&gt; par(mfrow=c(2,3))
-&gt; plot(pk_tab, loc = "X9", box_plot = TRUE, vars = "trt")</code></pre>
+<p><img src="chromatographR_files/figure-html/unnamed-chunk-3-1.png" width="576"></p>
+<p>The plot <code>peak_table</code> function provides an easy interface to various options for plotting peaks. For example, this function can be used to plot spectra or make a quick boxplot to compare treatments in sample metadata.</p>
+<pre class="text"><code>&gt; plot(pk_tab, loc = "X9", box_plot = TRUE, vars = "trt")</code></pre>
+<p><img src="chromatographR_files/figure-html/unnamed-chunk-4-1.png" width="576"></p>
 <pre><code>[1] "chrome no. 1; RT: 12.81; lambda = 318 nm"</code></pre>
+<p><img src="chromatographR_files/figure-html/unnamed-chunk-4-2.png" width="576"><img src="chromatographR_files/figure-html/unnamed-chunk-4-3.png" width="576"></p>
 <pre class="text"><code>&gt; plot(pk_tab, loc = "X13", box_plot = TRUE, vars = "trt")</code></pre>
+<p><img src="chromatographR_files/figure-html/unnamed-chunk-4-4.png" width="576"></p>
 <pre><code>[1] "chrome no. 4; RT: 13.87; lambda = 318 nm"</code></pre>
-<p><img src="chromatographR_files/figure-html/unnamed-chunk-4-1.png" width="576"> #### Plotting spectra</p>
+<p><img src="chromatographR_files/figure-html/unnamed-chunk-4-5.png" width="576"><img src="chromatographR_files/figure-html/unnamed-chunk-4-6.png" width="576"></p>
+</div>
+<div class="section level4">
+<h4 id="plotting-spectra">Plotting spectra<a class="anchor" aria-label="anchor" href="#plotting-spectra"></a>
+</h4>
 <p>The <code>plot_spectrum</code> function allows you to easily plot or record the spectra associated with a particular peak in your peak table. This is useful for interpreting your results and/or checking for errors in your peak table. For example, you may want to check if the spectra match for a particular peak in your peak table. Or you may just want to have a look at the spectrum for a peak of interest. The <code>plot_spectrum</code> function can be used to plot only the spectrum or only the chromatographic trace using the arguments <code>plot_spectrum</code> and <code>plot_trace</code>. By default it will plot data from the chromatogram with the biggest peak in the peak table, but you can choose the chromatogram (and the wavelength for the trace) using the <code>chr</code> and <code>lambda</code> arguments.</p>
 <pre class="text"><code>&gt; par(mfrow=c(2,1))
 &gt; peak="X7"
-&gt; plot_spectrum(peak, peak_table = pk_tab)</code></pre>
+&gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list=warp)</code></pre>
 <pre><code>[1] "chrome no. 4; RT: 12.3; lambda = 318 nm"</code></pre>
 <p><img src="chromatographR_files/figure-html/plot%20spectra-1.png" width="576"></p>
 <p>The <code>plot_all_spectra</code> function can be used to visually compare peaks at a given column of the peak table to confirm that they match.</p>
