@@ -170,26 +170,36 @@
 458 620.1729 228.73095 198.89770 530.8515 1399.5000  28.75473</code></pre>
 </div>
 <div class="section level3">
-<h3 id="further-analysis">Further analysis<a class="anchor" aria-label="anchor" href="#further-analysis"></a>
+<h3 id="further-analysis-and-data-visualization">Further analysis and data-visualization<a class="anchor" aria-label="anchor" href="#further-analysis-and-data-visualization"></a>
 </h3>
 <div class="section level4">
-<h4 id="plotting-spectra">Plotting spectra<a class="anchor" aria-label="anchor" href="#plotting-spectra"></a>
+<h4 id="attach-meta-data">Attach meta-data<a class="anchor" aria-label="anchor" href="#attach-meta-data"></a>
 </h4>
+<pre class="text"><code>&gt; path &lt;- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
+&gt; meta &lt;- read.csv(path)
+&gt; pk_tab &lt;- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")</code></pre>
+</div>
+<div class="section level4">
+<h4 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a>
+</h4>
+<p>The <code>mirror_plot</code> function provides a quick way to visually compare treatment groups.</p>
+<pre class="text"><code>&gt; mirror_plot(pk_tab, lambdas = c("210","260"), var = "trt", legend_size=3)</code></pre>
+<p><img src="chromatographR_files/figure-html/unnamed-chunk-3-1.png" width="576"> The plot <code>peak_table</code> function provides an easy interface to various options for plotting peaks. Plot spectra or make a quick boxplot comparing an arbitrary number of treatments.</p>
+<pre class="text"><code>&gt; par(mfrow=c(2,3))
+&gt; plot(pk_tab, loc = "X9", box_plot = TRUE, vars = "trt")</code></pre>
+<pre><code>[1] "chrome no. 1; RT: 12.81; lambda = 318 nm"</code></pre>
+<pre class="text"><code>&gt; plot(pk_tab, loc = "X13", box_plot = TRUE, vars = "trt")</code></pre>
+<pre><code>[1] "chrome no. 4; RT: 13.87; lambda = 318 nm"</code></pre>
+<p><img src="chromatographR_files/figure-html/unnamed-chunk-4-1.png" width="576"> #### Plotting spectra</p>
 <p>The <code>plot_spectrum</code> function allows you to easily plot or record the spectra associated with a particular peak in your peak table. This is useful for interpreting your results and/or checking for errors in your peak table. For example, you may want to check if the spectra match for a particular peak in your peak table. Or you may just want to have a look at the spectrum for a peak of interest. The <code>plot_spectrum</code> function can be used to plot only the spectrum or only the chromatographic trace using the arguments <code>plot_spectrum</code> and <code>plot_trace</code>. By default it will plot data from the chromatogram with the biggest peak in the peak table, but you can choose the chromatogram (and the wavelength for the trace) using the <code>chr</code> and <code>lambda</code> arguments.</p>
 <pre class="text"><code>&gt; par(mfrow=c(2,1))
 &gt; peak="X7"
-&gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp)</code></pre>
-<pre><code>[1] "chrome no. 4; RT: 12.3; lambda = 202 nm"</code></pre>
+&gt; plot_spectrum(peak, peak_table = pk_tab)</code></pre>
+<pre><code>[1] "chrome no. 4; RT: 12.3; lambda = 318 nm"</code></pre>
 <p><img src="chromatographR_files/figure-html/plot%20spectra-1.png" width="576"></p>
-<pre class="text"><code>&gt; peak="X13"
-&gt; plot_spectrum(peak, peak_table=pk_tab, chrom_list = warp)</code></pre>
-<pre><code>[1] "chrome no. 4; RT: 13.87; lambda = 202 nm"</code></pre>
-<p><img src="chromatographR_files/figure-html/plot%20spectra-2.png" width="576"></p>
 <p>The <code>plot_all_spectra</code> function can be used to visually compare peaks at a given column of the peak table to confirm that they match.</p>
 <pre class="text"><code>&gt; peak="X13"
-&gt; plot_all_spectra(peak, peak_table=pk_tab, chrom_list = warp, export=F, overlapping=T)</code></pre>
-<pre><code>Warning in min(x): no non-missing arguments to min; returning Inf</code></pre>
-<pre><code>Warning in max(x): no non-missing arguments to max; returning -Inf</code></pre>
+&gt; plot_all_spectra(peak, peak_table=pk_tab, export=F, overlapping=T)</code></pre>
 <p><img src="chromatographR_files/figure-html/plot_all-1.png" width="576"></p>
 </div>
 </div>
