@@ -129,7 +129,7 @@ pk_tab <- get_peaktable(pks_egh, response = "area")
 head(pk_tab$tab[,1:6])
 ```
 
-### Additional useful tools
+### Further analysis
 
 #### Plotting spectra
 

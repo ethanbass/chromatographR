@@ -107,7 +107,7 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list=NULL,
     } else if (what == "rt"){
       RT <- round(as.numeric(loc), sig)
       }
-    time <- which(elementwise.all.equal(RT, new.ts))[1]
+    time <- new.ts[which.min(abs(RT - new.ts))]
     if (chr == 'max'){
       chr <- which.max(tab[,loc])
     }
