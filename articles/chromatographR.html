@@ -41,6 +41,9 @@
 <li class="nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
@@ -67,7 +70,7 @@
       <img src="" class="logo" alt=""><h1>chromatographR</h1>
                         <h4 data-toc-skip class="author">Ethan Bass</h4>
             
-            <h4 data-toc-skip class="date">2022-04-24</h4>
+            <h4 data-toc-skip class="date">2022-04-25</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/HEAD/vignettes/chromatographR.Rmd" class="external-link"><code>vignettes/chromatographR.Rmd</code></a></small>
       <div class="d-none name"><code>chromatographR.Rmd</code></div>
@@ -127,9 +130,9 @@
 </h3>
 <p>In many cases, HPLC data can suffer from retention time shifts (e.g. due to temperature fluctuations, column degradation, or subtle changes in mobile-phase composition). Parametric time warping (as implemented in the <em>ptw</em> package can be quite an effective technique for correcting subtle retention time shifts <span class="citation">(Eilers 2004)</span>. If your chromatograms are already perfectly aligned you can skip this step. If you have severe retention time shifts this technique will be considerably less effective (and you should consider checking your HPLC for leaks).</p>
 <p>The <code>correct_rt</code> function is a wrapper around the <code>ptw</code> function. For each chromatogram, it produces a “global” warping function across all wavelengths included in <code>lambdas</code>). The goal of the warping function is to produce a better alignment of retention times by “warping” the time-axis of each chromatogram to match a reference chromatogram. The reference chromatogram can be selected manually or determined algorithmically by setting the <code>reference</code> argument. The code below creates warping models for the samples in the provided list of data matrices. The same function can then be used to warp each chromatogram according to the corresponding model, by setting the <code>models</code> parameter.</p>
-<pre class="text"><code>&gt; warping.models &lt;- correct_rt(dat.pr, what = "models", lambdas=c('210','260','318'))
+<pre class="text"><code>&gt; warping.models &lt;- correct_rt(dat.pr, what = "models", lambdas=c("210"))
 &gt; warp &lt;- correct_rt(chrom_list=dat.pr, models=warping.models)</code></pre>
-<p>You can see that, in this case, the alignment is considerably improved after warping.</p>
+<p>You can see that, in this case, the alignment is considerably improved after warping. You can also do a global alignment on multiple wavelengths at the same time, but it will not always improve the results.</p>
 <pre class="text"><code>&gt; par(mfrow=c(2,1))
 &gt; lambdas=c('210','260')
 &gt; plot.new()
@@ -220,7 +223,7 @@
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
     </footer>

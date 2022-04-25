@@ -16,6 +16,9 @@
     <loc>https://ethanbass.github.io/chromatographR/index.html</loc>
   </url>
   <url>
+    <loc>https://ethanbass.github.io/chromatographR/news/index.html</loc>
+  </url>
+  <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/Sa.html</loc>
   </url>
   <url>
@@ -65,6 +68,12 @@
   </url>
   <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/load_chroms.html</loc>
+  </url>
+  <url>
+    <loc>https://ethanbass.github.io/chromatographR/reference/mirror_plot.html</loc>
+  </url>
+  <url>
+    <loc>https://ethanbass.github.io/chromatographR/reference/pk_tab.html</loc>
   </url>
   <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/plot.peak_list.html</loc>

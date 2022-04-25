@@ -30,6 +30,9 @@ samples, and experimental settings."><!-- mathjax --><script src="https://cdnjs.
 <li class="active nav-item">
   <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
+</li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
@@ -80,18 +83,18 @@ samples, and experimental settings.</p>
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>peak_list</dt>
-<dd><p>A nested list of peak tables: the first level is the
-sample, and the second level is the component. Every component is described
-by a matrix where every row is one peak, and the columns contain information
-on retention time, full width at half maximum (FWHM), peak width, height,
-and area.</p></dd>
+<dd><p>A <code>peak_list</code> object created by <code><a href="get_peaks.html">get_peaks</a></code>,
+containing a nested list of peak tables: the first level is the
+sample, and the second level is the spectral component. Every component is
+described by a data.frame where every row is one peak, and the columns contain
+information on various peak parameters.</p></dd>
 <dt>chrom_list</dt>
 <dd><p>A list of chromatographic matrices.</p></dd>
 <dt>response</dt>
-<dd><p>An indicator whether peak area or peak height is to be used
-as intensity measure. Default is peak area.</p></dd>
+<dd><p>Indicates whether peak area or peak height is to be used
+as intensity measure. Defaults to <code>area</code> setting.</p></dd>
 <dt>use.cor</dt>
-<dd><p>Logical, indicating whether to use corrected retention times
+<dd><p>Logical. Indicates whether to use corrected retention times
 (by default) or raw retention times (not advised!).</p></dd>
 <dt>hmax</dt>
 <dd><p>Height at which the complete linkage dendrogram will be cut. Can
@@ -103,40 +106,40 @@ shown indicating the clustering.</p></dd>
 <dd><p>Logical. Ask before showing new plot?</p></dd>
 <dt>clust</dt>
 <dd><p>Specify whether to perform hierarchical clustering based on
-spectral similarity and retention time ("sp.rt") or retention time alone
-("rt"). Defaults to "rt". The "sp.rt" option is experimental and should be 
-used with some caution.</p></dd>
+spectral similarity and retention time (<code>sp.rt</code>) or retention time alone
+(<code>rt</code>). Defaults to <code>rt</code>. The <code>sp.rt</code> option is experimental
+and should be used with caution.</p></dd>
 <dt>sigma.t</dt>
 <dd><p>Width of gaussian in retention time distance function.
-Controls weight of retention time.</p></dd>
+Controls weight given to retention time if <code>sp.rt</code> is selected.</p></dd>
 <dt>sigma.r</dt>
 <dd><p>Width of gaussian in spectral similarity function. Controls
-weight of spectral correlation.</p></dd>
+weight given to spectral correlation if <code>sp.rt</code> is selected.</p></dd>
 <dt>deepSplit</dt>
 <dd><p>Logical. Controls sensitivity to cluster splitting. If
-TRUE, will return more smaller clusters. See documentation for
-<code>cutreeDynamic</code>.</p></dd>
+<code>TRUE</code>, function will return more smaller clusters. See documentation for
+<code>cutreeDynamic</code> for additional information.</p></dd>
 <dt>verbose</dt>
-<dd><p>Logical. Whether to print warning when combining peaks into 
-single time window. Defaults to FALSE.</p></dd>
+<dd><p>Logical. Whether to print warning when combining peaks into
+single time window. Defaults to <code>FALSE</code>.</p></dd>
 <dt>out</dt>
-<dd><p>Specify "data.frame" or "matrix" as output. Defaults to
-`data.frame`.</p></dd>
+<dd><p>Specify <code>data.frame</code> or <code>matrix</code> as output. Defaults to
+<code>data.frame</code>.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The function returns a peak_table object, consisting of the following
-elements:
-`tab`: the peak table itself -- a data-frame of intensities in a
-sample x peak configuration.
-peaks (columns).
-`pk_meta`: A data.frame containing peak meta-data (e.g. the spectral component,
-peak number, and average retention time).
-`sample_meta`: A data.frame of sample meta-data. Must be added using
-<code><a href="attach_metadata.html">attach_metadata</a></code>)
-`ref_spectra`: A data.frame of reference spectra (in a wavelength x peak
-configuration). Must be added using <code><a href="attach_ref_spectra.html">attach_ref_spectra</a></code>`args`: A vector of arguments given to <code>get_peaktable</code>.</p>
-    </div>
+    <p>The function returns a <code>peak_table</code> object, consisting of the following
+elements:</p><ul><li><p><code>tab</code>: the peak table itself -- a data-frame of intensities in a
+sample x peak configuration.</p></li>
+<li><p><code>pk_meta</code>: A data.frame containing peak meta-data (e.g. the spectral component,
+peak number, and average retention time).</p></li>
+<li><p><code>sample_meta</code>: A data.frame of sample meta-data. Must be added using
+<code><a href="attach_metadata.html">attach_metadata</a></code>).</p></li>
+<li><p><code>ref_spectra</code>: A data.frame of reference spectra (in a wavelength x peak
+configuration). Must be added using <code><a href="attach_ref_spectra.html">attach_ref_spectra</a></code></p></li>
+<li><p><code>args</code>: A vector of arguments given to <code>get_peaktable</code> to generate
+the peak table.</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The function performs a complete linkage clustering of retention times across
@@ -144,18 +147,18 @@ all samples, and cuts at a height given by the user (which can be understood
 as the maximal inter-cluster retention time difference) in the simple case
 based on retention times. Clustering can also incorporate information about
 spectral similarity using a distance function adapted from Broeckling et al.,
-2014: $$\exp({-\frac{(1-c_{ij})^2}{2\sigma_r^2}})*\exp({-\frac{(1-(t_i -
-t_j)^2}{2\sigma_t^2}})$$.</p>
-<p>If two peaks from the same sample are assigned to the same cluster, a warning
+2014:
+$$latexascii$$
+If two peaks from the same sample are assigned to the same cluster, a warning
 message is printed to the console. These warnings can usually be ignored, but
-one could also consider reducing the <code>hmax</code> variable. However, this may 
+one could also consider reducing the <code>hmax</code> variable. However, this may
 lead to splitting of peaks across multiple clusters. Another option is to
 filter the peaks by intensity to remove small features.</p>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
     <p>Adapted from
-<a href="https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R" class="external-link">https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R</a>getPeakTable
+<a href="https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R" class="external-link">getPeakTable</a>
 function in the alsace package by Ron Wehrens.</p>
     </div>
     <div class="section level2">
@@ -163,7 +166,7 @@ function in the alsace package by Ron Wehrens.</p>
     <p>Broeckling, C. D., F. A. Afsar, S. Neumann, A. Ben-Hur, and J.
 E. Prenni. 2014. RAMClust: A Novel Feature Clustering Method Enables
 Spectral-Matching-Based Annotation for Metabolomics Data. <em>Anal. Chem.</em>
-<b>86</b>:6812-6817.</p>
+<b>86</b>:6812-6817. <a href="https://doi.org/10.1021/ac501530d" class="external-link">doi:10.1021/ac501530d</a></p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -192,7 +195,7 @@ Spectral-Matching-Based Annotation for Metabolomics Data. <em>Anal. Chem.</em>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
 </div>
 
     </footer></div>
