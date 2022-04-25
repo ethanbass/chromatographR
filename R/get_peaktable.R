@@ -315,3 +315,115 @@ plot.peak_table <- function(x, ..., loc=NULL, chrom_list=NULL, what="peak",
             ylab="abs", xlab="", ...)
   }
 }
+
+#' Mirror plot from peak table.
+#' 
+#' Plots chromatograms as mirror plot.
+#' 
+#' Can be used to confirm the identity of a peak or check that a particular
+#' column in the peak table represents a single compound. Can also be used
+#' to create simple box-plots to examine the distribution of a peak with respect
+#' to variables defined in sample metadata.
+#' 
+#' @importFrom graphics matplot legend plot.new plot.window
+#' @importFrom utils head tail
+#' @param peak_table The peak table (output from \code{\link{get_peaktable}}
+#' function).
+#' @param chrom_list A list of chromatograms in matrix form (timepoints x
+#' wavelengths).
+#' @param lambdas The wavelength you wish to plot the traces at.
+#' @param var Variable to index chromatograms.
+#' @param subset Character vector specifying levels to use (if more than 2 levels
+#' are present in \code{var}).
+#' @param print_legend Logical. Whether to print legend. Defaults to \code{TRUE}.
+#' @param legend Character vector containing labels for legend.
+#' @param legend_pos Legend position.
+#' @param legend_size Legend size (\code{cex} argument). Default is 1.
+#' @param mirror Logical. Whether to plot as mirror or stacked plots.
+#' Defaults to \code{TRUE}.
+#' @param xlim Numerical vector specifying limits for x axis.
+#' @param ylim Numerical vector specifying limits for y axis.
+#' @param ... Additional arguments to \code{\link{matplot}} function.
+#' @author Ethan Bass
+#' @examples \dontrun{
+#' mirror_plot(pktab,lambdas=c("210","260"), var="trt", mirror=TRUE, col=c("green","blue"))
+#' }
+#' @export
+
+mirror_plot <- function(peak_table, chrom_list=NULL, lambdas, var, subset=NULL,
+                        print_legend=TRUE, legend=NULL, legend_pos = "topright",
+                        legend_size = 1, mirror = TRUE, xlim=NULL, ylim=NULL, ...){
+  meta <- peak_table$sample_meta
+  if (!exists("var"))
+    stop("Must provide independent variable or variables for mirror plot.")
+  if (!is.data.frame(meta)){
+    stop("Meta-data must be attached to peak table to make mirror plot.")
+  }
+  if (!(var %in% colnames(meta))){
+    stop(paste(var, "not found in sample meta-data."))
+  }
+  if (is.null(chrom_list)){
+    chrom_list <- try(get(peak_table$args["chrom_list"]))
+    if (inherits(chrom_list, "try-error")) stop("Chromatograms not found!")
+  }
+  
+  new.ts <- round(as.numeric(rownames(chrom_list[[1]])),2)
+  fac <- factor(meta[,var])
+  if (is.null(subset) & length(levels(fac)) > 2)
+    stop("The mirror plot requires two levels. Use the subset argument to 
+         specify which levels to use.")
+  if (!is.null(subset)){
+    if (mean(subset %in% levels(fac))<1){
+      stop(paste("The specified levels are not present in", var))
+    }
+  }
+  if (is.null(subset)){
+    trt1 <- levels(fac)[1]
+    trt2 <- levels(fac)[2]
+  } else {
+    trt1 <- subset[1]
+    trt2 <- subset[2]
+  }
+  set1 <- which(meta[,var] == trt1)
+  set2 <- which(meta[,var] == trt2)
+  if (is.null(legend))
+    legend <- c(trt1,trt2)
+  if (is.null(xlim))
+    xlim <- c(head(new.ts,1),tail(new.ts,1))
+  y_max <- max(sapply(chrom_list, function(x) max(x[,as.character(min(as.numeric(lambdas)))], na.rm=T)))
+  if (mirror){
+    if (is.null(ylim))
+      ylim <- c(-y_max, y_max)
+    par(mfrow=c(1,1))
+    plot.new()
+    plot.window(xlim = xlim,ylim = ylim)
+    for (i in set1){
+      matplot(new.ts, chrom_list[[i]][,lambdas], type='l', add=T, ...)
+    }
+    if (print_legend)
+      legend("topright", legend=legend[[1]], cex=legend_size, bty = "n")
+    for (i in set2){
+      matplot(new.ts, -chrom_list[[i]][,lambdas], type='l', add=T, ...)
+    }
+    legend("bottomright", legend=legend[[2]], cex=legend_size, bty = "n")
+  } else{
+    par(mfrow=c(2,1))
+    if (is.null(ylim))
+      ylim <- c(0,y_max)
+    plot.new()
+    plot.window(xlim = xlim, ylim = ylim)
+    for (i in set1){
+      matplot(new.ts, chrom_list[[i]][,lambdas], type='l', add=T, ...)
+    }
+    if (print_legend)
+      legend(legend_pos, legend=legend[[1]], cex=legend_size, bty = "n")
+    
+    plot.new()
+    plot.window(xlim = xlim, ylim = ylim)
+    for (i in set2){
+      matplot(new.ts, chrom_list[[i]][,lambdas], type='l', add=T, ...)
+    }
+    legend(legend_pos, legend=legend[[2]], cex=legend_size, bty = "n")
+  }
+}
+ 
