@@ -106,9 +106,11 @@ gather_reference_spectra <- function(peak_table, chrom_list=NULL, ref = c("max.c
 #' ref_m <- attach_ref_spectra(pk_tab, ref = "max.int")
 #' }
 #' @seealso
-#' \code{\link{get_peaks}}
-#'
-#' \code{\link{get_peaktable}}
+#' \code{\link{get_peaks}} \code{\link{get_peaktable}}
+#' @examples
+#' data(pk_tab)
+#' pk_tab <- attach_ref_spectra(pk_tab, ref="max.int")
+#' pk_tab <- attach_ref_spectra(pk_tab, ref = "max.cor")
 #' @export attach_ref_spectra
 #' 
 attach_ref_spectra <- function(peak_table, chrom_list=NULL, ref = c("max.cor","max.int")){
