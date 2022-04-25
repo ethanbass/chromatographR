@@ -170,7 +170,7 @@
 458 620.1729 228.73095 198.89770 530.8515 1399.5000  28.75473</code></pre>
 </div>
 <div class="section level3">
-<h3 id="additional-useful-tools">Additional useful tools<a class="anchor" aria-label="anchor" href="#additional-useful-tools"></a>
+<h3 id="further-analysis">Further analysis<a class="anchor" aria-label="anchor" href="#further-analysis"></a>
 </h3>
 <div class="section level4">
 <h4 id="plotting-spectra">Plotting spectra<a class="anchor" aria-label="anchor" href="#plotting-spectra"></a>
@@ -179,15 +179,17 @@
 <pre class="text"><code>&gt; par(mfrow=c(2,1))
 &gt; peak="X7"
 &gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp)</code></pre>
-<pre><code>[1] "chrome no. 4; RT: 12.3; lambda = 318 nm"</code></pre>
+<pre><code>[1] "chrome no. 4; RT: 12.3; lambda = 202 nm"</code></pre>
 <p><img src="chromatographR_files/figure-html/plot%20spectra-1.png" width="576"></p>
 <pre class="text"><code>&gt; peak="X13"
 &gt; plot_spectrum(peak, peak_table=pk_tab, chrom_list = warp)</code></pre>
-<pre><code>[1] "chrome no. 4; RT: 13.87; lambda = 318 nm"</code></pre>
+<pre><code>[1] "chrome no. 4; RT: 13.87; lambda = 202 nm"</code></pre>
 <p><img src="chromatographR_files/figure-html/plot%20spectra-2.png" width="576"></p>
 <p>The <code>plot_all_spectra</code> function can be used to visually compare peaks at a given column of the peak table to confirm that they match.</p>
 <pre class="text"><code>&gt; peak="X13"
 &gt; plot_all_spectra(peak, peak_table=pk_tab, chrom_list = warp, export=F, overlapping=T)</code></pre>
+<pre><code>Warning in min(x): no non-missing arguments to min; returning Inf</code></pre>
+<pre><code>Warning in max(x): no non-missing arguments to max; returning -Inf</code></pre>
 <p><img src="chromatographR_files/figure-html/plot_all-1.png" width="576"></p>
 </div>
 </div>
