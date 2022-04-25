@@ -98,12 +98,12 @@ plot_spectrum <- function(loc, peak_table=NULL, chrom_list=NULL,
     if (verbose){
       print(paste0("chrome no. ", chr, "; RT: ", RT, "; lambda = ", lambda, " nm"))
     if (!is.null(tab)){
-    pk <- names(which.min(abs(peak_table$pk_meta["RT",] - RT)))
+    pk <- names(which.min(abs(peak_table$pk_meta["rt",] - RT)))
     print(paste("closest match in peak table is", pk))
     }}
   } else {
     if (what == "peak"){
-    RT <- round(peak_table$pk_meta['RT',loc], sig)
+    RT <- round(peak_table$pk_meta['rt',loc], sig)
     } else if (what == "rt"){
       RT <- round(as.numeric(loc), sig)
       }

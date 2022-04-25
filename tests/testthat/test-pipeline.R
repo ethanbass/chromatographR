@@ -58,3 +58,23 @@ test_that("get_peaktable works", {
   expect_equal(class(pk_tab), "peak_table")
 })
 
+### test metadata attachment ###
+
+path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
+meta <- read.csv(path)
+pk_tab <- attach_metadata(pk_tab, metadata = meta, column="vial")
+
+test_that("attach_metadata works", {
+  expect_equal(rownames(pk_tab$tab), pk_tab$sample_meta$vial)
+})
+
+pk_tab <- attach_ref_spectra(pk_tab, chrom_list=dat.pr)
+
+test_that("attach_ref_spectra works", {
+  expect_equal(colnames(pk_tab$tab), colnames(pk_tab$ref_spectra))
+})
+
+
+
+
+

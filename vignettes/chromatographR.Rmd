@@ -97,14 +97,14 @@ plot.window(xlim=c(head(new.ts,1),tail(new.ts,1)),ylim=c(0,1000))
 for (i in 1:length(warp)){
   matplot(new.ts, warp[[i]][,lambdas],type='l',add=T)
 }
-legend("topright", legend="warped", cex=0.7, bty = "n")
+legend("topright", legend="warped", bty = "n")
 
 plot.new()
 plot.window(xlim=c(head(new.ts,1),tail(new.ts,1)),ylim=c(0,1000))
 for (i in 1:length(dat.pr)){
   matplot(new.ts, dat.pr[[i]][,lambdas],type='l',add=T)
 }
-legend("topright", legend="raw", cex=0.7, bty = "n")
+legend("topright", legend="raw", bty = "n")
 ```
 
 ### Peak finding and fitting
@@ -146,13 +146,16 @@ The `mirror_plot` function provides a quick way to visually compare treatment gr
 ```{r}
 mirror_plot(pk_tab, lambdas = c("210","260"), var = "trt", legend_size=3)
 ```
-The plot `peak_table` function provides an easy interface to various options for plotting peaks. Plot spectra or make a quick boxplot comparing an arbitrary number of treatments.
+
+The plot `peak_table` function provides an easy interface to various options for plotting peaks. For example, this function can be used to plot spectra or make a quick boxplot to compare treatments in sample metadata.
+
 
 ```{r}
-par(mfrow=c(2,3))
 plot(pk_tab, loc = "X9", box_plot = TRUE, vars = "trt")
 plot(pk_tab, loc = "X13", box_plot = TRUE, vars = "trt")
 ```
+
+
 #### Plotting spectra
 
 The `plot_spectrum` function allows you to easily plot or record the spectra associated with a particular peak in your peak table. This is useful for interpreting your results and/or checking for errors in your peak table. For example, you may want to check if the spectra match for a particular peak in your peak table. Or you may just want to have a look at the spectrum for a peak of interest. The `plot_spectrum` function can be used to plot only the spectrum or only the chromatographic trace using the arguments `plot_spectrum` and `plot_trace`. By default it will plot data from the chromatogram with the biggest peak in the peak table, but you can choose the chromatogram (and the wavelength for the trace) using the `chr` and `lambda` arguments.
@@ -160,7 +163,7 @@ The `plot_spectrum` function allows you to easily plot or record the spectra ass
 ```{r, plot spectra,fig.height=6}
 par(mfrow=c(2,1))
 peak="X7"
-plot_spectrum(peak, peak_table = pk_tab)
+plot_spectrum(peak, peak_table = pk_tab, chrom_list=warp)
 ```
 
 The `plot_all_spectra` function can be used to visually compare peaks at a given column of the peak table to confirm that they match.

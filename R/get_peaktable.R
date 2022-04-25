@@ -107,14 +107,15 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
     myPalette <- colorRampPalette(c("green", "blue", "purple", "red", "orange"))
   }
   clusterPeaks <- function(comp, pkLst){
-    pkLst <- lapply(pkLst, function(x) lapply(x, function(y) if (nrow(y) > 0){
+    pkLst <- lapply(pkLst, function(x) lapply(x, function(y){
+      if (nrow(y) > 0){
       y[!is.na(y[, rt]), , drop = FALSE]
-    }
-    else {
+    } else {
       y
-    }))
-    file.idx <- rep(names(pkLst), sapply(pkLst, function(samp) nrow(samp[[comp]])))
-    pkcenters <- unlist(lapply(pkLst, function(samp) samp[[comp]][,rt]))
+    }}))
+    xx <- do.call(rbind, sapply(pkLst, function(samp) samp[comp]))
+    file.idx <- xx$sample
+    pkcenters <- xx$rt
     names(pkcenters) <- NULL
     if (length(pkcenters) < 2) 
       return(NULL)
@@ -143,16 +144,17 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
       sing <- which(pkcenters.cl == 0)
       pkcenters.cl[sing] <- max(pkcenters.cl) + seq_along(sing)
     }
-    cl.centers <- aggregate(pkcenters, list(pkcenters.cl), 
-                            "mean")[, 2]
-    ncl <- length(cl.centers)
-    ## reorder clusters from small to large rt
-    pkcenters.cl <- order(order(cl.centers))[pkcenters.cl]
-    cl.centers <- sort(cl.centers)
-    metaInfo <- cbind(Component = rep(comp, ncl),
-                      Peak = 1:ncl, 
-                      RT = round(cl.centers,2)
+    cl.centers <- aggregate(cbind(rt,start,end,sd,tau,FWHM,r.squared) ~ 
+                              pkcenters.cl, data=xx, "mean")[,-1]
+    ncl <- length(cl.centers$rt)
+    ## re-order clusters from small to large rt
+    pkcenters.cl <- order(order(cl.centers$rt))[pkcenters.cl]
+    cl.centers <- cl.centers[order(cl.centers$rt),]
+    metaInfo <- cbind(component = rep(comp, ncl),
+                      peak = 1:ncl, 
+                      round(cl.centers,2)
                       )
+    rownames(metaInfo) <- NULL
     if (plot_it){
       mycols <- myPalette(length(cl.centers))
       cl.df <- data.frame(peaks = pkcenters, files = factor(file.idx), 
@@ -169,13 +171,12 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
       warning(paste("More than one peak of one injection in the same cluster", 
                 paste("for component ", comp, ".", sep = ""), 
                 "Keeping only the most intense one.", "", sep = "\n"))
-    allIs <- unlist(lapply(pkLst, function(samp) samp[[comp]][, 
-                                                              response]))
-    Iinfo <- matrix(0, ncl, length(pkLst), dimnames = list(NULL, 
-                                                           names(pkLst)))
-    for (i in seq(along = allIs)) Iinfo[pkcenters.cl[i],  file.idx[i]] <- 
+    allIs <- unlist(lapply(pkLst, function(samp) samp[[comp]][, response]))
+    Iinfo <- matrix(0, ncl, length(pkLst), dimnames = list(NULL, names(pkLst)))
+    for (i in seq(along = allIs)){
+      Iinfo[pkcenters.cl[i],  file.idx[i]] <- 
       max(allIs[i], Iinfo[pkcenters.cl[i], file.idx[i]])
-    #cbind(metaInfo, Iinfo)
+    }
     return(list(Iinfo, metaInfo))
   }
   result <- lapply(seq_len(ncomp), clusterPeaks, peak_list)
@@ -311,7 +312,7 @@ plot.peak_table <- function(x, ..., loc=NULL, chrom_list=NULL, what="peak",
     if (is.null(vars))
       stop("Must provide independent variable or variables for boxplot")
     boxplot(as.formula(paste("x$tab[,loc]",vars,sep="~")), data = x$sample_meta,
-            main = paste(loc, '\n', 'RT = ', round(x$pk_meta['RT', loc],2)),
+            main = paste(loc, '\n', 'RT = ', round(x$pk_meta['rt', loc],2)),
             ylab="abs", xlab="", ...)
   }
 }
