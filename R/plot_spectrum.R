@@ -45,25 +45,25 @@
 #' par(mfrow=c(2,1))
 #' plot_spectrum(loc = "X10", peak_table = pk_tab, what="peak")
 #' @export plot_spectrum
-plot_spectrum <- function(loc, peak_table=NULL, chrom_list=NULL,
+plot_spectrum <- function(loc, peak_table, chrom_list,
                           chr = 'max', lambda = 'max',
                           plot_spectrum = TRUE, plot_trace = TRUE,
                           spectrum_labels=TRUE, scale_spectrum=FALSE,
                           export_spectrum = FALSE, verbose=TRUE, 
                           what=c("peak", "rt", "click"), ...){
   what <- match.arg(what, c("peak", "rt", "click"))
+  if (missing(chrom_list) & missing(peak_table))
+    stop("Must provide either a peak_table or a chrom_list.")
+  if (missing(chrom_list)){
+    chrom_list <- try(get(peak_table$args["chrom_list"]))
+    if (inherits(chrom_list, "try-error")) stop("Chromatograms not found!")
+  }
   if (is.matrix(chrom_list)){
     chrom_list <- list(chrom_list)
     chr <- 1
   }
-  if (is.null(chrom_list) & is.null(peak_table))
-    stop("Must provide either a peak_table or a chrom_list.")
-  if (is.null(chrom_list)){
-    chrom_list <- try(get(peak_table$args["chrom_list"]))
-    if (inherits(chrom_list, "try-error")) stop("Chromatograms not found!")
-  }
   if (what == "peak"){
-    if(is.null(peak_table)){
+    if(missing(peak_table)){
       stop("Peak table is required to locate peak spectrum.")}
     if (!(loc %in% colnames(peak_table$tab))){
       stop(paste0("No match found for peak \'", loc, "\' in peak table."))}
@@ -183,11 +183,11 @@ elementwise.all.equal <- Vectorize(function(x, y, ...) {isTRUE(all.equal(x, y, .
 #' plot_all_spectra(peak="X13", peak_table = pk_tab, overlapping=TRUE)
 #' @export plot_all_spectra
 #' 
-plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all", 
+plot_all_spectra <- function(peak, peak_table, chrom_list, chrs="all", 
                              plot_spectrum = T, export_spectrum=TRUE,
                              scale_spectrum=TRUE, overlapping=TRUE,
                              verbose=FALSE, ...){
-  if (is.null(chrom_list)){
+  if (missing(chrom_list)){
     chrom_list <- get(peak_table$args["chrom_list"])
   }
   new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
@@ -238,10 +238,10 @@ plot_all_spectra <- function(peak, peak_table, chrom_list=NULL, chrs="all",
 #' data(Sa_pr)
 #' scan_chrom(Sa_pr, lambda="210", chr=2, export_spectrum=T)
 #' @export scan_chrom
-scan_chrom <- function(chrom_list, lambda, chr=NULL, peak_table=NULL, 
+scan_chrom <- function(chrom_list, lambda, chr, peak_table, 
                        scale_spectrum = FALSE, spectrum_labels = TRUE,
                        export_spectrum = FALSE, ...){
-  if (is.null(chr)){
+  if (missing(chr)){
     chr <- as.numeric(readline(
       prompt="Which chromatogram do you wish to plot? \n"))
   }

@@ -7,8 +7,8 @@
 scan_chrom(
   chrom_list,
   lambda,
-  chr = NULL,
-  peak_table = NULL,
+  chr,
+  peak_table,
   scale_spectrum = FALSE,
   spectrum_labels = TRUE,
   export_spectrum = FALSE,

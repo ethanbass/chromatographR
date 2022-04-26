@@ -7,7 +7,7 @@
 plot_all_spectra(
   peak,
   peak_table,
-  chrom_list = NULL,
+  chrom_list,
   chrs = "all",
   plot_spectrum = T,
   export_spectrum = TRUE,

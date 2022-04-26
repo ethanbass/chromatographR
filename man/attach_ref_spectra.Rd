@@ -4,11 +4,7 @@
 \alias{attach_ref_spectra}
 \title{Attach reference spectra}
 \usage{
-attach_ref_spectra(
-  peak_table,
-  chrom_list = NULL,
-  ref = c("max.cor", "max.int")
-)
+attach_ref_spectra(peak_table, chrom_list, ref = c("max.cor", "max.int"))
 }
 \arguments{
 \item{peak_table}{Peak table from \code{\link{get_peaktable}}.}

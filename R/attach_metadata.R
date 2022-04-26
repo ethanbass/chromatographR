@@ -55,8 +55,8 @@ attach_metadata <- function(peak_table, metadata, column){
 #' }
 #' @noRd
 
-gather_reference_spectra <- function(peak_table, chrom_list=NULL, ref = c("max.cor","max.int")){
-  if (is.null(chrom_list)){
+gather_reference_spectra <- function(peak_table, chrom_list, ref = c("max.cor","max.int")){
+  if (missing(chrom_list)){
     try.out <- try(chrom_list <- get(peak_table$args["chrom_list"]))
     if (inherits(try.out, "try-error")) stop("Chromatograms not found!")
   }
@@ -73,7 +73,7 @@ gather_reference_spectra <- function(peak_table, chrom_list=NULL, ref = c("max.c
     # sp.ref <- data.frame(do.call(cbind,sp.ref))
   } else {
     sp.ref <- sapply(colnames(peak_table$tab), function(pk){
-      plot_spectrum(loc = pk, peak_table, plot_trace=FALSE,
+      plot_spectrum(loc = pk, peak_table, chrom_list, plot_trace=FALSE,
                     plot_spectrum = FALSE, export_spectrum = TRUE,
                     verbose = FALSE,
                     scale_spectrum = TRUE)})
@@ -113,7 +113,11 @@ gather_reference_spectra <- function(peak_table, chrom_list=NULL, ref = c("max.c
 #' pk_tab <- attach_ref_spectra(pk_tab, ref = "max.cor")
 #' @export attach_ref_spectra
 #' 
-attach_ref_spectra <- function(peak_table, chrom_list=NULL, ref = c("max.cor","max.int")){
+attach_ref_spectra <- function(peak_table, chrom_list, ref = c("max.cor","max.int")){
+  # if (missing(chrom_list)){
+  #   chrom_list <- get_chrom_list(peak_table)
+  # }
   peak_table$ref_spectra <- gather_reference_spectra(peak_table, chrom_list, ref)
   return(peak_table)
 }
+

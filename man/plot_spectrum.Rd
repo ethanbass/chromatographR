@@ -6,8 +6,8 @@
 \usage{
 plot_spectrum(
   loc,
-  peak_table = NULL,
-  chrom_list = NULL,
+  peak_table,
+  chrom_list,
   chr = "max",
   lambda = "max",
   plot_spectrum = TRUE,

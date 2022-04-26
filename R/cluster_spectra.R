@@ -51,13 +51,14 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 # # @examples
 # cluster_spectra(pk_tab, warp, nboot=100, max.only = F,save = F)
 
-cluster_spectra <- function(peak_table, chrom_list=NULL, peak_no = c(5,100),
+cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
                             alpha=0.95, nboot=1000, plot_dend=T,
                             plot_spectra=TRUE, verbose=TRUE, save=TRUE,
                             parallel=TRUE, max.only=FALSE,
                             ...){
-  if (is.null(chrom_list)){
-    chrom_list <- get(peak_table$args["chrom_list"])
+  if (missing(chrom_list)){
+    chrom_list <- try(get(peak_table$args["chrom_list"]))
+    if (inherits(chrom_list, "try-error")) stop("Chromatograms not found!")
   }
   if (verbose) print('...collecting representative spectra')
   rep <- sapply(colnames(peak_table[[1]]), function(j){

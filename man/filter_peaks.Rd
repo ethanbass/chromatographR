@@ -7,7 +7,7 @@
 filter_peaks(peak_list, min_height, min_area, min_sd, max_sd)
 }
 \arguments{
-\item{peak_list}{A peak_list object, consisting of a nester list of peak
+\item{peak_list}{A peak_list object, consisting of a nested list of peak
 tables, where the first level is the sample, and the second level is the 
 spectral component. Every component is described by a matrix where every row 
 is one peak, and the columns contain information on retention time, 
@@ -22,7 +22,7 @@ full width at half maximum (FWHM), peak width, height, and area.}
 \item{max_sd}{Maximum standard deviation.}
 }
 \value{
-A peak list similar to the input peak_list, but with all rows removed
+A peak list similar, with all rows removed
 from the peak tables that are not satisfying the criteria.
 }
 \description{

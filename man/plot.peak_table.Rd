@@ -7,8 +7,8 @@
 \method{plot}{peak_table}(
   x,
   ...,
-  loc = NULL,
-  chrom_list = NULL,
+  loc,
+  chrom_list,
   what = "peak",
   chr = "max",
   lambda = "max",

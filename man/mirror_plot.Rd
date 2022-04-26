@@ -6,7 +6,7 @@
 \usage{
 mirror_plot(
   peak_table,
-  chrom_list = NULL,
+  chrom_list,
   lambdas,
   var,
   subset = NULL,

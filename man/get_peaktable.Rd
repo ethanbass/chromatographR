@@ -6,7 +6,7 @@
 \usage{
 get_peaktable(
   peak_list,
-  chrom_list = NULL,
+  chrom_list,
   response = c("area", "height"),
   use.cor = FALSE,
   hmax = 0.2,

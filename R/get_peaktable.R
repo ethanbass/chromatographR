@@ -84,7 +84,7 @@
 #' @seealso \code{\link{attach_ref_spectra}} \code{\link{attach_metadata}}
 #' @export get_peaktable
 #' 
-get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "height"),
+get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
                           use.cor = FALSE, hmax = 0.2, plot_it = FALSE,
                           ask = plot_it, clust = c("rt","sp.rt"),
                           sigma.t = NULL, sigma.r = 0.5,
@@ -96,7 +96,7 @@ get_peaktable <- function(peak_list, chrom_list = NULL, response = c("area", "he
   rt <- ifelse(use.cor, "rt.cor", "rt")
   if (class(peak_list) != "peak_list")
     stop("Peak list must be of the associated class.")
-  if (is.null(chrom_list)){
+  if (missing(chrom_list)){
     chrom_list <- try(get(attr(peak_list, "chrom_list")))
     if (inherits(chrom_list, "try-error")) stop("Chromatograms not found")
   }
@@ -280,13 +280,13 @@ row.names.peak_table <- function(x){
 #' @rdname plot.peak_table
 #' @export
 
-plot.peak_table <- function(x, ..., loc=NULL, chrom_list=NULL, what="peak",
+plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
                             chr = 'max', lambda = 'max',
                             plot_spectrum = TRUE, plot_trace = TRUE,
                             box_plot = FALSE, vars = NULL,
                             spectrum_labels = TRUE, scale_spectrum = FALSE,
                             export_spectrum = FALSE, verbose = TRUE){
-  if (what == "peak" & is.null(loc)){
+  if (what == "peak" & missing(loc)){
     loc <- readline(prompt="Which peak would you like to plot? \n")
     loc <- gsub('\\"', '', loc)
     loc <- gsub("\\'", "", loc)
@@ -295,7 +295,7 @@ plot.peak_table <- function(x, ..., loc=NULL, chrom_list=NULL, what="peak",
   }
   if (plot_spectrum == TRUE | plot_trace == TRUE){
     if (chr == "all"){
-      plot_all_spectra(loc, x, chrom_list = NULL,
+      plot_all_spectra(loc, x, chrom_list,
                        plot_spectrum = plot_spectrum,
                        export_spectrum = export_spectrum,
                        verbose = verbose, what = what)
@@ -351,7 +351,7 @@ plot.peak_table <- function(x, ..., loc=NULL, chrom_list=NULL, what="peak",
 #' }
 #' @export
 
-mirror_plot <- function(peak_table, chrom_list=NULL, lambdas, var, subset=NULL,
+mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset=NULL,
                         print_legend=TRUE, legend=NULL, legend_pos = "topright",
                         legend_size = 1, mirror = TRUE, xlim=NULL, ylim=NULL, ...){
   meta <- peak_table$sample_meta
@@ -363,7 +363,7 @@ mirror_plot <- function(peak_table, chrom_list=NULL, lambdas, var, subset=NULL,
   if (!(var %in% colnames(meta))){
     stop(paste(var, "not found in sample meta-data."))
   }
-  if (is.null(chrom_list)){
+  if (missing(chrom_list)){
     chrom_list <- try(get(peak_table$args["chrom_list"]))
     if (inherits(chrom_list, "try-error")) stop("Chromatograms not found!")
   }

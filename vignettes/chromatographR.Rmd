@@ -150,7 +150,7 @@ mirror_plot(pk_tab, lambdas = c("210","260"), var = "trt", legend_size=3)
 The plot `peak_table` function provides an easy interface to various options for plotting peaks. For example, this function can be used to plot spectra or make a quick boxplot to compare treatments in sample metadata.
 
 
-```{r}
+```{r,eval=T}
 plot(pk_tab, loc = "X9", box_plot = TRUE, vars = "trt")
 plot(pk_tab, loc = "X13", box_plot = TRUE, vars = "trt")
 ```
