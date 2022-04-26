@@ -175,10 +175,11 @@
 <div class="section level4">
 <h4 id="attaching-meta-data">Attaching meta-data<a class="anchor" aria-label="anchor" href="#attaching-meta-data"></a>
 </h4>
-<p>First you will usually want to attach sample meta-data to the <code>peak_table</code> object. This can be easily accomplished using the <code>attach_metadata</code> function.</p>
+<p>First you will usually want to attach sample meta-data to the <code>peak_table</code> object. This can be easily accomplished using the <code>attach_metadata</code> function. The peak table can then be normalized using the <code>normalize_data</code> function.</p>
 <pre class="text"><code>&gt; path &lt;- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
 &gt; meta &lt;- read.csv(path)
-&gt; pk_tab &lt;- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")</code></pre>
+&gt; pk_tab &lt;- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
+&gt; pk_tab &lt;- normalize_data(peak_table = pk_tab, column="mass")</code></pre>
 </div>
 <div class="section level4">
 <h4 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a>
