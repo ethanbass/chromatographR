@@ -367,7 +367,6 @@ mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset=NULL,
     chrom_list <- try(get(peak_table$args["chrom_list"]))
     if (inherits(chrom_list, "try-error")) stop("Chromatograms not found!")
   }
-  
   new.ts <- round(as.numeric(rownames(chrom_list[[1]])),2)
   fac <- factor(meta[,var])
   if (is.null(subset) & length(levels(fac)) > 2)
@@ -395,7 +394,6 @@ mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset=NULL,
   if (mirror){
     if (is.null(ylim))
       ylim <- c(-y_max, y_max)
-    par(mfrow=c(1,1))
     plot.new()
     plot.window(xlim = xlim,ylim = ylim)
     for (i in set1){

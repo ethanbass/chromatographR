@@ -9,7 +9,7 @@
 #' @param column The name of the column containing the sample names.
 #' @return A \code{peak_table} object with attached meta-data.
 #' @author Ethan Bass
-#' @seealso \code{\link{get_peaktable}}
+#' @seealso \code{\link{get_peaktable}} \code{\link{normalize_data}}
 #' @examples
 #' data(pk_tab)
 #' path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
@@ -103,13 +103,7 @@ gather_reference_spectra <- function(peak_table, chrom_list, ref = c("max.cor","
 #' intensity (\code{max.int}).
 #' @return A `peak_table` object with reference spectra attached
 #' @author Ethan Bass
-#' @examples \dontrun{
-#' data(pk_tab)
-#' data(Sa_warp)
-#' ref_m <- attach_ref_spectra(pk_tab, ref = "max.int")
-#' }
-#' @seealso
-#' \code{\link{get_peaks}} \code{\link{get_peaktable}}
+#' @seealso \code{\link{get_peaks}} \code{\link{get_peaktable}}
 #' @examples
 #' data(pk_tab)
 #' pk_tab <- attach_ref_spectra(pk_tab, ref="max.int")
@@ -127,7 +121,8 @@ attach_ref_spectra <- function(peak_table, chrom_list, ref = c("max.cor","max.in
 #' Normalize peak table or chromatograms
 #' 
 #' Normalizes peak table or list of chromatograms by specified column in sample
-#' meta-data.
+#' meta-data. Metadata must first be attached to \code{peak_table} using
+#' \code{\link{attach_metadata}}.
 #' 
 #' @param peak_table A `peak_table` object
 #' @param column The name of the column containing the weights.
@@ -136,7 +131,7 @@ attach_ref_spectra <- function(peak_table, chrom_list, ref = c("max.cor","max.in
 #' @param what `peak_table` or list of chromatograms (`chrom_list`).
 #' @return A normalized \code{peak_table} object.
 #' @author Ethan Bass
-#' @seealso \code{\link{get_peaktable}}
+#' @seealso \code{\link{get_peaktable}} \code{\link{attach_metadata}}
 #' @examples
 #' data(pk_tab)
 #' path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")

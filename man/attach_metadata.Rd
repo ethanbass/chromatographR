@@ -27,7 +27,7 @@ meta <- read.csv(path)
 pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
 }
 \seealso{
-\code{\link{get_peaktable}}
+\code{\link{get_peaktable}} \code{\link{normalize_data}}
 }
 \author{
 Ethan Bass

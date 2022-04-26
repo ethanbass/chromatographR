@@ -26,11 +26,6 @@ spectra are defined either as the spectrum with the highest intensity (
 to the other spectra in the peak_table (\code{max.cor}).
 }
 \examples{
-\dontrun{
-data(pk_tab)
-data(Sa_warp)
-ref_m <- attach_ref_spectra(pk_tab, ref = "max.int")
-}
 data(pk_tab)
 pk_tab <- attach_ref_spectra(pk_tab, ref="max.int")
 pk_tab <- attach_ref_spectra(pk_tab, ref = "max.cor")

@@ -26,7 +26,8 @@ A normalized \code{peak_table} object.
 }
 \description{
 Normalizes peak table or list of chromatograms by specified column in sample
-meta-data.
+meta-data. Metadata must first be attached to \code{peak_table} using
+\code{\link{attach_metadata}}.
 }
 \examples{
 data(pk_tab)
@@ -36,7 +37,7 @@ pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
 norm <- normalize_data(pk_tab, "mass", what = "peak_table")
 }
 \seealso{
-\code{\link{get_peaktable}}
+\code{\link{get_peaktable}} \code{\link{attach_metadata}}
 }
 \author{
 Ethan Bass
