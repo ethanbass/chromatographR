@@ -33,7 +33,7 @@ data(pk_tab)
 path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
 meta <- read.csv(path)
 pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
-norm <- normalize_data(pk_tab, "mass")
+norm <- normalize_data(pk_tab, "mass", what = "peak_table")
 }
 \seealso{
 \code{\link{get_peaktable}}

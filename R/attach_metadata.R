@@ -26,6 +26,9 @@ attach_metadata <- function(peak_table, metadata, column){
   meta <- data.frame(rownames(peak_table$tab))
   names(meta) <- column
   metadata[,column] <- as.character(metadata[,column])
+  missing_meta <- !(meta[,column] %in% metadata[,column])
+  if (sum(missing_meta)>0)
+    warning("The supplied metadata does not include all samples.")
   meta <- merge(meta, metadata, all.x=TRUE, all.y=FALSE, sort=FALSE)
   peak_table$sample_meta <- meta
   return(peak_table)
