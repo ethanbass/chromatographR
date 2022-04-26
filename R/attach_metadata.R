@@ -148,19 +148,22 @@ normalize_data <- function(peak_table, column, chrom_list,
     stop(paste0("Column, ", column, ", is not found."))
   what <- match.arg(what, c("peak_table", "chrom_list"))
   if (what == "peak_table"){
-    peak_table$tab <- as.data.frame(t(sapply(seq_len(nrow(peak_table$tab)), function(samp){
+    pktab <- as.data.frame(t(sapply(seq_len(nrow(peak_table$tab)), function(samp){
       as.numeric(as.vector(peak_table$tab[samp,]))/peak_table$sample_meta[samp,column]
     })))
+    rownames(pktab) <- rownames(peak_table$tab)
+    peak_table$tab <- pktab
     return(peak_table)
   } else if (what == "chrom_list"){
     if (missing(chrom_list)){
       chrom_list <- try(get(peak_table$args["chrom_list"]))
       if (inherits(chrom_list, "try-error")) stop("Chromatograms not found!")
     }
-    if (mean(elementwise.all.equal(names(chrom_list),rownames(peak_table$tab))) < 1)
+    if (mean(elementwise.all.equal(names(chrom_list), rownames(peak_table$tab))) < 1)
       stop("Names of chromatograms do not match the peak table.")
     chrom_list <- lapply(seq_len(nrow(peak_table$tab)), function(samp){
       chrom_list[[samp]]/peak_table$sample_meta[samp,column]
     })
+    return(chrom_list)
   }
 }

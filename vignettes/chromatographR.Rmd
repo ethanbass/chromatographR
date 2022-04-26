@@ -133,12 +133,13 @@ head(pk_tab$tab[,1:6])
 
 #### Attaching meta-data
 
-First you will usually want to attach sample meta-data to the `peak_table` object. This can be easily accomplished using the `attach_metadata` function. 
+First you will usually want to attach sample meta-data to the `peak_table` object. This can be easily accomplished using the `attach_metadata` function. The peak table can then be normalized using the `normalize_data` function.
 
 ```{r}
 path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
 meta <- read.csv(path)
 pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
+pk_tab <- normalize_data(peak_table = pk_tab, column="mass")
 ```
 
 #### Plotting
