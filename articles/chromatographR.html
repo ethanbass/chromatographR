@@ -81,8 +81,8 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p><em>chromatographR</em> is a package for the reproducible analysis of HPLC-DAD data in <code>R</code>. Liquid chromatography coupled to diode-array detection (HPLC-DAD) remains one of the most popular analytical methodologies due to its convenience and low-cost. However, there are currently few open-source tools available for analyzing HPLC-DAD chromatograms. The use of proprietary software for the analysis of HPLC-DAD data is currently a significant barrier to reproducible science, since these tools are not widely accessible, but also because such tools often require the user to select complicated options through a graphical interface which cannot easily be repeated. Reproducibility is of course much higher in command line workflows, like <em>chromatographR</em> where the entire analysis can be stored and easily repeated by anyone using publicly available software.</p>
-<p>The <em>chromatographR</em> package draws inspiration from the previously published <em>alsace</em> package <span class="citation">(Wehrens, Carvalho, and Fraser 2015)</span>, but with improved functions for peak-finding, integration and peak table generation as well as a number of new tools for data visualization and checking. Unlike <em>alsace</em>, which emphasized multivariate curve resolution through alternating least squares (MCR-ALS), <em>chromatographR</em> focuses on a more conventional workflow that may seem more familiar to users of standard software tools for HPLC-DAD analysis. <em>chromatographR</em> includes tools for a) pre-processing, b) retention-time alignment, c) peak-finding, d) peak-integration and e) peak-table construction, as well as additional functions useful in analysis of the resulting peak table.</p>
+<p><em>chromatographR</em> is a package for the reproducible analysis of HPLC-DAD data in <code>R</code>. Liquid chromatography coupled to diode-array detection (HPLC-DAD) remains one of the most popular analytical methodologies due to its convenience and low-cost. However, there are currently very few open-source tools available for analyzing HPLC-DAD chromatograms. The use of proprietary software for the analysis of HPLC-DAD data is currently a significant barrier to reproducible science, since these tools are not widely accessible, but usually involve the user to select complicated options through a graphical interface which aren’t easily repeatable. Reproducibility is much higher in command line workflows, like <em>chromatographR</em>, where the entire analysis can be stored and easily repeated by anyone using publicly available software.</p>
+<p>The <em>chromatographR</em> package draws inspiration from the previously published <em>alsace</em> package <span class="citation">(Wehrens, Carvalho, and Fraser 2015)</span>, but with improved functions for peak-finding, integration and peak table generation as well as a number of new tools for data visualization and downstream analysis. Unlike <em>alsace</em>, which emphasized multivariate curve resolution through alternating least squares (MCR-ALS), <em>chromatographR</em> is developed around a more conventional workflow that will probably seem more familiar to users of standard software tools for HPLC-DAD analysis. <em>chromatographR</em> includes tools for a) pre-processing, b) retention-time alignment, c) peak-finding, d) peak-integration and e) peak-table construction, as well as additional functions useful in analysis of the resulting peak table.</p>
 </div>
 <div class="section level2">
 <h2 id="workflow">Workflow<a class="anchor" aria-label="anchor" href="#workflow"></a>
@@ -90,9 +90,9 @@
 <div class="section level3">
 <h3 id="loading-data">Loading data<a class="anchor" aria-label="anchor" href="#loading-data"></a>
 </h3>
-<p>In most cases, the data coming from the spectrometer must first be converted into an <code>R</code>-accessible format such as a <code>csv</code> file. Once all <code>csv</code> files are gathered into a single directory (e.g. <code>foo</code>), the <code>load_chromes</code> function provides a simple interface to import your chromatograms.</p>
+<p>chromatographR now includes an option to directly convert files from ChemStation or MassHunter. Alternatively, the data from the spectrometer can be converted into an <code>R</code>-friendly format like a <code>csv</code> file. The <code>load_chroms</code> function provides a simple interface to read chromatograms into <code>R</code> from any of these formats.</p>
 <pre class="text"><code>&gt; # single folder
-&gt; load_chroms(paths = path)
+&gt; load_chroms(paths = path, format.in="csv")
 &gt; 
 &gt; # multiple folders
 &gt; path = 'foo'
@@ -108,7 +108,7 @@
 <div class="section level3">
 <h3 id="pre-processing-data">Pre-processing data<a class="anchor" aria-label="anchor" href="#pre-processing-data"></a>
 </h3>
-<p>Experimental data can suffer from a number of non-informative artifacts, such as noise (random or non- random), a shifting baseline, or missing values. In addition, the data produced by the instrument may have longer wavelength or time ranges (or higher resolution) than we need. Since HPLC-DAD data are fairly smooth, it is relatively easy to correct these issues in most cases. For example, smoothing can remove much of the noise in the spectral direction and baseline subtraction can correct a shifting baseline. Selection and interpolation can be used to select the time and wavelength ranges and resolutions we want. All of these functions are available through the <code>preprocess</code> function. Smoothing and baseline subtraction are enabled by default, and providing alternative sets of time points and/or wavelengths will lead to sub-sampling and subsequent interpolation along one or both axes. This can significantly reduce the computational load in later steps.</p>
+<p>Experimental data can suffer from a number of non-informative artifacts, such as noise, a shifting baseline, or missing values. In addition, the data produced by the instrument may have longer wavelength or time ranges (or higher resolution) than we need. Since HPLC-DAD data are fairly smooth, it is usually easy to correct these issues. For example, smoothing can reduce noise in the spectral direction while baseline subtraction can help correct a shifting baseline. Selection and interpolation can be used to narrow the range of times and wavelengths. All of these functions are available through the <code>preprocess</code> function. Smoothing and baseline subtraction are enabled by default. Additionally, alternative times (<code>dim1</code>) and/or wavelengths (<code>dim2</code>) can be provided to interpolate data along one or both axes. This can significantly reduce the computational time and memory requirements in later steps.</p>
 <p>The <code>baseline_cor</code> function from the <em>ptw</em> package <span class="citation">(Bloemberg et al. 2010)</span> takes arguments <code>p</code> (an asymmetry parameter) and <code>lambda</code> (a smoothing parameter). You can read more about these in the documentation for <code><a href="https://rdrr.io/pkg/ptw/man/asysm.html" class="external-link">ptw::asysm</a></code>. You may want to experiment with these parameters before choosing values to use on your whole dataset.</p>
 <pre class="text"><code>&gt; i=2 # chromatogram number in list of data
 &gt; tpoints &lt;- as.numeric(rownames(Sa[[i]]))
@@ -123,12 +123,12 @@
 &gt; new.lambdas &lt;- seq(200, 318, by = 2) # choose wavelengths</code></pre>
 <pre class="text"><code>&gt; dat.pr &lt;- preprocess(Sa, dim1=new.ts, dim2=new.lambdas,
 +            parallel=F, p=.001, lambda=1e5)</code></pre>
-<p>After loading data, you may want to normalize your chromatograms (e.g. by sample mass). However, you can also normalize after assembling the peak table.</p>
+<p>After loading data, you may want to normalize your chromatograms (e.g. by sample mass). However, you can also normalize later after assembling the peak table.</p>
 </div>
 <div class="section level3">
 <h3 id="dealing-with-retention-time-shifts">Dealing with retention time shifts<a class="anchor" aria-label="anchor" href="#dealing-with-retention-time-shifts"></a>
 </h3>
-<p>In many cases, HPLC data can suffer from retention time shifts (e.g. due to temperature fluctuations, column degradation, or subtle changes in mobile-phase composition). Parametric time warping (as implemented in the <em>ptw</em> package can be quite an effective technique for correcting subtle retention time shifts <span class="citation">(Eilers 2004)</span>. If your chromatograms are already perfectly aligned you can skip this step. If you have severe retention time shifts this technique will be considerably less effective (and you should consider checking your HPLC for leaks).</p>
+<p>In many cases, HPLC data can suffer from retention time shifts (e.g. due to temperature fluctuations, column degradation, or subtle changes in mobile-phase composition). Parametric time warping (as implemented in the <em>ptw</em> package can be quite an effective technique for correcting subtle retention time shifts <span class="citation">(Eilers 2004)</span>. If your chromatograms are already perfectly aligned you can skip this step. If you have severe retention time shifts this technique may not be so effective (and you should consider checking your HPLC for leaks).</p>
 <p>The <code>correct_rt</code> function is a wrapper around the <code>ptw</code> function. For each chromatogram, it produces a “global” warping function across all wavelengths included in <code>lambdas</code>). The goal of the warping function is to produce a better alignment of retention times by “warping” the time-axis of each chromatogram to match a reference chromatogram. The reference chromatogram can be selected manually or determined algorithmically by setting the <code>reference</code> argument. The code below creates warping models for the samples in the provided list of data matrices. The same function can then be used to warp each chromatogram according to the corresponding model, by setting the <code>models</code> parameter.</p>
 <pre class="text"><code>&gt; warping.models &lt;- correct_rt(dat.pr, what = "models", lambdas=c("210"))
 &gt; warp &lt;- correct_rt(chrom_list=dat.pr, models=warping.models)</code></pre>
@@ -173,8 +173,9 @@
 <h3 id="further-analysis-and-data-visualization">Further analysis and data-visualization<a class="anchor" aria-label="anchor" href="#further-analysis-and-data-visualization"></a>
 </h3>
 <div class="section level4">
-<h4 id="attach-meta-data">Attach meta-data<a class="anchor" aria-label="anchor" href="#attach-meta-data"></a>
+<h4 id="attaching-meta-data">Attaching meta-data<a class="anchor" aria-label="anchor" href="#attaching-meta-data"></a>
 </h4>
+<p>First you will usually want to attach sample meta-data to the <code>peak_table</code> object. This can be easily accomplished using the <code>attach_metadata</code> function.</p>
 <pre class="text"><code>&gt; path &lt;- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
 &gt; meta &lt;- read.csv(path)
 &gt; pk_tab &lt;- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")</code></pre>
@@ -185,7 +186,7 @@
 <p>The <code>mirror_plot</code> function provides a quick way to visually compare treatment groups.</p>
 <pre class="text"><code>&gt; mirror_plot(pk_tab, lambdas = c("210","260"), var = "trt", legend_size=3)</code></pre>
 <p><img src="chromatographR_files/figure-html/unnamed-chunk-3-1.png" width="576"></p>
-<p>The plot <code>peak_table</code> function provides an easy interface to various options for plotting peaks. For example, this function can be used to plot spectra or make a quick boxplot to compare treatments in sample metadata.</p>
+<p>The plot <code>peak_table</code> function provides an easy interface to various options for plotting peaks. For example, it can be used to plot spectra or make a quick boxplot to compare treatments.</p>
 <pre class="text"><code>&gt; plot(pk_tab, loc = "X9", box_plot = TRUE, vars = "trt")</code></pre>
 <p><img src="chromatographR_files/figure-html/unnamed-chunk-4-1.png" width="576"></p>
 <pre><code>[1] "chrome no. 1; RT: 12.81; lambda = 318 nm"</code></pre>
@@ -198,13 +199,13 @@
 <div class="section level4">
 <h4 id="plotting-spectra">Plotting spectra<a class="anchor" aria-label="anchor" href="#plotting-spectra"></a>
 </h4>
-<p>The <code>plot_spectrum</code> function allows you to easily plot or record the spectra associated with a particular peak in your peak table. This is useful for interpreting your results and/or checking for errors in your peak table. For example, you may want to check if the spectra match for a particular peak in your peak table. Or you may just want to have a look at the spectrum for a peak of interest. The <code>plot_spectrum</code> function can be used to plot only the spectrum or only the chromatographic trace using the arguments <code>plot_spectrum</code> and <code>plot_trace</code>. By default it will plot data from the chromatogram with the biggest peak in the peak table, but you can choose the chromatogram (and the wavelength for the trace) using the <code>chr</code> and <code>lambda</code> arguments.</p>
+<p>The <code>plot_spectrum</code> function allows you to plot or record the spectra associated with a particular peak in your peak table. This is useful for interpreting your results and/or checking for errors in your peak table. For example, you may want to check if the spectra match for a particular peak in your peak table across different samples. Or you may just want to compare your spectrum with a known standard. The <code>plot_spectrum</code> function can be used to plot only the spectrum or only the chromatographic trace using the arguments <code>plot_spectrum</code> and <code>plot_trace</code>. By default it will plot data from the chromatogram with the biggest peak in the peak table. Alternatively, you can choose the chromatogram and wavelength using the <code>chr</code> and <code>lambda</code> arguments.</p>
 <pre class="text"><code>&gt; par(mfrow=c(2,1))
 &gt; peak="X7"
 &gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list=warp)</code></pre>
 <pre><code>[1] "chrome no. 4; RT: 12.3; lambda = 318 nm"</code></pre>
 <p><img src="chromatographR_files/figure-html/plot%20spectra-1.png" width="576"></p>
-<p>The <code>plot_all_spectra</code> function can be used to visually compare peaks at a given column of the peak table to confirm that they match.</p>
+<p>The <code>plot_all_spectra</code> function can be used to visually compare the spectra for a specified peak across all samples.</p>
 <pre class="text"><code>&gt; peak="X13"
 &gt; plot_all_spectra(peak, peak_table=pk_tab, export=F, overlapping=T)</code></pre>
 <p><img src="chromatographR_files/figure-html/plot_all-1.png" width="576"></p>
