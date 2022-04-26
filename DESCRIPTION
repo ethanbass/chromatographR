@@ -1,7 +1,7 @@
 Type: Package
 Package: chromatographR
 Title: Import and Analyze HPLC-DAD/UV Data
-Version: 0.3
+Version: 0.3.0
 Authors@R: 
     person("Ethan", "Bass", , "ethanbass@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6175-6739"))

@@ -106,7 +106,9 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
     RT <- round(peak_table$pk_meta['rt',loc], sig)
     } else if (what == "rt"){
       RT <- round(as.numeric(loc), sig)
-      }
+    }
+    if (!is.numeric(RT))
+      stop("Retention time not found!")
     time <- as.character(new.ts[which.min(abs(RT - new.ts))])
     if (chr == 'max'){
       chr <- which.max(tab[,loc])

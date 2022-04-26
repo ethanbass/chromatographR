@@ -311,7 +311,7 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
   if (box_plot == T){
     if (is.null(vars))
       stop("Must provide independent variable or variables for boxplot")
-    boxplot(as.formula(paste("x$tab[,loc]",vars,sep="~")), data = x$sample_meta,
+    boxplot(as.formula(paste("unlist(x$tab[,loc])",vars,sep="~")), data = x$sample_meta,
             main = paste(loc, '\n', 'RT = ', round(x$pk_meta['rt', loc],2)),
             ylab="abs", xlab="", ...)
   }
