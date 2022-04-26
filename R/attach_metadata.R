@@ -149,7 +149,7 @@ normalize_data <- function(peak_table, column, chrom_list,
   what <- match.arg(what, c("peak_table", "chrom_list"))
   if (what == "peak_table"){
     peak_table$tab <- as.data.frame(t(sapply(seq_len(nrow(peak_table$tab)), function(samp){
-      as.numeric(as.vector(pktab.rts$tab[samp,]))/peak_table$sample_meta[samp,column]
+      as.numeric(as.vector(peak_table$tab[samp,]))/peak_table$sample_meta[samp,column]
     })))
     return(peak_table)
   } else if (what == "chrom_list"){

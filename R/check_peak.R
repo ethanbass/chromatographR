@@ -6,7 +6,7 @@
 #' all peaks within a certain radius around the focal peak on the basis of their
 #' spectral similarity to a reference spectrum.
 #' 
-#' @aliases check_peakd
+#' @aliases check_peak
 #' @importFrom graphics par matplot abline legend
 #' @param peak Name of peak to be checked.
 #' @param peak_table A peak_table object from \code{\link{get_peaktable}}.

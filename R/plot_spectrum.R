@@ -43,7 +43,7 @@
 #' pks <- get_peaks(Sa,lambda="220.00000")
 #' pk_tab <- get_peaktable(pks)
 #' par(mfrow=c(2,1))
-#' plot_spectrum(loc = "X10", peak_table = pk_tab, what="peak")
+#' plot_spectrum(loc = "V10", peak_table = pk_tab, what="peak")
 #' @export plot_spectrum
 plot_spectrum <- function(loc, peak_table, chrom_list,
                           chr = 'max', lambda = 'max',
@@ -109,7 +109,7 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
     }
     if (!is.numeric(RT))
       stop("Retention time not found!")
-    time <- as.character(new.ts[which.min(abs(RT - new.ts))])
+    time <- which.min(abs(RT - new.ts))
     if (chr == 'max'){
       chr <- which.max(tab[,loc])
     }
@@ -182,7 +182,7 @@ elementwise.all.equal <- Vectorize(function(x, y, ...) {isTRUE(all.equal(x, y, .
 #' data(Sa_warp)
 #' pks <- get_peaks(Sa_warp, lambda="220")
 #' pk_tab <- get_peaktable(pks)
-#' plot_all_spectra(peak="X13", peak_table = pk_tab, overlapping=TRUE)
+#' plot_all_spectra(peak="V13", peak_table = pk_tab, overlapping=TRUE)
 #' @export plot_all_spectra
 #' 
 plot_all_spectra <- function(peak, peak_table, chrom_list, chrs="all", 
@@ -240,14 +240,14 @@ plot_all_spectra <- function(peak, peak_table, chrom_list, chrs="all",
 #' data(Sa_pr)
 #' scan_chrom(Sa_pr, lambda="210", chr=2, export_spectrum=T)
 #' @export scan_chrom
-scan_chrom <- function(chrom_list, lambda, chr, peak_table, 
+scan_chrom <- function(chrom_list, lambda, chr, peak_table=NULL, 
                        scale_spectrum = FALSE, spectrum_labels = TRUE,
                        export_spectrum = FALSE, ...){
   if (missing(chr)){
     chr <- as.numeric(readline(
       prompt="Which chromatogram do you wish to plot? \n"))
   }
-  plot_spectrum(chrom_list=chrom_list,
+  plot_spectrum(chrom_list = chrom_list, peak_table=peak_table,
                             chr = chr, lambda = lambda,
                             what="click", ...)
 }

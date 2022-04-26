@@ -77,7 +77,7 @@ data(Sa)
 pks <- get_peaks(Sa,lambda="220.00000")
 pk_tab <- get_peaktable(pks)
 par(mfrow=c(2,1))
-plot_spectrum(loc = "X10", peak_table = pk_tab, what="peak")
+plot_spectrum(loc = "V10", peak_table = pk_tab, what="peak")
 \dontshow{\}) # examplesIf}
 }
 \author{

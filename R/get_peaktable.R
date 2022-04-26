@@ -180,9 +180,9 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
     return(list(Iinfo, metaInfo))
   }
   result <- lapply(seq_len(ncomp), clusterPeaks, peak_list)
-  result <- list(tab = data.frame(t(do.call("rbind", lapply(result,    
+  result <- list(tab = as.data.frame(t(do.call("rbind", lapply(result,    
                                                         function(x) x[[1]])))),
-                 pk_meta = data.frame(t(do.call("rbind", lapply(result, 
+                 pk_meta = as.data.frame(t(do.call("rbind", lapply(result, 
                                                         function(x) x[[2]])))),
                  sample_meta = NA,
                  ref_spectra = NA,
@@ -311,7 +311,7 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
   if (box_plot == T){
     if (is.null(vars))
       stop("Must provide independent variable or variables for boxplot")
-    boxplot(as.formula(paste("unlist(x$tab[,loc])",vars,sep="~")), data = x$sample_meta,
+    boxplot(as.formula(paste("x[['tab']][,loc]",vars,sep="~")), data = x$sample_meta,
             main = paste(loc, '\n', 'RT = ', round(x$pk_meta['rt', loc],2)),
             ylab="abs", xlab="", ...)
   }

@@ -55,6 +55,7 @@ test_that("get_peaks works", {
 pk_tab <- suppressWarnings(get_peaktable(pks_egh, dat.pr))
 test_that("get_peaktable works", {
   expect_equal(rownames(pk_tab$tab), names(dat.pr))
+  expect_equal(colnames(pk_tab$tab), colnames(pk_tab$pk_meta))
   expect_equal(class(pk_tab), "peak_table")
 })
 

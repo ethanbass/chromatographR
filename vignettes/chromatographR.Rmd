@@ -153,8 +153,8 @@ The plot `peak_table` function provides an easy interface to various options for
 
 
 ```{r,eval=T}
-plot(pk_tab, loc = "X9", box_plot = TRUE, vars = "trt")
-plot(pk_tab, loc = "X13", box_plot = TRUE, vars = "trt")
+plot(pk_tab, loc = "V9", box_plot = TRUE, vars = "trt")
+plot(pk_tab, loc = "V13", box_plot = TRUE, vars = "trt")
 ```
 
 
@@ -164,14 +164,14 @@ The `plot_spectrum` function allows you to plot or record the spectra associated
 
 ```{r, plot spectra,fig.height=6}
 par(mfrow=c(2,1))
-peak="X7"
+peak="V7"
 plot_spectrum(peak, peak_table = pk_tab, chrom_list=warp)
 ```
 
 The `plot_all_spectra` function can be used to visually compare the spectra for a specified peak across all samples.
 
 ```{r, plot_all}
-peak="X13"
+peak="V13"
 plot_all_spectra(peak, peak_table=pk_tab, export=F, overlapping=T)
 ```
 
