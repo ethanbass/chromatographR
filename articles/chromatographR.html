@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -163,7 +163,7 @@
 <p><img src="chromatographR_files/figure-html/plot_peaks-1.png" width="576"></p>
 <pre class="text"><code>&gt; pk_tab &lt;- get_peaktable(pks_egh, response = "area")
 &gt; head(pk_tab$tab[,1:6])</code></pre>
-<pre><code>          X1        X2        X3       X4        X5        X6
+<pre><code>          V1        V2        V3       V4        V5        V6
 119 547.5999   0.00000  64.73611 188.9210 1514.4775  31.08266
 121 426.2768 109.41736  61.30032   0.0000  800.6312   0.00000
 122 839.5934  94.67302 199.57845   0.0000 2595.0200 179.59510
@@ -187,11 +187,11 @@
 <pre class="text"><code>&gt; mirror_plot(pk_tab, lambdas = c("210","260"), var = "trt", legend_size=3)</code></pre>
 <p><img src="chromatographR_files/figure-html/unnamed-chunk-3-1.png" width="576"></p>
 <p>The plot <code>peak_table</code> function provides an easy interface to various options for plotting peaks. For example, it can be used to plot spectra or make a quick boxplot to compare treatments.</p>
-<pre class="text"><code>&gt; plot(pk_tab, loc = "X9", box_plot = TRUE, vars = "trt")</code></pre>
+<pre class="text"><code>&gt; plot(pk_tab, loc = "V9", box_plot = TRUE, vars = "trt")</code></pre>
 <p><img src="chromatographR_files/figure-html/unnamed-chunk-4-1.png" width="576"></p>
 <pre><code>[1] "chrome no. 1; RT: 12.81; lambda = 318 nm"</code></pre>
 <p><img src="chromatographR_files/figure-html/unnamed-chunk-4-2.png" width="576"><img src="chromatographR_files/figure-html/unnamed-chunk-4-3.png" width="576"></p>
-<pre class="text"><code>&gt; plot(pk_tab, loc = "X13", box_plot = TRUE, vars = "trt")</code></pre>
+<pre class="text"><code>&gt; plot(pk_tab, loc = "V13", box_plot = TRUE, vars = "trt")</code></pre>
 <p><img src="chromatographR_files/figure-html/unnamed-chunk-4-4.png" width="576"></p>
 <pre><code>[1] "chrome no. 4; RT: 13.87; lambda = 318 nm"</code></pre>
 <p><img src="chromatographR_files/figure-html/unnamed-chunk-4-5.png" width="576"><img src="chromatographR_files/figure-html/unnamed-chunk-4-6.png" width="576"></p>
@@ -201,12 +201,12 @@
 </h4>
 <p>The <code>plot_spectrum</code> function allows you to plot or record the spectra associated with a particular peak in your peak table. This is useful for interpreting your results and/or checking for errors in your peak table. For example, you may want to check if the spectra match for a particular peak in your peak table across different samples. Or you may just want to compare your spectrum with a known standard. The <code>plot_spectrum</code> function can be used to plot only the spectrum or only the chromatographic trace using the arguments <code>plot_spectrum</code> and <code>plot_trace</code>. By default it will plot data from the chromatogram with the biggest peak in the peak table. Alternatively, you can choose the chromatogram and wavelength using the <code>chr</code> and <code>lambda</code> arguments.</p>
 <pre class="text"><code>&gt; par(mfrow=c(2,1))
-&gt; peak="X7"
+&gt; peak="V7"
 &gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list=warp)</code></pre>
 <pre><code>[1] "chrome no. 4; RT: 12.3; lambda = 318 nm"</code></pre>
 <p><img src="chromatographR_files/figure-html/plot%20spectra-1.png" width="576"></p>
 <p>The <code>plot_all_spectra</code> function can be used to visually compare the spectra for a specified peak across all samples.</p>
-<pre class="text"><code>&gt; peak="X13"
+<pre class="text"><code>&gt; peak="V13"
 &gt; plot_all_spectra(peak, peak_table=pk_tab, export=F, overlapping=T)</code></pre>
 <p><img src="chromatographR_files/figure-html/plot_all-1.png" width="576"></p>
 </div>

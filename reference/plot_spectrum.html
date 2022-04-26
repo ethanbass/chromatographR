@@ -12,7 +12,7 @@ plots the spectrum a particular retention time for a given chromatogram."><!-- m
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -136,7 +136,7 @@ also be selected by clicking on the plotted trace if what == 'click'.</p>
 <span class="r-in"><span class="va">pks</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_peaks.html">get_peaks</a></span><span class="op">(</span><span class="va">Sa</span>,lambda<span class="op">=</span><span class="st">"220.00000"</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">pk_tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_peaktable.html">get_peaktable</a></span><span class="op">(</span><span class="va">pks</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">plot_spectrum</span><span class="op">(</span>loc <span class="op">=</span> <span class="st">"X10"</span>, peak_table <span class="op">=</span> <span class="va">pk_tab</span>, what<span class="op">=</span><span class="st">"peak"</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu">plot_spectrum</span><span class="op">(</span>loc <span class="op">=</span> <span class="st">"V10"</span>, peak_table <span class="op">=</span> <span class="va">pk_tab</span>, what<span class="op">=</span><span class="st">"peak"</span><span class="op">)</span></span>
 <span class="r-in"><span class="op">}</span></span>
 </code></pre></div>
     </div>
