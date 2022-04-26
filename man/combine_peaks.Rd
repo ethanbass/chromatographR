@@ -22,8 +22,9 @@ columns combined according to the specified criteria.
 }
 \description{
 Utility function to combine duplicate peaks in peak table, i.e. peaks that
-were integrated at more than one wavelength or component. Specify number of
-digits to match retention time and minimum spectral correlation for a match.
+were integrated at more than one wavelength or component. Specify tolerance
+(\code{tol}) for retention time matching and minimum spectral correlation
+(\code{min.cor}) for a match.
 }
 \examples{
 \dontrun{
