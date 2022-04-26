@@ -4,7 +4,7 @@
 #' the supplied meta-data must match exactly the row names of the peak table.
 #' 
 #' @aliases attach_metadata
-#' @param peak_table Peak table
+#' @param peak_table A `peak_table` object.
 #' @param metadata A `data.frame` containing the sample meta-data.
 #' @param column The name of the column containing the sample names.
 #' @return A \code{peak_table} object with attached meta-data.
@@ -121,3 +121,48 @@ attach_ref_spectra <- function(peak_table, chrom_list, ref = c("max.cor","max.in
   return(peak_table)
 }
 
+#' Normalize peak table or chromatograms
+#' 
+#' Normalizes peak table or list of chromatograms by specified column in sample
+#' meta-data.
+#' 
+#' @param peak_table A `peak_table` object
+#' @param column The name of the column containing the weights.
+#' @param chrom_list List of chromatograms for normalization. The samples must
+#' be in same order as the peak_table.
+#' @param what `peak_table` or list of chromatograms (`chrom_list`).
+#' @return A normalized \code{peak_table} object.
+#' @author Ethan Bass
+#' @seealso \code{\link{get_peaktable}}
+#' @examples
+#' data(pk_tab)
+#' path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
+#' meta <- read.csv(path)
+#' pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
+#' norm <- normalize_data(pk_tab, "mass", what = "peak_table")
+#' @export normalize_data
+
+normalize_data <- function(peak_table, column, chrom_list,
+                           what=c('peak_table','chrom_list')){
+  if (!is.data.frame(peak_table$sample_meta))
+    stop("Meta-data must be attached to peak_table prior to normalization.")
+  if (!(column %in% colnames(peak_table$sample_meta)))
+    stop(paste0("Column, ", column, ", is not found."))
+  what <- match.arg(what, c("peak_table", "chrom_list"))
+  if (what == "peak_table"){
+    peak_table$tab <- t(sapply(seq_len(nrow(peak_table$tab)), function(samp){
+      peak_table$tab[samp,]/peak_table$sample_meta[samp,column]
+    }))
+    return(peak_table)
+  } else if (what == "chrom_list"){
+    if (missing(chrom_list)){
+      chrom_list <- try(get(peak_table$args["chrom_list"]))
+      if (inherits(chrom_list, "try-error")) stop("Chromatograms not found!")
+    }
+    if (mean(elementwise.all.equal(names(chrom_list),rownames(peak_table$tab))) < 1)
+      stop("Names of chromatograms do not match the peak table.")
+    chrom_list <- lapply(seq_len(nrow(peak_table$tab)), function(samp){
+      chrom_list[[samp]]/peak_table$sample_meta[samp,column]
+    })
+  }
+}
