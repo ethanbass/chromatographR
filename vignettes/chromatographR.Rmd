@@ -48,7 +48,7 @@ data(Sa)
 
 ### Pre-processing data
 
-Experimental data can suffer from a number of non-informative artifacts, such as noise, a shifting baseline, or missing values. In addition, the data produced by the instrument may have longer wavelength or time ranges (or higher resolution) than we need. Since HPLC-DAD data are fairly smooth, it is usually easy to correct these issues. For example, smoothing can reduce noise in the spectral direction while baseline subtraction can help correct a shifting baseline. Selection and interpolation can be used to narrow the range of times and wavelengths. All of these functions are available through the `preprocess` function. Smoothing and baseline subtraction are enabled by default. Additionally, alternative times (`dim1`) and/or wavelengths (`dim2`) can be provided to interpolate data along one or both axes. This can significantly reduce the computational time and memory requirements in later steps.
+Experimental data can suffer from a number of non-informative artifacts, such as noise, shifting baselines, or missing values. In addition, the data produced by the instrument may have longer wavelength or time ranges (or higher resolution) than we need. Since HPLC-DAD data are fairly smooth, these types of issues can usually be corrected fairly easily. For example, smoothing can reduce noise in the spectral direction while baseline subtraction can help correct a shifting baseline. Selection of and interpolation of wavelengths and retention times can be used to reduce the dimensionality of the data, facilitating comparison across samples and reducing the computation load of downstream analyses. All of these functions are available through the `preprocess` function. Smoothing and baseline subtraction are enabled by default. Additionally, alternative times (`dim1`) and/or wavelengths (`dim2`) can be provided to interpolate data along one or both axes. This can significantly reduce the computational time and memory requirements in later steps.
 
 The `baseline_cor` function from the *ptw* package [@bloemberg2010] takes arguments `p` (an asymmetry parameter) and `lambda` (a smoothing parameter). You can read more about these in the documentation for `ptw::asysm`.  You may want to experiment with these parameters before choosing values to use on your whole dataset.
 
@@ -73,13 +73,11 @@ dat.pr <- preprocess(Sa, dim1=new.ts, dim2=new.lambdas,
            parallel=F, p=.001, lambda=1e5)
 ```
 
-After loading data, you may want to normalize your chromatograms (e.g. by sample mass). However, you can also normalize later after assembling the peak table.
-
 ### Dealing with retention time shifts
 
 In many cases, HPLC data can suffer from retention time shifts (e.g. due to temperature fluctuations, column degradation, or subtle changes in mobile-phase composition). Parametric time warping (as implemented in the *ptw* package can be quite an effective technique for correcting subtle retention time shifts [@eilers2004]. If your chromatograms are already perfectly aligned you can skip this step. If you have severe retention time shifts this technique may not be so effective (and you should consider checking your HPLC for leaks). 
 
-The `correct_rt` function is a wrapper around the `ptw` function. For each chromatogram, it produces a "global" warping function across all wavelengths included in `lambdas`). The goal of the warping function is to produce a better alignment of retention times by "warping" the time-axis of each chromatogram to match a reference chromatogram. The reference chromatogram can be selected manually or determined algorithmically by setting the `reference` argument. The code below creates warping models for the samples in the provided list of data matrices. The same function can then be used to warp each chromatogram according to the corresponding model, by setting the `models` parameter.
+The `correct_rt` function is a wrapper around the `ptw` function. For each chromatogram, it produces a "global" warping function across all wavelengths included in `lambdas`). The goal of the warping function is to produce a better alignment of retention times by "warping" the time-axis of each chromatogram to match a reference chromatogram. (The reference chromatogram can be selected manually or determined algorithmically by setting the `reference` argument). The code below creates warping models for the samples in the provided list of data matrices. The same function can then be used to warp each chromatogram according to the corresponding model, by setting the `models` parameter. Depending on the variety of your samples and the severity of the retention time shifts, it may take some experimentation with the warping parameters to get satisfactory results. Sometimes 'less' can actually be 'more' here -- for example, wavelengths with fewer peaks may sometimes yield better warping models.
 
 
 ```{r, warp model}
@@ -87,7 +85,7 @@ warping.models <- correct_rt(dat.pr, what = "models", lambdas=c("210"))
 warp <- correct_rt(chrom_list=dat.pr, models=warping.models)
 ```
 
-You can see that, in this case, the alignment is considerably improved after warping. You can also do a global alignment on multiple wavelengths at the same time, but it will not always improve the results.
+You can see that, in this case, the alignment is considerably improved after warping. You can also do a global alignment on multiple wavelengths at the same time, but it will not always improve the results. While the alignment still isn't perfect here, it is probably good enough to align our peaks and collate assemble them in the peak table, which is our main goal.
 
 ```{r, alignment_plot, fig.height=6}
 par(mfrow=c(2,1))
@@ -109,7 +107,7 @@ legend("topright", legend="raw", bty = "n")
 
 ### Peak finding and fitting
 
-The `get_peaks` function loops through your chromatograms at the specified wavelengths, finds peaks, and attempts to fit them to the specified function using non-linear least squares -- the current options are `gaussian` and `egh` (exponential-gaussian hybrid) [@lan2001]. The area under the curve for each peak is then estimated using a trapezoidal approximation method. The function returns a nested list of dataframes containing information about the peaks in each chromatogram.
+The `get_peaks` function loops through your chromatograms at the specified wavelengths, finds peaks, and attempts to fit them to the specified function using non-linear least squares -- the current options are `gaussian` and `egh` (exponential-gaussian hybrid) [@lan2001]. The area under the curve for each peak is then estimated using a trapezoidal approximation method. The function returns a nested list of data.frames containing parameters for the peaks in each chromatogram.
 
 ```{r, get_peaks, message=F, warning=F}
 pks_gauss <- get_peaks(warp, lambdas = c('210','260'), sd.max=40, fit="gaussian")
@@ -131,9 +129,9 @@ head(pk_tab$tab[,1:6])
 
 ### Further analysis and data-visualization
 
-#### Attaching meta-data
+##### Attaching meta-data
 
-First you will usually want to attach sample meta-data to the `peak_table` object. This can be easily accomplished using the `attach_metadata` function. The peak table can then be normalized using the `normalize_data` function.
+To begin analyzing your peak table, you will usually want to attach sample meta-data to the `peak_table` object. This can be easily accomplished using the `attach_metadata` function. The peak table can then be normalized (e.g. by dividing out the sample weight) using the `normalize_data` function.
 
 ```{r}
 path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
@@ -142,24 +140,13 @@ pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
 pk_tab <- normalize_data(peak_table = pk_tab, column="mass")
 ```
 
-#### Plotting
+##### Plotting
 
-The `mirror_plot` function provides a quick way to visually compare treatment groups.
+The `mirror_plot` function provides a quick way to visually compare results across treatment groups.
 
 ```{r}
 mirror_plot(pk_tab, lambdas = c("210","260"), var = "trt", legend_size=3)
 ```
-
-The plot `peak_table` function provides an easy interface to various options for plotting peaks. For example, it can be used to plot spectra or make a quick boxplot to compare treatments.
-
-
-```{r,eval=T}
-plot(pk_tab, loc = "V9", box_plot = TRUE, vars = "trt")
-plot(pk_tab, loc = "V13", box_plot = TRUE, vars = "trt")
-```
-
-
-#### Plotting spectra
 
 The `plot_spectrum` function allows you to plot or record the spectra associated with a particular peak in your peak table. This is useful for interpreting your results and/or checking for errors in your peak table. For example, you may want to check if the spectra match for a particular peak in your peak table across different samples. Or you may just want to compare your spectrum with a known standard. The `plot_spectrum` function can be used to plot only the spectrum or only the chromatographic trace using the arguments `plot_spectrum` and `plot_trace`. By default it will plot data from the chromatogram with the biggest peak in the peak table. Alternatively, you can choose the chromatogram and wavelength using the `chr` and `lambda` arguments.
 
@@ -175,6 +162,14 @@ The `plot_all_spectra` function can be used to visually compare the spectra for 
 peak="V13"
 plot_all_spectra(peak, peak_table=pk_tab, export=F, overlapping=T)
 ```
+
+The plot `peak_table` function provides a simplified interface to various options for plotting data from the peak table. For example, it can be used as a quick interface to the \code{plot_spectrum} and \code{plot_all_spectra} functions shown above. It can also be used to make a quick box plot to compare results across treatments.
+
+```{r,eval=T}
+plot(pk_tab, loc = "V9", box_plot = TRUE, vars = "trt")
+plot(pk_tab, loc = "V13", box_plot = TRUE, vars = "trt")
+```
+
 
 ## References
 

@@ -1,5 +1,3 @@
-# library(chromatographR)
-
 ### test preprocess ###
 
 data("Sa")
