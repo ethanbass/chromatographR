@@ -52,7 +52,7 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"),
   result <- lapply(seq_along(chrom_list), function(sample){
     suppressWarnings(ptable <- lapply(lambdas, function(lambda){
       cbind(sample = names(chrom_list)[sample], lambda,
-            fit_peaks(chrom_list[[sample]][,lambda],fit = fit,
+            fit_peaks(chrom_list[[sample]][,lambda], fit = fit,
                       max.iter = max.iter, sd.max = sd.max))
     }))
     names(ptable) <- lambdas
@@ -60,7 +60,8 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"),
   })
   names(result) <- names(chrom_list)
   result <- lapply(result, function(sample) lapply(sample, function(pks){
-    pks[apply(pks, 1, function(x) !any(is.na(x))), , drop = FALSE]
+    pks[apply(pks, 1, function(x){
+      !any(is.na(x)) & (x["rt"] > x["start"]) & x["rt"] < x["end"]}), , drop=FALSE]
   }))
   timepoints <- as.numeric(rownames(chrom_list[[1]]))
   tdiff <- median(diff(timepoints))

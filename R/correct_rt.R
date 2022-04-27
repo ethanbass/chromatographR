@@ -83,7 +83,7 @@ correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best',
     }
     ptwmods <- lapply(seq_len(dim(allmats)[3]), function(ii){
       ptw(allmats.t[,, reference],
-          allmats.t[, , ii], selected.traces = traces, init.coef=init.coef, ...,
+          allmats.t[,, ii], selected.traces = traces, init.coef=init.coef, ...,
           warp.type = "global")})
   } else {
     allmats <- sapply(chrom_list, identity, simplify = "array")
