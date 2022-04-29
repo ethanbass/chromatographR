@@ -54,6 +54,20 @@ preprocess <- function(X, dim1, ## time axis
   if (!is.list(X) & !is.matrix(X)){
     stop("X should be a matrix or a list of matrices")
   }
+  if (missing(dim1) | missing(dim2)){
+    warning("...Times or wavelengths not provided.
+            Extrapolating dimensions for interpolation.", immediate. = TRUE)
+  }
+  if (missing(dim2))
+    dim2 <- as.numeric(colnames(X[[1]]))
+  if (missing(dim1)){
+    limits <- sapply(X,function(x){
+      ts <- rownames(x)
+      c(head(ts,1), tail(ts,1))})
+    start <- round(max(as.numeric(limits[1,])),2)
+    end <- round(min(as.numeric(limits[2,])),2)
+    dim1 <- seq(start,end,by=.01)
+  }
   if (is.list(X)){
     if (mean(sapply(X,is.matrix)) != 1){
       stop("X should be a matrix or a list of matrices")
@@ -62,10 +76,6 @@ preprocess <- function(X, dim1, ## time axis
       if (length(find.package('parallel', quiet=TRUE))==0){
         stop("Parallel must be installed to enable parallel processing.")
       }
-    if (!exists("dim1") | !exists("dim2")){
-      stop("Times and wavelengths for interpolation must be defined. Please 
-      supply arguments 'dim1' and 'dim2' before proceeding.")
-    }
       parallel::mclapply(X, FUN=preprocess_matrix,
                dim1=dim1,
                dim2=dim2,
