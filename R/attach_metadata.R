@@ -52,10 +52,6 @@ attach_metadata <- function(peak_table, metadata, column){
 #' provided peak table.
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaks}}
-#' @examples \dontrun{
-#' ref_m <- gather_reference_spectra(pk_tab, ref = "max.int")
-#' ref_c <- gather_reference_spectra(pk_tab, ref="max.cor")
-#' }
 #' @noRd
 
 gather_reference_spectra <- function(peak_table, chrom_list, ref = c("max.cor","max.int")){

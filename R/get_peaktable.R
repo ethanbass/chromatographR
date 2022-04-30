@@ -346,9 +346,13 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
 #' @param ylim Numerical vector specifying limits for y axis.
 #' @param ... Additional arguments to \code{\link{matplot}} function.
 #' @author Ethan Bass
-#' @examples \dontrun{
-#' mirror_plot(pktab,lambdas=c("210","260"), var="trt", mirror=TRUE, col=c("green","blue"))
-#' }
+#' @examples
+#' data(Sa_warp)
+#' data(pk_tab)
+#' path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
+#' meta <- read.csv(path)
+#' pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
+#' mirror_plot(pk_tab,lambdas=c("210","260"), var="trt", mirror=TRUE, col=c("green","blue"))
 #' @export
 
 mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset=NULL,

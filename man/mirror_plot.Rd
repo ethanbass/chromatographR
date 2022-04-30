@@ -61,9 +61,12 @@ to create simple box-plots to examine the distribution of a peak with respect
 to variables defined in sample metadata.
 }
 \examples{
-\dontrun{
-mirror_plot(pktab,lambdas=c("210","260"), var="trt", mirror=TRUE, col=c("green","blue"))
-}
+data(Sa_warp)
+data(pk_tab)
+path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
+meta <- read.csv(path)
+pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
+mirror_plot(pk_tab,lambdas=c("210","260"), var="trt", mirror=TRUE, col=c("green","blue"))
 }
 \author{
 Ethan Bass

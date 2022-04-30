@@ -14,11 +14,14 @@
 #' columns combined according to the specified criteria.
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaks}}
-#' @examples \dontrun{
-#' combine_peaks(pk_tab, tol = .02, min.cor = .9)}
+#' @examples
+#' data(pk_tab)
+#' data(Sa_warp)
+#' pk_tab <- attach_ref_spectra(pk_tab)
+#' combine_peaks(pk_tab, tol = .02, min.cor = .9)
 #' @export combine_peaks
 combine_peaks <- function(peak_table, tol=.01, min.cor=0.9, choose='max'){
-  if (!is.data.frame(peak_table$ref_spectra)){
+  if (!(is.data.frame(peak_table$ref_spectra) | is.matrix(peak_table$ref_spectra))){
     stop("No reference spectra found. Use attach_ref_spectra function first.")
   }
   RTs <- as.numeric(peak_table$pk_meta['rt',])
