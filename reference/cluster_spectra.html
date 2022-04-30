@@ -154,9 +154,31 @@ the uncertainty in hierarchical clustering. Bioinformatics, 22-12:1540-1542
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu">cluster_spectra</span><span class="op">(</span><span class="va">pk_tab</span>, nboot<span class="op">=</span><span class="fl">100</span>, max.only <span class="op">=</span> <span class="cn">F</span>, save <span class="op">=</span> <span class="cn">F</span>, alpha <span class="op">=</span> <span class="fl">.97</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">pk_tab</span><span class="op">)</span></span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Sa_warp</span><span class="op">)</span></span>
+<span class="r-in"><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu">cluster_spectra</span><span class="op">(</span><span class="va">pk_tab</span>, nboot<span class="op">=</span><span class="fl">100</span>, max.only <span class="op">=</span> <span class="cn">FALSE</span>, save <span class="op">=</span> <span class="cn">FALSE</span>, alpha <span class="op">=</span> <span class="fl">.97</span><span class="op">)</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "...collecting representative spectra"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "...clustering spectra"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Creating a temporary cluster...done:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> socket cluster with 1 nodes on host ‘localhost’</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Cluster size is too small (or NULL). non-parallel version is executed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap (r = 0.5)... Done.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap (r = 0.6)... Done.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap (r = 0.7)... Done.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap (r = 0.8)... Done.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap (r = 0.9)... Done.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap (r = 1.0)... Done.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap (r = 1.1)... Done.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap (r = 1.2)... Done.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap (r = 1.3)... Done.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap (r = 1.4)... Done.</span>
+<span class="r-plt img"><img src="cluster_spectra-1.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "...plotting clustered spectra"</span>
+<span class="r-plt img"><img src="cluster_spectra-2.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="cluster_spectra-3.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="cluster_spectra-4.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="cluster_spectra-5.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="cluster_spectra-6.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
