@@ -50,10 +50,10 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' @export cluster_spectra
 
 # # @examples
-# cluster_spectra(pk_tab, warp, nboot=100, max.only = F,save = F)
+# cluster_spectra(pk_tab, warp, nboot=100, max.only = FALSE, save = FALSE)
 
 cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
-                            alpha=0.95, nboot=1000, plot_dend=T,
+                            alpha=0.95, nboot=1000, plot_dend=TRUE,
                             plot_spectra=TRUE, verbose=TRUE, save=TRUE,
                             parallel=TRUE, max.only=FALSE,
                             ...){
@@ -64,8 +64,8 @@ cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
   if (verbose) print('...collecting representative spectra')
   rep <- sapply(colnames(peak_table[[1]]), function(j){
     sp <- plot_spectrum(loc=j, peak_table=peak_table, chrom_list,
-                        scale_spectrum=T, plot_trace=F, export_spectrum = T,
-                        plot_spectrum=F, verbose=F)
+                        scale_spectrum=TRUE, plot_trace=FALSE,
+                        export_spectrum = TRUE, plot_spectrum=FALSE, verbose=FALSE)
   })
   rep <- data.frame(do.call(cbind,rep))
   names(rep) <- paste0('V',seq_len(ncol(rep)))
@@ -76,7 +76,7 @@ cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
                              nboot=nboot, parallel=parallel, ...)
   
   if (plot_dend){
-  plot(result,labels=F, cex.pv=0.5, print.pv='au',print.num = F)
+  plot(result,labels = FALSE, cex.pv=0.5, print.pv='au',print.num = FALSE)
   pvrect(result, alpha=alpha, max.only = max.only)
   }
   if (save) saveRDS(result, 'pvclust.RDS')

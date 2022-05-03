@@ -10,7 +10,7 @@ cluster_spectra(
   peak_no = c(5, 100),
   alpha = 0.95,
   nboot = 1000,
-  plot_dend = T,
+  plot_dend = TRUE,
   plot_spectra = TRUE,
   verbose = TRUE,
   save = TRUE,

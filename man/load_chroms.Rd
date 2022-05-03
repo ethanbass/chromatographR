@@ -33,11 +33,12 @@ will append newly imported chromatograms to the existing list.}
 A list of chromatograms in matrix format.
 }
 \description{
-Convenience function to import chromatograms from a list of folders.
+Convenience function to import chromatograms from a list of folders or paths.
 }
 \details{
 Chromatograms may be CSVs, ChemStation \code{.uv} files, or MassHunter \code{
-.sp} files.
+.sp} files. Parsers from the \href{https://github.com/bovee/Aston}{Aston}
+package for python are used to load binary files.
 }
 \note{
 Relies on the file parsers from the

@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_peaks.R
 \name{get_peaks}
 \alias{get_peaks}
-\title{Find and fit peaks from a list of chromatograms.}
+\title{Get peak list.}
 \usage{
 get_peaks(
   chrom_list,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_peaktable.R
 \name{mirror_plot}
 \alias{mirror_plot}
-\title{Mirror plot from peak table.}
+\title{Make mirror plot from peak table.}
 \usage{
 mirror_plot(
   peak_table,
@@ -52,7 +52,7 @@ Defaults to \code{TRUE}.}
 \item{...}{Additional arguments to \code{\link{matplot}} function.}
 }
 \description{
-Plots chromatograms as mirror plot.
+Plots chromatograms as a mirror plot.
 }
 \details{
 Can be used to confirm the identity of a peak or check that a particular

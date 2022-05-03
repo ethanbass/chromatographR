@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_peaktable.R
 \name{get_peaktable}
 \alias{get_peaktable}
-\title{Convert peak list into an ordered peak table}
+\title{Convert peak list into an ordered peak table.}
 \usage{
 get_peaktable(
   peak_list,
@@ -81,7 +81,7 @@ the peak table.
 }
 }
 \description{
-Function returns a peak_table object. The first slot contains a matrix of
+Returns a peak_table object. The first slot contains a matrix of
 intensities, where rows correspond to samples and columns correspond to
 aligned features. The rest of the slots contain various meta-data about peaks,
 samples, and experimental settings.

@@ -1,4 +1,4 @@
-#' Find and fit peaks from a list of chromatograms.
+#' Get peak list.
 #' 
 #' Finds and fits peaks and extracts peak parameters from a list of chromatograms
 #' at the specified wavelengths.
@@ -82,7 +82,7 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"),
 
 #' Plot fitted peak shapes.
 #' 
-#' Visually assess integration accuracy by plotting fitted peaks onto trace.
+#' Visually assess integration accuracy by plotting fitted peaks over trace.
 #'
 #' @importFrom stats median
 #' @importFrom graphics polygon arrows
@@ -144,8 +144,8 @@ plot.peak_list <- function(x, ..., chrom_list=NULL, index=1, lambda=NULL,
         color <- "purple"
       }
       sapply(1:(length(peak.loc)-1), function(i){
-        polygon(peak.loc[c(i,i,(i+1),(i+1))], c(0,yvals[i:(i+1)],0),
-                col=alpha(color,a), lty=3,border=NA)
+        polygon(peak.loc[c(i,i,(i+1), (i+1))], c(0,yvals[i:(i+1)], 0),
+                col=alpha(color, a), lty=3, border = NA)
       })
   }
 }

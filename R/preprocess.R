@@ -56,7 +56,8 @@ preprocess <- function(X, dim1, ## time axis
   }
   if (missing(dim1) | missing(dim2)){
     warning("...Times or wavelengths not provided.
-            Extrapolating dimensions for interpolation.", immediate. = TRUE)
+            Extrapolating matrix dimensions for interpolation.",
+            immediate. = TRUE)
   }
   if (missing(dim2))
     dim2 <- as.numeric(colnames(X[[1]]))
@@ -65,7 +66,7 @@ preprocess <- function(X, dim1, ## time axis
       ts <- rownames(x)
       c(head(ts,1), tail(ts,1))})
     start <- round(max(as.numeric(limits[1,])),2)
-    end <- round(min(as.numeric(limits[2,])),2)
+    end <- floor(min(as.numeric(limits[2,])))
     dim1 <- seq(start,end,by=.01)
   }
   if (is.list(X)){

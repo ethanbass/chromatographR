@@ -45,17 +45,16 @@
 #' warp <- correct_rt(chrom_list = Sa_pr, models = warping.models)
 #' @export correct_rt
 
-correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best',
+correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
                        what = c("models", "corrected.values"), 
                        init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, 
                        scale=TRUE, trwdth=200, ...){
   what <- match.arg(what, c("models", "corrected.values"))
   if (is.null(models)){
-    if (is.null(lambdas) & is.null(n.traces)){
-      stop("Must specify wavelengths ('lambdas') or number of traces ('n.traces')
-           to use for alignment.")
-    }
-    if (is.null(lambdas)){
+    if (missing(lambdas)){
+      if (is.null(n.traces)){
+        stop("Must specify wavelengths ('lambdas') or number of traces ('n.traces')
+             to use for alignment.")}
       lambdas <- colnames(chrom_list[[1]])
     }
     lambdas <- as.character(lambdas)

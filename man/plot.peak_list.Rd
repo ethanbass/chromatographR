@@ -38,7 +38,7 @@ to FALSE.}
 \item{cex.points}{Size of points. Defaults to 0.5}
 }
 \description{
-Visually assess integration accuracy by plotting fitted peaks onto trace.
+Visually assess integration accuracy by plotting fitted peaks over trace.
 }
 \seealso{
 \code{\link{get_peaks}}

@@ -31,7 +31,7 @@ find_peaks(
 (Defaults to TRUE).}
 }
 \value{
-If bounds == T, returns a data.frame containing the center, start,
+If bounds == TRUE, returns a data.frame containing the center, start,
 and end of each identified peak. Otherwise, returns a numeric vector of peak
 centers. All locations are expressed as indices.
 }
