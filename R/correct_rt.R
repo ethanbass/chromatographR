@@ -45,11 +45,12 @@
 #' warp <- correct_rt(chrom_list = Sa_pr, models = warping.models)
 #' @export correct_rt
 
-correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best',
-                       what = c("models", "corrected.values"), 
+correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
+                       alg = c("ptw", "sptw"), what = c("models", "corrected.values"), 
                        init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, 
-                       scale=TRUE, trwdth=200, ...){
+                       scale=TRUE, trwdth=200, ndx = 40, ...){
   what <- match.arg(what, c("models", "corrected.values"))
+  alg <- match.arg(alg, c("ptw", "sptw"))
   if (is.null(models)){
     if (is.null(lambdas) & is.null(n.traces)){
       stop("Must specify wavelengths ('lambdas') or number of traces ('n.traces')
@@ -83,8 +84,8 @@ correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best',
     }
     ptwmods <- lapply(seq_len(dim(allmats)[3]), function(ii){
       ptw(allmats.t[,, reference],
-          allmats.t[, , ii], selected.traces = traces, init.coef=init.coef, ...,
-          warp.type = "global")})
+          allmats.t[,, ii], selected.traces = traces, init.coef=init.coef,
+          alg = alg, warp.type = "global", ndx=ndx, ...)})
   } else {
     allmats <- sapply(chrom_list, identity, simplify = "array")
     warp.coef <- lapply(models,FUN=function(x){
@@ -92,7 +93,7 @@ correct_rt <- function(chrom_list, models=NULL, lambdas=NULL, reference='best',
     })
     ptwmods <- lapply(seq_len(dim(allmats)[3]), function(ii){
       ptw(t(allmats[,,1]), t(allmats[, , ii]), init.coef=warp.coef[[ii]],
-          try=TRUE, warp.type = "global")})
+          try=TRUE, alg = models[[1]]$alg, warp.type = "global", ...)})
   }
   if (what == "corrected.values" || !is.null(models)) {
     result <- lapply(ptwmods, function(x) t(x$warped.sample))
