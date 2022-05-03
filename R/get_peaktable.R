@@ -1,6 +1,6 @@
-#' Convert peak list into an ordered peak table
+#' Convert peak list into an ordered peak table.
 #' 
-#' Function returns a peak_table object. The first slot contains a matrix of
+#' Returns a peak_table object. The first slot contains a matrix of
 #' intensities, where rows correspond to samples and columns correspond to
 #' aligned features. The rest of the slots contain various meta-data about peaks,
 #' samples, and experimental settings. 
@@ -279,7 +279,7 @@ row.names.peak_table <- function(x){
 #' @author Ethan Bass
 #' @rdname plot.peak_table
 #' @export
-
+#'
 plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
                             chr = 'max', lambda = 'max',
                             plot_spectrum = TRUE, plot_trace = TRUE,
@@ -317,9 +317,9 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
   }
 }
 
-#' Mirror plot from peak table.
+#' Make mirror plot from peak table.
 #' 
-#' Plots chromatograms as mirror plot.
+#' Plots chromatograms as a mirror plot.
 #' 
 #' Can be used to confirm the identity of a peak or check that a particular
 #' column in the peak table represents a single compound. Can also be used
@@ -346,9 +346,13 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
 #' @param ylim Numerical vector specifying limits for y axis.
 #' @param ... Additional arguments to \code{\link{matplot}} function.
 #' @author Ethan Bass
-#' @examples \dontrun{
-#' mirror_plot(pktab,lambdas=c("210","260"), var="trt", mirror=TRUE, col=c("green","blue"))
-#' }
+#' @examples
+#' data(Sa_warp)
+#' data(pk_tab)
+#' path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
+#' meta <- read.csv(path)
+#' pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
+#' mirror_plot(pk_tab,lambdas=c("210","260"), var="trt", mirror=TRUE, col=c("green","blue"))
 #' @export
 
 mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset=NULL,

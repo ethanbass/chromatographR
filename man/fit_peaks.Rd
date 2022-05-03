@@ -39,7 +39,6 @@ the following information: \item{rt}{location of the maximum of the peak
 table if `fit=="egh"`)} \item{FWHM}{full width at half maximum (x)}
 \item{height}{height of the peak (y)} \item{area}{peak area}
 \item{r.squared}{r-squared value for linear fit of model to data.}
-
 Again, the first five elements (rt, start, end, sd and FWHM) are expressed
 as indices, so not in terms of the real retention times. The transformation
 to "real" time is done in function \code{get_peaks}.

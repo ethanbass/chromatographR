@@ -20,6 +20,10 @@ The input list of peak tables is returned with extra columns
 containing the corrected retention time.
 }
 \description{
+Corrects retention time differences using parametric time warping as 
+implemented in \code{\link[ptw:ptw]{ptw}}.
+}
+\details{
 Once an appropriate warping model has been established, corrected retention
 times can be predicted for each peak. These are stored in a separate column
 in the list of peak tables.

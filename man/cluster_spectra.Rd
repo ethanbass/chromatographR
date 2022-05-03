@@ -10,7 +10,7 @@ cluster_spectra(
   peak_no = c(5, 100),
   alpha = 0.95,
   nboot = 1000,
-  plot_dend = T,
+  plot_dend = TRUE,
   plot_spectra = TRUE,
   verbose = TRUE,
   save = TRUE,
@@ -69,9 +69,9 @@ to select clusters that exceed a certain confidence threshold as defined by
 alpha.
 }
 \examples{
-\dontrun{
-cl <- cluster_spectra(pk_tab, nboot=100, max.only = F, save = F, alpha = .97)
-}
+data(pk_tab)
+data(Sa_warp)
+cl <- cluster_spectra(pk_tab, nboot=100, max.only = FALSE, save = FALSE, alpha = .97)
 }
 \references{
 R. Suzuki, H. Shimodaira: Pvclust: an R package for assessing

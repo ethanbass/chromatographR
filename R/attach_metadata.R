@@ -36,10 +36,10 @@ attach_metadata <- function(peak_table, metadata, column){
 
 #' Gather reference spectra.
 #' 
-#' Defines reference spectra. Reference spectra are defined either as the spectrum
-#' with the highest intensity (`ref == "max.int"`) or as the spectrum with the 
-#' highest average correlation to the rest of the spectra in the peak_table
-#' (`ref == "max.cor"`).
+#' Defines reference spectra. Reference spectra are defined either as the 
+#' spectrum with the highest intensity (`max.int`) or as the spectrum 
+#' with the highest average correlation to the rest of the spectra in the
+#' peak_table (`max.cor`).
 #' 
 #' @importFrom stats cor sd
 #' @param peak_table Peak table from \code{\link{get_peaktable}}.
@@ -52,13 +52,10 @@ attach_metadata <- function(peak_table, metadata, column){
 #' provided peak table.
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaks}}
-#' @examples \dontrun{
-#' ref_m <- gather_reference_spectra(pk_tab, ref = "max.int")
-#' ref_c <- gather_reference_spectra(pk_tab, ref="max.cor")
-#' }
 #' @noRd
 
-gather_reference_spectra <- function(peak_table, chrom_list, ref = c("max.cor","max.int")){
+gather_reference_spectra <- function(peak_table, chrom_list,
+                                     ref = c("max.cor", "max.int")){
   if (missing(chrom_list)){
     try.out <- try(chrom_list <- get(peak_table$args["chrom_list"]))
     if (inherits(try.out, "try-error")) stop("Chromatograms not found!")

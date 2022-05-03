@@ -27,8 +27,10 @@ were integrated at more than one wavelength or component. Specify tolerance
 (\code{min.cor}) for a match.
 }
 \examples{
-\dontrun{
-combine_peaks(pk_tab, tol = .02, min.cor = .9)}
+data(pk_tab)
+data(Sa_warp)
+pk_tab <- attach_ref_spectra(pk_tab)
+combine_peaks(pk_tab, tol = .02, min.cor = .9)
 }
 \seealso{
 \code{\link{get_peaks}}

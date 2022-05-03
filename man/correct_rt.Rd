@@ -6,8 +6,8 @@
 \usage{
 correct_rt(
   chrom_list,
+  lambdas,
   models = NULL,
-  lambdas = NULL,
   reference = "best",
   what = c("models", "corrected.values"),
   init.coef = c(0, 1, 0),
@@ -21,9 +21,9 @@ correct_rt(
 \arguments{
 \item{chrom_list}{List of matrices containing concentration profiles.}
 
-\item{models}{List of models to warp by.}
-
 \item{lambdas}{Select wavelengths to use by name.}
+
+\item{models}{List of models to warp by.}
 
 \item{reference}{Index of the sample that is to be considered the reference
 sample.}

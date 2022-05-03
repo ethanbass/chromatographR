@@ -1,9 +1,10 @@
 #' Import chromatograms.
 #' 
-#' Convenience function to import chromatograms from a list of folders.
+#' Convenience function to import chromatograms from a list of folders or paths.
 #' 
 #' Chromatograms may be CSVs, ChemStation \code{.uv} files, or MassHunter \code{
-#' .sp} files.
+#' .sp} files. Parsers from the \href{https://github.com/bovee/Aston}{Aston}
+#' package for python are used to load binary files.
 #' 
 #' @name load_chroms
 #' @importFrom utils read.csv
@@ -35,7 +36,7 @@
 load_chroms <- function(paths, find_files = TRUE,
                          format.in=c("csv", "chemstation", "masshunter"),
                          sep = ",", dat=NULL, ...){
-  format.in = match.arg(format.in, c("csv", "chemstation", "masshunter"))
+  format.in <- match.arg(format.in, c("csv", "chemstation", "masshunter"))
   exists <- dir.exists(paths) | file.exists(paths)
   if (mean(exists) == 0){
     stop("Cannot locate files. None of the provided paths exist.")
@@ -44,7 +45,7 @@ load_chroms <- function(paths, find_files = TRUE,
     dat<-list()
   }
   # choose converter
-  if (format.in=="csv"){
+  if (format.in == "csv"){
     pattern <- ".csv|.CSV"
     get_names <- function(files){
       gsub(pattern,"", basename(files))
