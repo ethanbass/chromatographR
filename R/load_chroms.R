@@ -15,8 +15,8 @@
 #' Otherwise, set to\code{FALSE}.
 #' @param format.in Format of files.
 #' @param sep Argument provided to \code{read.csv}. Defaults to ",".
-#' @param dat Optional list of chromatograms. If list is provided, the function
-#' will append newly imported chromatograms to the existing list.
+#' @param dat Optional list of chromatograms. If provided, newly imported
+#' chromatograms will be appended to the existing list.
 #' @param ... Additional arguments to \code{\link{read.csv}}.
 #' @return A list of chromatograms in matrix format.
 #' @author Ethan Bass
