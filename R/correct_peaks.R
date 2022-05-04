@@ -1,5 +1,8 @@
 #' Correct peak positions according to a ptw warping model
 #' 
+#' Corrects retention time differences using parametric time warping as 
+#' implemented in \code{\link[ptw:ptw]{ptw}}.
+#' 
 #' Once an appropriate warping model has been established, corrected retention
 #' times can be predicted for each peak. These are stored in a separate column
 #' in the list of peak tables.

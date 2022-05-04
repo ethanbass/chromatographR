@@ -18,7 +18,7 @@
 #' @param amp_thresh Minimum threshold for peak amplitude. (Defaults to 0).
 #' @param bounds Logical. If TRUE, includes peak boundaries in data.frame.
 #' (Defaults to TRUE).
-#' @return If bounds == T, returns a data.frame containing the center, start,
+#' @return If bounds == TRUE, returns a data.frame containing the center, start,
 #' and end of each identified peak. Otherwise, returns a numeric vector of peak
 #' centers. All locations are expressed as indices.
 #' @note The \code{find_peaks} function is adapted from matlab code in Prof.
@@ -90,7 +90,6 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1,
 #' table if `fit=="egh"`)} \item{FWHM}{full width at half maximum (x)}
 #' \item{height}{height of the peak (y)} \item{area}{peak area}
 #' \item{r.squared}{r-squared value for linear fit of model to data.}
-#' 
 #' Again, the first five elements (rt, start, end, sd and FWHM) are expressed
 #' as indices, so not in terms of the real retention times. The transformation
 #' to "real" time is done in function \code{get_peaks}.
@@ -172,8 +171,8 @@ fit_peaks <- function (y, pos=NULL, sd.max = 50, fit = c("egh", "gaussian"),
   if(inherits(x,  "try-error")){NA} else {x}
 }
 #################################################################################################
-### gaussian
-## adapted from https://github.com/robertdouglasmorrison/DuffyTools/blob/master/R/gaussian.R
+#' Gaussian function
+#' @note: Adapted from \href{https://github.com/robertdouglasmorrison/DuffyTools/blob/master/R/gaussian.R}
 #' @noRd
 gaussian <- function(x, center=0, width=1, height=NULL, floor=0) {
   
@@ -190,6 +189,7 @@ gaussian <- function(x, center=0, width=1, height=NULL, floor=0) {
   y + floor
 }
 
+#' Fit gaussian peak
 #' @importFrom stats coef fitted lm nls.control quantile residuals
 #' @noRd
 
@@ -232,7 +232,7 @@ fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height
 }
 
 ###########################################################################################
-### expontential-gaussian hybrid
+#' Expontential-gaussian hybrid
 #' @noRd
 egh <- function(x, center, width,  height, tau, floor=0){
     result <- rep(0, length(x))
@@ -241,9 +241,10 @@ egh <- function(x, center, width,  height, tau, floor=0){
     return(result)
   }
 
+
+#' Fit exponential-gaussian hybrid peak
 #' @importFrom stats coef fitted lm nls.control quantile residuals
 #' @noRd
-
 fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
                     start.height=NULL, start.floor=NULL, fit.floor=FALSE,
                     max.iter=1000) {

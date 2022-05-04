@@ -55,11 +55,10 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
   what <- match.arg(what, c("models", "corrected.values"))
   alg <- match.arg(alg, c("ptw", "sptw"))
   if (is.null(models)){
-    if (is.null(lambdas) & is.null(n.traces)){
-      stop("Must specify wavelengths ('lambdas') or number of traces ('n.traces')
-           to use for alignment.")
-    }
-    if (is.null(lambdas)){
+    if (missing(lambdas)){
+      if (is.null(n.traces)){
+        stop("Must specify wavelengths ('lambdas') or number of traces ('n.traces')
+             to use for alignment.")}
       lambdas <- colnames(chrom_list[[1]])
     }
     lambdas <- as.character(lambdas)

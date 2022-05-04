@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_peaktable.R
 \name{mirror_plot}
 \alias{mirror_plot}
-\title{Mirror plot from peak table.}
+\title{Make mirror plot from peak table.}
 \usage{
 mirror_plot(
   peak_table,
@@ -52,7 +52,7 @@ Defaults to \code{TRUE}.}
 \item{...}{Additional arguments to \code{\link{matplot}} function.}
 }
 \description{
-Plots chromatograms as mirror plot.
+Plots chromatograms as a mirror plot.
 }
 \details{
 Can be used to confirm the identity of a peak or check that a particular
@@ -61,9 +61,12 @@ to create simple box-plots to examine the distribution of a peak with respect
 to variables defined in sample metadata.
 }
 \examples{
-\dontrun{
-mirror_plot(pktab,lambdas=c("210","260"), var="trt", mirror=TRUE, col=c("green","blue"))
-}
+data(Sa_warp)
+data(pk_tab)
+path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
+meta <- read.csv(path)
+pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
+mirror_plot(pk_tab,lambdas=c("210","260"), var="trt", mirror=TRUE, col=c("green","blue"))
 }
 \author{
 Ethan Bass
