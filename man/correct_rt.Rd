@@ -6,27 +6,32 @@
 \usage{
 correct_rt(
   chrom_list,
+  lambdas,
   models = NULL,
-  lambdas = NULL,
   reference = "best",
+  alg = c("ptw", "sptw"),
   what = c("models", "corrected.values"),
   init.coef = c(0, 1, 0),
   n.traces = NULL,
   n.zeros = 0,
   scale = TRUE,
   trwdth = 200,
+  ndx = 40,
   ...
 )
 }
 \arguments{
 \item{chrom_list}{List of matrices containing concentration profiles.}
 
-\item{models}{List of models to warp by.}
-
 \item{lambdas}{Select wavelengths to use by name.}
+
+\item{models}{List of models to warp by.}
 
 \item{reference}{Index of the sample that is to be considered the reference
 sample.}
+
+\item{alg}{algorithm to use: parametric time warping(\code{ptw}) or semi-
+dparametric time warping\code{sptw}.}
 
 \item{what}{What to return: either the 'corrected.values' (useful for visual
 inspection) or the warping 'models' (for further programmatic use).}
@@ -40,6 +45,8 @@ inspection) or the warping 'models' (for further programmatic use).}
 \item{scale}{Logical. If true, scale chromatograms before warping.}
 
 \item{trwdth}{width of the triangle in the WCC criterion.}
+
+\item{ndx}{number of knots to use in the B-splines if alg is \code{sptw}.}
 
 \item{\dots}{Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
 The only argument that cannot be changed is \code{warp.type}: this is always

@@ -7,10 +7,12 @@
 #' @import ptw
 #' @importFrom scales rescale
 #' @param chrom_list List of matrices containing concentration profiles.
-#' @param models List of models to warp by.
 #' @param lambdas Select wavelengths to use by name.
+#' @param models List of models to warp by.
 #' @param reference Index of the sample that is to be considered the reference
 #' sample.
+#' @param alg algorithm to use: parametric time warping(\code{ptw}) or semi-
+#' dparametric time warping\code{sptw}.
 #' @param what What to return: either the 'corrected.values' (useful for visual
 #' inspection) or the warping 'models' (for further programmatic use).
 #' @param init.coef Starting values for the optimization.
@@ -18,6 +20,7 @@
 #' @param n.zeros Number of zeros to add.
 #' @param scale Logical. If true, scale chromatograms before warping.
 #' @param trwdth width of the triangle in the WCC criterion.
+#' @param ndx number of knots to use in the B-splines if alg is \code{sptw}.
 #' @param \dots Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
 #' The only argument that cannot be changed is \code{warp.type}: this is always
 #' equal to \code{"global"}.
