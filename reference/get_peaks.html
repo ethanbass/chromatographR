@@ -87,14 +87,16 @@ in <code><a href="fit_peaks.html">fit_peaks</a></code>.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The result is an S3 object of class `peak_list`, containing a nested
+    <p>The result is an S3 object of class <code>peak_list</code>, containing a nested
 list of data.frames containing information about the peaks fitted for each
 chromatogram at each specified wavelength. The data.frame includes information
-about the retention time (`rt`), `start` and `end` of each peak, as well as the
-standard deviation (`sd`), `tau` (if `egh` is selected), full width at half 
-maximum (`FWHM`), `height`, `area`, and `r.squared` (coefficient of determination).
-This last parameter is determined from a linear model of the fitted peak values
-to the raw data.</p>
+about the retention time (<code>rt</code>), <code>start</code> and <code>end</code> of each peak,
+as well as the standard deviation (<code>sd</code>), <code>tau</code> (if <code>egh</code> is 
+selected), full width at half maximum (<code>FWHM</code>), <code>height</code>, <code>area</code>,
+and <code>r.squared</code> (coefficient of determination). (*Note:* This last
+parameter is determined from a linear model of the fitted peak values to the
+raw data. This approach is not really statistically valid but it can be useful
+as a rough metric for "goodness-of-fit").</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -106,9 +108,10 @@ calculated using a trapezoidal approximation.</p>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
-    <p>Function is adapted from the
+    <p>The function is adapted from the
 <a href="https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R" class="external-link">getAllPeaks</a>
-function authored by Ron Wehrens.</p>
+function authored by Ron Wehrens (though the underlying algorithms for peak
+identification and peak-fitting are not the same).</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
