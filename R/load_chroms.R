@@ -8,7 +8,7 @@
 #' 
 #' @name load_chroms
 #' @importFrom utils read.csv
-#' @import chromConverter
+#' @importFrom chromConverter sp_converter uv_converter
 #' @param paths Path(s) to chromatograms or the folders containing the files
 #' @param find_files Logical. Set to \code{TRUE} (default) if you are providing
 #' the function with a folder or vector of folders containing the files.
