@@ -27,7 +27,8 @@
 #' value.
 #' @param parallel Logical, indicating whether to use parallel processing.
 #' Defaults to TRUE.
-#' @param mc.cores How many cores to use for parallel processing. Defaults to 2.
+#' @param mc.cores How many cores to use for parallel processing. Defaults to 2,
+#' however on Windows systems, it will be automatically set to 1.
 #' @param \dots Further optional arguments to
 #' \code{\link[ptw:baseline.corr]{baseline.corr}}.
 #' @return The function returns the preprocessed data matrix, with rownames and
@@ -51,9 +52,10 @@ preprocess <- function(X, dim1, ## time axis
                           remove.time.baseline = TRUE,
                           spec.smooth = TRUE,
                           maxI, parallel=TRUE, mc.cores=2, ...){
-  if (!is.list(X) & !is.matrix(X)){
+  if(.Platform$OS.type == "windows")
+    mc.cores <- 1
+  if (!is.list(X) & !is.matrix(X))
     stop("X should be a matrix or a list of matrices")
-  }
   if (missing(dim1) | missing(dim2)){
     warning("...Times or wavelengths not provided.
             Extrapolating matrix dimensions for interpolation.",
