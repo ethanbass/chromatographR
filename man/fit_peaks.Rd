@@ -67,6 +67,7 @@ fit_peaks(Sa_pr[[1]][,"220"])
 Lan, K. & Jorgenson, J. W. A hybrid of exponential and gaussian
 functions as a simple model of asymmetric chromatographic peaks. Journal of
 Chromatography A 915, 1-13 (2001).
+
 Naish, P. J. & Hartwell, S. Exponentially Modified Gaussian functions - A
 good model for chromatographic peaks in isocratic HPLC? Chromatographia 26,
 285-296 (1988).

@@ -7,8 +7,8 @@
 #' @import ptw
 #' @importFrom scales rescale
 #' @param chrom_list List of matrices containing concentration profiles.
-#' @param models List of models to warp by.
 #' @param lambdas Select wavelengths to use by name.
+#' @param models List of models to warp by.
 #' @param reference Index of the sample that is to be considered the reference
 #' sample.
 #' @param what What to return: either the 'corrected.values' (useful for visual

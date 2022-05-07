@@ -20,18 +20,21 @@
 #' @param max.iter Maximum number of iterations for non-linear least squares
 #' in \code{\link{fit_peaks}}.
 #' @param \dots Additional arguments to \code{\link{find_peaks}}.
-#' @return The result is an S3 object of class `peak_list`, containing a nested
+#' @return The result is an S3 object of class \code{peak_list}, containing a nested
 #' list of data.frames containing information about the peaks fitted for each
 #' chromatogram at each specified wavelength. The data.frame includes information
-#' about the retention time (`rt`), `start` and `end` of each peak, as well as the
-#' standard deviation (`sd`), `tau` (if `egh` is selected), full width at half 
-#' maximum (`FWHM`), `height`, `area`, and `r.squared` (coefficient of determination).
-#' This last parameter is determined from a linear model of the fitted peak values
-#' to the raw data.
+#' about the retention time (\code{rt}), \code{start} and \code{end} of each peak,
+#' as well as the standard deviation (\code{sd}), \code{tau} (if \code{egh} is 
+#' selected), full width at half maximum (\code{FWHM}), \code{height}, \code{area},
+#' and \code{r.squared} (coefficient of determination). (*Note:* This last
+#' parameter is determined from a linear model of the fitted peak values to the
+#' raw data. This approach is not really statistically valid but it can be useful
+#' as a rough metric for "goodness-of-fit").
 #' @author Ethan Bass
-#' @note Function is adapted from the
+#' @note The function is adapted from the
 #' \href{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks}
-#' function authored by Ron Wehrens.
+#' function authored by Ron Wehrens (though the underlying algorithms for peak
+#' identification and peak-fitting are not the same).
 #' @references Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
 #' LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
 #' Metabolomics} \bold{11:1}:143-154. \doi{https://doi.org/10.1007/s11306-014-0683-5}.
