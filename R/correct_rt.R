@@ -12,9 +12,8 @@
 #' @param models List of models to warp by.
 #' @param reference Index of the sample that is to be considered the reference
 #' sample.
-#' @param alg algorithm to use: parametric time warping(\code{ptw}), semi-
-#' parametric time warping \code{sptw}, or variable penalty dynamic time warping
-#' \code{vpdtw}.
+#' @param alg algorithm to use: parametric time warping(\code{ptw}) or variable
+#' penalty dynamic time warping \code{vpdtw}.
 #' @param what What to return: either the 'corrected.values' (useful for visual
 #' inspection) or the warping 'models' (for further programmatic use).
 #' @param init.coef Starting values for the optimization.
@@ -22,7 +21,6 @@
 #' @param n.zeros Number of zeros to add.
 #' @param scale Logical. If true, scale chromatograms before warping.
 #' @param trwdth width of the triangle in the WCC criterion.
-#' @param ndx number of knots to use in the B-splines if alg is \code{sptw}.
 #' @param plot Logical. Whether to plot alignment.
 #' @param penalty Divisor for dilation calculated by \code{\link[VPdtw]{dilation}}.
 #' Adjusts penalty for variable penalty dynamic time warping.
@@ -61,11 +59,11 @@
 #' warp <- correct_rt(chrom_list = Sa_pr, models = warping.models)
 #' @export correct_rt
 correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
-                       alg = c("ptw", "sptw", "vpdtw"), what = c("models", "corrected.values"), 
+                       alg = c("ptw", "vpdtw"), what = c("models", "corrected.values"), 
                        init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, 
-                       scale=FALSE, trwdth=200, ndx = 40, plot=FALSE, penalty=5, ...){
+                       scale=FALSE, trwdth=200, plot=FALSE, penalty=5, ...){
   what <- match.arg(what, c("models", "corrected.values"))
-  alg <- match.arg(alg, c("ptw", "sptw", "vpdtw"))
+  alg <- match.arg(alg, c("ptw", "vpdtw"))
   if (missing(lambdas)){
     if (is.null(models) & is.null(n.traces)){
         stop("Must specify wavelengths ('lambdas') or number of traces ('n.traces')
@@ -96,14 +94,14 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
     } else{
       reference <- reference
     }
-    if (alg %in% c("ptw","sptw")){
+    if (alg == "ptw"){
       if (!is.null(models)){
         ptwmods <- models
       } else{
         ptwmods <- lapply(seq_len(dim(allmats)[3]), function(ii){
           ptw(allmats.t[,, reference],
               allmats.t[,, ii], selected.traces = traces, init.coef = init.coef,
-              alg = alg, warp.type = "global", ndx = ndx, ...)})
+              warp.type = "global", ...)})
       }
       if (what == "corrected.values"){
         allmats <- sapply(chrom_list_og, identity, simplify = "array")
