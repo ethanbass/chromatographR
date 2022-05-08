@@ -25,7 +25,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         env:
-          CRAN: c("https://github.com/ethanbass/VPdtw", "https://cloud.r-project.org")
+          CRAN: c("https://ethanbass.github.io/drat", "https://cloud.r-project.org")
         with:
           extra-packages: any::rcmdcheck
           needs: check
