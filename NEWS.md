@@ -1,7 +1,6 @@
 # chromatographR 0.3.1
 
-* Added support for variable penalty dynamic time warping and semi-parametric 
-time warping in `correct_RT`.
+* Added support for variable penalty dynamic time warping in `correct_RT`.
 
 # chromatographR 0.3
 
