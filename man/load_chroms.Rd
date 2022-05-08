@@ -24,8 +24,8 @@ Otherwise, set to\code{FALSE}.}
 
 \item{sep}{Argument provided to \code{read.csv}. Defaults to ",".}
 
-\item{dat}{Optional list of chromatograms. If list is provided, the function
-will append newly imported chromatograms to the existing list.}
+\item{dat}{Optional list of chromatograms. If provided, newly imported
+chromatograms will be appended to the existing list.}
 
 \item{...}{Additional arguments to \code{\link{read.csv}}.}
 }
