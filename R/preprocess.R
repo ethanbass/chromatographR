@@ -52,8 +52,10 @@ preprocess <- function(X, dim1, ## time axis
                           remove.time.baseline = TRUE,
                           spec.smooth = TRUE,
                           maxI, parallel=TRUE, mc.cores=2, ...){
-  if(.Platform$OS.type == "windows")
-    mc.cores <- 1
+  if (parallel & .Platform$OS.type == "windows"){
+    parallel <- FALSE
+    warning("Parallel processing is not currently available on Windows.")
+  }
   if (!is.list(X) & !is.matrix(X))
     stop("X should be a matrix or a list of matrices")
   if (missing(dim1) | missing(dim2)){

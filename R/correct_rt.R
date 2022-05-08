@@ -139,22 +139,23 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
       iset <- models$query
       jmax <- nrow(jset)
       short <- jmax - nrow(iset)
+      res <- round(mean(diff(as.numeric(rownames(chrom_list_og[[1]])))),5)
       result <- lapply(1:ncol(allmats), function(samp){
         x<-as.data.frame(apply(chrom_list_og[[samp]], 2, function(j){
           iset <- c(rep(NA, short), j)
           suppressWarnings(stats::approx(x = jset[,samp], y = iset, 1:jmax)$y)
         }))
         # fix times
-        old_ts <- c(rep(NA,short),rownames(chrom_list_og[[samp]]))
+        old_ts <- c(rep(NA,short), rownames(chrom_list_og[[samp]]))
         times <- suppressWarnings(stats::approx(x = jset[,samp],
                                                 y = old_ts, 1:jmax)$y)
         mi<-min(which(!is.na(times)))
         if (mi>1){
-          beg<-sort(seq(from = times[mi]-.01, by=-.01, length.out = mi-1),decreasing=F)
+          beg<-sort(seq(from = times[mi]-res, by=-res, length.out = mi-1),decreasing=F)
         } else beg<-NULL
         ma<-max(which(!is.na(times)))
         if (ma<length(times)){
-          end<-seq(from = times[ma]+.01, length.out = length(times)-ma, by=.01)
+          end<-seq(from = times[ma]+res, length.out = length(times)-ma, by=res)
         } else end <- NULL
         new.times <- c(beg,times[!is.na(times)], end)
         rownames(x) <- new.times
