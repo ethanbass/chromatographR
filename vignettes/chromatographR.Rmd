@@ -81,8 +81,8 @@ The `correct_rt` function is a wrapper around the `ptw` function. For each chrom
 
 
 ```{r, warp models}
-warping.models <- correct_rt(dat.pr, what = "models", lambdas=c("210"))
-warp_ptw <- correct_rt(chrom_list=dat.pr, models=warping.models)
+warping.models <- correct_rt(dat.pr, what = "models", lambdas=c("210"), scale=TRUE)
+warp_ptw <- correct_rt(chrom_list=dat.pr, models=warping.models, what="corrected.values")
 
 warp <- correct_rt(chrom_list=dat.pr, alg="vpdtw", what="corrected.values", lambdas="210")
 ```

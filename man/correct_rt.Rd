@@ -14,7 +14,7 @@ correct_rt(
   init.coef = c(0, 1, 0),
   n.traces = NULL,
   n.zeros = 0,
-  scale = TRUE,
+  scale = FALSE,
   trwdth = 200,
   ndx = 40,
   plot = FALSE,

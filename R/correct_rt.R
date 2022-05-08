@@ -63,7 +63,7 @@
 correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
                        alg = c("ptw", "sptw", "vpdtw"), what = c("models", "corrected.values"), 
                        init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, 
-                       scale=TRUE, trwdth=200, ndx = 40, plot=FALSE, penalty=5, ...){
+                       scale=FALSE, trwdth=200, ndx = 40, plot=FALSE, penalty=5, ...){
   what <- match.arg(what, c("models", "corrected.values"))
   alg <- match.arg(alg, c("ptw", "sptw", "vpdtw"))
   if (missing(lambdas)){
@@ -73,14 +73,14 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
       } else lambdas <- colnames(chrom_list[[1]])
     }
     lambdas <- as.character(lambdas)
+    if (scale){
+      chrom_list <- lapply(chrom_list, rescale)
+    }
     chrom_list_og <- chrom_list
     if (n.zeros > 0){
     chrom_list <- lapply(chrom_list,function(x){
       apply(x, 2, padzeros, nzeros=n.zeros, side='both')
     })
-    }
-    if (scale){
-      chrom_list <- lapply(chrom_list, rescale)
     }
     allmats <- sapply(chrom_list, function(x) x[,lambdas,drop=FALSE], simplify = "array")
     allmats.t <- sapply(chrom_list, function(x) t(x[,lambdas,drop=F]), simplify = "array")
@@ -97,13 +97,15 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
       reference <- reference
     }
     if (alg %in% c("ptw","sptw")){
-      if (is.null(models)){
+      if (!is.null(models)){
+        ptwmods <- models
+      } else{
         ptwmods <- lapply(seq_len(dim(allmats)[3]), function(ii){
           ptw(allmats.t[,, reference],
               allmats.t[,, ii], selected.traces = traces, init.coef = init.coef,
               alg = alg, warp.type = "global", ndx = ndx, ...)})
-      } else {ptwmods <- models}
-      if (what == "corrected.values" || !is.null(models)){
+      }
+      if (what == "corrected.values"){
         allmats <- sapply(chrom_list_og, identity, simplify = "array")
         warp.coef <- lapply(ptwmods,FUN=function(x){
           x$warp.coef[1,]
@@ -126,10 +128,12 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
       )
     }
     allmats <- sapply(chrom_list_og, function(x) x[,lambdas,drop=FALSE])
-    if (length(lambdas)>1)
+    if (length(lambdas) > 1)
       stop("VPdtw only supports warping by a single wavelength")
-    penalty <- VPdtw::dilation(allmats[,best$best.ref], 350) / penalty
-    models <- VPdtw::VPdtw(query=allmats, reference=allmats[,best$best.ref], penalty = penalty)
+    if (is.null(models)){
+      penalty <- VPdtw::dilation(allmats[,best$best.ref], 350) / penalty
+      models <- VPdtw::VPdtw(query=allmats, reference=allmats[,best$best.ref], penalty = penalty)
+    }
     if (plot)
       VPdtw::plot.VPdtw(models)
     if (what == "corrected.values"){
