@@ -8,15 +8,15 @@
 #' 
 #' @name load_chroms
 #' @importFrom utils read.csv
-#' @import chromConverter
+#' @importFrom chromConverter sp_converter uv_converter
 #' @param paths Path(s) to chromatograms or the folders containing the files
 #' @param find_files Logical. Set to \code{TRUE} (default) if you are providing
 #' the function with a folder or vector of folders containing the files.
 #' Otherwise, set to\code{FALSE}.
 #' @param format.in Format of files.
 #' @param sep Argument provided to \code{read.csv}. Defaults to ",".
-#' @param dat Optional list of chromatograms. If list is provided, the function
-#' will append newly imported chromatograms to the existing list.
+#' @param dat Optional list of chromatograms. If provided, newly imported
+#' chromatograms will be appended to the existing list.
 #' @param ... Additional arguments to \code{\link{read.csv}}.
 #' @return A list of chromatograms in matrix format.
 #' @author Ethan Bass

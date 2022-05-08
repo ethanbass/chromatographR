@@ -30,14 +30,16 @@ in \code{\link{fit_peaks}}.}
 \item{\dots}{Additional arguments to \code{\link{find_peaks}}.}
 }
 \value{
-The result is an S3 object of class `peak_list`, containing a nested
+The result is an S3 object of class \code{peak_list}, containing a nested
 list of data.frames containing information about the peaks fitted for each
 chromatogram at each specified wavelength. The data.frame includes information
-about the retention time (`rt`), `start` and `end` of each peak, as well as the
-standard deviation (`sd`), `tau` (if `egh` is selected), full width at half 
-maximum (`FWHM`), `height`, `area`, and `r.squared` (coefficient of determination).
-This last parameter is determined from a linear model of the fitted peak values
-to the raw data.
+about the retention time (\code{rt}), \code{start} and \code{end} of each peak,
+as well as the standard deviation (\code{sd}), \code{tau} (if \code{egh} is 
+selected), full width at half maximum (\code{FWHM}), \code{height}, \code{area},
+and \code{r.squared} (coefficient of determination). (*Note:* This last
+parameter is determined from a linear model of the fitted peak values to the
+raw data. This approach is not really statistically valid but it can be useful
+as a rough metric for "goodness-of-fit").
 }
 \description{
 Finds and fits peaks and extracts peak parameters from a list of chromatograms
@@ -51,9 +53,10 @@ function is fit to the signal using \code{\link{fit_peaks}}). The area is then
 calculated using a trapezoidal approximation.
 }
 \note{
-Function is adapted from the
+The function is adapted from the
 \href{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks}
-function authored by Ron Wehrens.
+function authored by Ron Wehrens (though the underlying algorithms for peak
+identification and peak-fitting are not the same).
 }
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}

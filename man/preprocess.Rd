@@ -43,7 +43,8 @@ value.}
 \item{parallel}{Logical, indicating whether to use parallel processing.
 Defaults to TRUE.}
 
-\item{mc.cores}{How many cores to use for parallel processing. Defaults to 2.}
+\item{mc.cores}{How many cores to use for parallel processing. Defaults to 2,
+however on Windows systems, it will be automatically set to 1.}
 
 \item{\dots}{Further optional arguments to
 \code{\link[ptw:baseline.corr]{baseline.corr}}.}
