@@ -12,6 +12,8 @@ preprocess(
   spec.smooth = TRUE,
   maxI,
   parallel = TRUE,
+  interpolate_rows = TRUE,
+  interpolate_cols = TRUE,
   mc.cores = 2,
   ...
 )
@@ -41,10 +43,15 @@ the spectral direction, according to
 value.}
 
 \item{parallel}{Logical, indicating whether to use parallel processing.
-Defaults to TRUE.}
+Defaults to TRUE (unless you're on Windows).}
 
-\item{mc.cores}{How many cores to use for parallel processing. Defaults to 2,
-however on Windows systems, it will be automatically set to 1.}
+\item{interpolate_rows}{Logical. Whether to interpolate along dim1. Defaults
+to TRUE.}
+
+\item{interpolate_cols}{Logical. Whether to interpolate along dim2. Defaults
+to TRUE.}
+
+\item{mc.cores}{How many cores to use for parallel processing. Defaults to 2.}
 
 \item{\dots}{Further optional arguments to
 \code{\link[ptw:baseline.corr]{baseline.corr}}.}
