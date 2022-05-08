@@ -9,14 +9,13 @@ correct_rt(
   lambdas,
   models = NULL,
   reference = "best",
-  alg = c("ptw", "sptw", "vpdtw"),
+  alg = c("ptw", "vpdtw"),
   what = c("models", "corrected.values"),
   init.coef = c(0, 1, 0),
   n.traces = NULL,
   n.zeros = 0,
   scale = FALSE,
   trwdth = 200,
-  ndx = 40,
   plot = FALSE,
   penalty = 5,
   ...
@@ -32,9 +31,8 @@ correct_rt(
 \item{reference}{Index of the sample that is to be considered the reference
 sample.}
 
-\item{alg}{algorithm to use: parametric time warping(\code{ptw}), semi-
-parametric time warping \code{sptw}, or variable penalty dynamic time warping
-\code{vpdtw}.}
+\item{alg}{algorithm to use: parametric time warping(\code{ptw}) or variable
+penalty dynamic time warping \code{vpdtw}.}
 
 \item{what}{What to return: either the 'corrected.values' (useful for visual
 inspection) or the warping 'models' (for further programmatic use).}
@@ -48,8 +46,6 @@ inspection) or the warping 'models' (for further programmatic use).}
 \item{scale}{Logical. If true, scale chromatograms before warping.}
 
 \item{trwdth}{width of the triangle in the WCC criterion.}
-
-\item{ndx}{number of knots to use in the B-splines if alg is \code{sptw}.}
 
 \item{plot}{Logical. Whether to plot alignment.}
 
