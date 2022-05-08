@@ -39,4 +39,5 @@ jobs:
           cache: false
 
       - uses: r-lib/actions/check-r-package@v2
-        cache: false
+        with:
+          cache: false
