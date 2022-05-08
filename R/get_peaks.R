@@ -56,7 +56,7 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"),
     suppressWarnings(ptable <- lapply(lambdas, function(lambda){
       cbind(sample = names(chrom_list)[sample], lambda,
             fit_peaks(chrom_list[[sample]][,lambda], fit = fit,
-                      max.iter = max.iter, sd.max = sd.max))
+                      max.iter = max.iter, sd.max = sd.max, ...))
     }))
     names(ptable) <- lambdas
     ptable
