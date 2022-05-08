@@ -110,7 +110,7 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
         })
         ptwmods <- lapply(seq_len(dim(allmats)[3]), function(ii){
           ptw(t(allmats[,,1]), t(allmats[, , ii]), init.coef=warp.coef[[ii]],
-              try=TRUE, alg = models[[1]]$alg, warp.type = "global", ...)})
+              try=TRUE, alg = ptwmods[[1]]$alg, warp.type = "global", ...)})
         result <- lapply(ptwmods, function(x) t(x$warped.sample))
         for (i in seq_along(result)) rownames(result[[i]]) <- rownames(chrom_list[[i]])
         names(result) <- names(chrom_list)
