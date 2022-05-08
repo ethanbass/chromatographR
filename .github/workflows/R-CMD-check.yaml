@@ -25,7 +25,7 @@ jobs:
     
       - name: Add VPdtw repo
         run: |
-          writeLines('options(repos = c(VPdtw = "https://ethanbass.github.io/drat/", getOption(\"repos\")))', file("~/.Rprofile", "ab"))
+          install.packages("VPdtw",dependencies=TRUE, repos="https://ethanbass.github.io/drat")
           shell: Rscript {0}
           
       - uses: r-lib/actions/setup-r-dependencies@v2
