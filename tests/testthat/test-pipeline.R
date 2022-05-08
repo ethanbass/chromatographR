@@ -26,11 +26,9 @@ test_that("preprocess works on a list", {
 })
 
 ### test correct_rt ###
-lambdas<-c("210")
-warping.models <- correct_rt(dat.pr[1:2], what = "models", lambdas=lambdas)
-warp <- correct_rt(chrom_list=dat.pr[1:2], models = warping.models, what="corrected.values")
-warp2 <- correct_rt(chrom_list=dat.pr[1:2], models = warping.models, alg="vpdtw", lambdas="210")
 
+warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','318'))
+warp <- correct_rt(chrom_list=dat.pr, models=warping.models, what = "corrected.values")
 test_that("correct_rt works", {
   equals(length(warping.models), length(warp), length(Sa[1:2]))
   expect_equal(names(warp), names(dat.pr[1:2]))
@@ -74,8 +72,5 @@ pk_tab <- attach_ref_spectra(pk_tab, chrom_list=dat.pr)
 test_that("attach_ref_spectra works", {
   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$ref_spectra))
 })
-
-
-
 
 

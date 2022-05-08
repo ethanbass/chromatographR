@@ -26,9 +26,12 @@
 #' @param maxI if given, the maximum intensity in the matrix is set to this
 #' value.
 #' @param parallel Logical, indicating whether to use parallel processing.
-#' Defaults to TRUE.
-#' @param mc.cores How many cores to use for parallel processing. Defaults to 2,
-#' however on Windows systems, it will be automatically set to 1.
+#' Defaults to TRUE (unless you're on Windows).
+#' @param interpolate_rows Logical. Whether to interpolate along dim1. Defaults
+#' to TRUE.
+#' @param interpolate_cols Logical. Whether to interpolate along dim2. Defaults
+#' to TRUE.
+#' @param mc.cores How many cores to use for parallel processing. Defaults to 2.
 #' @param \dots Further optional arguments to
 #' \code{\link[ptw:baseline.corr]{baseline.corr}}.
 #' @return The function returns the preprocessed data matrix, with rownames and
@@ -51,19 +54,27 @@ preprocess <- function(X, dim1, ## time axis
                           dim2, ## spectral axis
                           remove.time.baseline = TRUE,
                           spec.smooth = TRUE,
-                          maxI, parallel=TRUE, mc.cores=2, ...){
+                          maxI, parallel = TRUE, 
+                          interpolate_rows = TRUE,
+                          interpolate_cols = TRUE,
+                          mc.cores=2, ...){
   if(.Platform$OS.type == "windows")
     mc.cores <- 1
-  if (!is.list(X) & !is.matrix(X))
+    parallel <- FALSE
+  if (is.matrix(X)){
+    X <- list(X)
+    return_matrix <- TRUE
+  } else return_matrix <- FALSE
+  if (!is.list(X) | mean(sapply(X,is.matrix)) != 1)
     stop("X should be a matrix or a list of matrices")
-  if (missing(dim1) | missing(dim2)){
-    warning("...Times or wavelengths not provided.
-            Extrapolating matrix dimensions for interpolation.",
+  # if (missing(dim1) | missing(dim2)){
+  #   warning("...Times or wavelengths not provided.
+  #           Extrapolating matrix dimensions for interpolation.",
+  #           immediate. = TRUE)
+  # }
+  if (missing(dim1) & interpolate_rows){
+    warning("...Times not provided. Extrapolating from matrix dimensions for interpolation.",
             immediate. = TRUE)
-  }
-  if (missing(dim2))
-    dim2 <- as.numeric(colnames(X[[1]]))
-  if (missing(dim1)){
     limits <- sapply(X,function(x){
       ts <- rownames(x)
       c(head(ts,1), tail(ts,1))})
@@ -71,39 +82,38 @@ preprocess <- function(X, dim1, ## time axis
     end <- floor(min(as.numeric(limits[2,])))
     dim1 <- seq(start,end,by=.01)
   }
-  if (is.list(X)){
-    if (mean(sapply(X,is.matrix)) != 1){
-      stop("X should be a matrix or a list of matrices")
-    }
+  if (missing(dim2) & interpolate_cols){
+    warning("...Wavelengths not provided. Extrapolating from matrix dimensions for interpolation.",
+            immediate. = TRUE)
+    dim2 <- as.numeric(colnames(X[[1]]))
+  }
     if (parallel){
       if (length(find.package('parallel', quiet=TRUE))==0){
         stop("Parallel must be installed to enable parallel processing.")
-      }
-      parallel::mclapply(X, FUN=preprocess_matrix,
+    }
+      X <- parallel::mclapply(X, FUN=preprocess_matrix,
                dim1=dim1,
                dim2=dim2,
                remove.time.baseline = remove.time.baseline,
-               spec.smooth = spec.smooth,
-               maxI=maxI, mc.cores=mc.cores,
+               spec.smooth = spec.smooth, maxI = maxI,
+               interpolate_rows = interpolate_rows,
+               interpolate_cols = interpolate_cols,
+               mc.cores=mc.cores,
                ...)
     } else{
-      lapply(X, FUN=preprocess_matrix,
+      X <- lapply(X, FUN=preprocess_matrix,
              dim1=dim1,
              dim2=dim2,
              remove.time.baseline = remove.time.baseline,
-             spec.smooth = spec.smooth,
-             maxI=maxI,
+             spec.smooth = spec.smooth, maxI = maxI,
+             interpolate_rows = interpolate_rows,
+             interpolate_cols = interpolate_cols,
              ...)
     }
-    
-  } else{
-    preprocess_matrix(X, dim1=dim1,
-                      dim2=dim2,
-                      remove.time.baseline = remove.time.baseline,
-                      spec.smooth = spec.smooth,
-                      maxI=maxI,
-                      ...)
-  }
+    if (return_matrix){
+      X[[1]]
+    } else X
+      
 }
 
 #' @noRd
@@ -112,26 +122,29 @@ preprocess_matrix <- function(X,
                               dim2, ## spectral axis
                               remove.time.baseline = TRUE,
                               spec.smooth = TRUE,
-                              maxI, ...) {
+                              maxI,
+                              interpolate_rows = TRUE,
+                              interpolate_cols = TRUE,
+                              ...) {
   if (!is.matrix(X))
     stop("X should be a matrix!")
-  
   ## possibly resize matrix to a lower dimension - faster, noise averaging
-  if (length(tpoints <- as.numeric(rownames(X))) == 0)
-    tpoints <- seq_len(nrow(X))
-  if (length(lambdas <- as.numeric(colnames(X))) == 0)
-    lambdas <- seq_len(ncol(X))
-  if (min(dim1) < min(tpoints) |
-      max(dim1) > max(tpoints))
-    stop("No extrapolation allowed - check dim1 argument")
-  
-  X <- apply(X, 2, function(xx) approx(tpoints, xx, dim1)$y)
-  
-  if (min(dim2) < min(lambdas) |
-      max(dim2) > max(lambdas))
-    stop("No extrapolation allowed - check dim2 argument")
-  
-  X <- t(apply(X, 1, function(xx) approx(lambdas, xx, dim2)$y))
+  if (interpolate_rows){
+    if (length(tpoints <- as.numeric(rownames(X))) == 0)
+      tpoints <- seq_len(nrow(X))
+    if (min(dim1) < min(tpoints) |
+        max(dim1) > max(tpoints))
+      stop("No extrapolation allowed - check dim1 argument")
+    X <- apply(X, 2, function(xx) approx(tpoints, xx, dim1)$y)
+  } else dim1 <- rownames(X)
+  if (interpolate_cols){
+    if (length(lambdas <- as.numeric(colnames(X))) == 0)
+      lambdas <- seq_len(ncol(X))
+    if (min(dim2) < min(lambdas) |
+        max(dim2) > max(lambdas))
+      stop("No extrapolation allowed - check dim2 argument")
+    X <- t(apply(X, 1, function(xx) approx(lambdas, xx, dim2)$y)) 
+  } else dim2 <- colnames(X)
   
   if (spec.smooth)
     X <- t(apply(X, 1, function(xxx) smooth.spline(xxx)$y))
@@ -140,7 +153,7 @@ preprocess_matrix <- function(X,
     X <- apply(X, 2, baseline.corr, ...)
   if (min(X) < 0)
     # X <- X - min(X)
-    X[X<0] <- 0
+    X[X < 0] <- 0
   if (!missing(maxI))
     X <- maxI * X / max(X)
   
