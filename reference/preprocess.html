@@ -74,6 +74,8 @@ spectral dimension.</p>
   spec.smooth <span class="op">=</span> <span class="cn">TRUE</span>,
   <span class="va">maxI</span>,
   parallel <span class="op">=</span> <span class="cn">TRUE</span>,
+  interpolate_rows <span class="op">=</span> <span class="cn">TRUE</span>,
+  interpolate_cols <span class="op">=</span> <span class="cn">TRUE</span>,
   mc.cores <span class="op">=</span> <span class="fl">2</span>,
   <span class="va">...</span>
 <span class="op">)</span></code></pre></div>
@@ -106,10 +108,15 @@ the spectral direction, according to
 value.</p></dd>
 <dt>parallel</dt>
 <dd><p>Logical, indicating whether to use parallel processing.
-Defaults to TRUE.</p></dd>
+Defaults to TRUE (unless you're on Windows).</p></dd>
+<dt>interpolate_rows</dt>
+<dd><p>Logical. Whether to interpolate along dim1. Defaults
+to TRUE.</p></dd>
+<dt>interpolate_cols</dt>
+<dd><p>Logical. Whether to interpolate along dim2. Defaults
+to TRUE.</p></dd>
 <dt>mc.cores</dt>
-<dd><p>How many cores to use for parallel processing. Defaults to 2,
-however on Windows systems, it will be automatically set to 1.</p></dd>
+<dd><p>How many cores to use for parallel processing. Defaults to 2.</p></dd>
 <dt>...</dt>
 <dd><p>Further optional arguments to
 <code><a href="https://rdrr.io/pkg/ptw/man/baseline.corr.html" class="external-link">baseline.corr</a></code>.</p></dd>
