@@ -93,7 +93,7 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
     RT <- new.ts[time]
     abline(v=RT,col='red',lty=3)
     title(paste0("\n\n chr ", chr,  " ;   rt: ", RT, " ;  abs: ", round(y[time],1)))
-    y <- chrom_list[[chr]][time,]
+    y <- unlist(chrom_list[[chr]][time,,drop=T])
     # closest match
     if (verbose){
       print(paste0("chrome no. ", chr, "; RT: ", RT, "; lambda = ", lambda, " nm"))
@@ -113,7 +113,7 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
     if (chr == 'max'){
       chr <- which.max(tab[,loc])
     }
-    y <- chrom_list[[chr]][time,]
+    y <- unlist(chrom_list[[chr]][time,,drop=T])
     if (lambda == 'max'){
       lambda <- names(which.max(y))
       lambda.index <- which(new.lambdas == lambda)
@@ -133,7 +133,7 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
     y<-rescale(y)
   }
   if (plot_spectrum){
-    matplot(x=new.lambdas, y=y, type='l',
+    matplot(x=new.lambdas, y=as.numeric(y), type='l',
             #main=paste(peak, '\n', names(chrom_list)[chr], ';','\n', 'RT = ', RT, 'mins','; ',chr),
             ylab = 'Intensity', xlab = 'Wavelength (nm)',
             ylim=c(0,max(y)*1.2), ...)
