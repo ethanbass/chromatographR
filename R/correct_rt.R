@@ -64,6 +64,12 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
                        scale=FALSE, trwdth=200, plot=FALSE, penalty=5, ...){
   what <- match.arg(what, c("models", "corrected.values"))
   alg <- match.arg(alg, c("ptw", "vpdtw"))
+  if (alg == "vpdtw" & !requireNamespace("VPdtw", quietly = TRUE)) {
+    stop(
+      "Package VPdtw must be installed to use VPdtw alignment.",
+      call. = FALSE
+    )
+  }
   if (missing(lambdas)){
     if (is.null(models) & is.null(n.traces)){
         stop("Must specify wavelengths ('lambdas') or number of traces ('n.traces')
@@ -119,18 +125,12 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
         ptwmods
       }
   } else{
-    if (!requireNamespace("VPdtw", quietly = TRUE)) {
-      stop(
-        "Package VPdtw must be installed to use VPdtw alignment.",
-        call. = FALSE
-      )
-    }
     allmats <- sapply(chrom_list_og, function(x) x[,lambdas,drop=FALSE])
     if (length(lambdas) > 1)
       stop("VPdtw only supports warping by a single wavelength")
     if (is.null(models)){
-      penalty <- VPdtw::dilation(allmats[,best$best.ref], 350) / penalty
-      models <- VPdtw::VPdtw(query=allmats, reference=allmats[,best$best.ref], penalty = penalty)
+      penalty <- VPdtw::dilation(allmats[,reference], 350) / penalty
+      models <- VPdtw::VPdtw(query=allmats, reference=allmats[,reference], penalty = penalty)
     }
     if (plot)
       VPdtw::plot.VPdtw(models)
