@@ -9,7 +9,7 @@ fit_peaks(
   y,
   pos = NULL,
   sd.max = 50,
-  fit = c("egh", "gaussian"),
+  fit = c("egh", "gaussian", "raw"),
   max.iter = 1000,
   ...
 )
@@ -22,8 +22,10 @@ run automatically to find peak positions.}
 
 \item{sd.max}{Maximum width (standard deviation) for peaks. Defaults to 50.}
 
-\item{fit}{Function for peak fitting. (Currently "gaussian" and exponential
-gaussian hybrid ("egh") are supported. Defaults to egh.)}
+\item{fit}{Function for peak fitting. (Currently exponential-gaussian hybrid
+\code{egh}, \code{gaussian} and \code{raw} settings are supported). If \code{
+raw} is selected, trapezoidal integration will be performed on raw data
+without fitting a peak shape. Defaults to \code{egh}.)}
 
 \item{max.iter}{Maximum number of iterations to use in nonlinear least
 squares peak-fitting. (Defaults to 1000).}

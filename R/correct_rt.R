@@ -24,6 +24,7 @@
 #' @param plot Logical. Whether to plot alignment.
 #' @param penalty Divisor for dilation calculated by \code{\link[VPdtw]{dilation}}.
 #' Adjusts penalty for variable penalty dynamic time warping.
+#' @param verbose Whether to be verbose.
 #' @param \dots Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
 #' The only argument that cannot be changed is \code{warp.type}: this is always
 #' equal to \code{"global"}.
@@ -61,7 +62,8 @@
 correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
                        alg = c("ptw", "vpdtw"), what = c("models", "corrected.values"), 
                        init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, 
-                       scale=FALSE, trwdth=200, plot=FALSE, penalty=5, ...){
+                       scale=FALSE, trwdth=200, plot=FALSE, penalty=5,
+                       verbose = FALSE, ...){
   what <- match.arg(what, c("models", "corrected.values"))
   alg <- match.arg(alg, c("ptw", "vpdtw"))
   if (alg == "vpdtw" & !requireNamespace("VPdtw", quietly = TRUE)) {
@@ -97,6 +99,7 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
     if (reference == 'best'){
       best <- bestref(allmats.t)
       reference <- as.numeric(names(sort(table(best$best.ref),decreasing=TRUE))[1])
+      if (verbose) message(paste("Selected chromatogram", reference, "as best reference."))
     } else{
       reference <- reference
     }
@@ -139,7 +142,7 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
       iset <- models$query
       jmax <- nrow(jset)
       short <- jmax - nrow(iset)
-      res <- round(mean(diff(as.numeric(rownames(chrom_list_og[[1]])))),5)
+      res <- median(diff(as.numeric(rownames(chrom_list_og[[1]]))))
       result <- lapply(1:ncol(allmats), function(samp){
         x<-as.data.frame(apply(chrom_list_og[[samp]], 2, function(j){
           iset <- c(rep(NA, short), j)

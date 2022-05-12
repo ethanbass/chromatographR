@@ -18,6 +18,7 @@ correct_rt(
   trwdth = 200,
   plot = FALSE,
   penalty = 5,
+  verbose = FALSE,
   ...
 )
 }
@@ -51,6 +52,8 @@ inspection) or the warping 'models' (for further programmatic use).}
 
 \item{penalty}{Divisor for dilation calculated by \code{\link[VPdtw]{dilation}}.
 Adjusts penalty for variable penalty dynamic time warping.}
+
+\item{verbose}{Whether to be verbose.}
 
 \item{\dots}{Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
 The only argument that cannot be changed is \code{warp.type}: this is always
