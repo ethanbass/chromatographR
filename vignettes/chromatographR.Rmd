@@ -174,3 +174,9 @@ plot(pk_tab, loc = "V13", box_plot = TRUE, vars = "trt")
 ## References
 
 <div id="refs"></div>
+
+## Session Information
+
+```{r}
+sessionInfo()
+```
