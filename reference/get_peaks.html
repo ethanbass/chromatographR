@@ -12,7 +12,7 @@ at the specified wavelengths."><meta property="og:image" content="https://ethanb
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,7 @@ at the specified wavelengths.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">get_peaks</span><span class="op">(</span>
   <span class="va">chrom_list</span>,
   <span class="va">lambdas</span>,
-  fit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"egh"</span>, <span class="st">"gaussian"</span><span class="op">)</span>,
+  fit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"egh"</span>, <span class="st">"gaussian"</span>, <span class="st">"raw"</span><span class="op">)</span>,
   sd.max <span class="op">=</span> <span class="fl">50</span>,
   max.iter <span class="op">=</span> <span class="fl">100</span>,
   <span class="va">...</span>
@@ -75,8 +75,9 @@ at the specified wavelengths.</p>
 <dt>lambdas</dt>
 <dd><p>Character vector of wavelengths to find peaks at.</p></dd>
 <dt>fit</dt>
-<dd><p>What type of fit to use. Current options are gaussian and
-exponential gaussian hybrid (<code>egh</code>).</p></dd>
+<dd><p>What type of fit to use. Current options are exponential-gaussian
+hybrid (<code>egh</code>), gaussian or raw. The <code>raw</code> setting performs
+trapezoidal integration directly on the raw data without fitting a peak shape.</p></dd>
 <dt>sd.max</dt>
 <dd><p>Maximum width (standard deviation) for peaks. Defaults to 50.</p></dd>
 <dt>max.iter</dt>

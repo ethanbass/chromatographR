@@ -12,7 +12,7 @@ profile — fit_peaks"><meta property="og:description" content="Fit peak paramet
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,7 +61,7 @@ profile</h1>
   <span class="va">y</span>,
   pos <span class="op">=</span> <span class="cn">NULL</span>,
   sd.max <span class="op">=</span> <span class="fl">50</span>,
-  fit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"egh"</span>, <span class="st">"gaussian"</span><span class="op">)</span>,
+  fit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"egh"</span>, <span class="st">"gaussian"</span>, <span class="st">"raw"</span><span class="op">)</span>,
   max.iter <span class="op">=</span> <span class="fl">1000</span>,
   <span class="va">...</span>
 <span class="op">)</span></code></pre></div>
@@ -77,8 +77,10 @@ run automatically to find peak positions.</p></dd>
 <dt>sd.max</dt>
 <dd><p>Maximum width (standard deviation) for peaks. Defaults to 50.</p></dd>
 <dt>fit</dt>
-<dd><p>Function for peak fitting. (Currently "gaussian" and exponential
-gaussian hybrid ("egh") are supported. Defaults to egh.)</p></dd>
+<dd><p>Function for peak fitting. (Currently exponential-gaussian hybrid
+<code>egh</code>, <code>gaussian</code> and <code>raw</code> settings are supported). If <code>
+raw</code> is selected, trapezoidal integration will be performed on raw data
+without fitting a peak shape. Defaults to <code>egh</code>.)</p></dd>
 <dt>max.iter</dt>
 <dd><p>Maximum number of iterations to use in nonlinear least
 squares peak-fitting. (Defaults to 1000).</p></dd>

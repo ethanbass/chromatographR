@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,7 +77,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>chromatographR</h1>
                         <h4 data-toc-skip class="author">Ethan Bass</h4>
             
-            <h4 data-toc-skip class="date">2022-05-14</h4>
+            <h4 data-toc-skip class="date">2022-05-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/HEAD/vignettes/chromatographR.Rmd" class="external-link"><code>vignettes/chromatographR.Rmd</code></a></small>
       <div class="d-none name"><code>chromatographR.Rmd</code></div>
@@ -134,24 +134,26 @@
 <div class="section level3">
 <h3 id="dealing-with-retention-time-shifts">Dealing with retention time shifts<a class="anchor" aria-label="anchor" href="#dealing-with-retention-time-shifts"></a>
 </h3>
-<p>In many cases, HPLC data can suffer from retention time shifts (e.g. due to temperature fluctuations, column degradation, or subtle changes in mobile-phase composition). Parametric time warping (as implemented in the <a href="https://cran.r-project.org/web/packages/ptw/index.html" class="external-link">ptw</a> package can be quite an effective technique for correcting subtle retention time shifts <span class="citation">(Eilers 2004)</span>. If your chromatograms are already perfectly aligned you can skip this step. If you have severe retention time shifts this technique may not be so effective (and you should consider checking your HPLC for leaks).</p>
+<p>In many cases, HPLC data can suffer from retention time shifts (e.g. due to temperature fluctuations, column degradation, or subtle changes in mobile-phase composition). Parametric time warping (as implemented in the <a href="https://CRAN.R-project.org/package=ptw" class="external-link">ptw</a> package can be quite an effective technique for correcting subtle retention time shifts <span class="citation">(Eilers 2004)</span>. If your chromatograms are already perfectly aligned you can skip this step. If you have severe retention time shifts this technique may not be so effective (and you should consider checking your HPLC for leaks).</p>
 <p>The <code>correct_rt</code> function is a wrapper around the <code>ptw</code> function. For each chromatogram, it produces a “global” warping function across all wavelengths included in <code>lambdas</code>). The goal of the warping function is to produce a better alignment of retention times by “warping” the time-axis of each chromatogram to match a reference chromatogram. (The reference chromatogram can be determined algorithmically or selected manually by setting the <code>reference</code> argument). The code block below creates warping models for the samples in the provided list of data matrices. The same function is then used to warp each chromatogram according to the corresponding model, by setting the <code>models</code> parameter. Depending on the variety of your samples and the severity of the retention time shifts, it may take some experimentation with the warping parameters to get satisfactory results. Sometimes “less” can actually be “more” here – for example, wavelengths with fewer peaks may sometimes yield better warping models. (Also see the documentation for <a href="https://cran.r-project.org/web/packages/ptw/index.html" class="external-link">ptw</a> for more ideas about warp function optimization).</p>
-<pre class="text"><code>&gt; warping.models &lt;- correct_rt(dat.pr, what = "models", lambdas=c("210"))
-&gt; warp &lt;- correct_rt(chrom_list=dat.pr, models=warping.models)</code></pre>
+<pre class="text"><code>&gt; warping.models &lt;- correct_rt(dat.pr, what = "models", lambdas=c("210"), scale=TRUE)
+&gt; warp &lt;- correct_rt(chrom_list=dat.pr, models=warping.models, what="corrected.values")</code></pre>
 <p>You can see that, in this case, the alignment is considerably improved after warping. You can also use the <code>correct_rt</code> function to do a global alignment on multiple wavelengths, but this will not always improve the results. While the alignment still isn’t perfect after warping, it is probably good enough to align our peaks and assemble them in the peak table, which is our primary goal.</p>
 <pre class="text"><code>&gt; par(mfrow=c(2,1))
 &gt; lambdas=c('210','260')
 &gt; plot.new()
-&gt; plot.window(xlim=c(head(new.ts,1), tail(new.ts,1)),ylim=c(0,1000))
+&gt; ts &lt;- as.numeric(rownames(warp[[i]]))
+&gt; plot.window(xlim=c(head(ts,1), tail(ts,1)),ylim=c(0,1000))
 &gt; for (i in 1:length(warp)){
-+   matplot(new.ts, warp[[i]][,lambdas],type='l',add=T)
++   matplot(ts, warp[[i]][,lambdas],type='l',add=T)
 + }
-&gt; legend("topright", legend="warped", bty = "n")
+&gt; legend("topright", legend="ptw", bty = "n")
 &gt; 
 &gt; plot.new()
-&gt; plot.window(xlim=c(head(new.ts,1),tail(new.ts,1)),ylim=c(0,1000))
+&gt; ts &lt;- as.numeric(rownames(dat.pr[[i]]))
+&gt; plot.window(xlim=c(head(ts,1),tail(ts,1)),ylim=c(0,1000))
 &gt; for (i in 1:length(dat.pr)){
-+   matplot(new.ts, dat.pr[[i]][,lambdas],type='l',add=T)
++   matplot(ts, dat.pr[[i]][,lambdas],type='l',add=T)
 + }
 &gt; legend("topright", legend="raw", bty = "n")</code></pre>
 <p><img src="chromatographR_files/figure-html/alignment_plot-1.png" width="576"></p>
@@ -256,7 +258,7 @@ attached base packages:
 [8] base     
 
 other attached packages:
-[1] chromatographR_0.3 knitr_1.39        
+[1] chromatographR_0.4 knitr_1.39        
 
 loaded via a namespace (and not attached):
  [1] Rcpp_1.0.8.3          highr_0.9             bslib_0.3.1          
