@@ -1,7 +1,7 @@
 Type: Package
 Package: chromatographR
 Title: Import and Analyze HPLC-DAD/UV Data
-Version: 0.4.0
+Version: 0.4
 Authors@R: 
     person("Ethan", "Bass", , "ethanbass@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6175-6739"))
@@ -29,18 +29,17 @@ Imports:
     smoother,
     stats,
     utils
-Suggests:
+Suggests: 
     knitr,
     rmarkdown,
     spelling,
-    testthat (>= 3.0.0),
-    VPdtw
+    testthat (>= 3.0.0)
 VignetteBuilder: 
     knitr
-Additional_repositories: https://ethanbass.github.io/drat/
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-US
 LazyData: true
 LazyDataCompression: xz
 RoxygenNote: 7.1.2
+Additional_repositories: https://ethanbass.github.io/drat/
