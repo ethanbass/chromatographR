@@ -71,6 +71,7 @@ implemented in <code><a href="https://rdrr.io/pkg/ptw/man/ptw.html" class="exter
   trwdth <span class="op">=</span> <span class="fl">200</span>,
   plot <span class="op">=</span> <span class="cn">FALSE</span>,
   penalty <span class="op">=</span> <span class="fl">5</span>,
+  maxshift <span class="op">=</span> <span class="fl">50</span>,
   verbose <span class="op">=</span> <span class="cn">FALSE</span>,
   <span class="va">...</span>
 <span class="op">)</span></code></pre></div>
@@ -108,6 +109,8 @@ inspection) or the warping 'models' (for further programmatic use).</p></dd>
 <dt>penalty</dt>
 <dd><p>Divisor for dilation calculated by <code><a href="https://rdrr.io/pkg/VPdtw/man/dilation.html" class="external-link">dilation</a></code>.
 Adjusts penalty for variable penalty dynamic time warping.</p></dd>
+<dt>maxshift</dt>
+<dd><p>Integer. Maximum allowable shift for <code>VPdtw</code>.</p></dd>
 <dt>verbose</dt>
 <dd><p>Whether to be verbose.</p></dd>
 <dt>...</dt>
