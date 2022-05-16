@@ -167,7 +167,7 @@ The `mirror_plot` function provides a quick way to visually compare results acro
 mirror_plot(pk_tab, lambdas = c("210","260"), var = "trt", legend_size=2)
 ```
 
-##### Plot spectrum
+##### Plotting spectra
 
 The `plot_spectrum` function allows you to easily plot or record the spectra associated with a particular peak in your peak table. This is useful for interpreting your results and/or checking for errors in your peak table. For example, you may want to check if the spectra for a particular peak match across different samples, or you may want to compare your spectrum with a known standard. The `plot_spectrum` function can be used to plot only the spectrum or only the chromatographic trace using the arguments `plot_spectrum` and `plot_trace`. By default it will plot the trace and spectrum from the chromatogram with the largest peak in the peak table. Alternatively, you can choose the chromatogram index and wavelength using the `chr` and `lambda` arguments.
 
@@ -184,9 +184,9 @@ peak="V13"
 plot_all_spectra(peak, peak_table=pk_tab, export=F, overlapping=T)
 ```
 
-##### Plot peak table
+##### Plot peak table function
 
-The plot `peak_table` function provides a simplified interface to various options for plotting data from the peak table. For example, it can be used as a quick interface to the \code{plot_spectrum} and \code{plot_all_spectra} functions shown above. It can also be used to make a quick box plot to compare results across treatments.
+The `plot.peak_table` function provides a simplified interface to various options for plotting data from the peak table. For example, it can be used as a quick interface to the \code{plot_spectrum} and \code{plot_all_spectra} functions shown above. It can also be used to make a quick box plot to compare results across treatments.
 
 ```{r,eval=T}
 plot(pk_tab, loc = "V13", box_plot = TRUE, vars = "trt", verbose = FALSE)
