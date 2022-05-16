@@ -82,31 +82,21 @@ The `correct_rt` function is a wrapper around the `ptw` function. For each chrom
 
 ```{r, warp models}
 warping.models <- correct_rt(dat.pr, what = "models", lambdas=c("210"), scale=TRUE)
-warp_ptw <- correct_rt(chrom_list=dat.pr, models=warping.models, what="corrected.values")
-
-warp <- correct_rt(chrom_list=dat.pr, alg="vpdtw", what="corrected.values", lambdas="210")
+warp <- correct_rt(chrom_list=dat.pr, models=warping.models, what="corrected.values")
 ```
 
 You can see that, in this case, the alignment is considerably improved after warping. You can also use the `correct_rt` function to do a global alignment on multiple wavelengths, but this will not always improve the results. While the alignment still isn't perfect after warping, it is probably good enough to align our peaks and assemble them in the peak table, which is our primary goal.
 
 ```{r, alignment_plot, fig.height=6}
-par(mfrow=c(3,1))
+par(mfrow=c(2,1))
 lambdas=c('210','260')
 plot.new()
-ts <- as.numeric(rownames(warp_ptw[[i]]))
-plot.window(xlim=c(head(ts,1), tail(ts,1)),ylim=c(0,1000))
-for (i in 1:length(warp)){
-  matplot(ts, warp_ptw[[i]][,lambdas],type='l',add=T)
-}
-legend("topright", legend="ptw", bty = "n")
-
-plot.new()
-ts <- as.numeric(rownames(warp[[1]]))
+ts <- as.numeric(rownames(warp[[i]]))
 plot.window(xlim=c(head(ts,1), tail(ts,1)),ylim=c(0,1000))
 for (i in 1:length(warp)){
   matplot(ts, warp[[i]][,lambdas],type='l',add=T)
 }
-legend("topright", legend="VPdtw", bty = "n")
+legend("topright", legend="ptw", bty = "n")
 
 plot.new()
 ts <- as.numeric(rownames(dat.pr[[i]]))
