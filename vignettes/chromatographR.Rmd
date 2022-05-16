@@ -131,7 +131,7 @@ head(pk_tab$tab[,1:6])
 
 ### Further analysis and data-visualization
 
-##### Attaching meta-data
+##### Attaching metadata
 
 To begin analyzing your peak table, you will usually want to attach sample meta-data to the `peak_table` object. This can be easily accomplished using the `attach_metadata` function. The peak table can then be normalized (e.g. by dividing out the sample weight) using the `normalize_data` function.
 

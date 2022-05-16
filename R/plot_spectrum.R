@@ -221,7 +221,7 @@ plot_all_spectra <- function(peak, peak_table, chrom_list, chrs="all",
 #' Convenience function to call plot_spectrum with what = "click".
 #' 
 #' @importFrom scales rescale
-#' @importFrom graphics identify title text
+#' @importFrom graphics identify title text abline
 #' @param peak_table The peak table (output from \code{\link{get_peaktable}}
 #' function).
 #' @param chrom_list A list of chromatograms in matrix form (timepoints x

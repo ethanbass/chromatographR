@@ -1,7 +1,7 @@
 Type: Package
 Package: chromatographR
 Title: Import and Analyze HPLC-DAD/UV Data
-Version: 0.4
+Version: 0.4.0
 Authors@R: 
     person("Ethan", "Bass", , "ethanbass@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6175-6739"))
@@ -12,6 +12,7 @@ Description: Tools for high-throughput analysis of HPLC-DAD/UV
 License: GPL (>= 2)
 URL: https://ethanbass.github.io/chromatographR/
 BugReports: https://github.com/ethanbass/chromatographR/issues
+Depends: R (>= 3.5.0)
 Imports: 
     chromConverter,
     devtools,
@@ -33,7 +34,8 @@ Suggests:
     knitr,
     rmarkdown,
     spelling,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    VPdtw
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3
@@ -41,5 +43,5 @@ Encoding: UTF-8
 Language: en-US
 LazyData: true
 LazyDataCompression: xz
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Additional_repositories: https://ethanbass.github.io/drat/

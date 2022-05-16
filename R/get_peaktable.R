@@ -26,6 +26,7 @@
 #' @importFrom lattice panel.stripplot panel.abline stripplot
 #' @importFrom grDevices colorRampPalette 
 #' @importFrom scales rescale
+#' @importFrom graphics par
 #' @param peak_list A `peak_list` object created by \code{\link{get_peaks}},
 #' containing a nested list of peak tables: the first level is the
 #' sample, and the second level is the spectral component. Every component is
@@ -326,7 +327,7 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
 #' to create simple box-plots to examine the distribution of a peak with respect
 #' to variables defined in sample metadata.
 #' 
-#' @importFrom graphics matplot legend plot.new plot.window
+#' @importFrom graphics matplot legend plot.new plot.window par
 #' @importFrom utils head tail
 #' @param peak_table The peak table (output from \code{\link{get_peaktable}}
 #' function).
