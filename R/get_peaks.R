@@ -14,8 +14,9 @@
 #' @param chrom_list A list of profile matrices, each of the same dimensions
 #' (timepoints x wavelengths).
 #' @param lambdas Character vector of wavelengths to find peaks at.
-#' @param fit What type of fit to use. Current options are gaussian and
-#' exponential gaussian hybrid (\code{egh}).
+#' @param fit What type of fit to use. Current options are exponential-gaussian
+#' hybrid (\code{egh}), gaussian or raw. The \code{raw} setting performs
+#' trapezoidal integration directly on the raw data without fitting a peak shape.
 #' @param sd.max Maximum width (standard deviation) for peaks. Defaults to 50.
 #' @param max.iter Maximum number of iterations for non-linear least squares
 #' in \code{\link{fit_peaks}}.
@@ -43,9 +44,9 @@
 #' pks <- get_peaks(Sa_pr, lambdas = c('210'), sd.max=50, fit="egh")
 #' @export get_peaks
 
-get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian"),
+get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
                        sd.max=50, max.iter=100, ...){
-  fit <- match.arg(fit, c("egh", "gaussian"))
+  fit <- match.arg(fit, c("egh", "gaussian", "raw"))
   if (is.numeric(lambdas)){
     lambdas <- as.character(lambdas)
   }
@@ -121,7 +122,11 @@ plot.peak_list <- function(x, ..., chrom_list=NULL, index=1, lambda=NULL,
   new.ts <- as.numeric(rownames(chrom_list[[1]]))
   y <- chrom_list[[index]][,lambda]
   pks <- data.frame(x[[index]][[lambda]])
-  fit <- ifelse("tau" %in% colnames(pks), "egh", "gaussian")
+  if ("r.squared" %in% colnames(pks)){
+    fit <- ifelse("tau" %in% colnames(pks), "egh", "gaussian")
+  } else{
+    fit <- "raw"
+  }
   plot(new.ts, y, type='l', xlab='', ylab='', xaxt='n', yaxt='n', ...)
   if (points){
     points(pks$rt, pks$height, pch=20, cex=cex.points, col='red')
@@ -134,8 +139,9 @@ plot.peak_list <- function(x, ..., chrom_list=NULL, index=1, lambda=NULL,
            pks$end,y[which(new.ts %in% pks$end)]+5,
            col="blue", length=0)
   }
+  res <- median(diff(as.numeric(rownames(chrom_list[[1]]))))
   for (i in seq_len(nrow(pks))){
-    peak.loc<-seq.int((pks$start[i]),(pks$end[i]), by = .01)
+    peak.loc<-seq.int((pks$start[i]),(pks$end[i]), by = res)
       if (fit == "gaussian"){
         yvals <- gaussian(peak.loc, center=pks$rt[i],
                           width=pks$sd[i],height = pks$height[i])
@@ -145,6 +151,10 @@ plot.peak_list <- function(x, ..., chrom_list=NULL, index=1, lambda=NULL,
         yvals <- egh(x=peak.loc, center=pks$rt[i],
                      width=pks$sd[i], height = pks$height[i], tau=pks$tau[i])
         color <- "purple"
+      }
+      else if (fit == "raw"){
+        yvals <- chrom_list[[index]][as.character(peak.loc), lambda]
+        color <- "hotpink"
       }
       sapply(1:(length(peak.loc)-1), function(i){
         polygon(peak.loc[c(i,i,(i+1), (i+1))], c(0,yvals[i:(i+1)], 0),

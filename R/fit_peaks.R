@@ -58,7 +58,7 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1,
     # find upper bound
     suppressWarnings(bu <- sapply(p, function(v) min(p4[p4 > v])))
     bu[which(bu == Inf)] <- length(y)
-    data.frame(pos=p, lower=bl, upper=bu)
+    data.frame(pos = p, lower = bl, upper = bu)
   } else 
   p
 }
@@ -77,8 +77,10 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1,
 #' @param pos Locations of peaks in vector y. If NULL, \code{find_peaks} will
 #' run automatically to find peak positions.
 #' @param sd.max Maximum width (standard deviation) for peaks. Defaults to 50.
-#' @param fit Function for peak fitting. (Currently "gaussian" and exponential
-#' gaussian hybrid ("egh") are supported. Defaults to egh.)
+#' @param fit Function for peak fitting. (Currently exponential-gaussian hybrid
+#' \code{egh}, \code{gaussian} and \code{raw} settings are supported). If \code{
+#' raw} is selected, trapezoidal integration will be performed on raw data
+#' without fitting a peak shape. Defaults to \code{egh}.)
 #' @param max.iter Maximum number of iterations to use in nonlinear least
 #' squares peak-fitting. (Defaults to 1000).
 #' @param ... Additional arguments to \code{find_peaks}.
@@ -112,9 +114,9 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1,
 #' good model for chromatographic peaks in isocratic HPLC? Chromatographia 26,
 #' 285-296 (1988).
 #' @export fit_peaks
-fit_peaks <- function (y, pos=NULL, sd.max = 50, fit = c("egh", "gaussian"), 
+fit_peaks <- function (y, pos=NULL, sd.max = 50, fit = c("egh", "gaussian", "raw"), 
                        max.iter = 1000, ...){
-  fit <- match.arg(fit, c("egh", "gaussian"))
+  fit <- match.arg(fit, c("egh", "gaussian", "raw"))
   if (is.null(pos)){
     pos <- find_peaks(y, ...)
   }
@@ -161,6 +163,22 @@ fit_peaks <- function (y, pos=NULL, sd.max = 50, fit = c("egh", "gaussian"),
       area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
       c("rt" = m$center, "start" = pos[2], "end" = pos[3], "sd" = m$width, "tau" = m$tau, "FWHM" = 2.35 * m$width,
         "height" = y[xloc], "area" = area, "r.squared" = r.squared)
+    }
+  } else if (fit == "raw") {
+    tabnames <- c("rt", "start", "end", "sd", "FWHM", "height", "area")
+    noPeaksMat <- matrix(rep(NA, length(tabnames)), nrow = 1, dimnames = list(NULL, 
+                                                                              tabnames))
+    on.edge <- sapply(pos$pos, function(x) is.na(y[x + 1]) |
+                        is.na(y[x - 1]))
+    pos <- pos[!on.edge,]
+    if (nrow(pos) == 0) 
+      return(noPeaksMat)
+    fitpk <- function(pos){
+      xloc <- pos[1]
+      peak.loc <- seq.int(pos[2], pos[3])
+      area <- sum(diff(peak.loc) * mean(c(y[peak.loc][-1], tail(y[peak.loc],-1)))) # trapezoidal integration
+      c("rt" = pos[1], "start" = pos[2], "end" = pos[3], "sd" = pos[3]-pos[2], "FWHM" = 2.35 * pos[3]-pos[2],
+        "height" = y[xloc], "area" = area)
     }
   }
   huhn <- data.frame(t(apply(pos, 1, fitpk)))

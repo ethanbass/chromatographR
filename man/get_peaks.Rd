@@ -7,7 +7,7 @@
 get_peaks(
   chrom_list,
   lambdas,
-  fit = c("egh", "gaussian"),
+  fit = c("egh", "gaussian", "raw"),
   sd.max = 50,
   max.iter = 100,
   ...
@@ -19,8 +19,9 @@ get_peaks(
 
 \item{lambdas}{Character vector of wavelengths to find peaks at.}
 
-\item{fit}{What type of fit to use. Current options are gaussian and
-exponential gaussian hybrid (\code{egh}).}
+\item{fit}{What type of fit to use. Current options are exponential-gaussian
+hybrid (\code{egh}), gaussian or raw. The \code{raw} setting performs
+trapezoidal integration directly on the raw data without fitting a peak shape.}
 
 \item{sd.max}{Maximum width (standard deviation) for peaks. Defaults to 50.}
 

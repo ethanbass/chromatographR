@@ -9,12 +9,16 @@ correct_rt(
   lambdas,
   models = NULL,
   reference = "best",
+  alg = c("ptw", "vpdtw"),
   what = c("models", "corrected.values"),
   init.coef = c(0, 1, 0),
   n.traces = NULL,
   n.zeros = 0,
-  scale = TRUE,
+  scale = FALSE,
   trwdth = 200,
+  plot = FALSE,
+  penalty = 5,
+  verbose = FALSE,
   ...
 )
 }
@@ -28,6 +32,9 @@ correct_rt(
 \item{reference}{Index of the sample that is to be considered the reference
 sample.}
 
+\item{alg}{algorithm to use: parametric time warping(\code{ptw}) or variable
+penalty dynamic time warping \code{vpdtw}.}
+
 \item{what}{What to return: either the 'corrected.values' (useful for visual
 inspection) or the warping 'models' (for further programmatic use).}
 
@@ -40,6 +47,13 @@ inspection) or the warping 'models' (for further programmatic use).}
 \item{scale}{Logical. If true, scale chromatograms before warping.}
 
 \item{trwdth}{width of the triangle in the WCC criterion.}
+
+\item{plot}{Logical. Whether to plot alignment.}
+
+\item{penalty}{Divisor for dilation calculated by \code{\link[VPdtw]{dilation}}.
+Adjusts penalty for variable penalty dynamic time warping.}
+
+\item{verbose}{Whether to be verbose.}
 
 \item{\dots}{Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
 The only argument that cannot be changed is \code{warp.type}: this is always
@@ -76,6 +90,14 @@ Wehrens, R., Carvalho, E., Fraser, P.D. 2015.
 Metabolite profiling in
 LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
 Metabolomics} \bold{11:1}:143-154. \doi{10.1007/s11306-014-0683-5}
+
+Clifford, D., Stone, G., Montoliu, I., Rezzi, S., Martin, F. P., Guy, P.,
+... & Kochhar, S. 2009. Alignment using variable penalty dynamic time warping.
+\emph{Analytical chemistry}, \bold{81(3)}:1000-1007. \doi{10.1021/ac802041e}.
+
+Clifford, D., & Stone, G. (2012). Variable Penalty Dynamic Time Warping Code
+for Aligning Mass Spectrometry Chromatograms in R. \emph{Journal of
+Statistical Software}, \bold{47(8)}:1-17. \doi{10.18637/jss.v047.i08}.
 }
 \seealso{
 \code{\link[ptw:ptw]{ptw}}, \code{\link{correct_peaks}}
