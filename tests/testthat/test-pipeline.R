@@ -29,10 +29,10 @@ test_that("preprocess works on a list", {
 
 warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','318'))
 warp <- correct_rt(chrom_list=dat.pr, models=warping.models, what = "corrected.values")
-
 test_that("correct_rt works", {
   equals(length(warping.models), length(warp), length(Sa[1:2]))
-  expect_equal(names(warp), names(Sa[1:2]))
+  expect_equal(names(warp), names(dat.pr[1:2]))
+  expect_equal(t(warping.models[[1]]$warped.sample)[,1], as.numeric(warp[[1]][,"210"]))
 })
 
 ### test get_peaks ###

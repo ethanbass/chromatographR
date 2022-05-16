@@ -58,9 +58,10 @@ preprocess <- function(X, dim1, ## time axis
                           interpolate_rows = TRUE,
                           interpolate_cols = TRUE,
                           mc.cores=2, ...){
-  if(.Platform$OS.type == "windows")
-    mc.cores <- 1
+  if (parallel & .Platform$OS.type == "windows"){
     parallel <- FALSE
+    warning("Parallel processing is not currently available on Windows.")
+  }
   if (is.matrix(X)){
     X <- list(X)
     return_matrix <- TRUE
