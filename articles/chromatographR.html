@@ -213,7 +213,7 @@
 <p><img src="chromatographR_files/figure-html/unnamed-chunk-4-1.png" width="576"></p>
 </div>
 <div class="section level5">
-<h5 id="plot-spectrum">Plot spectrum<a class="anchor" aria-label="anchor" href="#plot-spectrum"></a>
+<h5 id="plotting-spectra">Plotting spectra<a class="anchor" aria-label="anchor" href="#plotting-spectra"></a>
 </h5>
 <p>The <code>plot_spectrum</code> function allows you to easily plot or record the spectra associated with a particular peak in your peak table. This is useful for interpreting your results and/or checking for errors in your peak table. For example, you may want to check if the spectra for a particular peak match across different samples, or you may want to compare your spectrum with a known standard. The <code>plot_spectrum</code> function can be used to plot only the spectrum or only the chromatographic trace using the arguments <code>plot_spectrum</code> and <code>plot_trace</code>. By default it will plot the trace and spectrum from the chromatogram with the largest peak in the peak table. Alternatively, you can choose the chromatogram index and wavelength using the <code>chr</code> and <code>lambda</code> arguments.</p>
 <pre class="text"><code>&gt; par(mfrow=c(2,1))
@@ -227,9 +227,9 @@
 <p><img src="chromatographR_files/figure-html/plot_all-1.png" width="576"></p>
 </div>
 <div class="section level5">
-<h5 id="plot-peak-table">Plot peak table<a class="anchor" aria-label="anchor" href="#plot-peak-table"></a>
+<h5 id="plot-peak-table-function">Plot peak table function<a class="anchor" aria-label="anchor" href="#plot-peak-table-function"></a>
 </h5>
-<p>The plot <code>peak_table</code> function provides a simplified interface to various options for plotting data from the peak table. For example, it can be used as a quick interface to the  and  functions shown above. It can also be used to make a quick box plot to compare results across treatments.</p>
+<p>The <code>plot.peak_table</code> function provides a simplified interface to various options for plotting data from the peak table. For example, it can be used as a quick interface to the  and  functions shown above. It can also be used to make a quick box plot to compare results across treatments.</p>
 <pre class="text"><code>&gt; plot(pk_tab, loc = "V13", box_plot = TRUE, vars = "trt", verbose = FALSE)</code></pre>
 <p><img src="chromatographR_files/figure-html/unnamed-chunk-5-1.png" width="576"><img src="chromatographR_files/figure-html/unnamed-chunk-5-2.png" width="576"><img src="chromatographR_files/figure-html/unnamed-chunk-5-3.png" width="576"></p>
 </div>
