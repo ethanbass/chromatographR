@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -181,7 +181,7 @@
 <h3 id="further-analysis-and-data-visualization">Further analysis and data-visualization<a class="anchor" aria-label="anchor" href="#further-analysis-and-data-visualization"></a>
 </h3>
 <div class="section level5">
-<h5 id="attaching-meta-data">Attaching meta-data<a class="anchor" aria-label="anchor" href="#attaching-meta-data"></a>
+<h5 id="attaching-metadata">Attaching metadata<a class="anchor" aria-label="anchor" href="#attaching-metadata"></a>
 </h5>
 <p>To begin analyzing your peak table, you will usually want to attach sample meta-data to the <code>peak_table</code> object. This can be easily accomplished using the <code>attach_metadata</code> function. The peak table can then be normalized (e.g. by dividing out the sample weight) using the <code>normalize_data</code> function.</p>
 <pre class="text"><code>&gt; path &lt;- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
@@ -193,7 +193,7 @@
 <h5 id="plotting">Plotting<a class="anchor" aria-label="anchor" href="#plotting"></a>
 </h5>
 <p>The <code>mirror_plot</code> function provides a quick way to visually compare results across treatment groups.</p>
-<pre class="text"><code>&gt; mirror_plot(pk_tab, lambdas = c("210","260"), var = "trt", legend_size=3)</code></pre>
+<pre class="text"><code>&gt; mirror_plot(pk_tab, lambdas = c("210","260"), var = "trt", legend_size=2)</code></pre>
 <p><img src="chromatographR_files/figure-html/unnamed-chunk-3-1.png" width="576"></p>
 <p>The <code>plot_spectrum</code> function allows you to easily plot or record the spectra associated with a particular peak in your peak table. This is useful for interpreting your results and/or checking for errors in your peak table. For example, you may want to check if the spectra for a particular peak match across different samples, or you may want to compare your spectrum with a known standard. The <code>plot_spectrum</code> function can be used to plot only the spectrum or only the chromatographic trace using the arguments <code>plot_spectrum</code> and <code>plot_trace</code>. By default it will plot the trace and spectrum from the chromatogram with the largest peak in the peak table. Alternatively, you can choose the chromatogram index and wavelength using the <code>chr</code> and <code>lambda</code> arguments.</p>
 <pre class="text"><code>&gt; par(mfrow=c(2,1))
@@ -258,7 +258,7 @@ attached base packages:
 [8] base     
 
 other attached packages:
-[1] chromatographR_0.4 knitr_1.39        
+[1] chromatographR_0.4.0 knitr_1.39          
 
 loaded via a namespace (and not attached):
  [1] Rcpp_1.0.8.3          highr_0.9             bslib_0.3.1          
@@ -277,8 +277,8 @@ loaded via a namespace (and not attached):
 [40] smoother_1.1          chromConverter_0.1.0  purrr_0.3.4          
 [43] fastcluster_1.2.3     magrittr_2.0.3        scales_1.2.0         
 [46] htmltools_0.5.2       dynamicTreeCut_1.63-1 colorspace_2.0-3     
-[49] ragg_1.2.2            stringi_1.7.6         munsell_0.5.0        
-[52] cachem_1.0.6          zoo_1.8-10           </code></pre>
+[49] VPdtw_2.1-12          ragg_1.2.2            stringi_1.7.6        
+[52] munsell_0.5.0         cachem_1.0.6          zoo_1.8-10           </code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
