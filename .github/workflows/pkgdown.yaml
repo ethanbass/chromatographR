@@ -22,8 +22,8 @@ jobs:
       - uses: r-lib/actions/setup-r@v1
         with:
           use-public-rspm: true
-          
-       - name: Add VPdtw repo
+      
+      - name: Add VPdtw repo
         run: |
           writeLines('options(repos = c(VPdtw = "https://ethanbass.github.io/drat/", getOption(\"repos\")))', file("~/.Rprofile", "ab"))
         shell: Rscript {0}
