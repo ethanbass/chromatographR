@@ -23,7 +23,7 @@ attach_metadata <- function(peak_table, metadata, column){
   if (sum((duplicated(metadata[,column]))) > 0)
     stop(paste0("Sample names must be unique. Please check column '", column,
     "' for duplicates."))
-  if (class(peak_table) != "peak_table")
+  if (!inherits(peak_table,"peak_table"))
     stop(paste("Provided peak_table object must be of class 'peak_table'."))
   meta <- data.frame(rownames(peak_table$tab))
   names(meta) <- column
@@ -58,7 +58,7 @@ attach_metadata <- function(peak_table, metadata, column){
 
 gather_reference_spectra <- function(peak_table, chrom_list,
                                      ref = c("max.cor", "max.int")){
-  if (class(peak_table) != "peak_table")
+  if (!inherits(peak_table, "peak_table"))
     stop(paste("Provided peak_table object must be of class 'peak_table'."))
   if (missing(chrom_list)){
     try.out <- try(chrom_list <- get(peak_table$args["chrom_list"]))
@@ -140,7 +140,7 @@ attach_ref_spectra <- function(peak_table, chrom_list, ref = c("max.cor","max.in
 
 normalize_data <- function(peak_table, column, chrom_list,
                            what=c('peak_table','chrom_list')){
-  if (class(peak_table) != "peak_table")
+  if (!inherits(peak_table,"peak_table"))
     stop(paste("Provided peak_table object must be of class 'peak_table'."))
   if (!is.data.frame(peak_table$sample_meta))
     stop("Meta-data must be attached to peak_table prior to normalization.")

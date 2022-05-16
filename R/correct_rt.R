@@ -1,7 +1,8 @@
 #' Correct retention time
 #' 
-#' Corrects retention time differences using parametric time warping as 
-#' implemented in \code{\link[ptw:ptw]{ptw}}.
+#' Corrects retention time differences using parametric time warping, as 
+#' implemented in \code{\link[ptw]{ptw}}, or variable penalty dynamic 
+#' time warping, as implemented in \code{\link[VPdtw]{VPdtw}}.
 #' 
 #' @aliases correct_rt
 #' @import ptw
@@ -24,7 +25,7 @@
 #' @param plot Logical. Whether to plot alignment.
 #' @param penalty Divisor for dilation calculated by \code{\link[VPdtw]{dilation}}.
 #' Adjusts penalty for variable penalty dynamic time warping.
-#' @param maxshift Integer. Maximum allowable shift for \code{VPdtw}.
+#' @param maxshift Integer. Maximum allowable shift for \code{\link[VPdtw]{VPdtw}}.
 #' @param verbose Whether to be verbose.
 #' @param \dots Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
 #' The only argument that cannot be changed is \code{warp.type}: this is always
@@ -34,7 +35,8 @@
 #' @note Adapted from
 #' \href{https://github.com/rwehrens/alsace/blob/master/R/correctRT.R}{correctRT}
 #' function in the alsace package by Ron Wehrens.
-#' @seealso \code{\link[ptw:ptw]{ptw}}, \code{\link{correct_peaks}}
+#' @seealso \code{\link[ptw:ptw]{ptw}}, \code{\link{correct_peaks}},
+#' \code{\link[VPdtw]{VPdtw}}
 #' @references Eilers, P.H.C. 2004. Parametric Time Warping.
 #' \emph{Anal. Chem.} \bold{76}:404-411. \doi{10.1021/ac034800e}.
 #' 
@@ -180,7 +182,7 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
 #' Correct peak positions according to a ptw warping model
 #' 
 #' Corrects retention time differences using parametric time warping as 
-#' implemented in \code{\link[ptw:ptw]{ptw}}.
+#' implemented in \code{\link[ptw]{ptw}}.
 #' 
 #' Once an appropriate warping model has been established, corrected retention
 #' times can be predicted for each peak. These are stored in a separate column
