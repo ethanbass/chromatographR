@@ -95,7 +95,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
   clust <- match.arg(clust, c("rt","sp.rt"))
   out <- match.arg(out, c('data.frame', 'matrix'))
   rt <- ifelse(use.cor, "rt.cor", "rt")
-  if (class(peak_list) != "peak_list")
+  if (!inherits(peak_list,"peak_list"))
     stop("Peak list must be of the associated class.")
   if (missing(chrom_list)){
     chrom_list <- try(get(attr(peak_list, "chrom_list")))

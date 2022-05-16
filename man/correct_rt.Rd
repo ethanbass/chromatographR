@@ -54,7 +54,7 @@ inspection) or the warping 'models' (for further programmatic use).}
 \item{penalty}{Divisor for dilation calculated by \code{\link[VPdtw]{dilation}}.
 Adjusts penalty for variable penalty dynamic time warping.}
 
-\item{maxshift}{Integer. Maximum allowable shift for \code{VPdtw}.}
+\item{maxshift}{Integer. Maximum allowable shift for \code{\link[VPdtw]{VPdtw}}.}
 
 \item{verbose}{Whether to be verbose.}
 
@@ -66,8 +66,9 @@ equal to \code{"global"}.}
 A list of `ptw` objects or a list of warped absorbance profiles.
 }
 \description{
-Corrects retention time differences using parametric time warping as 
-implemented in \code{\link[ptw:ptw]{ptw}}.
+Corrects retention time differences using parametric time warping, as 
+implemented in \code{\link[ptw]{ptw}}, or variable penalty dynamic 
+time warping, as implemented in \code{\link[VPdtw]{VPdtw}}.
 }
 \note{
 Adapted from
@@ -103,7 +104,8 @@ for Aligning Mass Spectrometry Chromatograms in R. \emph{Journal of
 Statistical Software}, \bold{47(8)}:1-17. \doi{10.18637/jss.v047.i08}.
 }
 \seealso{
-\code{\link[ptw:ptw]{ptw}}, \code{\link{correct_peaks}}
+\code{\link[ptw:ptw]{ptw}}, \code{\link{correct_peaks}},
+\code{\link[VPdtw]{VPdtw}}
 }
 \author{
 Ethan Bass

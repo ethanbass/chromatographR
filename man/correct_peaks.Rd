@@ -21,7 +21,7 @@ containing the corrected retention time.
 }
 \description{
 Corrects retention time differences using parametric time warping as 
-implemented in \code{\link[ptw:ptw]{ptw}}.
+implemented in \code{\link[ptw]{ptw}}.
 }
 \details{
 Once an appropriate warping model has been established, corrected retention
