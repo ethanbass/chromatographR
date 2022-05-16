@@ -1,9 +1,8 @@
 ## R CMD check results
 
-0 errors | 0 warnings | 3 notes
+0 errors | 0 warnings | 4 notes
 
-*There is a note about the possible mispelling of 3 words in the description: "HPLC (3:27, 9:52)", "chromatograms (10:5)" and
-  "preprocessing (10:61)". None of these words are actually mispelled.
+*There is a note about the possible mispelling of 3 words in the description: "HPLC (3:27, 9:52)", "chromatograms (10:5)" and "preprocessing (10:61)". None of these words are actually mispelled.
 
 * Two of the notes concern the package VPdtw which is included as a suggested dependency. VPdtw was formerly available on CRAN but has since been removed. The notes are generated because the package is not available (on CRAN) for checking. One of the notes concerns the Rd references to VPdtw: "Package unavailable to check Rd xrefs: 'VPdtw'". I think it appropriate to include these links to the VPdtw documentation, but I am open to alternative suggestions for how to deal with this. If VPdtw is not installed locally, the links do return an "internal server error". For example, I could use weblinks to the documentation on github rather than assuming that it is present locally. I have also been in touch with the package maintainer about returning the package to CRAN, but have not yet received a response.
 

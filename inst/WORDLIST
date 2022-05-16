@@ -1,5 +1,6 @@
 ALS
 Afsar
+Agilent
 Bioinformatics
 Bloemberg
 Broeckling
@@ -8,6 +9,7 @@ Carvalho
 ChemStation
 Chromatograms
 Chromatographia
+DTW
 DuffyTools
 Eilers
 FWHM
@@ -33,6 +35,7 @@ Pvclust
 RAMClust
 Reproducibility
 Rezzi
+Sa
 Shimodaira
 Solidago
 Spectrometry
@@ -72,3 +75,4 @@ stripplot
 terpconnect
 toh
 umd
+vpdtw

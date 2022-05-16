@@ -1,4 +1,14 @@
 
+@misc{bass2022c,
+  title = {{{chromConverter}}: {{Chromatographic File Converter}}},
+  shorttitle = {{{chromConverter}}},
+  author = {Bass, Ethan},
+  year = {2022},
+  month = apr,
+  abstract = {Reads chromatograms from binary formats into R objects. Currently supports conversion of Agilent ChemStation '.uv' and MassHunter '.sp', files using file parsers from the 'Aston' package {$<$}https://github.com/bovee/aston{$>$}.},
+  copyright = {GPL ({$\geq$} 3)}
+}
+
 @article{bloemberg2010,
   title = {Improved Parametric Time Warping for Proteomics},
   author = {Bloemberg, Tom G. and Gerretzen, Jan and Wouters, Hans J. P. and Gloerich, Jolein and {van Dael}, Maurice and Wessels, Hans J. C. T. and {van den Heuvel}, Lambert P. and Eilers, Paul H. C. and Buydens, Lutgarde M. C. and Wehrens, Ron},
@@ -14,7 +24,56 @@
   abstract = {We present an improved version of parametric time warping, which enables the method to be used in LC\textendash MS measurements in proteomics. The new features include a new similarity measure for comparing warped chromatograms, an insurance against peaks at the extremes of the chromatograms disappearing because of the warping, and the possibility to select and use multiple traces in searching the optimal alignment. Moreover, we present an alignment strategy combining global and individual alignments for aligning LC\textendash MS data that exhibit different shifts within the same sample, at the same retention time. Using an LC\textendash MS data set consisting of E. coli homogenates that were measured in several batches over a period of six months, we show the benefits of the improved algorithm and the merits of the new strategy. The algorithm is publicly available as the R package ptw.},
   langid = {english},
   keywords = {Alignment,Parametric time warping,Proteomics,R},
-  file = {../../../../../../Zotero/storage/QD86YU9B/Bloemberg et al. - 2010 - Improved parametric time warping for proteomics.pdf;../../../../../../Zotero/storage/PPPWBPPZ/S0169743910000572.html}
+  file = {/Users/ethanbass/Zotero/storage/QD86YU9B/Bloemberg et al. - 2010 - Improved parametric time warping for proteomics.pdf;/Users/ethanbass/Zotero/storage/PPPWBPPZ/S0169743910000572.html}
+}
+
+@misc{bovee2022,
+  title = {Aston},
+  author = {Bovee, Roderick},
+  year = {2022},
+  month = mar,
+  abstract = {View and interpret UV-visible and mass spectrometry chromatographic data.},
+  copyright = {BSD-3-Clause}
+}
+
+@misc{bovee2022a,
+  title = {Entab},
+  author = {Bovee, Roderick},
+  year = {2022},
+  month = apr,
+  abstract = {* -{$>$} TSV},
+  copyright = {MIT}
+}
+
+@article{clifford2009,
+  title = {Alignment {{Using Variable Penalty Dynamic Time Warping}}},
+  author = {Clifford, David and Stone, Glenn and Montoliu, Ivan and Rezzi, Serge and Martin, Fran{\c c}ois-Pierre and Guy, Philippe and Bruce, Stephen and Kochhar, Sunil},
+  year = {2009},
+  month = feb,
+  journal = {Analytical Chemistry},
+  volume = {81},
+  number = {3},
+  pages = {1000--1007},
+  publisher = {{American Chemical Society}},
+  issn = {0003-2700},
+  doi = {10.1021/ac802041e},
+  abstract = {In this article we highlight a novel variation on dynamic time warping (DTW) for aligning chromatogram signals. We are interested in sets of signals that can be aligned well locally, but not globally, by shifting individual signals in time. This kind of alignment is often sufficient for aligning gas chromatography data. Regular DTW often ``over-warps'' signals and introduces artificial features into the aligned data. To overcome this we introduce a variable penalty into the DTW process. The penalty is added to the distance metric whenever a nondiagonal step is taken. We select our penalty based on a morphological dilation of the two signals. We showcase our method by aligning GC/MS datafiles from 712 blood plasma samples processed in 23 batches over the course of 6 months. The use of variable penalty DTW significantly reduces the number of nondiagonal moves. In the examples presented here, this reduction is by a factor of 30, with no cost to visual quality of the alignment.}
+}
+
+@article{clifford2012,
+  title = {Variable {{Penalty Dynamic Time Warping Code}} for {{Aligning Mass Spectrometry Chromatograms}} in {{R}}},
+  author = {Clifford, David and Stone, Glenn},
+  year = {2012},
+  month = apr,
+  journal = {Journal of Statistical Software},
+  volume = {47},
+  pages = {1--17},
+  issn = {1548-7660},
+  doi = {10.18637/jss.v047.i08},
+  abstract = {Aligment of mass spectrometry (MS) chromatograms is sometimes required prior to sample comparison and data analysis. Without alignment, direct comparison of chromatograms would lead to inaccurate results. We demonstrate a new method for computing a high quality alignment of full length MS chromatograms using variable penalty dynamic time warping. This method aligns signals using local linear shifts without excessive warping that can alter the shape (and area) of chromatogram peaks. The software is available as the R package VPdtw on the Comprehensive R Archive Network and we highlight how one can use this package here.},
+  copyright = {Copyright (c) 2009 David Clifford, Glenn Stone},
+  langid = {english},
+  file = {/Users/ethanbass/Zotero/storage/GY9Q96P8/Clifford and Stone - 2012 - Variable Penalty Dynamic Time Warping Code for Ali.pdf}
 }
 
 @article{eilers2004,
@@ -30,7 +89,7 @@
   issn = {0003-2700},
   doi = {10.1021/ac034800e},
   abstract = {A parametric model is proposed for the warping function when aligning chromatograms. A very fast and stable algorithm results that consumes little memory and avoids the artifacts of dynamic time warping. The parameters of the warping function are useful for quality control. They also are easily interpolated, allowing alignment of batches of chromatograms based on warping functions for a limited number of calibration samples.},
-  file = {../../../../../../Zotero/storage/C9SFPIXK/Eilers - 2004 - Parametric Time Warping.pdf;../../../../../../Zotero/storage/UMUCZ7GZ/ac034800e.html}
+  file = {/Users/ethanbass/Zotero/storage/C9SFPIXK/Eilers - 2004 - Parametric Time Warping.pdf;/Users/ethanbass/Zotero/storage/UMUCZ7GZ/ac034800e.html}
 }
 
 @article{lan2001,
@@ -47,7 +106,7 @@
   abstract = {A hybrid of exponential and Gaussian functions is developed as a model of asymmetric peak profiles. This exponential-Gaussian hybrid function (EGH) is mathematically simple, numerically stable, and its parameters are readily determined by making graphical measurements and applying simple equations. Furthermore, the statistical moments of the EGH function can be accurately approximated (within{$\pm$}0.15\% error) at any level of asymmetry using formulae that are easily programmed into a computer. These features of the EGH make it very easy to implement by most chromatographers. The EGH serves as a useful alternative to the exponentially modified Gaussian (EMG) for modeling slightly asymmetric peaks since the two models produce nearly the same profile at relatively low asymmetries. The EGH also serves as an addition to the extensive list of alternative models that are sometimes better than the EMG at describing highly asymmetric peaks. A comparison between EMG and EGH curves at various asymmetries is made by analysis of toluene, phenylalanine, and pyridine on a reversed-phase liquid chromatographic system.},
   langid = {english},
   keywords = {chemometrics,Chromatographic peak detection,HPLC},
-  file = {../../../../../../Zotero/storage/F4LRTDRY/Lan and Jorgenson - 2001 - A hybrid of exponential and gaussian functions as .pdf;../../../../../../Zotero/storage/XLCPHTZ5/S0021967301005945.html}
+  file = {/Users/ethanbass/Zotero/storage/F4LRTDRY/Lan and Jorgenson - 2001 - A hybrid of exponential and gaussian functions as .pdf;/Users/ethanbass/Zotero/storage/XLCPHTZ5/S0021967301005945.html}
 }
 
 @article{suzuki2006,
@@ -63,7 +122,41 @@
   issn = {1367-4803},
   doi = {10.1093/bioinformatics/btl117},
   abstract = {Summary: Pvclust is an add-on package for a statistical software R to assess the uncertainty in hierarchical cluster analysis. Pvclust can be used easily for general statistical problems, such as DNA microarray analysis, to perform the bootstrap analysis of clustering, which has been popular in phylogenetic analysis. Pvclust calculates probability values (p-values) for each cluster using bootstrap resampling techniques. Two types of p-values are available: approximately unbiased (AU) p-value and bootstrap probability (BP) value. Multiscale bootstrap resampling is used for the calculation of AU p-value, which has superiority in bias over BP value calculated by the ordinary bootstrap resampling. In addition the computation time can be enormously decreased with parallel computing option.Availability: The program is freely distributed under GNU General Public License (GPL) and can directly be installed from CRAN (), the official R package archive. The instruction and program source code are available at Contact:ryota.suzuki@is.titech.ac.jp},
-  file = {../../../../../../Zotero/storage/M5H3FIBX/Suzuki and Shimodaira - 2006 - Pvclust an R package for assessing the uncertaint.pdf;../../../../../../Zotero/storage/U6FKE4BE/207339.html}
+  file = {/Users/ethanbass/Zotero/storage/M5H3FIBX/Suzuki and Shimodaira - 2006 - Pvclust an R package for assessing the uncertaint.pdf;/Users/ethanbass/Zotero/storage/U6FKE4BE/207339.html}
+}
+
+@article{tomasi2004,
+  title = {Correlation Optimized Warping and Dynamic Time Warping as Preprocessing Methods for Chromatographic Data},
+  author = {Tomasi, Giorgio and {van den Berg}, Frans and Andersson, Claus},
+  year = {2004},
+  journal = {Journal of Chemometrics},
+  volume = {18},
+  number = {5},
+  pages = {231--241},
+  issn = {1099-128X},
+  doi = {10.1002/cem.859},
+  abstract = {Two different algorithms for time-alignment as a preprocessing step in linear factor models are studied. Correlation optimized warping and dynamic time warping are both presented in the literature as methods that can eliminate shift-related artifacts from measurements by correcting a sample vector towards a reference. In this study both the theoretical properties and the practical implications of using signal warping as preprocessing for chromatographic data are investigated. The connection between the two algorithms is also discussed. The findings are illustrated by means of a case study of principal component analysis on a real data set, including manifest retention time artifacts, of extracts from coffee samples stored under different packaging conditions for varying storage times. We concluded that for the data presented here dynamic time warping with rigid slope constraints and correlation optimized warping are superior to unconstrained dynamic time warping; both considerably simplify interpretation of the factor model results. Unconstrained dynamic time warping was found to be too flexible for this chromatographic data set, resulting in an overcompensation of the observed shifts and suggesting the unsuitability of this preprocessing method for this type of signals. Copyright \textcopyright{} 2004 John Wiley \& Sons, Ltd.},
+  langid = {english},
+  keywords = {COW,DTW,PCA,retention time shift,warping},
+  annotation = {\_eprint: https://onlinelibrary.wiley.com/doi/pdf/10.1002/cem.859},
+  file = {/Users/ethanbass/Zotero/storage/JRXU3J7F/Tomasi et al. - 2004 - Correlation optimized warping and dynamic time war.pdf;/Users/ethanbass/Zotero/storage/2NA9ZVZ9/cem.html}
+}
+
+@article{uesugi2013,
+  title = {Herbivore Exclusion Drives the Evolution of Plant Competitiveness via Increased Allelopathy},
+  author = {Uesugi, Akane and Kessler, Andr{\'e}},
+  year = {2013},
+  month = may,
+  journal = {New Phytologist},
+  volume = {198},
+  number = {3},
+  pages = {916--924},
+  issn = {0028646X},
+  doi = {10.1111/nph.12172},
+  abstract = {The `Evolution of Increased Competitive Ability (EICA)' hypothesis predicts the evolution of plant invasiveness in introduced ranges when plants escape from their natural enemies. So far, the EICA hypothesis has been tested by comparing plant vigor from native and invasive populations, but these studies are confounded by among-population differences in additional environmental factors and/or founder effects.},
+  langid = {english},
+  keywords = {polyacetylenes},
+  file = {/Users/ethanbass/Box/refs/zotero/polyacetylenes/Uesugi_2013_Herbivore exclusion drives the evolution of plant competitiveness via increased.pdf}
 }
 
 @article{wehrens2015,
@@ -80,7 +173,7 @@
   doi = {10.1007/s11306-014-0683-5},
   abstract = {For those chemical compounds absorbing in the UV\textendash Vis region and not readily applicable to routine mass spectrometry ionisation methods, liquid chromatography coupled to diode array detection is a convenient platform to perform metabolite profiling. Data processing by hand is labour-intensive and error prone. In the present study a strategy based on multivariate curve resolution, and its implementation in an R package called alsace are described. The final result of an analysis is a table containing peak heights or peak areas for all features of the individual injections. The capabilities of the software, providing elements such as splitting the data into separate, possibly overlapping time windows, merging the results of the individual time windows, and parametric time warping to align features, are illustrated using a cassava-derived data set.},
   langid = {english},
-  file = {../../../../../../Box/refs/zotero/undefined/Wehrens et al. - 2015 - Metabolite profiling in LC–DAD using multivariate .pdf}
+  file = {/Users/ethanbass/Box/refs/zotero/undefined/Wehrens et al. - 2015 - Metabolite profiling in LC–DAD using multivariate .pdf}
 }
 
 @article{wehrens2015a,
@@ -95,7 +188,7 @@
   issn = {1367-4803},
   doi = {10.1093/bioinformatics/btv299},
   abstract = {Summary: Alignment of peaks across samples is a difficult but unavoidable step in the data analysis for all analytical techniques containing a separation step like chromatography. Important application examples are the fields of metabolomics and proteomics. Parametric time warping (PTW) has already shown to be very useful in these fields because of the highly restricted form of the warping functions, avoiding overfitting. Here, we describe a new formulation of PTW, working on peak-picked features rather than on complete profiles. Not only does this allow for a much more smooth integration in existing pipelines, it also speeds up the (already among the fastest) algorithm by orders of magnitude. Using two publicly available datasets we show the potential of the new approach. The first set is a LC\textendash DAD dataset of grape samples, and the second an LC\textendash MS dataset of apple extracts.Availability and implementation: Parametric time warping of peak lists is implemented in the ptw package, version 1.9.1 and onwards, available from Github (https://github.com/rwehrens/ptw) and CRAN (http://cran.r-project.org). The package also contains a vignette, providing more theoretical details and scripts to reproduce the results below.Contact: ron.wehrens@wur.nl},
-  file = {../../../../../../Box/refs/zotero/undefined/Wehrens et al. - 2015 - Fast parametric time warping of peak lists.pdf;../../../../../../Zotero/storage/V8SWIMI4/240579.html}
+  file = {/Users/ethanbass/Box/refs/zotero/undefined/Wehrens et al. - 2015 - Fast parametric time warping of peak lists.pdf;/Users/ethanbass/Zotero/storage/V8SWIMI4/240579.html}
 }
 
 
