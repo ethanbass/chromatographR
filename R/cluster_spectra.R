@@ -43,14 +43,12 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' @references R. Suzuki, H. Shimodaira: Pvclust: an R package for assessing
 #' the uncertainty in hierarchical clustering. Bioinformatics, 22-12:1540-1542
 #' (2006). \doi{10.1093/bioinformatics/btl117}.
-#' @examples
+#' @examples \donttest{
 #' data(pk_tab)
 #' data(Sa_warp)
 #' cl <- cluster_spectra(pk_tab, nboot=100, max.only = FALSE, save = FALSE, alpha = .97)
+#' }
 #' @export cluster_spectra
-
-# # @examples
-# cluster_spectra(pk_tab, warp, nboot=100, max.only = FALSE, save = FALSE)
 
 cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
                             alpha=0.95, nboot=1000, plot_dend=TRUE,

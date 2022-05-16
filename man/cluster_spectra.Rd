@@ -69,9 +69,11 @@ to select clusters that exceed a certain confidence threshold as defined by
 alpha.
 }
 \examples{
+\donttest{
 data(pk_tab)
 data(Sa_warp)
 cl <- cluster_spectra(pk_tab, nboot=100, max.only = FALSE, save = FALSE, alpha = .97)
+}
 }
 \references{
 R. Suzuki, H. Shimodaira: Pvclust: an R package for assessing

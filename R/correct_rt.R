@@ -24,6 +24,7 @@
 #' @param plot Logical. Whether to plot alignment.
 #' @param penalty Divisor for dilation calculated by \code{\link[VPdtw]{dilation}}.
 #' Adjusts penalty for variable penalty dynamic time warping.
+#' @param maxshift Integer. Maximum allowable shift for \code{VPdtw}.
 #' @param verbose Whether to be verbose.
 #' @param \dots Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
 #' The only argument that cannot be changed is \code{warp.type}: this is always
@@ -62,7 +63,8 @@
 correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
                        alg = c("ptw", "vpdtw"), what = c("models", "corrected.values"), 
                        init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, 
-                       scale=FALSE, trwdth=200, plot=FALSE, penalty=5,
+                       scale=FALSE, trwdth=200, plot=FALSE,
+                       penalty=5, maxshift=50,
                        verbose = FALSE, ...){
   what <- match.arg(what, c("models", "corrected.values"))
   alg <- match.arg(alg, c("ptw", "vpdtw"))
@@ -94,7 +96,7 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
     if (is.null(n.traces)){
       traces <- ifelse(length(lambdas) == 1, 1, lambdas)
     } else{
-      traces <- select.traces(X=allmats.t, criterion='coda')
+      traces <- select.traces(X = allmats.t, criterion='coda')
       traces <- traces$trace.nrs[1:n.traces]
     }
     if (reference == 'best'){
@@ -134,7 +136,8 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
       stop("VPdtw only supports warping by a single wavelength")
     if (is.null(models)){
       penalty <- VPdtw::dilation(allmats[,reference], 350) / penalty
-      models <- VPdtw::VPdtw(query=allmats, reference=allmats[,reference], penalty = penalty)
+      models <- VPdtw::VPdtw(query=allmats, reference=allmats[,reference],
+                             penalty = penalty, maxshift = maxshift)
     }
     if (plot)
       VPdtw::plot.VPdtw(models)
@@ -155,11 +158,12 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
                                                 y = old_ts, 1:jmax)$y)
         mi<-min(which(!is.na(times)))
         if (mi>1){
-          beg<-sort(seq(from = times[mi]-res, by=-res, length.out = mi-1),decreasing=F)
+          beg<-sort(seq(from = times[mi]-res, by=-res, length.out = mi-1),
+                    decreasing=F)
         } else beg<-NULL
         ma<-max(which(!is.na(times)))
-        if (ma<length(times)){
-          end<-seq(from = times[ma]+res, length.out = length(times)-ma, by=res)
+        if (ma < length(times)){
+          end <- seq(from = times[ma]+res, length.out = length(times)-ma, by=res)
         } else end <- NULL
         new.times <- c(beg,times[!is.na(times)], end)
         rownames(x) <- new.times

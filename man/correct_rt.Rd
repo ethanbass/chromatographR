@@ -18,6 +18,7 @@ correct_rt(
   trwdth = 200,
   plot = FALSE,
   penalty = 5,
+  maxshift = 50,
   verbose = FALSE,
   ...
 )
@@ -52,6 +53,8 @@ inspection) or the warping 'models' (for further programmatic use).}
 
 \item{penalty}{Divisor for dilation calculated by \code{\link[VPdtw]{dilation}}.
 Adjusts penalty for variable penalty dynamic time warping.}
+
+\item{maxshift}{Integer. Maximum allowable shift for \code{VPdtw}.}
 
 \item{verbose}{Whether to be verbose.}
 
