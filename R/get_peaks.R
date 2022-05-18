@@ -36,9 +36,10 @@
 #' \href{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks}
 #' function authored by Ron Wehrens (though the underlying algorithms for peak
 #' identification and peak-fitting are not the same).
-#' @references Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
+#' @references 
+#' Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
 #' LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
-#' Metabolomics} \bold{11:1}:143-154. \doi{https://doi.org/10.1007/s11306-014-0683-5}.
+#' Metabolomics} \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}
 #' @examplesIf interactive()
 #' data(Sa_pr)
 #' pks <- get_peaks(Sa_pr, lambdas = c('210'), sd.max=50, fit="egh")
@@ -99,16 +100,23 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
 #' @param points Logical. If TRUE, plot peak maxima. Defaults to FALSE.
 #' @param ticks Logical. If TRUE, mark beginning and end of each peak. Defaults
 #' to FALSE.
-#' @param a Select "alpha"" parameter controlling transparency of shapes.
+#' @param a Alpha parameter controlling the transparency of fitted shapes.
+#' @param color The color of the fitted shapes.
 #' @param cex.points Size of points. Defaults to 0.5
 #' @param \dots Additional arguments to plot function.
+#' @return No return value, called for side effects.
+#' @section Side effects:
+#' Plots a chromatographic trace from the specified chromatogram (\code{chr})
+#' at the specified wavelength (\code{lambda}) with fitted peak shapes from the
+#' provided \code{peak_list} drawn underneath the curve. 
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaks}}
 #' @rdname plot.peak_list
 #' @export
 #' 
 plot.peak_list <- function(x, ..., chrom_list=NULL, index=1, lambda=NULL,
-                       points=FALSE, ticks=FALSE, a=0.5, cex.points=0.5){
+                       points=FALSE, ticks=FALSE, a=0.5, color=NULL,
+                       cex.points=0.5){
   if (is.null(chrom_list)){
     chrom_list <- get(attr(x, "chrom_list"))
   }
@@ -145,16 +153,19 @@ plot.peak_list <- function(x, ..., chrom_list=NULL, index=1, lambda=NULL,
       if (fit == "gaussian"){
         yvals <- gaussian(peak.loc, center=pks$rt[i],
                           width=pks$sd[i],height = pks$height[i])
-        color <- "red"
+        if (is.null(color))
+          color <- "red"
       }
       else if (fit == "egh"){
         yvals <- egh(x=peak.loc, center=pks$rt[i],
                      width=pks$sd[i], height = pks$height[i], tau=pks$tau[i])
-        color <- "purple"
+        if (is.null(color))
+          color <- "purple"
       }
       else if (fit == "raw"){
         yvals <- chrom_list[[index]][as.character(peak.loc), lambda]
-        color <- "hotpink"
+        if (is.null(color))
+          color <- "hotpink"
       }
       sapply(1:(length(peak.loc)-1), function(i){
         polygon(peak.loc[c(i,i,(i+1), (i+1))], c(0,yvals[i:(i+1)], 0),

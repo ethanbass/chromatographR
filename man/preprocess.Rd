@@ -64,7 +64,7 @@ colnames indicating the time points and wavelengths, respectively.
 Standard pre-processing of response matrices, consisting of a time axis and
 a spectral axis (e.g. HPLC-DAD/UV data). For smooth data, like UV-VIS data,
 the size of the matrix can be reduced by interpolation. By default,
-the data are baseline-corrected in the time direction and smoothed in the 
+the data are baseline-corrected in the time direction and smoothed in the
 spectral dimension.
 }
 \note{
@@ -81,9 +81,14 @@ Sa_pr <- preprocess(Sa[[1]], dim1 = new.ts, dim2 = new.lambdas)
 \dontshow{\}) # examplesIf}
 }
 \references{
-Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
+\itemize{
+\item Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast
+parametric time warping of peak lists. \emph{Bioinformatics}
+\bold{31}:3063-3065. \doi{10.1093/bioinformatics/btv299}.
+\item Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
 LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
 Metabolomics} \bold{11:1}:143-154. \doi{10.1007/s11306-014-0683-5}.
+}
 }
 \author{
 Ethan Bass

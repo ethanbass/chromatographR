@@ -4,6 +4,10 @@
 #' implemented in \code{\link[ptw]{ptw}}, or variable penalty dynamic 
 #' time warping, as implemented in \code{\link[VPdtw]{VPdtw}}.
 #' 
+#' To use variable penalty dynamic time warping, the \code{VPdtw} package must
+#' be manually installed since it's no longer available from CRAN: \code{
+#' install.packages('VPdtw', repos='https://ethanbass.github.io/drat/')}.
+#'
 #' @aliases correct_rt
 #' @import ptw
 #' @importFrom scales rescale
@@ -30,37 +34,39 @@
 #' @param \dots Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
 #' The only argument that cannot be changed is \code{warp.type}: this is always
 #' equal to \code{"global"}.
-#' @return A list of `ptw` objects or a list of warped absorbance profiles.
+#' @return A list of `ptw` objects or a list of warped absorbance profiles,
+#' depending on the value of the \code{what} argument.
 #' @author Ethan Bass
 #' @note Adapted from
 #' \href{https://github.com/rwehrens/alsace/blob/master/R/correctRT.R}{correctRT}
 #' function in the alsace package by Ron Wehrens.
 #' @seealso \code{\link[ptw:ptw]{ptw}}, \code{\link{correct_peaks}},
 #' \code{\link[VPdtw]{VPdtw}}
-#' @references Eilers, P.H.C. 2004. Parametric Time Warping.
-#' \emph{Anal. Chem.} \bold{76}:404-411. \doi{10.1021/ac034800e}.
-#' 
-#' Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast
-#' parametric time warping of peak lists. \emph{Bioinformatics}
-#' \bold{31}:3063-3065. \doi{10.1093/bioinformatics/btv299}.
-#' 
-#' Wehrens, R., Carvalho, E., Fraser, P.D. 2015.
-#' Metabolite profiling in
-#' LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
-#' Metabolomics} \bold{11:1}:143-154. \doi{10.1007/s11306-014-0683-5}
-#'
-#' Clifford, D., Stone, G., Montoliu, I., Rezzi, S., Martin, F. P., Guy, P.,
+#' @references 
+#' * Clifford, D., Stone, G., Montoliu, I., Rezzi, S., Martin, F. P., Guy, P.,
 #' ... & Kochhar, S. 2009. Alignment using variable penalty dynamic time warping.
 #' \emph{Analytical chemistry}, \bold{81(3)}:1000-1007. \doi{10.1021/ac802041e}.
 #'
-#' Clifford, D., & Stone, G. (2012). Variable Penalty Dynamic Time Warping Code
+#' * Clifford, D., & Stone, G. 2012. Variable Penalty Dynamic Time Warping Code
 #' for Aligning Mass Spectrometry Chromatograms in R. \emph{Journal of
 #' Statistical Software}, \bold{47(8)}:1-17. \doi{10.18637/jss.v047.i08}.
+#' 
+#' * Eilers, P.H.C. 2004. Parametric Time Warping.
+#' \emph{Anal. Chem.}, \bold{76}:404-411. \doi{10.1021/ac034800e}.
+#' 
+#' * Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast
+#' parametric time warping of peak lists. \emph{Bioinformatics},
+#' \bold{31}:3063-3065. \doi{10.1093/bioinformatics/btv299}.
+#' 
+#' * Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
+#' LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
+#' Metabolomics}, \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}
 #' 
 #' @examplesIf interactive()
 #' data(Sa_pr)
 #' warping.models <- correct_rt(Sa_pr, what = "models", lambdas=c("210"))
 #' warp <- correct_rt(chrom_list = Sa_pr, models = warping.models)
+#' @md
 #' @export correct_rt
 correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
                        alg = c("ptw", "vpdtw"), what = c("models", "corrected.values"), 

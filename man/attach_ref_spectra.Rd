@@ -17,12 +17,13 @@ Current options are maximum correlation (\code{max.cor}) or maximum signal
 intensity (\code{max.int}).}
 }
 \value{
-A `peak_table` object with reference spectra attached
+A \code{peak_table} object with reference spectra attached in the
+\code{$ref_spectra} slot.
 }
 \description{
 Gathers reference spectra and attaches them to peak_table object. Reference 
 spectra are defined either as the spectrum with the highest intensity (
-\code{max.int}) or as the spectrum with the  highest average correlation
+\code{max.int}) or as the spectrum with the highest average correlation
 to the other spectra in the peak_table (\code{max.cor}).
 }
 \examples{

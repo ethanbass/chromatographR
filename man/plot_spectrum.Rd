@@ -62,6 +62,12 @@ mode.}
 
 \item{...}{Additional arguments.}
 }
+\value{
+If \code{export_spectrum} is TRUE, returns the spectrum as a \code{
+data.frame} with wavelengths as rows and a single column encoding the
+absorbance (or normalized absorbance, if \code{scale_spectrum} is TRUE)
+at each wavelength. Otherwise, there is no return value.
+}
 \description{
 Plots the trace and/or spectrum for a given peak in peak.table object, or
 plots the spectrum a particular retention time for a given chromatogram.
@@ -71,13 +77,20 @@ Can be used to confirm the identity of a peak or check that a particular
 column in the peak table represents a single compound. Retention times can
 also be selected by clicking on the plotted trace if what == 'click'.
 }
+\section{Side effects}{
+
+If \code{plot_trace} is TRUE, plots the chromatographic trace of the specified
+chromatogram (\code{chr}), at the specified wavelength (\code{lambda}) with a
+dotted red line to indicate the retention time given by \code{loc}. The
+trace is a single column from the chromatographic matrix.
+
+If \code{plot_spectrum} is TRUE, plots the spectrum for the specified chromatogram
+at the specified retention time. The spectrum is a single row from the chromatographic
+matrix.
+}
+
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
-data(Sa)
-pks <- get_peaks(Sa,lambda="220.00000")
-pk_tab <- get_peaktable(pks)
-par(mfrow=c(2,1))
-plot_spectrum(loc = "V10", peak_table = pk_tab, what="peak")
 \dontshow{\}) # examplesIf}
 }
 \author{

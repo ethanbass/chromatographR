@@ -14,11 +14,12 @@ attach_metadata(peak_table, metadata, column)
 \item{column}{The name of the column containing the sample names.}
 }
 \value{
-A \code{peak_table} object with attached meta-data.
+A \code{peak_table} object with attached metadata in the \code{
+$sample_meta} slot.
 }
 \description{
-Attaches experimental meta-data to `peak_table` object. One of the columns in
-the supplied meta-data must match exactly the row names of the peak table.
+Attaches experimental metadata to `peak_table` object. One of the columns in
+the supplied metadata must match exactly the row names of the peak table.
 }
 \examples{
 data(pk_tab)

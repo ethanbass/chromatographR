@@ -9,7 +9,7 @@ plot_all_spectra(
   peak_table,
   chrom_list,
   chrs = "all",
-  plot_spectrum = T,
+  plot_spectrum = TRUE,
   export_spectrum = TRUE,
   scale_spectrum = TRUE,
   overlapping = TRUE,
@@ -39,14 +39,28 @@ Defaults to FALSE.}
 
 \item{overlapping}{Logical. If TRUE, plot spectra in single plot.}
 
-\item{verbose}{Logical. If TRUE, print verbose output to console.}
+\item{verbose}{Logical. If TRUE, prints verbose output to console.}
 
 \item{\dots}{Additional arguments to plot_spectrum.}
+}
+\value{
+If \code{export_spectrum} is TRUE, returns the spectra as a \code{
+data.frame} with wavelengths as rows and one column for each sample in the
+\code{chrom_list} encoding the absorbance (or normalized absorbance, if
+\code{scale_spectrum} is TRUE) at each wavelength. Otherwise, there is no
+return value.
 }
 \description{
 Plot multiple for a given peak in peak table. Wrapper for
 \code{\link{plot_spectrum}}.
 }
+\section{Side effects}{
+
+If \code{plot_spectrum} is TRUE, plots the spectra for the specified chromatogram
+(\code{chr}) of the given \code{peak}. The spectrum is a single row
+from the chromatographic matrix.
+}
+
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 data(Sa_warp)

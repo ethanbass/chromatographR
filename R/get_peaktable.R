@@ -74,10 +74,15 @@
 #' @note Adapted from
 #' \href{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}{getPeakTable}
 #' function in the alsace package by Ron Wehrens.
-#' @references Broeckling, C. D., F. A. Afsar, S. Neumann, A. Ben-Hur, and J.
+#' @md
+#' @references
+#' * Broeckling, C. D., F. A. Afsar, S. Neumann, A. Ben-Hur, and J.
 #' E. Prenni. 2014. RAMClust: A Novel Feature Clustering Method Enables
 #' Spectral-Matching-Based Annotation for Metabolomics Data. \emph{Anal. Chem.}
 #' \bold{86}:6812-6817. \doi{10.1021/ac501530d}
+#' * Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
+#' LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
+#' Metabolomics} \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}
 #' @examplesIf interactive()
 #' data(Sa_pr)
 #' pks <- get_peaks(Sa_pr, lambdas = c('210'))
@@ -249,18 +254,17 @@ row.names.peak_table <- function(x){
 #' @param x The peak table (output from \code{\link{get_peaktable}}
 #' function).
 #' @param ... Additional arguments.
-#' @param loc The name of the peak or retention time for which you wish to
-#' extract spectral data.
+#' @param loc The name of the peak or retention time that you wish to plot.
 #' @param chrom_list A list of chromatograms in matrix form (timepoints x
 #' wavelengths).
-#' @param what What to look for. Either "peak" to extract spectral information
-#' for a certain peak, "rt" to scan by retention time, or "click" to manually
-#' select retention time by clicking on the chromatogram. Defaults to "peak".
+#' @param what What to look for. Either \code{peak} to extract spectral information
+#' for a certain peak, \code{rt} to scan by retention time, or \code{click} to manually
+#' select retention time by clicking on the chromatogram. Defaults to \code{peak}.
 #' @param chr Numerical index of chromatogram you wish to plot; "max" to
 #' plot the chromatogram with the largest signal; or "all" to plot spectra
 #' for all chromatograms.
-#' @param lambda The wavelength you wish to plot the trace at if
-#' plot_chrom ==T and/or the wavelength to be used for the determination
+#' @param lambda The wavelength you wish to plot the trace at (if
+#' \code{plot_chrom} is TRUE and/or the wavelength to be used for the determination
 #' of signal abundance.
 #' @param plot_spectrum Logical. If TRUE, plots the spectrum of the chosen
 #' peak. Defaults to TRUE.
@@ -277,6 +281,22 @@ row.names.peak_table <- function(x){
 #' Defaults to FALSE.
 #' @param verbose Logical. If TRUE, prints verbose output to console. Defaults
 #' to TRUE.
+#' @return If \code{export_spectrum} is TRUE, returns the spectrum as a \code{
+#' data.frame} with wavelengths as rows and columns encoding the
+#' absorbance (or normalized absorbance, if \code{scale_spectrum} is TRUE) for 
+#' the specified sample(s). Otherwise, there is no return value.
+#' @section Side effects:
+#' If \code{plot_trace} is TRUE, plots the chromatographic trace of the specified
+#' chromatogram (\code{chr}), at the specified wavelength (\code{lambda}) with a
+#' dotted red line to indicate the retention time given by \code{loc}. The
+#' trace is a single column from the chromatographic matrix.
+#'
+#' If \code{plot_spectrum} is TRUE, plots the spectrum for the specified chromatogram
+#' at the specified retention time. The spectrum is a single row from the chromatographic
+#' matrix.
+#' 
+#' If \code{box_plot} is TRUE, produces a \code{\link[graphics]{boxplot}} from the
+#' specified peak with groups provided by \code{vars}.
 #' @author Ethan Bass
 #' @rdname plot.peak_table
 #' @export
@@ -296,12 +316,12 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
   }
   if (plot_spectrum == TRUE | plot_trace == TRUE){
     if (chr == "all"){
-      plot_all_spectra(loc, x, chrom_list,
+      out <- plot_all_spectra(loc, x, chrom_list,
                        plot_spectrum = plot_spectrum,
                        export_spectrum = export_spectrum,
                        verbose = verbose, what = what)
     } else{
-      plot_spectrum(loc, x, chrom_list, chr=chr,
+      out <- plot_spectrum(loc, x, chrom_list, chr=chr,
                     lambda = lambda, plot_spectrum = plot_spectrum,
                     plot_trace = plot_trace, spectrum_labels = spectrum_labels,
                     scale_spectrum = scale_spectrum,
@@ -310,12 +330,21 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
     }
   }
   if (box_plot == T){
-    if (is.null(vars))
-      stop("Must provide independent variable or variables for boxplot")
+    if (!is.data.frame(x$sample_meta)){
+      stop("Metadata must be attached to peak table to make mirror plot.")
+    }
+    if (is.null(vars)){
+      stop("Must provide independent variable or variables for boxplot.")
+    }
+    if (what!="peak"){
+      stop("A peak name must be provided to `loc` to produce a boxplot.")
+    }
     boxplot(as.formula(paste("x[['tab']][,loc]",vars,sep="~")), data = x$sample_meta,
             main = paste(loc, '\n', 'RT = ', round(x$pk_meta['rt', loc],2)),
             ylab="abs", xlab="", ...)
   }
+  if (export_spectrum)
+    out
 }
 
 #' Make mirror plot from peak table.
@@ -338,7 +367,7 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
 #' @param subset Character vector specifying levels to use (if more than 2 levels
 #' are present in \code{var}).
 #' @param print_legend Logical. Whether to print legend. Defaults to \code{TRUE}.
-#' @param legend Character vector containing labels for legend.
+#' @param legend_txt Character vector containing labels for legend.
 #' @param legend_pos Legend position.
 #' @param legend_size Legend size (\code{cex} argument). Default is 1.
 #' @param mirror Logical. Whether to plot as mirror or stacked plots.
@@ -346,6 +375,14 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
 #' @param xlim Numerical vector specifying limits for x axis.
 #' @param ylim Numerical vector specifying limits for y axis.
 #' @param ... Additional arguments to \code{\link{matplot}} function.
+#' @return No return value, called for side effects.
+#' @section Side effects:
+#' If \code{mirror_plot} is TRUE, plots a mirror plot comparing two treatments
+#' defined by \code{var} and \code{subset} (if more than two factors are present
+#' in \code{var}).
+#'
+#' Otherwise, if \code{mirror_plot} is FALSE, the treatments are plotted in two
+#' separate panes.
 #' @author Ethan Bass
 #' @examples
 #' data(Sa_warp)
@@ -357,13 +394,13 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
 #' @export
 
 mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset=NULL,
-                        print_legend=TRUE, legend=NULL, legend_pos = "topright",
+                        print_legend=TRUE, legend_txt=NULL, legend_pos = "topright",
                         legend_size = 1, mirror = TRUE, xlim=NULL, ylim=NULL, ...){
   meta <- peak_table$sample_meta
   if (!exists("var"))
     stop("Must provide independent variable or variables for mirror plot.")
   if (!is.data.frame(meta)){
-    stop("Meta-data must be attached to peak table to make mirror plot.")
+    stop("Metadata must be attached to peak table to make mirror plot.")
   }
   if (!(var %in% colnames(meta))){
     stop(paste(var, "not found in sample meta-data."))
@@ -391,8 +428,8 @@ mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset=NULL,
   }
   set1 <- which(meta[,var] == trt1)
   set2 <- which(meta[,var] == trt2)
-  if (is.null(legend))
-    legend <- c(trt1,trt2)
+  if (print_legend & is.null(legend_txt))
+    legend_txt <- c(trt1,trt2)
   if (is.null(xlim))
     xlim <- c(head(new.ts,1),tail(new.ts,1))
   y_max <- max(sapply(chrom_list, function(x) max(x[,as.character(min(as.numeric(lambdas)))], na.rm=T)))
@@ -405,12 +442,14 @@ mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset=NULL,
       matplot(new.ts, chrom_list[[i]][,lambdas], type='l', add=T, ...)
     }
     if (print_legend)
-      legend("topright", legend=legend[[1]], cex=legend_size, bty = "n")
+      legend("topright", legend=legend_txt[[1]], cex=legend_size, bty = "n")
     for (i in set2){
       matplot(new.ts, -chrom_list[[i]][,lambdas], type='l', add=T, ...)
     }
-    legend("bottomright", legend=legend[[2]], cex=legend_size, bty = "n")
+    if (print_legend)
+      legend("bottomright", legend=legend_txt[[2]], cex=legend_size, bty = "n")
   } else{
+    oldpar <- par(no.readonly = TRUE)
     par(mfrow=c(2,1))
     if (is.null(ylim))
       ylim <- c(0,y_max)
@@ -420,14 +459,14 @@ mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset=NULL,
       matplot(new.ts, chrom_list[[i]][,lambdas], type='l', add=T, ...)
     }
     if (print_legend)
-      legend(legend_pos, legend=legend[[1]], cex=legend_size, bty = "n")
-    
+      legend(legend_pos, legend=legend_txt[[1]], cex=legend_size, bty = "n")
     plot.new()
     plot.window(xlim = xlim, ylim = ylim)
     for (i in set2){
       matplot(new.ts, chrom_list[[i]][,lambdas], type='l', add=T, ...)
     }
-    legend(legend_pos, legend=legend[[2]], cex=legend_size, bty = "n")
+    if (print_legend)
+      legend(legend_pos, legend=legend_txt[[2]], cex=legend_size, bty = "n")
+    par(oldpar) #reset par
   }
 }
- 

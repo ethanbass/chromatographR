@@ -172,9 +172,11 @@ mirror_plot(pk_tab, lambdas = c("210","260"), var = "trt", legend_size=2)
 The `plot_spectrum` function allows you to easily plot or record the spectra associated with a particular peak in your peak table. This is useful for interpreting your results and/or checking for errors in your peak table. For example, you may want to check if the spectra for a particular peak match across different samples, or you may want to compare your spectrum with a known standard. The `plot_spectrum` function can be used to plot only the spectrum or only the chromatographic trace using the arguments `plot_spectrum` and `plot_trace`. By default it will plot the trace and spectrum from the chromatogram with the largest peak in the peak table. Alternatively, you can choose the chromatogram index and wavelength using the `chr` and `lambda` arguments.
 
 ```{r, plot spectra,fig.height=6}
+oldpar <- par(no.readonly = TRUE)
 par(mfrow=c(2,1))
 peak="V7"
 plot_spectrum(peak, peak_table = pk_tab, chrom_list=warp)
+par(oldpar)
 ```
 
 The `plot_all_spectra` function can be used to visually compare the spectra for a specified peak across all samples.

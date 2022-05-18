@@ -40,7 +40,12 @@
 #' @note Adapted from
 #' \href{https://github.com/rwehrens/alsace/blob/master/R/preprocess.R}{preprocess}
 #' function in the alsace package by Ron Wehrens.
-#' @references Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
+#' @references 
+#' * Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast
+#' parametric time warping of peak lists. \emph{Bioinformatics}
+#' \bold{31}:3063-3065. \doi{10.1093/bioinformatics/btv299}.
+#' 
+#' * Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
 #' LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
 #' Metabolomics} \bold{11:1}:143-154. \doi{10.1007/s11306-014-0683-5}.
 #' @examplesIf interactive()
@@ -48,6 +53,7 @@
 #' new.ts <- seq(10,18.66,by=.01) # choose time-points
 #' new.lambdas <- seq(200, 318, by = 2) # choose wavelengths
 #' Sa_pr <- preprocess(Sa[[1]], dim1 = new.ts, dim2 = new.lambdas)
+#' @md
 #' @export preprocess
 
 preprocess <- function(X, dim1, ## time axis

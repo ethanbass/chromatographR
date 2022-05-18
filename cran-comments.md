@@ -1,3 +1,23 @@
+## Response to comments
+
+I have addressed all of the comments kindly provided by Gregor Seyer after my last submission.
+Namely, I have:
+          1) expanded the DESCRIPTION (adding references to appropriate sources),
+          2) replaced `T` with `TRUE` in `plot_all_spectra`
+          3) added the `\value` field to the various plotting functions. I also adding "Side effects"
+          sections where I described the various kinds of plots that are produced by each function,
+          even though this was not explicitly requested.
+          4) I fixed the examples, vignettes and also functions (e.g. `mirror_plot`) so they reset the users
+          par settings after running.
+          5) While looking over the docs I also made some other minor changes to the text
+          with the goal of clarifying some things and reformatted some of the references for consistency.
+          6) I fixed a couple of small bugs and added some more informative error messages
+          to some of the the plot functions while looking them over.
+          7) All of these changes are also documented in somewhat greater detail in my `News.md` file.
+          8) Finally I pushed the version to 4.0.1.
+          
+          Thank you for your helpful feedback!
+          
 ## R CMD check results
 
 0 errors | 0 warnings | 3 notes

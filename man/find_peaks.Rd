@@ -46,8 +46,8 @@ threshold.
 \note{
 The \code{find_peaks} function is adapted from matlab code in Prof.
 Tom O'Haver's
-\href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{Pragmatic
-Introduction to Signal Processing}.
+\href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{
+Pragmatic Introduction to Signal Processing}.
 }
 \examples{
 data(Sa_pr)

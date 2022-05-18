@@ -13,6 +13,7 @@
   points = FALSE,
   ticks = FALSE,
   a = 0.5,
+  color = NULL,
   cex.points = 0.5
 )
 }
@@ -33,13 +34,25 @@ matrices)}
 \item{ticks}{Logical. If TRUE, mark beginning and end of each peak. Defaults
 to FALSE.}
 
-\item{a}{Select "alpha"" parameter controlling transparency of shapes.}
+\item{a}{Alpha parameter controlling the transparency of fitted shapes.}
+
+\item{color}{The color of the fitted shapes.}
 
 \item{cex.points}{Size of points. Defaults to 0.5}
+}
+\value{
+No return value, called for side effects.
 }
 \description{
 Visually assess integration accuracy by plotting fitted peaks over trace.
 }
+\section{Side effects}{
+
+Plots a chromatographic trace from the specified chromatogram (\code{chr})
+at the specified wavelength (\code{lambda}) with fitted peak shapes from the
+provided \code{peak_list} drawn underneath the curve.
+}
+
 \seealso{
 \code{\link{get_peaks}}
 }

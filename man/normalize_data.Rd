@@ -22,7 +22,8 @@ be in same order as the peak_table.}
 \item{what}{`peak_table` or list of chromatograms (`chrom_list`).}
 }
 \value{
-A normalized \code{peak_table} object.
+A \code{peak_table} object where the peaks are normalized by the mass
+of each sample.
 }
 \description{
 Normalizes peak table or list of chromatograms by specified column in sample

@@ -11,7 +11,7 @@ mirror_plot(
   var,
   subset = NULL,
   print_legend = TRUE,
-  legend = NULL,
+  legend_txt = NULL,
   legend_pos = "topright",
   legend_size = 1,
   mirror = TRUE,
@@ -36,7 +36,7 @@ are present in \code{var}).}
 
 \item{print_legend}{Logical. Whether to print legend. Defaults to \code{TRUE}.}
 
-\item{legend}{Character vector containing labels for legend.}
+\item{legend_txt}{Character vector containing labels for legend.}
 
 \item{legend_pos}{Legend position.}
 
@@ -51,6 +51,9 @@ Defaults to \code{TRUE}.}
 
 \item{...}{Additional arguments to \code{\link{matplot}} function.}
 }
+\value{
+No return value, called for side effects.
+}
 \description{
 Plots chromatograms as a mirror plot.
 }
@@ -60,6 +63,16 @@ column in the peak table represents a single compound. Can also be used
 to create simple box-plots to examine the distribution of a peak with respect
 to variables defined in sample metadata.
 }
+\section{Side effects}{
+
+If \code{mirror_plot} is TRUE, plots a mirror plot comparing two treatments
+defined by \code{var} and \code{subset} (if more than two factors are present
+in \code{var}).
+
+Otherwise, if \code{mirror_plot} is FALSE, the treatments are plotted in two
+separate panes.
+}
+
 \examples{
 data(Sa_warp)
 data(pk_tab)

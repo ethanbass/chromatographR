@@ -23,8 +23,8 @@
 #' centers. All locations are expressed as indices.
 #' @note The \code{find_peaks} function is adapted from matlab code in Prof.
 #' Tom O'Haver's
-#' \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{Pragmatic
-#' Introduction to Signal Processing}.
+#' \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{
+#' Pragmatic Introduction to Signal Processing}.
 #' @author Ethan Bass
 #' @examples
 #' data(Sa_pr)
@@ -106,13 +106,13 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1,
 #' fit_peaks(Sa_pr[[1]][,"220"])
 #' @seealso \code{\link{find_peaks}}, \code{\link{get_peaks}}
 #' @references
-#' Lan, K. & Jorgenson, J. W. A hybrid of exponential and gaussian
-#' functions as a simple model of asymmetric chromatographic peaks. Journal of
-#' Chromatography A 915, 1-13 (2001).
+#' Lan, K. & Jorgenson, J. W. 2001. A hybrid of exponential and gaussian
+#' functions as a simple model of asymmetric chromatographic peaks. \emph{Journal of
+#' Chromatography A} \bold{915}:1-13. \doi{10.1016/S0021-9673(01)00594-5}.
 #'
-#' Naish, P. J. & Hartwell, S. Exponentially Modified Gaussian functions - A
-#' good model for chromatographic peaks in isocratic HPLC? Chromatographia 26,
-#' 285-296 (1988).
+#' Naish, P. J. & Hartwell, S. 1988. Exponentially Modified Gaussian functions - A
+#' good model for chromatographic peaks in isocratic HPLC? \emph{Chromatographia},
+#' /bold{26}: 285-296. \doi{10.1007/BF02268168}.
 #' @export fit_peaks
 fit_peaks <- function (y, pos=NULL, sd.max = 50, fit = c("egh", "gaussian", "raw"), 
                        max.iter = 1000, ...){

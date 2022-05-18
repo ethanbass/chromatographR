@@ -28,22 +28,21 @@ function).}
 
 \item{...}{Additional arguments.}
 
-\item{loc}{The name of the peak or retention time for which you wish to
-extract spectral data.}
+\item{loc}{The name of the peak or retention time that you wish to plot.}
 
 \item{chrom_list}{A list of chromatograms in matrix form (timepoints x
 wavelengths).}
 
-\item{what}{What to look for. Either "peak" to extract spectral information
-for a certain peak, "rt" to scan by retention time, or "click" to manually
-select retention time by clicking on the chromatogram. Defaults to "peak".}
+\item{what}{What to look for. Either \code{peak} to extract spectral information
+for a certain peak, \code{rt} to scan by retention time, or \code{click} to manually
+select retention time by clicking on the chromatogram. Defaults to \code{peak}.}
 
 \item{chr}{Numerical index of chromatogram you wish to plot; "max" to
 plot the chromatogram with the largest signal; or "all" to plot spectra
 for all chromatograms.}
 
-\item{lambda}{The wavelength you wish to plot the trace at if
-plot_chrom ==T and/or the wavelength to be used for the determination
+\item{lambda}{The wavelength you wish to plot the trace at (if
+\code{plot_chrom} is TRUE and/or the wavelength to be used for the determination
 of signal abundance.}
 
 \item{plot_spectrum}{Logical. If TRUE, plots the spectrum of the chosen
@@ -69,6 +68,12 @@ Defaults to FALSE.}
 \item{verbose}{Logical. If TRUE, prints verbose output to console. Defaults
 to TRUE.}
 }
+\value{
+If \code{export_spectrum} is TRUE, returns the spectrum as a \code{
+data.frame} with wavelengths as rows and columns encoding the
+absorbance (or normalized absorbance, if \code{scale_spectrum} is TRUE) for 
+the specified sample(s). Otherwise, there is no return value.
+}
 \description{
 Plots the trace and/or spectrum for a given peak in peak table.
 }
@@ -78,6 +83,21 @@ column in the peak table represents a single compound. Can also be used
 to create simple box-plots to examine the distribution of a peak with respect
 to variables defined in sample metadata.
 }
+\section{Side effects}{
+
+If \code{plot_trace} is TRUE, plots the chromatographic trace of the specified
+chromatogram (\code{chr}), at the specified wavelength (\code{lambda}) with a
+dotted red line to indicate the retention time given by \code{loc}. The
+trace is a single column from the chromatographic matrix.
+
+If \code{plot_spectrum} is TRUE, plots the spectrum for the specified chromatogram
+at the specified retention time. The spectrum is a single row from the chromatographic
+matrix.
+
+If \code{box_plot} is TRUE, produces a \code{\link[graphics]{boxplot}} from the
+specified peak with groups provided by \code{vars}.
+}
+
 \author{
 Ethan Bass
 }

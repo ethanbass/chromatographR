@@ -37,9 +37,26 @@ Defaults to FALSE.}
 
 \item{...}{Additional arguments.}
 }
+\value{
+If \code{export_spectrum} is TRUE, returns the spectrum as a \code{
+data.frame} with wavelengths as rows and a single column encoding the
+absorbance (or normalized absorbance, if \code{scale_spectrum} is TRUE)
+at each wavelength. Otherwise, there is no return value.
+}
 \description{
 Convenience function to call plot_spectrum with what = "click".
 }
+\section{Side effects}{
+
+Plots a chromatographic trace from the specified chromatogram (\code{chr}),
+at the specified wavelength (\code{lambda}) with a dotted red line to indicate
+the user-selected retention time. The trace is a single column from the
+chromatographic matrix.
+
+If \code{plot_spectrum} is TRUE, plots the spectrum for the specified
+chromatogram at the user-specified retention time. The spectrum is a single
+}
+
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 data(Sa_pr)
