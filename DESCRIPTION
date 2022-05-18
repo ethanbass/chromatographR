@@ -27,7 +27,6 @@ BugReports: https://github.com/ethanbass/chromatographR/issues
 Depends: R (>= 3.5.0)
 Imports: 
     chromConverter,
-    devtools,
     dynamicTreeCut,
     fastcluster,
     graphics,
