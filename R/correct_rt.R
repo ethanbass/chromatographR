@@ -100,7 +100,7 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
     })
     }
     allmats <- sapply(chrom_list, function(x) x[,lambdas,drop=FALSE], simplify = "array")
-    allmats.t <- sapply(chrom_list, function(x) t(x[,lambdas,drop=F]), simplify = "array")
+    allmats.t <- sapply(chrom_list, function(x) t(x[,lambdas,drop=FALSE]), simplify = "array")
     if (is.null(n.traces)){
       traces <- ifelse(length(lambdas) == 1, 1, lambdas)
     } else{
@@ -167,7 +167,7 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
         mi<-min(which(!is.na(times)))
         if (mi>1){
           beg<-sort(seq(from = times[mi]-res, by=-res, length.out = mi-1),
-                    decreasing=F)
+                    decreasing=FALSE)
         } else beg<-NULL
         ma<-max(which(!is.na(times)))
         if (ma < length(times)){

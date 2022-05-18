@@ -27,7 +27,7 @@ The *chromatographR* package draws inspiration from the previously published *al
 ## Workflow
 ### Loading data
 
-chromatographR now includes an option to directly convert files from ChemStation or MassHunter [@bass2022c; @bovee2022; @bovee2022a]. Alternatively, the data from the spectrometer can be converted into an `R`-friendly  format like a `csv` file. The `load_chroms` function provides a simple interface to read chromatograms into `R` from any of these formats.
+chromatographR now includes an option to directly convert files from ChemStation or MassHunter [@bovee2022; @bovee2022a]. Alternatively, the data from the spectrometer can be converted into an `R`-friendly  format like a `csv` file. The `load_chroms` function provides a simple interface to read chromatograms into `R` from any of these formats.
 
 ```{r,eval=F}
 # single folder
@@ -175,7 +175,7 @@ The `plot_spectrum` function allows you to easily plot or record the spectra ass
 oldpar <- par(no.readonly = TRUE)
 par(mfrow=c(2,1))
 peak="V7"
-plot_spectrum(peak, peak_table = pk_tab, chrom_list=warp)
+plot_spectrum(peak, peak_table = pk_tab, chrom_list=warp, verbose=F)
 par(oldpar)
 ```
 

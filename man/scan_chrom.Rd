@@ -60,7 +60,7 @@ chromatogram at the user-specified retention time. The spectrum is a single
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 data(Sa_pr)
-scan_chrom(Sa_pr, lambda="210", chr=2, export_spectrum=T)
+scan_chrom(Sa_pr, lambda="210", chr=2, export_spectrum=TRUE)
 \dontshow{\}) # examplesIf}
 }
 \author{

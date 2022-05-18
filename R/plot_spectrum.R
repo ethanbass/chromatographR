@@ -108,11 +108,11 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
     y<-chrom_list[[chr]][,lambda.idx]
     matplot(x=new.ts, y=y, type='l', ylab='', xlab='')
     message("Click trace to select timepoint")
-    time <- identify(new.ts, y, n=1, plot=F)
+    time <- identify(new.ts, y, n=1, plot=FALSE)
     RT <- new.ts[time]
     abline(v=RT,col='red',lty=3)
     title(paste0("\n\n chr ", chr,  " ;   rt: ", RT, " ;  abs: ", round(y[time],1)))
-    y <- unlist(chrom_list[[chr]][time,,drop=T])
+    y <- unlist(chrom_list[[chr]][time,,drop=TRUE])
     # closest match
     if (verbose){
       message(paste0("chrome no. ", chr, "; RT: ", RT, "; lambda = ", lambda, " nm"))
@@ -134,7 +134,7 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
     if (chr == 'max'){
       chr <- which.max(tab[,loc])
     }
-    y <- unlist(chrom_list[[chr]][time,,drop=T])
+    y <- unlist(chrom_list[[chr]][time,,drop=TRUE])
     if (lambda == 'max'){
       lambda <- names(which.max(y))
       lambda.idx <- which(new.lambdas == lambda)
@@ -159,7 +159,7 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
             ylab = 'Intensity', xlab = 'Wavelength (nm)',
             ylim=c(0,max(y)*1.2), ...)
     if (spectrum_labels){
-      suppressWarnings(pks <- find_peaks(y,slope_thresh=.00001, bounds=F))
+      suppressWarnings(pks <- find_peaks(y,slope_thresh=.00001, bounds=FALSE))
       if (length(pks)>0){
       pks <- data.frame(round(as.numeric(names(y)[pks]),0), y[pks],stringsAsFactors = FALSE)
       text(pks[,1],pks[,2],pks[,1],pos=3,offset=.3,cex = .8)
@@ -282,7 +282,7 @@ plot_all_spectra <- function(peak, peak_table, chrom_list, chrs="all",
 #' @author Ethan Bass
 #' @examplesIf interactive()
 #' data(Sa_pr)
-#' scan_chrom(Sa_pr, lambda="210", chr=2, export_spectrum=T)
+#' scan_chrom(Sa_pr, lambda="210", chr=2, export_spectrum=TRUE)
 #' @export scan_chrom
 scan_chrom <- function(chrom_list, lambda, chr, peak_table=NULL, 
                        scale_spectrum = FALSE, spectrum_labels = TRUE,

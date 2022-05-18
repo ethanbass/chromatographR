@@ -28,7 +28,7 @@ combine_peaks <- function(peak_table, tol=.01, min.cor=0.9, choose='max'){
   compare_rts <- function(rt1, rt2, tol){
     abs(rt1 - rt2) < tol
   }
-  mat <- outer(RTs, RTs, compare_rts, tol=tol)
+  mat <- outer(RTs, RTs, compare_rts, tol = tol)
   # find columns with a retention time match
   d <- which(apply(mat,2, sum) > 1)
   cors <- cor(peak_table$tab)

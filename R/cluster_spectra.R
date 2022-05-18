@@ -63,7 +63,7 @@ cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
   rep <- sapply(colnames(peak_table[[1]]), function(j){
     sp <- plot_spectrum(loc=j, peak_table=peak_table, chrom_list,
                         scale_spectrum=TRUE, plot_trace=FALSE,
-                        export_spectrum = TRUE, plot_spectrum=FALSE, verbose=FALSE)
+                        export_spectrum=TRUE, plot_spectrum=FALSE, verbose=FALSE)
   })
   rep <- data.frame(do.call(cbind,rep))
   names(rep) <- paste0('V',seq_len(ncol(rep)))

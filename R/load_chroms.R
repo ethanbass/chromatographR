@@ -51,7 +51,7 @@ load_chroms <- function(paths, find_files = TRUE,
       gsub(pattern,"", basename(files))
       }
     converter <- function(file){
-      read.csv(file, row.names = 1, header=TRUE,
+      read.csv(file, row.names = 1, header = TRUE,
                           fileEncoding="utf-16",check.names = FALSE, ...)}
   }
   if (format.in!="csv" & !requireNamespace("chromConverter", quietly = TRUE)){
@@ -101,10 +101,10 @@ load_chroms <- function(paths, find_files = TRUE,
                     files[match]), immediate. = TRUE)
     }
   }
-  data <- lapply(X=files, function(f){
+  data <- lapply(X = files, function(f){
     as.matrix(converter(f))
   })
-  names(data) <- lapply(X=files, function(f){
+  names(data) <- lapply(X = files, function(f){
     get_names(f)
   })
   dat <- append(dat,data)

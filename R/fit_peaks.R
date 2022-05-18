@@ -138,7 +138,7 @@ fit_peaks <- function (y, pos=NULL, sd.max = 50, fit = c("egh", "gaussian", "raw
                                          max.iter = max.iter)
       )
       area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
-      r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=T)
+      r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=TRUE)
       c("rt" = m$center, "start" = pos[2], "end" = pos[3], "sd" = m$width, "FWHM" = 2.35 * m$width,
         "height" = y[xloc], "area" = area, "r.squared" = r.squared)
     }
@@ -159,7 +159,7 @@ fit_peaks <- function (y, pos=NULL, sd.max = 50, fit = c("egh", "gaussian", "raw
       suppressWarnings(m <- fit_egh(peak.loc, y[peak.loc], start.center = xloc,
                                     start.height = y[xloc], max.iter = max.iter)
                        )
-      r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=T)
+      r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=TRUE)
       area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
       c("rt" = m$center, "start" = pos[2], "end" = pos[3], "sd" = m$width, "tau" = m$tau, "FWHM" = 2.35 * m$width,
         "height" = y[xloc], "area" = area, "r.squared" = r.squared)
@@ -187,7 +187,7 @@ fit_peaks <- function (y, pos=NULL, sd.max = 50, fit = c("egh", "gaussian", "raw
   if (!is.null(sd.max)) {
     huhn <- huhn[huhn$sd < sd.max, ]
   }
-  x <- try(huhn[huhn$rt>0,],silent=T)
+  x <- try(huhn[huhn$rt>0,],silent=TRUE)
   if(inherits(x,  "try-error")){NA} else {x}
 }
 #################################################################################################
@@ -225,11 +225,13 @@ fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height
   controlList <- nls.control( maxiter = max.iter, minFactor=1/512, warnOnly=TRUE)
   starts <- list( "center"=start.center, "width"=start.width, "height"=start.height)
   if ( ! fit.floor) {
-    nlsAns <- try(nlsLM( y ~ gaussian( x, center, width, height), start=starts, control=controlList), silent=T)
+    nlsAns <- try(nlsLM( y ~ gaussian(x, center, width, height),
+                         start=starts, control=controlList), silent=TRUE)
   } else{
     if (is.null( start.floor)) start.floor <- quantile( y, seq(0,1,0.1))[2]
     starts <- c(starts,"floor"=start.floor)
-    nlsAns <- try(nlsLM( y ~ gaussian( x, center, width, height, floor), start=starts, control=controlList), silent=T)
+    nlsAns <- try(nlsLM( y ~ gaussian( x, center, width, height, floor),
+                         start=starts, control=controlList), silent=TRUE)
   }
   
   # package up the results to pass back
@@ -289,11 +291,13 @@ fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
   controlList <- nls.control(maxiter=max.iter, minFactor=1/512, warnOnly=TRUE)
   starts <- list("center"=start.center, "width"=start.width, "height"=start.height, "tau"=start.tau)
   if (!fit.floor){
-    nlsAns <- try(nlsLM(y1 ~ egh(x1, center, width, height, tau), start=starts, control=controlList), silent=T)
+    nlsAns <- try(nlsLM(y1 ~ egh(x1, center, width, height, tau),
+                        start=starts, control=controlList), silent=TRUE)
   } else{
     if (is.null( start.floor)) start.floor <- quantile( y1, seq(0,1,0.1))[2]
     starts <- c(starts, "floor"=start.floor)
-    nlsAns <- try(nlsLM(y1 ~ egh(x1, center, width, height, tau, floor), start=starts, control=controlList), silent=T)
+    nlsAns <- try(nlsLM(y1 ~ egh(x1, center, width, height, tau, floor),
+                        start=starts, control=controlList), silent=TRUE)
   }
   
   # package up the results to pass back

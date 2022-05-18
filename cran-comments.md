@@ -3,7 +3,8 @@
 I have addressed all of the comments kindly provided by Gregor Seyer after my last submission.
 Namely, I have:
           1) expanded the DESCRIPTION (adding references to appropriate sources),
-          2) replaced `T` with `TRUE` in `plot_all_spectra`
+          2) replaced `T` & `F` with `TRUE` & `FALSE` in various functions and
+          examples (e.g. `get_peaktable`, `plot_all_spectra` and `mirror_plot`).
           3) added the `\value` field to the various plotting functions. I also adding "Side effects"
           sections where I described the various kinds of plots that are produced by each function,
           even though this was not explicitly requested.

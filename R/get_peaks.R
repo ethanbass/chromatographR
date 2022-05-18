@@ -53,7 +53,7 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
   }
   peaks<-list()
   chrom_list_str <- deparse(substitute(chrom_list))
-  chrom_list <- lapply(chrom_list, function(c_mat) c_mat[,lambdas, drop=F])
+  chrom_list <- lapply(chrom_list, function(c_mat) c_mat[,lambdas, drop=FALSE])
   result <- lapply(seq_along(chrom_list), function(sample){
     suppressWarnings(ptable <- lapply(lambdas, function(lambda){
       cbind(sample = names(chrom_list)[sample], lambda,

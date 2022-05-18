@@ -131,14 +131,14 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
     }
     if (clust == 'sp.rt'){
       if (is.null(sigma.t)){
-        sigma.t <- .5*mean(do.call(rbind,unlist(pkLst,recursive = F))$end - 
-                             do.call(rbind,unlist(pkLst,recursive = F))$start)
+        sigma.t <- .5*mean(do.call(rbind,unlist(pkLst,recursive = FALSE))$end - 
+                             do.call(rbind,unlist(pkLst,recursive = FALSE))$start)
       }
       ts<- as.numeric(rownames(chrom_list[[1]]))
       sp <- sapply(seq_along(pkcenters), function(i){
         rescale(t(chrom_list[[file.idx[i]]][
           which(elementwise.all.equal(ts, pkcenters[i])),]))
-      }, simplify=T)
+      }, simplify=TRUE)
       cor.matrix <- cor(sp, method = "pearson")
       mint <- abs(outer(unlist(pkcenters), unlist(pkcenters), FUN="-"))
       S <- (exp((-(1-abs(cor.matrix))^2)/(2*sigma.r^2)))*exp(-(mint^2)/(2*sigma.t^2))
@@ -393,8 +393,8 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
 #' mirror_plot(pk_tab,lambdas=c("210","260"), var="trt", mirror=TRUE, col=c("green","blue"))
 #' @export
 
-mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset=NULL,
-                        print_legend=TRUE, legend_txt=NULL, legend_pos = "topright",
+mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset = NULL,
+                        print_legend = TRUE, legend_txt = NULL, legend_pos = "topright",
                         legend_size = 1, mirror = TRUE, xlim=NULL, ylim=NULL, ...){
   meta <- peak_table$sample_meta
   if (!exists("var"))
@@ -415,7 +415,7 @@ mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset=NULL,
     stop("The mirror plot requires two levels. Use the subset argument to 
          specify which levels to use.")
   if (!is.null(subset)){
-    if (mean(subset %in% levels(fac))<1){
+    if (mean(subset %in% levels(fac)) < 1){
       stop(paste("The specified levels are not present in", var))
     }
   }
@@ -432,19 +432,19 @@ mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset=NULL,
     legend_txt <- c(trt1,trt2)
   if (is.null(xlim))
     xlim <- c(head(new.ts,1),tail(new.ts,1))
-  y_max <- max(sapply(chrom_list, function(x) max(x[,as.character(min(as.numeric(lambdas)))], na.rm=T)))
+  y_max <- max(sapply(chrom_list, function(x) max(x[,as.character(min(as.numeric(lambdas)))], na.rm=TRUE)))
   if (mirror){
     if (is.null(ylim))
       ylim <- c(-y_max, y_max)
     plot.new()
     plot.window(xlim = xlim,ylim = ylim)
     for (i in set1){
-      matplot(new.ts, chrom_list[[i]][,lambdas], type='l', add=T, ...)
+      matplot(new.ts, chrom_list[[i]][,lambdas], type='l', add=TRUE, ...)
     }
     if (print_legend)
       legend("topright", legend=legend_txt[[1]], cex=legend_size, bty = "n")
     for (i in set2){
-      matplot(new.ts, -chrom_list[[i]][,lambdas], type='l', add=T, ...)
+      matplot(new.ts, -chrom_list[[i]][,lambdas], type='l', add=TRUE, ...)
     }
     if (print_legend)
       legend("bottomright", legend=legend_txt[[2]], cex=legend_size, bty = "n")
@@ -456,14 +456,14 @@ mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset=NULL,
     plot.new()
     plot.window(xlim = xlim, ylim = ylim)
     for (i in set1){
-      matplot(new.ts, chrom_list[[i]][,lambdas], type='l', add=T, ...)
+      matplot(new.ts, chrom_list[[i]][,lambdas], type='l', add=TRUE, ...)
     }
     if (print_legend)
       legend(legend_pos, legend=legend_txt[[1]], cex=legend_size, bty = "n")
     plot.new()
     plot.window(xlim = xlim, ylim = ylim)
     for (i in set2){
-      matplot(new.ts, chrom_list[[i]][,lambdas], type='l', add=T, ...)
+      matplot(new.ts, chrom_list[[i]][,lambdas], type='l', add=TRUE, ...)
     }
     if (print_legend)
       legend(legend_pos, legend=legend_txt[[2]], cex=legend_size, bty = "n")
