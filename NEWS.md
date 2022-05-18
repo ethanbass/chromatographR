@@ -14,8 +14,7 @@ to FALSE.
 * Added error for `box_plot` option in `plot.peak_table` if peak is not provided to `loc`.
 * Added error in `plot_spectrum` function for user-supplied retention times beyond
 the edges of the chromatogram.
-* Added error in `plot_spectrum` function for unspecified `lambda` (if `what=="rt"` 
-or `what=="click`).
+* Added error in `plot_spectrum` function for unspecified `lambda` (if `what=="click`).
 
 
 # chromatographR 0.4.0

@@ -90,23 +90,22 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
   new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
   if(lambda!="max"){
     lambda <- as.numeric(lambda)
-    lambda.index <- which(new.lambdas == lambda) 
+    lambda.idx <- which(new.lambdas == lambda) 
   }
-  sig <- max(sapply(
-    strsplit(rownames(chrom_list[[1]]),".", fixed=T), function(x) nchar(x[2])),na.rm=T)
+  sig <- max(nchar(gsub(".*\\.","",rownames(chrom_list[[1]]))))
   if (what == "rt" | what == "click"){
     if (chr == "max")
       stop("Chromatogram must be specified for scan function.")
-    if (lambda == "max")
-      stop("Lambda must be specified for scan function.")
-    if (!(lambda %in% new.lambdas))
-      stop("Lambda not found!")
+    if (what == "click" & lambda == "max")
+      stop("Lambda must be specified for interactive scanning.")
+    if (lambda != "max" & !(lambda %in% new.lambdas))
+      stop("The specified wavelength (`lambda`) could not be found!")
     if (is.null(chrom_list)){
       stop("List of chromatograms must be provided for scan function.")
     }
   }
   if (what == "click"){
-    y<-chrom_list[[chr]][,lambda.index]
+    y<-chrom_list[[chr]][,lambda.idx]
     matplot(x=new.ts, y=y, type='l', ylab='', xlab='')
     message("Click trace to select timepoint")
     time <- identify(new.ts, y, n=1, plot=F)
@@ -138,10 +137,10 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
     y <- unlist(chrom_list[[chr]][time,,drop=T])
     if (lambda == 'max'){
       lambda <- names(which.max(y))
-      lambda.index <- which(new.lambdas == lambda)
+      lambda.idx <- which(new.lambdas == lambda)
     } else lambda <- as.character(lambda)
     if (plot_trace){
-      matplot(x=new.ts, y=chrom_list[[chr]][,lambda.index],type='l',
+      matplot(x=new.ts, y=chrom_list[[chr]][,lambda.idx],type='l',
               #main=paste(names(chrom_list)[chr], ';','\n', 'RT = ', RT,
               #          '; Wavelength = ', lambda, 'nm'))
               ylab='', xlab='')
