@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,22 +82,21 @@ function).</p></dd>
 <dt>...</dt>
 <dd><p>Additional arguments.</p></dd>
 <dt>loc</dt>
-<dd><p>The name of the peak or retention time for which you wish to
-extract spectral data.</p></dd>
+<dd><p>The name of the peak or retention time that you wish to plot.</p></dd>
 <dt>chrom_list</dt>
 <dd><p>A list of chromatograms in matrix form (timepoints x
 wavelengths).</p></dd>
 <dt>what</dt>
-<dd><p>What to look for. Either "peak" to extract spectral information
-for a certain peak, "rt" to scan by retention time, or "click" to manually
-select retention time by clicking on the chromatogram. Defaults to "peak".</p></dd>
+<dd><p>What to look for. Either <code>peak</code> to extract spectral information
+for a certain peak, <code>rt</code> to scan by retention time, or <code>click</code> to manually
+select retention time by clicking on the chromatogram. Defaults to <code>peak</code>.</p></dd>
 <dt>chr</dt>
 <dd><p>Numerical index of chromatogram you wish to plot; "max" to
 plot the chromatogram with the largest signal; or "all" to plot spectra
 for all chromatograms.</p></dd>
 <dt>lambda</dt>
-<dd><p>The wavelength you wish to plot the trace at if
-plot_chrom ==T and/or the wavelength to be used for the determination
+<dd><p>The wavelength you wish to plot the trace at (if
+<code>plot_chrom</code> is TRUE and/or the wavelength to be used for the determination
 of signal abundance.</p></dd>
 <dt>plot_spectrum</dt>
 <dd><p>Logical. If TRUE, plots the spectrum of the chosen
@@ -124,11 +123,32 @@ Defaults to FALSE.</p></dd>
 to TRUE.</p></dd>
 </dl></div>
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>If <code>export_spectrum</code> is TRUE, returns the spectrum as a <code>
+data.frame</code> with wavelengths as rows and columns encoding the
+absorbance (or normalized absorbance, if <code>scale_spectrum</code> is TRUE) for 
+the specified sample(s). Otherwise, there is no return value.</p>
+    </div>
+    <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Can be used to confirm the identity of a peak or check that a particular
 column in the peak table represents a single compound. Can also be used
 to create simple box-plots to examine the distribution of a peak with respect
 to variables defined in sample metadata.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="side-effects">Side effects<a class="anchor" aria-label="anchor" href="#side-effects"></a></h2>
+    
+
+<p>If <code>plot_trace</code> is TRUE, plots the chromatographic trace of the specified
+chromatogram (<code>chr</code>), at the specified wavelength (<code>lambda</code>) with a
+dotted red line to indicate the retention time given by <code>loc</code>. The
+trace is a single column from the chromatographic matrix.</p>
+<p>If <code>plot_spectrum</code> is TRUE, plots the spectrum for the specified chromatogram
+at the specified retention time. The spectrum is a single row from the chromatographic
+matrix.</p>
+<p>If <code>box_plot</code> is TRUE, produces a <code><a href="https://rdrr.io/r/graphics/boxplot.html" class="external-link">boxplot</a></code> from the
+specified peak with groups provided by <code>vars</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>

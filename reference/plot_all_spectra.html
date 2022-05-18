@@ -12,7 +12,7 @@ plot_spectrum."><meta property="og:image" content="https://ethanbass.github.io/c
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,7 +62,7 @@ plot_spectrum."><meta property="og:image" content="https://ethanbass.github.io/c
   <span class="va">peak_table</span>,
   <span class="va">chrom_list</span>,
   chrs <span class="op">=</span> <span class="st">"all"</span>,
-  plot_spectrum <span class="op">=</span> <span class="cn">T</span>,
+  plot_spectrum <span class="op">=</span> <span class="cn">TRUE</span>,
   export_spectrum <span class="op">=</span> <span class="cn">TRUE</span>,
   scale_spectrum <span class="op">=</span> <span class="cn">TRUE</span>,
   overlapping <span class="op">=</span> <span class="cn">TRUE</span>,
@@ -95,10 +95,26 @@ Defaults to FALSE.</p></dd>
 <dt>overlapping</dt>
 <dd><p>Logical. If TRUE, plot spectra in single plot.</p></dd>
 <dt>verbose</dt>
-<dd><p>Logical. If TRUE, print verbose output to console.</p></dd>
+<dd><p>Logical. If TRUE, prints verbose output to console.</p></dd>
 <dt>...</dt>
 <dd><p>Additional arguments to plot_spectrum.</p></dd>
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>If <code>export_spectrum</code> is TRUE, returns the spectra as a <code>
+data.frame</code> with wavelengths as rows and one column for each sample in the
+<code>chrom_list</code> encoding the absorbance (or normalized absorbance, if
+<code>scale_spectrum</code> is TRUE) at each wavelength. Otherwise, there is no
+return value.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="side-effects">Side effects<a class="anchor" aria-label="anchor" href="#side-effects"></a></h2>
+    
+
+<p>If <code>plot_spectrum</code> is TRUE, plots the spectra for the specified chromatogram
+(<code>chr</code>) of the given <code>peak</code>. The spectrum is a single row
+from the chromatographic matrix.</p>
+    </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="plot_spectrum.html">plot_spectrum</a></code></p></div>

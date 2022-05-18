@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,6 +64,7 @@
   points <span class="op">=</span> <span class="cn">FALSE</span>,
   ticks <span class="op">=</span> <span class="cn">FALSE</span>,
   a <span class="op">=</span> <span class="fl">0.5</span>,
+  color <span class="op">=</span> <span class="cn">NULL</span>,
   cex.points <span class="op">=</span> <span class="fl">0.5</span>
 <span class="op">)</span></code></pre></div>
     </div>
@@ -87,10 +88,24 @@ matrices)</p></dd>
 <dd><p>Logical. If TRUE, mark beginning and end of each peak. Defaults
 to FALSE.</p></dd>
 <dt>a</dt>
-<dd><p>Select "alpha"" parameter controlling transparency of shapes.</p></dd>
+<dd><p>Alpha parameter controlling the transparency of fitted shapes.</p></dd>
+<dt>color</dt>
+<dd><p>The color of the fitted shapes.</p></dd>
 <dt>cex.points</dt>
 <dd><p>Size of points. Defaults to 0.5</p></dd>
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>No return value, called for side effects.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="side-effects">Side effects<a class="anchor" aria-label="anchor" href="#side-effects"></a></h2>
+    
+
+<p>Plots a chromatographic trace from the specified chromatogram (<code>chr</code>)
+at the specified wavelength (<code>lambda</code>) with fitted peak shapes from the
+provided <code>peak_list</code> drawn underneath the curve.</p>
+    </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="get_peaks.html">get_peaks</a></code></p></div>

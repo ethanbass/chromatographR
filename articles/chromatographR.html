@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -77,7 +77,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>chromatographR</h1>
                         <h4 data-toc-skip class="author">Ethan Bass</h4>
             
-            <h4 data-toc-skip class="date">2022-05-17</h4>
+            <h4 data-toc-skip class="date">2022-05-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/HEAD/vignettes/chromatographR.Rmd" class="external-link"><code>vignettes/chromatographR.Rmd</code></a></small>
       <div class="d-none name"><code>chromatographR.Rmd</code></div>
@@ -216,11 +216,13 @@
 <h5 id="plotting-spectra">Plotting spectra<a class="anchor" aria-label="anchor" href="#plotting-spectra"></a>
 </h5>
 <p>The <code>plot_spectrum</code> function allows you to easily plot or record the spectra associated with a particular peak in your peak table. This is useful for interpreting your results and/or checking for errors in your peak table. For example, you may want to check if the spectra for a particular peak match across different samples, or you may want to compare your spectrum with a known standard. The <code>plot_spectrum</code> function can be used to plot only the spectrum or only the chromatographic trace using the arguments <code>plot_spectrum</code> and <code>plot_trace</code>. By default it will plot the trace and spectrum from the chromatogram with the largest peak in the peak table. Alternatively, you can choose the chromatogram index and wavelength using the <code>chr</code> and <code>lambda</code> arguments.</p>
-<pre class="text"><code>&gt; par(mfrow=c(2,1))
+<pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE)
+&gt; par(mfrow=c(2,1))
 &gt; peak="V7"
 &gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list=warp)</code></pre>
-<pre><code>[1] "chrome no. 4; RT: 12.3; lambda = 318 nm"</code></pre>
+<pre><code>chrome no. 4; RT: 12.3; lambda = 318 nm</code></pre>
 <p><img src="chromatographR_files/figure-html/plot%20spectra-1.png" width="576"></p>
+<pre class="text"><code>&gt; par(oldpar)</code></pre>
 <p>The <code>plot_all_spectra</code> function can be used to visually compare the spectra for a specified peak across all samples.</p>
 <pre class="text"><code>&gt; peak="V13"
 &gt; plot_all_spectra(peak, peak_table=pk_tab, export=F, overlapping=T)</code></pre>
@@ -298,7 +300,7 @@ attached base packages:
 [8] base     
 
 other attached packages:
-[1] chromatographR_0.4.0 knitr_1.39          
+[1] chromatographR_0.4.1 knitr_1.39          
 
 loaded via a namespace (and not attached):
  [1] Rcpp_1.0.8.3          highr_0.9             bslib_0.3.1          

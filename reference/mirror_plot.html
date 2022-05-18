@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,7 +61,7 @@
   <span class="va">var</span>,
   subset <span class="op">=</span> <span class="cn">NULL</span>,
   print_legend <span class="op">=</span> <span class="cn">TRUE</span>,
-  legend <span class="op">=</span> <span class="cn">NULL</span>,
+  legend_txt <span class="op">=</span> <span class="cn">NULL</span>,
   legend_pos <span class="op">=</span> <span class="st">"topright"</span>,
   legend_size <span class="op">=</span> <span class="fl">1</span>,
   mirror <span class="op">=</span> <span class="cn">TRUE</span>,
@@ -88,7 +88,7 @@ wavelengths).</p></dd>
 are present in <code>var</code>).</p></dd>
 <dt>print_legend</dt>
 <dd><p>Logical. Whether to print legend. Defaults to <code>TRUE</code>.</p></dd>
-<dt>legend</dt>
+<dt>legend_txt</dt>
 <dd><p>Character vector containing labels for legend.</p></dd>
 <dt>legend_pos</dt>
 <dd><p>Legend position.</p></dd>
@@ -105,11 +105,25 @@ Defaults to <code>TRUE</code>.</p></dd>
 <dd><p>Additional arguments to <code><a href="https://rdrr.io/r/graphics/matplot.html" class="external-link">matplot</a></code> function.</p></dd>
 </dl></div>
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>No return value, called for side effects.</p>
+    </div>
+    <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Can be used to confirm the identity of a peak or check that a particular
 column in the peak table represents a single compound. Can also be used
 to create simple box-plots to examine the distribution of a peak with respect
 to variables defined in sample metadata.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="side-effects">Side effects<a class="anchor" aria-label="anchor" href="#side-effects"></a></h2>
+    
+
+<p>If <code>mirror_plot</code> is TRUE, plots a mirror plot comparing two treatments
+defined by <code>var</code> and <code>subset</code> (if more than two factors are present
+in <code>var</code>).</p>
+<p>Otherwise, if <code>mirror_plot</code> is FALSE, the treatments are plotted in two
+separate panes.</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
