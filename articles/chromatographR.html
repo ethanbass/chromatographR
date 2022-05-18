@@ -97,7 +97,7 @@
 <div class="section level3">
 <h3 id="loading-data">Loading data<a class="anchor" aria-label="anchor" href="#loading-data"></a>
 </h3>
-<p>chromatographR now includes an option to directly convert files from ChemStation or MassHunter <span class="citation">(Bass 2022; Bovee 2022a, 2022b)</span>. Alternatively, the data from the spectrometer can be converted into an <code>R</code>-friendly format like a <code>csv</code> file. The <code>load_chroms</code> function provides a simple interface to read chromatograms into <code>R</code> from any of these formats.</p>
+<p>chromatographR now includes an option to directly convert files from ChemStation or MassHunter <span class="citation">(Bovee 2022a, 2022b)</span>. Alternatively, the data from the spectrometer can be converted into an <code>R</code>-friendly format like a <code>csv</code> file. The <code>load_chroms</code> function provides a simple interface to read chromatograms into <code>R</code> from any of these formats.</p>
 <pre class="text"><code>&gt; # single folder
 &gt; load_chroms(paths = path, format.in="csv")
 &gt; 
@@ -219,8 +219,7 @@
 <pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE)
 &gt; par(mfrow=c(2,1))
 &gt; peak="V7"
-&gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list=warp)</code></pre>
-<pre><code>chrome no. 4; RT: 12.3; lambda = 318 nm</code></pre>
+&gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list=warp, verbose=F)</code></pre>
 <p><img src="chromatographR_files/figure-html/plot%20spectra-1.png" width="576"></p>
 <pre class="text"><code>&gt; par(oldpar)</code></pre>
 <p>The <code>plot_all_spectra</code> function can be used to visually compare the spectra for a specified peak across all samples.</p>
@@ -242,9 +241,6 @@
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <div id="refs">
-<div id="ref-bass2022c">
-<p>Bass, Ethan. 2022. “chromConverter: Chromatographic File Converter.”</p>
-</div>
 <div id="ref-bloemberg2010">
 <p>Bloemberg, Tom G., Jan Gerretzen, Hans J. P. Wouters, Jolein Gloerich, Maurice van Dael, Hans J. C. T. Wessels, Lambert P. van den Heuvel, Paul H. C. Eilers, Lutgarde M. C. Buydens, and Ron Wehrens. 2010. “Improved Parametric Time Warping for Proteomics.” <em>Chemometrics and Intelligent Laboratory Systems</em>, OMICS, 104 (1): 65–74. <a href="https://doi.org/10.1016/j.chemolab.2010.04.008" class="external-link">https://doi.org/10.1016/j.chemolab.2010.04.008</a>.</p>
 </div>
