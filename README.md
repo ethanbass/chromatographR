@@ -11,7 +11,7 @@
   
 ## Installation
 
-chromatographR can now be installed from CRAN:
+`chromatographR` can now be installed from CRAN:
 
 ```
 install.packages("chromatographR")
