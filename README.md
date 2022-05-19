@@ -1,5 +1,8 @@
 # chromatographR <a href='https://ethanbass.github.io/chromatographR/'><img src='man/figures/logo.png' align="right" height="160" /></a>
+
 <!-- badges: start -->
+  [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/chromatographR)](https://cran.r-project.org/package=chromatographR)
+  [![metacran downloads](https://cranlogs.r-pkg.org/badges/last-week/chromatographR)](https://cran.r-project.org/package=chromatographR)
   [![R-CMD-check](https://github.com/ethanbass/chromatographR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ethanbass/chromatographR/actions/workflows/R-CMD-check.yaml)
   <!-- badges: end -->
 
@@ -8,7 +11,14 @@
   
 ## Installation
 
-You can install `chromatographR` from GitHub using the devtools package:
+chromatographR can now be installed from CRAN:
+
+```
+install.packages("chromatographR")
+```
+
+You can also install the latest development version of `chromatographR` from GitHub using the devtools package:
+
 ```
 install.packages("devtools")
 devtools::install_github("https://github.com/ethanbass/chromatographR/")

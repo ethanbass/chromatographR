@@ -1,3 +1,6 @@
+# chromatograph 0.4.2
+* Fixed typos in vignette
+
 # chromatographR 0.4.1
 
 * Extended package DESCRIPTION and added citations to relevant references.
@@ -15,7 +18,7 @@ to FALSE.
 * Added error in `plot_spectrum` function for user-supplied retention times beyond
 the edges of the chromatogram.
 * Added error in `plot_spectrum` function for unspecified `lambda` (if `what=="click`).
-
+* Released on CRAN
 
 # chromatographR 0.4.0
 
