@@ -9,7 +9,8 @@ combine_peaks(peak_table, tol = 0.01, min.cor = 0.9, choose = "max")
 \arguments{
 \item{peak_table}{Peak table from \code{\link{get_peaktable}}.}
 
-\item{tol}{Tolerance for matching retention times.}
+\item{tol}{Tolerance for matching retention times (maximum retention time
+difference).}
 
 \item{min.cor}{Minimum spectral correlation to confirm a match.}
 

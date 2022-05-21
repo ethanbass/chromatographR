@@ -2,7 +2,7 @@
 % Please edit documentation in R/cluster_spectra.R
 \name{cluster_spectra}
 \alias{cluster_spectra}
-\title{Function to cluster peaks by spectral similarity.}
+\title{Cluster peaks by spectral similarity.}
 \usage{
 cluster_spectra(
   peak_table,
@@ -16,6 +16,7 @@ cluster_spectra(
   save = TRUE,
   parallel = TRUE,
   max.only = FALSE,
+  output = c("clusters", "pvclust", "both"),
   ...
 )
 }
@@ -48,25 +49,64 @@ cluster.}
 \item{max.only}{Logical. If TRUE, returns only highest level for nested
 dendrograms.}
 
+\item{output}{What to return. Either \code{clusters} to return list of clusters,
+\code{pvclust} to return pvclust object, or \code{both} to return both items.}
+
 \item{...}{Additional arguments to \code{\link[pvclust:pvclust]{pvclust}}.}
 }
 \value{
-Returns S4 "cluster" object with the following components:
-\item{peaks}{a character vector containing the names of all peaks contained
-in the given cluster.} \item{pval}{a numeric vector of length 1 containing
-the bootstrap p-value (au) for the given cluster.}
+Returns clusters and/or \code{pvclust} object according to the value
+of the \code{output} argument.
+\itemize{
+\item If \code{output = clusters},  returns a list of S4 \code{cluster} objects.
+\item If \code{output = pvclust}, returns a \code{\link[pvclust:pvclust]{pvclust}}
+object.
+\item If \code{output = both}, returns a nested list containing \code{[[1]]} the
+\code{\link[pvclust:pvclust]{pvclust}} object, and \code{[[2]]} the list of
+S4 \code{cluster} objects.
+}
+
+The \code{cluster} objects consist of the following components:
+\itemize{
+\item \code{peaks}: a character vector containing the names
+of all peaks contained in the given cluster.
+\item \code{pval}: a numeric vector of length 1 containing
+the bootstrap p-value (au) for the given cluster.
+}
 }
 \description{
 Function to cluster peaks by spectral similarity. A representative spectrum
 is selected for each peak in the provided peak table and used to construct a
 distance matrix based on spectral similarity (pearson correlation) between
-peaks. Currently, representative spectrum is just selected from the
-chromatogram with the highest absorbance at lambda max. Hierarchical
-clustering with bootstrap resampling is performed on the resulting
-correlation matrix, as implemented in the
-\code{\link[pvclust:pvclust]{pvclust}} package. Bootstrap values can be used
+peaks. Hierarchical clustering with bootstrap resampling is performed on the resulting
+correlation matrix to classify peaks into by their spectral similarity.
+}
+\details{
+A representative spectrum is selected for each peak in the provided peak table
+and used to construct a distance matrix based on spectral similarity
+(pearson correlation) between peaks. It is suggested to attach representative
+spectra to the \code{peak_table} using \code{\link{attach_ref_spectra}}.
+Otherwise, representative spectra are obtained from the chromatogram with the
+highest absorbance at lambda max.
+
+Hierarchical clustering with bootstrap
+resampling is performed on the resulting correlation matrix, as implemented in
+\code{\link[pvclust:pvclust]{pvclust}}. Finally, bootstrap values can be used
 to select clusters that exceed a certain confidence threshold as defined by
-alpha.
+\code{alpha}. Clusters can also be filtered by the minimum and maximum
+size of the cluster using the argument \code{peak_no}. If \code{max_only}
+is TRUE, only the largest cluster in a nested dendrogram of clusters meeting
+the confidence threshold will be returned.
+}
+\note{
+\itemize{
+\item Users should be aware that the clustering algorithm will often return nested
+clusters. Thus, an individual peak could appear in more than one cluster.
+\item It is highly suggested to use more than 100 bootstraps if you run the
+clustering algorithm on real data even though we use \code{nboot = 100} in
+the example to reduce runtime. The authors of \code{pvclust} suggest \code{
+nboot = 10000}.
+}
 }
 \examples{
 \donttest{
@@ -76,9 +116,9 @@ cl <- cluster_spectra(pk_tab, nboot=100, max.only = FALSE, save = FALSE, alpha =
 }
 }
 \references{
-R. Suzuki, H. Shimodaira: Pvclust: an R package for assessing
-the uncertainty in hierarchical clustering. Bioinformatics, 22-12:1540-1542
-(2006). \doi{10.1093/bioinformatics/btl117}.
+R. Suzuki & H. Shimodaira. 2006. Pvclust: an R package for assessing
+the uncertainty in hierarchical clustering. \emph{Bioinformatics},
+\bold{22(12)}:1540-1542. \doi{10.1093/bioinformatics/btl117}.
 }
 \author{
 Ethan Bass

@@ -35,7 +35,6 @@ Pvclust
 RAMClust
 Reproducibility
 Rezzi
-Sa
 Shimodaira
 Solidago
 Spectrometry
@@ -53,6 +52,7 @@ btv
 chrom
 chromatogram
 chromatograms
+chromatograph
 chromatographic
 correctRT
 devtools
@@ -67,6 +67,7 @@ https
 isocratic
 jss
 matlab
+metacran
 parsers
 pearson
 pre
@@ -80,4 +81,3 @@ terpconnect
 toh
 umd
 unwarped
-vpdtw
