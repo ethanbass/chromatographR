@@ -6,7 +6,8 @@
 #' (\code{min.cor}) for a match.
 #' 
 #' @param peak_table Peak table from \code{\link{get_peaktable}}.
-#' @param tol Tolerance for matching retention times.
+#' @param tol Tolerance for matching retention times (maximum retention time
+#' difference).
 #' @param min.cor Minimum spectral correlation to confirm a match.
 #' @param choose If "max" will retain peak with highest intensity. Otherwise,
 #' the first column in the data.frame will be retained.
@@ -31,7 +32,7 @@ combine_peaks <- function(peak_table, tol=.01, min.cor=0.9, choose='max'){
   mat <- outer(RTs, RTs, compare_rts, tol = tol)
   # find columns with a retention time match
   d <- which(apply(mat,2, sum) > 1)
-  cors <- cor(peak_table$tab)
+  cors <- cor(peak_table$ref_spectra)
   # iterate over columns with retention time match
   # find columns to remove (sub)
   sub <- sapply(d, function(e){
