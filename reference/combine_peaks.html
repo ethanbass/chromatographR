@@ -98,6 +98,7 @@ columns combined according to the specified criteria.</p>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Sa_warp</span><span class="op">)</span></span>
 <span class="r-in"><span class="va">pk_tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="attach_ref_spectra.html">attach_ref_spectra</a></span><span class="op">(</span><span class="va">pk_tab</span><span class="op">)</span></span>
 <span class="r-in"><span class="fu">combine_peaks</span><span class="op">(</span><span class="va">pk_tab</span>, tol <span class="op">=</span> <span class="fl">.02</span>, min.cor <span class="op">=</span> <span class="fl">.9</span><span class="op">)</span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>the standard deviation is zero</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           V1        V2        V3       V4        V5        V6        V7</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 119 547.5999   0.00000  64.73611 188.9210 1514.4775  31.08266  7972.271</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 121 426.2768 109.41736  61.30032   0.0000  800.6312   0.00000  5742.089</span>
@@ -123,21 +124,16 @@ columns combined according to the specified criteria.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 121  0.000000 25.78324  0.00000  0.00000 58.29037 35.70237   0.000000  313.3893</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 122  4.146413 88.99537  0.00000 17.72865 63.09756 40.62970  30.633681 1083.3709</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 458 21.856280 39.24938  0.00000 30.85831 80.37326 77.24610 134.060160  634.5378</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           V40       V41       V43       V45       V47      V50       V51</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 119  5.954668  3.185244 19.529956 26.855908  86.47116 1594.504 181.23686</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 121  0.000000 17.384465  5.862668  4.328725 183.23581 1107.869  46.57830</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 122 34.168541  0.000000 31.640419  2.934368 171.81509 1369.448  94.47697</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 458  0.000000  5.334132 65.213799 58.508031  64.75548 1217.711 254.76091</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          V52      V57      V58       V60      V61      V62       V63       V64</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 119 68.35036 0.000000 6.765074 10.825399 5.025003 2.659547 3.6475704 0.8761701</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 121 34.55536 1.169725 3.267406  5.880129 0.000000 6.603921 3.9397790 0.0000000</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 122 88.13190 1.348439 4.906127 14.487687 2.717955 2.681821 0.2072812 5.1790159</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 458 97.89059 4.839070 1.766295 11.990751 6.853318 8.433412 2.3869028 5.2174281</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           V65       V66       V67</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 119 12.669349  4.685768  9.931884</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 121 28.182136  0.000000  7.197999</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 122  3.779035  9.283830 19.382161</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 458  9.259943 11.240626 21.058001</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           V40       V41       V45      V50       V51      V52      V57      V58</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 119  5.954668  3.185244 26.855908 1594.504 181.23686 68.35036 0.000000 6.765074</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 121  0.000000 17.384465  4.328725 1107.869  46.57830 34.55536 1.169725 3.267406</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 122 34.168541  0.000000  2.934368 1369.448  94.47697 88.13190 1.348439 4.906127</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 458  0.000000  5.334132 58.508031 1217.711 254.76091 97.89059 4.839070 1.766295</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           V60      V61      V62       V67</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 119 10.825399 5.025003 2.659547  9.931884</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 121  5.880129 0.000000 6.603921  7.197999</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 122 14.487687 2.717955 2.681821 19.382161</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 458 11.990751 6.853318 8.433412 21.058001</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
