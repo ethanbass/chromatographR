@@ -40,6 +40,7 @@ lam <- "260"
 pks_egh <- get_peaks(dat.pr, lambdas = lam, fit = "egh")
 pks_gaussian <- get_peaks(dat.pr, lambdas = lam, fit = "gaussian")
 
+
 test_that("get_peaks works", {
   expect_equal(names(pks_egh), names(dat.pr))
   expect_equal(names(pks_gaussian), names(dat.pr))
@@ -71,6 +72,49 @@ pk_tab <- attach_ref_spectra(pk_tab, chrom_list=dat.pr)
 
 test_that("attach_ref_spectra works", {
   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$ref_spectra))
+})
+
+### test plotting functions
+
+test_that("plot.peak_list works", {
+  plot_peaks <- function() plot(pks_egh, chrom_list = dat.pr)
+  vdiffr::expect_doppelganger("plot.peak_list", plot_peaks)
+})
+
+test_that("plot.peak_table works", {
+  plot_peak_table <- function(){
+    par(mfrow=c(3,1))
+    plot(pk_tab, loc = "V13", chrom_list=dat.pr, box_plot = TRUE,
+                                     vars = "trt", verbose = FALSE)
+    }
+  vdiffr::expect_doppelganger("plot.peak_table", plot_peak_table)
+})
+
+test_that("plot_all_spectra works", {
+  plot_spectra <- function(){
+    plot_all_spectra("V13", peak_table=pk_tab, chrom_list = dat.pr, export=F, overlapping=T)
+  }
+  vdiffr::expect_doppelganger("plot_all_spectra", plot_spectra)
+})
+
+test_that("plot_spectrum works", {
+  plot_spec <- function(){
+    par(mfrow=c(2,1))
+    x<- plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr, export=T,
+                  what="rt", chr=1, verbose=F)
+  }
+  vdiffr::expect_doppelganger("plot_spectrum", plot_spec)
+  expect_equal(rownames(x), as.character(new.lambdas))
+  expect_equal(class(x), "data.frame")
+})
+
+
+test_that("mirror_plot works", {
+  mirror1 <- function(){
+    mirror_plot(pk_tab, chrom_list = dat.pr, lambdas = c("210","260"),
+                var = "trt", legend_size=2)
+  }
+  vdiffr::expect_doppelganger("mirror1", mirror1)
 })
 
 

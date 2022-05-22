@@ -214,7 +214,7 @@ elementwise.all.equal <- Vectorize(function(x, y, ...) {isTRUE(all.equal(x, y, .
 #' pk_tab <- get_peaktable(pks)
 #' plot_all_spectra(peak="V13", peak_table = pk_tab, overlapping=TRUE)
 #' @export plot_all_spectra
-#' 
+#'
 plot_all_spectra <- function(peak, peak_table, chrom_list, chrs="all", 
                              plot_spectrum = TRUE, export_spectrum=TRUE,
                              scale_spectrum=TRUE, overlapping=TRUE,
