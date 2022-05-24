@@ -27,4 +27,8 @@ devtools::install_github("https://github.com/ethanbass/chromatographR/")
 To build the vignette, include the argument `build_vignettes=TRUE` (**Note:** this will take considerably longer than building the package without the vignette).
 
 ## Usage
-Please see the [vignette](https://ethanbass.github.io/chromatographR/articles/chromatographR.html) included with the package for details on the application of `chromatographR` for the analysis of HPLC data. `chromatographR` can now import ChemStation and MassHunter file formats (using the parsers included with the [Aston](https://github.com/bovee/aston) package for Python) as well as regular `csv` files.
+Please see the [vignette](https://ethanbass.github.io/chromatographR/articles/chromatographR.html) included with the package for details on the application of `chromatographR` for the analysis of HPLC data. `chromatographR` can now import ChemStation and MassHunter file formats (using the parsers included with the [Aston](https://github.com/bovee/aston) package for Python) as well as regular `csv` files. A second vignette with a suggested workflow for the analysis of GC-FID data will be forthcoming soon. 
+
+## Contributing
+
+Contributions to the package are very welcome. Please get in touch (preferable by opening a GitHub [issue](https://github.com/ethanbass/chromatographR/issues)) to discuss any suggestions or to file a bug report. If you get a cryptic error message that you can't understand, that would also be a good reason to file an issue. You can also file an issue if you have a file format you'd like to read that isn't currently supported by chromatographR. (If you do this, please o make sure tinclude a link to an example file!)
