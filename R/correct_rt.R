@@ -1,6 +1,6 @@
 #' Correct retention time
 #' 
-#' Corrects retention time differences using parametric time warping, as 
+#' Aligns chromatograms using parametric time warping, as 
 #' implemented in \code{\link[ptw]{ptw}}, or variable penalty dynamic 
 #' time warping, as implemented in \code{\link[VPdtw]{VPdtw}}.
 #' 
@@ -69,12 +69,12 @@
 #' @md
 #' @export correct_rt
 correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
-                       alg = c("ptw", "vpdtw"), what = c("models", "corrected.values"), 
+                       alg = c("ptw", "vpdtw"), what = c("corrected.values", "models"), 
                        init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, 
                        scale=FALSE, trwdth=200, plot=FALSE,
                        penalty=5, maxshift=50,
                        verbose = FALSE, ...){
-  what <- match.arg(what, c("models", "corrected.values"))
+  what <- match.arg(what, c("corrected.values", "models"))
   alg <- match.arg(alg, c("ptw", "vpdtw"))
   if (alg == "vpdtw" & !requireNamespace("VPdtw", quietly = TRUE)) {
     stop(
@@ -90,6 +90,9 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
       } else lambdas <- colnames(chrom_list[[1]])
     }
     lambdas <- as.character(lambdas)
+    if (!all(lambdas %in% colnames(chrom_list[[1]]))){
+      stop("Lambdas not found!")
+    }
     if (scale){
       chrom_list <- lapply(chrom_list, rescale)
     }

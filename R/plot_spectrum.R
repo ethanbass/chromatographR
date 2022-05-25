@@ -167,7 +167,9 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
     }
   }
   if (export_spectrum){
-    return(data.frame(y))}
+    y<-data.frame(y)
+    colnames(y) <- names(chrom_list)[chr]
+    y}
 }
 
 
@@ -230,8 +232,9 @@ plot_all_spectra <- function(peak, peak_table, chrom_list, chrs="all",
                   export_spectrum = TRUE, scale_spectrum=scale_spectrum,
                   verbose=verbose, what="peak")
   })
-  sp<-do.call(cbind, sp)
+  sp<-as.data.frame(do.call(cbind, sp))
   colnames(sp) <- names(chrom_list)[chrs]
+  rownames(sp) <- colnames(chrom_list[[1]])
   if (plot_spectrum){
     if(overlapping){
       matplot(new.lambdas, sp, type='l', xlab='wavelength', ylab='intensity',las=2)

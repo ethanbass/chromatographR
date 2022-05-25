@@ -24,7 +24,19 @@ filter_peaks <- function(peak_list, min_height, min_area, min_sd, max_sd) {
     warning("Nothing to filter...")
     return(peak_list)
   }
-  
+  x<-do.call(rbind,do.call(rbind, peak_list))
+  if (!missing(min_height)){
+    if (min_height < min(x$height))
+      warning("'min_height' is less than minimum peak height.")}
+  if (!missing(min_area)){
+    if (min_area < min(x$area))
+      warning("'min_area' is less than minimum peak area.")}
+  if (!missing(min_sd)){
+    if (min_sd < min(x$sd))
+      warning("'min_sd' is less than minimum peak standard deviation.")}
+  if (!missing(max_sd)){
+    if (max_sd > max(x$sd))
+      warning("'max_sd' is greater than maximum peak standard deviation,")}
   if (missing(max_sd)) ## find max value in peak_list and add 1 to be sure...
     max_sd <- 1 + max(unlist(sapply(peak_list,
                                     function(samp)

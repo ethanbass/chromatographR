@@ -10,7 +10,7 @@ correct_rt(
   models = NULL,
   reference = "best",
   alg = c("ptw", "vpdtw"),
-  what = c("models", "corrected.values"),
+  what = c("corrected.values", "models"),
   init.coef = c(0, 1, 0),
   n.traces = NULL,
   n.zeros = 0,
