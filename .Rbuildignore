@@ -6,3 +6,4 @@
 ^docs$
 ^pkgdown$
 ^CRAN-SUBMISSION$
+^LICENSE$

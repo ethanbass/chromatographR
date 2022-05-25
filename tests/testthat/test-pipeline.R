@@ -1,5 +1,16 @@
 ### test preprocess ###
 
+test_that("load_chroms works", {
+  path <- "testdata/DAD1.CSV"
+  x <- read.csv(path, fileEncoding = "utf-16")
+  x1 <- load_chroms(path, format.in = "csv", find_files = FALSE)
+  folder <- "testdata"
+  x2 <- load_chroms(folder, format.in = "csv", find_files = TRUE)
+  expect_equal(x[,2], x1[[1]][, "220.00000"], ignore_attr = TRUE)
+  expect_equal(x1, x2, ignore_attr = TRUE)
+  expect_equal(length(x1), length(path))
+})
+
 data("Sa")
 new.ts <- seq(10,18.66,by=.01) # choose time-points
 new.lambdas <- seq(200, 318, by = 2) # choose wavelengths
@@ -12,9 +23,20 @@ test_that("preprocess works on matrix", {
   expect_equal(colnames(out), as.character(new.lambdas))
 })
 
-# test_that("preprocess returns correct errors", {
-#   expect_error(preprocess(X=as.data.frame(Sa[[1]])))
+test_that("preprocess returns correct errors", {
+  expect_error(preprocess(X=as.data.frame(Sa[[1]])))
+})
+
+# test_that("preprocess returns correct warning", {
+#   expect_warning(preprocess(X=Sa[[1]]))
 # })
+
+test_that("preprocess works without interpolation", {
+  dat.pr <- preprocess(X=Sa[[1]], interpolate_cols = F, interpolate_rows=F)
+  expect_equal(dim(dat.pr),dim(Sa[[1]]))
+  expect_equal(rownames(dat.pr), rownames(Sa[[1]]))
+  expect_equal(colnames(dat.pr), colnames(Sa[[1]]))
+})
 
 dat.pr <- preprocess(X = Sa[1:2], dim1 = new.ts, dim2 = new.lambdas)
 
@@ -32,14 +54,28 @@ warp <- correct_rt(chrom_list=dat.pr, models=warping.models, what = "corrected.v
 test_that("correct_rt works", {
   equals(length(warping.models), length(warp), length(Sa[1:2]))
   expect_equal(names(warp), names(dat.pr[1:2]))
+  expect_equal(colnames(warp[[1]]), colnames(dat.pr[[1]]), ignore_attr=TRUE)
   expect_equal(t(warping.models[[1]]$warped.sample)[,1], as.numeric(warp[[1]][,"210"]))
+  expect_error(correct_rt(dat.pr))
+  expect_error(correct_rt(dat.pr, what="x"))
+  expect_error(correct_rt(dat.pr, lambdas = "x"))
+  expect_error(correct_rt(dat.pr, lambdas = "210", alg="x"))
 })
 
+test_that("correct_rt works with vpdtw", {
+  skip_if_not_installed("VPdtw")
+  warp <- correct_rt(dat.pr, lambdas = "210", alg="vpdtw")
+  expect_equal(names(warp), names(dat.pr[1:2]))
+  expect_equal(colnames(warp[[1]]), colnames(dat.pr[[1]]), ignore_attr=TRUE)
+  expect_error(correct_rt(dat.pr, lambdas = c("210","260"), alg="vpdtw"))
+  expect_error(correct_rt(dat.pr, lambdas = c("x"), alg="vpdtw"))
+})
+
+
 ### test get_peaks ###
-lam <- "260"
+lam <- c("260") # tests fail if I use multiple wavelengths here
 pks_egh <- get_peaks(dat.pr, lambdas = lam, fit = "egh")
 pks_gaussian <- get_peaks(dat.pr, lambdas = lam, fit = "gaussian")
-
 
 test_that("get_peaks works", {
   expect_equal(names(pks_egh), names(dat.pr))
@@ -47,15 +83,53 @@ test_that("get_peaks works", {
   expect_equal(names(pks_egh[[1]]), lam)
   expect_equal(names(pks_gaussian[[1]]), lam)
   expect_equal(class(pks_egh), "peak_list")
+  expect_error(get_peaks(dat.pr)) # lambdas must be provided
+  expect_error(get_peaks(dat.pr, lambdas="210", fit="nonsense"))
+})
+
+pks_s <- filter_peaks(pks_egh, min_height = 10, min_area = 10, min_sd = .07)
+
+test_that("filter_peaks works", {
+  expect_equal(names(pks_egh), names(pks_s))
+  expect_equal(names(pks_s), names(dat.pr))
+  expect_equal(names(pks_s[[1]]), lam)
+  expect_equal(class(pks_s), "peak_list")
+  expect_lt(nrow(pks_s[[1]][[1]]), nrow(pks_egh[[1]][[1]]))
+  expect_lt(nrow(pks_s[[2]][[1]]), nrow(pks_egh[[2]][[1]]))
+  expect_warning(filter_peaks(pks_egh))
+  expect_warning(filter_peaks(pks_egh, min_sd=0))
+  expect_warning(filter_peaks(pks_egh, min_height=0))
+  expect_warning(filter_peaks(pks_egh, min_area=0))
+  expect_warning(filter_peaks(pks_egh, max_sd=Inf))
+})
+
+pks_s <- filter_peaks(pks_egh, min_height = 10, min_area = 10, min_sd = .07)
+test_that("filter_peaks works", {
+  expect_equal(names(pks_egh), names(pks_s))
+  expect_equal(names(pks_s), names(dat.pr))
+  expect_equal(names(pks_s[[1]]), lam)
+  expect_equal(class(pks_s), "peak_list")
+  expect_lt(nrow(pks_s[[1]][[1]]), nrow(pks_egh[[1]][[1]]))
+  expect_lt(nrow(pks_s[[2]][[1]]), nrow(pks_egh[[2]][[1]]))
+  expect_warning(filter_peaks(pks_egh))
+  expect_warning(filter_peaks(pks_egh, min_sd=0))
+  expect_warning(filter_peaks(pks_egh, min_height=0))
+  expect_warning(filter_peaks(pks_egh, min_area=0))
+  expect_warning(filter_peaks(pks_egh, max_sd=Inf))
 })
 
 ### test get_peaktable ###
 
 pk_tab <- suppressWarnings(get_peaktable(pks_egh, dat.pr))
+pk_tab_sp <- suppressWarnings(get_peaktable(pks_egh, dat.pr, clust="sp.rt"))
+
 test_that("get_peaktable works", {
   expect_equal(rownames(pk_tab$tab), names(dat.pr))
   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$pk_meta))
   expect_equal(class(pk_tab), "peak_table")
+  expect_equal(class(pk_tab$tab), "data.frame")
+  expect_equal(class(pk_tab$pk_meta), "data.frame")
+  expect_equal(class(pk_tab$args), "character")
 })
 
 ### test metadata attachment ###
@@ -66,18 +140,61 @@ pk_tab <- attach_metadata(pk_tab, metadata = meta, column="vial")
 
 test_that("attach_metadata works", {
   expect_equal(rownames(pk_tab$tab), pk_tab$sample_meta$vial)
+  expect_equal(colnames(pk_tab$sample_meta), colnames(meta))
+  ### check errors & warnings ###
+  expect_error(attach_metadata(pk_tab))
+  expect_error(attach_metadata(pk_tab, metadata=meta, column ="x"))
+  expect_error(attach_metadata(pk_tab$tab, metadata=meta, column ="vial"))
+  expect_error(attach_metadata(pk_tab, metadata=rbind(meta,meta), column ="vial"))
+  expect_warning(attach_metadata(pk_tab, metadata=meta[-1,], column ="vial"))
 })
 
-pk_tab <- attach_ref_spectra(pk_tab, chrom_list=dat.pr)
 
 test_that("attach_ref_spectra works", {
+  pk_tab <- attach_ref_spectra(pk_tab, chrom_list=dat.pr, ref="max.cor")
   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$ref_spectra))
+  pk_tab <- attach_ref_spectra(pk_tab, chrom_list=dat.pr,ref = "max.int")
+  expect_equal(colnames(pk_tab$tab), colnames(pk_tab$ref_spectra))
+  expect_error(attach_ref_spectra(pk_tab,ref = "x"))
+})
+
+test_that("normalize_data works", {
+  pk_tab_norm <- normalize_data(pk_tab, chrom_list = dat.pr, column = "mass")
+  expect_equal(rownames(pk_tab_norm$tab), rownames(pk_tab$tab))
+  expect_equal(class(pk_tab_norm), class(pk_tab))
+  expect_equal(colnames(pk_tab_norm$tab), colnames(pk_tab$tab))
+  chroms <- normalize_data(pk_tab, chrom_list=dat.pr, column = "mass",what = "chrom_list")
+  expect_equal(dim(chroms), dim(dat.pr))
+  expect_error(normalize_data(pk_tab, chrom_list = dat.pr, column = "x"))
+  expect_error(normalize_data(pk_tab, chrom_list = dat.pr, column = "mass", what="x"))
+})
+
+### cluster
+suppressWarnings(cl <- cluster_spectra(pk_tab, chrom_list=dat.pr, nboot = 10,
+                                       parallel = FALSE, verbose = FALSE,
+                                       save = FALSE, output = "both"))
+# suppressWarnings(cl1 <- cluster_spectra(pk_tab, chrom_list=dat.pr, nboot = 10,
+#                                        parallel = FALSE, verbose = FALSE,
+#                                        save = FALSE, output = "clusters"))
+# 
+# suppressWarnings(cl2 <- cluster_spectra(pk_tab, chrom_list=dat.pr, nboot = 10,
+#                                         parallel = FALSE, verbose = FALSE,
+#                                         save = FALSE, output = "pvclust"))
+
+test_that("cluster_spectra works", {
+  expect_equal(class(cl[[1]]), "pvclust")
+  expect_equal(class(cl[[2]]), "list")
+  # expect_equal(class(cl1), "list")
+  # expect_equal(class(cl2), "pvclust")
+  
+  
 })
 
 ### test plotting functions
 
 test_that("plot.peak_list works", {
-  plot_peaks <- function() plot(pks_egh, chrom_list = dat.pr)
+  plot_peaks <- function() plot(pks_egh, chrom_list = dat.pr, points = TRUE,
+                                ticks=TRUE)
   vdiffr::expect_doppelganger("plot.peak_list", plot_peaks)
 })
 
@@ -90,24 +207,33 @@ test_that("plot.peak_table works", {
   vdiffr::expect_doppelganger("plot.peak_table", plot_peak_table)
 })
 
+
 test_that("plot_all_spectra works", {
   plot_spectra <- function(){
-    plot_all_spectra("V13", peak_table=pk_tab, chrom_list = dat.pr, export=F, overlapping=T)
+    plot_all_spectra("V13", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
+                     overlapping=TRUE)
   }
+  x <- plot_all_spectra("V13", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
+                        overlapping=TRUE)
   vdiffr::expect_doppelganger("plot_all_spectra", plot_spectra)
+  expect_equal(class(x), "data.frame")
+  expect_equal(rownames(x), as.character(new.lambdas))
+  expect_equal(colnames(x), rownames(pk_tab$tab))
 })
 
 test_that("plot_spectrum works", {
   plot_spec <- function(){
     par(mfrow=c(2,1))
-    x<- plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr, export=T,
-                  what="rt", chr=1, verbose=F)
+    plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
+                  what="rt", chr=1, verbose = FALSE)
   }
+  x <- plot_spectrum("V13", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
+                what="peak", chr=1, verbose = FALSE)
   vdiffr::expect_doppelganger("plot_spectrum", plot_spec)
   expect_equal(rownames(x), as.character(new.lambdas))
   expect_equal(class(x), "data.frame")
+  expect_equal(ncol(x), 1)
 })
-
 
 test_that("mirror_plot works", {
   mirror1 <- function(){
@@ -117,4 +243,13 @@ test_that("mirror_plot works", {
   vdiffr::expect_doppelganger("mirror1", mirror1)
 })
 
+#test fit_peaks
+y<-dat.pr[[1]][,'280']
+pos<-find_peaks(y)
+pks<-fit_peaks(y,pos, max.iter=1000)
+
+test_that("fit_peaks works independently", {
+  expect_equal(ncol(pos),3)
+  expect_equal(ncol(pks),9)
+})
 

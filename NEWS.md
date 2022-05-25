@@ -1,6 +1,6 @@
 # chromatograph 0.4.2
 * Fixed typos in vignette
-
+* Changed default behavior in `correct_rt` to `corrected_values` rather than `models`.
 # chromatographR 0.4.1
 
 * Extended package DESCRIPTION and added citations to relevant references.
