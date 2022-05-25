@@ -31,4 +31,4 @@ Please see the [vignette](https://ethanbass.github.io/chromatographR/articles/ch
 
 ## Contributing
 
-Contributions to the package are very welcome. Please get in touch (preferable by opening a GitHub [issue](https://github.com/ethanbass/chromatographR/issues)) to discuss any suggestions or to file a bug report. If you get a cryptic error message that you can't understand, that would also be a good reason to file an issue. You can also file an issue if you have a file format that that isn't currently supported by chromatographR. (If you do this, please include a link to an example file!)
+Contributions to the package are very welcome. Please get in touch (preferable by opening a GitHub [issue](https://github.com/ethanbass/chromatographR/issues)) to discuss any suggestions or to file a bug report. If you get a cryptic error message that you can't understand, that would also be a good reason to file an issue. You can also file an issue if you have a file format you'd like to read that isn't currently supported by chromatographR. (If you do this, please o make sure tinclude a link to an example file!)
