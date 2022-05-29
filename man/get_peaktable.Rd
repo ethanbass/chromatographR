@@ -114,9 +114,9 @@ get_peaktable(pks, response = "area")
 }
 \references{
 \itemize{
-\item Broeckling, C. D., F. A. Afsar, S. Neumann, A. Ben-Hur, and J.
-E. Prenni. 2014. RAMClust: A Novel Feature Clustering Method Enables
-Spectral-Matching-Based Annotation for Metabolomics Data. \emph{Anal. Chem.}
+\item Broeckling, C. D., Afsar F.A., Neumann S., Ben-Hur A., and Prenni J.E. 2014.
+RAMClust: A Novel Feature Clustering Method Enables Spectral-Matching-Based
+Annotation for Metabolomics Data. \emph{Anal. Chem.}
 \bold{86}:6812-6817. \doi{10.1021/ac501530d}
 \item Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
 LC–DAD using multivariate curve resolution: the alsace package for R. \emph{

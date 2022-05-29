@@ -67,7 +67,7 @@ A list of \code{ptw} objects or a list of warped absorbance profiles,
 depending on the value of the \code{what} argument.
 }
 \description{
-Corrects retention time differences using parametric time warping, as
+Aligns chromatograms using parametric time warping, as
 implemented in \code{\link[ptw]{ptw}}, or variable penalty dynamic
 time warping, as implemented in \code{\link[VPdtw]{VPdtw}}.
 }
