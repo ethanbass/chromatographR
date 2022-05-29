@@ -31,7 +31,7 @@ combine_peaks <- function(peak_table, tol=.01, min.cor=0.9, choose='max'){
   }
   mat <- outer(RTs, RTs, compare_rts, tol = tol)
   # find columns with a retention time match
-  d <- which(apply(mat,2, sum) > 1)
+  d <- which(apply(mat, 2, sum) > 1)
   cors <- cor(peak_table$ref_spectra)
   # iterate over columns with retention time match
   # find columns to remove (sub)
@@ -47,7 +47,10 @@ combine_peaks <- function(peak_table, tol=.01, min.cor=0.9, choose='max'){
       which(colnames(peak_table$tab) %in% sub)
     }
   })
+  if (length(sub > 0)){
   peak_table$tab <- peak_table$tab[, -unlist(sub)]
   peak_table$pk_meta <- peak_table$pk_meta[, -unlist(sub)]
-  return(peak_table)
+  }
+  message(paste("Removed "), length(sub), " peaks from peak table.")
+  peak_table
 }
