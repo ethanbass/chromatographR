@@ -74,7 +74,7 @@ gather_reference_spectra <- function(peak_table, chrom_list,
                        scale_spectrum = TRUE)
     })
     sp.ref <- sapply(seq_along(sp.l), function(i){
-      sp.l[[i]][,which.max(colMeans(cor(sp.l[[i]][,which(apply((sp.l[[i]]),2,sd)!=0)])))]})
+      sp.l[[i]][,which.max(colMeans(cor(sp.l[[i]][,which(apply((sp.l[[i]]),2,sd)!=0), drop=FALSE])))]})
   } else {
     sp.ref <- sapply(colnames(peak_table$tab), function(pk){
       plot_spectrum(loc = pk, peak_table, chrom_list, plot_trace=FALSE,

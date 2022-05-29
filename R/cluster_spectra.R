@@ -106,11 +106,11 @@ cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
     rep <- data.frame(do.call(cbind,rep))
     names(rep) <- paste0('V',seq_len(ncol(rep)))
   }
-  d <- 1 - abs(cor(rep, method="pearson"))
-  
+  rm <- which(apply(rep,2,sd)==0)
+  d <- 1 - abs(cor(rep[,-rm], method="pearson"))
   if (verbose)
     print('...clustering spectra')
-  result <- pvclust(rep, method.dist="cor",
+  result <- pvclust(rep[,-rm], method.dist="cor",
                              nboot=nboot, parallel=parallel, ...)
   
   if (plot_dend){
