@@ -74,6 +74,12 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
   if (missing(chrom_list)){
     chrom_list <- try(get(peak_table$args["chrom_list"]))
     if (inherits(chrom_list, "try-error")) stop("Chromatograms not found!")
+    if (length(chrom_list) != nrow(peak_table$tab)){
+      stop("Chrom_list does not match")
+    } else{
+      if (!all.equal(names(chrom_list), rownames(peak_table$tab)))
+        stop("Chrom_list does not match")
+    }
   }
   if (is.matrix(chrom_list)){
     chrom_list <- list(chrom_list)
