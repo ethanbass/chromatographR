@@ -99,7 +99,8 @@ cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
     if (verbose)
       print('...collecting representative spectra')
     rep <- sapply(colnames(peak_table[[1]]), function(j){
-      sp <- plot_spectrum(loc=j, peak_table=peak_table, chrom_list,
+      #print(j)
+      sp <- plot_spectrum(loc=j, peak_table=peak_table, chrom_list = chrom_list,
                           scale_spectrum=TRUE, plot_trace=FALSE,
                           export_spectrum=TRUE, plot_spectrum=FALSE, verbose=FALSE)
     })
@@ -107,10 +108,12 @@ cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
     names(rep) <- paste0('V',seq_len(ncol(rep)))
   }
   rm <- which(apply(rep,2,sd)==0)
-  d <- 1 - abs(cor(rep[,-rm], method="pearson"))
+  if (length(rm)>0)
+    rep <- rep[,-rm]
+  d <- 1 - abs(cor(rep, method="pearson"))
   if (verbose)
     print('...clustering spectra')
-  result <- pvclust(rep[,-rm], method.dist="cor",
+  result <- pvclust(rep, method.dist="cor",
                              nboot=nboot, parallel=parallel, ...)
   
   if (plot_dend){
@@ -133,7 +136,7 @@ cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
     if (verbose) print('...plotting clustered spectra')
     new.lambdas <- colnames(chrom_list[[1]])
     sapply(seq_along(sub), function(i){ 
-      matplot(new.lambdas,rep[,as.numeric(gsub('V','',sub[[i]]@peaks))],
+      matplot(new.lambdas,rep[,sub[[i]]@peaks],
               type='l', ylab='', yaxt='n', xlab=expression(lambda),
               main=paste0('cluster ', i, '; p = ',
                           format(round(sub[[i]]@pval,2),nsmall=2))
