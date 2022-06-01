@@ -409,6 +409,8 @@ mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset = NULL,
     chrom_list <- try(get(peak_table$args["chrom_list"]))
     if (inherits(chrom_list, "try-error")) stop("Chromatograms not found!")
   }
+  if (!(inherits(chrom_list, "list") | inherits(chrom_list, "chrom_list")))
+    stop("chrom_list is not a list")
   new.ts <- round(as.numeric(rownames(chrom_list[[1]])),2)
   fac <- factor(meta[,var])
   if (is.null(subset) & length(levels(fac)) > 2)

@@ -18,10 +18,12 @@ new.lambdas <- seq(200, 318, by = 2) # choose wavelengths
 out <- preprocess(X = Sa[[1]], dim1 = new.ts, dim2 = new.lambdas)
 
 test_that("preprocess works on matrix", {
+  out <- preprocess_matrix(X = Sa[[1]], dim1 = new.ts, dim2 = new.lambdas,maxI = 1)
   expect_equal(class(out)[1],"matrix")
   expect_equal(rownames(out), as.character(new.ts))
   expect_equal(colnames(out), as.character(new.lambdas))
 })
+
 
 test_that("preprocess returns correct errors", {
   expect_error(preprocess(X=as.data.frame(Sa[[1]])))
@@ -142,7 +144,6 @@ test_that("attach_ref_spectra works", {
   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$ref_spectra))
   expect_error(attach_ref_spectra(pk_tab,ref = "x"))
 })
-
 
 test_that("combine_peaks works", {
   suppressWarnings(pk_tab_c <- combine_peaks(pk_tab))
