@@ -72,15 +72,10 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
   if (missing(chrom_list) & missing(peak_table))
     stop("Must provide either a peak_table or a chrom_list.")
   if (missing(chrom_list)){
-    chrom_list <- try(get(peak_table$args["chrom_list"]))
-    if (inherits(chrom_list, "try-error")) stop("Chromatograms not found!")
-    if (length(chrom_list) != nrow(peak_table$tab)){
-      stop("Chrom_list does not match")
-    } else{
-      if (!all.equal(names(chrom_list), rownames(peak_table$tab)))
-        stop("Chrom_list does not match")
-    }
+    chrom_list <- get_chrom_list(peak_table)
   }
+  if (!(inherits(chrom_list, "list") | inherits(chrom_list, "chrom_list")))
+    stop("chrom_list is not a list")
   if (is.matrix(chrom_list)){
     chrom_list <- list(chrom_list)
     chr <- 1
@@ -228,8 +223,10 @@ plot_all_spectra <- function(peak, peak_table, chrom_list, chrs="all",
                              scale_spectrum=TRUE, overlapping=TRUE,
                              verbose=FALSE, ...){
   if (missing(chrom_list)){
-    chrom_list <- get(peak_table$args["chrom_list"])
+    chrom_list <- get_chrom_list(peak_table)
   }
+  if (!(inherits(chrom_list, "list") | inherits(chrom_list, "chrom_list")))
+    stop("chrom_list is not a list")
   new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
   if ("all" %in% chrs) chrs <- seq_along(chrom_list)
   sp <- sapply(chrs, function(chr){
@@ -296,6 +293,8 @@ plot_all_spectra <- function(peak, peak_table, chrom_list, chrs="all",
 scan_chrom <- function(chrom_list, lambda, chr, peak_table=NULL, 
                        scale_spectrum = FALSE, spectrum_labels = TRUE,
                        export_spectrum = FALSE, ...){
+  if (!(inherits(chrom_list, "list") | inherits(chrom_list, "chrom_list")))
+    stop("chrom_list is not a list")
   if (missing(chr)){
     chr <- as.numeric(readline(
       prompt="Which chromatogram do you wish to plot? \n"))
@@ -307,3 +306,29 @@ scan_chrom <- function(chrom_list, lambda, chr, peak_table=NULL,
                             export_spectrum = export_spectrum, ...)
 }
 
+#' Retrieve chrom_list from peak_table object
+#' @param peak_table Peak table object
+#' @author Ethan Bass
+#' @noRd
+get_chrom_list <- function(x){
+  if (inherits(x, "peak_table")){
+    chrom_list <- try(get(x$args["chrom_list"]))
+    if (inherits(chrom_list, "try-error")) stop("Chromatograms not found!")
+    if (length(chrom_list) != nrow(x$tab)){
+      stop("Chrom_list does not match peak_table")
+    } else{
+      if (!all.equal(names(chrom_list), rownames(x$tab)))
+        stop("Chrom_list does not match peak_table")
+    }
+  } else if (inherits(x, "peak_list")){
+    chrom_list <- try(get(attr(x, "chrom_list")))
+    if (inherits(chrom_list, "try-error")) stop("Chromatograms not found!")
+    if (length(chrom_list) != length(x)){
+      stop("Chrom_list does not match peak_list")
+    } else{
+      if (!all.equal(names(chrom_list), names(x)))
+        stop("Chrom_list does not match peak_table")
+    }
+  }
+  chrom_list
+}

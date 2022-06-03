@@ -183,12 +183,14 @@ test_that("cluster_spectra works", {
 ### test plotting functions
 
 test_that("plot.peak_list works", {
+  skip_if_not_installed("vdiffr")
   plot_peaks <- function() plot(pks_egh, chrom_list = dat.pr, points = TRUE,
                                 ticks=TRUE)
   vdiffr::expect_doppelganger("plot.peak_list", plot_peaks)
 })
 
 test_that("plot.peak_table works", {
+  skip_if_not_installed("vdiffr")
   plot_peak_table <- function(){
     par(mfrow=c(3,1))
     plot(pk_tab, loc = "V13", chrom_list = dat.pr, box_plot = TRUE,
@@ -199,6 +201,7 @@ test_that("plot.peak_table works", {
 
 
 test_that("plot_all_spectra works", {
+  skip_if_not_installed("vdiffr")
   plot_spectra <- function(){
     plot_all_spectra("V13", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
                      overlapping=TRUE)
@@ -212,6 +215,7 @@ test_that("plot_all_spectra works", {
 })
 
 test_that("plot_spectrum works", {
+  skip_if_not_installed("vdiffr")
   plot_spec <- function(){
     par(mfrow=c(2,1))
     plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
@@ -226,6 +230,7 @@ test_that("plot_spectrum works", {
 })
 
 test_that("mirror_plot works", {
+  skip_if_not_installed("vdiffr")
   mirror1 <- function(){
     mirror_plot(pk_tab, chrom_list = dat.pr, lambdas = c("210","260"),
                 var = "trt", legend_size=2)
@@ -234,11 +239,11 @@ test_that("mirror_plot works", {
 })
 
 #test fit_peaks
-y<-dat.pr[[1]][,'280']
-pos<-find_peaks(y)
-pks<-fit_peaks(y,pos, max.iter=1000)
 
 test_that("fit_peaks works independently", {
+  y<-dat.pr[[1]][,'280']
+  pos<-find_peaks(y)
+  pks<-fit_peaks(y,pos, max.iter=1000)
   expect_equal(ncol(pos),3)
   expect_equal(ncol(pks),9)
 })
