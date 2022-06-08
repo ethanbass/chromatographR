@@ -102,7 +102,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
   rt <- ifelse(use.cor, "rt.cor", "rt")
   if (!inherits(peak_list,"peak_list"))
     stop("Peak list must be of the associated class.")
-  if (missing(chrom_list)){
+  if (clust == "sp.rt" & missing(chrom_list)){
     chrom_list <- get_chrom_list(peak_list)
   }
   ncomp <- length(peak_list[[1]]) ## all elements should have the same length
@@ -330,15 +330,16 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
   }
   if (box_plot == T){
     if (!is.data.frame(x$sample_meta)){
-      stop("Metadata must be attached to peak table to make mirror plot.")
+      stop("Attach metadata to peak_table to make mirror plot.")
     }
     if (is.null(vars)){
-      stop("Must provide independent variable or variables for boxplot.")
+      stop("Must provide independent variable or variables (`var`) for boxplot.")
     }
-    if (what!="peak"){
+    if (what != "peak"){
       stop("A peak name must be provided to `loc` to produce a boxplot.")
     }
-    boxplot(as.formula(paste("x[['tab']][,loc]",vars,sep="~")), data = x$sample_meta,
+    boxplot(as.formula(paste("x[['tab']][,loc]", vars, sep="~")),
+            data = x$sample_meta,
             main = paste(loc, '\n', 'RT = ', round(x$pk_meta['rt', loc],2)),
             ylab="abs", xlab="", ...)
   }
@@ -430,7 +431,9 @@ mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset = NULL,
     legend_txt <- c(trt1,trt2)
   if (is.null(xlim))
     xlim <- c(head(new.ts,1),tail(new.ts,1))
-  y_max <- max(sapply(chrom_list, function(x) max(x[,as.character(min(as.numeric(lambdas)))], na.rm=TRUE)))
+  y_max <- max(sapply(chrom_list, function(x){
+    max(x[,as.character(min(as.numeric(lambdas)))], na.rm=TRUE)
+    }))
   if (mirror){
     if (is.null(ylim))
       ylim <- c(-y_max, y_max)

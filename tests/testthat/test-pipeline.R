@@ -11,6 +11,18 @@ test_that("load_chroms works", {
   expect_equal(length(x1), length(path))
 })
 
+
+# test_that("load_chroms can read chemstation UV data", {
+#   path_csv <- system.file("testdata/DAD1.CSV", package="chromConverter")
+#   path_uv <- system.file("testdata/DAD1.uv", package="chromConverter")
+#   x <- read.csv(path_csv, fileEncoding = "utf-16")
+#   x1 <- load_chroms(path_uv, format.in = "chemstation", find_files = FALSE)
+#   folder <- system.file("testdata", package="chromConverter")
+#   x2 <- load_chroms(folder, format.in = "chemstation", find_files = TRUE)
+#   expect_equal(x[,2], x1[[1]][, "220.0"], ignore_attr = TRUE)
+#   expect_equal(x1, x2, ignore_attr = TRUE)
+# })
+
 data("Sa")
 new.ts <- seq(10,18.66,by=.01) # choose time-points
 new.lambdas <- seq(200, 318, by = 2) # choose wavelengths
@@ -51,9 +63,9 @@ test_that("preprocess works on a list", {
 
 ### test correct_rt ###
 
-warping.models <- correct_rt(dat.pr, what = "models", lambdas=c('210','260','318'))
-warp <- correct_rt(chrom_list=dat.pr, models=warping.models, what = "corrected.values")
 test_that("correct_rt works", {
+  warping.models <- correct_rt(dat.pr, lambdas=c('210','260','318'), what = "models")
+  warp <- correct_rt(chrom_list=dat.pr, models=warping.models, what = "corrected.values")
   equals(length(warping.models), length(warp), length(Sa[1:2]))
   expect_equal(names(warp), names(dat.pr[1:2]))
   expect_equal(colnames(warp[[1]]), colnames(dat.pr[[1]]), ignore_attr=TRUE)
@@ -221,12 +233,26 @@ test_that("plot_spectrum works", {
     plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
                   what="rt", chr=1, verbose = FALSE)
   }
-  x <- plot_spectrum("V13", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
-                what="peak", chr=1, verbose = FALSE)
   vdiffr::expect_doppelganger("plot_spectrum", plot_spec)
+  x <- plot_spectrum("V13", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
+                     what="peak", chr=1, verbose = FALSE)
   expect_equal(rownames(x), as.character(new.lambdas))
   expect_equal(class(x), "data.frame")
   expect_equal(ncol(x), 1)
+})
+
+test_that("plot_spectrum works", {
+  x <- plot_spectrum("V13", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
+                     what="peak", chr=1, verbose = FALSE)
+  expect_equal(rownames(x), as.character(new.lambdas))
+  expect_equal(class(x), "data.frame")
+  expect_equal(ncol(x), 1)
+  expect_error(plot_spectrum(peak_table = pk_tab, what="click"))
+  expect_error(plot_spectrum(peak_table = pk_tab, what="click", chr=1))
+  expect_error(plot_spectrum(peak_table = pk_tab, what="click",lambda="210"))
+  expect_error(plot_spectrum(peak_table = pk_tab, what="rt", lambda="210"))
+  expect_error(plot_spectrum(peak_table = pk_tab, what="rt", chr=1))
+  expect_error(plot_spectrum(loc=12, peak_table = pk_tab, what="rt"))
 })
 
 test_that("mirror_plot works", {

@@ -3,8 +3,9 @@
 #' Standard pre-processing of response matrices, consisting of a time axis and
 #' a spectral axis (e.g. HPLC-DAD/UV data). For smooth data, like UV-VIS data,
 #' the size of the matrix can be reduced by interpolation. By default,
-#' the data are baseline-corrected in the time direction and smoothed in the 
-#' spectral dimension.
+#' the data are baseline-corrected in the time direction
+#' (\code{\link[ptw:baseline.corr]{baseline.corr}}) and smoothed in the 
+#' spectral dimension using cubic smoothing splines (\code{\link[stats:smooth.spline]{smooth.spline}}.
 #' 
 #' @import ptw
 #' @importFrom stats approx smooth.spline
@@ -34,8 +35,8 @@
 #' @param mc.cores How many cores to use for parallel processing. Defaults to 2.
 #' @param \dots Further optional arguments to
 #' \code{\link[ptw:baseline.corr]{baseline.corr}}.
-#' @return The function returns the preprocessed data matrix, with rownames and
-#' colnames indicating the time points and wavelengths, respectively.
+#' @return The function returns the preprocessed data matrix, with row names and
+#' column names indicating the time points and wavelengths, respectively.
 #' @author Ethan Bass
 #' @note Adapted from
 #' \href{https://github.com/rwehrens/alsace/blob/master/R/preprocess.R}{preprocess}
@@ -120,7 +121,6 @@ preprocess <- function(X, dim1, ## time axis
     if (return_matrix){
       X[[1]]
     } else X
-      
 }
 
 #' @noRd

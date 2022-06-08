@@ -62,6 +62,11 @@
 <g clip-path='url(#cpNTkuMDR8Njg5Ljc2fDU5LjA0fDIxNC41Ng==)'>
 <line x1='326.52' y1='214.56' x2='326.52' y2='59.04' style='stroke-width: 0.75; stroke: #FF0000; stroke-dasharray: 1.00,3.00;' />
 </g>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHwyODguMDA=)'>
+<text x='374.40' y='17.20' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: sans;' textLength='0.00px' lengthAdjust='spacingAndGlyphs'></text>
+<text x='374.40' y='34.48' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: sans;' textLength='0.00px' lengthAdjust='spacingAndGlyphs'></text>
+<text x='374.40' y='51.76' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: sans;' textLength='217.72px' lengthAdjust='spacingAndGlyphs'> Chr 1 ;   RT: 13.62 ;  lambda: 220</text>
+</g>
 <defs>
   <clipPath id='cpNTkuMDR8Njg5Ljc2fDM0Ny4wNHw1MDIuNTY='>
     <rect x='59.04' y='347.04' width='630.72' height='155.52' />

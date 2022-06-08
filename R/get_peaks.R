@@ -48,8 +48,18 @@
 get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
                        sd.max=50, max.iter=100, ...){
   fit <- match.arg(fit, c("egh", "gaussian", "raw"))
+  if (missing(lambdas)){
+    if (ncol(chrom_list[[1]]) == 1){
+      lambdas <- colnames(chrom_list[[1]])
+    } else stop("Wavelengths (`lambdas`) must be provided.")
+  }
+    
   if (is.numeric(lambdas)){
     lambdas <- as.character(lambdas)
+  }
+  if (is.null(names(chrom_list))){
+    warning("Sample names not found. It is recommended to include names for your samples.", immediate. = TRUE)
+    names(chrom_list) <- seq_along(chrom_list)
   }
   peaks<-list()
   chrom_list_str <- deparse(substitute(chrom_list))
@@ -81,8 +91,8 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
   structure(result,
             chrom_list = chrom_list_str,
             lambdas = deparse(substitute(lambdas)), fit=fit, sd.max=sd.max,
-            max.iter=max.iter,
-            class="peak_list")
+            max.iter = max.iter,
+            class = "peak_list")
 }
 
 #' Plot fitted peak shapes.
@@ -118,7 +128,7 @@ plot.peak_list <- function(x, ..., chrom_list=NULL, index=1, lambda=NULL,
                        points=FALSE, ticks=FALSE, a=0.5, color=NULL,
                        cex.points=0.5){
   if (is.null(chrom_list)){
-    chrom_list <- get(attr(x, "chrom_list"))
+    chrom_list <- get_chrom_list(x)
   }
   if (is.null(lambda)){
     lambda <- names(x[[1]])[1]
@@ -126,7 +136,9 @@ plot.peak_list <- function(x, ..., chrom_list=NULL, index=1, lambda=NULL,
   if (!(lambda %in% names(x[[1]]))){
     stop('Error: lambda must match one of the wavelengths in your peak list')
   }
-  if (is.numeric(lambda)){lambda <- as.character(lambda)}
+  if (is.numeric(lambda)){
+    lambda <- as.character(lambda)
+  }
   new.ts <- as.numeric(rownames(chrom_list[[1]]))
   y <- chrom_list[[index]][,lambda]
   pks <- data.frame(x[[index]][[lambda]])
@@ -157,7 +169,7 @@ plot.peak_list <- function(x, ..., chrom_list=NULL, index=1, lambda=NULL,
           color <- "red"
       }
       else if (fit == "egh"){
-        yvals <- egh(x=peak.loc, center=pks$rt[i],
+        yvals <- egh(x = peak.loc, center = pks$rt[i],
                      width=pks$sd[i], height = pks$height[i], tau=pks$tau[i])
         if (is.null(color))
           color <- "purple"
@@ -167,8 +179,8 @@ plot.peak_list <- function(x, ..., chrom_list=NULL, index=1, lambda=NULL,
         if (is.null(color))
           color <- "hotpink"
       }
-      sapply(1:(length(peak.loc)-1), function(i){
-        polygon(peak.loc[c(i,i,(i+1), (i+1))], c(0,yvals[i:(i+1)], 0),
+      sapply(1:(length(peak.loc) - 1), function(i){
+        polygon(peak.loc[c(i, i, (i+1), (i+1))], c(0, yvals[i:(i+1)], 0),
                 col=alpha(color, a), lty=3, border = NA)
       })
   }

@@ -54,10 +54,6 @@ load_chroms <- function(paths, find_files = TRUE,
       read.csv(file, row.names = 1, header = TRUE,
                           fileEncoding="utf-16",check.names = FALSE, ...)}
   }
-  if (format.in!="csv" & !requireNamespace("chromConverter", quietly = TRUE)){
-      stop("To import binary formats, you must install chromConverter. You can use
-      devtools::install_github(https://github.com/ethanbass/chromConverter).")
-  }
   if (format.in %in% c("chemstation", "masshunter")){
     get_names <- function(files){
       file_names <- sapply(files, function(f){

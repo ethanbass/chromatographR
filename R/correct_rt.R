@@ -99,11 +99,11 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
     chrom_list_og <- chrom_list
     if (n.zeros > 0){
     chrom_list <- lapply(chrom_list,function(x){
-      apply(x, 2, padzeros, nzeros=n.zeros, side='both')
+      apply(x, 2, padzeros, nzeros = n.zeros, side = 'both')
     })
     }
-    allmats <- sapply(chrom_list, function(x) x[,lambdas,drop=FALSE], simplify = "array")
-    allmats.t <- sapply(chrom_list, function(x) t(x[,lambdas,drop=FALSE]), simplify = "array")
+    allmats <- sapply(chrom_list, function(x) x[, lambdas, drop=FALSE], simplify = "array")
+    allmats.t <- sapply(chrom_list, function(x) t(x[, lambdas, drop=FALSE]), simplify = "array")
     if (is.null(n.traces)){
       traces <- ifelse(length(lambdas) == 1, 1, lambdas)
     } else{
@@ -147,7 +147,7 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
       stop("VPdtw only supports warping by a single wavelength")
     if (is.null(models)){
       penalty <- VPdtw::dilation(allmats[,reference], 350) / penalty
-      models <- VPdtw::VPdtw(query=allmats, reference=allmats[,reference],
+      models <- VPdtw::VPdtw(query = allmats, reference = allmats[,reference],
                              penalty = penalty, maxshift = maxshift)
     }
     if (plot)
@@ -159,7 +159,7 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
       short <- jmax - nrow(iset)
       res <- median(diff(as.numeric(rownames(chrom_list_og[[1]]))))
       result <- lapply(1:ncol(allmats), function(samp){
-        x<-as.data.frame(apply(chrom_list_og[[samp]], 2, function(j){
+        x <- as.data.frame(apply(chrom_list_og[[samp]], 2, function(j){
           iset <- c(rep(NA, short), j)
           suppressWarnings(stats::approx(x = jset[,samp], y = iset, 1:jmax)$y)
         }))
