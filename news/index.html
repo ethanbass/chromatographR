@@ -48,6 +48,22 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.1" id="chromatographr-041">chromatographR 0.4.1<a class="anchor" aria-label="anchor" href="#chromatographr-041"></a></h2><p class="text-muted">CRAN release: 2022-05-19</p>
+<ul><li>Extended package DESCRIPTION and added citations to relevant references.</li>
+<li>Added <code>\value</code> and <code>\section{Side effects}</code> fields to docs for the various plot functions.</li>
+<li>Fixed bug in <code>mirror_plot</code> so legend can be fully hidden by setting <code>plot_legend</code> to FALSE.</li>
+<li>Fixed bug in <code>scan_chrom</code> so additional arguments are passed to <code>plot_spectrum</code>.</li>
+<li>Added <code>color</code> argument to customize color of fitted peaks in <code>plot.peak_list</code>.</li>
+<li>Fixed plot functions and examples so they don’t change par settings.</li>
+<li>Other small updates to documents (mostly formatting or small clarifications).</li>
+<li>Fixed <code>plot.peak_table</code> so it can return spectra if <code>export_spectrum</code> is TRUE.</li>
+<li>Added error for <code>box_plot</code> option in <code>plot.peak_table</code> if metadata is not attached.</li>
+<li>Added error for <code>box_plot</code> option in <code>plot.peak_table</code> if peak is not provided to <code>loc</code>.</li>
+<li>Added error in <code>plot_spectrum</code> function for user-supplied retention times beyond the edges of the chromatogram.</li>
+<li>Added error in <code>plot_spectrum</code> function for unspecified <code>lambda</code> (if <code>what=="click</code>).</li>
+<li>Released on CRAN</li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.0" id="chromatographr-040">chromatographR 0.4.0<a class="anchor" aria-label="anchor" href="#chromatographr-040"></a></h2>
 <ul><li>Added support for variable penalty dynamic time warping (VPdtw) through <code>correct_rt</code> function.</li>
 <li>Fixed bug in get_peaks function.</li>
