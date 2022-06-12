@@ -135,6 +135,8 @@ preprocess_matrix <- function(X,
                               ...) {
   if (!is.matrix(X))
     stop("X should be a matrix!")
+  metadata <- attributes(X)
+  metadata[c("dimnames", "names", "row.names", "dim", "class", "levels")] <- NULL
   ## possibly resize matrix to a lower dimension - faster, noise averaging
   if (interpolate_rows){
     if (length(tpoints <- as.numeric(rownames(X))) == 0)
@@ -163,7 +165,7 @@ preprocess_matrix <- function(X,
     X[X < 0] <- 0
   if (!missing(maxI))
     X <- maxI * X / max(X)
-  
   dimnames(X) <- list(dim1, dim2)
+  attributes(X) <- c(attributes(X), metadata)
   X
 }

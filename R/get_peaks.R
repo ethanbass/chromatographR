@@ -40,9 +40,18 @@
 #' Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
 #' LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
 #' Metabolomics} \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}
+#' 
+#' #' Lan, K. & Jorgenson, J. W. 2001. A hybrid of exponential and gaussian
+#' functions as a simple model of asymmetric chromatographic peaks. \emph{Journal of
+#' Chromatography A} \bold{915}:1-13. \doi{10.1016/S0021-9673(01)00594-5}.
+#'
+#' Naish, P. J. & Hartwell, S. 1988. Exponentially Modified Gaussian functions - A
+#' good model for chromatographic peaks in isocratic HPLC? \emph{Chromatographia},
+#' /bold{26}: 285-296. \doi{10.1007/BF02268168}.
 #' @examplesIf interactive()
 #' data(Sa_pr)
 #' pks <- get_peaks(Sa_pr, lambdas = c('210'), sd.max=50, fit="egh")
+#' @seealso \code{\link{find_peaks}}, \code{\link{fit_peaks}}
 #' @export get_peaks
 
 get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
