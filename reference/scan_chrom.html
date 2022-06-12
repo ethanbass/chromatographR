@@ -71,28 +71,45 @@
     <dl><dt>chrom_list</dt>
 <dd><p>A list of chromatograms in matrix form (timepoints x
 wavelengths).</p></dd>
+
+
 <dt>lambda</dt>
 <dd><p>The wavelength to plot the trace at.</p></dd>
+
+
 <dt>chr</dt>
 <dd><p>Numerical index of chromatogram you wish to plot.</p></dd>
+
+
 <dt>peak_table</dt>
 <dd><p>The peak table (output from <code><a href="get_peaktable.html">get_peaktable</a></code>
 function).</p></dd>
+
+
 <dt>scale_spectrum</dt>
 <dd><p>Logical. If TRUE, scales spectrum to unit height.
 Defaults to FALSE.</p></dd>
+
+
 <dt>spectrum_labels</dt>
 <dd><p>Logical. If TRUE, plots labels on maxima in spectral
 plot. Defaults to TRUE.</p></dd>
+
+
 <dt>export_spectrum</dt>
 <dd><p>Logical. If TRUE, exports spectrum to console.
 Defaults to FALSE.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional arguments.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>If <code>export_spectrum</code> is TRUE, returns the spectrum as a <code>
+    
+
+<p>If <code>export_spectrum</code> is TRUE, returns the spectrum as a <code>
 data.frame</code> with wavelengths as rows and a single column encoding the
 absorbance (or normalized absorbance, if <code>scale_spectrum</code> is TRUE)
 at each wavelength. Otherwise, there is no return value.</p>
@@ -130,7 +147,7 @@ chromatogram at the user-specified retention time. The spectrum is a single</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

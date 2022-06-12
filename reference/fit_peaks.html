@@ -71,46 +71,64 @@ profile</h1>
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>y</dt>
 <dd><p>response (numerical vector)</p></dd>
+
+
 <dt>pos</dt>
 <dd><p>Locations of peaks in vector y. If NULL, <code>find_peaks</code> will
 run automatically to find peak positions.</p></dd>
+
+
 <dt>sd.max</dt>
 <dd><p>Maximum width (standard deviation) for peaks. Defaults to 50.</p></dd>
+
+
 <dt>fit</dt>
 <dd><p>Function for peak fitting. (Currently exponential-gaussian hybrid
 <code>egh</code>, <code>gaussian</code> and <code>raw</code> settings are supported). If <code>
 raw</code> is selected, trapezoidal integration will be performed on raw data
 without fitting a peak shape. Defaults to <code>egh</code>.)</p></dd>
+
+
 <dt>max.iter</dt>
 <dd><p>Maximum number of iterations to use in nonlinear least
 squares peak-fitting. (Defaults to 1000).</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional arguments to <code>find_peaks</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Function <code>fit_peaks</code> returns a matrix, whose columns contain
+    
+
+<p>Function <code>fit_peaks</code> returns a matrix, whose columns contain
 the following information:</p>
 <dl><dt>rt</dt>
 <dd><p>location of the maximum of the peak
 (x)</p></dd>
-<dt>start</dt>
+ <dt>start</dt>
 <dd><p>start of peak (only included in table if `bounds==TRUE`)</p></dd>
+
 <dt>end</dt>
 <dd><p>end of peak (only included in table if `bounds==TRUE`)</p></dd>
+
 <dt>sd</dt>
 <dd><p>width of the peak (x)</p></dd>
-<dt>tau</dt>
+ <dt>tau</dt>
 <dd><p>tau parameter (only included in
 table if `fit=="egh"`)</p></dd>
-<dt>FWHM</dt>
+ <dt>FWHM</dt>
 <dd><p>full width at half maximum (x)</p></dd>
+
 <dt>height</dt>
 <dd><p>height of the peak (y)</p></dd>
-<dt>area</dt>
+ <dt>area</dt>
 <dd><p>peak area</p></dd>
+
 <dt>r.squared</dt>
 <dd><p>r-squared value for linear fit of model to data.</p></dd>
+
 </dl><p>Again, the first five elements (rt, start, end, sd and FWHM) are expressed
 as indices, so not in terms of the real retention times. The transformation
 to "real" time is done in function <code>get_peaks</code>.</p>
@@ -227,7 +245,7 @@ good model for chromatographic peaks in isocratic HPLC? <em>Chromatographia</em>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

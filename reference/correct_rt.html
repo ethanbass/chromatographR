@@ -84,46 +84,79 @@ time warping, as implemented in <code><a href="https://rdrr.io/pkg/VPdtw/man/VPd
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>chrom_list</dt>
 <dd><p>List of matrices containing concentration profiles.</p></dd>
+
+
 <dt>lambdas</dt>
 <dd><p>Select wavelengths to use by name.</p></dd>
+
+
 <dt>models</dt>
 <dd><p>List of models to warp by.</p></dd>
+
+
 <dt>reference</dt>
 <dd><p>Index of the sample that is to be considered the reference
 sample.</p></dd>
+
+
 <dt>alg</dt>
 <dd><p>algorithm to use: parametric time warping(<code>ptw</code>) or variable
 penalty dynamic time warping <code>vpdtw</code>.</p></dd>
+
+
 <dt>what</dt>
 <dd><p>What to return: either the 'corrected.values' (useful for visual
 inspection) or the warping 'models' (for further programmatic use).</p></dd>
+
+
 <dt>init.coef</dt>
 <dd><p>Starting values for the optimization.</p></dd>
+
+
 <dt>n.traces</dt>
 <dd><p>Number of traces to use.</p></dd>
+
+
 <dt>n.zeros</dt>
 <dd><p>Number of zeros to add.</p></dd>
+
+
 <dt>scale</dt>
 <dd><p>Logical. If true, scale chromatograms before warping.</p></dd>
+
+
 <dt>trwdth</dt>
 <dd><p>width of the triangle in the WCC criterion.</p></dd>
+
+
 <dt>plot</dt>
 <dd><p>Logical. Whether to plot alignment.</p></dd>
+
+
 <dt>penalty</dt>
 <dd><p>Divisor for dilation calculated by <code><a href="https://rdrr.io/pkg/VPdtw/man/dilation.html" class="external-link">dilation</a></code>.
 Adjusts penalty for variable penalty dynamic time warping.</p></dd>
+
+
 <dt>maxshift</dt>
 <dd><p>Integer. Maximum allowable shift for <code><a href="https://rdrr.io/pkg/VPdtw/man/VPdtw.html" class="external-link">VPdtw</a></code>.</p></dd>
+
+
 <dt>verbose</dt>
 <dd><p>Whether to be verbose.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Optional arguments for the <code><a href="https://rdrr.io/pkg/ptw/man/ptw.html" class="external-link">ptw</a></code> function.
 The only argument that cannot be changed is <code>warp.type</code>: this is always
 equal to <code>"global"</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list of <code>ptw</code> objects or a list of warped absorbance profiles,
+    
+
+<p>A list of <code>ptw</code> objects or a list of warped absorbance profiles,
 depending on the value of the <code>what</code> argument.</p>
     </div>
     <div class="section level2">
@@ -188,7 +221,7 @@ Metabolomics</em>, <b>11</b>:143-154. <a href="https://doi.org/10.1007/s11306-01
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>

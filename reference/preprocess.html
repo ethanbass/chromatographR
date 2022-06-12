@@ -90,43 +90,66 @@ spectral dimension using cubic smoothing splines (<code><a href="https://rdrr.io
 <dd><p>A numerical data matrix, or list of data matrices. Missing values
 are not allowed. If rownames or colnames attributes are used, they should be
 numerical and signify time points and wavelengths, respectively.</p></dd>
+
+
 <dt>dim1</dt>
 <dd><p>A new, usually shorter, set of time points (numerical). The
 range of these should not be outside the range of the original time points,
 otherwise the function stops with an error message.</p></dd>
+
+
 <dt>dim2</dt>
 <dd><p>A new, usually shorter, set of wavelengths (numerical). The
 range of these should not be outside the range of the original wavelengths,
 otherwise the function stops with an error message.</p></dd>
+
+
 <dt>remove.time.baseline</dt>
 <dd><p>Logical, indicating whether baseline correction
 should be done in the time direction, according to
 <code><a href="https://rdrr.io/pkg/ptw/man/baseline.corr.html" class="external-link">baseline.corr</a></code>. Default is TRUE.</p></dd>
+
+
 <dt>spec.smooth</dt>
 <dd><p>Logical, indicating whether smoothing should be done in
 the spectral direction, according to
 <code><a href="https://rdrr.io/r/stats/smooth.spline.html" class="external-link">smooth.spline</a></code>. Default is TRUE.</p></dd>
+
+
 <dt>maxI</dt>
 <dd><p>if given, the maximum intensity in the matrix is set to this
 value.</p></dd>
+
+
 <dt>parallel</dt>
 <dd><p>Logical, indicating whether to use parallel processing.
 Defaults to TRUE (unless you're on Windows).</p></dd>
+
+
 <dt>interpolate_rows</dt>
 <dd><p>Logical. Whether to interpolate along dim1. Defaults
 to TRUE.</p></dd>
+
+
 <dt>interpolate_cols</dt>
 <dd><p>Logical. Whether to interpolate along dim2. Defaults
 to TRUE.</p></dd>
+
+
 <dt>mc.cores</dt>
 <dd><p>How many cores to use for parallel processing. Defaults to 2.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Further optional arguments to
 <code><a href="https://rdrr.io/pkg/ptw/man/baseline.corr.html" class="external-link">baseline.corr</a></code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The function returns the preprocessed data matrix, with row names and
+    
+
+<p>The function returns the preprocessed data matrix, with row names and
 column names indicating the time points and wavelengths, respectively.</p>
     </div>
     <div class="section level2">
@@ -171,7 +194,7 @@ Metabolomics</em> <b>11:1</b>:143-154. <a href="https://doi.org/10.1007/s11306-0
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
 </div>
 
     </footer></div>
