@@ -2,3 +2,9 @@ url: https://ethanbass.github.io/chromatographR/
 template:
   bootstrap: 5
 
+home:
+	links:
+		- text: ChromConverter
+		  href: https://ethanbass.github.io/chromConverter/
+		 - text: ShinyChromViewer
+		   href: https://github.com/ethanbass/ShinyChromViewer
