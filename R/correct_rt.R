@@ -135,7 +135,10 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
           ptw(t(allmats[,,1]), t(allmats[, , ii]), init.coef=warp.coef[[ii]],
               try=TRUE, alg = ptwmods[[1]]$alg, warp.type = "global", ...)})
         result <- lapply(ptwmods, function(x) t(x$warped.sample))
-        for (i in seq_along(result)) rownames(result[[i]]) <- rownames(chrom_list[[i]])
+        for (i in seq_along(result)){
+          rownames(result[[i]]) <- rownames(chrom_list[[i]])
+          result[[i]] <- transfer_metadata(result[[i]], chrom_list_og[[i]])
+        }
         names(result) <- names(chrom_list)
         result
       } else {
@@ -159,10 +162,10 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
       short <- jmax - nrow(iset)
       res <- median(diff(as.numeric(rownames(chrom_list_og[[1]]))))
       result <- lapply(1:ncol(allmats), function(samp){
-        x <- as.data.frame(apply(chrom_list_og[[samp]], 2, function(j){
+        x <- apply(chrom_list_og[[samp]], 2, function(j){
           iset <- c(rep(NA, short), j)
           suppressWarnings(stats::approx(x = jset[,samp], y = iset, 1:jmax)$y)
-        }))
+        })
         # fix times
         old_ts <- c(rep(NA,short), rownames(chrom_list_og[[samp]]))
         times <- suppressWarnings(stats::approx(x = jset[,samp],
@@ -172,12 +175,13 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
           beg<-sort(seq(from = times[mi]-res, by=-res, length.out = mi-1),
                     decreasing=FALSE)
         } else beg<-NULL
-        ma<-max(which(!is.na(times)))
+        ma <- max(which(!is.na(times)))
         if (ma < length(times)){
           end <- seq(from = times[ma]+res, length.out = length(times)-ma, by=res)
         } else end <- NULL
         new.times <- c(beg,times[!is.na(times)], end)
         rownames(x) <- new.times
+        x <- transfer_metadata(x, chrom_list_og[[samp]])
         x
       })
       names(result) <- names(chrom_list)
@@ -222,3 +226,11 @@ correct_peaks <- function(peak_list, mod_list){
            })},
     peak_list, mod_list, SIMPLIFY = FALSE)
 }
+
+transfer_metadata <- function(new_object, old_object,
+                              exclude = c('names','row.names','class','dim','dimnames')){
+    a <- attributes(old_object)
+    a[exclude] <- NULL
+    attributes(new_object) <- c(attributes(new_object), a)
+    new_object
+  }
