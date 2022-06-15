@@ -65,12 +65,11 @@ matplot(x=tpoints, y = ptw::baseline.corr(Sa[[i]][,lambda],p=.001,lambda=1e5),
        type='l', add = T, col='blue', lty = 3)
 ```
 
-```{r, choosing dimensions}
+```{r, preprocessing, eval=T}
+# choose dimensions for interpolation
 new.ts <- seq(10,18.66,by=.01) # choose time-points
 new.lambdas <- seq(200, 318, by = 2) # choose wavelengths
-```
 
-```{r, preprocessing, eval=T}
 dat.pr <- preprocess(Sa, dim1=new.ts, dim2=new.lambdas,
            parallel=F, p=.001, lambda=1e5)
 ```

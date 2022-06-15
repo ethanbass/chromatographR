@@ -112,7 +112,8 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
   }
   if (lambda == 'max'){
     if (what == "click")
-      stop("Lambda must be specified for interactive scanning.")
+      stop("Wavelength (`lambda`) must be specified for interactive scanning.")
+    y <- unlist(chrom_list[[chr]][idx, , drop=TRUE])
     lambda <- names(which.max(y))
     lambda.idx <- which(new.lambdas == lambda)
   } else{
@@ -130,18 +131,21 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
       idx <- identify(new.ts, y_trace, n = 1, plot = FALSE)
       RT <- new.ts[idx]
     }
-    abline(v = RT,col='red',lty=3)
-    title(paste0("\n\n Chr ", chr,  " ;   RT: ", RT, " ;  lambda: ", lambda))
+    abline(v = RT,col='red', lty=3)
+    title(bquote(paste("\n\n Chr ", .(chr),  " ;   RT: ", .(RT), " ;  ", lambda, ": ", .(lambda), " nm",
+                       #" abs: ", .(round(y_trace[idx], 2))
+                       )))
+    
   }
   if (verbose){
-    message(paste0("chrome no. ", chr, ": `", names(chrom_list)[chr], "` \n",
-                   "RT: ", RT,
-                   ";  lambda = ", lambda, " nm;  ",
+    message(paste0("chrome no. ", chr, " (`", names(chrom_list)[chr], "`) \n",
+                   "RT: ", RT, "; \n",
+                   "lambda = ", lambda, " nm; \n",
                    "abs = ", round(y_trace[idx], 2)))
     ### report closest match ###
     if (what != "peak" & !is.null(peak_table$tab)){
       pk <- names(which.min(abs(peak_table$pk_meta["rt",] - RT)))
-      message(paste("closest match in peak table is", pk))
+      message(paste("nearest peak:", pk))
     }
   }
   y <- unlist(chrom_list[[chr]][idx, , drop=TRUE])
@@ -152,7 +156,7 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
     plot_spec(y = y, spectrum_labels = spectrum_labels, ...)
   }
   if (export_spectrum){
-    y<-data.frame(y)
+    y <- data.frame(y)
     colnames(y) <- names(chrom_list)[chr]
     y
   }
