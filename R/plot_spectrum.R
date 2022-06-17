@@ -162,9 +162,6 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
   }
 }
 
-# identify <- function(x, ...){
-#   identify(x, ...)
-# }
 
 #' Elementwise all equal function
 #' @author Brian Diggs
