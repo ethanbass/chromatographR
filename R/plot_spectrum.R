@@ -101,14 +101,17 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
       RT <- round(as.numeric(loc), sig)
     }
     if (what != "click"){
-    if (!is.numeric(RT))
-      stop("Retention time not found!")
-    if (RT > tail(new.ts, 1) | RT < head(new.ts, 1))
-      stop("The supplied retention time falls outside the bounds of the chromatogram.")
-    idx <- which.min(abs(RT - new.ts))
-    if (chr == 'max'){
-      chr <- which.max(peak_table$tab[,loc])
+      if (!is.numeric(RT))
+        stop("Retention time not found!")
+      if (RT > tail(new.ts, 1) | RT < head(new.ts, 1))
+        stop("The supplied retention time falls outside the bounds of the chromatogram.")
+      idx <- which.min(abs(RT - new.ts))
+      if (chr == 'max'){
+        chr <- which.max(peak_table$tab[,loc])
+      }
     }
+  if (is.character(chr) & !(chr %in% names(chrom_list))){
+    stop("Chromatogram not found. check `chr` argument!")
   }
   if (lambda == 'max'){
     if (what == "click")
