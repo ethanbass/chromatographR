@@ -66,21 +66,21 @@ correlation matrix to classify peaks into by their spectral similarity.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">cluster_spectra</span><span class="op">(</span>
-  <span class="va">peak_table</span>,
-  <span class="va">chrom_list</span>,
-  peak_no <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">100</span><span class="op">)</span>,
-  alpha <span class="op">=</span> <span class="fl">0.95</span>,
-  nboot <span class="op">=</span> <span class="fl">1000</span>,
-  plot_dend <span class="op">=</span> <span class="cn">TRUE</span>,
-  plot_spectra <span class="op">=</span> <span class="cn">TRUE</span>,
-  verbose <span class="op">=</span> <span class="cn">TRUE</span>,
-  save <span class="op">=</span> <span class="cn">TRUE</span>,
-  parallel <span class="op">=</span> <span class="cn">TRUE</span>,
-  max.only <span class="op">=</span> <span class="cn">FALSE</span>,
-  output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"clusters"</span>, <span class="st">"pvclust"</span>, <span class="st">"both"</span><span class="op">)</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cluster_spectra</span><span class="op">(</span></span>
+<span>  <span class="va">peak_table</span>,</span>
+<span>  <span class="va">chrom_list</span>,</span>
+<span>  peak_no <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">100</span><span class="op">)</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  nboot <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  plot_dend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  plot_spectra <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  save <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  parallel <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  max.only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"clusters"</span>, <span class="st">"pvclust"</span>, <span class="st">"both"</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -201,10 +201,10 @@ the uncertainty in hierarchical clustering. <em>Bioinformatics</em>,
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># \donttest{</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">pk_tab</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Sa_warp</span><span class="op">)</span></span>
-<span class="r-in"><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu">cluster_spectra</span><span class="op">(</span><span class="va">pk_tab</span>, nboot<span class="op">=</span><span class="fl">100</span>, max.only <span class="op">=</span> <span class="cn">FALSE</span>, save <span class="op">=</span> <span class="cn">FALSE</span>, alpha <span class="op">=</span> <span class="fl">.97</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">pk_tab</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Sa_warp</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu">cluster_spectra</span><span class="op">(</span><span class="va">pk_tab</span>, nboot<span class="op">=</span><span class="fl">100</span>, max.only <span class="op">=</span> <span class="cn">FALSE</span>, save <span class="op">=</span> <span class="cn">FALSE</span>, alpha <span class="op">=</span> <span class="fl">.97</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "...collecting representative spectra"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "...clustering spectra"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Creating a temporary cluster...done:</span>
@@ -230,7 +230,8 @@ the uncertainty in hierarchical clustering. <em>Bioinformatics</em>,
 <span class="r-plt img"><img src="cluster_spectra-7.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="cluster_spectra-8.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="cluster_spectra-9.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span class="co"># }</span></span>
+<span class="r-plt img"><img src="cluster_spectra-10.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -242,7 +243,7 @@ the uncertainty in hierarchical clustering. <em>Bioinformatics</em>,
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.4.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
 </div>
 
     </footer></div>
