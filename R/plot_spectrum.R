@@ -304,15 +304,15 @@ scan_chrom <- function(chrom_list, lambda, chr, peak_table=NULL,
 #' @param peak_table Peak table object
 #' @author Ethan Bass
 #' @noRd
-get_chrom_list <- function(x){
+get_chrom_list <- function(x, verbose = FALSE){
   if (inherits(x, "peak_table")){
     chrom_list <- try(get(x$args["chrom_list"]))
     if (inherits(chrom_list, "try-error")) stop("Chromatograms not found!")
     if (length(chrom_list) != nrow(x$tab)){
       stop("Chrom_list does not match peak_table")
     } else{
-      if (!all.equal(names(chrom_list), rownames(x$tab)))
-        stop("Chrom_list does not match peak_table")
+      if (verbose & any(names(chrom_list) != rownames(x$tab)))
+        warning("Names of chromatograms do not match peak_table")
     }
   } else if (inherits(x, "peak_list")){
     chrom_list <- try(get(attr(x, "chrom_list")))
