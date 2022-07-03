@@ -8,7 +8,7 @@
 #' 
 #' @name load_chroms
 #' @importFrom utils read.csv
-#' @importFrom chromConverter sp_converter uv_converter
+#' @import chromConverter
 #' @param paths Path(s) to chromatograms or the folders containing the files
 #' @param find_files Logical. Set to \code{TRUE} (default) if you are providing
 #' the function with a folder or vector of folders containing the files.
@@ -36,6 +36,9 @@
 load_chroms <- function(paths, find_files = TRUE,
                          format.in=c("csv", "chemstation", "masshunter"),
                          sep = ",", dat=NULL, ...){
+  .Deprecated("read_chroms", package="chromConverter",
+              msg="The `load_chroms` function is deprecated. It is suggested to use `read_chroms` in the chromConverter package instead.",
+              old = as.character(sys.call(sys.parent()))[1L])
   format.in <- match.arg(format.in, c("csv", "chemstation", "masshunter"))
   exists <- dir.exists(paths) | file.exists(paths)
   if (mean(exists) == 0){

@@ -2,6 +2,8 @@
 
 * Fixed typos in vignette
 * Changed default behavior in `correct_rt` to `corrected_values` rather than `models`.
+* Deprecated `load_chroms` function. Please use `read_chroms` from chromConverter
+to import files.
 
 # chromatographR 0.4.1
 
