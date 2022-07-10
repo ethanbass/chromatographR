@@ -2,6 +2,9 @@
 
 * Fixed typos in vignette
 * Changed default behavior in `correct_rt` to `corrected_values` rather than `models`.
+* Fixed bug in `cluster_spectra` when there's a peak with 0 SD.
+* Added more informative warnings and error messages to various functions.
+* Allow preservation of instrumental metadata through preprocessing and alignment steps.
 * Deprecated `load_chroms` function. Please use `read_chroms` from chromConverter
 to import files.
 

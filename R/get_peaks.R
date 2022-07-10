@@ -57,6 +57,8 @@
 get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
                        sd.max=50, max.iter=100, ...){
   fit <- match.arg(fit, c("egh", "gaussian", "raw"))
+  if (class(chrom_list)[1] == "matrix")
+    chrom_list <- list(chrom_list)
   if (missing(lambdas)){
     if (ncol(chrom_list[[1]]) == 1){
       lambdas <- colnames(chrom_list[[1]])
