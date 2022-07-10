@@ -28,16 +28,16 @@ The *chromatographR* package draws inspiration from the previously published *al
 ## Workflow
 ### Loading data
 
-chromatographR now includes an option to directly convert files from ChemStation or MassHunter [@bovee2022; @bovee2022a]. Alternatively, the data from the spectrometer can be converted into an R-friendly  format like a `csv` file. The `load_chroms` function provides a simple interface to read chromatograms into `R` from any of these formats.
+chromatographR now includes an option to directly read data from Agilent ChemStation or MassHunter files [@bovee2022; @bovee2022a], Chromeleon UV ASCII files, Thermo Raw, Waters ARW and others using the `read_chroms` function. Select the appropriate file format by setting the `format_in` argument to `csv`, `chemstation_uv`, `masshunter_dad`, `chromeleon_uv`, `waters_arw`, etc.
 
 ```{r,eval=F}
 # single folder
 load_chroms(paths = path, format.in="csv")
 
 # multiple folders
-path = 'foo'
+path = 'foo' # path to parent directory
 folders <- list.files(path = path, pattern = "EXPORT3D")
-dat <- load_chroms(folders)
+dat <- read_chroms(folders, format_in = "csv")
 ```
 
 ### Example data
