@@ -64,7 +64,6 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
       lambdas <- colnames(chrom_list[[1]])
     } else stop("Wavelengths (`lambdas`) must be provided.")
   }
-    
   if (is.numeric(lambdas)){
     lambdas <- as.character(lambdas)
   }
