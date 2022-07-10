@@ -77,7 +77,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>chromatographR</h1>
                         <h4 data-toc-skip class="author">Ethan Bass</h4>
             
-            <h4 data-toc-skip class="date">2022-07-03</h4>
+            <h4 data-toc-skip class="date">2022-07-10</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/HEAD/vignettes/chromatographR.Rmd" class="external-link"><code>vignettes/chromatographR.Rmd</code></a></small>
       <div class="d-none name"><code>chromatographR.Rmd</code></div>
@@ -97,14 +97,14 @@
 <div class="section level3">
 <h3 id="loading-data">Loading data<a class="anchor" aria-label="anchor" href="#loading-data"></a>
 </h3>
-<p>chromatographR now includes an option to directly convert files from ChemStation or MassHunter <span class="citation">(Bovee 2022a, 2022b)</span>. Alternatively, the data from the spectrometer can be converted into an R-friendly format like a <code>csv</code> file. The <code>load_chroms</code> function provides a simple interface to read chromatograms into <code>R</code> from any of these formats.</p>
+<p>chromatographR now includes an option to directly read data from Agilent ChemStation or MassHunter files <span class="citation">(Bovee 2022a, 2022b)</span>, Chromeleon UV ASCII files, Thermo Raw, Waters ARW and others using the <code>read_chroms</code> function. Select the appropriate file format by setting the <code>format_in</code> argument to <code>csv</code>, <code>chemstation_uv</code>, <code>masshunter_dad</code>, <code>chromeleon_uv</code>, <code>waters_arw</code>, etc.</p>
 <pre class="text"><code>&gt; # single folder
 &gt; load_chroms(paths = path, format.in="csv")
 &gt; 
 &gt; # multiple folders
-&gt; path = 'foo'
+&gt; path = 'foo' # path to parent directory
 &gt; folders &lt;- list.files(path = path, pattern = "EXPORT3D")
-&gt; dat &lt;- load_chroms(folders)</code></pre>
+&gt; dat &lt;- read_chroms(folders, format_in = "csv")</code></pre>
 </div>
 <div class="section level3">
 <h3 id="example-data">Example data<a class="anchor" aria-label="anchor" href="#example-data"></a>
@@ -305,7 +305,7 @@ other attached packages:
 [1] chromatographR_0.4.2 knitr_1.39          
 
 loaded via a namespace (and not attached):
- [1] Rcpp_1.0.8.3          highr_0.9             bslib_0.3.1          
+ [1] Rcpp_1.0.9            highr_0.9             bslib_0.3.1          
  [4] compiler_4.2.1        jquerylib_0.1.4       xts_0.12.1           
  [7] tools_4.2.1           pvclust_2.2-0         digest_0.6.29        
 [10] lifecycle_1.0.1       jsonlite_1.8.0        RcppDE_0.1.6         
@@ -317,7 +317,7 @@ loaded via a namespace (and not attached):
 [28] sass_0.4.1            systemfonts_1.0.4     rprojroot_2.0.3      
 [31] grid_4.2.1            reticulate_1.25       R6_2.5.1             
 [34] textshaping_0.3.6     ptw_1.9-16            minpack.lm_1.2-2     
-[37] rmarkdown_2.14        farver_2.1.0          TTR_0.24.3           
+[37] rmarkdown_2.14        farver_2.1.1          TTR_0.24.3           
 [40] smoother_1.1          chromConverter_0.1.0  purrr_0.3.4          
 [43] fastcluster_1.2.3     magrittr_2.0.3        scales_1.2.0         
 [46] htmltools_0.5.2       dynamicTreeCut_1.63-1 colorspace_2.0-3     
