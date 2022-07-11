@@ -19,6 +19,12 @@
 #' @export attach_metadata
 
 attach_metadata <- function(peak_table, metadata, column){
+  if (any(grepl("tbl", class(metadata)))){
+    metadata <- as.data.frame(metadata)
+  }
+  if (!inherits(metadata, "data.frame")){
+    stop("Please provide metadata as a data.frame")
+  }
   if (!(column %in% colnames(metadata)))
     stop(paste0("Column, ", column, ", is not found."))
   if (sum((duplicated(metadata[,column]))) > 0)
