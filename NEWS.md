@@ -7,6 +7,7 @@
 * Allow preservation of instrumental metadata through preprocessing and alignment steps.
 * Deprecated `load_chroms` function. Please use `read_chroms` from chromConverter
 to import files.
+* Recommend installation of `VPdtw` from CRAN instead of https://ethanbass.github.io/drat/
 
 # chromatographR 0.4.1
 

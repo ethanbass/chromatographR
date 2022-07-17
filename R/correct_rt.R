@@ -79,7 +79,7 @@ correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
   if (alg == "vpdtw" & !requireNamespace("VPdtw", quietly = TRUE)) {
     stop(
       "Package VPdtw must be installed to use VPdtw alignment:
-      install.packages('VPdtw', repos='https://ethanbass.github.io/drat/')",
+      install.packages('VPdtw')",
       call. = FALSE
     )
   }
