@@ -14,8 +14,8 @@
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.1.0/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.1.0/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link href="../deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="chromatographR">
 <meta property="og:description" content="chromatographR">
@@ -77,7 +77,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>chromatographR</h1>
                         <h4 data-toc-skip class="author">Ethan Bass</h4>
             
-            <h4 data-toc-skip class="date">2022-07-11</h4>
+            <h4 data-toc-skip class="date">2022-07-17</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/HEAD/vignettes/chromatographR.Rmd" class="external-link"><code>vignettes/chromatographR.Rmd</code></a></small>
       <div class="d-none name"><code>chromatographR.Rmd</code></div>
@@ -167,8 +167,8 @@
 <div class="section level4">
 <h4 id="variable-penalty-dynamic-time-warping">Variable penalty dynamic time warping<a class="anchor" aria-label="anchor" href="#variable-penalty-dynamic-time-warping"></a>
 </h4>
-<p>Variable penalty dynamic time warping is another algorithm that can be quite effective for correcting retention time shifts <span class="citation">(Clifford et al. 2009; Clifford and Stone 2012)</span>. Instead of calculating an explicit warping function, dynamic time warping (DTW) works by repeatedly shifting, expanding or contracting the time axis in small steps until a satisfactory alignment is attained. This process can result in very close matching of peaks, but can also lead to severe peak distortion if the time axis is repeatedly expanded and/or contracted <span class="citation">(Tomasi, van den Berg, and Andersson 2004)</span>. Variable penalty dynamic time warping is a derivative of DTW that constrains expansion and contraction of the time-axis by applying a penalty to these types of “risky” moves. This can often achieve a very good alignment with minimal peak distortion. VPdtw package must be installed manually, since it is not currently available on CRAN. Unlike <code>ptw</code>, <code>VPdtw</code> can only take a single wavelength as input (but it returns a global warping on the whole chromatographic matrix). The code snippet below is not run, but shows how one could install <code>VPdtw</code> and use it to warp the example chromatograms.</p>
-<pre class="text"><code>&gt; install.packages("VPdtw", repos="https://ethanbass.github.io/drat")
+<p>Variable penalty dynamic time warping is another algorithm that can be very effective for correcting retention time shifts <span class="citation">(Clifford et al. 2009; Clifford and Stone 2012)</span>. Instead of calculating an explicit warping function, dynamic time warping (DTW) works by repeatedly shifting, expanding or contracting the time axis in small steps until a satisfactory alignment is attained. This process can result in very close matching of peaks, but can also lead to severe peak distortion if the time axis is repeatedly expanded and/or contracted <span class="citation">(Tomasi, van den Berg, and Andersson 2004)</span>. <strong>Variable penalty dynamic time warping</strong> is a derivative of DTW that constrains expansion and contraction of the time-axis by applying a penalty to these types of “risky” moves. This can often achieve a very good alignment with minimal peak distortion. VPdtw package is a suggested dependency since it requires a working C++ compiler. oUnlike <code>ptw</code>, <code>VPdtw</code> can only take a single wavelength as input (but it returns a global warping on the whole chromatographic matrix). The code snippet below is not run, but shows how one could install <code>VPdtw</code> and use it to warp the example chromatograms.</p>
+<pre class="text"><code>&gt; install.packages("VPdtw")
 &gt; warp &lt;- correct_rt(chrom_list=dat.pr, alg="vpdtw", lambda="210", what="corrected.values")</code></pre>
 </div>
 </div>
@@ -308,12 +308,12 @@ loaded via a namespace (and not attached):
  [1] Rcpp_1.0.9            lattice_0.20-45       RcppDE_0.1.6         
  [4] tidyr_1.2.0           png_0.1-7             zoo_1.8-10           
  [7] rprojroot_2.0.3       digest_0.6.29         utf8_1.2.2           
-[10] R6_2.5.1              cellranger_1.1.0      VPdtw_2.1-12         
+[10] R6_2.5.1              cellranger_1.1.0      VPdtw_2.1-14         
 [13] dynamicTreeCut_1.63-1 evaluate_0.15         highr_0.9            
-[16] pillar_1.7.0          rlang_1.0.3           curl_4.3.2           
+[16] pillar_1.7.0          rlang_1.0.4           curl_4.3.2           
 [19] readxl_1.4.0          TTR_0.24.3            jquerylib_0.1.4      
 [22] Matrix_1.4-1          reticulate_1.25       rmarkdown_2.14       
-[25] pkgdown_2.0.5         textshaping_0.3.6     desc_1.4.1           
+[25] pkgdown_2.0.6         textshaping_0.3.6     desc_1.4.1           
 [28] stringr_1.4.0         munsell_0.5.0         compiler_4.2.1       
 [31] xfun_0.31             pkgconfig_2.0.3       systemfonts_1.0.4    
 [34] htmltools_0.5.2       tidyselect_1.1.2      tibble_3.1.7         
@@ -322,13 +322,13 @@ loaded via a namespace (and not attached):
 [43] magrittr_2.0.3        scales_1.2.0          cli_3.3.0            
 [46] stringi_1.7.8         cachem_1.0.6          farver_2.1.1         
 [49] ptw_1.9-16            fs_1.5.2              xml2_1.3.3           
-[52] smoother_1.1          bslib_0.3.1           fastcluster_1.2.3    
+[52] smoother_1.1          bslib_0.4.0           fastcluster_1.2.3    
 [55] ellipsis_0.3.2        xts_0.12.1            ragg_1.2.2           
 [58] generics_0.1.3        vctrs_0.4.1           tools_4.2.1          
 [61] pvclust_2.2-0         glue_1.6.2            purrr_0.3.4          
 [64] fastmap_1.1.0         yaml_2.3.5            colorspace_2.0-3     
 [67] memoise_2.0.1         minpack.lm_1.2-2      chromConverter_0.2.1 
-[70] sass_0.4.1           </code></pre>
+[70] sass_0.4.2           </code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
@@ -343,7 +343,7 @@ loaded via a namespace (and not attached):
 
 <div class="pkgdown-footer-right">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.5.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
     </footer>
