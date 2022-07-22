@@ -134,8 +134,9 @@ inspection) or the warping 'models' (for further programmatic use).</p></dd>
 
 
 <dt>penalty</dt>
-<dd><p>Divisor for dilation calculated by <code><a href="https://rdrr.io/pkg/VPdtw/man/dilation.html" class="external-link">dilation</a></code>.
-Adjusts penalty for variable penalty dynamic time warping.</p></dd>
+<dd><p>The penalty for <code><a href="https://rdrr.io/pkg/VPdtw/man/VPdtw.html" class="external-link">VPdtw</a></code> is calculated by
+dividing the <code><a href="https://rdrr.io/pkg/VPdtw/man/dilation.html" class="external-link">dilation</a></code> by the number provided by this
+argument. Thus, a lower number allows more warping to occur. Defaults to 5.</p></dd>
 
 
 <dt>maxshift</dt>
@@ -162,8 +163,7 @@ depending on the value of the <code>what</code> argument.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>To use variable penalty dynamic time warping, the <code>VPdtw</code> package must
-be manually installed since it's no longer available from CRAN: <code>
-install.packages('VPdtw', repos='https://ethanbass.github.io/drat/')</code>.</p>
+be manually installed: <code>install.packages('VPdtw')</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
@@ -175,8 +175,8 @@ function in the alsace package by Ron Wehrens.</p>
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     
 <ul><li><p>Clifford, D., Stone, G., Montoliu, I., Rezzi, S., Martin, F. P., Guy, P.,
-... &amp; Kochhar, S. 2009. Alignment using variable penalty dynamic time warping.
-<em>Analytical chemistry</em>, <b>81(3)</b>:1000-1007. <a href="https://doi.org/10.1021/ac802041e" class="external-link">doi:10.1021/ac802041e</a>
+Bruce, S., &amp; Kochhar, S. 2009. Alignment using variable penalty dynamic time
+warping. <em>Analytical chemistry</em>, <b>81(3)</b>:1000-1007. <a href="https://doi.org/10.1021/ac802041e" class="external-link">doi:10.1021/ac802041e</a>
 .</p></li>
 <li><p>Clifford, D., &amp; Stone, G. 2012. Variable Penalty Dynamic Time Warping Code
 for Aligning Mass Spectrometry Chromatograms in R. <em>Journal of
