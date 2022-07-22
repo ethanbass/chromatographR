@@ -61,11 +61,13 @@ preprocess <- function(X, dim1, ## time axis
                           dim2, ## spectral axis
                           remove.time.baseline = TRUE,
                           spec.smooth = TRUE,
-                          maxI, parallel = TRUE, 
+                          maxI, parallel, 
                           interpolate_rows = TRUE,
                           interpolate_cols = TRUE,
                           mc.cores=2, ...){
-  if (parallel & .Platform$OS.type == "windows"){
+  if (missing(parallel)){
+    parallel <- .Platform$OS.type != "windows"
+  } else if (parallel & .Platform$OS.type == "windows"){
     parallel <- FALSE
     warning("Parallel processing is not currently available on Windows.")
   }

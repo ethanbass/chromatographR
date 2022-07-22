@@ -5,8 +5,7 @@
 #' time warping, as implemented in \code{\link[VPdtw]{VPdtw}}.
 #' 
 #' To use variable penalty dynamic time warping, the \code{VPdtw} package must
-#' be manually installed since it's no longer available from CRAN: \code{
-#' install.packages('VPdtw', repos='https://ethanbass.github.io/drat/')}.
+#' be manually installed: \code{install.packages('VPdtw')}.
 #'
 #' @aliases correct_rt
 #' @import ptw
@@ -27,8 +26,9 @@
 #' @param scale Logical. If true, scale chromatograms before warping.
 #' @param trwdth width of the triangle in the WCC criterion.
 #' @param plot Logical. Whether to plot alignment.
-#' @param penalty Divisor for dilation calculated by \code{\link[VPdtw]{dilation}}.
-#' Adjusts penalty for variable penalty dynamic time warping.
+#' @param penalty The penalty for \code{\link[VPdtw]{VPdtw}} is calculated by
+#' dividing the \code{\link[VPdtw]{dilation}} by the number provided by this
+#' argument. Thus, a lower number allows more warping to occur. Defaults to 5.
 #' @param maxshift Integer. Maximum allowable shift for \code{\link[VPdtw]{VPdtw}}.
 #' @param verbose Whether to be verbose.
 #' @param \dots Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
@@ -44,8 +44,8 @@
 #' \code{\link[VPdtw]{VPdtw}}
 #' @references 
 #' * Clifford, D., Stone, G., Montoliu, I., Rezzi, S., Martin, F. P., Guy, P.,
-#' ... & Kochhar, S. 2009. Alignment using variable penalty dynamic time warping.
-#' \emph{Analytical chemistry}, \bold{81(3)}:1000-1007. \doi{10.1021/ac802041e}.
+#' Bruce, S., & Kochhar, S. 2009. Alignment using variable penalty dynamic time
+#' warping. \emph{Analytical chemistry}, \bold{81(3)}:1000-1007. \doi{10.1021/ac802041e}.
 #'
 #' * Clifford, D., & Stone, G. 2012. Variable Penalty Dynamic Time Warping Code
 #' for Aligning Mass Spectrometry Chromatograms in R. \emph{Journal of

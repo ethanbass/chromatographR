@@ -11,7 +11,7 @@ preprocess(
   remove.time.baseline = TRUE,
   spec.smooth = TRUE,
   maxI,
-  parallel = TRUE,
+  parallel,
   interpolate_rows = TRUE,
   interpolate_cols = TRUE,
   mc.cores = 2,

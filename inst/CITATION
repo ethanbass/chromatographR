@@ -2,13 +2,13 @@ citHeader("To cite chromatographR in publications, please use:")
 
 citEntry(
   entry    = "manual",
-  title    = "chromatographR",
+  title    = "chromatographR: chromatographic data analysis toolset",
   author   = "Ethan Bass",
   year     = "2022",
-  note   = "version 0.4.1",
+  note   = "version 0.4.2",
   url      = "https://cran.r-project.org/package=chromatographR/",
   textVersion = paste("Bass, E. (2022).",
-        "chromatographR (version 0.4.1).",
+        "chromatographR: chromatographic data analysis toolset (version 0.4.2).",
         "https://cran.r-project.org/package=chromatographR/"
         )
   )
