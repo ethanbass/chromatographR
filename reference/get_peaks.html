@@ -63,6 +63,7 @@ at the specified wavelengths.</p>
 <span>  fit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"egh"</span>, <span class="st">"gaussian"</span>, <span class="st">"raw"</span><span class="op">)</span>,</span>
 <span>  sd.max <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>  max.iter <span class="op">=</span> <span class="fl">100</span>,</span>
+<span>  time.units <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"min"</span>, <span class="st">"ms"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -93,6 +94,11 @@ trapezoidal integration directly on the raw data without fitting a peak shape.</
 in <code><a href="fit_peaks.html">fit_peaks</a></code>.</p></dd>
 
 
+<dt>time.units</dt>
+<dd><p>Units of <code>sd</code>, <code>FWHM</code>, <code>area</code>, and <code>tau</code>
+(if applicable). Options are milliseconds <code>"ms"</code> or minutes <code>"min"</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Additional arguments to <code><a href="find_peaks.html">find_peaks</a></code>.</p></dd>
 
@@ -119,6 +125,8 @@ of the specified chromatographic traces (function <code><a href="find_peaks.html
 At the given positions, an exponential-gaussian hybrid (or regular gaussian)
 function is fit to the signal using <code><a href="fit_peaks.html">fit_peaks</a></code>). The area is then
 calculated using a trapezoidal approximation.</p>
+<p>The <code>sd</code>, <code>FWHM</code>, <code>tau</code>, and <code>area</code> are returned in units
+determined by <code>time.units</code>. By defaults the units are in minutes.</p>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
