@@ -1,11 +1,11 @@
 ### test preprocess ###
+path <- "testdata/DAD1.CSV"
+x <- read.csv(path, fileEncoding = "utf-16")
+x1 <- suppressWarnings(load_chroms(path, format.in = "csv", find_files = FALSE))
+folder <- "testdata"
+x2 <- suppressWarnings(load_chroms(folder, format.in = "csv", find_files = TRUE))
 
 test_that("load_chroms works", {
-  path <- "testdata/DAD1.CSV"
-  x <- read.csv(path, fileEncoding = "utf-16")
-  x1 <- load_chroms(path, format.in = "csv", find_files = FALSE)
-  folder <- "testdata"
-  x2 <- load_chroms(folder, format.in = "csv", find_files = TRUE)
   expect_equal(x[,2], x1[[1]][, "220.00000"], ignore_attr = TRUE)
   expect_equal(x1, x2, ignore_attr = TRUE)
   expect_equal(length(x1), length(path))

@@ -164,10 +164,11 @@
 <line x1='38.97' y1='444.02' x2='34.21' y2='444.02' style='stroke-width: 0.75;' />
 <line x1='38.97' y1='424.10' x2='34.21' y2='424.10' style='stroke-width: 0.75;' />
 <text transform='translate(27.56,523.66) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: sans;' textLength='4.41px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text transform='translate(27.56,503.75) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: sans;' textLength='13.22px' lengthAdjust='spacingAndGlyphs'>200</text>
-<text transform='translate(27.56,483.84) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: sans;' textLength='13.22px' lengthAdjust='spacingAndGlyphs'>400</text>
-<text transform='translate(27.56,463.93) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: sans;' textLength='13.22px' lengthAdjust='spacingAndGlyphs'>600</text>
-<text transform='translate(27.56,444.02) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: sans;' textLength='13.22px' lengthAdjust='spacingAndGlyphs'>800</text>
+<text transform='translate(27.56,503.75) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: sans;' textLength='4.41px' lengthAdjust='spacingAndGlyphs'>2</text>
+<text transform='translate(27.56,483.84) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: sans;' textLength='4.41px' lengthAdjust='spacingAndGlyphs'>4</text>
+<text transform='translate(27.56,463.93) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: sans;' textLength='4.41px' lengthAdjust='spacingAndGlyphs'>6</text>
+<text transform='translate(27.56,444.02) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: sans;' textLength='4.41px' lengthAdjust='spacingAndGlyphs'>8</text>
+<text transform='translate(27.56,424.10) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: sans;' textLength='8.81px' lengthAdjust='spacingAndGlyphs'>10</text>
 </g>
 <defs>
   <clipPath id='cpMC4wMHw3MjAuMDB8Mzg0LjAwfDU3Ni4wMA=='>

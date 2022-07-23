@@ -10,6 +10,7 @@ get_peaks(
   fit = c("egh", "gaussian", "raw"),
   sd.max = 50,
   max.iter = 100,
+  time.units = c("min", "ms"),
   ...
 )
 }
@@ -27,6 +28,9 @@ trapezoidal integration directly on the raw data without fitting a peak shape.}
 
 \item{max.iter}{Maximum number of iterations for non-linear least squares
 in \code{\link{fit_peaks}}.}
+
+\item{time.units}{Units of \code{sd}, \code{FWHM}, \code{area}, and \code{tau}
+(if applicable). Options are milliseconds \code{"ms"} or minutes \code{"min"}.}
 
 \item{\dots}{Additional arguments to \code{\link{find_peaks}}.}
 }
@@ -52,6 +56,9 @@ of the specified chromatographic traces (function \code{\link{find_peaks}}).
 At the given positions, an exponential-gaussian hybrid (or regular gaussian)
 function is fit to the signal using \code{\link{fit_peaks}}). The area is then
 calculated using a trapezoidal approximation.
+
+The \code{sd}, \code{FWHM}, \code{tau}, and \code{area} are returned in units
+determined by \code{time.units}. By defaults the units are in minutes.
 }
 \note{
 The function is adapted from the

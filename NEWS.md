@@ -8,6 +8,7 @@
 * Deprecated `load_chroms` function. Please use `read_chroms` from chromConverter
 to import files.
 * Recommend installation of `VPdtw` from CRAN instead of https://ethanbass.github.io/drat/
+* Add option to `get_peaks` to select `time.units` for peak area.
 
 # chromatographR 0.4.1
 
