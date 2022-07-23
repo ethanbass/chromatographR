@@ -4,7 +4,7 @@
 \alias{filter_peaks}
 \title{Filter peak lists}
 \usage{
-filter_peaks(peak_list, min_height, min_area, min_sd, max_sd)
+filter_peaks(peak_list, min_height, min_area, min_sd, max_sd, min_rt, max_rt)
 }
 \arguments{
 \item{peak_list}{A peak_list object, consisting of a nested list of peak
@@ -20,6 +20,10 @@ full width at half maximum (FWHM), peak width, height, and area.}
 \item{min_sd}{Minimal standard deviation.}
 
 \item{max_sd}{Maximum standard deviation.}
+
+\item{min_rt}{Minimum retention time.}
+
+\item{max_rt}{Maxmimum retention time.}
 }
 \value{
 A peak list similar, with all rows removed
@@ -28,7 +32,7 @@ from the peak tables that are not satisfying the criteria.
 \description{
 Utility function to remove peaks from a peak list, e.g. because their
 intensity is too low. Currently one can filter on peak height, peak area,
-and width at half maximum.
+standard deviation, and/or retention time.
 }
 \seealso{
 \code{\link{get_peaks}}

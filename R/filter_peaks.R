@@ -2,7 +2,7 @@
 #' 
 #' Utility function to remove peaks from a peak list, e.g. because their
 #' intensity is too low. Currently one can filter on peak height, peak area,
-#' and width at half maximum.
+#' standard deviation, and/or retention time.
 #' 
 #' @param peak_list A peak_list object, consisting of a nested list of peak
 #' tables, where the first level is the sample, and the second level is the 
@@ -13,18 +13,22 @@
 #' @param min_area Minimum peak area.
 #' @param min_sd Minimal standard deviation.
 #' @param max_sd Maximum standard deviation.
+#' @param min_rt Minimum retention time.
+#' @param max_rt Maxmimum retention time.
 #' @return A peak list similar, with all rows removed
 #' from the peak tables that are not satisfying the criteria.
 #' @author Ron Wehrens, Ethan Bass
 #' @seealso \code{\link{get_peaks}}
 #' @export filter_peaks
-filter_peaks <- function(peak_list, min_height, min_area, min_sd, max_sd) {
+filter_peaks <- function(peak_list, min_height, min_area,
+                         min_sd, max_sd,min_rt, max_rt) {
   if (missing(min_height) & missing(min_area) &
-      missing(max_sd) & missing(min_sd)) {
+      missing(min_sd) & missing(max_sd) &
+      missing(min_rt) & missing(max_rt)) {
     warning("Nothing to filter...")
     return(peak_list)
   }
-  x<-do.call(rbind,do.call(rbind, peak_list))
+  x <- do.call(rbind, do.call(rbind, peak_list))
   if (!missing(min_height)){
     if (min_height < min(x$height))
       warning("'min_height' is less than minimum peak height.")}
@@ -42,18 +46,26 @@ filter_peaks <- function(peak_list, min_height, min_area, min_sd, max_sd) {
                                     function(samp)
                                       sapply(samp,
                                              function(comp) comp[,"sd"]))))
+  if (missing(max_rt)) ## find max value in peak_list and add 1 to be sure...
+    max_rt <- 1 + max(unlist(sapply(peak_list,
+                                    function(samp)
+                                      sapply(samp,
+                                             function(comp) comp[,"rt"]))))
   if (missing(min_sd)) min_sd <- 0
   if (missing(min_height)) min_height <- 0
   if (missing(min_area)) min_area <- 0
+  if (missing(min_rt)) min_rt <- 0
   
   result <- lapply(peak_list,
          function(smpl)
            lapply(smpl,
                   function(comp)
-                    comp[comp[,"sd"] < max_sd &
+                    comp[which(comp[,"sd"] < max_sd &
                            comp[,"sd"] > min_sd &
                            comp[,"height"] > min_height &
-                           comp[,"area"] > min_area,,drop = FALSE]))
+                           comp[,"area"] > min_area &
+                           comp[,"rt"] > as.numeric(min_rt) &
+                           comp[,"rt"] < as.numeric(max_rt)), , drop = FALSE]))
   att <- attributes(peak_list)
   structure(result,
             chrom_list = att$chrom_list,

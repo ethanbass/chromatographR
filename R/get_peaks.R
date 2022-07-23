@@ -24,7 +24,8 @@
 #' @param max.iter Maximum number of iterations for non-linear least squares
 #' in \code{\link{fit_peaks}}.
 #' @param time.units Units of \code{sd}, \code{FWHM}, \code{area}, and \code{tau}
-#' (if applicable). Options are milliseconds \code{"ms"} or minutes \code{"min"}.
+#' (if applicable). Options are minutes \code{"min"}, seconds (\code{"s"}, or 
+#' milliseconds \code{"ms"}.
 #' @param \dots Additional arguments to \code{\link{find_peaks}}.
 #' @return The result is an S3 object of class \code{peak_list}, containing a nested
 #' list of data.frames containing information about the peaks fitted for each
@@ -59,11 +60,12 @@
 #' @seealso \code{\link{find_peaks}}, \code{\link{fit_peaks}}
 #' @export get_peaks
 
-get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
-                       sd.max=50, max.iter=100, time.units = c("min", "ms"), ...){
-  time.units <- match.arg(time.units, c("min", "ms"))
-  tfac <- switch(time.units, "ms" = 60000, "min" = 1)
+get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
+                       sd.max=50, max.iter=100, time.units = c("min", "s", "ms"), ...){
+  time.units <- match.arg(time.units, c("min", "s", "ms"))
+  tfac <- switch(time.units, "min" = 1, "s" = 60, "ms" = 60*1000)
   fit <- match.arg(fit, c("egh", "gaussian", "raw"))
+  chrom_list_string <- deparse(substitute(chrom_list))
   if (class(chrom_list)[1] == "matrix")
     chrom_list <- list(chrom_list)
   if (missing(lambdas)){
@@ -79,7 +81,6 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
     names(chrom_list) <- seq_along(chrom_list)
   }
   peaks<-list()
-  chrom_list_str <- deparse(substitute(chrom_list))
   chrom_list <- lapply(chrom_list, function(c_mat) c_mat[,lambdas, drop=FALSE])
   result <- lapply(seq_along(chrom_list), function(sample){
     suppressWarnings(ptable <- lapply(lambdas, function(lambda){
@@ -106,8 +107,8 @@ get_peaks <- function (chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
     x
   }))
   structure(result,
-            chrom_list = chrom_list_str,
-            lambdas = deparse(substitute(lambdas)), fit=fit, sd.max=sd.max,
+            chrom_list = chrom_list_string,
+            lambdas = lambdas, fit=fit, sd.max=sd.max,
             max.iter = max.iter,
             time.units = time.units,
             class = "peak_list")
@@ -146,7 +147,7 @@ plot.peak_list <- function(x, ..., chrom_list=NULL, index=1, lambda=NULL,
                        points=FALSE, ticks=FALSE, a=0.5, color=NULL,
                        cex.points=0.5){
   time.units <- attributes(x)$time.units
-  tfac <- switch(time.units, "min" = 1, "ms" = 1/60000)
+  tfac <- switch(time.units, "min" = 1, "s" = 1/60, "ms" = 1/60000)
   if (is.null(chrom_list)){
     chrom_list <- get_chrom_list(x)
   }

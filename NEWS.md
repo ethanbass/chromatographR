@@ -9,6 +9,7 @@
 to import files.
 * Recommend installation of `VPdtw` from CRAN instead of https://ethanbass.github.io/drat/
 * Add option to `get_peaks` to select `time.units` for peak area.
+* Fixed bug affecting `peak_list` metadata.
 
 # chromatographR 0.4.1
 

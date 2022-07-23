@@ -10,7 +10,7 @@ get_peaks(
   fit = c("egh", "gaussian", "raw"),
   sd.max = 50,
   max.iter = 100,
-  time.units = c("min", "ms"),
+  time.units = c("min", "s", "ms"),
   ...
 )
 }
@@ -30,7 +30,8 @@ trapezoidal integration directly on the raw data without fitting a peak shape.}
 in \code{\link{fit_peaks}}.}
 
 \item{time.units}{Units of \code{sd}, \code{FWHM}, \code{area}, and \code{tau}
-(if applicable). Options are milliseconds \code{"ms"} or minutes \code{"min"}.}
+(if applicable). Options are minutes \code{"min"}, seconds (\code{"s"}, or 
+milliseconds \code{"ms"}.}
 
 \item{\dots}{Additional arguments to \code{\link{find_peaks}}.}
 }
