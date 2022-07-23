@@ -63,7 +63,7 @@ at the specified wavelengths.</p>
 <span>  fit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"egh"</span>, <span class="st">"gaussian"</span>, <span class="st">"raw"</span><span class="op">)</span>,</span>
 <span>  sd.max <span class="op">=</span> <span class="fl">50</span>,</span>
 <span>  max.iter <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>  time.units <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"min"</span>, <span class="st">"ms"</span><span class="op">)</span>,</span>
+<span>  time.units <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"min"</span>, <span class="st">"s"</span>, <span class="st">"ms"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -96,7 +96,8 @@ in <code><a href="fit_peaks.html">fit_peaks</a></code>.</p></dd>
 
 <dt>time.units</dt>
 <dd><p>Units of <code>sd</code>, <code>FWHM</code>, <code>area</code>, and <code>tau</code>
-(if applicable). Options are milliseconds <code>"ms"</code> or minutes <code>"min"</code>.</p></dd>
+(if applicable). Options are minutes <code>"min"</code>, seconds (<code>"s"</code>, or 
+milliseconds <code>"ms"</code>.</p></dd>
 
 
 <dt>...</dt>
