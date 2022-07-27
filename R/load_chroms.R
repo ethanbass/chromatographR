@@ -110,6 +110,8 @@ load_chroms <- function(paths, find_files = TRUE,
   dat
 }
 
-##' @importFrom chromConverter read_chroms
-##' @name read_chroms
-##' @export
+#' Read chromatograms.
+#' @importFrom chromConverter read_chroms
+#' @name read_chroms
+#' @export read_chroms
+chromConverter::read_chroms
