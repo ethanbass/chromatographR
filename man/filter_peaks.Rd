@@ -23,11 +23,11 @@ full width at half maximum (FWHM), peak width, height, and area.}
 
 \item{min_rt}{Minimum retention time.}
 
-\item{max_rt}{Maxmimum retention time.}
+\item{max_rt}{Maximum retention time.}
 }
 \value{
-A peak list similar, with all rows removed
-from the peak tables that are not satisfying the criteria.
+A peak list similar to the input, with all rows removed
+from that do not satisfy the specified criteria.
 }
 \description{
 Utility function to remove peaks from a peak list, e.g. because their

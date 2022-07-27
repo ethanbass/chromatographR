@@ -14,14 +14,14 @@
 #' @param min_sd Minimal standard deviation.
 #' @param max_sd Maximum standard deviation.
 #' @param min_rt Minimum retention time.
-#' @param max_rt Maxmimum retention time.
-#' @return A peak list similar, with all rows removed
-#' from the peak tables that are not satisfying the criteria.
+#' @param max_rt Maximum retention time.
+#' @return A peak list similar to the input, with all rows removed
+#' from that do not satisfy the specified criteria.
 #' @author Ron Wehrens, Ethan Bass
 #' @seealso \code{\link{get_peaks}}
 #' @export filter_peaks
 filter_peaks <- function(peak_list, min_height, min_area,
-                         min_sd, max_sd,min_rt, max_rt) {
+                         min_sd, max_sd, min_rt, max_rt){
   if (missing(min_height) & missing(min_area) &
       missing(min_sd) & missing(max_sd) &
       missing(min_rt) & missing(max_rt)) {
@@ -72,4 +72,81 @@ filter_peaks <- function(peak_list, min_height, min_area,
             lambdas = att$lambdas, fit=att$fit, sd.max=att$sd.max,
             max.iter=att$max.iter,
             class="peak_list")
+}
+
+#' Filter peak table
+#' 
+#' Utility function to remove peaks from peak table, e.g. because their
+#' intensity is too low. Currently one can filter on mean or median peak intensity,
+#' or retention time.
+#' 
+#' @param peak_table A peak_table object from \code{\link{get_peaktable}}.
+#' @param rts Vector of retention times to include in the peak table.
+#' @param min_rt Minimum retention time to include in the peak table.
+#' @param max_rt Maximum retention time to include in the peak table.
+#' @param min_value Minimal cutoff for average peak intensity.
+#' @param what Whether to average intensities using \code{mean} or \code{median}.
+#' @param comp Component(s) to include in peak table (e.g. wavelengths if you
+#' are using HPLC-DAD/UV).
+#' @param tol Tolerance for matching of retention times to \code{rts}.
+#' @return A peak table similar to the input, with all columns removed
+#' from the peak table that do not satisfy the specified criteria.
+#' @author Ethan Bass
+#' @seealso \code{\link{get_peaktable}}
+#' @export filter_peaktable
+filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value, comp,
+                              what=c("median","mean"), tol=0){
+  if (missing(rts) & missing(min_rt) &
+      missing(max_rt) & missing(min_value) & missing(comp)) {
+    warning("Nothing to filter...")
+    return(peak_table)
+  }
+  what <- match.arg(what, c("median","mean"))
+  if (!missing(rts)){
+    rts <- as.numeric(rts)
+    if (!inherits(rts, c("numeric"))){
+      stop("`rts` should be a vector of retention times.")
+    }
+    idx.rt <- as.numeric(sapply(rts, function(x){
+      which(elementwise.all.equal(x, peak_table$pk_meta["rt",], tolerance=tol, scale=1))
+    }))
+    nas <- is.na(idx.rt)
+    if (any(nas)){
+      warning(paste0("The following retention times were not identified in the peak table: ",
+                     paste(rts[nas], collapse = ', '),
+              ". \n", "     You can try increasing the tolerance (`tol`) to permit fuzzier matching."),
+              immediate. = TRUE)
+      idx.rt <- idx.rt[-which(nas)]
+    }
+  } else if (!missing(min_rt) | !missing(max_rt)){
+    if (missing(min_rt))
+      min_rt <- 0
+    if (missing(max_rt))
+      max_rt <- peak_table$pk_meta["rt",] + 1
+    idx.rt <- which(peak_table$pk_meta["rt",] > min_rt &
+                      peak_table$pk_meta["rt",] < max_rt)
+  } else{idx.rt <- seq_along(peak_table$pk_meta)}
+  if (!missing(min_value)){
+    val <- apply(peak_table$tab, 2, eval(what))
+    idx.val <- which(val >= min_value)
+  } else (idx.val <- seq_along(peak_table$tab))
+  if (!missing(comp)){
+    idx.comp <- which(peak_table$pk_meta["component",] %in% comp)
+  } else (idx.comp <- seq_along(peak_table$tab))
+  idx <- Reduce(intersect, list(idx.rt, idx.val, idx.comp))
+  # idx <- intersect(idx.rt, idx.val, idx.comp)
+  # idx.idx <- which(c(exists("idx.val"), exists("idx.rt"), exists("idx.comp")))
+  # idx <- switch(paste(exists("idx.val"), exists("idx.rt"), exists("idx.comp"), collapse = '', sep="/"),
+  #        "TRUE/FALSE" = idx.val,
+  #        "FALSE/TRUE" = idx.rt,
+  #        "TRUE/TRUE" = intersect(idx.val, idx.rt))
+  peak_table$tab <- peak_table$tab[,idx, drop=FALSE]
+  peak_table$pk_meta <- peak_table$pk_meta[,idx, drop=FALSE]
+  if (inherits(peak_table$sample_meta, c("data.frame","matrix"))){
+    peak_table$sample_meta <- peak_table$sample_meta[idx,, drop=FALSE]
+  }
+  if (inherits(peak_table$ref_spectra, c("data.frame", "matrix"))){
+    peak_table$ref_spectra <- peak_table$ref_spectra[idx,, drop=FALSE]
+  }
+  peak_table
 }

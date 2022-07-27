@@ -6,10 +6,11 @@
 * Added more informative warnings and error messages to various functions.
 * Allow preservation of instrumental metadata through preprocessing and alignment steps.
 * Deprecated `load_chroms` function. Please use `read_chroms` from chromConverter
-to import files.
+to import files instead.
 * Recommend installation of `VPdtw` from CRAN instead of https://ethanbass.github.io/drat/
 * Add option to `get_peaks` to select `time.units` for peak area.
 * Fixed bug affecting `peak_list` metadata.
+* Added `filter_peaktable` function.
 
 # chromatographR 0.4.1
 

@@ -109,3 +109,7 @@ load_chroms <- function(paths, find_files = TRUE,
   dat <- append(dat,data)
   dat
 }
+
+##' @importFrom chromConverter read_chroms
+##' @name read_chroms
+##' @export
