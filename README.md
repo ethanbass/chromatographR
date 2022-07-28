@@ -42,3 +42,10 @@ Contributions to the package are very welcome. Please get in touch (preferable b
 - You're getting a cryptic error message that you don't understand.  
 - You have a file format you'd like to read that isn't currently supported by chromatographR.  (If you do this, please make sure to include a link to an example file!)  
 - You have a new feature you'd like to see implemented.  
+
+## Citation:
+
+If you use chromatographR in published work, please cite it as follows:
+
+Bass, E. (2022). chromatographR: chromatographic data analysis toolset (version 0.4.2).
+https://cran.r-project.org/package=chromatographR/
