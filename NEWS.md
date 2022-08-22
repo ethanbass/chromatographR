@@ -1,16 +1,25 @@
+# chromatograph 0.4.3
+
+* Minor changes to documentation.
+* Added additional check of chrom_list dimensions and names.
+
 # chromatograph 0.4.2
 
-* Fixed typos in vignette
+* Added option to select `time.units` for peak area in `get_peaks` function
+facilitating better comparison with vendor software.
+* Now allow preservation of instrumental metadata through preprocessing and alignment steps.
+* Added `filter_peaktable` function.
 * Changed default behavior in `correct_rt` to `corrected_values` rather than `models`.
-* Fixed bug in `cluster_spectra` when there's a peak with 0 SD.
-* Added more informative warnings and error messages to various functions.
-* Allow preservation of instrumental metadata through preprocessing and alignment steps.
+* Fixed bug in `cluster_spectra` affecting peaks with 0 standard deviation.
+* Fixed bug affecting `peak_list` metadata.
 * Deprecated `load_chroms` function. Please use `read_chroms` from chromConverter
 to import files instead.
-* Recommend installation of `VPdtw` from CRAN instead of https://ethanbass.github.io/drat/
-* Add option to `get_peaks` to select `time.units` for peak area.
-* Fixed bug affecting `peak_list` metadata.
-* Added `filter_peaktable` function.
+
+### Minor changes:
+
+* Added more informative warnings and error messages to various functions.
+* Now recommend installation of `VPdtw` from CRAN instead of https://ethanbass.github.io/drat/
+* Fixed typos in vignette
 
 # chromatographR 0.4.1
 

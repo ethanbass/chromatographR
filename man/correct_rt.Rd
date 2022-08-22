@@ -33,8 +33,8 @@ correct_rt(
 \item{reference}{Index of the sample that is to be considered the reference
 sample.}
 
-\item{alg}{algorithm to use: parametric time warping(\code{ptw}) or variable
-penalty dynamic time warping \code{vpdtw}.}
+\item{alg}{algorithm to use: parametric time warping (\code{ptw}) or variable
+penalty dynamic time warping (\code{vpdtw}).}
 
 \item{what}{What to return: either the 'corrected.values' (useful for visual
 inspection) or the warping 'models' (for further programmatic use).}

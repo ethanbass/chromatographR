@@ -16,8 +16,8 @@
 #' @param models List of models to warp by.
 #' @param reference Index of the sample that is to be considered the reference
 #' sample.
-#' @param alg algorithm to use: parametric time warping(\code{ptw}) or variable
-#' penalty dynamic time warping \code{vpdtw}.
+#' @param alg algorithm to use: parametric time warping (\code{ptw}) or variable
+#' penalty dynamic time warping (\code{vpdtw}).
 #' @param what What to return: either the 'corrected.values' (useful for visual
 #' inspection) or the warping 'models' (for further programmatic use).
 #' @param init.coef Starting values for the optimization.

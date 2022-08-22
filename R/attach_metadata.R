@@ -69,7 +69,7 @@ gather_reference_spectra <- function(peak_table, chrom_list,
     stop(paste("Provided peak_table object must be of class 'peak_table'."))
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(peak_table)
-  }
+  } else get_chrom_list(peak_table, chrom_list)
   ref <- match.arg(ref, c("max.cor", "max.int"))
   X<-colnames(peak_table$tab)
   if (ref=="max.cor"){
@@ -164,7 +164,7 @@ normalize_data <- function(peak_table, column, chrom_list,
   } else if (what == "chrom_list"){
     if (missing(chrom_list)){
       chrom_list <- get_chrom_list(peak_table)
-    }
+    } else get_chrom_list(peak_table, chrom_list)
     if (mean(elementwise.all.equal(names(chrom_list), rownames(peak_table$tab))) < 1)
       stop("Names of chromatograms do not match the peak table.")
     chrom_list <- lapply(seq_len(nrow(peak_table$tab)), function(samp){

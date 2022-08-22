@@ -35,7 +35,7 @@ intensity is too low. Currently one can filter on peak height, peak area,
 standard deviation, and/or retention time.
 }
 \seealso{
-\code{\link{get_peaks}}
+\code{\link{get_peaks}}, \code{\link{filter_peaktable}}
 }
 \author{
 Ron Wehrens, Ethan Bass

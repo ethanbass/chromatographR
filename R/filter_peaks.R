@@ -18,7 +18,7 @@
 #' @return A peak list similar to the input, with all rows removed
 #' from that do not satisfy the specified criteria.
 #' @author Ron Wehrens, Ethan Bass
-#' @seealso \code{\link{get_peaks}}
+#' @seealso \code{\link{get_peaks}}, \code{\link{filter_peaktable}}
 #' @export filter_peaks
 filter_peaks <- function(peak_list, min_height, min_area,
                          min_sd, max_sd, min_rt, max_rt){
@@ -92,10 +92,13 @@ filter_peaks <- function(peak_list, min_height, min_area,
 #' @return A peak table similar to the input, with all columns removed
 #' from the peak table that do not satisfy the specified criteria.
 #' @author Ethan Bass
-#' @seealso \code{\link{get_peaktable}}
+#' @seealso \code{\link{get_peaktable}}, \code{\link{filter_peaks}}
+#' @examples
+#' data(pk_tab)
+#' pk_tab <- filter_peaktable(pk_tab, min_rt = 10, max_rt = 16)
 #' @export filter_peaktable
 filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value, comp,
-                              what=c("median","mean"), tol=0){
+                              what = c("median","mean"), tol = 0){
   if (missing(rts) & missing(min_rt) &
       missing(max_rt) & missing(min_value) & missing(comp)) {
     warning("Nothing to filter...")
@@ -142,11 +145,8 @@ filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value, comp,
   #        "TRUE/TRUE" = intersect(idx.val, idx.rt))
   peak_table$tab <- peak_table$tab[,idx, drop=FALSE]
   peak_table$pk_meta <- peak_table$pk_meta[,idx, drop=FALSE]
-  if (inherits(peak_table$sample_meta, c("data.frame","matrix"))){
-    peak_table$sample_meta <- peak_table$sample_meta[idx,, drop=FALSE]
-  }
   if (inherits(peak_table$ref_spectra, c("data.frame", "matrix"))){
-    peak_table$ref_spectra <- peak_table$ref_spectra[idx,, drop=FALSE]
+    peak_table$ref_spectra <- peak_table$ref_spectra[,idx, drop=FALSE]
   }
   peak_table
 }

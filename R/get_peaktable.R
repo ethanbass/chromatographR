@@ -102,8 +102,10 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
   rt <- ifelse(use.cor, "rt.cor", "rt")
   if (!inherits(peak_list,"peak_list"))
     stop("Peak list must be of the associated class.")
-  if (clust == "sp.rt" & missing(chrom_list)){
-    chrom_list <- get_chrom_list(peak_list)
+  if (clust == "sp.rt"){
+    if (missing(chrom_list)){
+      chrom_list <- get_chrom_list(peak_list)
+    } else get_chrom_list(peak_list, chrom_list)
   }
   ncomp <- length(peak_list[[1]]) ## all elements should have the same length
   if (plot_it) {
@@ -407,7 +409,7 @@ mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset = NULL,
   }
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(peak_table)
-  }
+  } else get_chrom_list(peak_table, chrom_list)
   new.ts <- round(as.numeric(rownames(chrom_list[[1]])),2)
   fac <- factor(meta[,var])
   if (is.null(subset) & length(levels(fac)) > 2)

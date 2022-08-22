@@ -90,7 +90,7 @@ cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
                             ...){
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(peak_table)
-  }
+  } else get_chrom_list(peak_table, chrom_list)
   output <- match.arg(output, c("clusters","pvclust","both"))
   if (is.data.frame(peak_table$ref_spectra) | is.matrix(peak_table$ref_spectra)){
     rep <- peak_table$ref_spectra

@@ -120,8 +120,8 @@ test_that("filter_peaks works", {
 
 ### test get_peaktable ###
 
-pk_tab <- suppressWarnings(get_peaktable(pks_egh, dat.pr))
-pk_tab_sp <- suppressWarnings(get_peaktable(pks_egh, dat.pr, clust="sp.rt"))
+pk_tab <- get_peaktable(pks_egh, dat.pr)
+pk_tab_sp <- get_peaktable(pks_egh, dat.pr, clust = "sp.rt")
 
 test_that("get_peaktable works", {
   expect_equal(rownames(pk_tab$tab), names(dat.pr))
@@ -131,6 +131,7 @@ test_that("get_peaktable works", {
   expect_equal(class(pk_tab$pk_meta), "data.frame")
   expect_equal(class(pk_tab$args), "character")
 })
+
 
 ### test metadata attachment ###
 
@@ -152,9 +153,20 @@ test_that("attach_metadata works", {
 pk_tab <- attach_ref_spectra(pk_tab, chrom_list = dat.pr, ref="max.cor")
 test_that("attach_ref_spectra works", {
   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$ref_spectra))
-  pk_tab <- attach_ref_spectra(pk_tab, chrom_list=dat.pr,ref = "max.int")
+  pk_tab <- attach_ref_spectra(pk_tab, chrom_list=dat.pr, ref = "max.int")
   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$ref_spectra))
   expect_error(attach_ref_spectra(pk_tab,ref = "x"))
+})
+
+# test filter_peaktable
+pktab_s <- filter_peaktable(pk_tab, min_rt=6, max_rt=15)
+
+test_that("filter_peaktable works", {
+  expect_equal(rownames(pk_tab$tab), rownames(pktab_s$tab))
+  expect_equal(colnames(pktab_s$tab), colnames(pktab_s$pk_meta))
+  expect_equal(nrow(pktab_s$tab), nrow(pktab_s$sample_meta))
+  expect_equal(colnames(pktab_s$tab), colnames(pktab_s$ref_spectra))
+  expect_warning(filter_peaktable(pk_tab))
 })
 
 test_that("combine_peaks works", {

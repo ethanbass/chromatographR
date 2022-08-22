@@ -42,8 +42,12 @@ Utility function to remove peaks from peak table, e.g. because their
 intensity is too low. Currently one can filter on mean or median peak intensity,
 or retention time.
 }
+\examples{
+data(pk_tab)
+pk_tab <- filter_peaktable(pk_tab, min_rt = 10, max_rt = 16)
+}
 \seealso{
-\code{\link{get_peaktable}}
+\code{\link{get_peaktable}}, \code{\link{filter_peaks}}
 }
 \author{
 Ethan Bass
