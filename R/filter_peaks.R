@@ -111,7 +111,8 @@ filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value, comp,
       stop("`rts` should be a vector of retention times.")
     }
     idx.rt <- as.numeric(sapply(rts, function(x){
-      which(elementwise.all.equal(x, peak_table$pk_meta["rt",], tolerance=tol, scale=1))
+      which(elementwise.all.equal(x, peak_table$pk_meta["rt",],
+                                  tolerance = tol, scale = 1))
     }))
     nas <- is.na(idx.rt)
     if (any(nas)){
@@ -137,16 +138,10 @@ filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value, comp,
     idx.comp <- which(peak_table$pk_meta["component",] %in% comp)
   } else (idx.comp <- seq_along(peak_table$tab))
   idx <- Reduce(intersect, list(idx.rt, idx.val, idx.comp))
-  # idx <- intersect(idx.rt, idx.val, idx.comp)
-  # idx.idx <- which(c(exists("idx.val"), exists("idx.rt"), exists("idx.comp")))
-  # idx <- switch(paste(exists("idx.val"), exists("idx.rt"), exists("idx.comp"), collapse = '', sep="/"),
-  #        "TRUE/FALSE" = idx.val,
-  #        "FALSE/TRUE" = idx.rt,
-  #        "TRUE/TRUE" = intersect(idx.val, idx.rt))
-  peak_table$tab <- peak_table$tab[,idx, drop=FALSE]
-  peak_table$pk_meta <- peak_table$pk_meta[,idx, drop=FALSE]
+  peak_table$tab <- peak_table$tab[,idx, drop = FALSE]
+  peak_table$pk_meta <- peak_table$pk_meta[,idx, drop = FALSE]
   if (inherits(peak_table$ref_spectra, c("data.frame", "matrix"))){
-    peak_table$ref_spectra <- peak_table$ref_spectra[,idx, drop=FALSE]
+    peak_table$ref_spectra <- peak_table$ref_spectra[,idx, drop = FALSE]
   }
   peak_table
 }
