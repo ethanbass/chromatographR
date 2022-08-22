@@ -2,7 +2,7 @@
 
 0 errors | 0 warnings | 1 note
 
-* Another note concerns five DOI links in the documentation which are supposedly invalid:
+* The note concerns four DOI links in the documentation which are supposedly invalid:
 
 Found the following (possibly) invalid URLs:
   URL: https://doi.org/10.1002/cem.859
@@ -23,3 +23,11 @@ Found the following (possibly) invalid URLs:
     Message: Service Unavailable
 
 I believe these messages can safely be ignored, since all of the links in question load fine in my web browser.
+
+*There's an additional note when I used rhub to build the package on the Windows Server 2022, R-devel, 64 bit.
+
+checking for detritus in the temp directory ... NOTE
+Found the following files/directories:
+  'lastMiKTeXException'
+  
+I don't really understand why this is being generated, but I think it can likewise be ignored.
