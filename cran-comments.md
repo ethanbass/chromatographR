@@ -1,5 +1,7 @@
 ## R CMD check results
 
+There was an issue with some of the tests in my last submission that was only showing up when tested on the MKL machine (https://www.stats.ox.ac.uk/pub/bdr/Rblas/MKL/chromatographR.out). I believe I have remedied these issues in this new release. I apologize for the double release!
+
 0 errors | 0 warnings | 1 note
 
 * The note concerns four DOI links in the documentation which are supposedly invalid:

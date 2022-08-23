@@ -1,3 +1,7 @@
+# chromatograph 0.4.4
+
+*Fixed issue with tests when run on certain machines (MKL).
+
 # chromatograph 0.4.3
 
 * Minor changes to documentation.

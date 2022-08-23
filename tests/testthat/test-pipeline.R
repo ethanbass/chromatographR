@@ -11,7 +11,6 @@ test_that("load_chroms works", {
   expect_equal(length(x1), length(path))
 })
 
-
 # test_that("load_chroms can read chemstation UV data", {
 #   path_csv <- system.file("testdata/DAD1.CSV", package="chromConverter")
 #   path_uv <- system.file("testdata/DAD1.uv", package="chromConverter")
@@ -41,9 +40,6 @@ test_that("preprocess returns correct errors", {
   expect_error(preprocess(X=as.data.frame(Sa[[1]])))
 })
 
-# test_that("preprocess returns correct warning", {
-#   expect_warning(preprocess(X=Sa[[1]]))
-# })
 
 test_that("preprocess works without interpolation", {
   dat.pr <- preprocess(X=Sa[[1]], interpolate_cols = F, interpolate_rows=F)
@@ -155,10 +151,11 @@ test_that("attach_ref_spectra works", {
   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$ref_spectra))
   pk_tab <- attach_ref_spectra(pk_tab, chrom_list=dat.pr, ref = "max.int")
   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$ref_spectra))
-  expect_error(attach_ref_spectra(pk_tab,ref = "x"))
+  expect_error(attach_ref_spectra(pk_tab, chrom_list = dat.pr, ref = "x"))
 })
-
+# 
 # test filter_peaktable
+
 pktab_s <- filter_peaktable(pk_tab, min_rt=6, max_rt=15)
 
 test_that("filter_peaktable works", {
@@ -188,17 +185,10 @@ test_that("normalize_data works", {
 })
 
 ### cluster
+
 suppressWarnings(cl <- cluster_spectra(pk_tab, chrom_list = dat.pr, nboot = 10,
                                        parallel = FALSE, verbose = FALSE,
                                        save = FALSE, output = "both"))
-# suppressWarnings(cl1 <- cluster_spectra(pk_tab, chrom_list=dat.pr, nboot = 10,
-#                                        parallel = FALSE, verbose = FALSE,
-#                                        save = FALSE, output = "clusters"))
-# 
-# suppressWarnings(cl2 <- cluster_spectra(pk_tab, chrom_list=dat.pr, nboot = 10,
-#                                         parallel = FALSE, verbose = FALSE,
-#                                         save = FALSE, output = "pvclust"))
-
 test_that("cluster_spectra works", {
   expect_equal(class(cl[[1]]), "pvclust")
   expect_equal(class(cl[[2]]), "list")
@@ -259,12 +249,12 @@ test_that("plot_spectrum works", {
   expect_equal(rownames(x), as.character(new.lambdas))
   expect_equal(class(x), "data.frame")
   expect_equal(ncol(x), 1)
-  expect_error(plot_spectrum(peak_table = pk_tab, what="click"))
-  expect_error(plot_spectrum(peak_table = pk_tab, what="click", chr=1))
-  expect_error(plot_spectrum(peak_table = pk_tab, what="click",lambda="210"))
-  expect_error(plot_spectrum(peak_table = pk_tab, what="rt", lambda="210"))
-  expect_error(plot_spectrum(peak_table = pk_tab, what="rt", chr=1))
-  expect_error(plot_spectrum(loc=12, peak_table = pk_tab, what="rt"))
+  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click"))
+  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click", chr=1))
+  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click",lambda="210"))
+  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="rt", lambda="210"))
+  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="rt", chr=1))
+  expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr, what="rt"))
 })
 
 test_that("mirror_plot works", {

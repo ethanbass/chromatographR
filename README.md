@@ -47,5 +47,5 @@ Contributions to the package are very welcome. Please get in touch (preferable b
 
 If you use chromatographR in published work, please cite it as follows:
 
-Bass, E. (2022). chromatographR: chromatographic data analysis toolset (version 0.4.3).
+Bass, E. (2022). chromatographR: chromatographic data analysis toolset (version 0.4.4).
 https://cran.r-project.org/package=chromatographR/

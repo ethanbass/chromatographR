@@ -5,10 +5,10 @@ citEntry(
   title    = "chromatographR: chromatographic data analysis toolset",
   author   = "Ethan Bass",
   year     = "2022",
-  note   = "version 0.4.3",
+  note   = "version 0.4.4",
   url      = "https://cran.r-project.org/package=chromatographR/",
   textVersion = paste("Bass, E. (2022).",
-        "chromatographR: chromatographic data analysis toolset (version 0.4.3).",
+        "chromatographR: chromatographic data analysis toolset (version 0.4.4).",
         "https://cran.r-project.org/package=chromatographR/"
         )
   )
