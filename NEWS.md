@@ -7,7 +7,7 @@
 
 * Added option to select `time.units` for peak area in `get_peaks` function
 facilitating better comparison with vendor software.
-* Now allow preservation of instrumental metadata through preprocessing and alignment steps.
+* Now allow preservation of instrumental metadata through pre-processing and alignment steps.
 * Added `filter_peaktable` function.
 * Changed default behavior in `correct_rt` to `corrected_values` rather than `models`.
 * Fixed bug in `cluster_spectra` affecting peaks with 0 standard deviation.
