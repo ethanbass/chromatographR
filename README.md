@@ -29,7 +29,7 @@ To build the vignette, include the argument `build_vignettes=TRUE` (**Note:** th
 ## Usage
 
 #### Importing data
-chromatographR can now import ChemStation and MassHunter files directly (using the [Aston](https://github.com/bovee/aston) or [Entab](https://github.com/bovee/entab) parsers wrapped by [chromConverter](https://ethanbass.github.io/chromConverter/)) as well as regular `csv` and `ascii` files.
+chromatographR can now import a variety of binary formats, including ChemStation and MassHunter files. This is accomplished using the [Aston](https://github.com/bovee/aston) or [Entab](https://github.com/bovee/entab) parsers wrapped by [chromConverter](https://ethanbass.github.io/chromConverter/)). See the chromConverter page for a full list of supported formats. Alternatively, chromatographR can be used with regular `csv` files.
 
 #### Analysis
 Please see the [vignette](https://ethanbass.github.io/chromatographR/articles/chromatographR.html) included with the package for details on the application of chromatographR for the analysis of HPLC data. A second vignette with a suggested workflow for the analysis of GC-FID data will be forthcoming soon. 
