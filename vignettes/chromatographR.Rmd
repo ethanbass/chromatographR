@@ -32,7 +32,7 @@ chromatographR now includes an option to directly read data from Agilent ChemSta
 
 ```{r,eval=F}
 # single folder
-load_chroms(paths = path, format.in="csv")
+read_chroms(paths = path, format_in = "csv")
 
 # multiple folders
 path = 'foo' # path to parent directory
@@ -74,7 +74,7 @@ dat.pr <- preprocess(Sa, dim1=new.ts, dim2=new.lambdas,
            parallel=F, p=.001, lambda=1e5)
 ```
 
-### Dealing with retention time shifts
+### Alignment
 
 In many cases, liquid chromatography can suffer from retention time shifts (e.g. due to temperature fluctuations, column degradation, or subtle changes in mobile-phase composition), which can make it very difficult to compare peaks across samples. Luckily, a number of "time-warping" algorithms have been developed for correcting these kinds of shifts. In `chromatographR`, parametric time warping (`ptw`) [@eilers2004; @bloemberg2010] and variable penalty dynamic time warping (`vpdtw`) [@clifford2009; @clifford2012] are available for correcting retention time shifts through the `correct_rt` function. Both warping functions aim to produce a better alignment of retention times by "warping" the time-axis of each supplied chromatogram to match a reference chromatogram. (The reference chromatogram can either be determined algorithmically or selected manually by setting the `reference` argument).
 
@@ -122,13 +122,18 @@ warp <- correct_rt(chrom_list=dat.pr, alg="vpdtw", lambda="210", what="corrected
 
 ### Peak finding and fitting
 
-The `get_peaks` function produced a nested list of peaks by looping through the supplied chromatograms at the specified wavelengths, finding peaks, and fitting them to the specified function using non-linear least squares. The current peak-shape options are `gaussian` and `egh` (exponential-gaussian hybrid) [@lan2001]. The area under the curve for each peak is then estimated using trapezoidal approximation. The function returns a nested list of data.frames containing parameters for the peaks identified in each chromatogram. You can also filter peaks returned by `get_peaks` using the argument `sd_max` (to filter by peak width) and/or `amp_thresh` (to filter by peak height). The `filter_peaks` function can also be used to secondarily filter peaks according to these criteria after the `peak_list` has already been created. The peak-finding algorithm may often detect a lot of peaks that are little more than noise. It is recommended to filter out extraneous peaks at this stage (especially if you are processing a lot of samples) as it can greatly reduce the computational load of peak table construction.
+The `get_peaks` function produced a nested list of peaks by looping through the supplied chromatograms at the specified wavelengths, finding peaks, and fitting them to the specified function using non-linear least squares. The current peak-shape options are `gaussian` and `egh` (exponential-gaussian hybrid) [@lan2001]. The area under the curve for each peak is then estimated using trapezoidal approximation. The function returns a nested list of data.frames containing parameters for the peaks identified in each chromatogram.
+
+##### Filtering
+
+The peak-finding algorithm may often detect a lot of peaks that are little more than noise. Thus, it is recommended to filter out extraneous peaks at this stage (especially if you are processing a lot of samples) as it can greatly reduce the computational load of peak table construction. This can be accomplished directly by using the arguments `sd_max` (to filter by peak width) and/or `amp_thresh` (to filter by peak height). Alternatively, the `filter_peaks` function can be used to filter peaks after the `peak_list` has already been created. 
 
 ```{r, get_peaks, message=F, warning=F}
 pks_gauss <- get_peaks(warp, lambdas = c('210','260'), sd.max=40, fit="gaussian")
 pks_egh <- get_peaks(warp, lambdas = c('210', '260'), sd.max=40, fit="egh")
 ```
 
+##### Visualization
 The `plot.peak_list` function allows you to visually assess the peak integration accuracy. Below we compare the peaks fitted for the first chromatogram (`index = 1`) using the two algorithms. Usually the egh function performs slightly better for asymmetrical peaks.
 
 ```{r, plot_peaks, warning=F, fig.height=6}
@@ -139,7 +144,7 @@ plot(pks_egh, index=1, lambda='210')
 
 ### Peak table assembly
 
-After obtaining a `peak_list`, the `get_peaks` function performs complete linkage hierarchical clustering to link peaks across samples. It returns a `peak_table` object with samples as rows and peaks as columns. The `peak_table` object also has slots for holding various metadata about peaks, samples, and analyses. If you have a lot of samples, this step can be quite computationally expensive. Thus, it is suggested to filter the peak_list provided to `get_peaktable` in order to remove extraneous peaks (see [Peak finding and fitting](###Peak finding and fitting) section above).
+After obtaining a `peak_list`, the `get_peaks` function performs complete-linkage hierarchical clustering to link peaks across samples. It returns a `peak_table` object with samples as rows and peaks as columns. The `peak_table` object also has slots for holding various metadata about peaks, samples, and analyses. If you have a lot of samples, this step can be quite computationally expensive. Thus, it is suggested to filter the peak_list provided to `get_peaktable` in order to remove extraneous peaks (see [Peak finding and fitting](###Peak finding and fitting) section above).
 
 ```{r, get_peaktable}
 pk_tab <- get_peaktable(pks_egh, response = "area")

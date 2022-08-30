@@ -51,9 +51,11 @@ inspection) or the warping 'models' (for further programmatic use).}
 
 \item{plot}{Logical. Whether to plot alignment.}
 
-\item{penalty}{The penalty for \code{\link[VPdtw]{VPdtw}} is calculated by
-dividing the \code{\link[VPdtw]{dilation}} by the number provided by this
-argument. Thus, a lower number allows more warping to occur. Defaults to 5.}
+\item{penalty}{The divisor used to calculate the penalty for
+\code{\link[VPdtw]{VPdtw}}. The penalty is calculated by dividing the
+\code{\link[VPdtw]{dilation}} by this number. Thus, a higher number will
+produce a lower penalty and be more permissive, while a lower number will
+produce a higher penalty and allow less warping. Defaults to 5.}
 
 \item{maxshift}{Integer. Maximum allowable shift for \code{\link[VPdtw]{VPdtw}}.}
 

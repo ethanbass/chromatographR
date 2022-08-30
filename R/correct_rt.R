@@ -26,9 +26,11 @@
 #' @param scale Logical. If true, scale chromatograms before warping.
 #' @param trwdth width of the triangle in the WCC criterion.
 #' @param plot Logical. Whether to plot alignment.
-#' @param penalty The penalty for \code{\link[VPdtw]{VPdtw}} is calculated by
-#' dividing the \code{\link[VPdtw]{dilation}} by the number provided by this
-#' argument. Thus, a lower number allows more warping to occur. Defaults to 5.
+#' @param penalty The divisor used to calculate the penalty for
+#' \code{\link[VPdtw]{VPdtw}}. The penalty is calculated by dividing the
+#' \code{\link[VPdtw]{dilation}} by this number. Thus, a higher number will
+#' produce a lower penalty and be more permissive, while a lower number will 
+#' produce a higher penalty and allow less warping. Defaults to 5.
 #' @param maxshift Integer. Maximum allowable shift for \code{\link[VPdtw]{VPdtw}}.
 #' @param verbose Whether to be verbose.
 #' @param \dots Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
@@ -68,11 +70,11 @@
 #' warp <- correct_rt(chrom_list = Sa_pr, models = warping.models)
 #' @md
 #' @export correct_rt
-correct_rt <- function(chrom_list, lambdas, models=NULL, reference='best',
+correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
                        alg = c("ptw", "vpdtw"), what = c("corrected.values", "models"), 
-                       init.coef = c(0, 1, 0), n.traces=NULL, n.zeros=0, 
-                       scale=FALSE, trwdth=200, plot=FALSE,
-                       penalty=5, maxshift=50,
+                       init.coef = c(0, 1, 0), n.traces = NULL, n.zeros = 0, 
+                       scale = FALSE, trwdth = 200, plot = FALSE,
+                       penalty = 5, maxshift = 50,
                        verbose = FALSE, ...){
   what <- match.arg(what, c("corrected.values", "models"))
   alg <- match.arg(alg, c("ptw", "vpdtw"))
