@@ -134,9 +134,11 @@ inspection) or the warping 'models' (for further programmatic use).</p></dd>
 
 
 <dt>penalty</dt>
-<dd><p>The penalty for <code><a href="https://rdrr.io/pkg/VPdtw/man/VPdtw.html" class="external-link">VPdtw</a></code> is calculated by
-dividing the <code><a href="https://rdrr.io/pkg/VPdtw/man/dilation.html" class="external-link">dilation</a></code> by the number provided by this
-argument. Thus, a lower number allows more warping to occur. Defaults to 5.</p></dd>
+<dd><p>The divisor used to calculate the penalty for
+<code><a href="https://rdrr.io/pkg/VPdtw/man/VPdtw.html" class="external-link">VPdtw</a></code>. The penalty is calculated by dividing the
+<code><a href="https://rdrr.io/pkg/VPdtw/man/dilation.html" class="external-link">dilation</a></code> by this number. Thus, a higher number will
+produce a lower penalty and be more permissive, while a lower number will
+produce a higher penalty and allow less warping. Defaults to 5.</p></dd>
 
 
 <dt>maxshift</dt>
