@@ -34,11 +34,11 @@ attach_metadata <- function(peak_table, metadata, column){
     stop(paste("Provided peak_table object must be of class 'peak_table'."))
   meta <- data.frame(rownames(peak_table$tab))
   names(meta) <- column
-  metadata[,column] <- as.character(metadata[,column])
-  missing_meta <- !(meta[,column] %in% metadata[,column])
-  if (sum(missing_meta)>0)
+  metadata[, column] <- as.character(metadata[, column])
+  missing_meta <- !(meta[, column] %in% metadata[, column])
+  if (sum(missing_meta) > 0)
     warning("The supplied metadata does not include all samples.")
-  meta <- merge(meta, metadata, all.x=TRUE, all.y=FALSE, sort=FALSE)
+  meta <- merge(meta, metadata, all.x = TRUE, all.y = FALSE, sort = FALSE)
   peak_table$sample_meta <- meta
   return(peak_table)
 }

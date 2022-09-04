@@ -75,14 +75,17 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
     stop("Must provide either a peak_table or a chrom_list.")
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(peak_table)
-  } else get_chrom_list(peak_table, chrom_list)
+  } else if (!missing(peak_table)) get_chrom_list(peak_table, chrom_list)
   if (!(class(chrom_list) %in% c("list", "chrom_list", "matrix")))
-    stop("Chrom_list does not appear to be valid. Check chrom_list argument")
+    stop("The provided `chrom_list` does not appear to be valid. 
+                            ......Please check `chrom_list` argument")
   if (is.matrix(chrom_list)){
     chrom_list <- list(chrom_list)
     chr <- 1
   }
-  new.ts <- round(as.numeric(rownames(chrom_list[[1]])),2)
+  if ((plot_spectrum | export_spectrum) & ncol(chrom_list[[1]]) == 1)
+    stop("Spectral data is unidimensional.")
+  new.ts <- as.numeric(rownames(chrom_list[[1]]))
   new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
   sig <- max(nchar(gsub(".*\\.","",rownames(chrom_list[[1]]))))
   if (what == "rt" | what == "click"){
@@ -118,16 +121,15 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
       stop("Wavelength (`lambda`) must be specified for interactive scanning.")
     y <- unlist(chrom_list[[chr]][idx, , drop=TRUE])
     lambda <- names(which.max(y))
-    lambda.idx <- which(new.lambdas == lambda)
   } else{
     lambda <- as.numeric(lambda)
-    lambda.idx <- which(new.lambdas == lambda) 
-    if (length(lambda.idx) == 0)
-      stop("The specified wavelength (`lambda`) could not be found!")
   }
+  lambda.idx <- ifelse(length(new.lambdas) == 1, 1, which(new.lambdas == lambda))
+  if (length(lambda.idx) == 0)
+    stop("The specified wavelength (`lambda`) could not be found!")
   if (plot_trace){
     y_trace <- chrom_list[[chr]][,lambda.idx]
-    matplot(x = new.ts, y = y_trace,type='l',
+    matplot(x = new.ts, y = y_trace, type='l',
             ylab='', xlab='')
     if (what == "click"){
       message("Click trace to select timepoint")
@@ -142,11 +144,11 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
   }
   if (verbose){
     message(paste0("chrome no. ", chr, " (`", names(chrom_list)[chr], "`) \n",
-                   "RT: ", RT, "; \n",
+                   "RT: ", round(RT, 2), "; \n",
                    "lambda = ", lambda, " nm; \n",
                    "abs = ", round(y_trace[idx], 2)))
     ### report closest match ###
-    if (what != "peak" & !is.null(peak_table$tab)){
+    if (!missing(peak_table) & what != "peak"){
       pk <- names(which.min(abs(peak_table$pk_meta["rt",] - RT)))
       message(paste("nearest peak:", pk))
     }
@@ -161,6 +163,11 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
   if (export_spectrum){
     y <- data.frame(y)
     colnames(y) <- names(chrom_list)[chr]
+    a <- attributes(chrom_list[[chr]])
+    a$sample_name <- ifelse(is.null(a$sample_name), names(chrom_list)[chr], a$sample_name)
+    a <- c(a, rt = RT, loc=loc)
+    attr(y, "meta") <- a[-which(names(a) %in% c(
+      "time_range", "time_interval", "dimnames", "dim", "format"))]
     y
   }
 }
