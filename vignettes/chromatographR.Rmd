@@ -28,7 +28,7 @@ The *chromatographR* package draws inspiration from the previously published *al
 ## Workflow
 ### Loading data
 
-chromatographR now includes an option to directly read data from Agilent ChemStation or MassHunter files [@bovee2022; @bovee2022a], Chromeleon UV ASCII files, Thermo Raw, Waters ARW and others using the `read_chroms` function. Select the appropriate file format by setting the `format_in` argument to `csv`, `chemstation_uv`, `masshunter_dad`, `chromeleon_uv`, `waters_arw`, etc.
+chromatographR can import data from a growing list of proprietary file formats using the `read_chroms` function. Supported file formats include 'Agilent ChemStation' or 'MassHunter' (`.D`) files [@bovee2022; @bovee2022a], 'Thermo Raw' (`.raw`) [@hulstaert2020], 'Chromeleon' UV ASCII (`.txt`), 'Waters ARW' (`.arw`), 'Shimadzu' ASCII (`.txt`), and more. (For a full list, see the [chromConverter documentation](https://ethanbass.github.io/chromConverter)). Select the appropriate file format by specifying the `format_in` argument (e.g. `csv`, `chemstation_uv`, `masshunter_dad`, `chromeleon_uv`, `waters_arw`, etc).
 
 ```{r,eval=F}
 # single folder
@@ -120,11 +120,15 @@ install.packages("VPdtw")
 warp <- correct_rt(chrom_list=dat.pr, alg="vpdtw", lambda="210", what="corrected.values")
 ```
 
+![](VPdtw.svg)
+  
+In this case the alignments produced by the two algorithms are very similar, but in many cases one algorithm may dramatically out-perform the other, so it is useful to have more than one option available.
+
 ### Peak finding and fitting
 
 The `get_peaks` function produced a nested list of peaks by looping through the supplied chromatograms at the specified wavelengths, finding peaks, and fitting them to the specified function using non-linear least squares. The current peak-shape options are `gaussian` and `egh` (exponential-gaussian hybrid) [@lan2001]. The area under the curve for each peak is then estimated using trapezoidal approximation. The function returns a nested list of data.frames containing parameters for the peaks identified in each chromatogram.
 
-##### Filtering
+#### Filtering
 
 The peak-finding algorithm may often detect a lot of peaks that are little more than noise. Thus, it is recommended to filter out extraneous peaks at this stage (especially if you are processing a lot of samples) as it can greatly reduce the computational load of peak table construction. This can be accomplished directly by using the arguments `sd_max` (to filter by peak width) and/or `amp_thresh` (to filter by peak height). Alternatively, the `filter_peaks` function can be used to filter peaks after the `peak_list` has already been created. 
 
@@ -133,7 +137,7 @@ pks_gauss <- get_peaks(warp, lambdas = c('210','260'), sd.max=40, fit="gaussian"
 pks_egh <- get_peaks(warp, lambdas = c('210', '260'), sd.max=40, fit="egh")
 ```
 
-##### Visualization
+#### Visualization
 The `plot.peak_list` function allows you to visually assess the peak integration accuracy. Below we compare the peaks fitted for the first chromatogram (`index = 1`) using the two algorithms. Usually the egh function performs slightly better for asymmetrical peaks.
 
 ```{r, plot_peaks, warning=F, fig.height=6}
