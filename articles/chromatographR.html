@@ -97,7 +97,7 @@
 <div class="section level3">
 <h3 id="loading-data">Loading data<a class="anchor" aria-label="anchor" href="#loading-data"></a>
 </h3>
-<p>chromatographR now includes an option to directly read data from Agilent ChemStation or MassHunter files <span class="citation">(Bovee 2022a, 2022b)</span>, Chromeleon UV ASCII files, Thermo Raw, Waters ARW and others using the <code>read_chroms</code> function. Select the appropriate file format by setting the <code>format_in</code> argument to <code>csv</code>, <code>chemstation_uv</code>, <code>masshunter_dad</code>, <code>chromeleon_uv</code>, <code>waters_arw</code>, etc.</p>
+<p>chromatographR can import data from a growing list of proprietary file formats using the <code>read_chroms</code> function. Supported file formats include ‘Agilent ChemStation’ or ‘MassHunter’ (<code>.D</code>) files <span class="citation">(Bovee 2022a, 2022b)</span>, ‘Thermo Raw’ (<code>.raw</code>) <span class="citation">(<span class="citeproc-not-found" data-reference-id="hulstaert2020"><strong>???</strong></span>)</span>, ‘Chromeleon’ UV ASCII (<code>.txt</code>), ‘Waters ARW’ (<code>.arw</code>), ‘Shimadzu’ ASCII (<code>.txt</code>), and more. (For a full list, see the <a href="https://ethanbass.github.io/chromConverter" class="external-link">chromConverter documentation</a>). Select the appropriate file format by specifying the <code>format_in</code> argument (e.g. <code>csv</code>, <code>chemstation_uv</code>, <code>masshunter_dad</code>, <code>chromeleon_uv</code>, <code>waters_arw</code>, etc).</p>
 <pre class="text"><code>&gt; # single folder
 &gt; read_chroms(paths = path, format_in = "csv")
 &gt; 
@@ -170,22 +170,24 @@
 <p>Variable penalty dynamic time warping is another algorithm that can be very effective for correcting retention time shifts <span class="citation">(Clifford et al. 2009; Clifford and Stone 2012)</span>. Instead of calculating an explicit warping function, dynamic time warping (DTW) works by repeatedly shifting, expanding or contracting the time axis in small steps until a satisfactory alignment is attained. This process can result in very close matching of peaks, but can also lead to severe peak distortion if the time axis is repeatedly expanded and/or contracted <span class="citation">(Tomasi, van den Berg, and Andersson 2004)</span>. <strong>Variable penalty dynamic time warping</strong> is a derivative of DTW that constrains expansion and contraction of the time-axis by applying a penalty to these types of “risky” moves. This can often achieve a very good alignment with minimal peak distortion. VPdtw package is a suggested dependency since it requires a working C++ compiler. Unlike <code>ptw</code>, <code>VPdtw</code> can only take a single wavelength as input (but it returns a global warping on the whole chromatographic matrix). The code snippet below is not run, but shows how one could install <code>VPdtw</code> and use it to warp the example chromatograms.</p>
 <pre class="text"><code>&gt; install.packages("VPdtw")
 &gt; warp &lt;- correct_rt(chrom_list=dat.pr, alg="vpdtw", lambda="210", what="corrected.values")</code></pre>
+<p><img src="VPdtw.svg"></p>
+<p>In this case the alignments produced by the two algorithms are very similar, but in many cases one algorithm may dramatically out-perform the other, so it is useful to have more than one option available.</p>
 </div>
 </div>
 <div class="section level3">
 <h3 id="peak-finding-and-fitting">Peak finding and fitting<a class="anchor" aria-label="anchor" href="#peak-finding-and-fitting"></a>
 </h3>
 <p>The <code>get_peaks</code> function produced a nested list of peaks by looping through the supplied chromatograms at the specified wavelengths, finding peaks, and fitting them to the specified function using non-linear least squares. The current peak-shape options are <code>gaussian</code> and <code>egh</code> (exponential-gaussian hybrid) <span class="citation">(Lan and Jorgenson 2001)</span>. The area under the curve for each peak is then estimated using trapezoidal approximation. The function returns a nested list of data.frames containing parameters for the peaks identified in each chromatogram.</p>
-<div class="section level5">
-<h5 id="filtering">Filtering<a class="anchor" aria-label="anchor" href="#filtering"></a>
-</h5>
+<div class="section level4">
+<h4 id="filtering">Filtering<a class="anchor" aria-label="anchor" href="#filtering"></a>
+</h4>
 <p>The peak-finding algorithm may often detect a lot of peaks that are little more than noise. Thus, it is recommended to filter out extraneous peaks at this stage (especially if you are processing a lot of samples) as it can greatly reduce the computational load of peak table construction. This can be accomplished directly by using the arguments <code>sd_max</code> (to filter by peak width) and/or <code>amp_thresh</code> (to filter by peak height). Alternatively, the <code>filter_peaks</code> function can be used to filter peaks after the <code>peak_list</code> has already been created.</p>
 <pre class="text"><code>&gt; pks_gauss &lt;- get_peaks(warp, lambdas = c('210','260'), sd.max=40, fit="gaussian")
 &gt; pks_egh &lt;- get_peaks(warp, lambdas = c('210', '260'), sd.max=40, fit="egh")</code></pre>
 </div>
-<div class="section level5">
-<h5 id="visualization">Visualization<a class="anchor" aria-label="anchor" href="#visualization"></a>
-</h5>
+<div class="section level4">
+<h4 id="visualization">Visualization<a class="anchor" aria-label="anchor" href="#visualization"></a>
+</h4>
 <p>The <code>plot.peak_list</code> function allows you to visually assess the peak integration accuracy. Below we compare the peaks fitted for the first chromatogram (<code>index = 1</code>) using the two algorithms. Usually the egh function performs slightly better for asymmetrical peaks.</p>
 <pre class="text"><code>&gt; par(mfrow=c(2,1))
 &gt; plot(pks_gauss, index=1, lambda='210')
