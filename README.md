@@ -1,12 +1,14 @@
 # chromatographR <a href='https://ethanbass.github.io/chromatographR/'><img src='man/figures/logo.png' align="right" height="160" /></a>
 
 <!-- badges: start -->
-  [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/chromatographR)](https://cran.r-project.org/package=chromatographR)
   [![R-CMD-check](https://github.com/ethanbass/chromatographR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ethanbass/chromatographR/actions/workflows/R-CMD-check.yaml)
+  [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/chromatographR)](https://cran.r-project.org/package=chromatographR)
+  [![chromatographR status badge](https://ethanbass.r-universe.dev/badges/chromatographR)](https://ethanbass.r-universe.dev)
+
+  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7016988.svg)](https://doi.org/10.5281/zenodo.7016988)
   [![metacran downloads](https://cranlogs.r-pkg.org/badges/grand-total/chromatographR)](https://cran.r-project.org/package=chromatographR)
   [![metacran downloads](https://cranlogs.r-pkg.org/badges/last-month/chromatographR)](https://cran.r-project.org/package=chromatographR)
-  [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7016988.svg)](https://doi.org/10.5281/zenodo.7016988)
-  <!-- badges: end -->
+   <!-- badges: end -->
 
 ## Overview
 `chromatographR` is a package for the reproducible analysis of HPLC-DAD chromatographic data in R. It can also be used to analyze other "simple" chromatographic data like GC-FID, HPLC-UV, or HPLC-FD.
