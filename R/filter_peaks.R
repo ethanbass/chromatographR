@@ -104,6 +104,7 @@ filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value, comp,
     warning("Nothing to filter...")
     return(peak_table)
   }
+  peak_table$pk_meta["rt",] <-as.numeric(peak_table$pk_meta["rt",])
   what <- match.arg(what, c("median","mean"))
   if (!missing(rts)){
     rts <- as.numeric(rts)

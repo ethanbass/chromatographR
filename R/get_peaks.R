@@ -61,7 +61,8 @@
 #' @export get_peaks
 
 get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
-                       sd.max=50, max.iter=100, time.units = c("min", "s", "ms"), ...){
+                       sd.max = 50, max.iter = 100,
+                      time.units = c("min", "s", "ms"), ...){
   time.units <- match.arg(time.units, c("min", "s", "ms"))
   tfac <- switch(time.units, "min" = 1, "s" = 60, "ms" = 60*1000)
   fit <- match.arg(fit, c("egh", "gaussian", "raw"))
@@ -77,15 +78,16 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
     lambdas <- as.character(lambdas)
   }
   if (is.null(names(chrom_list))){
-    warning("Sample names not found. It is recommended to include names for your samples.", immediate. = TRUE)
+    warning("Sample names not found. It is recommended to include names for your samples.",
+            immediate. = TRUE)
     names(chrom_list) <- seq_along(chrom_list)
   }
   peaks<-list()
-  chrom_list <- lapply(chrom_list, function(c_mat) c_mat[,lambdas, drop=FALSE])
+  # chrom_list <- lapply(chrom_list, function(c_mat) c_mat[,lambdas, drop=FALSE])
   result <- lapply(seq_along(chrom_list), function(sample){
     suppressWarnings(ptable <- lapply(lambdas, function(lambda){
       cbind(sample = names(chrom_list)[sample], lambda,
-            fit_peaks(chrom_list[[sample]][,lambda], fit = fit,
+            fit_peaks(chrom_list[[sample]], lambda=lambda, fit = fit,
                       max.iter = max.iter, sd.max = sd.max, ...))
     }))
     names(ptable) <- lambdas
@@ -94,7 +96,7 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
   names(result) <- names(chrom_list)
   result <- lapply(result, function(sample) lapply(sample, function(pks){
     pks[apply(pks, 1, function(x){
-      !any(is.na(x)) & (x["rt"] > x["start"]) & x["rt"] < x["end"]}), , drop=FALSE]
+      !all(is.na(x)) & (x["rt"] > x["start"]) & x["rt"] < x["end"]}), , drop=FALSE]
   }))
   timepoints <- as.numeric(rownames(chrom_list[[1]]))
   tdiff <- median(diff(timepoints))
@@ -108,7 +110,7 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
   }))
   structure(result,
             chrom_list = chrom_list_string,
-            lambdas = lambdas, fit=fit, sd.max=sd.max,
+            lambdas = lambdas, fit = fit, sd.max = sd.max,
             max.iter = max.iter,
             time.units = time.units,
             class = "peak_list")
@@ -121,7 +123,8 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
 #' @importFrom stats median
 #' @importFrom graphics polygon arrows
 #' @importFrom scales alpha
-#' @param x Peak_list object. Output from the \code{get_peaks} function.
+#' @param x A \code{peak_list} object. Output from the \code{get_peaks} function.
+#' @param ... Additional arguments to main plot function.
 #' @param chrom_list List of chromatograms (retention time x wavelength
 #' matrices)
 #' @param index Index or name of chromatogram to be plotted.
@@ -132,7 +135,11 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
 #' @param a Alpha parameter controlling the transparency of fitted shapes.
 #' @param color The color of the fitted shapes.
 #' @param cex.points Size of points. Defaults to 0.5
-#' @param \dots Additional arguments to plot function.
+#' @param numbers Whether to number peaks. Defaults to FALSE.
+#' @param cex.font Font size if peaks are numbered. Defaults to 0.5.
+#' @param y.offset Y offset for peak numbers. Defaults to 25.
+#' @param plot_purity Whether to add visualization of peak purity.
+#' @param res time resolution for peak fitting
 #' @return No return value, called for side effects.
 #' @section Side effects:
 #' Plots a chromatographic trace from the specified chromatogram (\code{chr})
@@ -142,13 +149,14 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
 #' @seealso \code{\link{get_peaks}}
 #' @rdname plot.peak_list
 #' @export
-#' 
-plot.peak_list <- function(x, ..., chrom_list=NULL, index=1, lambda=NULL,
+
+plot.peak_list <- function(x, ..., chrom_list, index=1, lambda=NULL,
                        points=FALSE, ticks=FALSE, a=0.5, color=NULL,
-                       cex.points=0.5){
+                       cex.points=0.5, numbers = FALSE, cex.font = 0.5, 
+                       y.offset = 25, plot_purity = FALSE, res){
   time.units <- attributes(x)$time.units
   tfac <- switch(time.units, "min" = 1, "s" = 1/60, "ms" = 1/60000)
-  if (is.null(chrom_list)){
+  if (missing(chrom_list)){
     chrom_list <- get_chrom_list(x)
   }
   if (is.null(lambda)){
@@ -160,7 +168,7 @@ plot.peak_list <- function(x, ..., chrom_list=NULL, index=1, lambda=NULL,
   if (is.numeric(lambda)){
     lambda <- as.character(lambda)
   }
-  new.ts <- as.numeric(rownames(chrom_list[[1]]))
+  new.ts <- as.numeric(rownames(chrom_list[[index]]))
   y <- chrom_list[[index]][,lambda]
   pks <- data.frame(x[[index]][[lambda]])
   if ("r.squared" %in% colnames(pks)){
@@ -180,7 +188,11 @@ plot.peak_list <- function(x, ..., chrom_list=NULL, index=1, lambda=NULL,
            pks$end,y[which(new.ts %in% pks$end)]+5,
            col="blue", length=0)
   }
-  res <- median(diff(as.numeric(rownames(chrom_list[[1]]))))
+  if (numbers){
+    text(pks$rt, y[pks$rt] + y.offset, labels=seq_len(nrow(pks)), cex=cex.font)
+  }
+  if (missing(res))
+    res <- median(diff(as.numeric(rownames(chrom_list[[1]]))))
   for (i in seq_len(nrow(pks))){
     peak.loc<-seq.int((pks$start[i]),(pks$end[i]), by = res)
       if (fit == "gaussian"){
@@ -201,9 +213,31 @@ plot.peak_list <- function(x, ..., chrom_list=NULL, index=1, lambda=NULL,
         if (is.null(color))
           color <- "hotpink"
       }
-      sapply(1:(length(peak.loc) - 1), function(i){
-        polygon(peak.loc[c(i, i, (i+1), (i+1))], c(0, yvals[i:(i+1)], 0),
-                col=alpha(color, a), lty=3, border = NA)
+      draw_trapezoid(peak.loc, yvals, color, a)
+  }
+  if (plot_purity){
+    peaks <- x[[index]][[lambda]][,3:5]
+    # color <- "#FFB000"
+    color="black"
+    p <- apply(peaks, 1, function(pos){
+      pos[1] <- which(new.ts %in% pos[[1]])
+      pos[2] <- which(new.ts %in% pos[[2]])
+      pos[3] <- which(new.ts %in% pos[[3]])
+      idx <- seq(pos[2], pos[3])
+      yvals <- chrom_list[[index]][,lambda][idx]
+      p <- get_purity_values(chrom_list[[index]], pos)
+      # lines(as.numeric(new.ts[idx]), -scales::rescale(p, c(0,20)), col = "darkgray", lty=3, lwd=1.5)
+      lim=-20
+      draw_trapezoid(new.ts[idx], scales::rescale(p, c(0,lim)), color="black", a=0.6)
+      abline(h=lim, lty=3, col="darkgray")
       })
   }
+}
+
+#' @noRd
+draw_trapezoid <- function(peak.loc, yvals, color, a){
+  sapply(1:(length(peak.loc) - 1), function(i){
+  polygon(peak.loc[c(i, i, (i+1), (i+1))], c(0, yvals[i:(i+1)], 0),
+          col=alpha(color, a), lty=3, border = NA)
+})
 }

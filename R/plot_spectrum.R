@@ -67,7 +67,8 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
                           plot_spectrum = TRUE, plot_trace = TRUE,
                           spectrum_labels=TRUE, scale_spectrum=FALSE,
                           export_spectrum = FALSE, verbose=TRUE, 
-                          what=c("peak", "rt", "click"), ...){
+                          what=c("peak", "rt", "click"),
+                          ...){
   what <- match.arg(what, c("peak", "rt", "click"))
   if (what == "click")
     plot_trace <- TRUE
@@ -99,7 +100,7 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
         stop("Peak table must be provided to locate peak.")}
       if (!(loc %in% colnames(peak_table$tab))){
         stop(paste0("No match found for peak \'", loc, "\' in peak table."))}
-      RT <- round(peak_table$pk_meta['rt', loc], sig)
+      RT <- round(as.numeric(peak_table$pk_meta['rt', loc]), sig)
     } else if (what == "rt"){
       RT <- round(as.numeric(loc), sig)
     }
@@ -128,9 +129,9 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
   if (length(lambda.idx) == 0)
     stop("The specified wavelength (`lambda`) could not be found!")
   if (plot_trace){
-    y_trace <- chrom_list[[chr]][,lambda.idx]
-    matplot(x = new.ts, y = y_trace, type='l',
-            ylab='', xlab='')
+      y_trace <- chrom_list[[chr]][,lambda.idx]
+      matplot(x = new.ts, y = y_trace, type='l',
+              ylab='', xlab='')
     if (what == "click"){
       message("Click trace to select timepoint")
       idx <- identify(new.ts, y_trace, n = 1, plot = FALSE)
@@ -140,13 +141,13 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
     title(bquote(paste("\n\n Chr ", .(chr),  " ;   RT: ", .(RT), " ;  ", lambda, ": ", .(lambda), " nm",
                        #" abs: ", .(round(y_trace[idx], 2))
                        )))
-    
   }
   if (verbose){
     message(paste0("chrome no. ", chr, " (`", names(chrom_list)[chr], "`) \n",
                    "RT: ", round(RT, 2), "; \n",
                    "lambda = ", lambda, " nm; \n",
                    "abs = ", round(y_trace[idx], 2)))
+    
     ### report closest match ###
     if (!missing(peak_table) & what != "peak"){
       pk <- names(which.min(abs(peak_table$pk_meta["rt",] - RT)))
@@ -171,7 +172,6 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
     y
   }
 }
-
 
 #' Elementwise all equal function
 #' @author Brian Diggs
@@ -216,7 +216,7 @@ elementwise.all.equal <- Vectorize(function(x, y, ...) {isTRUE(all.equal(x, y, .
 #' pk_tab <- get_peaktable(pks)
 #' plot_all_spectra(peak="V13", peak_table = pk_tab, overlapping=TRUE)
 #' @export plot_all_spectra
-#'
+
 plot_all_spectra <- function(peak, peak_table, chrom_list, chrs="all", 
                              plot_spectrum = TRUE, export_spectrum=TRUE,
                              scale_spectrum=TRUE, overlapping=TRUE,
@@ -234,7 +234,7 @@ plot_all_spectra <- function(peak, peak_table, chrom_list, chrs="all",
                   export_spectrum = TRUE, scale_spectrum=scale_spectrum,
                   verbose=verbose, what="peak")
   })
-  sp<-as.data.frame(do.call(cbind, sp))
+  sp <- as.data.frame(do.call(cbind, sp))
   colnames(sp) <- names(chrom_list)[chrs]
   rownames(sp) <- colnames(chrom_list[[1]])
   if (plot_spectrum){

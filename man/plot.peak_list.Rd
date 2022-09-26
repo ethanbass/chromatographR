@@ -7,20 +7,25 @@
 \method{plot}{peak_list}(
   x,
   ...,
-  chrom_list = NULL,
+  chrom_list,
   index = 1,
   lambda = NULL,
   points = FALSE,
   ticks = FALSE,
   a = 0.5,
   color = NULL,
-  cex.points = 0.5
+  cex.points = 0.5,
+  numbers = FALSE,
+  cex.font = 0.5,
+  y.offset = 25,
+  plot_purity = FALSE,
+  res
 )
 }
 \arguments{
-\item{x}{Peak_list object. Output from the \code{get_peaks} function.}
+\item{x}{A \code{peak_list} object. Output from the \code{get_peaks} function.}
 
-\item{\dots}{Additional arguments to plot function.}
+\item{...}{Additional arguments to main plot function.}
 
 \item{chrom_list}{List of chromatograms (retention time x wavelength
 matrices)}
@@ -39,6 +44,16 @@ to FALSE.}
 \item{color}{The color of the fitted shapes.}
 
 \item{cex.points}{Size of points. Defaults to 0.5}
+
+\item{numbers}{Whether to number peaks. Defaults to FALSE.}
+
+\item{cex.font}{Font size if peaks are numbered. Defaults to 0.5.}
+
+\item{y.offset}{Y offset for peak numbers. Defaults to 25.}
+
+\item{plot_purity}{Whether to add visualization of peak purity.}
+
+\item{res}{time resolution for peak fitting}
 }
 \value{
 No return value, called for side effects.

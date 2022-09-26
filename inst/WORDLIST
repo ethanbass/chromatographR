@@ -12,6 +12,7 @@ Chromatograms
 Chromatographia
 Chromatographic
 Chromeleon
+DOI
 DTW
 DuffyTools
 Eilers
@@ -26,8 +27,8 @@ Jorgenson
 Kochhar
 Lan
 MCR
+MKL
 MassHunter
-Maxmimum
 Metabolomics
 Montoliu
 Naish
@@ -42,15 +43,18 @@ Pvclust
 RAMClust
 Reproducibility
 Rezzi
+Shimadzu
 Shimodaira
 Solidago
 Spectrometry
+Stahl
 Thermo
 Toolset
 VIS
 VPdtw
 WCC
 Wehrens
+agilent
 al
 algorithmically
 alsace
@@ -62,7 +66,6 @@ chrom
 chromConverter
 chromatogram
 chromatograms
-chromatograph
 chromatographic
 correctRT
 devtools
@@ -77,6 +80,7 @@ https
 isocratic
 jss
 matlab
+md
 metacran
 parsers
 pearson
@@ -89,5 +93,7 @@ sd
 stripplot
 terpconnect
 toh
+toolset
 umd
 unwarped
+www

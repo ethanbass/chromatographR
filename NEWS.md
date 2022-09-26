@@ -1,29 +1,46 @@
-# chromatograph 0.4.4
+# chromatographR 0.4.5
+
+#### New features
+* Added `reshape_chroms` function for converting chromatograms to "long" format.
+* Added `export.peaktable` function to easily write peak_table to `csv` or `xlsx`.
+* Added functions for assessing peak purity: `get_purity_values` and `get_mean_purity`.
+* Added `fill_gaps` function for filling gaps in `peak_table`.
+
+#### Changes to *fit_peaks* function:
+* Simplified logic in `fit_peaks` function.
+* Modified `fit_peaks` syntax so it now takes a matrix (`x`) and a wavelength
+(`lambda`) instead of a numeric vector (`y`).
+* Incorporated assessment of peak purity during peak fitting.
+* Added wavelength (`lambda`) to `peak_list` and `peak_table` metadata.
+
+# chromatographR 0.4.4
 
 * Fixed issue with tests when run on certain machines (MKL).
 
-# chromatograph 0.4.3
+# chromatographR 0.4.3
 
 * Minor changes to documentation.
 * Added additional check of chrom_list dimensions and names.
 
-# chromatograph 0.4.2
+# chromatographR 0.4.2
 
+#### New features
 * Added option to select `time.units` for peak area in `get_peaks` function
 facilitating better comparison with vendor software.
 * Now allow preservation of instrumental metadata through pre-processing and alignment steps.
 * Added `filter_peaktable` function.
-* Changed default behavior in `correct_rt` to `corrected_values` rather than `models`.
-* Fixed bug in `cluster_spectra` affecting peaks with 0 standard deviation.
-* Fixed bug affecting `peak_list` metadata.
+
+#### Minor changes:
 * Deprecated `load_chroms` function. Please use `read_chroms` from chromConverter
 to import files instead.
-
-### Minor changes:
-
+* Changed default behavior in `correct_rt` to `corrected_values` rather than `models`.
 * Added more informative warnings and error messages to various functions.
 * Now recommend installation of `VPdtw` from CRAN instead of https://ethanbass.github.io/drat/
 * Fixed typos in vignette
+
+#### Bug fixes
+* Fixed bug in `cluster_spectra` affecting peaks with 0 standard deviation.
+* Fixed bug affecting `peak_list` metadata.
 
 # chromatographR 0.4.1
 

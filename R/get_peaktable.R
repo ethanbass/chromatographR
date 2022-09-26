@@ -157,7 +157,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
     ## re-order clusters from small to large rt
     pkcenters.cl <- order(order(cl.centers$rt))[pkcenters.cl]
     cl.centers <- cl.centers[order(cl.centers$rt),]
-    metaInfo <- cbind(component = rep(comp, ncl),
+    metaInfo <- cbind(lambda = rep(as.numeric(names(peak_list[[1]])[comp]), ncl),
                       peak = 1:ncl, 
                       round(cl.centers,2)
                       )
@@ -186,10 +186,12 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
     }
     return(list(Iinfo, metaInfo))
   }
+  as.structure <- switch(out, "data.frame" = as.data.frame,
+             "matrix" = as.matrix)
   result <- lapply(seq_len(ncomp), clusterPeaks, peak_list)
-  result <- list(tab = as.data.frame(t(do.call("rbind", lapply(result,    
+  result <- list(tab = as.structure(t(do.call("rbind", lapply(result,    
                                                         function(x) x[[1]])))),
-                 pk_meta = as.data.frame(t(do.call("rbind", lapply(result, 
+                 pk_meta = as.structure(t(do.call("rbind", lapply(result, 
                                                         function(x) x[[2]])))),
                  sample_meta = NA,
                  ref_spectra = NA,
@@ -201,7 +203,11 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
                         clust = clust,
                         sigma.t = sigma.t,
                         sigma.r = sigma.r,
-                        deepSplit = deepSplit
+                        deepSplit = deepSplit,
+                        reference_spectra = NA,
+                        metadata_path = NA,
+                        normalized = FALSE,
+                        normalization_by = NA
                         ))
   class(result) <- "peak_table"
   return(result)
@@ -301,7 +307,7 @@ row.names.peak_table <- function(x){
 #' @author Ethan Bass
 #' @rdname plot.peak_table
 #' @export
-#'
+
 plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
                             chr = 'max', lambda = 'max',
                             plot_spectrum = TRUE, plot_trace = TRUE,
@@ -342,7 +348,7 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
     }
     boxplot(as.formula(paste("x[['tab']][,loc]", vars, sep="~")),
             data = x$sample_meta,
-            main = paste(loc, '\n', 'RT = ', round(x$pk_meta['rt', loc],2)),
+            main = paste(loc, '\n', 'RT = ', round(as.numeric(x$pk_meta['rt', loc]),2)),
             ylab="abs", xlab="", ...)
   }
   if (export_spectrum)

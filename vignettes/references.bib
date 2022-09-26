@@ -9,7 +9,7 @@
   copyright = {GPL ({$\geq$} 3)}
 }
 
-@article{bloemberg2010,
+@article{bloemberg2010a,
   title = {Improved Parametric Time Warping for Proteomics},
   author = {Bloemberg, Tom G. and Gerretzen, Jan and Wouters, Hans J. P. and Gloerich, Jolein and {van Dael}, Maurice and Wessels, Hans J. C. T. and {van den Heuvel}, Lambert P. and Eilers, Paul H. C. and Buydens, Lutgarde M. C. and Wehrens, Ron},
   year = {2010},
@@ -27,22 +27,13 @@
   file = {/Users/ethanbass/Zotero/storage/QD86YU9B/Bloemberg et al. - 2010 - Improved parametric time warping for proteomics.pdf;/Users/ethanbass/Zotero/storage/PPPWBPPZ/S0169743910000572.html}
 }
 
-@misc{bovee2022,
+@misc{bovee2022c,
   title = {Aston},
   author = {Bovee, Roderick},
   year = {2022},
   month = mar,
   abstract = {View and interpret UV-visible and mass spectrometry chromatographic data.},
   copyright = {BSD-3-Clause}
-}
-
-@misc{bovee2022a,
-  title = {Entab},
-  author = {Bovee, Roderick},
-  year = {2022},
-  month = apr,
-  abstract = {* -{$>$} TSV},
-  copyright = {MIT}
 }
 
 @article{clifford2009,
@@ -57,7 +48,8 @@
   publisher = {{American Chemical Society}},
   issn = {0003-2700},
   doi = {10.1021/ac802041e},
-  abstract = {In this article we highlight a novel variation on dynamic time warping (DTW) for aligning chromatogram signals. We are interested in sets of signals that can be aligned well locally, but not globally, by shifting individual signals in time. This kind of alignment is often sufficient for aligning gas chromatography data. Regular DTW often ``over-warps'' signals and introduces artificial features into the aligned data. To overcome this we introduce a variable penalty into the DTW process. The penalty is added to the distance metric whenever a nondiagonal step is taken. We select our penalty based on a morphological dilation of the two signals. We showcase our method by aligning GC/MS datafiles from 712 blood plasma samples processed in 23 batches over the course of 6 months. The use of variable penalty DTW significantly reduces the number of nondiagonal moves. In the examples presented here, this reduction is by a factor of 30, with no cost to visual quality of the alignment.}
+  abstract = {In this article we highlight a novel variation on dynamic time warping (DTW) for aligning chromatogram signals. We are interested in sets of signals that can be aligned well locally, but not globally, by shifting individual signals in time. This kind of alignment is often sufficient for aligning gas chromatography data. Regular DTW often ``over-warps'' signals and introduces artificial features into the aligned data. To overcome this we introduce a variable penalty into the DTW process. The penalty is added to the distance metric whenever a nondiagonal step is taken. We select our penalty based on a morphological dilation of the two signals. We showcase our method by aligning GC/MS datafiles from 712 blood plasma samples processed in 23 batches over the course of 6 months. The use of variable penalty DTW significantly reduces the number of nondiagonal moves. In the examples presented here, this reduction is by a factor of 30, with no cost to visual quality of the alignment.},
+  file = {/Users/ethanbass/Zotero/storage/QQ9IQJHK/Clifford et al. - 2009 - Alignment Using Variable Penalty Dynamic Time Warp.pdf;/Users/ethanbass/Zotero/storage/CP4MXHRA/ac802041e.html}
 }
 
 @article{clifford2012,
@@ -76,6 +68,22 @@
   file = {/Users/ethanbass/Zotero/storage/GY9Q96P8/Clifford and Stone - 2012 - Variable Penalty Dynamic Time Warping Code for Ali.pdf}
 }
 
+@article{eilers2003,
+  title = {A {{Perfect Smoother}}},
+  author = {Eilers, Paul H. C.},
+  year = {2003},
+  month = jul,
+  journal = {Analytical Chemistry},
+  volume = {75},
+  number = {14},
+  pages = {3631--3636},
+  publisher = {{American Chemical Society}},
+  issn = {0003-2700},
+  doi = {10.1021/ac034173t},
+  abstract = {The well-known and popular Savitzky-Golay filter has several disadvantages. A very attractive alternative is a smoother based on penalized least squares, extending ideas presented by Whittaker 80 years ago. This smoother is extremely fast, gives continuous control over smoothness, interpolates automatically, and allows fast leave-one-out cross-validation. It can be programmed in a few lines of Matlab code. Theory, implementation, and applications are presented.},
+  file = {/Users/ethanbass/Zotero/storage/MB5ZT2WV/Eilers - 2003 - A Perfect Smoother.pdf;/Users/ethanbass/Zotero/storage/XJ9VFVZB/Eilers - 2003 - A Perfect Smoother.pdf;/Users/ethanbass/Zotero/storage/69Z8KKSL/ac034173t.html}
+}
+
 @article{eilers2004,
   title = {Parametric {{Time Warping}}},
   author = {Eilers, Paul H. C.},
@@ -92,7 +100,24 @@
   file = {/Users/ethanbass/Zotero/storage/C9SFPIXK/Eilers - 2004 - Parametric Time Warping.pdf;/Users/ethanbass/Zotero/storage/UMUCZ7GZ/ac034800e.html}
 }
 
-@article{lan2001,
+@article{hulstaert2020,
+  title = {{{ThermoRawFileParser}}: {{Modular}}, {{Scalable}}, and {{Cross-Platform RAW File Conversion}}},
+  shorttitle = {{{ThermoRawFileParser}}},
+  author = {Hulstaert, Niels and Shofstahl, Jim and Sachsenberg, Timo and Walzer, Mathias and Barsnes, Harald and Martens, Lennart and {Perez-Riverol}, Yasset},
+  year = {2020},
+  month = jan,
+  journal = {Journal of Proteome Research},
+  volume = {19},
+  number = {1},
+  pages = {537--542},
+  publisher = {{American Chemical Society}},
+  issn = {1535-3893},
+  doi = {10.1021/acs.jproteome.9b00328},
+  abstract = {The field of computational proteomics is approaching the big data age, driven both by a continuous growth in the number of samples analyzed per experiment as well as by the growing amount of data obtained in each analytical run. In order to process these large amounts of data, it is increasingly necessary to use elastic compute resources such as Linux-based cluster environments and cloud infrastructures. Unfortunately, the vast majority of cross-platform proteomics tools are not able to operate directly on the proprietary formats generated by the diverse mass spectrometers. Here, we present ThermoRawFileParser, an open-source, cross-platform tool that converts Thermo RAW files into open file formats such as MGF and the HUPO-PSI standard file format mzML. To ensure the broadest possible availability and to increase integration capabilities with popular workflow systems such as Galaxy or Nextflow, we have also built Conda package and BioContainers container around ThermoRawFileParser. In addition, we implemented a user-friendly interface (ThermoRawFileParserGUI) for those users not familiar with command-line tools. Finally, we performed a benchmark of ThermoRawFileParser and msconvert to verify that the converted mzML files contain reliable quantitative results.},
+  file = {/Users/ethanbass/Zotero/storage/5ZTJJ8UD/Hulstaert et al. - 2020 - ThermoRawFileParser Modular, Scalable, and Cross-.pdf;/Users/ethanbass/Zotero/storage/WZ6KBLWK/acs.jproteome.html}
+}
+
+@article{lan2001a,
   title = {A Hybrid of Exponential and Gaussian Functions as a Simple Model of Asymmetric Chromatographic Peaks},
   author = {Lan, Kevin and Jorgenson, James W.},
   year = {2001},
@@ -107,6 +132,18 @@
   langid = {english},
   keywords = {chemometrics,Chromatographic peak detection,HPLC},
   file = {/Users/ethanbass/Zotero/storage/F4LRTDRY/Lan and Jorgenson - 2001 - A hybrid of exponential and gaussian functions as .pdf;/Users/ethanbass/Zotero/storage/XLCPHTZ5/S0021967301005945.html}
+}
+
+@article{stahl2003,
+  title = {Peak Purity Analysis in {{HPLC}} and {{CE}} Using Diode-Array Technology},
+  author = {Stahl, Mark},
+  year = {2003},
+  month = apr,
+  journal = {Agilent Technologies},
+  pages = {16},
+  abstract = {In terms of quality control and for all quantitative analysis peak purity is a major task, which can be addressed in different ways. Often only peak shapes and chromatograms are taken into consideration but a very elegant possibility without the need to use a mass spectrometric detector is the comparison of spectra recorded with a diode-array detector during the registration of a chromatographic peak. Due to the differences of these spectra within a single chromatographic peak, its purity can be decided easily. The Agilent ChemStation software offers an easy to use tool to perform these tasks routinely. In this note, the theoretical background of peak purity determination is presented as well as the practical use of the ChemStation software for these purposes.},
+  langid = {english},
+  file = {/Users/ethanbass/Zotero/storage/2NMT6HLE/Stahl - Peak purity analysis in HPLC and CE using diode-ar.pdf}
 }
 
 @article{suzuki2006,
@@ -142,7 +179,7 @@
   file = {/Users/ethanbass/Zotero/storage/JRXU3J7F/Tomasi et al. - 2004 - Correlation optimized warping and dynamic time war.pdf;/Users/ethanbass/Zotero/storage/2NA9ZVZ9/cem.html}
 }
 
-@article{uesugi2013,
+@article{uesugi2013b,
   title = {Herbivore Exclusion Drives the Evolution of Plant Competitiveness via Increased Allelopathy},
   author = {Uesugi, Akane and Kessler, Andr{\'e}},
   year = {2013},
@@ -155,8 +192,8 @@
   doi = {10.1111/nph.12172},
   abstract = {The `Evolution of Increased Competitive Ability (EICA)' hypothesis predicts the evolution of plant invasiveness in introduced ranges when plants escape from their natural enemies. So far, the EICA hypothesis has been tested by comparing plant vigor from native and invasive populations, but these studies are confounded by among-population differences in additional environmental factors and/or founder effects.},
   langid = {english},
-  keywords = {polyacetylenes},
-  file = {/Users/ethanbass/Box/refs/zotero/polyacetylenes/Uesugi_2013_Herbivore exclusion drives the evolution of plant competitiveness via increased.pdf}
+  keywords = {allelopathy,artificial selection,cis-dehydromatricaria ester,evolution,Evolution of Increased Competitive Ability (EICA) hypothesis,herbivory,inter- and intra-specific competition,polyacetylenes,Solidago altissima},
+  file = {/Users/ethanbass/Zotero/storage/KMYKT9DM/Uesugi and Kessler - 2013 - Herbivore exclusion drives the evolution of plant .pdf;/Users/ethanbass/Zotero/storage/XP83C5G2/nph.html}
 }
 
 @article{wehrens2015,
@@ -173,7 +210,8 @@
   doi = {10.1007/s11306-014-0683-5},
   abstract = {For those chemical compounds absorbing in the UV\textendash Vis region and not readily applicable to routine mass spectrometry ionisation methods, liquid chromatography coupled to diode array detection is a convenient platform to perform metabolite profiling. Data processing by hand is labour-intensive and error prone. In the present study a strategy based on multivariate curve resolution, and its implementation in an R package called alsace are described. The final result of an analysis is a table containing peak heights or peak areas for all features of the individual injections. The capabilities of the software, providing elements such as splitting the data into separate, possibly overlapping time windows, merging the results of the individual time windows, and parametric time warping to align features, are illustrated using a cassava-derived data set.},
   langid = {english},
-  file = {/Users/ethanbass/Box/refs/zotero/undefined/Wehrens et al. - 2015 - Metabolite profiling in LC–DAD using multivariate .pdf}
+  keywords = {Bioinformatics,Carotenoids,Metabolic profiling,Open-source software,UPLC–DAD},
+  file = {/Users/ethanbass/Zotero/storage/EH5J3P6N/Wehrens et al. - 2015 - Metabolite profiling in LC–DAD using multivariate .pdf;/Users/ethanbass/Zotero/storage/PSEQCXD9/Wehrens et al. - 2015 - Metabolite profiling in LC–DAD using multivariate .pdf}
 }
 
 @article{wehrens2015a,
@@ -188,7 +226,7 @@
   issn = {1367-4803},
   doi = {10.1093/bioinformatics/btv299},
   abstract = {Summary: Alignment of peaks across samples is a difficult but unavoidable step in the data analysis for all analytical techniques containing a separation step like chromatography. Important application examples are the fields of metabolomics and proteomics. Parametric time warping (PTW) has already shown to be very useful in these fields because of the highly restricted form of the warping functions, avoiding overfitting. Here, we describe a new formulation of PTW, working on peak-picked features rather than on complete profiles. Not only does this allow for a much more smooth integration in existing pipelines, it also speeds up the (already among the fastest) algorithm by orders of magnitude. Using two publicly available datasets we show the potential of the new approach. The first set is a LC\textendash DAD dataset of grape samples, and the second an LC\textendash MS dataset of apple extracts.Availability and implementation: Parametric time warping of peak lists is implemented in the ptw package, version 1.9.1 and onwards, available from Github (https://github.com/rwehrens/ptw) and CRAN (http://cran.r-project.org). The package also contains a vignette, providing more theoretical details and scripts to reproduce the results below.Contact: ron.wehrens@wur.nl},
-  file = {/Users/ethanbass/Box/refs/zotero/undefined/Wehrens et al. - 2015 - Fast parametric time warping of peak lists.pdf;/Users/ethanbass/Zotero/storage/V8SWIMI4/240579.html}
+  file = {/Users/ethanbass/Zotero/storage/9W4TVLDY/Wehrens et al. - 2015 - Fast parametric time warping of peak lists.pdf;/Users/ethanbass/Zotero/storage/V8SWIMI4/240579.html}
 }
 
 
