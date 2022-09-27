@@ -80,7 +80,7 @@ In many cases, liquid chromatography can suffer from retention time shifts (e.g.
 
 #### Parametric time warping
 
-The `ptw` option can take a single wavelength or a list of wavelengths provided by the user using the `lambdas` argument. For each chromatogram, `ptw` then produces a "global" warping function across all the wavelengths supplied by the user. The code block below creates warping models for the samples in the provided list of data matrices. The same function is then used to warp each chromatogram according to the corresponding model, by setting the `models` parameter. Depending on the variety of your samples and the severity of the retention time shifts, it may take some experimentation with the warping parameters to get satisfactory results. Sometimes "less" can actually be "more" here -- for example, wavelengths with fewer peaks may sometimes yield better warping models. (Also see the documentation for [ptw](https://CRAN.R-project.org/package=ptw) for more guidance on warp function optimization).
+The `ptw` option can take a single wavelength or a list of wavelengths provided by the user using the `lambdas` argument. For each chromatogram, `ptw` then produces a "global" warping function across all the wavelengths supplied by the user. The code block below creates warping models for the samples in the provided list of data matrices. The same function is then used to warp each chromatogram according to the corresponding model, by setting the `models` parameter. Depending on the variety of your samples and the severity of the retention time shifts, it may take some experimentation with the warping parameters to get satisfactory results. Sometimes less can actually be more here -- for example, wavelengths with fewer peaks may sometimes yield better warping models. (Also see the documentation for [ptw](https://CRAN.R-project.org/package=ptw) for more guidance on warp function optimization).
 
 ```{r, warp models}
 warping.models <- correct_rt(dat.pr, what = "models", lambdas=c("210"), scale=TRUE)
@@ -126,16 +126,16 @@ In this case the alignments produced by the two algorithms are very similar, but
 
 ### Peak finding and fitting
 
-The `get_peaks` function produced a nested list of peaks by looping through the supplied chromatograms at the specified wavelengths, finding peaks, and fitting them to the specified function using non-linear least squares. The current peak-shape options are `gaussian` and `egh` (exponential-gaussian hybrid) [@lan2001]. The area under the curve for each peak is then estimated using trapezoidal approximation. The function returns a nested list of data.frames containing parameters for the peaks identified in each chromatogram.
-
-#### Filtering
-
-The peak-finding algorithm may often detect a lot of peaks that are little more than noise. Thus, it is recommended to filter out extraneous peaks at this stage (especially if you are processing a lot of samples) as it can greatly reduce the computational load of peak table construction. This can be accomplished directly by using the arguments `sd_max` (to filter by peak width) and/or `amp_thresh` (to filter by peak height). Alternatively, the `filter_peaks` function can be used to filter peaks after the `peak_list` has already been created. 
+The `get_peaks` function produced a nested list of peaks by looping through the supplied chromatograms at the specified wavelengths, finding peaks, and fitting them to the specified function using non-linear least squares. The current peak-shape options are `gaussian` or exponential-gaussian hybrid (`egh`) [@lan2001]. The area under the curve for each peak is then estimated using trapezoidal approximation. The function returns a nested list of data.frames containing parameters for the peaks identified in each chromatogram.
 
 ```{r, get_peaks, message=F, warning=F}
 pks_gauss <- get_peaks(warp, lambdas = c('210','260'), sd.max=40, fit="gaussian")
 pks_egh <- get_peaks(warp, lambdas = c('210', '260'), sd.max=40, fit="egh")
 ```
+
+#### Filtering
+
+The peak-finding algorithm may often detect a lot of peaks that are little more than noise. Thus, it is recommended to filter out extraneous peaks at this stage (especially if you are processing a lot of samples) as it can greatly reduce the computational load of peak table construction. This can be accomplished directly by using the arguments `sd_max` (to filter by peak width) and/or `amp_thresh` (to filter by peak height). Alternatively, the `filter_peaks` function can be used to filter peaks after the `peak_list` has already been created. 
 
 #### Visualization
 The `plot.peak_list` function allows you to visually assess the peak integration accuracy. Below we compare the peaks fitted for the first chromatogram (`index = 1`) using the two algorithms. Usually the egh function performs slightly better for asymmetrical peaks.
@@ -148,7 +148,7 @@ plot(pks_egh, index=1, lambda='210')
 
 ### Peak table assembly
 
-After obtaining a `peak_list`, the `get_peaks` function performs complete-linkage hierarchical clustering to link peaks across samples. It returns a `peak_table` object with samples as rows and peaks as columns. The `peak_table` object also has slots for holding various metadata about peaks, samples, and analyses. If you have a lot of samples, this step can be quite computationally expensive. Thus, it is suggested to filter the peak_list provided to `get_peaktable` in order to remove extraneous peaks (see [Peak finding and fitting](###Peak finding and fitting) section above).
+After obtaining a `peak_list`, the `get_peaks` function performs complete-linkage hierarchical clustering to link peaks across samples. It returns a `peak_table` object with samples as rows and peaks as columns. The `peak_table` object also has slots for holding various metadata about peaks, samples, and analyses. If you have a lot of samples, this step can be quite computationally expensive. Thus, it is suggested to filter the peak_list provided to `get_peaktable` in order to remove extraneous peaks (see [Peak finding and fitting](###Peak finding and fitting) section above). Peaks can also be filtered after `peak_table` assembly using the `filter_peaktable` function.
 
 ```{r, get_peaktable}
 pk_tab <- get_peaktable(pks_egh, response = "area")

@@ -12,27 +12,28 @@
 #' @param plot_it Whether to plot difference between filled and unfilled peak tables.
 #' @author Ethan Bass
 #' @export fill_gaps
-fill_gaps <- function(peak_table, chrom_list, ref = c("max.cor","max.int"),
-                      similarity_threshold=0.95, rt_tolerance=0.15,
+fill_gaps <- function(peak_table, chrom_list, ref = c("max.cor", "max.int"),
+                      similarity_threshold = 0.95, rt_tolerance = 0.15,
                       spectral_weight=0.5, only_zeros = FALSE,
-                      peaks_only=TRUE, plot_it = FALSE){
+                      peaks_only = TRUE, plot_it = FALSE){
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(peak_table)
   }
   ref <- match.arg(ref, c("max.cor","max.int"))
-  if (is.na(peak_table$ref_spectra)){
+  if (length(peak_table$ref_spectra) == 1){
     peak_table <- attach_ref_spectra(peak_table, ref = ref)
   } else{
     if (peak_table$args["reference_spectra"] != ref)
-      warning(paste("reference spectra in peak table are", peak_table$args["reference_spectra"],
-                     "but selection is", ref))
+      warning(paste0("Reference spectra in peak table are `", peak_table$args[["reference_spectra"]],
+                     "`, but selection is `", ref, "`."))
   }
-  for (j in colnames(peak_table$tab)){
-    pktab <- fill_gap(j, peak_table, similarity_threshold = similarity_threshold,
-             rt_tolerance = rt_tolerance, spectral_weight = spectral_weight,
-             only_zeros = only_zeros, peaks_only = peaks_only, plot_it = plot_it)
-  }
-  pktab
+  peak_table$filled <- matrix(0, nrow(peak_table$tab), ncol(peak_table$tab),
+                              dimnames = list(rownames(peak_table[[1]]),
+                                              colnames(peak_table[[1]])))
+  peak_table$tab <- sapply(colnames(peak_table$tab), fill_gap, peak_table= peak_table, similarity_threshold = similarity_threshold,
+                           rt_tolerance = rt_tolerance, spectral_weight = spectral_weight,
+                           only_zeros = only_zeros, peaks_only = peaks_only, plot_it = FALSE)
+  peak_table
 }
 
 #' Fill gap in one column of peaktable
@@ -41,14 +42,18 @@ fill_gaps <- function(peak_table, chrom_list, ref = c("max.cor","max.int"),
 #' @param reference chromatogram to use as reference. Defaults to "max".
 #' @param similarity_threshold Minimum spectral similarity.
 #' @param rt_tolerance Maximum retention time difference.
+#' @param what What to return. Either filled column, matrix of peak values,
+#' or full \code{peak_table} object.
 #' @param only_zeros Only consider zeros in peak_table for filling.
 #' @param peaks_only Only consider peaks found by \code{\link{find_peaks}}.
 #' @param plot_it Whether to plot difference between filled and unfilled peak tables.
 #' @author Ethan Bass
 #' @noRd
-fill_gap <- function(peak, peak_table, chrom_list, similarity_threshold=0.95,
-                     rt_tolerance = 0.5, spectral_weight = 0.5, only_zeros = FALSE,
+fill_gap <- function(peak, peak_table, chrom_list, similarity_threshold = 0.95,
+                     rt_tolerance = 0.5, spectral_weight = 0.5,
+                     what = c("col", "mat", "list"), only_zeros = FALSE,
                      peaks_only = TRUE, plot_it = FALSE){
+  what <- match.arg(what, c("col", "mat", "list"))
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(peak_table)
   }
@@ -87,16 +92,20 @@ fill_gap <- function(peak, peak_table, chrom_list, similarity_threshold=0.95,
         break
       } else{
         # replace values in peak_table
-        peak_table$tab[chr,peak] <- spec[peak_table$pk_meta["lambda",peak],idx_select]
+        if (!isTRUE(all.equal(peak_table$tab[chr,peak], spec[peak_table$pk_meta[1,peak],idx_select]))){
+          peak_table$tab[chr,peak] <- spec[peak_table$pk_meta[1,peak],idx_select]
+          peak_table$filled[chr,peak] <- 1
+        }
       }
     }
   if (plot_it){
     matplot(seq_dim(peak_table), cbind(OG_areas, peak_table$tab[,peak]), 
             pch=c(1,20), xlab='old',ylab='new')
     # legend()
-    # plot(peak_table$tab[,peak] ~ OG_areas, pch=20)
   }
-  peak_table
+  switch(what, "col" = peak_table$tab[,peak],
+         "mat" = peak_table$tab,
+         "list" = peak_table)
 }
 
 

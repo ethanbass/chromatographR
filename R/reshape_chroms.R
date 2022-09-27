@@ -1,21 +1,3 @@
-#' Reshapes  a single chromatogram from wide to long format
-#' @name reshape_chrom
-#' @importFrom stats reshape
-#' @param x A chromatographic matrix in wide format.
-#' @return A chromatographic matrix in long format.
-#' @author Ethan Bass
-reshape_chrom <- function(x){
-  x <- as.data.frame(x)
-  data <- reshape(as.data.frame(rt=rownames(x),x), direction = "long",
-                  varying = list(1:ncol(x)), v.names="absorbance",
-                  times = colnames(x), timevar = "lambda",
-                  idvar="rt", ids=rownames(x))
-  rownames(data) <- NULL
-  data$rt <- as.numeric(data$rt)
-  data$lambda <- as.numeric(data$lambda)
-  data[,c(3,2,1)]
-}
-
 
 #' Reshapes list of chromatograms from wide to long format
 #' @name reshape_chroms
@@ -36,4 +18,23 @@ reshape_chroms <- function(x, idx, sample_var = "sample"){
     xx
   })
   do.call(rbind,dat)
+}
+
+#' Reshapes  a single chromatogram from wide to long format
+#' @name reshape_chrom
+#' @importFrom stats reshape
+#' @param x A chromatographic matrix in wide format.
+#' @return A chromatographic matrix in long format.
+#' @author Ethan Bass
+#' @noRd
+reshape_chrom <- function(x){
+  x <- as.data.frame(x)
+  data <- reshape(as.data.frame(rt=rownames(x),x), direction = "long",
+                  varying = list(1:ncol(x)), v.names="absorbance",
+                  times = colnames(x), timevar = "lambda",
+                  idvar="rt", ids=rownames(x))
+  rownames(data) <- NULL
+  data$rt <- as.numeric(data$rt)
+  data$lambda <- as.numeric(data$lambda)
+  data[,c(3,2,1)]
 }

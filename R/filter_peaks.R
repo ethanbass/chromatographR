@@ -86,7 +86,7 @@ filter_peaks <- function(peak_list, min_height, min_area,
 #' @param max_rt Maximum retention time to include in the peak table.
 #' @param min_value Minimal cutoff for average peak intensity.
 #' @param what Whether to average intensities using \code{mean} or \code{median}.
-#' @param comp Component(s) to include in peak table (e.g. wavelengths if you
+#' @param lambda Component(s) to include in peak table (e.g. wavelengths if you
 #' are using HPLC-DAD/UV).
 #' @param tol Tolerance for matching of retention times to \code{rts}.
 #' @return A peak table similar to the input, with all columns removed
@@ -97,10 +97,10 @@ filter_peaks <- function(peak_list, min_height, min_area,
 #' data(pk_tab)
 #' pk_tab <- filter_peaktable(pk_tab, min_rt = 10, max_rt = 16)
 #' @export filter_peaktable
-filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value, comp,
+filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value, lambda,
                               what = c("median","mean"), tol = 0){
   if (missing(rts) & missing(min_rt) &
-      missing(max_rt) & missing(min_value) & missing(comp)) {
+      missing(max_rt) & missing(min_value) & missing(lambda)) {
     warning("Nothing to filter...")
     return(peak_table)
   }
@@ -135,10 +135,10 @@ filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value, comp,
     val <- apply(peak_table$tab, 2, eval(what))
     idx.val <- which(val >= min_value)
   } else (idx.val <- seq_along(peak_table$tab))
-  if (!missing(comp)){
-    idx.comp <- which(peak_table$pk_meta["component",] %in% comp)
-  } else (idx.comp <- seq_along(peak_table$tab))
-  idx <- Reduce(intersect, list(idx.rt, idx.val, idx.comp))
+  if (!missing(lambda)){
+    idx.lambda <- which(peak_table$pk_meta["lambda",] %in% lambda)
+  } else (idx.lambda <- seq_along(peak_table$tab))
+  idx <- Reduce(intersect, list(idx.rt, idx.val, idx.lambda))
   peak_table$tab <- peak_table$tab[,idx, drop = FALSE]
   peak_table$pk_meta <- peak_table$pk_meta[,idx, drop = FALSE]
   if (inherits(peak_table$ref_spectra, c("data.frame", "matrix"))){

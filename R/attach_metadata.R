@@ -66,7 +66,7 @@ attach_metadata <- function(peak_table, metadata, column){
 gather_reference_spectra <- function(peak_table, chrom_list,
                                      ref = c("max.cor", "max.int")){
   if (!inherits(peak_table, "peak_table"))
-    stop(paste("Provided peak_table object must be of class 'peak_table'."))
+    stop(paste("Provided peak_table object must be a `peak_table` object."))
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(peak_table)
   } else get_chrom_list(peak_table, chrom_list)
