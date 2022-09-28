@@ -88,6 +88,7 @@ cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
                             parallel=TRUE, max.only=FALSE,
                             output=c("clusters", "pvclust", "both"),
                             ...){
+  check_peaktable(peak_table)
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(peak_table)
   } else get_chrom_list(peak_table, chrom_list)

@@ -10,6 +10,7 @@ write_peaktable <- function(peak_table, path, format=c("csv", "xlsx"),
                              what = c("tab", "pk_meta",
                                       "sample_meta", "ref_spectra",
                                       "args")){
+  check_peaktable(peak_table)
   what <- match.arg(what, c("tab", "pk_meta",
                             "sample_meta", "ref_spectra",
                             "args"), several.ok=TRUE)

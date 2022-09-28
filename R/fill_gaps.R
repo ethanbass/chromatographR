@@ -16,9 +16,10 @@ fill_gaps <- function(peak_table, chrom_list, ref = c("max.cor", "max.int"),
                       similarity_threshold = 0.95, rt_tolerance = 0.15,
                       spectral_weight=0.5, only_zeros = FALSE,
                       peaks_only = TRUE, plot_it = FALSE){
+  check_peaktable(peak_table)
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(peak_table)
-  }
+  }  else get_chrom_list(peak_table, chrom_list)
   ref <- match.arg(ref, c("max.cor","max.int"))
   if (length(peak_table$ref_spectra) == 1){
     peak_table <- attach_ref_spectra(peak_table, ref = ref)
@@ -30,9 +31,13 @@ fill_gaps <- function(peak_table, chrom_list, ref = c("max.cor", "max.int"),
   peak_table$filled <- matrix(0, nrow(peak_table$tab), ncol(peak_table$tab),
                               dimnames = list(rownames(peak_table[[1]]),
                                               colnames(peak_table[[1]])))
-  peak_table$tab <- sapply(colnames(peak_table$tab), fill_gap, peak_table= peak_table, similarity_threshold = similarity_threshold,
+  rnames <- rownames(peak_table$tab)
+  peak_table$tab <- sapply(colnames(peak_table$tab), fill_gap, peak_table= peak_table,
+                           chrom_list = chrom_list,
+                           similarity_threshold = similarity_threshold,
                            rt_tolerance = rt_tolerance, spectral_weight = spectral_weight,
                            only_zeros = only_zeros, peaks_only = peaks_only, plot_it = FALSE)
+  rownames(peak_table$tab) <- rnames
   peak_table
 }
 
@@ -56,7 +61,7 @@ fill_gap <- function(peak, peak_table, chrom_list, similarity_threshold = 0.95,
   what <- match.arg(what, c("col", "mat", "list"))
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(peak_table)
-  }
+  } else get_chrom_list(peak_table, chrom_list)
   ref <- peak_table$ref_spectra[,peak]
   ts <- as.numeric(rownames(chrom_list[[1]]))
   lambdas <- as.numeric(colnames(chrom_list[[1]]))
@@ -92,9 +97,10 @@ fill_gap <- function(peak, peak_table, chrom_list, similarity_threshold = 0.95,
         break
       } else{
         # replace values in peak_table
-        if (!isTRUE(all.equal(peak_table$tab[chr,peak], spec[peak_table$pk_meta[1,peak],idx_select]))){
-          peak_table$tab[chr,peak] <- spec[peak_table$pk_meta[1,peak],idx_select]
-          peak_table$filled[chr,peak] <- 1
+        idx_lambda <- which(lambdas == peak_table$pk_meta[1,peak])
+        if (!isTRUE(all.equal(peak_table$tab[chr,peak], spec[idx_lambda,idx_select]))){
+          peak_table$tab[chr,peak] <- spec[idx_lambda, idx_select]
+          peak_table$filled[chr, peak] <- 1
         }
       }
     }

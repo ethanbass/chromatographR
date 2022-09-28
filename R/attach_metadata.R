@@ -19,11 +19,12 @@
 #' @export attach_metadata
 
 attach_metadata <- function(peak_table, metadata, column){
+  check_peaktable(peak_table)
   if (any(grepl("tbl", class(metadata)))){
     metadata <- as.data.frame(metadata)
   }
   if (!inherits(metadata, "data.frame")){
-    stop("Please provide metadata as a data.frame")
+    stop("Please provide metadata as a `data.frame`")
   }
   if (!(column %in% colnames(metadata)))
     stop(paste0("Column, ", column, ", is not found."))
@@ -43,7 +44,7 @@ attach_metadata <- function(peak_table, metadata, column){
   return(peak_table)
 }
 
-#' Gather reference spectra.
+#' Get reference spectra.
 #' 
 #' Defines reference spectra. Reference spectra are defined either as the 
 #' spectrum with the highest intensity (\code{max.int}) or as the spectrum 
@@ -63,15 +64,16 @@ attach_metadata <- function(peak_table, metadata, column){
 #' @seealso \code{\link{get_peaks}}
 #' @noRd
 
-gather_reference_spectra <- function(peak_table, chrom_list,
+get_reference_spectra <- function(peak_table, chrom_list,
                                      ref = c("max.cor", "max.int")){
+  check_peaktable(peak_table)
   if (!inherits(peak_table, "peak_table"))
     stop(paste("Provided peak_table object must be a `peak_table` object."))
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(peak_table)
   } else get_chrom_list(peak_table, chrom_list)
   ref <- match.arg(ref, c("max.cor", "max.int"))
-  X<-colnames(peak_table$tab)
+  X <- colnames(peak_table$tab)
   if (ref=="max.cor"){
     sp.l <- lapply(X,function(pk){
       plot_all_spectra(peak = pk, peak_table, chrom_list,
@@ -118,7 +120,8 @@ gather_reference_spectra <- function(peak_table, chrom_list,
 #' @export attach_ref_spectra
 #' 
 attach_ref_spectra <- function(peak_table, chrom_list, ref = c("max.cor","max.int")){
-  peak_table$ref_spectra <- gather_reference_spectra(peak_table, chrom_list, ref)
+  check_peaktable(peak_table)
+  peak_table$ref_spectra <- get_reference_spectra(peak_table, chrom_list, ref)
   peak_table$args["reference_spectra"] <- ref
   return(peak_table)
 }
@@ -148,8 +151,7 @@ attach_ref_spectra <- function(peak_table, chrom_list, ref = c("max.cor","max.in
 
 normalize_data <- function(peak_table, column, chrom_list,
                            what=c('peak_table','chrom_list')){
-  if (!inherits(peak_table,"peak_table"))
-    stop(paste("Provided peak_table object must be of class 'peak_table'."))
+  check_peaktable(peak_table)
   if (!is.data.frame(peak_table$sample_meta))
     stop("Meta-data must be attached to peak_table prior to normalization.")
   if (!(column %in% colnames(peak_table$sample_meta)))

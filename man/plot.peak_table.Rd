@@ -28,7 +28,7 @@ function).}
 
 \item{...}{Additional arguments.}
 
-\item{loc}{The name of the peak or retention time that you wish to plot.}
+\item{loc}{A vector specifying the peak(s) or retention time(s) that you wish to plot.}
 
 \item{chrom_list}{A list of chromatograms in matrix form (timepoints x
 wavelengths).}

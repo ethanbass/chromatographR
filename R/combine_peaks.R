@@ -21,7 +21,9 @@
 #' pk_tab <- attach_ref_spectra(pk_tab)
 #' combine_peaks(pk_tab, tol = .02, min.cor = .9)
 #' @export combine_peaks
+
 combine_peaks <- function(peak_table, tol=.01, min.cor=0.9, choose='max'){
+  check_peaktable(peak_table)
   if (!(is.data.frame(peak_table$ref_spectra) | is.matrix(peak_table$ref_spectra))){
     stop("No reference spectra found. Use attach_ref_spectra function first.")
   }

@@ -69,6 +69,7 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
                           export_spectrum = FALSE, verbose=TRUE, 
                           what=c("peak", "rt", "click"),
                           ...){
+  check_peaktable(peak_table)
   what <- match.arg(what, c("peak", "rt", "click"))
   if (what == "click")
     plot_trace <- TRUE
@@ -96,14 +97,15 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
       stop("List of chromatograms must be provided for scan function.")
   }
     if (what == "peak"){
-      if(missing(peak_table)){
+      if (missing(peak_table)){
         stop("Peak table must be provided to locate peak.")}
       if (!(loc %in% colnames(peak_table$tab))){
         stop(paste0("No match found for peak \'", loc, "\' in peak table."))}
       RT <- round(as.numeric(peak_table$pk_meta['rt', loc]), sig)
     } else if (what == "rt"){
       RT <- round(as.numeric(loc), sig)
-    }
+    } else{RT <- NULL
+          idx <- NULL}
     if (what != "click"){
       if (!is.numeric(RT))
         stop("Retention time not found!")
@@ -129,18 +131,8 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
   if (length(lambda.idx) == 0)
     stop("The specified wavelength (`lambda`) could not be found!")
   if (plot_trace){
-      y_trace <- chrom_list[[chr]][,lambda.idx]
-      matplot(x = new.ts, y = y_trace, type='l',
-              ylab='', xlab='')
-    if (what == "click"){
-      message("Click trace to select timepoint")
-      idx <- identify(new.ts, y_trace, n = 1, plot = FALSE)
-      RT <- new.ts[idx]
-    }
-    abline(v = RT,col='red', lty=3)
-    title(bquote(paste("\n\n Chr ", .(chr),  " ;   RT: ", .(RT), " ;  ", lambda, ": ", .(lambda), " nm",
-                       #" abs: ", .(round(y_trace[idx], 2))
-                       )))
+    y_trace <- chrom_list[[chr]][,lambda.idx]
+    idx <- plot_trace(chrom_list, chr, lambda.idx, idx, what = what)
   }
   if (verbose){
     message(paste0("chrome no. ", chr, " (`", names(chrom_list)[chr], "`) \n",
@@ -168,7 +160,8 @@ plot_spectrum <- function(loc, peak_table, chrom_list,
     a$sample_name <- ifelse(is.null(a$sample_name), names(chrom_list)[chr], a$sample_name)
     a <- c(a, rt = RT, loc=loc)
     attr(y, "meta") <- a[-which(names(a) %in% c(
-      "time_range", "time_interval", "dimnames", "dim", "format"))]
+      "time_range", "time_interval", "dimnames", "row.names",
+      "class", "dim", "format", "names"))]
     y
   }
 }
@@ -218,9 +211,10 @@ elementwise.all.equal <- Vectorize(function(x, y, ...) {isTRUE(all.equal(x, y, .
 #' @export plot_all_spectra
 
 plot_all_spectra <- function(peak, peak_table, chrom_list, chrs="all", 
-                             plot_spectrum = TRUE, export_spectrum=TRUE,
-                             scale_spectrum=TRUE, overlapping=TRUE,
-                             verbose=FALSE, ...){
+                             plot_spectrum = TRUE, export_spectrum = TRUE,
+                             scale_spectrum = TRUE, overlapping = TRUE,
+                             verbose = FALSE, ...){
+  check_peaktable(peak_table)
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(peak_table)
   } else get_chrom_list(peak_table, chrom_list)
@@ -229,10 +223,10 @@ plot_all_spectra <- function(peak, peak_table, chrom_list, chrs="all",
   new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
   if ("all" %in% chrs) chrs <- seq_along(chrom_list)
   sp <- sapply(chrs, function(chr){
-    plot_spectrum(loc = peak, peak_table = peak_table, chrom_list=chrom_list,
-                  chr=chr, plot_spectrum=FALSE, plot_trace=FALSE, 
-                  export_spectrum = TRUE, scale_spectrum=scale_spectrum,
-                  verbose=verbose, what="peak")
+    plot_spectrum(loc = peak, peak_table = peak_table, chrom_list = chrom_list,
+                  chr = chr, plot_spectrum = FALSE, plot_trace = FALSE, 
+                  export_spectrum = TRUE, scale_spectrum = scale_spectrum,
+                  verbose = verbose, what = "peak")
   })
   sp <- as.data.frame(do.call(cbind, sp))
   colnames(sp) <- names(chrom_list)[chrs]
@@ -339,6 +333,7 @@ get_chrom_list <- function(x, chrom_list, verbose = FALSE){
 }
 
 #' Plot spectrum
+#' @importFrom scales rescale
 #' @param y Numeric vector containing spectral data.
 #' @param spectrum_labels Logical. Whether to label peaks in spectrum.
 #' @author Ethan Bass
@@ -349,9 +344,87 @@ plot_spec <- function(y, spectrum_labels = TRUE, ...){
           ylim=c(0,max(y, na.rm = TRUE)*1.2), ...)
   if (spectrum_labels){
     suppressWarnings(pks <- find_peaks(y, slope_thresh = .00001, bounds = FALSE))
-    if (length(pks)>0){
-      pks <- data.frame(round(as.numeric(names(y)[pks]),0), y[pks],stringsAsFactors = FALSE)
+    if (length(pks) > 0){
+      pks <- data.frame(round(as.numeric(names(y)[pks]), 0), y[pks],
+                        stringsAsFactors = FALSE)
       text(pks[,1], pks[,2], pks[,1], pos=3, offset=.3, cex = .8)
     }
   }
 }
+
+#' Plot spectrum with plotly
+#' @param y Numeric vector containing spectral data.
+#' @param spectrum_labels Logical. Whether to label peaks in spectrum.
+#' @author Ethan Bass
+#' @noRd
+plotly_spec <- function(y, spectrum_labels = TRUE, ...){
+  if (!requireNamespace("plotly", quietly = TRUE)) {
+    stop(
+      "Package plotly must be installed:
+      try `install.packages('plotly')`",
+      call. = FALSE
+    )
+  }
+  df <- data.frame(lambda= as.numeric(names(y)), abs = y)
+  p <- plotly::plot_ly(data = df, x = ~lambda, y = ~abs, type='scatter', mode = 'lines')
+    plotly::layout(p, xaxis=list(title = "Wavelength"),
+           yaxis=list(title= "Absorbance (mAU)")
+    )
+}
+
+#' @noRd
+check_peaktable <- function(peak_table){
+  if (!inherits(peak_table, "peak_table"))
+    stop("The provided peak_table must be of the `peak_table` class")
+}
+
+plot_trace <- function(chrom_list, chr, lambda.idx, idx=NULL, what){
+  new.ts <- as.numeric(rownames(chrom_list[[1]]))
+  lambda <- colnames(chrom_list[[1]])[lambda.idx]
+  y_trace <- chrom_list[[chr]][,lambda.idx]
+  matplot(x = new.ts, y = y_trace, type='l', ylab='', xlab='')
+  if (what == "click"){
+    message("Click trace to select timepoint")
+    idx <- identify(new.ts, y_trace, n = 1, plot = FALSE)
+  }
+  RT <- new.ts[idx]
+  abline(v = RT,col='red', lty=3)
+  title(bquote(paste("\n\n Chr ", .(chr),  " ;   RT: ", .(RT), " ;  ", lambda, ": ", .(lambda), " nm",
+                     #" abs: ", .(round(y_trace[idx], 2))
+  )))
+    idx
+}
+
+#' Plot trace with plotly
+#' @param y chrom_list A list of chromatograms in matrix format
+#' @param chr Index of chromatogram to plot.
+#' @param lambda.idx Index of wavelength to plot
+#' @param idx Index of retention time.
+#' @author Ethan Bass
+#' @noRd
+plotly_trace <- function(chrom_list, chr, lambda.idx, idx, color="black", width=1.2, ...){
+  if (!requireNamespace("plotly", quietly = TRUE)) {
+    stop(
+      "Package plotly must be installed:
+      try `install.packages('plotly')`",
+      call. = FALSE
+    )
+  }
+  new.ts <- as.numeric(rownames(chrom_list[[1]]))
+  lambda <- colnames(chrom_list[[1]])[lambda.idx]
+  RT <- new.ts[idx]
+  y_trace <- chrom_list[[chr]][,lambda.idx]
+  df <- data.frame(rt= new.ts, abs = y_trace)
+  # plot_title <- bquote(paste("\n\n Chr ", .(chr),  " ;   RT: ",
+  #              .(RT), " ;  ", lambda, ": ", .(lambda), " nm"))
+  p <- plotly::plot_ly(data = df, x = ~rt, y = ~abs, type='scatter', mode = 'lines',
+                  line = list(color=color, width = width, ...))
+    p <- plotly::add_trace(p, x = ~RT, mode = "lines", line = list(dash=3, color="red"))
+    p <- plotly::layout(p,
+          # title = list(text=plot_title),
+           xaxis=list(title = "Wavelength"),
+           yaxis=list(title= "Absorbance (mAU)")
+          )
+    p
+}
+# plotly_trace(chrom_list, chr=1, lambda.idx=10, idx = 100, color="black", width=1)

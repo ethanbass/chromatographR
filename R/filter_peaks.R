@@ -20,6 +20,7 @@
 #' @author Ron Wehrens, Ethan Bass
 #' @seealso \code{\link{get_peaks}}, \code{\link{filter_peaktable}}
 #' @export filter_peaks
+
 filter_peaks <- function(peak_list, min_height, min_area,
                          min_sd, max_sd, min_rt, max_rt){
   if (missing(min_height) & missing(min_area) &
@@ -97,8 +98,10 @@ filter_peaks <- function(peak_list, min_height, min_area,
 #' data(pk_tab)
 #' pk_tab <- filter_peaktable(pk_tab, min_rt = 10, max_rt = 16)
 #' @export filter_peaktable
+
 filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value, lambda,
                               what = c("median","mean"), tol = 0){
+  check_peaktable(peak_table)
   if (missing(rts) & missing(min_rt) &
       missing(max_rt) & missing(min_value) & missing(lambda)) {
     warning("Nothing to filter...")

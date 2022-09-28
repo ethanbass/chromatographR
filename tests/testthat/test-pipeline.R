@@ -149,20 +149,25 @@ test_that("attach_metadata works", {
 pk_tab <- attach_ref_spectra(pk_tab, chrom_list = dat.pr, ref="max.cor")
 test_that("attach_ref_spectra works", {
   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$ref_spectra))
+  expect_equal(pk_tab$args[["reference_spectra"]], "max.cor")
   pk_tab <- attach_ref_spectra(pk_tab, chrom_list=dat.pr, ref = "max.int")
+  expect_equal(pk_tab$args[["reference_spectra"]], "max.int")
   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$ref_spectra))
   expect_error(attach_ref_spectra(pk_tab, chrom_list = dat.pr, ref = "x"))
+  
 })
-# 
+
 # test filter_peaktable
 
 pktab_s <- filter_peaktable(pk_tab, min_rt=6, max_rt=15)
 
 test_that("filter_peaktable works", {
+  # check that dimensions are unaltered
   expect_equal(rownames(pk_tab$tab), rownames(pktab_s$tab))
   expect_equal(colnames(pktab_s$tab), colnames(pktab_s$pk_meta))
   expect_equal(nrow(pktab_s$tab), nrow(pktab_s$sample_meta))
   expect_equal(colnames(pktab_s$tab), colnames(pktab_s$ref_spectra))
+  # warning if no arguments are provided
   expect_warning(filter_peaktable(pk_tab))
 })
 
@@ -182,6 +187,8 @@ test_that("normalize_data works", {
   expect_equal(dim(chroms), dim(dat.pr))
   expect_error(normalize_data(pk_tab, chrom_list = dat.pr, column = "x"))
   expect_error(normalize_data(pk_tab, chrom_list = dat.pr, column = "mass", what="x"))
+  expect_equal(pk_tab_norm$args[["normalized"]], "TRUE")
+  expect_equal(pk_tab_norm$args[["normalization_by"]], "mass")
 })
 
 ### cluster
@@ -208,8 +215,8 @@ test_that("plot.peak_table works", {
   plot_peak_table <- function(){
     par(mfrow=c(3,1))
     plot(pk_tab, loc = "V13", chrom_list = dat.pr, box_plot = TRUE,
-                                     vars = "trt", verbose = FALSE)
-    }
+         vars = "trt", verbose = FALSE)
+  }
   vdiffr::expect_doppelganger("plot.peak_table", plot_peak_table)
 })
 
@@ -266,6 +273,22 @@ test_that("mirror_plot works", {
   vdiffr::expect_doppelganger("mirror1", mirror1)
 })
 
+pktab_filled <- fill_gaps(pk_tab, chrom_list = dat.pr)
+test_that("fill_gaps works",{
+  # the number of zeros should decline in the filled peak table
+  expect_lt(sum(pktab_filled$tab == 0), sum(pk_tab$tab == 0))
+  
+  # no values should decrease in filled peak table
+  expect_equal(sum(pktab_filled$tab < pk_tab$tab), 0)
+  
+  # dim names should be unchanged
+  expect_equal(rownames(pktab_filled$tab), rownames(pk_tab$tab))
+  expect_equal(colnames(pktab_filled$tab), colnames(pk_tab$tab))
+  expect_equal(rownames(pktab_filled$filled), rownames(pk_tab$tab))
+  expect_equal(colnames(pktab_filled$filled), colnames(pk_tab$tab))
+  expect_true(all(names(pk_tab) %in% names(pktab_filled)))
+})
+
 # test fit_peaks
 # 
 # test_that("fit_peaks works independently", {
@@ -273,3 +296,4 @@ test_that("mirror_plot works", {
 #   expect_equal(ncol(pks),11)
 # })
 # 
+

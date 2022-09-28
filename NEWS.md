@@ -5,6 +5,9 @@
 * Added `export.peaktable` function to easily write peak_table to `csv` or `xlsx`.
 * Added functions for assessing peak purity: `get_purity_values` and `get_mean_purity`.
 * Added `fill_gaps` function for filling gaps in `peak_table`.
+* Permit multiple peaks as arguments to `plot.peaktable`.
+* Added functions for plotting trace and spectra with [plotly](https://plotly.com/r/):
+`plotly_trace` and `plotly_spec`.
 
 #### Changes to *fit_peaks* function:
 * Simplified logic in `fit_peaks` function.

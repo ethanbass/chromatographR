@@ -261,7 +261,7 @@ row.names.peak_table <- function(x){
 #' @param x The peak table (output from \code{\link{get_peaktable}}
 #' function).
 #' @param ... Additional arguments.
-#' @param loc The name of the peak or retention time that you wish to plot.
+#' @param loc A vector specifying the peak(s) or retention time(s) that you wish to plot.
 #' @param chrom_list A list of chromatograms in matrix form (timepoints x
 #' wavelengths).
 #' @param what What to look for. Either \code{peak} to extract spectral information
@@ -318,10 +318,11 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
     loc <- readline(prompt="Which peak would you like to plot? \n")
     loc <- gsub('\\"', '', loc)
     loc <- gsub("\\'", "", loc)
-    if (!(loc %in% colnames(x$tab)))
-      stop("Peak not found.")
+    if (!all(loc %in% colnames(x$tab)))
+      stop("Peak(s) not found.")
   }
-  if (plot_spectrum == TRUE | plot_trace == TRUE){
+  for (loc in loc){
+  if (plot_spectrum | plot_trace){
     if (chr == "all"){
       out <- plot_all_spectra(loc, x, chrom_list,
                        plot_spectrum = plot_spectrum,
@@ -336,7 +337,7 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
                     verbose = verbose, what = what)
     }
   }
-  if (box_plot == T){
+  if (box_plot){
     if (!is.data.frame(x$sample_meta)){
       stop("Attach metadata to peak_table to make mirror plot.")
     }
@@ -353,6 +354,7 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
   }
   if (export_spectrum)
     out
+  }
 }
 
 #' Make mirror plot from peak table.
@@ -404,6 +406,7 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
 mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset = NULL,
                         print_legend = TRUE, legend_txt = NULL, legend_pos = "topright",
                         legend_size = 1, mirror = TRUE, xlim=NULL, ylim=NULL, ...){
+  check_peaktable(peak_table)
   meta <- peak_table$sample_meta
   if (!exists("var"))
     stop("Must provide independent variable or variables for mirror plot.")
