@@ -13,7 +13,7 @@
 #' @author Ethan Bass
 #' @export fill_gaps
 fill_gaps <- function(peak_table, chrom_list, ref = c("max.cor", "max.int"),
-                      similarity_threshold = 0.95, rt_tolerance = 0.15,
+                      similarity_threshold = 0.95, rt_tolerance = 0.2,
                       spectral_weight=0.5, only_zeros = FALSE,
                       peaks_only = TRUE, plot_it = FALSE){
   check_peaktable(peak_table)
@@ -32,12 +32,22 @@ fill_gaps <- function(peak_table, chrom_list, ref = c("max.cor", "max.int"),
                               dimnames = list(rownames(peak_table[[1]]),
                                               colnames(peak_table[[1]])))
   rnames <- rownames(peak_table$tab)
-  peak_table$tab <- sapply(colnames(peak_table$tab), fill_gap, peak_table= peak_table,
-                           chrom_list = chrom_list,
-                           similarity_threshold = similarity_threshold,
-                           rt_tolerance = rt_tolerance, spectral_weight = spectral_weight,
-                           only_zeros = only_zeros, peaks_only = peaks_only, plot_it = FALSE)
-  rownames(peak_table$tab) <- rnames
+  # peak_table$tab <- sapply(colnames(peak_table$tab), fill_gap, peak_table= peak_table,
+  #                          chrom_list = chrom_list,
+  #                          similarity_threshold = similarity_threshold,
+  #                          rt_tolerance = rt_tolerance, spectral_weight = spectral_weight,
+  #                          only_zeros = only_zeros, peaks_only = peaks_only, plot_it = FALSE)
+  # rownames(peak_table$tab) <- rnames
+  for (j in colnames(peak_table$tab)){
+    # print(j)
+    try(peak_table <- fill_gap(peak = j, peak_table= peak_table,
+                             chrom_list = chrom_list,
+                             similarity_threshold = similarity_threshold,
+                             rt_tolerance = rt_tolerance, spectral_weight = spectral_weight,
+                             only_zeros = only_zeros, peaks_only = peaks_only,
+                             plot_it = FALSE, what = "list")
+    )
+  }
   peak_table
 }
 
@@ -95,8 +105,7 @@ fill_gap <- function(peak, peak_table, chrom_list, similarity_threshold = 0.95,
       idx_select <- idx[which.max(score)]
       if (length(idx_select) == 0){
         break
-      } else{
-        # replace values in peak_table
+      } else{ ### replace values in peak_table
         idx_lambda <- which(lambdas == peak_table$pk_meta[1,peak])
         if (!isTRUE(all.equal(peak_table$tab[chr,peak], spec[idx_lambda,idx_select]))){
           peak_table$tab[chr,peak] <- spec[idx_lambda, idx_select]
@@ -109,7 +118,8 @@ fill_gap <- function(peak, peak_table, chrom_list, similarity_threshold = 0.95,
             pch=c(1,20), xlab='old',ylab='new')
     # legend()
   }
-  switch(what, "col" = peak_table$tab[,peak],
+  switch(what,
+         "col" = peak_table$tab[,peak],
          "mat" = peak_table$tab,
          "list" = peak_table)
 }

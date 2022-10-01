@@ -40,9 +40,9 @@ Please see the [vignette](https://ethanbass.github.io/chromatographR/articles/ch
 
 ## Contributing
 
-Contributions to the package are very welcome. Please get in touch (preferable by opening a GitHub [issue](https://github.com/ethanbass/chromatographR/issues)) to discuss any suggestions or to file a bug report. Some good reasons to file an issue:
+Contributions are very welcome. Please get in touch (preferable by opening a GitHub [issue](https://github.com/ethanbass/chromatographR/issues)) to discuss any suggestions or to file a bug report. Some good reasons to file an issue:
 
-- You found an actual bug.  
+- You've found an actual bug.  
 - You're getting a cryptic error message that you don't understand.  
 - You have a file format you'd like to read that isn't currently supported by chromatographR.  (If you do this, please make sure to include a link to an example file!)  
 - You have a new feature you'd like to see implemented.  

@@ -258,7 +258,7 @@ test_that("plot_spectrum works", {
   expect_equal(ncol(x), 1)
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click"))
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click", chr=1))
-  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click",lambda="210"))
+  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click", lambda="210"))
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="rt", lambda="210"))
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="rt", chr=1))
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr, what="rt"))

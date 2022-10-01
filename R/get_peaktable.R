@@ -313,7 +313,9 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
                             plot_spectrum = TRUE, plot_trace = TRUE,
                             box_plot = FALSE, vars = NULL,
                             spectrum_labels = TRUE, scale_spectrum = FALSE,
-                            export_spectrum = FALSE, verbose = TRUE){
+                            export_spectrum = FALSE, verbose = TRUE,
+                            engine = c("base", "plotly")){
+  engine <- match.arg(engine, c("base", "plotly"))
   if (what == "peak" & missing(loc)){
     loc <- readline(prompt="Which peak would you like to plot? \n")
     loc <- gsub('\\"', '', loc)
@@ -339,13 +341,13 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
   }
   if (box_plot){
     if (!is.data.frame(x$sample_meta)){
-      stop("Attach metadata to peak_table to make mirror plot.")
+      stop("Attach metadata to `peak_table` to make a boxplot.")
     }
     if (is.null(vars)){
-      stop("Must provide independent variable or variables (`var`) for boxplot.")
+      stop("Must provide independent variable(s) (`var`) to make a boxplot.")
     }
     if (what != "peak"){
-      stop("A peak name must be provided to `loc` to produce a boxplot.")
+      stop("A peak name must be provided to `loc` to make a boxplot.")
     }
     boxplot(as.formula(paste("x[['tab']][,loc]", vars, sep="~")),
             data = x$sample_meta,
