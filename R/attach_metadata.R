@@ -74,7 +74,7 @@ get_reference_spectra <- function(peak_table, chrom_list,
   } else get_chrom_list(peak_table, chrom_list)
   ref <- match.arg(ref, c("max.cor", "max.int"))
   X <- colnames(peak_table$tab)
-  if (ref=="max.cor"){
+  if (ref == "max.cor"){
     sp.l <- lapply(X,function(pk){
       plot_all_spectra(peak = pk, peak_table, chrom_list,
                        plot_spectrum = FALSE, export_spectrum = TRUE,
@@ -87,7 +87,8 @@ get_reference_spectra <- function(peak_table, chrom_list,
       plot_spectrum(loc = pk, peak_table, chrom_list, plot_trace=FALSE,
                     plot_spectrum = FALSE, export_spectrum = TRUE,
                     verbose = FALSE,
-                    scale_spectrum = TRUE)})
+                    scale_spectrum = TRUE, engine = "base")
+      })
     sp.ref <- do.call(cbind, sp.ref)
   }
   colnames(sp.ref) <- colnames(peak_table$tab)

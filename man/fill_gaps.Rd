@@ -9,7 +9,7 @@ fill_gaps(
   chrom_list,
   ref = c("max.cor", "max.int"),
   similarity_threshold = 0.95,
-  rt_tolerance = 0.15,
+  rt_tolerance = 0.2,
   spectral_weight = 0.5,
   only_zeros = FALSE,
   peaks_only = TRUE,

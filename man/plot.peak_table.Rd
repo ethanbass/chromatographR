@@ -19,7 +19,8 @@
   spectrum_labels = TRUE,
   scale_spectrum = FALSE,
   export_spectrum = FALSE,
-  verbose = TRUE
+  verbose = TRUE,
+  engine = c("base", "plotly")
 )
 }
 \arguments{
@@ -67,6 +68,8 @@ Defaults to FALSE.}
 
 \item{verbose}{Logical. If TRUE, prints verbose output to console. Defaults
 to TRUE.}
+
+\item{engine}{Which plotting engine to use: either \code{base} or \code{plotly}.}
 }
 \value{
 If \code{export_spectrum} is TRUE, returns the spectrum as a \code{

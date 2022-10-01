@@ -5,7 +5,7 @@
 \title{Plot spectrum from peak table}
 \usage{
 plot_spectrum(
-  loc,
+  loc = NULL,
   peak_table,
   chrom_list,
   chr = "max",
@@ -16,7 +16,8 @@ plot_spectrum(
   scale_spectrum = FALSE,
   export_spectrum = FALSE,
   verbose = TRUE,
-  what = c("peak", "rt", "click"),
+  what = c("peak", "rt", "idx", "click"),
+  engine = c("base", "plotly"),
   ...
 )
 }
@@ -59,6 +60,8 @@ to TRUE.}
 for a certain peak, "rt" to scan by retention time, or "click" to manually
 select retention time by clicking on the chromatogram. Defaults to "peak"
 mode.}
+
+\item{engine}{Which plotting engine to use: either \code{base} or \code{plotly}.}
 
 \item{...}{Additional arguments.}
 }
