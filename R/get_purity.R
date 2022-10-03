@@ -8,7 +8,7 @@
 find_noise <- function(x, noise_threshold=0.01, lambdas){
   lambdas <- which(as.numeric(colnames(x)) %in% lambdas)
   max_abs <- apply(x[,lambdas], 1, max)
-  which(max_abs < max(max_abs)*noise_threshold)
+  which(max_abs < max(max_abs, na.rm = TRUE)*noise_threshold)
 }
 
 #alternatively, could define baseline as areas where no peak is detected,
@@ -25,7 +25,7 @@ find_noise <- function(x, noise_threshold=0.01, lambdas){
 get_noise_variance <- function(x, noise_threshold=.005, lambdas=c(210:400)){
   noise_idx <- find_noise(x = x, noise_threshold = noise_threshold, 
                       lambdas = lambdas)
-  mean(apply(x[noise_idx,], 1, var))
+  mean(apply(x[noise_idx,], 1, var), na.rm = TRUE)
   # if (plot_it){
   #   matplot(x,type='l')
   #   
@@ -54,12 +54,13 @@ get_noise_variance <- function(x, noise_threshold=.005, lambdas=c(210:400)){
 #' @author Ethan Bass
 get_agilent_threshold <- function(x, pos, weight=1, noise_threshold=.005,
                                   lambdas=c(210:400)){
-  var_noise <- get_noise_variance(x, noise_threshold = noise_threshold, lambdas=lambdas)
+  var_noise <- get_noise_variance(x, noise_threshold = noise_threshold,
+                                  lambdas=lambdas)
   idx <- seq(as.numeric(pos[2]), as.numeric(pos[3]))
   xx <- sapply(idx, function(i){
     (max(0, 1 - weight *
-           (var_noise / var(x[i, ]) +
-              var_noise / var(x[as.numeric(pos[1]), ]))))^2
+           (var_noise / var(x[i, ], na.rm=TRUE) +
+              var_noise / var(x[as.numeric(pos[1]), ], na.rm = TRUE))))^2
   })
   xx
 }
@@ -129,5 +130,5 @@ trim_peak <- function(x, pos, cutoff = 0.05){
 
 get_mean_purity <- function(x, pos, weight=1, cutoff=0.05){
   p <- get_purity_values(x, pos, weight = weight)
-  mean(p[trim_peak(x, pos, cutoff=cutoff)] < 1)
+  mean(p[trim_peak(x, pos, cutoff=cutoff)] < 1, na.rm=TRUE)
 }
