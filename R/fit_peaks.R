@@ -307,7 +307,7 @@ fitpk_gaussian <- function(x, pos, lambda, max.iter, ...){
   )
   area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
   r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=TRUE)
-  purity <- ifelse(dim(x)[2]>1, get_mean_purity(x, pos), NA)
+  purity <- ifelse(dim(x)[2] > 1, try(get_mean_purity(x, pos)), NA)
   c("rt" = m$center, "start" = pos[2], "end" = pos[3], 
     "sd" = m$width, "FWHM" = 2.35 * m$width,
     "height" = y[xloc], "area" = area, "r.squared" = r.squared, purity=purity)
@@ -321,7 +321,7 @@ fitpk_egh <- function(x, pos, lambda, max.iter){
                                 start.height = y[xloc], max.iter = max.iter)
   )
   r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=TRUE)
-  purity <- ifelse(dim(x)[2]>1, get_mean_purity(x, pos), NA)
+  purity <- ifelse(dim(x)[2] > 1, try(get_mean_purity(x, pos)), NA)
   area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
   c("rt" = m$center, "start" = pos[2], "end" = pos[3], 
     "sd" = m$width, "tau" = m$tau, "FWHM" = 2.35 * m$width,
@@ -333,7 +333,7 @@ fitpk_raw <- function(x, pos, lambda, max.iter){
   xloc <- pos[1]
   peak.loc <- seq.int(pos[2], pos[3])
   area <- sum(diff(peak.loc) * mean(c(y[peak.loc][-1], tail(y[peak.loc],-1)))) # trapezoidal integration
-  purity <- ifelse(dim(x)[2]>1, get_mean_purity(x, pos), NA)
+  purity <- ifelse(dim(x)[2] > 1, try(get_mean_purity(x, pos)), NA)
   c("rt" = pos[1], "start" = pos[2], "end" = pos[3], 
     "sd" = pos[3]-pos[2], "FWHM" = 2.35 * pos[3]-pos[2],
     "height" = y[xloc], "area" = area, purity = purity)
