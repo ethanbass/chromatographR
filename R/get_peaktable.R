@@ -197,6 +197,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
                  ref_spectra = NA,
                  args = c(peak_list = deparse(substitute(peak_list)),
                         chrom_list = attr(peak_list,"chrom_list"),
+                        lambdas = names(peak_list[[1]]),
                         response = response,
                         use.cor = use.cor,
                         hmax = hmax,
@@ -288,6 +289,7 @@ row.names.peak_table <- function(x){
 #' Defaults to FALSE.
 #' @param verbose Logical. If TRUE, prints verbose output to console. Defaults
 #' to TRUE.
+#' @param engine Which plotting engine to use: either \code{base} or \code{plotly}.
 #' @return If \code{export_spectrum} is TRUE, returns the spectrum as a \code{
 #' data.frame} with wavelengths as rows and columns encoding the
 #' absorbance (or normalized absorbance, if \code{scale_spectrum} is TRUE) for 
