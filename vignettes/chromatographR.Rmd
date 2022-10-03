@@ -30,7 +30,7 @@ The *chromatographR* package began as a fork from the previously published *alsa
 
 chromatographR can import data from a growing list of proprietary file formats using the `read_chroms` function. Supported file formats include 'Agilent ChemStation' or 'MassHunter' (`.D`) files [@bovee2022; @bovee2022a], 'Thermo Raw' (`.raw`) [@hulstaert2020], 'Chromeleon' UV ASCII (`.txt`), 'Waters ARW' (`.arw`), 'Shimadzu' ASCII (`.txt`), and more. (For a full list, see the [chromConverter documentation](https://ethanbass.github.io/chromConverter)). Select the appropriate file format by specifying the `format_in` argument (e.g. `csv`, `chemstation_uv`, `masshunter_dad`, `chromeleon_uv`, `waters_arw`, etc).
 
-```{r,eval=F}
+```{r,eval=FALSE}
 # single folder
 read_chroms(paths = path, format_in = "csv")
 
@@ -71,7 +71,7 @@ new.ts <- seq(10,18.66,by=.01) # choose time-points
 new.lambdas <- seq(200, 318, by = 2) # choose wavelengths
 
 dat.pr <- preprocess(Sa, dim1=new.ts, dim2=new.lambdas,
-           parallel=F, p=.001, lambda=1e5)
+           parallel=FALSE, p=.001, lambda=1e5)
 ```
 
 ### Alignment
@@ -128,7 +128,7 @@ In this case the alignments produced by the two algorithms are very similar, but
 
 The `get_peaks` function produced a nested list of peaks by looping through the supplied chromatograms at the specified wavelengths, finding peaks, and fitting them to the specified function using non-linear least squares. The current peak-shape options are `gaussian` or exponential-gaussian hybrid (`egh`) [@lan2001]. The area under the curve for each peak is then estimated using trapezoidal approximation. The function returns a nested list of data.frames containing parameters for the peaks identified in each chromatogram.
 
-```{r, get_peaks, message=F, warning=F}
+```{r, get_peaks, message=FALSE, warning=FALSE}
 pks_gauss <- get_peaks(warp, lambdas = c('210','260'), sd.max=40, fit="gaussian")
 pks_egh <- get_peaks(warp, lambdas = c('210', '260'), sd.max=40, fit="egh")
 ```
@@ -140,7 +140,7 @@ The peak-finding algorithm may often detect a lot of peaks that are little more 
 #### Visualization
 The `plot.peak_list` function allows you to visually assess the peak integration accuracy. Below we compare the peaks fitted for the first chromatogram (`index = 1`) using the two algorithms. Usually the egh function performs slightly better for asymmetrical peaks.
 
-```{r, plot_peaks, warning=F, fig.height=6}
+```{r, plot_peaks, warning=FALSE, fig.height=6}
 par(mfrow=c(2,1))
 plot(pks_gauss, index=1, lambda='210')
 plot(pks_egh, index=1, lambda='210')
@@ -182,12 +182,18 @@ mirror_plot(pk_tab, lambdas = c("210","260"), var = "trt", legend_size=2)
 
 The `plot_spectrum` function allows you to easily plot or record the spectra associated with a particular peak in your peak table. This is useful for interpreting your results and/or checking for errors in your peak table. For example, you may want to check if the spectra for a particular peak match across different samples, or you may want to compare your spectrum with a known standard. The `plot_spectrum` function can be used to plot only the spectrum or only the chromatographic trace using the arguments `plot_spectrum` and `plot_trace`. By default it will plot the trace and spectrum from the chromatogram with the largest peak in the peak table. Alternatively, you can choose the chromatogram index and wavelength using the `chr` and `lambda` arguments.
 
-```{r, plot spectra,fig.height=6}
+```{r, plot spectra, fig.height=6}
 oldpar <- par(no.readonly = TRUE)
 par(mfrow=c(2,1))
 peak="V7"
-plot_spectrum(peak, peak_table = pk_tab, chrom_list=warp, verbose=F)
+plot_spectrum(peak, peak_table = pk_tab, chrom_list=warp, verbose=FALSE)
 par(oldpar)
+```
+
+The `plot_spectrum` function can also generate interactive plots using [plotly](https://plotly.com/r/).
+
+```{r, plotly_plot}
+plot_spectrum(peak, peak_table = pk_tab, chrom_list=warp, verbose=FALSE, engine="plotly")
 ```
 
 The `plot_all_spectra` function can be used to visually compare the spectra for a specified peak across all samples.
@@ -201,7 +207,7 @@ plot_all_spectra(peak, peak_table=pk_tab, export=F, overlapping=T)
 
 The `plot.peak_table` function provides a simplified interface to various options for plotting data from the `peak_table`. For example, it can be used as a quick interface to the `plot_spectrum` and `plot_all_spectra` functions shown above. It can also be used to quickly compare results across treatments by calling `boxplot`.
 
-```{r,eval=T}
+```{r, plot.peaktable}
 plot(pk_tab, loc = "V13", box_plot = TRUE, vars = "trt", verbose = FALSE)
 ```
 
