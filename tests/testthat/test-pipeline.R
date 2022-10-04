@@ -125,7 +125,7 @@ test_that("get_peaktable works", {
   expect_equal(class(pk_tab), "peak_table")
   expect_equal(class(pk_tab$tab), "data.frame")
   expect_equal(class(pk_tab$pk_meta), "data.frame")
-  expect_equal(class(pk_tab$args), "character")
+  expect_equal(class(pk_tab$args), "list")
 })
 
 
@@ -251,6 +251,22 @@ test_that("plot_spectrum works", {
 })
 
 test_that("plot_spectrum works", {
+  skip_if_not_installed("vdiffr")
+  test_spec <- function(){
+    par(mfrow=c(2,1))
+    plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
+                  what="rt", chr=1, verbose = FALSE)
+  }
+  vdiffr::expect_doppelganger("plot_spectrum", test_spec)
+  x <- plot_spectrum("V13", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
+                     what="peak", chr=1, verbose = FALSE)
+  expect_equal(rownames(x), as.character(new.lambdas))
+  expect_equal(class(x), "data.frame")
+  expect_equal(ncol(x), 1)
+})
+
+
+test_that("plot_spectrum works", {
   x <- plot_spectrum("V13", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
                      what="peak", chr=1, verbose = FALSE)
   expect_equal(rownames(x), as.character(new.lambdas))
@@ -258,10 +274,21 @@ test_that("plot_spectrum works", {
   expect_equal(ncol(x), 1)
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click"))
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click", chr=1))
-  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click", lambda="210"))
+  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click",lambda="210"))
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="rt", lambda="210"))
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="rt", chr=1))
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr, what="rt"))
+  expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr, what="rt"))
+  
+  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click", engine="plotly"))
+  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click", chr=1, engine="plotly"))
+  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click", chr=1, lambda="210",
+                             engine="plotly"))
+  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click",lambda="210", engine="plotly"))
+  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="rt", lambda="210", engine="plotly"))
+  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="rt", chr=1, engine="plotly"))
+  expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr, what="rt", engine="plotly"))
+  expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr, what="rt", engine="plotly"))
 })
 
 test_that("mirror_plot works", {
@@ -297,3 +324,10 @@ test_that("fill_gaps works",{
 # })
 # 
 
+# 
+# test_that("plot_spectrum works with plotly", {
+#   skip_if_not_installed("vdiffr")
+#   write_plotly_svg(p, path)
+#   vdiffr::expect_doppelganger("plotly_plot", plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr, export=FALSE,
+#                                                            what="rt", chr=1, verbose = FALSE, engine="plotly"))
+# })

@@ -14,7 +14,7 @@ check_peaktable <- function(peak_table){
 get_chrom_list <- function(x, chrom_list, verbose = FALSE){
   if (inherits(x, "peak_table")){
     if (missing(chrom_list)){
-      chrom_list <- try(get(x$args["chrom_list"]))
+      chrom_list <- try(get(x$args[["chrom_list"]]))
       if (inherits(chrom_list, "try-error")) stop("Chromatograms not found!")
     }
     if (length(chrom_list) != nrow(x$tab)){
