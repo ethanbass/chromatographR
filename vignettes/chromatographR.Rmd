@@ -192,7 +192,7 @@ par(oldpar)
 
 The `plot_spectrum` function can also generate interactive plots using [plotly](https://plotly.com/r/).
 
-```{r, plotly_plot}
+```{r, plotly_plot, eval = FALSE}
 plot_spectrum(peak, peak_table = pk_tab, chrom_list=warp, verbose=FALSE, engine="plotly")
 ```
 
