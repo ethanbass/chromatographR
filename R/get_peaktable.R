@@ -415,10 +415,10 @@ mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset = NULL,
   if (!exists("var"))
     stop("Must provide independent variable or variables for mirror plot.")
   if (!is.data.frame(meta)){
-    stop("Metadata must be attached to peak table to make mirror plot.")
+    stop("Sample metadata must be attached to peak table to make mirror plot.")
   }
   if (!(var %in% colnames(meta))){
-    stop(paste(var, "not found in sample meta-data."))
+    stop(paste0("`", var, "`", " could not be found in sample metadata."))
   }
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(peak_table)
@@ -426,11 +426,11 @@ mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset = NULL,
   new.ts <- round(as.numeric(rownames(chrom_list[[1]])),2)
   fac <- factor(meta[,var])
   if (is.null(subset) & length(levels(fac)) > 2)
-    stop("The mirror plot requires two levels. Use the subset argument to 
-         specify which levels to use.")
+    stop("The mirror plot can only compare two factor levels. Please use the
+    `subset` argument to specify which levels to use.")
   if (!is.null(subset)){
     if (mean(subset %in% levels(fac)) < 1){
-      stop(paste("The specified levels are not present in", var))
+      stop(paste0("The specified factor levels are not present in `", var, "`"))
     }
   }
   if (is.null(subset)){

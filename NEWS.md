@@ -8,6 +8,7 @@
 * Permit multiple peaks as arguments to `plot.peaktable`.
 * Added functions for plotting trace and spectra with [plotly](https://plotly.com/r/):
 `plotly_trace` and `plotly_spec`.
+* Fixed `preprocess` so it will no longer try to interpolate along columns for 2D data.
 
 #### Changes to *fit_peaks* function:
 * Simplified logic in `fit_peaks` function.

@@ -77,11 +77,9 @@ preprocess <- function(X, dim1, ## time axis
   } else return_matrix <- FALSE
   if (!is.list(X) | mean(sapply(X,is.matrix)) != 1)
     stop("X should be a matrix or a list of matrices")
-  # if (missing(dim1) | missing(dim2)){
-  #   warning("...Times or wavelengths not provided.
-  #           Extrapolating matrix dimensions for interpolation.",
-  #           immediate. = TRUE)
-  # }
+  if (ncol(X[[1]]) == 1){
+    interpolate_cols <- FALSE
+  }
   if (missing(dim1) & interpolate_rows){
     warning("...Times not provided. Extrapolating from matrix dimensions for interpolation.",
             immediate. = TRUE)
