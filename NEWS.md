@@ -18,9 +18,6 @@ facilitating better comparison with vendor software.
 * Fixed bug affecting `peak_list` metadata.
 * Deprecated `load_chroms` function. Please use `read_chroms` from chromConverter
 to import files instead.
-
-### Minor changes:
-
 * Added more informative warnings and error messages to various functions.
 * Now recommend installation of `VPdtw` from CRAN instead of https://ethanbass.github.io/drat/
 * Fixed typos in vignette
@@ -54,6 +51,6 @@ the edges of the chromatogram.
 * Allow use of raw data for peak integration in `get_peaks`.
 * Added `verbose` option to `correct_rt` to print reference chromatogram.
 
-# chromatographR 0.3
+# chromatographR 0.3.0
 
 * Added a `NEWS.md` file to track changes to the package.
