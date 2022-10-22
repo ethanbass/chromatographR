@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.5</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,28 @@
       <small>Source: <a href="https://github.com/ethanbass/chromatographR/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.4" id="chromatographr-044">chromatographR 0.4.4<a class="anchor" aria-label="anchor" href="#chromatographr-044"></a></h2><p class="text-muted">CRAN release: 2022-08-24</p>
+<ul><li>Fixed issue with tests when run on certain machines (MKL).</li></ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.3" id="chromatographr-043">chromatographR 0.4.3<a class="anchor" aria-label="anchor" href="#chromatographr-043"></a></h2><p class="text-muted">CRAN release: 2022-08-22</p>
+<ul><li>Minor changes to documentation.</li>
+<li>Added additional check of chrom_list dimensions and names.</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.2" id="chromatographr-042">chromatographR 0.4.2<a class="anchor" aria-label="anchor" href="#chromatographr-042"></a></h2>
+<ul><li>Added option to select <code>time.units</code> for peak area in <code>get_peaks</code> function facilitating better comparison with vendor software.</li>
+<li>Now allow preservation of instrumental metadata through pre-processing and alignment steps.</li>
+<li>Added <code>filter_peaktable</code> function.</li>
+<li>Changed default behavior in <code>correct_rt</code> to <code>corrected_values</code> rather than <code>models</code>.</li>
+<li>Fixed bug in <code>cluster_spectra</code> affecting peaks with 0 standard deviation.</li>
+<li>Fixed bug affecting <code>peak_list</code> metadata.</li>
+<li>Deprecated <code>load_chroms</code> function. Please use <code>read_chroms</code> from chromConverter to import files instead.</li>
+<li>Added more informative warnings and error messages to various functions.</li>
+<li>Now recommend installation of <code>VPdtw</code> from CRAN instead of <a href="https://ethanbass.github.io/drat/" class="external-link uri">https://ethanbass.github.io/drat/</a>
+</li>
+<li>Fixed typos in vignette</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.1" id="chromatographr-041">chromatographR 0.4.1<a class="anchor" aria-label="anchor" href="#chromatographr-041"></a></h2><p class="text-muted">CRAN release: 2022-05-19</p>
 <ul><li>Extended package DESCRIPTION and added citations to relevant references.</li>
