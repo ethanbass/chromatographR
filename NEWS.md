@@ -1,4 +1,4 @@
-# chromatographR 0.4.5
+# chromatographR 0.4.6
 
 #### New features
 * Added `reshape_chroms` function for converting chromatograms to "long" format.
@@ -16,6 +16,10 @@
 (`lambda`) instead of a numeric vector (`y`).
 * Incorporated assessment of peak purity during peak fitting.
 * Added wavelength (`lambda`) to `peak_list` and `peak_table` metadata.
+
+# chromatograph 0.4.5
+
+* Fixed bug in `attach_metadata` that could result in disordered rows.
 
 # chromatographR 0.4.4
 
@@ -75,6 +79,6 @@ the edges of the chromatogram.
 * Allow use of raw data for peak integration in `get_peaks`.
 * Added `verbose` option to `correct_rt` to print reference chromatogram.
 
-# chromatographR 0.3
+# chromatographR 0.3.0
 
 * Added a `NEWS.md` file to track changes to the package.
