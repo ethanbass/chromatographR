@@ -38,10 +38,25 @@ attach_metadata <- function(peak_table, metadata, column){
   missing_meta <- !(meta[, column] %in% metadata[, column])
   if (sum(missing_meta) > 0)
     warning("The supplied metadata does not include all samples.")
-  meta <- merge(meta, metadata, all.x = TRUE, all.y = FALSE, sort = FALSE)
+  meta <- keep_order(meta, merge, y=metadata, all.x = TRUE, all.y = FALSE,
+                     sort = FALSE, by = column)
   peak_table$sample_meta <- meta
   return(peak_table)
 }
+
+
+#' note: convenience function from stackoverflow:
+#' https://stackoverflow.com/questions/17878048/merge-two-data-frames-while-keeping-the-original-row-order
+keep_order <- function(data, fn, ...) { 
+  col <- ".sortColumn"
+  data[,col] <- 1:nrow(data) 
+  out <- fn(data, ...) 
+  if (!col %in% colnames(out)) stop("Ordering column not preserved by function") 
+  out <- out[order(out[,col]),] 
+  out[,col] <- NULL 
+  out 
+} 
+
 
 #' Gather reference spectra.
 #' 

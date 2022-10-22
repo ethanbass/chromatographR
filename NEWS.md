@@ -1,13 +1,17 @@
-# chromatograph 0.4.4
+# chromatograph 0.4.5
+
+* Fixed bug in `attach_metadata` that could result in disordered rows.
+
+# chromatographR 0.4.4
 
 * Fixed issue with tests when run on certain machines (MKL).
 
-# chromatograph 0.4.3
+# chromatographR 0.4.3
 
 * Minor changes to documentation.
 * Added additional check of chrom_list dimensions and names.
 
-# chromatograph 0.4.2
+# chromatographR 0.4.2
 
 * Added option to select `time.units` for peak area in `get_peaks` function
 facilitating better comparison with vendor software.
