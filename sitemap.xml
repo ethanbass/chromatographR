@@ -58,16 +58,34 @@
     <loc>https://ethanbass.github.io/chromatographR/reference/filter_peaktable.html</loc>
   </url>
   <url>
+    <loc>https://ethanbass.github.io/chromatographR/reference/find_noise.html</loc>
+  </url>
+  <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/find_peaks.html</loc>
   </url>
   <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/fit_peaks.html</loc>
   </url>
   <url>
+    <loc>https://ethanbass.github.io/chromatographR/reference/get_agilent_threshold.html</loc>
+  </url>
+  <url>
+    <loc>https://ethanbass.github.io/chromatographR/reference/get_mean_purity.html</loc>
+  </url>
+  <url>
+    <loc>https://ethanbass.github.io/chromatographR/reference/get_noise_variance.html</loc>
+  </url>
+  <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/get_peaks.html</loc>
   </url>
   <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/get_peaktable.html</loc>
+  </url>
+  <url>
+    <loc>https://ethanbass.github.io/chromatographR/reference/get_purity_values.html</loc>
+  </url>
+  <url>
+    <loc>https://ethanbass.github.io/chromatographR/reference/get_spectral_similarity.html</loc>
   </url>
   <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/index.html</loc>
@@ -103,6 +121,15 @@
     <loc>https://ethanbass.github.io/chromatographR/reference/read_chroms.html</loc>
   </url>
   <url>
+    <loc>https://ethanbass.github.io/chromatographR/reference/reshape_chroms.html</loc>
+  </url>
+  <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/scan_chrom.html</loc>
+  </url>
+  <url>
+    <loc>https://ethanbass.github.io/chromatographR/reference/trim_peak.html</loc>
+  </url>
+  <url>
+    <loc>https://ethanbass.github.io/chromatographR/reference/write_peaktable.html</loc>
   </url>
 </urlset>

@@ -48,6 +48,28 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.5" id="chromatographr-045">chromatographR 0.4.5<a class="anchor" aria-label="anchor" href="#chromatographr-045"></a></h2>
+<div class="section level5">
+<h5 id="new-features-0-4-5">New features<a class="anchor" aria-label="anchor" href="#new-features-0-4-5"></a></h5>
+<ul><li>Added <code>reshape_chroms</code> function for converting chromatograms to “long” format.</li>
+<li>Added <code>export.peaktable</code> function to easily write peak_table to <code>csv</code> or <code>xlsx</code>.</li>
+<li>Added functions for assessing peak purity: <code>get_purity_values</code> and <code>get_mean_purity</code>.</li>
+<li>Allow multiple peaks as arguments to <code>plot.peaktable</code>.</li>
+<li>Added functions for plotting trace and spectra with <a href="https://plotly.com/r/" class="external-link">plotly</a>: <code>plotly_trace</code> and <code>plotly_spec</code>.</li>
+<li>Fixed <code>preprocess</code> so it will no longer try to interpolate along columns for 2D data.</li>
+<li>Added stand-alone boxplot function for peak_table object.</li>
+<li>Fixed bug in <code>attach_metadata</code> that could result in disordered rows.</li>
+</ul></div>
+<div class="section level5">
+<h5 id="changes-to-fit_peaks-function-0-4-5">Changes to <em>fit_peaks</em> function:<a class="anchor" aria-label="anchor" href="#changes-to-fit_peaks-function-0-4-5"></a></h5>
+<ul><li>Simplified logic in <code>fit_peaks</code> function.</li>
+<li>Modified <code>fit_peaks</code> syntax so it now takes a matrix (<code>x</code>) and a wavelength (<code>lambda</code>) instead of a numeric vector (<code>y</code>).</li>
+<li>Incorporated assessment of peak purity during peak fitting.</li>
+<li>Added wavelength (<code>lambda</code>) to <code>peak_list</code> and <code>peak_table</code> metadata.</li>
+<li>Fixed bug to allow fitting of a single peak with <code>fit_peaks</code>.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.4" id="chromatographr-044">chromatographR 0.4.4<a class="anchor" aria-label="anchor" href="#chromatographr-044"></a></h2><p class="text-muted">CRAN release: 2022-08-24</p>
 <ul><li>Fixed issue with tests when run on certain machines (MKL).</li></ul></div>
     <div class="section level2">
@@ -57,18 +79,27 @@
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.2" id="chromatographr-042">chromatographR 0.4.2<a class="anchor" aria-label="anchor" href="#chromatographr-042"></a></h2>
+<div class="section level5">
+<h5 id="new-features-0-4-2">New features<a class="anchor" aria-label="anchor" href="#new-features-0-4-2"></a></h5>
 <ul><li>Added option to select <code>time.units</code> for peak area in <code>get_peaks</code> function facilitating better comparison with vendor software.</li>
 <li>Now allow preservation of instrumental metadata through pre-processing and alignment steps.</li>
 <li>Added <code>filter_peaktable</code> function.</li>
+</ul></div>
+<div class="section level5">
+<h5 id="minor-changes-0-4-2">Minor changes:<a class="anchor" aria-label="anchor" href="#minor-changes-0-4-2"></a></h5>
+<ul><li>Deprecated <code>load_chroms</code> function. Please use <code>read_chroms</code> from chromConverter to import files instead.</li>
 <li>Changed default behavior in <code>correct_rt</code> to <code>corrected_values</code> rather than <code>models</code>.</li>
-<li>Fixed bug in <code>cluster_spectra</code> affecting peaks with 0 standard deviation.</li>
-<li>Fixed bug affecting <code>peak_list</code> metadata.</li>
-<li>Deprecated <code>load_chroms</code> function. Please use <code>read_chroms</code> from chromConverter to import files instead.</li>
 <li>Added more informative warnings and error messages to various functions.</li>
 <li>Now recommend installation of <code>VPdtw</code> from CRAN instead of <a href="https://ethanbass.github.io/drat/" class="external-link uri">https://ethanbass.github.io/drat/</a>
 </li>
 <li>Fixed typos in vignette</li>
 </ul></div>
+<div class="section level5">
+<h5 id="bug-fixes-0-4-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-4-2"></a></h5>
+<ul><li>Fixed bug in <code>cluster_spectra</code> affecting peaks with 0 standard deviation.</li>
+<li>Fixed bug affecting <code>peak_list</code> metadata.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.1" id="chromatographr-041">chromatographR 0.4.1<a class="anchor" aria-label="anchor" href="#chromatographr-041"></a></h2><p class="text-muted">CRAN release: 2022-05-19</p>
 <ul><li>Extended package DESCRIPTION and added citations to relevant references.</li>

@@ -44,7 +44,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Plot spectrum from peak table</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/HEAD/R/get_peaktable.R" class="external-link"><code>R/get_peaktable.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/HEAD/R/plot.peak_table.R" class="external-link"><code>R/plot.peak_table.R</code></a></small>
       <div class="d-none name"><code>plot.peak_table.Rd</code></div>
     </div>
 
@@ -70,7 +70,8 @@
 <span>  spectrum_labels <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  scale_spectrum <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  export_spectrum <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  engine <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"base"</span>, <span class="st">"plotly"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -86,7 +87,7 @@ function).</p></dd>
 
 
 <dt>loc</dt>
-<dd><p>The name of the peak or retention time that you wish to plot.</p></dd>
+<dd><p>A vector specifying the peak(s) or retention time(s) that you wish to plot.</p></dd>
 
 
 <dt>chrom_list</dt>
@@ -149,6 +150,10 @@ Defaults to FALSE.</p></dd>
 <dt>verbose</dt>
 <dd><p>Logical. If TRUE, prints verbose output to console. Defaults
 to TRUE.</p></dd>
+
+
+<dt>engine</dt>
+<dd><p>Which plotting engine to use: either <code>base</code> or <code>plotly</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -58,25 +58,30 @@
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">...</span>,</span>
-<span>  chrom_list <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">chrom_list</span>,</span>
 <span>  index <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  lambda <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  points <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ticks <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  a <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  color <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  cex.points <span class="op">=</span> <span class="fl">0.5</span></span>
+<span>  cex.points <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  numbers <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  cex.font <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  y.offset <span class="op">=</span> <span class="fl">25</span>,</span>
+<span>  plot_purity <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">res</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>x</dt>
-<dd><p>Peak_list object. Output from the <code>get_peaks</code> function.</p></dd>
+<dd><p>A <code>peak_list</code> object. Output from the <code>get_peaks</code> function.</p></dd>
 
 
 <dt>...</dt>
-<dd><p>Additional arguments to plot function.</p></dd>
+<dd><p>Additional arguments to main plot function.</p></dd>
 
 
 <dt>chrom_list</dt>
@@ -111,6 +116,26 @@ to FALSE.</p></dd>
 
 <dt>cex.points</dt>
 <dd><p>Size of points. Defaults to 0.5</p></dd>
+
+
+<dt>numbers</dt>
+<dd><p>Whether to number peaks. Defaults to FALSE.</p></dd>
+
+
+<dt>cex.font</dt>
+<dd><p>Font size if peaks are numbered. Defaults to 0.5.</p></dd>
+
+
+<dt>y.offset</dt>
+<dd><p>Y offset for peak numbers. Defaults to 25.</p></dd>
+
+
+<dt>plot_purity</dt>
+<dd><p>Whether to add visualization of peak purity.</p></dd>
+
+
+<dt>res</dt>
+<dd><p>time resolution for peak fitting</p></dd>
 
 </dl></div>
     <div class="section level2">
