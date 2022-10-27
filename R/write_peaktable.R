@@ -29,15 +29,9 @@ write_peaktable <- function(peak_table, path, format=c("csv", "xlsx"),
     suffix <- "csv"
     writer <- write_csvs
   } else if (format == "xlsx"){
-    if (!requireNamespace("openxlsx", quietly = TRUE)) {
-      stop(
-        "Package `openxlsx` must be installed to export xlsx:
-          `install.packages('openxlsx')`",
-        call. = FALSE
-      )
+    check_for_pkg("openxlsx")
       names(sheets) <- c("Peak Table", "Peak Metadata", "Sample Metadata",
                          "Reference Spectra", "Arguments")[what]
-    }
     suffix = "xlsx"
     writer <- openxlsx::write.xlsx
   } 
@@ -71,13 +65,14 @@ write_csvs <- function(x, file, rowNames){
 #' @param path path as character string
 #' @noRd
 check_path <- function(path, format){
-  # check for leading slash
-  if (!(substr(path, 1, 1) %in% c("/", "~"))){
-    path <- paste0("/", path)
+  if (.Platform$OS.type != "windows"){
+    # check for leading slash
+    if (!(substr(path, 1, 1) %in% c("/", "~"))){
+      path <- paste0("/", path)
+    }
   }
   no_suffix <- !grepl(format, path, ignore.case = TRUE)
   if (no_suffix){
-    
     # check if path leads to directory
     if (dir.exists(path)){
       # check for trailing slash
@@ -88,7 +83,6 @@ check_path <- function(path, format){
       # add file name
       path <- paste0(path, "peak_table")
     }
-    
     # add suffix
     path <- paste(path, format, sep = ".")
   }

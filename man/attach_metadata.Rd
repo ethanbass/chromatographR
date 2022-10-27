@@ -9,7 +9,7 @@ attach_metadata(peak_table, metadata, column)
 \arguments{
 \item{peak_table}{A `peak_table` object.}
 
-\item{metadata}{A `data.frame` containing the sample meta-data.}
+\item{metadata}{A `data.frame` containing the sample metadata.}
 
 \item{column}{The name of the column containing the sample names.}
 }

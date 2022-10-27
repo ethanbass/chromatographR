@@ -28,6 +28,8 @@ reshape_chroms <- function(x, idx, sample_var = "sample"){
 #' @author Ethan Bass
 #' @noRd
 reshape_chrom <- function(x){
+  if (ncol(x) == 1)
+    stop("The provided data is already in long format!")
   x <- as.data.frame(x)
   data <- reshape(as.data.frame(rt=rownames(x),x), direction = "long",
                   varying = list(1:ncol(x)), v.names="absorbance",
@@ -38,3 +40,20 @@ reshape_chrom <- function(x){
   data$lambda <- as.numeric(data$lambda)
   data[,c(3,2,1)]
 }
+
+# 
+# x<-pk_tab
+# reshape_peaktable <- function(x){
+#   x$tab <- reshape(as.data.frame(chr=rownames(x$tab), x$tab), direction = "long",
+#     varying = list(1:ncol(x$tab)), v.names = x$args[["response"]],
+#     times = colnames(x$tab), timevar = "peak",
+#     idvar = "chr", ids = rownames(x$tab))
+#   rownames(x$tab) <- NULL
+#   x$tab <- x$tab[,c(3,1,2)]
+#   merge(x$tab, x$sample_meta, )
+#   x
+# }
+# 
+# x$tab %>% filter(peak=="V1") %>% ggplot(aes(x=chr, y=area)) + geom_violin() +
+#   geom_dotplot(binaxis='y', stackdir='center', stack.ratio=1.5)
+

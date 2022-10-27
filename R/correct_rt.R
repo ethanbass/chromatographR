@@ -78,13 +78,8 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
                        verbose = FALSE, ...){
   what <- match.arg(what, c("corrected.values", "models"))
   alg <- match.arg(alg, c("ptw", "vpdtw"))
-  if (alg == "vpdtw" & !requireNamespace("VPdtw", quietly = TRUE)) {
-    stop(
-      "Package VPdtw must be installed to use VPdtw alignment:
-      install.packages('VPdtw')",
-      call. = FALSE
-    )
-  }
+  if (alg == "vpdtw")
+    check_for_pkg("VPdtw")
   if (missing(lambdas)){
     if (is.null(models) & is.null(n.traces)){
         stop("Must specify wavelengths ('lambdas') or number of traces ('n.traces')

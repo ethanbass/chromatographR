@@ -12,7 +12,8 @@
 #' @param plot_it Whether to plot difference between filled and unfilled peak tables.
 #' @author Ethan Bass
 #' @export fill_gaps
-fill_gaps <- function(peak_table, chrom_list, ref = c("max.cor", "max.int"),
+
+fill_gaps <- function(peak_table, chrom_list, ref = c("max.int", "max.cor"),
                       similarity_threshold = 0.95, rt_tolerance = 0.2,
                       spectral_weight=0.5, only_zeros = FALSE,
                       peaks_only = TRUE, plot_it = FALSE){
@@ -22,7 +23,7 @@ fill_gaps <- function(peak_table, chrom_list, ref = c("max.cor", "max.int"),
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(peak_table)
   }  else get_chrom_list(peak_table, chrom_list)
-  ref <- match.arg(ref, c("max.cor","max.int"))
+  ref <- match.arg(ref, c("max.int", "max.cor"))
   if (length(peak_table$ref_spectra) == 1){
     peak_table <- attach_ref_spectra(peak_table, ref = ref)
   } else{
@@ -66,17 +67,20 @@ fill_gaps <- function(peak_table, chrom_list, ref = c("max.cor", "max.int"),
 #' @param plot_it Whether to plot difference between filled and unfilled peak tables.
 #' @author Ethan Bass
 #' @noRd
-fill_gap <- function(peak, peak_table, chrom_list, similarity_threshold = 0.95,
-                     rt_tolerance = 0.5, spectral_weight = 0.5,
-                     what = c("col", "mat", "list"), only_zeros = FALSE,
-                     peaks_only = TRUE, plot_it = FALSE){
+
+fill_gap <- function(peak, peak_table, chrom_list, similarity_threshold=0.95,
+                     rt_tolerance = 0.5, spectral_weight = 0.5, only_zeros = FALSE,
+                     peaks_only = TRUE, plot_it = FALSE, what = c("col", "mat", "list")){
+  if (is.null(peak_table$filled)){
+    peak_table$filled <- matrix(NA, nrow(peak_table$tab), ncol(peak_table$tab))
+  }
   what <- match.arg(what, c("col", "mat", "list"))
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(peak_table)
   } else get_chrom_list(peak_table, chrom_list)
   ref <- peak_table$ref_spectra[,peak]
-  ts <- as.numeric(rownames(chrom_list[[1]]))
-  lambdas <- as.numeric(colnames(chrom_list[[1]]))
+  ts <- get_times(chrom_list)
+  lambdas <- get_lambdas(chrom_list)
   OG_areas <- peak_table$tab[,peak]
   # lambdas <- rownames(ref)
   ref.s <- rescale(ref)
@@ -88,36 +92,52 @@ fill_gap <- function(peak, peak_table, chrom_list, similarity_threshold = 0.95,
     chrs <- (seq_along(chrom_list))
   }
   rad <- rt_tolerance/median(diff(ts))
-    for (chr in chrs){
-      start <- max(0, (pk.idx - rad))
-      end <- min((pk.idx + rad), length(ts))
-      spec <- t(chrom_list[[chr]][c(start:end),])
-      spec.s <- rescale(spec)
-      spec_cor <- as.numeric(suppressWarnings(cor(ref.s, spec.s, method='pearson')))
-      lambda <- lambdas[which.max(ref.s)]
-      lambda <- which(lambdas == lambda)
-      if (peaks_only){
-        idx <- find_peaks(spec[lambda,])$pos
-      } else{
-        idx <- seq_len(2*rad+1)
+  for (chr in chrs){
+    start <- max(0, (pk.idx - rad))
+    end <- min((pk.idx + rad), length(ts))
+    spec <- t(chrom_list[[chr]][c(start:end),])
+    spec.s <- rescale(spec)
+    spec_cor <- as.numeric(suppressWarnings(cor(ref.s, spec.s, method='pearson')))
+    lambda <- lambdas[which.max(ref.s)]
+    lambda <- which(lambdas == lambda)
+    if (peaks_only){
+      pks <- find_peaks(spec[lambda,])
+      idx <- pks$pos
+    } else{
+      idx <- seq_len(2*rad+1)
+    }
+    idx <- idx[spec_cor[idx] >= similarity_threshold]
+    rt_diff <- abs(c(-rad:rad)[idx])
+    score <- spectral_weight*spec_cor[idx] + (1 - spectral_weight)*(1-(rt_diff/(2*rad)))
+    idx_select <- idx[which.max(score)]
+    if (length(idx_select) == 0){
+      break
+    } else{
+      ### replace values in peak_table
+      idx_lambda <- which(lambdas == peak_table$pk_meta[1,peak])
+      response <- peak_table$args$response
+      if (response == "height"){
+        val <- spec[idx_lambda, idx_select] 
+      } else if (response == "area"){
+      val <- fit_peaks(x = chrom_list[[chr]],
+                       lambda = as.character(lambdas[lambda]),
+                       pos = pks[which.max(score),],
+                       sd.max = attr(peak_table,"pk_args")$sd.max,
+                       fit = attr(peak_table,"pk_args")$fit,
+                       max.iter = attr(peak_table,"pk_args")$max.iter)[,"area"]
       }
-      idx <- idx[spec_cor[idx] >= similarity_threshold]
-      rt_diff <- abs(c(-rad:rad)[idx])
-      score <- spectral_weight*spec_cor[idx] + (1-spectral_weight)*(1-(rt_diff/(2*rad)))
-      idx_select <- idx[which.max(score)]
-      if (length(idx_select) == 0){
-        break
-      } else{ ### replace values in peak_table
-        idx_lambda <- which(lambdas == peak_table$pk_meta[1,peak])
-        if (!isTRUE(all.equal(peak_table$tab[chr,peak], spec[idx_lambda,idx_select]))){
-          peak_table$tab[chr,peak] <- spec[idx_lambda, idx_select]
-          peak_table$filled[chr, peak] <- 1
-        }
+      if (peak_table$args$normalized){
+        val <- val/peak_table$sample_meta[chr, peak_table$args$normalization_by]
+      }
+      if (!isTRUE(all.equal(peak_table$tab[chr,peak], spec[idx_lambda,idx_select]))){
+        peak_table$tab[chr,peak] <- val
+        peak_table$filled[chr, peak] <- 1
       }
     }
+  }
   if (plot_it){
     matplot(seq_dim(peak_table), cbind(OG_areas, peak_table$tab[,peak]), 
-            pch=c(1,20), xlab='old',ylab='new')
+            pch=c(1,20), xlab='old', ylab='new')
     # legend()
   }
   switch(what,

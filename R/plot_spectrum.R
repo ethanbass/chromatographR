@@ -445,13 +445,7 @@ plot_spec <- function(y, spectrum_labels = TRUE, ...){
 #' @noRd
 plotly_spec <- function(y, spectrum_labels = TRUE, color="black", width=1.2, 
                         hide_legend = TRUE, ...){
-  if (!requireNamespace("plotly", quietly = TRUE)) {
-    stop(
-      "Package plotly must be installed:
-      try `install.packages('plotly')`",
-      call. = FALSE
-    )
-  }
+  check_for_pkg("plotly")
   df <- data.frame(lambda= as.numeric(names(y)), abs = y)
   p <- plotly::plot_ly(data = df, x = ~lambda, y = ~abs, type='scatter', 
                        mode = 'lines', line = list(color=color, width = width, ...))
@@ -489,13 +483,7 @@ plot_trace <- function(chrom_list, chr, lambda.idx, idx=NULL, what){
 #' @noRd
 plotly_trace <- function(chrom_list, chr, lambda.idx, idx, color="black",
                          width=1.2, hide_legend = TRUE, ...){
-  if (!requireNamespace("plotly", quietly = TRUE)) {
-    stop(
-      "Package plotly must be installed:
-      try `install.packages('plotly')`",
-      call. = FALSE
-    )
-  }
+  check_for_pkg("plotly")
   new.ts <- as.numeric(rownames(chrom_list[[1]]))
   lambda <- colnames(chrom_list[[1]])[lambda.idx]
   RT <- new.ts[idx]
@@ -516,5 +504,16 @@ plotly_trace <- function(chrom_list, chr, lambda.idx, idx, color="black",
     p <- plotly::hide_legend(p)
   }
   p
+}
+
+#' @noRd
+check_for_pkg <- function(pkg){
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    stop(paste(
+      "Package", sQuote(pkg), "must be installed to perform this action:
+          try", paste0("`install.packages('", pkg, "')`.")),
+      call. = FALSE
+    )
+  }
 }
 

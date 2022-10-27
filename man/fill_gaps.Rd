@@ -7,7 +7,7 @@
 fill_gaps(
   peak_table,
   chrom_list,
-  ref = c("max.cor", "max.int"),
+  ref = c("max.int", "max.cor"),
   similarity_threshold = 0.95,
   rt_tolerance = 0.2,
   spectral_weight = 0.5,
