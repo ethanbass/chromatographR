@@ -158,7 +158,7 @@ fit_peaks <- function (x, lambda, pos = NULL, sd.max = 50,
   huhn <- data.frame(t(apply(pos, 1, fitpk, x = x,
                              lambda = lambda, max.iter = max.iter)))
   colnames(huhn) <- tabnames
-  huhn <- data.frame(sapply(huhn, as.numeric))
+  huhn <- data.frame(sapply(huhn, as.numeric, simplify = FALSE))
   if (!is.null(sd.max)) {
     huhn <- huhn[huhn$sd < sd.max, ]
   }
