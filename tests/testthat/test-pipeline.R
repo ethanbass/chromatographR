@@ -300,18 +300,6 @@ test_that("mirror_plot works", {
   vdiffr::expect_doppelganger("mirror1", mirror1)
 })
 
-pktab_filled <- fill_gaps(pk_tab, chrom_list = dat.pr)
-test_that("fill_gaps works",{
-  # the number of zeros should decline in the filled peak table
-  expect_lte(sum(pktab_filled$tab == 0), sum(pk_tab$tab == 0))
-  
-  # dim names should be unchanged
-  expect_equal(rownames(pktab_filled$tab), rownames(pk_tab$tab))
-  expect_equal(colnames(pktab_filled$tab), colnames(pk_tab$tab))
-  expect_equal(rownames(pktab_filled$filled), rownames(pk_tab$tab))
-  expect_equal(colnames(pktab_filled$filled), colnames(pk_tab$tab))
-  expect_true(all(names(pk_tab) %in% names(pktab_filled)))
-})
 
 # test fit_peaks
 # 
