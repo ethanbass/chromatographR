@@ -48,6 +48,9 @@ Suggests:
     testthat (>= 3.0.0),
     vdiffr,
     VPdtw
+Enhances:
+    openxlsx,
+    plotly
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3

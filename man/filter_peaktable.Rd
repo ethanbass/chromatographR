@@ -10,7 +10,7 @@ filter_peaktable(
   min_rt,
   max_rt,
   min_value,
-  comp,
+  lambda,
   what = c("median", "mean"),
   tol = 0
 )
@@ -26,7 +26,7 @@ filter_peaktable(
 
 \item{min_value}{Minimal cutoff for average peak intensity.}
 
-\item{comp}{Component(s) to include in peak table (e.g. wavelengths if you
+\item{lambda}{Component(s) to include in peak table (e.g. wavelengths if you
 are using HPLC-DAD/UV).}
 
 \item{what}{Whether to average intensities using \code{mean} or \code{median}.}

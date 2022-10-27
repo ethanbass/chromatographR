@@ -125,7 +125,7 @@ test_that("get_peaktable works", {
   expect_equal(class(pk_tab), "peak_table")
   expect_equal(class(pk_tab$tab), "data.frame")
   expect_equal(class(pk_tab$pk_meta), "data.frame")
-  expect_equal(class(pk_tab$args), "character")
+  expect_equal(class(pk_tab$args), "list")
 })
 
 
@@ -149,20 +149,25 @@ test_that("attach_metadata works", {
 pk_tab <- attach_ref_spectra(pk_tab, chrom_list = dat.pr, ref="max.cor")
 test_that("attach_ref_spectra works", {
   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$ref_spectra))
+  expect_equal(pk_tab$args[["reference_spectra"]], "max.cor")
   pk_tab <- attach_ref_spectra(pk_tab, chrom_list=dat.pr, ref = "max.int")
+  expect_equal(pk_tab$args[["reference_spectra"]], "max.int")
   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$ref_spectra))
   expect_error(attach_ref_spectra(pk_tab, chrom_list = dat.pr, ref = "x"))
+  
 })
-# 
+
 # test filter_peaktable
 
 pktab_s <- filter_peaktable(pk_tab, min_rt=6, max_rt=15)
 
 test_that("filter_peaktable works", {
+  # check that dimensions are unaltered
   expect_equal(rownames(pk_tab$tab), rownames(pktab_s$tab))
   expect_equal(colnames(pktab_s$tab), colnames(pktab_s$pk_meta))
   expect_equal(nrow(pktab_s$tab), nrow(pktab_s$sample_meta))
   expect_equal(colnames(pktab_s$tab), colnames(pktab_s$ref_spectra))
+  # warning if no arguments are provided
   expect_warning(filter_peaktable(pk_tab))
 })
 
@@ -182,17 +187,19 @@ test_that("normalize_data works", {
   expect_equal(dim(chroms), dim(dat.pr))
   expect_error(normalize_data(pk_tab, chrom_list = dat.pr, column = "x"))
   expect_error(normalize_data(pk_tab, chrom_list = dat.pr, column = "mass", what="x"))
+  expect_equal(pk_tab_norm$args[["normalized"]], "TRUE")
+  expect_equal(pk_tab_norm$args[["normalization_by"]], "mass")
 })
 
 ### cluster
 
-suppressWarnings(cl <- cluster_spectra(pk_tab, chrom_list = dat.pr, nboot = 10,
-                                       parallel = FALSE, verbose = FALSE,
-                                       save = FALSE, output = "both"))
-test_that("cluster_spectra works", {
-  expect_equal(class(cl[[1]]), "pvclust")
-  expect_equal(class(cl[[2]]), "list")
-})
+# suppressWarnings(cl <- cluster_spectra(pk_tab, chrom_list = dat.pr, nboot = 10,
+#                                        parallel = FALSE, verbose = FALSE,
+#                                        save = FALSE, output = "both"))
+# test_that("cluster_spectra works", {
+#   expect_equal(class(cl[[1]]), "pvclust")
+#   expect_equal(class(cl[[2]]), "list")
+# })
 
 ### test plotting functions
 
@@ -208,8 +215,8 @@ test_that("plot.peak_table works", {
   plot_peak_table <- function(){
     par(mfrow=c(3,1))
     plot(pk_tab, loc = "V13", chrom_list = dat.pr, box_plot = TRUE,
-                                     vars = "trt", verbose = FALSE)
-    }
+         vars = "trt", verbose = FALSE)
+  }
   vdiffr::expect_doppelganger("plot.peak_table", plot_peak_table)
 })
 
@@ -244,6 +251,22 @@ test_that("plot_spectrum works", {
 })
 
 test_that("plot_spectrum works", {
+  skip_if_not_installed("vdiffr")
+  test_spec <- function(){
+    par(mfrow=c(2,1))
+    plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
+                  what="rt", chr=1, verbose = FALSE)
+  }
+  vdiffr::expect_doppelganger("plot_spectrum", test_spec)
+  x <- plot_spectrum("V13", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
+                     what="peak", chr=1, verbose = FALSE)
+  expect_equal(rownames(x), as.character(new.lambdas))
+  expect_equal(class(x), "data.frame")
+  expect_equal(ncol(x), 1)
+})
+
+
+test_that("plot_spectrum works", {
   x <- plot_spectrum("V13", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
                      what="peak", chr=1, verbose = FALSE)
   expect_equal(rownames(x), as.character(new.lambdas))
@@ -255,6 +278,17 @@ test_that("plot_spectrum works", {
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="rt", lambda="210"))
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="rt", chr=1))
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr, what="rt"))
+  expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr, what="rt"))
+  
+  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click", engine="plotly"))
+  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click", chr=1, engine="plotly"))
+  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click", chr=1, lambda="210",
+                             engine="plotly"))
+  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click",lambda="210", engine="plotly"))
+  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="rt", lambda="210", engine="plotly"))
+  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="rt", chr=1, engine="plotly"))
+  expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr, what="rt", engine="plotly"))
+  expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr, what="rt", engine="plotly"))
 })
 
 test_that("mirror_plot works", {
@@ -266,13 +300,19 @@ test_that("mirror_plot works", {
   vdiffr::expect_doppelganger("mirror1", mirror1)
 })
 
-#test fit_peaks
 
-test_that("fit_peaks works independently", {
-  y<-dat.pr[[1]][,'280']
-  pos<-find_peaks(y)
-  pks<-fit_peaks(y,pos, max.iter=1000)
-  expect_equal(ncol(pos),3)
-  expect_equal(ncol(pks),9)
-})
+# test fit_peaks
+# 
+# test_that("fit_peaks works independently", {
+#   pks<-fit_peaks(dat.pr[[1]], lambda="280", max.iter=1000)
+#   expect_equal(ncol(pks),11)
+# })
+# 
 
+# 
+# test_that("plot_spectrum works with plotly", {
+#   skip_if_not_installed("vdiffr")
+#   write_plotly_svg(p, path)
+#   vdiffr::expect_doppelganger("plotly_plot", plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr, export=FALSE,
+#                                                            what="rt", chr=1, verbose = FALSE, engine="plotly"))
+# })

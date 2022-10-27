@@ -8,7 +8,8 @@ normalize_data(
   peak_table,
   column,
   chrom_list,
-  what = c("peak_table", "chrom_list")
+  what = c("peak_table", "chrom_list"),
+  by = c("meta", "peak")
 )
 }
 \arguments{
@@ -20,6 +21,9 @@ normalize_data(
 be in same order as the peak_table.}
 
 \item{what}{`peak_table` or list of chromatograms (`chrom_list`).}
+
+\item{by}{Whether to normalize by a column in sample metadata (\code{meta}) or
+by a column in the peak table itself (\code{peak}).}
 }
 \value{
 A \code{peak_table} object where the peaks are normalized by the mass
@@ -27,7 +31,7 @@ of each sample.
 }
 \description{
 Normalizes peak table or list of chromatograms by specified column in sample
-meta-data. Metadata must first be attached to \code{peak_table} using
+metadata. Metadata must first be attached to \code{peak_table} using
 \code{\link{attach_metadata}}.
 }
 \examples{

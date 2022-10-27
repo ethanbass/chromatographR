@@ -2,12 +2,13 @@
 % Please edit documentation in R/plot_spectrum.R
 \name{scan_chrom}
 \alias{scan_chrom}
-\title{Scan spectrum}
+\title{Plot spectra by clicking on the chromatogram}
 \usage{
 scan_chrom(
   chrom_list,
-  lambda,
   chr,
+  lambda,
+  plot_spectrum = TRUE,
   peak_table = NULL,
   scale_spectrum = FALSE,
   spectrum_labels = TRUE,
@@ -19,9 +20,11 @@ scan_chrom(
 \item{chrom_list}{A list of chromatograms in matrix form (timepoints x
 wavelengths).}
 
+\item{chr}{Numerical index of chromatogram you wish to plot.}
+
 \item{lambda}{The wavelength to plot the trace at.}
 
-\item{chr}{Numerical index of chromatogram you wish to plot.}
+\item{plot_spectrum}{Logical. Whether to plot the spectrum or not.}
 
 \item{peak_table}{The peak table (output from \code{\link{get_peaktable}}
 function).}
@@ -44,7 +47,7 @@ absorbance (or normalized absorbance, if \code{scale_spectrum} is TRUE)
 at each wavelength. Otherwise, there is no return value.
 }
 \description{
-Convenience function to call plot_spectrum with what = "click".
+Plot spectra by clicking on the chromatogram
 }
 \section{Side effects}{
 

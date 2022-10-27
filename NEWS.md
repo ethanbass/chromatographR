@@ -1,6 +1,23 @@
-# chromatograph 0.4.5
+# chromatographR 0.4.5
 
+#### New features
+* Added `reshape_chroms` function for converting chromatograms to "long" format.
+* Added `export.peaktable` function to easily write peak_table to `csv` or `xlsx`.
+* Added functions for assessing peak purity: `get_purity_values` and `get_mean_purity`.
+* Allow multiple peaks as arguments to `plot.peaktable`.
+* Added functions for plotting trace and spectra with [plotly](https://plotly.com/r/):
+`plotly_trace` and `plotly_spec`.
+* Fixed `preprocess` so it will no longer try to interpolate along columns for 2D data.
+* Added stand-alone boxplot function for peak_table object.
 * Fixed bug in `attach_metadata` that could result in disordered rows.
+
+#### Changes to *fit_peaks* function:
+* Simplified logic in `fit_peaks` function.
+* Modified `fit_peaks` syntax so it now takes a matrix (`x`) and a wavelength
+(`lambda`) instead of a numeric vector (`y`).
+* Incorporated assessment of peak purity during peak fitting.
+* Added wavelength (`lambda`) to `peak_list` and `peak_table` metadata.
+* Fixed bug to allow fitting of a single peak with `fit_peaks`.
 
 # chromatographR 0.4.4
 
@@ -13,18 +30,23 @@
 
 # chromatographR 0.4.2
 
+#### New features
 * Added option to select `time.units` for peak area in `get_peaks` function
 facilitating better comparison with vendor software.
 * Now allow preservation of instrumental metadata through pre-processing and alignment steps.
 * Added `filter_peaktable` function.
-* Changed default behavior in `correct_rt` to `corrected_values` rather than `models`.
-* Fixed bug in `cluster_spectra` affecting peaks with 0 standard deviation.
-* Fixed bug affecting `peak_list` metadata.
+
+#### Minor changes:
 * Deprecated `load_chroms` function. Please use `read_chroms` from chromConverter
 to import files instead.
+* Changed default behavior in `correct_rt` to `corrected_values` rather than `models`.
 * Added more informative warnings and error messages to various functions.
 * Now recommend installation of `VPdtw` from CRAN instead of https://ethanbass.github.io/drat/
 * Fixed typos in vignette
+
+#### Bug fixes
+* Fixed bug in `cluster_spectra` affecting peaks with 0 standard deviation.
+* Fixed bug affecting `peak_list` metadata.
 
 # chromatographR 0.4.1
 

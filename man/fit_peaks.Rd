@@ -6,7 +6,8 @@
 profile}
 \usage{
 fit_peaks(
-  y,
+  x,
+  lambda,
   pos = NULL,
   sd.max = 50,
   fit = c("egh", "gaussian", "raw"),
@@ -15,7 +16,9 @@ fit_peaks(
 )
 }
 \arguments{
-\item{y}{response (numerical vector)}
+\item{x}{A chromatogram in matrix format.}
+
+\item{lambda}{Wavelength to fit peaks at.}
 
 \item{pos}{Locations of peaks in vector y. If NULL, \code{find_peaks} will
 run automatically to find peak positions.}
@@ -34,13 +37,17 @@ squares peak-fitting. (Defaults to 1000).}
 }
 \value{
 Function \code{fit_peaks} returns a matrix, whose columns contain
-the following information: \item{rt}{location of the maximum of the peak
-(x)} \item{start}{start of peak (only included in table if `bounds==TRUE`)}
+the following information:
+\item{rt}{location of the maximum of the peak (x)}
+\item{start}{start of peak (only included in table if `bounds==TRUE`)}
 \item{end}{end of peak (only included in table if `bounds==TRUE`)}
 \item{sd}{width of the peak (x)} \item{tau}{tau parameter (only included in
-table if `fit=="egh"`)} \item{FWHM}{full width at half maximum (x)}
-\item{height}{height of the peak (y)} \item{area}{peak area}
+table if `fit=="egh"`)}
+\item{FWHM}{full width at half maximum (x)}
+\item{height}{height of the peak (y)}
+\item{area}{peak area}
 \item{r.squared}{r-squared value for linear fit of model to data.}
+#' \item{purity}{spectral purity of peak as assessed by \code{\link{get_mean_purity}}.}
 Again, the first five elements (rt, start, end, sd and FWHM) are expressed
 as indices, so not in terms of the real retention times. The transformation
 to "real" time is done in function \code{get_peaks}.
@@ -63,7 +70,7 @@ as well as code published in Ron Wehrens'
 }
 \examples{
 data(Sa_pr)
-fit_peaks(Sa_pr[[1]][,"220"])
+fit_peaks(Sa_pr[[1]], lambda="220")
 }
 \references{
 Lan, K. & Jorgenson, J. W. 2001. A hybrid of exponential and gaussian
