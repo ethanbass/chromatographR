@@ -1,14 +1,16 @@
-# chromatographR 0.4.6
+# chromatographR 0.4.5
 
 #### New features
 * Added `reshape_chroms` function for converting chromatograms to "long" format.
 * Added `export.peaktable` function to easily write peak_table to `csv` or `xlsx`.
 * Added functions for assessing peak purity: `get_purity_values` and `get_mean_purity`.
 * Added `fill_gaps` function for filling gaps in `peak_table`.
-* Permit multiple peaks as arguments to `plot.peaktable`.
+* Allow multiple peaks as arguments to `plot.peaktable`.
 * Added functions for plotting trace and spectra with [plotly](https://plotly.com/r/):
 `plotly_trace` and `plotly_spec`.
 * Fixed `preprocess` so it will no longer try to interpolate along columns for 2D data.
+* Added stand-alone boxplot function for peak_table object.
+* Fixed bug in `attach_metadata` that could result in disordered rows.
 
 #### Changes to *fit_peaks* function:
 * Simplified logic in `fit_peaks` function.
@@ -16,10 +18,7 @@
 (`lambda`) instead of a numeric vector (`y`).
 * Incorporated assessment of peak purity during peak fitting.
 * Added wavelength (`lambda`) to `peak_list` and `peak_table` metadata.
-
-# chromatograph 0.4.5
-
-* Fixed bug in `attach_metadata` that could result in disordered rows.
+* Fixed bug to allow fitting of a single peak with `fit_peaks`.
 
 # chromatographR 0.4.4
 
