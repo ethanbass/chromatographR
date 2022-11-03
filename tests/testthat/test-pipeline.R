@@ -299,20 +299,3 @@ test_that("mirror_plot works", {
   }
   vdiffr::expect_doppelganger("mirror1", mirror1)
 })
-
-
-# test fit_peaks
-# 
-# test_that("fit_peaks works independently", {
-#   pks<-fit_peaks(dat.pr[[1]], lambda="280", max.iter=1000)
-#   expect_equal(ncol(pks),11)
-# })
-# 
-
-# 
-# test_that("plot_spectrum works with plotly", {
-#   skip_if_not_installed("vdiffr")
-#   write_plotly_svg(p, path)
-#   vdiffr::expect_doppelganger("plotly_plot", plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr, export=FALSE,
-#                                                            what="rt", chr=1, verbose = FALSE, engine="plotly"))
-# })

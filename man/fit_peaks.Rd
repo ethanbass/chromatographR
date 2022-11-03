@@ -47,7 +47,7 @@ table if `fit=="egh"`)}
 \item{height}{height of the peak (y)}
 \item{area}{peak area}
 \item{r.squared}{r-squared value for linear fit of model to data.}
-#' \item{purity}{spectral purity of peak as assessed by \code{\link{get_mean_purity}}.}
+#' \item{purity}{spectral purity of peak as assessed by \code{\link{get_purity}}.}
 Again, the first five elements (rt, start, end, sd and FWHM) are expressed
 as indices, so not in terms of the real retention times. The transformation
 to "real" time is done in function \code{get_peaks}.

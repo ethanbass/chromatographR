@@ -1,14 +1,16 @@
 ---
-title: "chromatographR"
-author: "Ethan Bass"
+title: "chromatographR: An introduction to HPLC-DAD analysis"
+author: "Ethan Bass^1^"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 bibliography: references.bib
 vignette: >
-  %\VignetteIndexEntry{chromatographR}
+  %\VignetteIndexEntry{chromatographR: An introduction to HPLC-DAD analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+^1^ Department of Ecology and Evolutionary Biology, Cornell University, Ithaca NY
 
 ```{r setup, include=FALSE}
 library("knitr", quietly=TRUE)
@@ -128,7 +130,7 @@ In this case the alignments produced by the two algorithms are very similar, but
 
 ### Peak finding and fitting
 
-The `get_peaks` function produced a nested list of peaks by looping through the supplied chromatograms at the specified wavelengths, finding peaks, and fitting them to the specified function using non-linear least squares. The current peak-shape options are exponential-gaussian hybrid (`egh`), `gaussian`, or (`raw`) [@lan2001]. The area under the curve for each peak is then estimated using trapezoidal approximation. Alternatively, peak area can be integrated without applying a model (`raw`). The function returns a nested list of data.frames containing parameters for the peaks identified in each chromatogram.
+The `get_peaks` function produced a nested list of peaks by looping through the supplied chromatograms at the specified wavelengths, finding peaks, and fitting them to the specified function using non-linear least squares. The current peak-shape options are exponential-gaussian hybrid (`egh`) [@lan2001], `gaussian`, or (`raw`) . The area under the curve for each peak is then estimated using trapezoidal approximation. Alternatively, peak area can be integrated without applying a model (`raw`). The function returns a nested list of data.frames containing parameters for the peaks identified in each chromatogram.
 
 ```{r, get_peaks, message=FALSE, warning=FALSE}
 pks_gauss <- get_peaks(warp, lambdas = c('210','260'), sd.max=40, fit="gaussian")
