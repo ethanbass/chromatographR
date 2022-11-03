@@ -100,7 +100,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
   clust <- match.arg(clust, c("rt","sp.rt"))
   out <- match.arg(out, c('data.frame', 'matrix'))
   rt <- ifelse(use.cor, "rt.cor", "rt")
-  if (!inherits(peak_list,"peak_list"))
+  if (!inherits(peak_list, "peak_list"))
     stop("Peak list must be of the associated class.")
   if (clust == "sp.rt"){
     if (missing(chrom_list)){
@@ -151,9 +151,10 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
       sing <- which(pkcenters.cl == 0)
       pkcenters.cl[sing] <- max(pkcenters.cl) + seq_along(sing)
     }
-    cl.centers <- aggregate(cbind(rt,start,end,sd,tau,FWHM,r.squared) ~ 
+    cl.centers <- aggregate(cbind(rt,start,end,sd,tau,FWHM,r.squared,purity) ~ 
                               pkcenters.cl, data=xx, "mean")[,-1]
     ncl <- length(cl.centers$rt)
+    
     ## re-order clusters from small to large rt
     pkcenters.cl <- order(order(cl.centers$rt))[pkcenters.cl]
     cl.centers <- cl.centers[order(cl.centers$rt),]

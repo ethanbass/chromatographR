@@ -1,3 +1,26 @@
+#' Calculate mean peak purity
+#' 
+#' Estimates peak purity by assessing the dissimilarity of the spectra
+#' comprising the peak, using the method described by Stahl.
+#' 
+#' @param x A chromatogram in matrix format
+#' @param pos A vector containing peak information
+#' @param weight weight provided to \code{\link{get_agilent_threshold}}
+#' @param cutoff Proportion of maximum absorbance to use as cutoff.
+#' Argument to \code{\link{trim_peak}}.
+#' @return Returns the mean purity of the peak specified by \code{pos}, defined
+#' as the proportion of timepoints with purity values below 1.
+#' @references
+#' Stahl, Mark. “Peak Purity Analysis in HPLC and CE Using Diode-Array Technology.”
+#' Agilent Technologies, April 1, 2003, 16.
+#' /href{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
+#' @author Ethan Bass
+
+get_purity <- function(x, pos, weight=1, cutoff=0.05){
+  p <- get_purity_values(x, pos, weight = weight)
+  mean(p[trim_peak(x, pos, cutoff=cutoff)] < 1, na.rm=TRUE)
+}
+
 #' Define noise spectra based on specified threshold
 #' @param x A chromatogram in matrix format 
 #' @param noise_threshold Threshold to define noise. Highest proportion of maximum absorbance.
@@ -112,23 +135,4 @@ get_purity_values <- function(x, pos, weight =1){
 trim_peak <- function(x, pos, cutoff = 0.05){
   idx <- pos[2]:pos[3]
   which(x[idx] > cutoff*x[pos[1]])
-}
-
-#' Calculate mean peak purity
-#' @param x A chromatogram in matrix format
-#' @param pos A vector containing peak information
-#' @param weight weight provided to \code{\link{get_agilent_threshold}}
-#' @param cutoff Proportion of maximum absorbance to use as cutoff.
-#' Argument to \code{\link{trim_peak}}.
-#' @return Returns the mean purity of the peak specified by \code{pos}, defined
-#' as the proportion of timepoints with purity values below 1.
-#' @references
-#' Stahl, Mark. “Peak Purity Analysis in HPLC and CE Using Diode-Array Technology.”
-#' Agilent Technologies, April 1, 2003, 16.
-#' /href{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
-#' @author Ethan Bass
-
-get_mean_purity <- function(x, pos, weight=1, cutoff=0.05){
-  p <- get_purity_values(x, pos, weight = weight)
-  mean(p[trim_peak(x, pos, cutoff=cutoff)] < 1, na.rm=TRUE)
 }

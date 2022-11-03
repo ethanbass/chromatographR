@@ -3,13 +3,15 @@
 #### New features
 * Added `reshape_chroms` function for converting chromatograms to "long" format.
 * Added `export.peaktable` function to easily write peak_table to `csv` or `xlsx`.
-* Added functions for assessing peak purity: `get_purity_values` and `get_mean_purity`.
+* Added `get_purity` function for assessing peak purity.
 * Allow multiple peaks as arguments to `plot.peaktable`.
 * Added functions for plotting trace and spectra with [plotly](https://plotly.com/r/):
 `plotly_trace` and `plotly_spec`.
 * Fixed `preprocess` so it will no longer try to interpolate along columns for 2D data.
-* Added stand-alone boxplot function for peak_table object.
+* Added stand-alone `boxplot` function for peak_table object.
 * Fixed bug in `attach_metadata` that could result in disordered rows.
+* Fixed test failure on MKL by removing `cluster_spectra` test.
+* Changed `fit_peaks` function and syntax (see below).
 
 #### Changes to *fit_peaks* function:
 * Simplified logic in `fit_peaks` function.

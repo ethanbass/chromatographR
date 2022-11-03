@@ -33,10 +33,10 @@
 #' about the retention time (\code{rt}), \code{start} and \code{end} of each peak,
 #' as well as the standard deviation (\code{sd}), \code{tau} (if \code{egh} is 
 #' selected), full width at half maximum (\code{FWHM}), \code{height}, \code{area},
-#' and \code{r.squared} (coefficient of determination). (*Note:* This last
-#' parameter is determined from a linear model of the fitted peak values to the
-#' raw data. This approach is not really statistically valid but it can be useful
-#' as a rough metric for "goodness-of-fit").
+#' \code{r.squared} (coefficient of determination), and \code{purity}. (*Note:*
+#' the \code{r.squared} is calculated by fitting a linear model of the fitted
+#' peak values to the raw data. This approach is not really statistically valid
+#' but it can still be useful as a rough metric for "goodness-of-fit").
 #' @author Ethan Bass
 #' @note The function is adapted from the
 #' \href{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks}
