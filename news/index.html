@@ -53,12 +53,14 @@
 <h5 id="new-features-0-4-5">New features<a class="anchor" aria-label="anchor" href="#new-features-0-4-5"></a></h5>
 <ul><li>Added <code>reshape_chroms</code> function for converting chromatograms to “long” format.</li>
 <li>Added <code>export.peaktable</code> function to easily write peak_table to <code>csv</code> or <code>xlsx</code>.</li>
-<li>Added functions for assessing peak purity: <code>get_purity_values</code> and <code>get_mean_purity</code>.</li>
+<li>Added <code>get_purity</code> function for assessing peak purity.</li>
 <li>Allow multiple peaks as arguments to <code>plot.peaktable</code>.</li>
 <li>Added functions for plotting trace and spectra with <a href="https://plotly.com/r/" class="external-link">plotly</a>: <code>plotly_trace</code> and <code>plotly_spec</code>.</li>
 <li>Fixed <code>preprocess</code> so it will no longer try to interpolate along columns for 2D data.</li>
-<li>Added stand-alone boxplot function for peak_table object.</li>
+<li>Added stand-alone <code>boxplot</code> function for peak_table object.</li>
 <li>Fixed bug in <code>attach_metadata</code> that could result in disordered rows.</li>
+<li>Fixed test failure on MKL by removing <code>cluster_spectra</code> test.</li>
+<li>Changed <code>fit_peaks</code> function and syntax (see below).</li>
 </ul></div>
 <div class="section level5">
 <h5 id="changes-to-fit_peaks-function-0-4-5">Changes to <em>fit_peaks</em> function:<a class="anchor" aria-label="anchor" href="#changes-to-fit_peaks-function-0-4-5"></a></h5>

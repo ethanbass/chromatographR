@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="description" content="chromatographR">
-<title>chromatographR • chromatographR</title>
+<title>chromatographR: An introduction to HPLC-DAD analysis • chromatographR</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <link href="../deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="chromatographR">
+<!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="chromatographR: An introduction to HPLC-DAD analysis">
 <meta property="og:description" content="chromatographR">
 <meta property="og:image" content="https://ethanbass.github.io/chromatographR/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -74,10 +74,11 @@
 
 <script src="chromatographR_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>chromatographR</h1>
-                        <h4 data-toc-skip class="author">Ethan Bass</h4>
+      <img src="../logo.png" class="logo" alt=""><h1>chromatographR: An introduction to HPLC-DAD analysis</h1>
+                        <h4 data-toc-skip class="author">Ethan Bass<sup>1</sup>
+</h4>
             
-            <h4 data-toc-skip class="date">2022-10-27</h4>
+            <h4 data-toc-skip class="date">2022-11-03</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/HEAD/vignettes/chromatographR.Rmd" class="external-link"><code>vignettes/chromatographR.Rmd</code></a></small>
       <div class="d-none name"><code>chromatographR.Rmd</code></div>
@@ -85,6 +86,7 @@
 
     
     
+<p><sup>1</sup> Department of Ecology and Evolutionary Biology, Cornell University, Ithaca NY</p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -179,7 +181,7 @@
 <div class="section level3">
 <h3 id="peak-finding-and-fitting">Peak finding and fitting<a class="anchor" aria-label="anchor" href="#peak-finding-and-fitting"></a>
 </h3>
-<p>The <code>get_peaks</code> function produced a nested list of peaks by looping through the supplied chromatograms at the specified wavelengths, finding peaks, and fitting them to the specified function using non-linear least squares. The current peak-shape options are exponential-gaussian hybrid (<code>egh</code>), <code>gaussian</code>, or (<code>raw</code>) <span class="citation">(<span class="citeproc-not-found" data-reference-id="lan2001"><strong>???</strong></span>)</span>. The area under the curve for each peak is then estimated using trapezoidal approximation. Alternatively, peak area can be integrated without applying a model (<code>raw</code>). The function returns a nested list of data.frames containing parameters for the peaks identified in each chromatogram.</p>
+<p>The <code>get_peaks</code> function produced a nested list of peaks by looping through the supplied chromatograms at the specified wavelengths, finding peaks, and fitting them to the specified function using non-linear least squares. The current peak-shape options are exponential-gaussian hybrid (<code>egh</code>) <span class="citation">(Lan and Jorgenson 2001)</span>, <code>gaussian</code>, or (<code>raw</code>) . The area under the curve for each peak is then estimated using trapezoidal approximation. Alternatively, peak area can be integrated without applying a model (<code>raw</code>). The function returns a nested list of data.frames containing parameters for the peaks identified in each chromatogram.</p>
 <pre class="text"><code>&gt; pks_gauss &lt;- get_peaks(warp, lambdas = c('210','260'), sd.max=40, fit="gaussian")
 &gt; pks_egh &lt;- get_peaks(warp, lambdas = c('210', '260'), sd.max=40, fit="egh")
 &gt; pks_raw &lt;- get_peaks(warp, lambdas = c('210', '260'), sd.max=60, fit="raw")</code></pre>
@@ -276,6 +278,9 @@
 <div id="ref-hulstaert2020">
 <p>Hulstaert, Niels, Jim Shofstahl, Timo Sachsenberg, Mathias Walzer, Harald Barsnes, Lennart Martens, and Yasset Perez-Riverol. 2020. “ThermoRawFileParser: Modular, Scalable, and Cross-Platform RAW File Conversion.” <em>Journal of Proteome Research</em> 19 (1): 537–42. <a href="https://doi.org/10.1021/acs.jproteome.9b00328" class="external-link">https://doi.org/10.1021/acs.jproteome.9b00328</a>.</p>
 </div>
+<div id="ref-lan2001">
+<p>Lan, Kevin, and James W. Jorgenson. 2001. “A Hybrid of Exponential and Gaussian Functions as a Simple Model of Asymmetric Chromatographic Peaks.” <em>Journal of Chromatography A</em> 915 (1): 1–13. <a href="https://doi.org/10.1016/S0021-9673(01)00594-5" class="external-link">https://doi.org/10.1016/S0021-9673(01)00594-5</a>.</p>
+</div>
 <div id="ref-tomasi2004">
 <p>Tomasi, Giorgio, Frans van den Berg, and Claus Andersson. 2004. “Correlation Optimized Warping and Dynamic Time Warping as Preprocessing Methods for Chromatographic Data.” <em>Journal of Chemometrics</em> 18 (5): 231–41. <a href="https://doi.org/10.1002/cem.859" class="external-link">https://doi.org/10.1002/cem.859</a>.</p>
 </div>
@@ -288,7 +293,7 @@
 <h2 id="session-information">Session Information<a class="anchor" aria-label="anchor" href="#session-information"></a>
 </h2>
 <pre class="text"><code>&gt; sessionInfo()</code></pre>
-<pre><code>R version 4.2.1 (2022-06-23)
+<pre><code>R version 4.2.2 (2022-10-31)
 Platform: x86_64-pc-linux-gnu (64-bit)
 Running under: Ubuntu 20.04.5 LTS
 
@@ -319,16 +324,16 @@ loaded via a namespace (and not attached):
 [19] TTR_0.24.3            jquerylib_0.1.4       Matrix_1.5-1         
 [22] reticulate_1.26       rmarkdown_2.17        pkgdown_2.0.6        
 [25] textshaping_0.3.6     desc_1.4.2            stringr_1.4.1        
-[28] munsell_0.5.0         compiler_4.2.1        xfun_0.34            
+[28] munsell_0.5.0         compiler_4.2.2        xfun_0.34            
 [31] pkgconfig_2.0.3       systemfonts_1.0.4     htmltools_0.5.3      
 [34] tidyselect_1.2.0      tibble_3.1.8          fansi_1.0.3          
-[37] dplyr_1.0.10          grid_4.2.1            jsonlite_1.8.3       
+[37] dplyr_1.0.10          grid_4.2.2            jsonlite_1.8.3       
 [40] lifecycle_1.0.3       magrittr_2.0.3        scales_1.2.1         
 [43] cli_3.4.1             stringi_1.7.8         cachem_1.0.6         
 [46] farver_2.1.1          ptw_1.9-16            fs_1.5.2             
-[49] xml2_1.3.3            smoother_1.1          bslib_0.4.0          
-[52] fastcluster_1.2.3     xts_0.12.2            ragg_1.2.3           
-[55] generics_0.1.3        vctrs_0.5.0           tools_4.2.1          
+[49] xml2_1.3.3            smoother_1.1          bslib_0.4.1          
+[52] fastcluster_1.2.3     xts_0.12.2            ragg_1.2.4           
+[55] generics_0.1.3        vctrs_0.5.0           tools_4.2.2          
 [58] pvclust_2.2-0         glue_1.6.2            purrr_0.3.5          
 [61] fastmap_1.1.0         yaml_2.3.6            colorspace_2.0-3     
 [64] memoise_2.0.1         minpack.lm_1.2-2      chromConverter_0.2.1 
