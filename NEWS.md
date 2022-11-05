@@ -1,6 +1,7 @@
 # chromatographR 0.4.5
 
 #### New features
+
 * Added `reshape_chroms` function for converting chromatograms to "long" format.
 * Added `export.peaktable` function to easily write peak_table to `csv` or `xlsx`.
 * Added `get_purity` function for assessing peak purity.
@@ -10,10 +11,11 @@
 * Fixed `preprocess` so it will no longer try to interpolate along columns for 2D data.
 * Added stand-alone `boxplot` function for peak_table object.
 * Fixed bug in `attach_metadata` that could result in disordered rows.
-* Fixed test failure on MKL by removing `cluster_spectra` test.
 * Changed `fit_peaks` function and syntax (see below).
+* Fixed test failure on MKL server by removing `cluster_spectra` test.
 
 #### Changes to *fit_peaks* function:
+
 * Simplified logic in `fit_peaks` function.
 * Modified `fit_peaks` syntax so it now takes a matrix (`x`) and a wavelength
 (`lambda`) instead of a numeric vector (`y`).
@@ -33,12 +35,14 @@
 # chromatographR 0.4.2
 
 #### New features
+
 * Added option to select `time.units` for peak area in `get_peaks` function
 facilitating better comparison with vendor software.
 * Now allow preservation of instrumental metadata through pre-processing and alignment steps.
 * Added `filter_peaktable` function.
 
 #### Minor changes:
+
 * Deprecated `load_chroms` function. Please use `read_chroms` from chromConverter
 to import files instead.
 * Changed default behavior in `correct_rt` to `corrected_values` rather than `models`.
@@ -47,6 +51,7 @@ to import files instead.
 * Fixed typos in vignette
 
 #### Bug fixes
+
 * Fixed bug in `cluster_spectra` affecting peaks with 0 standard deviation.
 * Fixed bug affecting `peak_list` metadata.
 

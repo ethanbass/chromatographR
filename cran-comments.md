@@ -1,6 +1,6 @@
-## R CMD check results
+* I apparently did not succeed in fixing the test failure on the MKL server in version 0.4.0, so I made another attempt to do so here by eliminating the test that is failing.
 
-There was an issue with some of the tests in my last submission that was only showing up when tested on the MKL machine (https://www.stats.ox.ac.uk/pub/bdr/Rblas/MKL/chromatographR.out). I believe I have remedied these issues in this new release. I apologize for the double release!
+## R CMD check results
 
 0 errors | 0 warnings | 1 note
 
@@ -25,11 +25,3 @@ Found the following (possibly) invalid URLs:
     Message: Service Unavailable
 
 I believe these messages can safely be ignored, since all of the links in question load fine in my web browser.
-
-*There's an additional note when I used rhub to build the package on the Windows Server 2022, R-devel, 64 bit.
-
-checking for detritus in the temp directory ... NOTE
-Found the following files/directories:
-  'lastMiKTeXException'
-  
-I don't really understand why this is being generated, but I think it can likewise be ignored.
