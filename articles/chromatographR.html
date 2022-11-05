@@ -78,7 +78,7 @@
                         <h4 data-toc-skip class="author">Ethan Bass<sup>1</sup>
 </h4>
             
-            <h4 data-toc-skip class="date">2022-11-03</h4>
+            <h4 data-toc-skip class="date">2022-11-05</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/HEAD/vignettes/chromatographR.Rmd" class="external-link"><code>vignettes/chromatographR.Rmd</code></a></small>
       <div class="d-none name"><code>chromatographR.Rmd</code></div>
@@ -99,7 +99,7 @@
 <div class="section level3">
 <h3 id="loading-data">Loading data<a class="anchor" aria-label="anchor" href="#loading-data"></a>
 </h3>
-<p>chromatographR can import data from a growing list of proprietary file formats using the <code>read_chroms</code> function. Supported file formats include ‘Agilent ChemStation’ or ‘MassHunter’ (<code>.D</code>) files <span class="citation">(<span class="citeproc-not-found" data-reference-id="bovee2022"><strong>???</strong></span>; <span class="citeproc-not-found" data-reference-id="bovee2022a"><strong>???</strong></span>)</span>, ‘Thermo Raw’ (<code>.raw</code>) <span class="citation">(Hulstaert et al. 2020)</span>, ‘Chromeleon’ UV ASCII (<code>.txt</code>), ‘Waters ARW’ (<code>.arw</code>), ‘Shimadzu’ ASCII (<code>.txt</code>), and more. (For a full list, see the <a href="https://ethanbass.github.io/chromConverter" class="external-link">chromConverter documentation</a>). Select the appropriate file format by specifying the <code>format_in</code> argument (e.g. <code>csv</code>, <code>chemstation_uv</code>, <code>masshunter_dad</code>, <code>chromeleon_uv</code>, <code>waters_arw</code>, etc).</p>
+<p>chromatographR can import data from a growing list of proprietary file formats using the <code>read_chroms</code> function. Supported file formats include ‘Agilent ChemStation’ or ‘MassHunter’ (<code>.D</code>) files <span class="citation">(<span class="citeproc-not-found" data-reference-id="bovee2022"><strong>???</strong></span>; <span class="citeproc-not-found" data-reference-id="bovee2022a"><strong>???</strong></span>)</span>, ‘Thermo Raw’ (<code>.raw</code>) <span class="citation">(Hulstaert et al. 2020)</span>, ‘Chromeleon’ UV ASCII (<code>.txt</code>), ‘Waters ARW’ (<code>.arw</code>), ‘Shimadzu’ ASCII (<code>.txt</code>), and more. (For a full list, see the <a href="https://ethanbass.github.io/chromConverter/" class="external-link">chromConverter documentation</a>). Select the appropriate file format by specifying the <code>format_in</code> argument (e.g. <code>csv</code>, <code>chemstation_uv</code>, <code>masshunter_dad</code>, <code>chromeleon_uv</code>, <code>waters_arw</code>, etc).</p>
 <pre class="text"><code>&gt; # single folder
 &gt; read_chroms(paths = path, format_in = "csv")
 &gt; 
