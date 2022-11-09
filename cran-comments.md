@@ -1,4 +1,9 @@
-* I apparently did not succeed in fixing the test failure on the MKL server in version 0.4.0, so I made another attempt to do so here by eliminating the test that is failing.
+Package was archived on CRAN
+CRAN repository db overrides:
+  X-CRAN-Comment: Archived on 2022-11-07 as recurring issues were not
+    corrected in time. and policy violation, sending HTML.
+    
+* My package was archived because of a test that sporadically fails on one of the CRAN test machines used to run Additional tests (MKL). I apparently did not succeed in fixing this issue with the patch I introduced in version 0.4.4. I believe I have now fixed by setting the failing test to be skipped on CRAN. The test in question does work on most machines (and usually even on the MKL test machine where it occasionally fails). I also violated the CRAN policy against sending html email, for which I apologize. I will certainly be very careful to avoid this in the future.
 
 ## R CMD check results
 

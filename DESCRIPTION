@@ -47,10 +47,9 @@ Suggests:
     spelling,
     testthat (>= 3.0.0),
     vdiffr,
-    VPdtw
-Enhances:
+    VPdtw,
     openxlsx,
-    plotly
+    plotly,
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3

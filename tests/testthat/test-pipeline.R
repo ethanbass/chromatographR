@@ -299,3 +299,12 @@ test_that("mirror_plot works", {
   }
   vdiffr::expect_doppelganger("mirror1", mirror1)
 })
+
+test_that("cluster_spectra works", {
+  skip_on_cran()
+  suppressWarnings(cl <- cluster_spectra(pk_tab, chrom_list = dat.pr, nboot = 10,
+                                         parallel = FALSE, verbose = FALSE,
+                                         save = FALSE, output = "both"))
+  expect_equal(class(cl[[1]]), "pvclust")
+  expect_equal(class(cl[[2]]), "list")
+})

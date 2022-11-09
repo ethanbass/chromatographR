@@ -113,15 +113,15 @@ cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
   d <- 1 - abs(cor(rep, method="pearson"))
   if (verbose)
     print('...clustering spectra')
-  result <- pvclust(rep, method.dist="cor",
-                             nboot=nboot, parallel=parallel, ...)
+  result <- pvclust(rep, method.dist = "cor",
+                             nboot = nboot, parallel = parallel, ...)
   
   if (plot_dend){
-    plot(result,labels = FALSE, cex.pv=0.5, print.pv='au',print.num = FALSE)
-    pvrect(result, alpha=alpha, max.only = max.only)
+    plot(result,labels = FALSE, cex.pv=0.5, print.pv = 'au',print.num = FALSE)
+    pvrect(result, alpha = alpha, max.only = max.only)
   }
   if (save) saveRDS(result, 'pvclust.RDS')
-  p <- pvpick(result, alpha=alpha, max.only=max.only)
+  p <- pvpick(result, alpha = alpha, max.only = max.only)
   l <- sapply(p$clusters, length)
   sub <- p$clusters[which(l > peak_no[1] & l < peak_no[2])]
   pval <- 1-result$edges[p$edges[which(l > peak_no[1] & l < peak_no[2])],'au']
@@ -130,7 +130,7 @@ cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
   pval <- format(round(
     result$edges[p$edges[which(l > peak_no[1] & l < peak_no[2])],'au'],2),
     nsmall=2)
-  names(sub) <- paste0('c',seq_along(sub))
+  names(sub) <- paste0('c', seq_along(sub))
   
   if (plot_spectra){
     if (verbose) print('...plotting clustered spectra')
