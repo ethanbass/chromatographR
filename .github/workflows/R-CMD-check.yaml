@@ -2,9 +2,9 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [dev]
+    branches: [master]
   pull_request:
-    branches: [dev]
+    branches: [master]
 
 name: R-CMD-check
 
@@ -22,11 +22,6 @@ jobs:
       - uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
-          
-      - name: Add VPdtw repo
-        run: |
-          writeLines('options(repos = c(VPdtw = "https://ethanbass.github.io/drat/", getOption(\"repos\")))', file("~/.Rprofile", "ab"))
-        shell: Rscript {0}
           
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
