@@ -40,14 +40,14 @@ Imports:
     scales,
     smoother,
     stats,
-    utils
+    utils,
+    VPdtw
 Suggests: 
     knitr,
     rmarkdown,
     spelling,
     testthat (>= 3.0.0),
     vdiffr,
-    VPdtw,
     openxlsx,
     plotly,
 VignetteBuilder: 

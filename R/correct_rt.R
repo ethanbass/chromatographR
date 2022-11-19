@@ -25,7 +25,7 @@
 #' @param n.zeros Number of zeros to add.
 #' @param scale Logical. If true, scale chromatograms before warping.
 #' @param trwdth width of the triangle in the WCC criterion.
-#' @param plot Logical. Whether to plot alignment.
+#' @param plot_it Logical. Whether to plot alignment.
 #' @param penalty The divisor used to calculate the penalty for
 #' \code{\link[VPdtw]{VPdtw}}. The penalty is calculated by dividing the
 #' \code{\link[VPdtw]{dilation}} by this number. Thus, a higher number will
@@ -73,13 +73,11 @@
 correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
                        alg = c("ptw", "vpdtw"), what = c("corrected.values", "models"), 
                        init.coef = c(0, 1, 0), n.traces = NULL, n.zeros = 0, 
-                       scale = FALSE, trwdth = 200, plot = FALSE,
+                       scale = FALSE, trwdth = 200, plot_it = FALSE,
                        penalty = 5, maxshift = 50,
                        verbose = FALSE, ...){
   what <- match.arg(what, c("corrected.values", "models"))
   alg <- match.arg(alg, c("ptw", "vpdtw"))
-  if (alg == "vpdtw")
-    check_for_pkg("VPdtw")
   if (missing(lambdas)){
     if (is.null(models) & is.null(n.traces)){
         stop("Must specify wavelengths ('lambdas') or number of traces ('n.traces')
@@ -99,10 +97,12 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
       apply(x, 2, padzeros, nzeros = n.zeros, side = 'both')
     })
     }
-    allmats <- sapply(chrom_list, function(x) x[, lambdas, drop=FALSE], simplify = "array")
-    allmats.t <- sapply(chrom_list, function(x) t(x[, lambdas, drop=FALSE]), simplify = "array")
+    allmats <- sapply(chrom_list, function(x){
+      x[, lambdas, drop = FALSE]}, simplify = "array")
+    allmats.t <- sapply(chrom_list, function(x){
+      t(x[, lambdas, drop = FALSE])}, simplify = "array")
     if (is.null(n.traces)){
-      traces <- ifelse(length(lambdas) == 1, 1, lambdas)
+      traces <- ifelse(length(lambdas) == 1, 1, list(lambdas))[[1]]
     } else{
       traces <- select.traces(X = allmats.t, criterion='coda')
       traces <- traces$trace.nrs[1:n.traces]
@@ -116,12 +116,17 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
     }
     if (alg == "ptw"){
       if (!is.null(models)){
+        if(!(class(models) %in% c("ptw_list", "VPdtw"))){
+          stop("Model object not recognized.")
+        }
         ptwmods <- models
       } else{
         ptwmods <- lapply(seq_len(dim(allmats)[3]), function(ii){
           ptw(allmats.t[,, reference],
               allmats.t[,, ii], selected.traces = traces, init.coef = init.coef,
               warp.type = "global", ...)})
+        class(ptwmods) <- "ptw_list"
+        if (plot_it) plot(ptwmods)
       }
       if (what == "corrected.values"){
         allmats <- sapply(chrom_list_og, identity, simplify = "array")
@@ -142,7 +147,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
         ptwmods
       }
   } else{
-    allmats <- sapply(chrom_list_og, function(x) x[,lambdas,drop=FALSE])
+    allmats <- sapply(chrom_list_og, function(x) x[,lambdas, drop = FALSE])
     if (length(lambdas) > 1)
       stop("VPdtw only supports warping by a single wavelength")
     if (is.null(models)){
@@ -150,8 +155,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
       models <- VPdtw::VPdtw(query = allmats, reference = allmats[,reference],
                              penalty = penalty, maxshift = maxshift)
     }
-    if (plot)
-      VPdtw::plot.VPdtw(models)
+    if (plot_it)  VPdtw::plot.VPdtw(models)
     if (what == "corrected.values"){
       jset <- models$xVals + models$shift
       iset <- models$query
@@ -231,3 +235,48 @@ transfer_metadata <- function(new_object, old_object,
     attributes(new_object) <- c(attributes(new_object), a)
     new_object
   }
+
+#' Plot PTW alignments
+#' @importFrom graphics matplot
+#' @param x A \code{ptw_list} object created by \code{\link{correct_rt}}.
+#' @param lambdas Which lambdas to plot.
+#' @param legend Logical. Whether to label the plots.
+#' @param ... Additional arguments to \code{\link[graphics]{matplot}}.
+#' @author Ethan Bass
+#' @export
+
+plot.ptw_list <- function(x, lambdas, legend = TRUE, ...){
+  oldpar <- par(no.readonly = TRUE)
+  on.exit(par(oldpar))
+  par(mfrow=c(2,1), mar=c(2,3,2,3))
+
+  all.lambdas <- as.numeric(rownames(x[[1]]$warped.sample))
+  ts <- as.numeric(colnames(x[[1]]$sample))
+  
+  if (missing(lambdas)){
+    lambdas<-all.lambdas
+  }
+  if (any(!(lambdas %in% all.lambdas))){
+    stop("Lambdas not found. Please check argument and try again")
+  }
+  
+  lambda.idx <- which(lambdas %in% all.lambdas)
+  
+  plot.new()
+  plot.window(xlim=c(head(ts,1), tail(ts,1)),
+              ylim=c(0, max(sapply(x, function(xx) xx$warped.sample), na.rm=TRUE)*1.2))
+  for (i in seq_along(x)){
+    matplot(ts, t(x[[i]]$warped.sample[lambda.idx,, drop=FALSE]), type='l',add=TRUE)
+  }
+  if (legend)
+    legend("topright", legend="ptw", bty = "n")
+  
+  plot.new()
+  plot.window(xlim=c(head(ts,1),tail(ts,1)),
+              ylim=c(0, max(x[[i]]$reference, na.rm = TRUE)*1.2))
+  for (i in seq_along(x)){
+    matplot(ts, t(x[[i]]$sample[lambda.idx,, drop=FALSE]), type='l', add=TRUE)
+  }
+  if (legend)
+    legend("topright", legend="queries", bty = "n")
+}

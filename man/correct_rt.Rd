@@ -16,7 +16,7 @@ correct_rt(
   n.zeros = 0,
   scale = FALSE,
   trwdth = 200,
-  plot = FALSE,
+  plot_it = FALSE,
   penalty = 5,
   maxshift = 50,
   verbose = FALSE,
@@ -49,7 +49,7 @@ inspection) or the warping 'models' (for further programmatic use).}
 
 \item{trwdth}{width of the triangle in the WCC criterion.}
 
-\item{plot}{Logical. Whether to plot alignment.}
+\item{plot_it}{Logical. Whether to plot alignment.}
 
 \item{penalty}{The divisor used to calculate the penalty for
 \code{\link[VPdtw]{VPdtw}}. The penalty is calculated by dividing the

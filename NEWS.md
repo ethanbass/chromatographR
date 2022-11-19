@@ -6,13 +6,18 @@
 * Added `export.peaktable` function to easily write peak_table to `csv` or `xlsx`.
 * Added `get_purity` function for assessing peak purity.
 * Allow multiple peaks as arguments to `plot.peaktable`.
-* Added functions for plotting trace and spectra with [plotly](https://plotly.com/r/):
+* Added functions for plotting traces and spectra with [plotly](https://plotly.com/r/):
 `plotly_trace` and `plotly_spec`.
 * Fixed `preprocess` so it will no longer try to interpolate along columns for 2D data.
-* Added stand-alone `boxplot` function for peak_table object.
+* Added stand-alone `boxplot` function for `peak_table` objects.
 * Fixed bug in `attach_metadata` that could result in disordered rows.
 * Changed `fit_peaks` function and syntax (see below).
-* Fixed test failure on MKL server by removing `cluster_spectra` test.
+* Added a new class (`ptw_list`) and plotting function for lists of `ptw` alignment objects.
+* Added `plot_it` argument in `correct_rt` for plotting alignments.
+* Added [VPdtw](https://github.com/ethanbass/VPdtw/) as a dependency (instead of being only suggested).
+* Minor updates to vignette.
+* Adjusted `cluster_spectra` and `combine_peaks` functions so messages can be suppressed with `verbose == FALSE`.
+* Fixed test failure on MKL server by skipping `cluster_spectra` test on CRAN.
 
 #### Changes to *fit_peaks* function:
 
