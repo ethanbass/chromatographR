@@ -98,10 +98,17 @@ check_chr <- function(chr, loc=NULL, peak_table, chrom_list, allow_max = TRUE){
 #' @noRd
 elementwise.all.equal <- Vectorize(function(x, y, ...) {isTRUE(all.equal(x, y, ...))})
 
+#' @noRd
 get_times <- function(chrom_list){
   as.numeric(rownames(chrom_list[[1]]))
 }
 
+#' @noRd
 get_lambdas <- function(chrom_list){
   as.numeric(colnames(chrom_list[[1]]))
+}
+
+#' @noRd
+get_time_resolution <- function(chrom_list){
+  signif(median(diff(as.numeric(rownames(chrom_list[[1]])))))
 }

@@ -192,7 +192,7 @@ plot.peak_list <- function(x, ..., chrom_list, index=1, lambda=NULL,
     text(pks$rt, y[pks$rt] + y.offset, labels=seq_len(nrow(pks)), cex=cex.font)
   }
   if (missing(res))
-    res <- median(diff(as.numeric(rownames(chrom_list[[1]]))))
+    res <- get_time_resolution(chrom_list)
   for (i in seq_len(nrow(pks))){
     peak.loc<-seq.int((pks$start[i]),(pks$end[i]), by = res)
       if (fit == "gaussian"){
