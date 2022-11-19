@@ -63,7 +63,13 @@ were integrated at more than one wavelength or component. Specify tolerance
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">combine_peaks</span><span class="op">(</span><span class="va">peak_table</span>, tol <span class="op">=</span> <span class="fl">0.01</span>, min.cor <span class="op">=</span> <span class="fl">0.9</span>, choose <span class="op">=</span> <span class="st">"max"</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">combine_peaks</span><span class="op">(</span></span>
+<span>  <span class="va">peak_table</span>,</span>
+<span>  tol <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>  min.cor <span class="op">=</span> <span class="fl">0.9</span>,</span>
+<span>  choose <span class="op">=</span> <span class="st">"max"</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -84,6 +90,11 @@ difference).</p></dd>
 <dt>choose</dt>
 <dd><p>If "max" will retain peak with highest intensity. Otherwise,
 the first column in the data.frame will be retained.</p></dd>
+
+
+<dt>verbose</dt>
+<dd><p>Logical. Whether to print status to the console. Defaults to
+TRUE.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -109,7 +120,6 @@ columns combined according to the specified criteria.</p>
 <span class="r-in"><span><span class="va">pk_tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="attach_ref_spectra.html">attach_ref_spectra</a></span><span class="op">(</span><span class="va">pk_tab</span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>number of items to replace is not a multiple of replacement length</span>
 <span class="r-in"><span><span class="fu">combine_peaks</span><span class="op">(</span><span class="va">pk_tab</span>, tol <span class="op">=</span> <span class="fl">.02</span>, min.cor <span class="op">=</span> <span class="fl">.9</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>the standard deviation is zero</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Removed 32 peaks from peak table.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           V1        V2        V3       V4        V5        V6        V7</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 119 547.5999   0.00000  64.73611 188.9210 1514.4775  31.08266  7972.271</span>

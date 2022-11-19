@@ -206,10 +206,277 @@ the uncertainty in hierarchical clustering. <em>Bioinformatics</em>,
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Sa_warp</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu">cluster_spectra</span><span class="op">(</span><span class="va">pk_tab</span>, nboot<span class="op">=</span><span class="fl">100</span>, max.only <span class="op">=</span> <span class="cn">FALSE</span>, save <span class="op">=</span> <span class="cn">FALSE</span>, alpha <span class="op">=</span> <span class="fl">.97</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "...collecting representative spectra"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 3 (`122`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 10.72; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 206 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 38.32</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 11.02; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 206 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 2.35</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 3 (`122`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 11.29; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 206 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 16.99</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 11.47; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 318 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 75.35</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 3 (`122`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 11.64; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 200 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 12.46</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 3 (`122`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 11.92; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 316 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 2.54</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 12.3; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 318 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 85.69</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 12.59; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 202 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 104.94</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 1 (`119`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 12.81; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 202 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 207.68</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 13.07; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 206 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 32.27</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 13.28; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 204 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 15.53</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 2 (`121`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 13.59; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 212 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 33.4</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 13.87; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 220 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 64.38</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 14.05; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 222 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 7.88</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 1 (`119`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 14.48; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 318 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 68.73</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 3 (`122`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 14.66; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 310 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 12.28</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 14.85; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 318 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 15.08</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 15.1; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 202 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 8.99</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 1 (`119`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 15.35; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 318 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 14.26</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 15.59; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 318 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 33.45</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 15.8; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 318 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 69.78</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 3 (`122`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 16.07; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 318 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 4.89</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 2 (`121`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 16.25; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 200 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 0.53</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 16.39; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 202 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 0.55</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 2 (`121`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 16.56; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 200 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 6.22</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 16.82; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 318 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 292.19</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 1 (`119`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 17.08; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 200 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 14.8</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 3 (`122`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 17.36; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 204 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 5.47</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 1 (`119`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 17.62; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 204 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 4.77</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 1 (`119`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 17.82; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 200 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 7.08</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 1 (`119`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 18; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 204 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 8.35</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 18.16; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 204 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 11.05</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 3 (`122`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 18.41; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 206 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 10.72</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 1 (`119`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 18.59; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 206 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 9.09</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 10.31; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 200 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 6.85</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 10.64; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 204 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 52.96</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 10.98; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 204 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 11.32</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 11.33; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 202 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 21.78</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 3 (`122`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 11.6; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 318 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 45.15</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 3 (`122`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 11.84; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 200 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 12.65</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 2 (`121`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 12.01; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 204 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 13.12</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 12.3; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 318 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 85.69</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 12.58; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 202 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 104.94</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 1 (`119`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 12.82; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 202 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 104.47</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 13.1; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 202 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 37.23</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 13.27; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 202 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 19.67</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 2 (`121`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 13.57; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 212 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 55.61</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 13.87; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 220 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 64.38</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 14.05; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 222 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 7.88</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 1 (`119`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 14.45; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 318 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 329.38</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 14.77; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 316 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 157.32</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 15.05; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 200 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 10.94</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 1 (`119`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 15.35; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 318 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 14.26</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 1 (`119`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 15.6; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 318 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 54.29</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 15.8; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 318 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 69.78</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 3 (`122`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 16.07; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 318 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 4.89</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 16.29; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 256 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 0.28</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 1 (`119`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 16.49; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 202 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 2.46</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 16.83; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 318 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 292.19</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 3 (`122`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 17.11; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 206 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 6.63</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 17.29; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 200 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 7.21</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 17.41; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 206 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 7.06</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 2 (`121`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 17.61; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 208 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 3.33</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 17.82; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 204 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 9.31</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 2 (`121`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 17.99; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 208 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 5.26</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 18.18; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 204 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 11.54</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> chrome no. 4 (`458`) </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> RT: 18.47; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> lambda = 204 nm; </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> abs = 12.76</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "...clustering spectra"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Creating a temporary cluster...done:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> socket cluster with 1 nodes on host ‘localhost’</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Cluster size is too small (or NULL). non-parallel version is executed</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap (r = 0.5)... Done.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap (r = 0.6)... Done.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Bootstrap (r = 0.7)... Done.</span>
@@ -228,9 +495,6 @@ the uncertainty in hierarchical clustering. <em>Bioinformatics</em>,
 <span class="r-plt img"><img src="cluster_spectra-5.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="cluster_spectra-6.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="cluster_spectra-7.png" alt="" width="700" height="433"></span>
-<span class="r-plt img"><img src="cluster_spectra-8.png" alt="" width="700" height="433"></span>
-<span class="r-plt img"><img src="cluster_spectra-9.png" alt="" width="700" height="433"></span>
-<span class="r-plt img"><img src="cluster_spectra-10.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

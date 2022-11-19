@@ -55,12 +55,17 @@
 <li>Added <code>export.peaktable</code> function to easily write peak_table to <code>csv</code> or <code>xlsx</code>.</li>
 <li>Added <code>get_purity</code> function for assessing peak purity.</li>
 <li>Allow multiple peaks as arguments to <code>plot.peaktable</code>.</li>
-<li>Added functions for plotting trace and spectra with <a href="https://plotly.com/r/" class="external-link">plotly</a>: <code>plotly_trace</code> and <code>plotly_spec</code>.</li>
+<li>Added functions for plotting traces and spectra with <a href="https://plotly.com/r/" class="external-link">plotly</a>: <code>plotly_trace</code> and <code>plotly_spec</code>.</li>
 <li>Fixed <code>preprocess</code> so it will no longer try to interpolate along columns for 2D data.</li>
-<li>Added stand-alone <code>boxplot</code> function for peak_table object.</li>
+<li>Added stand-alone <code>boxplot</code> function for <code>peak_table</code> objects.</li>
 <li>Fixed bug in <code>attach_metadata</code> that could result in disordered rows.</li>
 <li>Changed <code>fit_peaks</code> function and syntax (see below).</li>
-<li>Fixed test failure on MKL server by removing <code>cluster_spectra</code> test.</li>
+<li>Added a new class (<code>ptw_list</code>) and plotting function for lists of <code>ptw</code> alignment objects.</li>
+<li>Added <code>plot_it</code> argument in <code>correct_rt</code> for plotting alignments.</li>
+<li>Added <a href="https://github.com/ethanbass/VPdtw/" class="external-link">VPdtw</a> as a dependency (instead of being only suggested).</li>
+<li>Minor updates to vignette.</li>
+<li>Adjusted <code>cluster_spectra</code> and <code>combine_peaks</code> functions so messages can be suppressed with <code>verbose == FALSE</code>.</li>
+<li>Fixed test failure on MKL server by skipping <code>cluster_spectra</code> test on CRAN.</li>
 </ul></div>
 <div class="section level5">
 <h5 id="changes-to-fit_peaks-function-0-4-5">Changes to <em>fit_peaks</em> function:<a class="anchor" aria-label="anchor" href="#changes-to-fit_peaks-function-0-4-5"></a></h5>
