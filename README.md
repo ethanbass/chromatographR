@@ -28,7 +28,11 @@ install.packages("devtools")
 devtools::install_github("https://github.com/ethanbass/chromatographR/")
 ```
 
-To build the vignette, include the argument `build_vignettes=TRUE`.
+or from R Universe:
+
+```
+install.packages("chromatographR", repos="https://ethanbass.r-universe.dev/", type="source")
+```
 
 ## Usage
 
