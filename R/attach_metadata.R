@@ -91,19 +91,22 @@ get_reference_spectra <- function(peak_table, chrom_list,
   X <- colnames(peak_table$tab)
   if (ref == "max.cor"){
     sp.l <- lapply(X,function(pk){
-      plot_all_spectra(peak = pk, peak_table, chrom_list,
+      x<-plot_all_spectra(peak = pk, peak_table, chrom_list,
                        plot_spectrum = FALSE, export_spectrum = TRUE,
                        scale_spectrum = TRUE)
+      apply(x, 2, as.numeric)
     })
     sp.ref <- sapply(seq_along(sp.l), function(i){
-      sp.l[[i]][,which.max(colMeans(cor(sp.l[[i]][,which(apply((sp.l[[i]]),2,sd)!=0), drop=FALSE])))]})
+      sp.l[[i]][,which.max(colMeans(cor(sp.l[[i]][,which(apply((sp.l[[i]]), 2, sd)!=0), drop=FALSE])))]
+    })
   } else {
     sp.ref <- sapply(colnames(peak_table$tab), function(pk){
-      plot_spectrum(loc = pk, peak_table, chrom_list, plot_trace=FALSE,
+      try(plot_spectrum(loc = pk, peak_table, chrom_list, plot_trace=FALSE,
                     plot_spectrum = FALSE, export_spectrum = TRUE,
                     verbose = FALSE,
                     scale_spectrum = TRUE, engine = "base")
-      })
+      )
+    })
     sp.ref <- do.call(cbind, sp.ref)
   }
   colnames(sp.ref) <- colnames(peak_table$tab)

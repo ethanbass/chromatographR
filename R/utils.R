@@ -59,6 +59,11 @@ check_idx <- function(idx, chrom_list){
 }
 
 #' Get wavelength index
+#' @param lambda lambda to be found
+#' @param lambdas lambdas to be matched
+#' @param y Signal as numeric vector.
+#' @param allow_max Logical. Whether to return lambda at maximum signal intensity
+#' of vector \code{y}. Defaults to TRUE.
 #' @author Ethan Bass
 #' @noRd
 get_lambda_idx <- function(lambda, lambdas, y, allow_max = TRUE){

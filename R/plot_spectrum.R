@@ -135,8 +135,8 @@ plot_spectrum_plotly <- function(loc, peak_table, chrom_list,
   }
   if (what == "click")
     stop("The plotly engine does not currently support clicking.")
-  new.ts <- as.numeric(rownames(chrom_list[[1]]))
-  new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
+  new.ts <- get_times(chrom_list)
+  new.lambdas <- get_lambdas(chrom_list)
   sig <- max(nchar(gsub(".*\\.","",rownames(chrom_list[[1]]))))
   if (what == "peak"){
     RT <- round(as.numeric(peak_table$pk_meta['rt', loc]), sig)
@@ -207,8 +207,8 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
                                export_spectrum = FALSE, verbose=TRUE, 
                                what=c("peak", "rt", "idx", "click"),
                                ...){
-  new.ts <- as.numeric(rownames(chrom_list[[1]]))
-  new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
+  new.ts <- get_times(chrom_list)
+  new.lambdas <- get_lambdas(chrom_list)
   sig <- max(nchar(gsub(".*\\.","",rownames(chrom_list[[1]]))))
   if (what == "peak"){
     RT <- round(as.numeric(peak_table$pk_meta['rt', loc]), sig)
@@ -228,7 +228,10 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
   idx <- get_retention_idx(RT, times = new.ts)
   chr <- check_chr(chr, loc, peak_table, chrom_list)
   y <- unlist(chrom_list[[chr]][idx, , drop=TRUE])
-  lambda.idx <- get_lambda_idx(lambda, lambdas = new.lambdas, y=y)
+  if (all(is.na(y))){
+    stop("The peak does not exist in the specified chromatogram")
+  }
+  lambda.idx <- get_lambda_idx(lambda, lambdas = new.lambdas, y = y)
   if (plot_trace){
     idx <- plot_trace(chrom_list, chr, lambda.idx, idx, what = what)
   }
@@ -396,10 +399,11 @@ plot_all_spectra <- function(peak, peak_table, chrom_list, chrs="all",
   new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
   if ("all" %in% chrs) chrs <- seq_along(chrom_list)
   sp <- sapply(chrs, function(chr){
-    plot_spectrum(loc = peak, peak_table = peak_table, chrom_list = chrom_list,
+    try(plot_spectrum(loc = peak, peak_table = peak_table, chrom_list = chrom_list,
                   chr = chr, plot_spectrum = FALSE, plot_trace = FALSE, 
                   export_spectrum = TRUE, scale_spectrum = scale_spectrum,
                   verbose = verbose, what = "peak", engine="base")
+    )
   })
   sp <- as.data.frame(do.call(cbind, sp))
   colnames(sp) <- names(chrom_list)[chrs]
@@ -458,7 +462,7 @@ plotly_spec <- function(y, spectrum_labels = TRUE, color="black", width=1.2,
 }
 
 plot_trace <- function(chrom_list, chr, lambda.idx, idx=NULL, what){
-  new.ts <- as.numeric(rownames(chrom_list[[1]]))
+  new.ts <- get_times(chrom_list)
   lambda <- colnames(chrom_list[[1]])[lambda.idx]
   y_trace <- chrom_list[[chr]][,lambda.idx]
   matplot(x = new.ts, y = y_trace, type='l', ylab='', xlab='')
