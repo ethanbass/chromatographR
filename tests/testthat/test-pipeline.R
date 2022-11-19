@@ -159,9 +159,8 @@ test_that("attach_ref_spectra works", {
 
 # test filter_peaktable
 
-pktab_s <- filter_peaktable(pk_tab, min_rt=6, max_rt=15)
-
 test_that("filter_peaktable works", {
+  pktab_s <- filter_peaktable(pk_tab, min_rt = 6, max_rt = 15)
   # check that dimensions are unaltered
   expect_equal(rownames(pk_tab$tab), rownames(pktab_s$tab))
   expect_equal(colnames(pktab_s$tab), colnames(pktab_s$pk_meta))
@@ -172,7 +171,7 @@ test_that("filter_peaktable works", {
 })
 
 test_that("combine_peaks works", {
-  suppressWarnings(pk_tab_c <- combine_peaks(pk_tab))
+  pk_tab_c <- combine_peaks(pk_tab, verbose = FALSE)
   expect_lt(ncol(pk_tab_c), ncol(pk_tab))
   expect_lt(ncol(pk_tab_c$pk_meta), ncol(pk_tab$pk_meta))
   expect_equal(rownames(pk_tab_c$tab), rownames(pk_tab$tab))
@@ -251,22 +250,6 @@ test_that("plot_spectrum works", {
 })
 
 test_that("plot_spectrum works", {
-  skip_if_not_installed("vdiffr")
-  test_spec <- function(){
-    par(mfrow=c(2,1))
-    plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
-                  what="rt", chr=1, verbose = FALSE)
-  }
-  vdiffr::expect_doppelganger("plot_spectrum", test_spec)
-  x <- plot_spectrum("V13", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
-                     what="peak", chr=1, verbose = FALSE)
-  expect_equal(rownames(x), as.character(new.lambdas))
-  expect_equal(class(x), "data.frame")
-  expect_equal(ncol(x), 1)
-})
-
-
-test_that("plot_spectrum works", {
   x <- plot_spectrum("V13", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
                      what="peak", chr=1, verbose = FALSE)
   expect_equal(rownames(x), as.character(new.lambdas))
@@ -302,9 +285,9 @@ test_that("mirror_plot works", {
 
 test_that("cluster_spectra works", {
   skip_on_cran()
-  suppressWarnings(cl <- cluster_spectra(pk_tab, chrom_list = dat.pr, nboot = 10,
-                                         parallel = FALSE, verbose = FALSE,
-                                         save = FALSE, output = "both"))
+  cl <- cluster_spectra(pk_tab, chrom_list = dat.pr, nboot = 10,
+                          parallel = FALSE, verbose = FALSE, save = FALSE,
+                        output = "both", plot_dend = FALSE, plot_spectra = FALSE)
   expect_equal(class(cl[[1]]), "pvclust")
   expect_equal(class(cl[[2]]), "list")
 })

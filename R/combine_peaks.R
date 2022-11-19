@@ -11,6 +11,8 @@
 #' @param min.cor Minimum spectral correlation to confirm a match.
 #' @param choose If "max" will retain peak with highest intensity. Otherwise,
 #' the first column in the data.frame will be retained.
+#' @param verbose Logical. Whether to print status to the console. Defaults to
+#' TRUE.
 #' @return A peak table similar to the input peak table, but with duplicate
 #' columns combined according to the specified criteria.
 #' @author Ethan Bass
@@ -22,7 +24,8 @@
 #' combine_peaks(pk_tab, tol = .02, min.cor = .9)
 #' @export combine_peaks
 
-combine_peaks <- function(peak_table, tol=.01, min.cor=0.9, choose='max'){
+combine_peaks <- function(peak_table, tol = .01, min.cor = 0.9,
+                          choose = 'max', verbose = TRUE){
   check_peaktable(peak_table)
   if (!(is.data.frame(peak_table$ref_spectra) | is.matrix(peak_table$ref_spectra))){
     stop("No reference spectra found. Use attach_ref_spectra function first.")
@@ -34,7 +37,8 @@ combine_peaks <- function(peak_table, tol=.01, min.cor=0.9, choose='max'){
   mat <- outer(RTs, RTs, compare_rts, tol = tol)
   # find columns with a retention time match
   d <- which(apply(mat, 2, sum) > 1)
-  cors <- cor(peak_table$ref_spectra)
+  cors <- suppressWarnings(cor(peak_table$ref_spectra))
+  if (verbose) warnings()
   # iterate over columns with retention time match
   # find columns to remove (sub)
   sub <- sapply(d, function(e){
@@ -53,6 +57,8 @@ combine_peaks <- function(peak_table, tol=.01, min.cor=0.9, choose='max'){
   peak_table$tab <- peak_table$tab[, -unlist(sub)]
   peak_table$pk_meta <- peak_table$pk_meta[, -unlist(sub)]
   }
-  message(paste("Removed "), length(sub), " peaks from peak table.")
+  if (verbose){
+    message(paste("Removed "), length(sub), " peaks from peak table.")
+  }
   peak_table
 }

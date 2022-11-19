@@ -99,10 +99,9 @@ cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
     if (verbose)
       print('...collecting representative spectra')
     rep <- sapply(colnames(peak_table[[1]]), function(j){
-      #print(j)
       sp <- plot_spectrum(loc=j, peak_table=peak_table, chrom_list = chrom_list,
                           scale_spectrum=TRUE, plot_trace=FALSE,
-                          export_spectrum=TRUE, plot_spectrum=FALSE, verbose=FALSE)
+                          export_spectrum=TRUE, plot_spectrum=FALSE, verbose=verbose)
     })
     rep <- data.frame(do.call(cbind,rep))
     names(rep) <- paste0('V',seq_len(ncol(rep)))
@@ -113,9 +112,9 @@ cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
   d <- 1 - abs(cor(rep, method="pearson"))
   if (verbose)
     print('...clustering spectra')
-  result <- pvclust(rep, method.dist = "cor",
-                             nboot = nboot, parallel = parallel, ...)
-  
+  result <- suppressWarnings(pvclust(rep, method.dist = "cor",
+                             nboot = nboot, parallel = parallel, quiet=!verbose, ...)
+  )
   if (plot_dend){
     plot(result,labels = FALSE, cex.pv=0.5, print.pv = 'au',print.num = FALSE)
     pvrect(result, alpha = alpha, max.only = max.only)

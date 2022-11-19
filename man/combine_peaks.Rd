@@ -4,7 +4,13 @@
 \alias{combine_peaks}
 \title{Combine peaks in peak table}
 \usage{
-combine_peaks(peak_table, tol = 0.01, min.cor = 0.9, choose = "max")
+combine_peaks(
+  peak_table,
+  tol = 0.01,
+  min.cor = 0.9,
+  choose = "max",
+  verbose = TRUE
+)
 }
 \arguments{
 \item{peak_table}{Peak table from \code{\link{get_peaktable}}.}
@@ -16,6 +22,9 @@ difference).}
 
 \item{choose}{If "max" will retain peak with highest intensity. Otherwise,
 the first column in the data.frame will be retained.}
+
+\item{verbose}{Logical. Whether to print status to the console. Defaults to
+TRUE.}
 }
 \value{
 A peak table similar to the input peak table, but with duplicate
