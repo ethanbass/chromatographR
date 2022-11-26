@@ -509,15 +509,3 @@ plotly_trace <- function(chrom_list, chr, lambda.idx, idx, color="black",
   }
   p
 }
-
-#' @noRd
-check_for_pkg <- function(pkg){
-  if (!requireNamespace(pkg, quietly = TRUE)) {
-    stop(paste(
-      "Package", sQuote(pkg), "must be installed to perform this action:
-          try", paste0("`install.packages('", pkg, "')`.")),
-      call. = FALSE
-    )
-  }
-}
-

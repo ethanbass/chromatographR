@@ -117,3 +117,15 @@ get_lambdas <- function(chrom_list){
 get_time_resolution <- function(chrom_list){
   signif(median(diff(as.numeric(rownames(chrom_list[[1]])))))
 }
+
+#' @noRd
+check_for_pkg <- function(pkg){
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    stop(paste(
+      "Package", sQuote(pkg), "must be installed to perform this action:
+          try", paste0("`install.packages('", pkg, "')`.")),
+      call. = FALSE
+    )
+  }
+}
+
