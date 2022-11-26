@@ -1,25 +1,4 @@
 
-#' @noRd
-#' @export
-boxplot.peak_table <- function(x, loc, rows, vars, ...){
-  if (is.null(vars)){
-    stop("Must provide independent variable(s) (`var`) to make a boxplot.")
-  }
-  if (missing(loc)){
-    stop("A peak name must be provided to `loc` to make a boxplot.")
-  }
-  if (missing(rows)){
-    rows <- seq_len(nrow(x[["tab"]]))
-  }
-  for (l in loc){
-    boxplot(as.formula(paste("x[['tab']][rows, l]", vars, sep="~")),
-            data = x$sample_meta,
-            main = paste(loc, '\n', 'RT = ', round(as.numeric(x$pk_meta['rt', l]), 2)),
-            ylab="abs", xlab="", ...)
-  }
-}
-
-
 #' Plot spectrum from peak table
 #' 
 #' Plots the trace and/or spectrum for a given peak in peak table. 
@@ -53,7 +32,7 @@ boxplot.peak_table <- function(x, loc, rows, vars, ...){
 #' lambda. Defaults to TRUE.
 #' @param box_plot Logical. If TRUE, plots box plot using categories
 #' defined by \code{vars}.
-#' @param vars Independent variables for boxplot.
+#' @param vars Independent variables for boxplot. Righthand side of formula.
 #' @param spectrum_labels Logical. If TRUE, plots labels on maxima in spectral
 #' plot. Defaults to TRUE.
 #' @param scale_spectrum Logical. If TRUE, scales spectrum to unit height.
@@ -131,6 +110,31 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
     }
     if (export_spectrum)
       out
+  }
+}
+
+#' Make boxplot of variables from peak table.
+#' @noRd
+#' @examples
+#' data(pk_tab)
+#' boxplot(pk_tab, loc= "V11", var="trt*genotype")
+#' @export
+
+boxplot.peak_table <- function(x, loc, idx, vars, ...){
+  if (is.null(vars)){
+    stop("Must provide independent variable(s) (`var`) to make a boxplot.")
+  }
+  if (missing(loc)){
+    stop("A peak name must be provided to `loc` to make a boxplot.")
+  }
+  if (missing(idx)){
+    idx <- seq_len(nrow(x[["tab"]]))
+  }
+  for (l in loc){
+    boxplot(as.formula(paste("x[['tab']][idx, l]", vars, sep="~")),
+            data = x$sample_meta,
+            main = paste(loc, '\n', 'RT = ', round(as.numeric(x$pk_meta['rt', l]), 2)),
+            ylab="abs", xlab="", ...)
   }
 }
 
