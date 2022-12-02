@@ -15,8 +15,9 @@
 #' function).
 #' @param ... Additional arguments.
 #' @param loc A vector specifying the peak(s) or retention time(s) that you wish to plot.
-#' @param chrom_list A list of chromatograms in matrix form (timepoints x
-#' wavelengths).
+#' @param chrom_list A list of chromatograms in matrix format (timepoints x
+#' wavelengths). If no argument is provided here, the function will try to find the
+#' \code{chrom_list} object used to create the \code{peak_table}.
 #' @param what What to look for. Either \code{peak} to extract spectral information
 #' for a certain peak, \code{rt} to scan by retention time, or \code{click} to manually
 #' select retention time by clicking on the chromatogram. Defaults to \code{peak}.
@@ -114,26 +115,35 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
 }
 
 #' Make boxplot of variables from peak table.
-#' @noRd
+#' 
+#' The function can take multiple response variables on the left hand side of the
+#' formula (separated by \code{+}). In this case, a separate boxplot will be
+#' produced for each response variable.
+#' 
+#' @param x A peak_table object
+#' @param formula A formula object
+#' @param ... Additional arguments to \code{\link[graphics]{boxplot}}
+#' @importFrom stats reformulate terms
+#' @importFrom graphics boxplot
 #' @examples
 #' data(pk_tab)
-#' boxplot(pk_tab, loc= "V11", var="trt*genotype")
+#' path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
+#' meta <- read.csv(path)
+#' pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
+#' boxplot(pk_tab, formula=V11 ~ trt)
 #' @export
 
-boxplot.peak_table <- function(x, loc, idx, vars, ...){
-  if (is.null(vars)){
-    stop("Must provide independent variable(s) (`var`) to make a boxplot.")
+boxplot.peak_table <- function(x, formula, ...){
+  if (missing(formula)){
+    stop("Please provide a `formula` to make a boxplot.")
   }
-  if (missing(loc)){
-    stop("A peak name must be provided to `loc` to make a boxplot.")
-  }
-  if (missing(idx)){
-    idx <- seq_len(nrow(x[["tab"]]))
-  }
-  for (l in loc){
-    boxplot(as.formula(paste("x[['tab']][idx, l]", vars, sep="~")),
+  lhs <- get_lhs_vars(formula)
+  for (li in lhs){
+    response <- paste0("x[['tab']][,'",li, "']")
+    form <- reformulate(labels(terms(formula)), response = response)
+    boxplot(form,
             data = x$sample_meta,
-            main = paste(loc, '\n', 'RT = ', round(as.numeric(x$pk_meta['rt', l]), 2)),
+            main = paste(li, '\n', 'RT = ', round(as.numeric(x$pk_meta['rt', li]), 2)),
             ylab="abs", xlab="", ...)
   }
 }
@@ -151,8 +161,9 @@ boxplot.peak_table <- function(x, loc, idx, vars, ...){
 #' @importFrom utils head tail
 #' @param peak_table The peak table (output from \code{\link{get_peaktable}}
 #' function).
-#' @param chrom_list A list of chromatograms in matrix form (timepoints x
-#' wavelengths).
+#' @param chrom_list A list of chromatograms in matrix format (timepoints x
+#' wavelengths). If no argument is provided here, the function will try to find the
+#' \code{chrom_list} object used to create the \code{peak_table}.
 #' @param lambdas The wavelength you wish to plot the traces at.
 #' @param var Variable to index chromatograms.
 #' @param subset Character vector specifying levels to use (if more than 2 levels

@@ -15,7 +15,10 @@ get_chrom_list <- function(x, chrom_list, verbose = FALSE){
   if (inherits(x, "peak_table")){
     if (missing(chrom_list)){
       chrom_list <- try(get(x$args[["chrom_list"]]))
-      if (inherits(chrom_list, "try-error")) stop("Chromatograms not found!")
+      if (inherits(chrom_list, "try-error")){
+        stop("Chromatograms not found! Please make sure the appropriate chrom_list
+             object has been loaded")
+      }
     }
     if (length(chrom_list) != nrow(x$tab)){
       stop("Dimensions of chrom_list and peak_table do not match.")
@@ -129,3 +132,14 @@ check_for_pkg <- function(pkg){
   }
 }
 
+#' Extract variables from the left-hand-side of a formula
+#'
+#' @param formula A \code{\link{formula}} object.
+#' @importFrom Formula Formula
+#' @noRd
+#' @note Adapted from https://github.com/adibender/pammtools/blob/master/R/formula-utils.R
+get_lhs_vars <- function(formula) {
+  if (is.character(formula) ) formula <- as.formula(formula)
+  form <- formula(Formula::Formula(formula), lhs = TRUE, rhs = FALSE)
+  all.vars(form)
+}

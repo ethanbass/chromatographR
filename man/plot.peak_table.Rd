@@ -31,8 +31,9 @@ function).}
 
 \item{loc}{A vector specifying the peak(s) or retention time(s) that you wish to plot.}
 
-\item{chrom_list}{A list of chromatograms in matrix form (timepoints x
-wavelengths).}
+\item{chrom_list}{A list of chromatograms in matrix format (timepoints x
+wavelengths). If no argument is provided here, the function will try to find the
+\code{chrom_list} object used to create the \code{peak_table}.}
 
 \item{what}{What to look for. Either \code{peak} to extract spectral information
 for a certain peak, \code{rt} to scan by retention time, or \code{click} to manually
@@ -55,7 +56,7 @@ lambda. Defaults to TRUE.}
 \item{box_plot}{Logical. If TRUE, plots box plot using categories
 defined by \code{vars}.}
 
-\item{vars}{Independent variables for boxplot.}
+\item{vars}{Independent variables for boxplot. Righthand side of formula.}
 
 \item{spectrum_labels}{Logical. If TRUE, plots labels on maxima in spectral
 plot. Defaults to TRUE.}

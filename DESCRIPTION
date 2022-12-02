@@ -26,9 +26,11 @@ URL: https://ethanbass.github.io/chromatographR/
 BugReports: https://github.com/ethanbass/chromatographR/issues
 Depends: R (>= 3.5.0)
 Imports: 
+    caTools,
     chromConverter,
     dynamicTreeCut,
     fastcluster,
+    Formula,
     graphics,
     grDevices,
     lattice,
@@ -38,7 +40,6 @@ Imports:
     ptw,
     pvclust,
     scales,
-    smoother,
     stats,
     utils,
     VPdtw

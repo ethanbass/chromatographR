@@ -23,8 +23,9 @@ cluster_spectra(
 \arguments{
 \item{peak_table}{Peak table from \code{\link{get_peaktable}}.}
 
-\item{chrom_list}{A list of chromatograms in matrix form (timepoints x
-wavelengths).}
+\item{chrom_list}{A list of chromatograms in matrix format (timepoints x
+wavelengths). If no argument is provided here, the function will try to find
+the \code{chrom_list} object used to create the provided \code{peak_table}.}
 
 \item{peak_no}{Minimum and maximum thresholds for the number of peaks a
 cluster may have.}

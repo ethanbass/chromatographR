@@ -14,8 +14,9 @@
 #' extract spectral data.
 #' @param peak_table The peak table (output from \code{\link{get_peaktable}}
 #' function).
-#' @param chrom_list A list of chromatograms in matrix form (timepoints x
-#' wavelengths).
+#' @param chrom_list A list of chromatograms in matrix format (timepoints x
+#' wavelengths). If no argument is provided here, the function will try to find
+#' the \code{chrom_list} object used to create the provided \code{peak_table}.
 #' @param chr Numerical index of chromatogram you wish to plot, or "max" to
 #' automatically plot the chromatogram with the largest signal.
 #' @param lambda The wavelength you wish to plot the trace at if plot_trace ==
@@ -124,8 +125,8 @@ plot_spectrum <- function(loc = NULL, peak_table, chrom_list,
 plot_spectrum_plotly <- function(loc, peak_table, chrom_list,
                                  chr = 'max', lambda = 'max',
                                  plot_spectrum = TRUE, plot_trace = TRUE,
-                                 spectrum_labels=TRUE, scale_spectrum=FALSE,
-                                 export_spectrum = FALSE, verbose=TRUE, 
+                                 spectrum_labels = TRUE, scale_spectrum = FALSE,
+                                 export_spectrum = FALSE, verbose = TRUE, 
                                  what=c("peak", "rt", "idx", "click"),
                                  ...){
   if (!requireNamespace("plotly", quietly = TRUE)) {
@@ -203,7 +204,7 @@ plot_spectrum_plotly <- function(loc, peak_table, chrom_list,
 plot_spectrum_base <- function(loc, peak_table, chrom_list,
                                chr = 'max', lambda = 'max',
                                plot_spectrum = TRUE, plot_trace = TRUE,
-                               spectrum_labels=TRUE, scale_spectrum=FALSE,
+                               spectrum_labels = TRUE, scale_spectrum = FALSE,
                                export_spectrum = FALSE, verbose=TRUE, 
                                what=c("peak", "rt", "idx", "click"),
                                ...){
@@ -277,8 +278,9 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
 #' @importFrom graphics identify title text abline
 #' @param peak_table The peak table (output from \code{\link{get_peaktable}}
 #' function).
-#' @param chrom_list A list of chromatograms in matrix form (timepoints x
-#' wavelengths).
+#' @param chrom_list A list of chromatograms in matrix format (timepoints x
+#' wavelengths). If no argument is provided here, the function will try to find
+#' the \code{chrom_list} object used to create the provided \code{peak_table}.
 #' @param chr Numerical index of chromatogram you wish to plot.
 #' @param lambda The wavelength to plot the trace at.
 #' @param plot_spectrum Logical. Whether to plot the spectrum or not.
@@ -357,8 +359,10 @@ scan_chrom <- function(chrom_list, chr, lambda,
 #' format)
 #' @param peak_table The peak table (output from \code{\link{get_peaktable}}
 #' function)
-#' @param chrom_list A list of profile matrices, each of the same dimensions
-#' (timepoints x components).
+#' @param chrom_list A list of chromatograms in matrix format (timepoints x 
+#' components). If no argument is provided here, the function will
+#' try to find the \code{chrom_list} object used to create the provided
+#' \code{peak_table}.
 #' @param chrs Vector of chromatograms to plot.
 #' @param plot_spectrum Logical. If TRUE, plots the spectrum of the chosen
 #' peak.
@@ -433,7 +437,8 @@ plot_spec <- function(y, spectrum_labels = TRUE, ...){
           ylab = 'Intensity', xlab = 'Wavelength (nm)',
           ylim=c(0,max(y, na.rm = TRUE)*1.2), ...)
   if (spectrum_labels){
-    suppressWarnings(pks <- find_peaks(y, slope_thresh = .00001, bounds = FALSE))
+    suppressWarnings(pks <- find_peaks(y, slope_thresh = .00001, bounds = FALSE, 
+                                       smooth_type = "none"))
     if (length(pks) > 0){
       pks <- data.frame(round(as.numeric(names(y)[pks]), 0), y[pks],
                         stringsAsFactors = FALSE)

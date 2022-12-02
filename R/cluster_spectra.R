@@ -30,8 +30,9 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' @importFrom methods new
 #' @importFrom graphics matplot
 #' @param peak_table Peak table from \code{\link{get_peaktable}}.
-#' @param chrom_list A list of chromatograms in matrix form (timepoints x
-#' wavelengths).
+#' @param chrom_list A list of chromatograms in matrix format (timepoints x
+#' wavelengths). If no argument is provided here, the function will try to find
+#' the \code{chrom_list} object used to create the provided \code{peak_table}.
 #' @param peak_no Minimum and maximum thresholds for the number of peaks a
 #' cluster may have.
 #' @param alpha Confidence threshold for inclusion of cluster.

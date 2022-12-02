@@ -85,8 +85,8 @@ test_that("correct_rt works with vpdtw", {
 ### test get_peaks ###
 # lam <- c("260") # tests fail if I use multiple wavelengths here
 lam <- c("210","318")
-pks_egh <- get_peaks(dat.pr, lambdas = lam, fit = "egh")
-pks_gaussian <- get_peaks(dat.pr, lambdas = lam, fit = "gaussian")
+pks_egh <- get_peaks(dat.pr, lambdas = lam, fit = "egh", smooth_type = "none")
+pks_gaussian <- get_peaks(dat.pr, lambdas = lam, fit = "gaussian", smooth_type = "none")
 
 test_that("get_peaks works", {
   expect_equal(names(pks_egh), names(dat.pr))
@@ -214,7 +214,7 @@ test_that("plot.peak_table works", {
   plot_peak_table <- function(){
     par(mfrow=c(3,1))
     plot(pk_tab, loc = "V13", chrom_list = dat.pr, box_plot = TRUE,
-         vars = "trt", verbose = FALSE)
+         vars = "trt", verbose = FALSE, spectrum_labels = TRUE)
   }
   vdiffr::expect_doppelganger("plot.peak_table", plot_peak_table)
 })

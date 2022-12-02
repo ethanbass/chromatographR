@@ -9,8 +9,9 @@ attach_ref_spectra(peak_table, chrom_list, ref = c("max.cor", "max.int"))
 \arguments{
 \item{peak_table}{Peak table from \code{\link{get_peaktable}}.}
 
-\item{chrom_list}{A list of chromatograms in matrix form (timepoints x
-wavelengths).}
+\item{chrom_list}{A list of chromatograms in matrix format (timepoints x
+wavelengths). If no argument is provided here, the function will try to find
+the \code{chrom_list} object used to create the provided \code{peak_table}.}
 
 \item{ref}{What criterion to use to select reference spectra.
 Current options are maximum correlation (\code{max.cor}) or maximum signal

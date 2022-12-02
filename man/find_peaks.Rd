@@ -6,9 +6,8 @@
 \usage{
 find_peaks(
   y,
-  smooth_type = "gaussian",
-  smooth_window = 1,
-  smooth_width = 0.1,
+  smooth_type = c("gaussian", "box", "savgol", "mva", "tmva", "none"),
+  smooth_window = 0.001,
   slope_thresh = 0,
   amp_thresh = 0,
   bounds = TRUE
@@ -17,11 +16,15 @@ find_peaks(
 \arguments{
 \item{y}{response (numerical vector)}
 
-\item{smooth_type}{Type of smoothing. (Defaults to "gaussian").}
+\item{smooth_type}{Type of smoothing. Either gaussian kernel (\code{gaussian}),
+box kernel (\code{box}), savitzky-golay smoothing (\code{savgol}),
+moving average (\code{mva}), triangular moving average (\code{tmva}), or 
+no smoothing (\code{none}).}
 
-\item{smooth_window}{Window for smoothing. (Defaults to 1).}
-
-\item{smooth_width}{Width for smoothing. (Defaults to 0.1).}
+\item{smooth_window}{Smoothing window. If the supplied value is between 0 and
+1, window will be interpreted as a proportion of points to include. Otherwise,
+the window will be the absolute number of points to include in the window.
+(Defaults to .001).}
 
 \item{slope_thresh}{Minimum threshold for peak slope. (Defaults to 0).}
 
@@ -39,9 +42,17 @@ centers. All locations are expressed as indices.
 Find peaks in chromatographic profile.
 }
 \details{
-Find peaks with function \code{find_peaks} by looking for zero-crossings in
-the smoothed first derivative of a signal that exceed a given slope
-threshold.
+Find peaks by looking for zero-crossings in the smoothed first derivative of
+the signal (\code{y}) that exceed the specified slope threshold
+(\code{slope_thresh}). Peaks can also be filtered by supplying a minimal
+amplitude threshold (\code{amp_thresh}), to filter out peaks below the
+specified height. 
+
+It is recommended to do pre-processing using the \code{\link{preprocess}}
+function before peak detection. Overly high chromatographic resolution can 
+sometimes lead to peaks being split into multiple segments. In this case,
+it is recommended to reduce the chromatogram resolution using the \code{dim2}
+argument before proceeding with further analyses.
 }
 \note{
 The \code{find_peaks} function is adapted from matlab code in Prof.

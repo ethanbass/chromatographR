@@ -2,18 +2,31 @@
 #' 
 #' Find peaks in chromatographic profile.
 #' 
-#' Find peaks with function \code{find_peaks} by looking for zero-crossings in
-#' the smoothed first derivative of a signal that exceed a given slope
-#' threshold.
+#' Find peaks by looking for zero-crossings in the smoothed first derivative of
+#' the signal (\code{y}) that exceed the specified slope threshold
+#' (\code{slope_thresh}). Peaks can also be filtered by supplying a minimal
+#' amplitude threshold (\code{amp_thresh}), to filter out peaks below the
+#' specified height. 
 #' 
-#' @importFrom smoother smth.gaussian
+#' It is recommended to do pre-processing using the \code{\link{preprocess}}
+#' function before peak detection. Overly high chromatographic resolution can 
+#' sometimes lead to peaks being split into multiple segments. In this case,
+#' it is recommended to reduce the chromatogram resolution using the \code{dim2}
+#' argument before proceeding with further analyses.
+#' 
+#' @importFrom caTools runmean
 #' @importFrom minpack.lm nlsLM
-#' @importFrom stats deriv lm
+#' @importFrom stats deriv lm ksmooth
 #' @importFrom utils tail
 #' @param y response (numerical vector)
-#' @param smooth_type Type of smoothing. (Defaults to "gaussian").
-#' @param smooth_window Window for smoothing. (Defaults to 1).
-#' @param smooth_width Width for smoothing. (Defaults to 0.1).
+#' @param smooth_type Type of smoothing. Either gaussian kernel (\code{gaussian}),
+#' box kernel (\code{box}), savitzky-golay smoothing (\code{savgol}),
+#' moving average (\code{mva}), triangular moving average (\code{tmva}), or 
+#' no smoothing (\code{none}).
+#' @param smooth_window Smoothing window. If the supplied value is between 0 and
+#' 1, window will be interpreted as a proportion of points to include. Otherwise,
+#' the window will be the absolute number of points to include in the window.
+#' (Defaults to .001).
 #' @param slope_thresh Minimum threshold for peak slope. (Defaults to 0).
 #' @param amp_thresh Minimum threshold for peak amplitude. (Defaults to 0).
 #' @param bounds Logical. If TRUE, includes peak boundaries in data.frame.
@@ -34,15 +47,27 @@
 #' Applications in scientific measurement.
 #' /href{https://terpconnect.umd.edu/~toh/spectrum/} (Accessed January, 2022).
 #' @export find_peaks
-find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1,
-                       smooth_width = 0.1, slope_thresh = 0, amp_thresh = 0,
+find_peaks <- function(y, smooth_type=c("gaussian", "box", "savgol", "mva","tmva","none"),
+                       smooth_window = .001, slope_thresh = 0, amp_thresh = 0,
                        bounds = TRUE){
-  
+  smooth_type <- match.arg(smooth_type, c("gaussian", "box","savgol", "mva","tmva","none"))
+  if (smooth_window < 1){
+    smooth_window <- length(y)*smooth_window
+  }
   #compute derivative (with or without smoothing)
-  if (smooth_type=='gaussian'){
-    d <- smth.gaussian(diff(y), window = smooth_window, alpha = smooth_width)
+  if (smooth_type == "savgol"){
+    if ((smooth_window %% 2) == 0){smooth_window <- smooth_window + 1}
+    d <- savgol(diff(y), fl = smooth_window)
+  } else if (smooth_type == "mva"){
+    d <- caTools::runmean(diff(y), k = smooth_window)
+  } else if (smooth_type == 'gaussian'){
+    d <- diff(ksmooth(seq_along(y), y, kernel = "normal", bandwidth = smooth_window)$y)
+  }  else if (smooth_type == "box"){
+    d <- diff(ksmooth(seq_along(y), y, kernel = "box", bandwidth = smooth_window)$y)
+  } else if (smooth_type == "tmva"){
+    d <- runmean(runmean(diff(y), k=smooth_window), k=smooth_window)
   } else{
-    d <- deriv(y)
+    d <- diff(y)
   }
   
   # detect zero-crossing of first derivative (peak apex)
@@ -64,8 +89,8 @@ find_peaks <- function(y, smooth_type="gaussian", smooth_window = 1,
     # find upper bound
     suppressWarnings(bu <- sapply(p, function(v) min(p4[p4 > v])))
     bu[which(bu == Inf)] <- length(y)
-    data.frame(pos = p, lower = bl, upper = bu)
-  } else 
+    p <- data.frame(pos = p, lower = bl, upper = bu)
+  }
   p
 }
 
@@ -337,4 +362,54 @@ fitpk_raw <- function(x, pos, lambda, max.iter){
   c("rt" = pos[1], "start" = pos[2], "end" = pos[3], 
     "sd" = pos[3]-pos[2], "FWHM" = 2.35 * pos[3]-pos[2],
     "height" = y[xloc], "area" = area, purity = purity)
+}
+
+
+#' Savitsky Golay Smoothing from pracma
+#' @author Hans W. Borchers
+#' @param T Vector of signals to be filtered
+#' @param fl Filter length (for instance fl = 51..151), has to be odd.
+#' @param forder filter order Filter order (2 = quadratic filter, 4 = quartic).
+#' @param dorder Derivative order (0 = smoothing, 1 = first derivative, etc.).
+#' @importFrom stats convolve
+savgol <- function(T, fl, forder = 4, dorder = 0) {
+  stopifnot(is.numeric(T), is.numeric(fl))
+  if (fl <= 1 || fl %% 2 == 0)
+    stop("Argument 'fl' must be an odd integer greater than 1.")
+  n <- length(T)
+  
+  # -- calculate filter coefficients --
+  fc <- (fl-1)/2                          # index: window left and right
+  X <- outer(-fc:fc, 0:forder, FUN="^")   # polynomial terms and coeffs
+  Y <- pinv(X);                           # pseudoinverse
+  
+  # -- filter via convolution and take care of the end points --
+  T2 <- convolve(T, rev(Y[(dorder+1),]), type="o")   # convolve(...)
+  T2 <- T2[(fc+1):(length(T2)-fc)]
+  
+  Tsg <- (-1)^dorder * T2
+  return( Tsg )
+}
+
+#' @noRd
+pinv <- function (A, tol = .Machine$double.eps^(2/3)) {
+  stopifnot(is.numeric(A) || is.complex(A), is.matrix(A))
+  
+  s <- svd(A)
+  # D <- diag(s$d); Dinv <- diag(1/s$d)
+  # U <- s$u; V <- s$v
+  # A = U D V'
+  # X = V Dinv U'
+  if (is.complex(A)) s$u <- Conj(s$u)
+  
+  p <- ( s$d > max(tol * s$d[1], 0) )
+  if (all(p)) {
+    mp <- s$v %*% (1/s$d * t(s$u))
+  } else if (any(p)) {
+    mp <- s$v[, p, drop=FALSE] %*% (1/s$d[p] * t(s$u[, p, drop=FALSE]))
+  } else {
+    mp <- matrix(0, nrow=ncol(A), ncol=nrow(A))
+  }
+  
+  return(mp)
 }

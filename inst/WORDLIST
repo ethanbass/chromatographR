@@ -4,6 +4,7 @@ Afsar
 Agilent
 Bioinformatics
 Bloemberg
+Borchers
 Broeckling
 CMD
 Carvalho
@@ -20,6 +21,7 @@ Entab
 FID
 FWHM
 GC
+Golay
 HPLC
 Hartwell
 Hur
@@ -35,6 +37,7 @@ Naish
 Neumann
 O'Haver
 O'Haver's
+PTW
 Parsers
 Pre
 Prenni
@@ -43,6 +46,8 @@ Pvclust
 RAMClust
 Reproducibility
 Rezzi
+Righthand
+Savitsky
 Shimadzu
 Shimodaira
 Solidago
@@ -75,6 +80,7 @@ egh
 et
 getAllPeaks
 getPeakTable
+golay
 href
 https
 isocratic
@@ -85,11 +91,14 @@ metacran
 parsers
 pearson
 plotly
+pracma
 pre
 preprocess
 preprocessed
 ptw
 pvclust
+quartic
+savitzky
 sd
 stripplot
 terpconnect
@@ -97,5 +106,4 @@ timepoint
 toh
 toolset
 umd
-unwarped
 www

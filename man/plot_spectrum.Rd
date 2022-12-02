@@ -28,8 +28,9 @@ extract spectral data.}
 \item{peak_table}{The peak table (output from \code{\link{get_peaktable}}
 function).}
 
-\item{chrom_list}{A list of chromatograms in matrix form (timepoints x
-wavelengths).}
+\item{chrom_list}{A list of chromatograms in matrix format (timepoints x
+wavelengths). If no argument is provided here, the function will try to find
+the \code{chrom_list} object used to create the provided \code{peak_table}.}
 
 \item{chr}{Numerical index of chromatogram you wish to plot, or "max" to
 automatically plot the chromatogram with the largest signal.}

@@ -18,7 +18,9 @@ normalize_data(
 \item{column}{The name of the column containing the weights.}
 
 \item{chrom_list}{List of chromatograms for normalization. The samples must
-be in same order as the peak_table.}
+be in same order as the peak_table. If no argument is provided here, the
+function will try to find the \code{chrom_list} object used to create the
+provided \code{peak_table}.}
 
 \item{what}{`peak_table` or list of chromatograms (`chrom_list`).}
 

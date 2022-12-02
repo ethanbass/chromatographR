@@ -68,8 +68,9 @@ keep_order <- function(data, fn, ...) {
 #' 
 #' @importFrom stats cor sd
 #' @param peak_table Peak table from \code{\link{get_peaktable}}.
-#' @param chrom_list A list of chromatograms in matrix form (timepoints x
-#' wavelengths).
+#' @param chrom_list A list of chromatograms in matrix format (timepoints x
+#' wavelengths). If no argument is provided here, the function will try to find
+#' the \code{chrom_list} object used to create the provided \code{peak_table}.
 #' @param ref What criterion to use to select reference spectra.
 #' Current options are maximum correlation (\code{max.cor}) or maximum signal
 #' intensity (\code{max.int}).
@@ -123,8 +124,9 @@ get_reference_spectra <- function(peak_table, chrom_list,
 #' 
 #' @aliases attach_ref_spectra
 #' @param peak_table Peak table from \code{\link{get_peaktable}}.
-#' @param chrom_list A list of chromatograms in matrix form (timepoints x
-#' wavelengths).
+#' @param chrom_list A list of chromatograms in matrix format (timepoints x
+#' wavelengths). If no argument is provided here, the function will try to find
+#' the \code{chrom_list} object used to create the provided \code{peak_table}.
 #' @param ref What criterion to use to select reference spectra.
 #' Current options are maximum correlation (\code{max.cor}) or maximum signal
 #' intensity (\code{max.int}).
@@ -154,7 +156,9 @@ attach_ref_spectra <- function(peak_table, chrom_list, ref = c("max.cor","max.in
 #' @param peak_table A `peak_table` object
 #' @param column The name of the column containing the weights.
 #' @param chrom_list List of chromatograms for normalization. The samples must
-#' be in same order as the peak_table.
+#' be in same order as the peak_table. If no argument is provided here, the
+#' function will try to find the \code{chrom_list} object used to create the
+#' provided \code{peak_table}.
 #' @param what `peak_table` or list of chromatograms (`chrom_list`).
 #' @param by Whether to normalize by a column in sample metadata (\code{meta}) or
 #' by a column in the peak table itself (\code{peak}).

@@ -17,8 +17,9 @@ scan_chrom(
 )
 }
 \arguments{
-\item{chrom_list}{A list of chromatograms in matrix form (timepoints x
-wavelengths).}
+\item{chrom_list}{A list of chromatograms in matrix format (timepoints x
+wavelengths). If no argument is provided here, the function will try to find
+the \code{chrom_list} object used to create the provided \code{peak_table}.}
 
 \item{chr}{Numerical index of chromatogram you wish to plot.}
 

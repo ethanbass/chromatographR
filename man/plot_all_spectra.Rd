@@ -24,8 +24,10 @@ format)}
 \item{peak_table}{The peak table (output from \code{\link{get_peaktable}}
 function)}
 
-\item{chrom_list}{A list of profile matrices, each of the same dimensions
-(timepoints x components).}
+\item{chrom_list}{A list of chromatograms in matrix format (timepoints x 
+components). If no argument is provided here, the function will
+try to find the \code{chrom_list} object used to create the provided
+\code{peak_table}.}
 
 \item{chrs}{Vector of chromatograms to plot.}
 
