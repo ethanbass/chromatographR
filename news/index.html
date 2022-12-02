@@ -65,7 +65,8 @@
 <li>Added <a href="https://github.com/ethanbass/VPdtw/" class="external-link">VPdtw</a> as a dependency (instead of being only suggested).</li>
 <li>Minor updates to vignette.</li>
 <li>Adjusted <code>cluster_spectra</code> and <code>combine_peaks</code> functions so messages can be suppressed with <code>verbose == FALSE</code>.</li>
-<li>Fixed test failure on MKL server by skipping <code>cluster_spectra</code> test on CRAN.</li>
+<li>Fixed occasional test failure on MKL server by skipping <code>cluster_spectra</code> test on CRAN.</li>
+<li>Updated find_peaks function with more and better smoothing options. The defaults smoothing is slightly changed. Find peaks will now do gaussian smoothing by default with</li>
 </ul></div>
 <div class="section level5">
 <h5 id="changes-to-fit_peaks-function-0-4-5">Changes to <em>fit_peaks</em> function:<a class="anchor" aria-label="anchor" href="#changes-to-fit_peaks-function-0-4-5"></a></h5>

@@ -56,9 +56,8 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">find_peaks</span><span class="op">(</span></span>
 <span>  <span class="va">y</span>,</span>
-<span>  smooth_type <span class="op">=</span> <span class="st">"gaussian"</span>,</span>
-<span>  smooth_window <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  smooth_width <span class="op">=</span> <span class="fl">0.1</span>,</span>
+<span>  smooth_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"gaussian"</span>, <span class="st">"box"</span>, <span class="st">"savgol"</span>, <span class="st">"mva"</span>, <span class="st">"tmva"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
+<span>  smooth_window <span class="op">=</span> <span class="fl">0.005</span>,</span>
 <span>  slope_thresh <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  amp_thresh <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  bounds <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -72,15 +71,16 @@
 
 
 <dt>smooth_type</dt>
-<dd><p>Type of smoothing. (Defaults to "gaussian").</p></dd>
+<dd><p>Type of smoothing. Either guassian kernel (<code>gaussian</code>),
+box kernel (<code>box</code>), savitsky-golay smoothing (<code>savgol</code>),
+moving average <code>mva</code>, triangular moving average <code>tmva</code>, or <code>none</code>.</p></dd>
 
 
 <dt>smooth_window</dt>
-<dd><p>Window for smoothing. (Defaults to 1).</p></dd>
-
-
-<dt>smooth_width</dt>
-<dd><p>Width for smoothing. (Defaults to 0.1).</p></dd>
+<dd><p>Smoothing window. If the supplied value is between 0 and
+1, window will be interpreted as a proportion of points to include. Otherwise,
+the window will be the absolute number of points to include in the window.
+(Defaults to .005).</p></dd>
 
 
 <dt>slope_thresh</dt>
@@ -106,9 +106,16 @@ centers. All locations are expressed as indices.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Find peaks with function <code>find_peaks</code> by looking for zero-crossings in
-the smoothed first derivative of a signal that exceed a given slope
-threshold.</p>
+    <p>Find peaks by looking for zero-crossings in the smoothed first derivative of
+the signal (<code>y</code>) that exceed the specified slope threshold
+(<code>slope_thresh</code>). Peaks can also be filtered by supplying a minimal
+amplitude threshold (<code>amp_thresh</code>), to filter out peaks below the
+specified height.</p>
+<p>It is recommended to do pre-processing using the <code><a href="preprocess.html">preprocess</a></code>
+function before peak detection. Overly high chromatographic resolution can 
+sometimes lead to peaks being split into multiple segments. In this case,
+it is recommended to reduce the chromatogram resolution using the <code>dim2</code>
+argument before proceeding with further analyses.</p>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>

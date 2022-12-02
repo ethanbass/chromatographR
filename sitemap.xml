@@ -37,6 +37,9 @@
     <loc>https://ethanbass.github.io/chromatographR/reference/attach_ref_spectra.html</loc>
   </url>
   <url>
+    <loc>https://ethanbass.github.io/chromatographR/reference/boxplot.peak_table.html</loc>
+  </url>
+  <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/chromatographR-package.html</loc>
   </url>
   <url>
@@ -125,6 +128,9 @@
   </url>
   <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/reshape_chroms.html</loc>
+  </url>
+  <url>
+    <loc>https://ethanbass.github.io/chromatographR/reference/savgol.html</loc>
   </url>
   <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/scan_chrom.html</loc>

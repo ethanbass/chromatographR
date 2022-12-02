@@ -91,8 +91,9 @@ function).</p></dd>
 
 
 <dt>chrom_list</dt>
-<dd><p>A list of chromatograms in matrix form (timepoints x
-wavelengths).</p></dd>
+<dd><p>A list of chromatograms in matrix format (timepoints x
+wavelengths). If no argument is provided here, the function will try to find the
+<code>chrom_list</code> object used to create the <code>peak_table</code>.</p></dd>
 
 
 <dt>what</dt>
@@ -129,7 +130,7 @@ defined by <code>vars</code>.</p></dd>
 
 
 <dt>vars</dt>
-<dd><p>Independent variables for boxplot.</p></dd>
+<dd><p>Independent variables for boxplot. Righthand side of formula.</p></dd>
 
 
 <dt>spectrum_labels</dt>
