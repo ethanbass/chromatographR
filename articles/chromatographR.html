@@ -207,11 +207,11 @@
 <p>After obtaining a <code>peak_list</code>, the <code>get_peaks</code> function performs complete-linkage hierarchical clustering to link peaks across samples. It returns a <code>peak_table</code> object with samples as rows and peaks as columns. The <code>peak_table</code> object also has slots for holding various metadata about peaks, samples, and analyses. If you have a lot of samples, this step can be quite computationally expensive. Thus, it is suggested to filter the peak_list provided to <code>get_peaktable</code> in order to remove extraneous peaks (see <a href="###Peak%20finding%20and%20fitting">Peak finding and fitting</a> section above). Peaks can also be filtered after <code>peak_table</code> assembly using the <code>filter_peaktable</code> function.</p>
 <pre class="text"><code>&gt; pk_tab &lt;- get_peaktable(pks_egh, response = "area")
 &gt; head(pk_tab$tab[,1:6])</code></pre>
-<pre><code>          V1       V2        V3        V4       V5        V6
-119 0.000000 5.475999 0.0000000 0.6473611 1.889210 15.144775
-121 0.000000 4.262768 1.0941736 0.6130032 0.000000  8.006312
-122 0.000000 8.395934 0.9467302 1.9957845 0.000000 25.950200
-458 5.934559 6.201729 2.2873095 1.9889770 5.308515 13.995000</code></pre>
+<pre><code>          V1       V2        V3        V4        V5        V6
+119 0.000000 5.476068 0.0000000 0.6477083 15.144775 0.3108294
+121 0.000000 4.265326 1.0949622 0.6130032  8.006312 0.0000000
+122 0.000000 8.429666 0.8847985 1.9957845 25.950196 2.2444369
+458 5.934559 6.201729 2.2880236 1.9933859 14.565451 0.2541771</code></pre>
 </div>
 <div class="section level3">
 <h3 id="further-analysis-and-data-visualization">Further analysis and data-visualization<a class="anchor" aria-label="anchor" href="#further-analysis-and-data-visualization"></a>
