@@ -16,9 +16,9 @@
 #' /href{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
 #' @author Ethan Bass
 
-get_purity <- function(x, pos, weight=1, cutoff=0.05){
+get_purity <- function(x, pos, weight=1, cutoff = 0.05){
   p <- get_purity_values(x, pos, weight = weight)
-  mean(p[trim_peak(x, pos, cutoff=cutoff)] < 1, na.rm=TRUE)
+  mean(p[trim_peak(x, pos, cutoff = cutoff)] < 1, na.rm = TRUE)
 }
 
 #' Define noise spectra based on specified threshold
@@ -31,7 +31,7 @@ get_purity <- function(x, pos, weight=1, cutoff=0.05){
 find_noise <- function(x, noise_threshold=0.01, lambdas){
   lambdas <- which(as.numeric(colnames(x)) %in% lambdas)
   max_abs <- apply(x[,lambdas], 1, max)
-  which(max_abs < max(max_abs, na.rm = TRUE)*noise_threshold)
+  which(max_abs < max(max_abs, na.rm = TRUE) * noise_threshold)
 }
 
 #alternatively, could define baseline as areas where no peak is detected,

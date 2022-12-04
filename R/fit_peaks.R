@@ -168,8 +168,9 @@ fit_peaks <- function (x, lambda, pos = NULL, sd.max = 50,
   )
     noPeaksMat <- matrix(rep(NA, length(tabnames)),
                          nrow = 1, dimnames = list(NULL, tabnames))
-    on.edge <- sapply(pos$pos, function(x) is.na(y[x + 1]) |
-                        is.na(y[x - 1]))
+    on.edge <- sapply(pos$pos, function(x){
+      x <= 1 || is.na(y[x + 1]) || is.na(y[x - 1])
+    })
     pos <- pos[!on.edge,]
     
     if (nrow(pos) == 0) 
