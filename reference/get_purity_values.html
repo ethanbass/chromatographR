@@ -54,7 +54,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_purity_values</span><span class="op">(</span><span class="va">x</span>, <span class="va">pos</span>, weight <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_purity_values</span><span class="op">(</span><span class="va">x</span>, <span class="va">pos</span>, weight <span class="op">=</span> <span class="fl">1</span>, noise_threshold <span class="op">=</span> <span class="fl">0.005</span>, <span class="va">lambdas</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -69,6 +69,14 @@
 
 <dt>weight</dt>
 <dd><p>weight provided to <code><a href="get_agilent_threshold.html">get_agilent_threshold</a></code></p></dd>
+
+
+<dt>noise_threshold</dt>
+<dd><p>Threshold to define noise. Highest proportion of maximum absorbance.</p></dd>
+
+
+<dt>lambdas</dt>
+<dd><p>Wavelengths to include in calculations.</p></dd>
 
 </dl></div>
     <div class="section level2">
