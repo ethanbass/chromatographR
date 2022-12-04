@@ -20,6 +20,7 @@ correct_rt(
   penalty = 5,
   maxshift = 50,
   verbose = FALSE,
+  progress_bar = FALSE,
   ...
 )
 }
@@ -59,7 +60,10 @@ produce a higher penalty and allow less warping. Defaults to 5.}
 
 \item{maxshift}{Integer. Maximum allowable shift for \code{\link[VPdtw]{VPdtw}}.}
 
-\item{verbose}{Whether to be verbose.}
+\item{verbose}{Whether to print verbose output.}
+
+\item{progress_bar}{Logical. Whether to show progress bar. Defaults to
+\code{FALSE}.}
 
 \item{\dots}{Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
 The only argument that cannot be changed is \code{warp.type}: this is always

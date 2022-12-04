@@ -11,6 +11,8 @@ get_peaks(
   sd.max = 50,
   max.iter = 100,
   time.units = c("min", "s", "ms"),
+  noise_threshold = 0.001,
+  progress_bar = FALSE,
   ...
 )
 }
@@ -32,6 +34,11 @@ in \code{\link{fit_peaks}}.}
 \item{time.units}{Units of \code{sd}, \code{FWHM}, \code{area}, and \code{tau}
 (if applicable). Options are minutes \code{"min"}, seconds (\code{"s"}, or 
 milliseconds \code{"ms"}.}
+
+\item{noise_threshold}{Noise threshold. Argument to \code{get_purity}.}
+
+\item{progress_bar}{Logical. Whether to show progress bar. Defaults to 
+\code{FALSE}.}
 
 \item{\dots}{Additional arguments to \code{\link{find_peaks}}.}
 }

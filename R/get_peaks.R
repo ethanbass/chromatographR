@@ -26,6 +26,9 @@
 #' @param time.units Units of \code{sd}, \code{FWHM}, \code{area}, and \code{tau}
 #' (if applicable). Options are minutes \code{"min"}, seconds (\code{"s"}, or 
 #' milliseconds \code{"ms"}.
+#' @param noise_threshold Noise threshold. Argument to \code{get_purity}.
+#' @param progress_bar Logical. Whether to show progress bar. Defaults to 
+#' \code{FALSE}.
 #' @param \dots Additional arguments to \code{\link{find_peaks}}.
 #' @return The result is an S3 object of class \code{peak_list}, containing a nested
 #' list of data.frames containing information about the peaks fitted for each
@@ -62,7 +65,8 @@
 
 get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
                        sd.max = 50, max.iter = 100,
-                      time.units = c("min", "s", "ms"), ...){
+                      time.units = c("min", "s", "ms"),
+                      noise_threshold = .001, progress_bar = FALSE, ...){
   time.units <- match.arg(time.units, c("min", "s", "ms"))
   tfac <- switch(time.units, "min" = 1, "s" = 60, "ms" = 60*1000)
   fit <- match.arg(fit, c("egh", "gaussian", "raw"))
@@ -83,12 +87,13 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
     names(chrom_list) <- seq_along(chrom_list)
   }
   peaks<-list()
-  # chrom_list <- lapply(chrom_list, function(c_mat) c_mat[,lambdas, drop=FALSE])
-  result <- lapply(seq_along(chrom_list), function(sample){
+  laplee <- choose_apply_fnc(progress_bar)
+  result <- laplee(seq_along(chrom_list), function(sample){
     suppressWarnings(ptable <- lapply(lambdas, function(lambda){
       cbind(sample = names(chrom_list)[sample], lambda,
             fit_peaks(chrom_list[[sample]], lambda=lambda, fit = fit,
-                      max.iter = max.iter, sd.max = sd.max, ...))
+                      max.iter = max.iter, sd.max = sd.max, 
+                      noise_threshold = noise_threshold, ...))
     }))
     names(ptable) <- lambdas
     ptable
@@ -116,3 +121,13 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
             class = "peak_list")
 }
 
+#'@noRd
+choose_apply_fnc <- function(progress_bar){
+  if (progress_bar){
+    check_for_pkg("pbapply")
+    fn <- pbapply::pblapply
+  } else{
+    fn <- lapply
+  }
+  fn
+}

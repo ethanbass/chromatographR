@@ -32,7 +32,9 @@
 #' produce a lower penalty and be more permissive, while a lower number will 
 #' produce a higher penalty and allow less warping. Defaults to 5.
 #' @param maxshift Integer. Maximum allowable shift for \code{\link[VPdtw]{VPdtw}}.
-#' @param verbose Whether to be verbose.
+#' @param verbose Whether to print verbose output.
+#' @param progress_bar Logical. Whether to show progress bar. Defaults to 
+#' \code{FALSE}.
 #' @param \dots Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
 #' The only argument that cannot be changed is \code{warp.type}: this is always
 #' equal to \code{"global"}.
@@ -75,7 +77,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
                        init.coef = c(0, 1, 0), n.traces = NULL, n.zeros = 0, 
                        scale = FALSE, trwdth = 200, plot_it = FALSE,
                        penalty = 5, maxshift = 50,
-                       verbose = FALSE, ...){
+                       verbose = FALSE, progress_bar = FALSE, ...){
   what <- match.arg(what, c("corrected.values", "models"))
   alg <- match.arg(alg, c("ptw", "vpdtw"))
   if (missing(lambdas)){
@@ -93,7 +95,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
     }
     chrom_list_og <- chrom_list
     if (n.zeros > 0){
-    chrom_list <- lapply(chrom_list,function(x){
+    chrom_list <- lapply(chrom_list, function(x){
       apply(x, 2, padzeros, nzeros = n.zeros, side = 'both')
     })
     }
@@ -107,6 +109,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
       traces <- select.traces(X = allmats.t, criterion='coda')
       traces <- traces$trace.nrs[1:n.traces]
     }
+    # choose reference chromatogram
     if (reference == 'best'){
       best <- bestref(allmats.t)
       reference <- as.numeric(names(sort(table(best$best.ref),decreasing=TRUE))[1])
@@ -121,7 +124,8 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
         }
         ptwmods <- models
       } else{
-        ptwmods <- lapply(seq_len(dim(allmats)[3]), function(ii){
+        laplee <- choose_apply_fnc(progress_bar)
+        ptwmods <- laplee(seq_len(dim(allmats)[3]), function(ii){
           ptw(allmats.t[,, reference],
               allmats.t[,, ii], selected.traces = traces, init.coef = init.coef,
               warp.type = "global", ...)})

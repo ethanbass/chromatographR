@@ -4,7 +4,7 @@
 \alias{get_noise_variance}
 \title{Calculate variance of noise regions}
 \usage{
-get_noise_variance(x, noise_threshold = 0.005, lambdas = c(210:400))
+get_noise_variance(x, noise_threshold = 0.01, lambdas)
 }
 \arguments{
 \item{x}{A chromatogram in matrix format}

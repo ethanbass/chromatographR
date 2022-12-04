@@ -4,7 +4,7 @@
 \alias{get_purity}
 \title{Calculate mean peak purity}
 \usage{
-get_purity(x, pos, weight = 1, cutoff = 0.05)
+get_purity(x, pos, weight = 1, cutoff = 0.05, noise_threshold = 0.01, lambdas)
 }
 \arguments{
 \item{x}{A chromatogram in matrix format}
@@ -15,6 +15,10 @@ get_purity(x, pos, weight = 1, cutoff = 0.05)
 
 \item{cutoff}{Proportion of maximum absorbance to use as cutoff.
 Argument to \code{\link{trim_peak}}.}
+
+\item{noise_threshold}{Threshold to define noise. Highest proportion of maximum absorbance.}
+
+\item{lambdas}{Wavelengths to include in calculations.}
 }
 \value{
 Returns the mean purity of the peak specified by \code{pos}, defined
@@ -22,7 +26,7 @@ as the proportion of timepoints with purity values below 1.
 }
 \description{
 Estimates peak purity by assessing the dissimilarity of the spectra
-comprising the peak, using the method described by Stahl.
+comprising the peak, using the method described in Stahl 2003.
 }
 \references{
 Stahl, Mark. “Peak Purity Analysis in HPLC and CE Using Diode-Array Technology.”

@@ -20,6 +20,7 @@
 * Fixed occasional test failure on MKL server by skipping `cluster_spectra` test on CRAN.
 * Updated find_peaks function with more and better smoothing options. The defaults smoothing is slightly changed.
 Find peaks will now do gaussian smoothing by default with
+* Added `progress_bar` option to `get_peaks` and `correct_rt`.
 
 #### Changes to *fit_peaks* function:
 

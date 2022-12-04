@@ -115,6 +115,7 @@ find_peaks <- function(y, smooth_type=c("gaussian", "box", "savgol", "mva","tmva
 #' without fitting a peak shape. Defaults to \code{egh}.)
 #' @param max.iter Maximum number of iterations to use in nonlinear least
 #' squares peak-fitting. (Defaults to 1000).
+#' @param noise_threshold Noise threshold. Input to \code{get_purity}.
 #' @param ... Additional arguments to \code{find_peaks}.
 #' @return Function \code{fit_peaks} returns a matrix, whose columns contain
 #' the following information:
@@ -152,7 +153,7 @@ find_peaks <- function(y, smooth_type=c("gaussian", "box", "savgol", "mva","tmva
 #' @export fit_peaks
 fit_peaks <- function (x, lambda, pos = NULL, sd.max = 50,
                        fit = c("egh", "gaussian", "raw"), 
-                       max.iter = 1000, ...){
+                       max.iter = 1000, noise_threshold=.001, ...){
   y <- x[,lambda]
   fit <- match.arg(fit, c("egh", "gaussian", "raw"))
   if (is.null(pos)){
@@ -182,7 +183,8 @@ fit_peaks <- function (x, lambda, pos = NULL, sd.max = 50,
                   "raw" = fitpk_raw)
   
   huhn <- data.frame(t(apply(pos, 1, fitpk, x = x,
-                             lambda = lambda, max.iter = max.iter)))
+                             lambda = lambda, max.iter = max.iter,
+                             noise_threshold = noise_threshold)))
   colnames(huhn) <- tabnames
   huhn <- data.frame(sapply(huhn, as.numeric, simplify = FALSE))
   if (!is.null(sd.max)) {
@@ -291,7 +293,8 @@ fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
   }
   # call the Nonlinear Least Squares, either fitting the floor too or not
   controlList <- nls.control(maxiter=max.iter, minFactor=1/512, warnOnly=TRUE)
-  starts <- list("center"=start.center, "width"=start.width, "height"=start.height, "tau"=start.tau)
+  starts <- list("center"=start.center, "width"=start.width, 
+                 "height"=start.height, "tau"=start.tau)
   if (!fit.floor){
     nlsAns <- try(nlsLM(y1 ~ egh(x1, center, width, height, tau),
                         start=starts, control=controlList), silent=TRUE)
@@ -321,7 +324,8 @@ fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
   return(out)
 }
 
-fitpk_gaussian <- function(x, pos, lambda, max.iter, ...){
+#' @noRd
+fitpk_gaussian <- function(x, pos, lambda, max.iter, noise_threshold = .001, ...){
   
   y <- x[,lambda]
   xloc <- pos[1]
@@ -333,13 +337,14 @@ fitpk_gaussian <- function(x, pos, lambda, max.iter, ...){
   )
   area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
   r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=TRUE)
-  purity <- ifelse(dim(x)[2] > 1, try(get_purity(x, pos)), NA)
+  purity <- ifelse(dim(x)[2] > 1, try(get_purity(x, pos, noise_threshold = noise_threshold)), NA)
   c("rt" = m$center, "start" = pos[2], "end" = pos[3], 
     "sd" = m$width, "FWHM" = 2.35 * m$width,
     "height" = y[xloc], "area" = area, "r.squared" = r.squared, purity=purity)
 }
 
-fitpk_egh <- function(x, pos, lambda, max.iter){
+#' @noRd
+fitpk_egh <- function(x, pos, lambda, max.iter, noise_threshold = .001){
   y <- x[,lambda]
   xloc <- pos[1]
   peak.loc <- seq.int(pos[2], pos[3])
@@ -347,19 +352,20 @@ fitpk_egh <- function(x, pos, lambda, max.iter){
                                 start.height = y[xloc], max.iter = max.iter)
   )
   r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=TRUE)
-  purity <- ifelse(dim(x)[2] > 1, try(get_purity(x, pos)), NA)
+  purity <- ifelse(dim(x)[2] > 1, try(get_purity(x, pos, noise_threshold)), NA)
   area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
   c("rt" = m$center, "start" = pos[2], "end" = pos[3], 
     "sd" = m$width, "tau" = m$tau, "FWHM" = 2.35 * m$width,
     "height" = y[xloc], "area" = area, "r.squared" = r.squared, purity=purity)
 }
 
-fitpk_raw <- function(x, pos, lambda, max.iter){
+#' @noRd
+fitpk_raw <- function(x, pos, lambda, max.iter, noise_threshold = .001){
   y <- x[,lambda]
   xloc <- pos[1]
   peak.loc <- seq.int(pos[2], pos[3])
   area <- sum(diff(peak.loc) * mean(c(y[peak.loc][-1], tail(y[peak.loc],-1)))) # trapezoidal integration
-  purity <- ifelse(dim(x)[2] > 1, try(get_purity(x, pos)), NA)
+  purity <- ifelse(dim(x)[2] > 1, try(get_purity(x, pos, noise_threshold)), NA)
   c("rt" = pos[1], "start" = pos[2], "end" = pos[3], 
     "sd" = pos[3]-pos[2], "FWHM" = 2.35 * pos[3]-pos[2],
     "height" = y[xloc], "area" = area, purity = purity)
@@ -391,7 +397,7 @@ savgol <- function(T, fl, forder = 4, dorder = 0) {
   Tsg <- (-1)^dorder * T2
   return( Tsg )
 }
-
+#' pinv port from pracma
 #' @noRd
 pinv <- function (A, tol = .Machine$double.eps^(2/3)) {
   stopifnot(is.numeric(A) || is.complex(A), is.matrix(A))

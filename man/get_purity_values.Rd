@@ -4,7 +4,7 @@
 \alias{get_purity_values}
 \title{Calculate peak purity values}
 \usage{
-get_purity_values(x, pos, weight = 1)
+get_purity_values(x, pos, weight = 1, noise_threshold = 0.005, lambdas)
 }
 \arguments{
 \item{x}{A chromatogram in matrix format}
@@ -12,6 +12,10 @@ get_purity_values(x, pos, weight = 1)
 \item{pos}{A vector containing peak information}
 
 \item{weight}{weight provided to \code{\link{get_agilent_threshold}}}
+
+\item{noise_threshold}{Threshold to define noise. Highest proportion of maximum absorbance.}
+
+\item{lambdas}{Wavelengths to include in calculations.}
 }
 \value{
 Returns a vector of peak purity values at each timepoint within the

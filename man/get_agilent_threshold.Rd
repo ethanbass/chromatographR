@@ -2,15 +2,9 @@
 % Please edit documentation in R/get_purity.R
 \name{get_agilent_threshold}
 \alias{get_agilent_threshold}
-\title{calculate purity thresholds}
+\title{Calculate purity thresholds}
 \usage{
-get_agilent_threshold(
-  x,
-  pos,
-  weight = 1,
-  noise_threshold = 0.005,
-  lambdas = c(210:400)
-)
+get_agilent_threshold(x, pos, weight = 1, noise_threshold = 0.005, lambdas)
 }
 \arguments{
 \item{x}{A chromatogram in matrix format}
@@ -28,7 +22,7 @@ Returns a vector of purity thresholds at each retention time index
 within the peak specified by \code{pos}.
 }
 \description{
-calculate purity thresholds
+Calculate purity thresholds
 }
 \references{
 Stahl, Mark. “Peak Purity Analysis in HPLC and CE Using Diode-Array Technology.”

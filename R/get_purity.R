@@ -1,13 +1,15 @@
 #' Calculate mean peak purity
 #' 
 #' Estimates peak purity by assessing the dissimilarity of the spectra
-#' comprising the peak, using the method described by Stahl.
+#' comprising the peak, using the method described in Stahl 2003.
 #' 
 #' @param x A chromatogram in matrix format
 #' @param pos A vector containing peak information
 #' @param weight weight provided to \code{\link{get_agilent_threshold}}
 #' @param cutoff Proportion of maximum absorbance to use as cutoff.
 #' Argument to \code{\link{trim_peak}}.
+#' @param noise_threshold Threshold to define noise. Highest proportion of maximum absorbance.
+#' @param lambdas Wavelengths to include in calculations.
 #' @return Returns the mean purity of the peak specified by \code{pos}, defined
 #' as the proportion of timepoints with purity values below 1.
 #' @references
@@ -16,8 +18,16 @@
 #' /href{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
 #' @author Ethan Bass
 
-get_purity <- function(x, pos, weight=1, cutoff = 0.05){
-  p <- get_purity_values(x, pos, weight = weight)
+get_purity <- function(x, pos, weight = 1, cutoff = 0.05, noise_threshold = 0.01,
+                       lambdas){
+  if (missing(lambdas)){
+    lambdas <- seq_len(ncol(x))
+  }
+  if (is.character(lambdas)){
+    lambdas <- which(as.numeric(colnames(x)) %in% lambdas) 
+  }
+  p <- get_purity_values(x, pos, weight = weight, noise_threshold = noise_threshold,
+                         lambdas)
   mean(p[trim_peak(x, pos, cutoff = cutoff)] < 1, na.rm = TRUE)
 }
 
@@ -29,12 +39,11 @@ get_purity <- function(x, pos, weight=1, cutoff = 0.05){
 #' specified noise threshold.
 #' @author Ethan Bass
 find_noise <- function(x, noise_threshold=0.01, lambdas){
-  lambdas <- which(as.numeric(colnames(x)) %in% lambdas)
   max_abs <- apply(x[,lambdas], 1, max)
   which(max_abs < max(max_abs, na.rm = TRUE) * noise_threshold)
 }
 
-#alternatively, could define baseline as areas where no peak is detected,
+# alternatively, we cuould define the baseline as areas where no peak is detected,
 # since we've already done peak detection.
 
 #' Calculate variance of noise regions
@@ -45,7 +54,10 @@ find_noise <- function(x, noise_threshold=0.01, lambdas){
 #' @return Returns the average variance of the signal over the retention times
 #' defined as noise according to \code{\link{find_noise}}.
 #' @author Ethan Bass
-get_noise_variance <- function(x, noise_threshold=.005, lambdas=c(210:400)){
+get_noise_variance <- function(x, noise_threshold=.01, lambdas){
+  if (missing(lambdas)){
+    lambdas <- seq_len(ncol(x))
+  }
   noise_idx <- find_noise(x = x, noise_threshold = noise_threshold, 
                       lambdas = lambdas)
   mean(apply(x[noise_idx,], 1, var), na.rm = TRUE)
@@ -62,7 +74,7 @@ get_noise_variance <- function(x, noise_threshold=.005, lambdas=c(210:400)){
 
 # noise_variance <- get_noise_variance(chrom)
 
-#' calculate purity thresholds
+#' Calculate purity thresholds
 #' @param x A chromatogram in matrix format
 #' @param pos A vector containing peak information
 #' @param weight scaling parameter affecting stringency of threshold
@@ -76,13 +88,16 @@ get_noise_variance <- function(x, noise_threshold=.005, lambdas=c(210:400)){
 #' /href{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
 #' @author Ethan Bass
 get_agilent_threshold <- function(x, pos, weight=1, noise_threshold=.005,
-                                  lambdas=c(210:400)){
+                                  lambdas){
+  if (missing(lambdas)){
+    lambdas <- seq_len(ncol(x))
+  }
   var_noise <- get_noise_variance(x, noise_threshold = noise_threshold,
                                   lambdas=lambdas)
   idx <- seq(as.numeric(pos[2]), as.numeric(pos[3]))
   xx <- sapply(idx, function(i){
     (max(0, 1 - weight *
-           (var_noise / var(x[i, ], na.rm=TRUE) +
+           (var_noise / var(x[i, ], na.rm = TRUE) +
               var_noise / var(x[as.numeric(pos[1]), ], na.rm = TRUE))))^2
   })
   xx
@@ -112,6 +127,8 @@ get_spectral_similarity <- function(x, pos){
 #' @param x A chromatogram in matrix format
 #' @param pos A vector containing peak information
 #' @param weight weight provided to \code{\link{get_agilent_threshold}}
+#' @param noise_threshold Threshold to define noise. Highest proportion of maximum absorbance.
+#' @param lambdas Wavelengths to include in calculations.
 #' @return Returns a vector of peak purity values at each timepoint within the
 #' peak specified by \code{pos}.
 #' @references
@@ -120,9 +137,15 @@ get_spectral_similarity <- function(x, pos){
 #' /href{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
 #' @author Ethan Bass
 
-get_purity_values <- function(x, pos, weight =1){
+get_purity_values <- function(x, pos, weight = 1, noise_threshold = 0.005,
+                              lambdas){
+  if (missing(lambdas)){
+    lambdas <- seq_len(ncol(x))
+  }
   ((1 - get_spectral_similarity(x, pos)))/
-    (1 - get_agilent_threshold(x, pos, weight = weight))
+    (1 - get_agilent_threshold(x, pos, weight = weight, 
+                               noise_threshold = noise_threshold,
+                               lambdas = lambdas))
 }
 
 #' Trim peak
