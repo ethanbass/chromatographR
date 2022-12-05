@@ -107,9 +107,9 @@ check_chr <- function(chr, loc=NULL, peak_table, chrom_list, allow_max = TRUE){
 elementwise.all.equal <- Vectorize(function(x, y, ...) {isTRUE(all.equal(x, y, ...))})
 
 #' @noRd
-get_times <- function(x){
+get_times <- function(x, index=1){
   if (inherits(x, "chrom_list") | inherits(x, "list")){
-    as.numeric(rownames(x[[1]]))
+    as.numeric(rownames(x[[index]]))
   } else if (inherits(x, "matrix")){
     as.numeric(rownames(x))
   }
