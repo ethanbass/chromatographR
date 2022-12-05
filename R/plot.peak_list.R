@@ -76,43 +76,47 @@ plot.peak_list <- function(x, ..., chrom_list, index=1, lambda=NULL,
   if (missing(res))
     res <- get_time_resolution(chrom_list)
   for (i in seq_len(nrow(pks))){
-    peak.loc<-seq.int((pks$start[i]),(pks$end[i]), by = res)
-    if (fit == "gaussian"){
-      yvals <- gaussian(peak.loc, center=pks$rt[i],
-                        width=pks$sd[i]*tfac, height = pks$height[i])
-      if (is.null(color))
-        color <- "red"
-    }
-    else if (fit == "egh"){
-      yvals <- egh(x = peak.loc, center = pks$rt[i],
-                   width=pks$sd[i]*tfac, height = pks$height[i],
-                   tau=pks$tau[i]*tfac)
-      if (is.null(color))
-        color <- "purple"
-    }
-    else if (fit == "raw"){
-      yvals <- chrom_list[[index]][as.character(peak.loc), lambda]
-      if (is.null(color))
-        color <- "hotpink"
-    }
-    draw_trapezoid(peak.loc, yvals, color, a)
+    try({
+      peak.loc<-seq.int((pks$start[i]),(pks$end[i]), by = res)
+      if (fit == "gaussian"){
+        yvals <- gaussian(peak.loc, center=pks$rt[i],
+                          width=pks$sd[i]*tfac, height = pks$height[i])
+        if (is.null(color))
+          color <- "red"
+      }
+      else if (fit == "egh"){
+        yvals <- egh(x = peak.loc, center = pks$rt[i],
+                     width=pks$sd[i]*tfac, height = pks$height[i],
+                     tau=pks$tau[i]*tfac)
+        if (is.null(color))
+          color <- "purple"
+      }
+      else if (fit == "raw"){
+        yvals <- chrom_list[[index]][as.character(peak.loc), lambda]
+        if (is.null(color))
+          color <- "hotpink"
+      }
+      draw_trapezoid(peak.loc, yvals, color, a)
+    }, silent=TRUE)
   }
   if (plot_purity){
-    peaks <- x[[index]][[lambda]][,3:5]
-    # color <- "#FFB000"
-    color="black"
-    p <- apply(peaks, 1, function(pos){
-      pos[1] <- which(new.ts %in% pos[[1]])
-      pos[2] <- which(new.ts %in% pos[[2]])
-      pos[3] <- which(new.ts %in% pos[[3]])
-      idx <- seq(pos[2], pos[3])
-      yvals <- chrom_list[[index]][,lambda][idx]
-      p <- get_purity_values(chrom_list[[index]], pos)
-      # lines(as.numeric(new.ts[idx]), -scales::rescale(p, c(0,20)), col = "darkgray", lty=3, lwd=1.5)
-      lim=-20
-      draw_trapezoid(new.ts[idx], scales::rescale(p, c(0,lim)), color="black", a=0.6)
-      abline(h=lim, lty=3, col="darkgray")
-    })
+    try({
+      peaks <- x[[index]][[lambda]][,3:5]
+      # color <- "#FFB000"
+      color="black"
+      p <- apply(peaks, 1, function(pos){
+        pos[1] <- which(new.ts %in% pos[[1]])
+        pos[2] <- which(new.ts %in% pos[[2]])
+        pos[3] <- which(new.ts %in% pos[[3]])
+        idx <- seq(pos[2], pos[3])
+        yvals <- chrom_list[[index]][,lambda][idx]
+        p <- get_purity_values(chrom_list[[index]], pos)
+        # lines(as.numeric(new.ts[idx]), -scales::rescale(p, c(0,20)), col = "darkgray", lty=3, lwd=1.5)
+        lim=-20
+        draw_trapezoid(new.ts[idx], scales::rescale(p, c(0,lim)), color="black", a=0.6)
+        abline(h=lim, lty=3, col="darkgray")
+      })
+    }, silent=TRUE)
   }
 }
 

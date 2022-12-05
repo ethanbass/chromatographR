@@ -15,12 +15,13 @@
 * Added a new class (`ptw_list`) and plotting function for lists of `ptw` alignment objects.
 * Added `plot_it` argument in `correct_rt` for plotting alignments.
 * Added [VPdtw](https://github.com/ethanbass/VPdtw/) as a dependency (instead of being only suggested).
-* Minor updates to vignette.
 * Adjusted `cluster_spectra` and `combine_peaks` functions so messages can be suppressed with `verbose == FALSE`.
 * Fixed occasional test failure on MKL server by skipping `cluster_spectra` test on CRAN.
 * Updated find_peaks function with more and better smoothing options. The defaults smoothing is slightly changed.
 Find peaks will now do gaussian smoothing by default with
 * Added `progress_bar` option to `get_peaks` and `correct_rt`.
+* Improved error handling in `plot.peaklist`.
+* Minor updates to vignette.
 
 #### Changes to *fit_peaks* function:
 
