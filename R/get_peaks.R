@@ -105,14 +105,16 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
   }))
   timepoints <- as.numeric(rownames(chrom_list[[1]]))
   tdiff <- median(diff(timepoints))
-  result <- lapply(result, function(smpl) lapply(smpl, function(lambda){
-    x <- lambda
-    x[, c('rt', 'start', 'end')] <- sapply(c('rt', 'start', 'end'),
-                                           function(j) timepoints[x[,j]])
-    x[, c('sd', 'FWHM', 'area')] <- x[, c('sd', 'FWHM', 'area')] * tdiff * tfac
-    if (!is.null(x$tau)){x[, c('tau')] <- x[, c('tau')] * tdiff * tfac} 
-    x
-  }))
+  result <- lapply(result, function(smpl){
+    lapply(smpl, function(lambda){
+      x <- lambda
+      x[, c('rt', 'start', 'end')] <- sapply(c('rt', 'start', 'end'),
+                                             function(j) timepoints[x[,j]])
+      x[, c('sd', 'FWHM', 'area')] <- x[, c('sd', 'FWHM', 'area')] * tdiff * tfac
+      if (!is.null(x$tau)){x[, c('tau')] <- x[, c('tau')] * tdiff * tfac} 
+      x
+    })
+  })
   structure(result,
             chrom_list = chrom_list_string,
             lambdas = lambdas, fit = fit, sd.max = sd.max,

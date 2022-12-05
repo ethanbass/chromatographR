@@ -175,11 +175,11 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
         old_ts <- c(rep(NA,short), rownames(chrom_list_og[[samp]]))
         times <- suppressWarnings(stats::approx(x = jset[,samp],
                                                 y = old_ts, 1:jmax)$y)
-        mi<-min(which(!is.na(times)))
-        if (mi>1){
-          beg<-sort(seq(from = times[mi]-res, by=-res, length.out = mi-1),
-                    decreasing=FALSE)
-        } else beg<-NULL
+        mi <- min(which(!is.na(times)))
+        if (mi > 1){
+          beg <- sort(seq(from = times[mi]-res, by = -res, length.out = mi-1),
+                    decreasing = FALSE)
+        } else beg <- NULL
         ma <- max(which(!is.na(times)))
         if (ma < length(times)){
           end <- seq(from = times[ma]+res, length.out = length(times)-ma, by=res)
@@ -190,7 +190,12 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
         x
       })
       names(result) <- names(chrom_list)
-      result
+      # equalize time span across samples
+      x1 <- max(as.numeric(sapply(result,function(x) head(rownames(x),1))), na.rm=TRUE)
+      x2<- min(as.numeric(sapply(result,function(x) tail(rownames(x),1))), na.rm=TRUE)
+      lapply(result, function(samp){
+        samp[-which(as.numeric(rownames(samp))<x1 | as.numeric(rownames(samp))>x2),]
+      })
     } else{
       models
     }
