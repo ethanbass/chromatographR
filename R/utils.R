@@ -121,8 +121,8 @@ get_lambdas <- function(chrom_list){
 }
 
 #' @noRd
-get_time_resolution <- function(chrom_list){
-  signif(median(diff(as.numeric(rownames(chrom_list[[1]])))))
+get_time_resolution <- function(chrom_list, index=1){
+  signif(median(diff(as.numeric(rownames(chrom_list[[index]])))))
 }
 
 #' @noRd

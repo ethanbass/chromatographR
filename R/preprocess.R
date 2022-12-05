@@ -80,7 +80,7 @@ preprocess <- function(X, dim1, ## time axis
   if (ncol(X[[1]]) == 1){
     interpolate_cols <- FALSE
   }
-  if (missing(dim1) & interpolate_rows){
+  if (interpolate_rows && missing(dim1)){
     warning("...Times not provided. Extrapolating from matrix dimensions for interpolation.",
             immediate. = TRUE)
     limits <- sapply(X,function(x){
@@ -90,7 +90,7 @@ preprocess <- function(X, dim1, ## time axis
     end <- floor(min(as.numeric(limits[2,])))
     dim1 <- seq(start,end,by=.01)
   }
-  if (missing(dim2) & interpolate_cols){
+  if (interpolate_cols && missing(dim2)){
     warning("...Wavelengths not provided. Extrapolating from matrix dimensions for interpolation.",
             immediate. = TRUE)
     dim2 <- as.numeric(colnames(X[[1]]))
@@ -160,7 +160,7 @@ preprocess_matrix <- function(X,
   
   if (remove.time.baseline)
     X <- apply(X, 2, baseline.corr, ...)
-  if (min(X) < 0)
+  if (min(X, na.rm = TRUE) < 0)
     # X <- X - min(X)
     X[X < 0] <- 0
   if (!missing(maxI))

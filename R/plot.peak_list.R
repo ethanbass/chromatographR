@@ -50,7 +50,7 @@ plot.peak_list <- function(x, ..., chrom_list, index=1, lambda=NULL,
   if (is.numeric(lambda)){
     lambda <- as.character(lambda)
   }
-  new.ts <- as.numeric(rownames(chrom_list[[index]]))
+  new.ts <- get_times(x=chrom_list, index=index)
   y <- chrom_list[[index]][,lambda]
   pks <- data.frame(x[[index]][[lambda]])
   if ("r.squared" %in% colnames(pks)){

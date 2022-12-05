@@ -1,7 +1,7 @@
 # chromatographR 0.4.5
 
 #### New features
-
+* Fixed bug causing mismatched time axes (and improper alignment of chromatograms) after variable penalty dynamic time warping (VPdtw). 
 * Added `reshape_chroms` function for converting chromatograms to "long" format.
 * Added `export.peaktable` function to easily write peak_table to `csv` or `xlsx`.
 * Added `get_purity` function for assessing peak purity.

@@ -28,6 +28,7 @@ suppressMessages(require(chromatographR, quiet=TRUE))
 The *chromatographR* package began as a fork from the previously published *alsace* package [@wehrens2015], but has been reworked with improved functions for peak-finding, integration and peak table generation as well as a number of new tools for data visualization and downstream analysis. Unlike *alsace*, which emphasized multivariate curve resolution through alternating least squares (MCR-ALS), *chromatographR* is developed around a more conventional workflow that should seem more familiar to users of standard software tools for HPLC-DAD analysis. *chromatographR* includes tools for a) pre-processing, b) retention-time alignment, c) peak-finding, d) peak-integration and e) peak-table construction, as well as additional functions useful in analysis of the resulting peak table.
 
 ## Workflow
+
 ### Loading data
 
 chromatographR can import data from a growing list of proprietary file formats using the `read_chroms` function. Supported file formats include 'Agilent ChemStation' or 'MassHunter' (`.D`) files [@bovee2022; @bovee2022a], 'Thermo Raw' (`.raw`) [@hulstaert2020], 'Chromeleon' UV ASCII (`.txt`), 'Waters ARW' (`.arw`), 'Shimadzu' ASCII (`.txt`), and more. (For a full list, see the [chromConverter documentation](https://ethanbass.github.io/chromConverter/)). Select the appropriate file format by specifying the `format_in` argument (e.g. `csv`, `chemstation_uv`, `masshunter_dad`, `chromeleon_uv`, `waters_arw`, etc).
@@ -54,7 +55,7 @@ data(Sa)
 
 Data from liquid chromatography often suffer from a variety of non-informative artifacts, such as noise or a drifting baseline. In addition, the data produced by the instrument may have a higher resolution or wider range (along either the time or spectral dimensions) than we require. Fortunately, most of these issues can be remedied fairly easily. For example, smoothing can reduce noise in the spectral direction while baseline subtraction can help correct a drifting baseline. Interpolation of wavelengths and retention times can be used to reduce the dimensionality of the data, facilitating comparison across samples and reducing the time and computational load required by downstream analyses. All of these functions (smoothing, baseline correction, and interpolation) are available through the `preprocess` function and are enabled by default.
 
-To select a narrower range of times and/or wavelengths, arguments can be provided to `dim1` and `dim2` arguments. The `baseline_cor` function from the *ptw* package [@bloemberg2010] takes arguments `p` (an asymmetry parameter) and `lambda` (a smoothing parameter). You can read more about these in the documentation for `ptw::asysm`.  You may want to experiment with these parameters before choosing values to use on your whole dataset.
+To select a narrower range of times and/or wavelengths, arguments can be provided to `dim1` and `dim2` arguments. The `baseline_cor` function from the *ptw* package [@bloemberg2010] takes arguments `p` (an asymmetry parameter) and `lambda` (a smoothing parameter). You can read more about these in the documentation for `ptw::asysm`. You may want to experiment with these parameters before choosing values to use on your whole dataset.
 
 ```{r, choosing parameters}
 i=2 # chromatogram number in list of data
@@ -95,7 +96,7 @@ We can then use the following code snippet to compare the alignment of warped (t
 par(mfrow=c(2,1))
 lambdas=c('210','260')
 plot.new()
-ts <- as.numeric(rownames(warp[[i]]))
+ts <- as.numeric(rownames(warp[[1]]))
 plot.window(xlim=c(head(ts,1), tail(ts,1)),ylim=c(0,1000))
 for (i in 1:length(warp)){
   matplot(ts, warp[[i]][,lambdas],type='l',add=T)
@@ -118,14 +119,19 @@ Clearly, the alignment is considerably improved after warping. You can also use 
 Variable penalty dynamic time warping is another algorithm that can be very effective for correcting retention time shifts [@clifford2009; @clifford2012]. Instead of calculating an explicit warping function, dynamic time warping (DTW) works by repeatedly shifting, expanding or contracting the time axis in small steps until a satisfactory alignment is attained. This process can result in very close matching of peaks, but can also lead to severe peak distortion if the time axis is repeatedly expanded and/or contracted [@tomasi2004]. **Variable penalty dynamic time warping** is a derivative of DTW that constrains expansion and contraction of the time-axis by applying a penalty to these types of "risky" moves. This can often achieve a very good alignment with minimal peak distortion. VPdtw package is a suggested dependency since it requires a working C++ compiler. Unlike `ptw`, `VPdtw` can only take a single wavelength as input (but it returns a global warping on the whole chromatographic matrix). The code snippet below is not run, but shows how one could install `VPdtw` and use it to warp the example chromatograms. the `penalty` and `maxshift` parameters can be adjusted to control the degree of warping.
 
 ```{r, eval=FALSE}
-install.packages("VPdtw")
-warp <- correct_rt(chrom_list=dat.pr, alg="vpdtw", lambdas="230", what="corrected.values")
-warping.models <- correct_rt(dat.pr, what = "models", lambdas = c('210'), scale= TRUE, alg = 'vpdtw')
-correct_rt(chrom_list = dat.pr, what = 'corrected.values', alg = 'vpdtw', lambdas="210")
+warp <- correct_rt(chrom_list=dat.pr, alg="vpdtw", lambdas="210", what="corrected.values", reference=1)
+warping.models <- correct_rt(dat.pr, what = "models", lambdas = c('210'), scale= TRUE, alg = 'vpdtw', reference=1)
 ```
 
-![](VPdtw.svg)
-  
+```{r, fig.height=6}
+par(mfrow=c(2,1))
+matplot(sapply(warp,function(x)x[,"210"]),type='l')
+legend("topright", legend="vpdtw", bty = "n")
+
+matplot(sapply(dat.pr,function(x)x[,"210"]),type='l')
+legend("topright", legend="raw", bty = "n")
+```
+
 In this case the alignments produced by the two algorithms are very similar, but in many cases one algorithm may dramatically out-perform the other, so it is useful to have more than one option available.
 
 ### Peak finding and fitting
@@ -135,12 +141,12 @@ The `get_peaks` function produced a nested list of peaks by looping through the 
 ```{r, get_peaks, message=FALSE, warning=FALSE}
 pks_gauss <- get_peaks(warp, lambdas = c('210','260'), sd.max=40, fit="gaussian")
 pks_egh <- get_peaks(warp, lambdas = c('210', '260'), sd.max=40, fit="egh")
-pks_raw <- get_peaks(warp, lambdas = c('210', '260'), sd.max=60, fit="raw")
+pks_raw <- get_peaks(warp, lambdas = c('210', '260'), sd.max=100, fit="raw")
 ```
 
 #### Filtering
 
-The peak-finding algorithm may often detect a lot of peaks that are little more than noise. Thus, it is recommended to filter out extraneous peaks at this stage (especially if you are processing a lot of samples) as it can greatly reduce the computational load of peak table construction. This can be accomplished directly by using the arguments `sd_max` (to filter by peak width) and/or `amp_thresh` (to filter by peak height). Alternatively, the `filter_peaks` function can be used to filter peaks after the `peak_list` has already been created. 
+The peak-finding algorithm may often detect a lot of peaks that are little more than noise. Thus, it is recommended to filter out extraneous peaks at this stage (especially if you are processing a lot of samples) as it can greatly reduce the computational load of peak table construction. This can be accomplished directly by using the arguments `sd_max` (to filter by peak width) and/or `amp_thresh` (to filter by peak height). Alternatively, the `filter_peaks` function can be used to filter peaks after the `peak_list` has already been created.
 
 #### Visualization
 
@@ -155,7 +161,7 @@ plot(pks_raw, index=1, lambda='210')
 
 ### Peak table assembly
 
-After obtaining a `peak_list`, the `get_peaks` function performs complete-linkage hierarchical clustering to link peaks across samples. It returns a `peak_table` object with samples as rows and peaks as columns. The `peak_table` object also has slots for holding various metadata about peaks, samples, and analyses. If you have a lot of samples, this step can be quite computationally expensive. Thus, it is suggested to filter the peak_list provided to `get_peaktable` in order to remove extraneous peaks (see [Peak finding and fitting](###Peak finding and fitting) section above). Peaks can also be filtered after `peak_table` assembly using the `filter_peaktable` function.
+After obtaining a `peak_list`, the `get_peaks` function performs complete-linkage hierarchical clustering to link peaks across samples. It returns a `peak_table` object with samples as rows and peaks as columns. The `peak_table` object also has slots for holding various metadata about peaks, samples, and analyses. If you have a lot of samples, this step can be quite computationally expensive. Thus, it is suggested to filter the peak_list provided to `get_peaktable` in order to remove extraneous peaks (see [Peak finding and fitting](###Peak%20finding%20and%20fitting) section above). Peaks can also be filtered after `peak_table` assembly using the `filter_peaktable` function.
 
 ```{r, get_peaktable}
 pk_tab <- get_peaktable(pks_egh, response = "area")
@@ -218,10 +224,10 @@ The `plot.peak_table` function provides a simplified interface to various option
 plot(pk_tab, loc = "V13", box_plot = TRUE, vars = "trt", verbose = FALSE)
 ```
 
-
 ## References
 
-<div id="refs"></div>
+::: {#refs}
+:::
 
 ## Session Information
 

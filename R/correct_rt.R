@@ -150,7 +150,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
       } else {
         ptwmods
       }
-  } else{
+  } else if (alg == "vpdtw"){
     allmats <- sapply(chrom_list_og, function(x) x[,lambdas, drop = FALSE])
     if (length(lambdas) > 1)
       stop("VPdtw only supports warping by a single wavelength")
@@ -190,12 +190,15 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
         x
       })
       names(result) <- names(chrom_list)
-      # equalize time span across samples
-      x1 <- max(as.numeric(sapply(result,function(x) head(rownames(x),1))), na.rm=TRUE)
-      x2<- min(as.numeric(sapply(result,function(x) tail(rownames(x),1))), na.rm=TRUE)
-      lapply(result, function(samp){
-        samp[-which(as.numeric(rownames(samp))<x1 | as.numeric(rownames(samp))>x2),]
-      })
+      # replace NAs with 0s
+      result<-lapply(result, function(xx){
+          if(any(is.na(xx))){
+            xx[which(is.na(xx))] <- 0
+          }
+          xx
+        })
+      
+      result
     } else{
       models
     }

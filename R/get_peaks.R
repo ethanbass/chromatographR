@@ -103,10 +103,13 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
     pks[which(apply(pks, 1, function(x){
       !all(is.na(x)) & (x["rt"] > x["start"]) & x["rt"] < x["end"]})), , drop=FALSE]
   }))
-  timepoints <- as.numeric(rownames(chrom_list[[1]]))
-  tdiff <- median(diff(timepoints))
-  result <- lapply(result, function(smpl){
-    lapply(smpl, function(lambda){
+  # timepoints <- as.numeric(rownames(chrom_list[[1]]))
+  # tdiff <- median(diff(timepoints))
+  sample_names<-names(result)
+  result <- lapply(seq_along(result), function(i){
+    timepoints <- get_times(chrom_list, index=i)
+    tdiff <- get_time_resolution(chrom_list, index=i)
+    lapply(result[[i]], function(lambda){
       x <- lambda
       x[, c('rt', 'start', 'end')] <- sapply(c('rt', 'start', 'end'),
                                              function(j) timepoints[x[,j]])
@@ -115,6 +118,7 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
       x
     })
   })
+  names(result) <- sample_names
   structure(result,
             chrom_list = chrom_list_string,
             lambdas = lambdas, fit = fit, sd.max = sd.max,
