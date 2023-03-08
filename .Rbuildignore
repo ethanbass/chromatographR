@@ -7,3 +7,4 @@
 ^pkgdown$
 ^CRAN-SUBMISSION$
 ^LICENSE$
+^\.DS_Store$

@@ -22,8 +22,8 @@ Description: Tools for high-throughput analysis of HPLC-DAD/UV
     <doi:10.1016/S0021-9673(01)00594-5>). See the vignette for more details and
     suggested workflow.
 License: GPL (>= 2)
-URL: https://ethanbass.github.io/chromatographR, https://github.com/ethanbass/chromatographR
-BugReports: https://github.com/ethanbass/chromatographR/issues
+URL: https://ethanbass.github.io/chromatographR/, https://github.com/ethanbass/chromatographR/
+BugReports: https://github.com/ethanbass/chromatographR/issues/
 Depends: R (>= 3.5.0)
 Imports: 
     caTools,
