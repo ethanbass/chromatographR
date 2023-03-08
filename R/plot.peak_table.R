@@ -144,7 +144,7 @@ boxplot.peak_table <- function(x, formula, ...){
     boxplot(form,
             data = x$sample_meta,
             main = paste(li, '\n', 'RT = ', round(as.numeric(x$pk_meta['rt', li]), 2)),
-            ylab="abs", xlab="", ...)
+            ylab = x$args[["response"]], xlab = "", ...)
   }
 }
 

@@ -44,19 +44,25 @@ Find peaks in chromatographic profile.
 \details{
 Find peaks by looking for zero-crossings in the smoothed first derivative of
 the signal (\code{y}) that exceed the specified slope threshold
-(\code{slope_thresh}). Peaks can also be filtered by supplying a minimal
-amplitude threshold (\code{amp_thresh}), to filter out peaks below the
-specified height. 
+(\code{slope_thresh}). Additionally, peaks can be filtered by supplying a minimal
+amplitude threshold (\code{amp_thresh}), filtering out peaks below the
+specified height. Smoothing is intended to prevent the algorithm from
+getting caught up on local minima and maxima that do not represent true
+features. Several smoothing options are available, including \code{gaussian},
+box kernel (\code{box}), savitzky-golay smoothing (\code{savgol}),
+moving average (\code{mva}), triangular moving average (\code{tmva}), or 
+no smoothing (\code{none}).
 
 It is recommended to do pre-processing using the \code{\link{preprocess}}
 function before peak detection. Overly high chromatographic resolution can 
 sometimes lead to peaks being split into multiple segments. In this case,
-it is recommended to reduce the chromatogram resolution using the \code{dim2}
-argument before proceeding with further analyses.
+it is recommended to increase the \code{smooth_window} or reduce the
+resolution along the time axis by adjusting the \code{dim2} argument before
+proceeding with further analyses.
 }
 \note{
-The \code{find_peaks} function is adapted from matlab code in Prof.
-Tom O'Haver's
+The \code{find_peaks} function is adapted from MATLAB code included in
+Prof. Tom O'Haver's
 \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{
 Pragmatic Introduction to Signal Processing}.
 }

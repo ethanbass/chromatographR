@@ -1,4 +1,4 @@
-### test preprocess ###
+### test preprocess function ###
 path <- "testdata/DAD1.CSV"
 x <- read.csv(path, fileEncoding = "utf-16")
 x1 <- suppressWarnings(load_chroms(path, format.in = "csv", find_files = FALSE))
@@ -11,17 +11,6 @@ test_that("load_chroms works", {
   expect_equal(length(x1), length(path))
 })
 
-# test_that("load_chroms can read chemstation UV data", {
-#   path_csv <- system.file("testdata/DAD1.CSV", package="chromConverter")
-#   path_uv <- system.file("testdata/DAD1.uv", package="chromConverter")
-#   x <- read.csv(path_csv, fileEncoding = "utf-16")
-#   x1 <- load_chroms(path_uv, format.in = "chemstation", find_files = FALSE)
-#   folder <- system.file("testdata", package="chromConverter")
-#   x2 <- load_chroms(folder, format.in = "chemstation", find_files = TRUE)
-#   expect_equal(x[,2], x1[[1]][, "220.0"], ignore_attr = TRUE)
-#   expect_equal(x1, x2, ignore_attr = TRUE)
-# })
-
 data("Sa")
 new.ts <- seq(10,18.66,by=.01) # choose time-points
 new.lambdas <- seq(200, 318, by = 2) # choose wavelengths
@@ -29,7 +18,7 @@ new.lambdas <- seq(200, 318, by = 2) # choose wavelengths
 out <- preprocess(X = Sa[[1]], dim1 = new.ts, dim2 = new.lambdas)
 
 test_that("preprocess works on matrix", {
-  out <- preprocess_matrix(X = Sa[[1]], dim1 = new.ts, dim2 = new.lambdas,maxI = 1)
+  out <- preprocess_matrix(X = Sa[[1]], dim1 = new.ts, dim2 = new.lambdas, maxI = 1)
   expect_equal(class(out)[1],"matrix")
   expect_equal(rownames(out), as.character(new.ts))
   expect_equal(colnames(out), as.character(new.lambdas))
@@ -58,10 +47,10 @@ test_that("preprocess works on a list", {
 })
 
 ### test correct_rt ###
+warping.models <- correct_rt(dat.pr, lambdas = c('210','260','318'), what = "models", progress_bar = FALSE)
+warp <- correct_rt(chrom_list = dat.pr, models = warping.models, what = "corrected.values", progress_bar = FALSE)
 
 test_that("correct_rt works", {
-  warping.models <- correct_rt(dat.pr, lambdas=c('210','260','318'), what = "models")
-  warp <- correct_rt(chrom_list=dat.pr, models=warping.models, what = "corrected.values")
   equals(length(warping.models), length(warp), length(Sa[1:2]))
   expect_equal(names(warp), names(dat.pr[1:2]))
   expect_equal(colnames(warp[[1]]), colnames(dat.pr[[1]]), ignore_attr=TRUE)
@@ -70,6 +59,7 @@ test_that("correct_rt works", {
   expect_error(correct_rt(dat.pr, what="x"))
   expect_error(correct_rt(dat.pr, lambdas = "x"))
   expect_error(correct_rt(dat.pr, lambdas = "210", alg="x"))
+  expect_error(correct_rt(dat.pr, lambdas = "210", models = "warping.models", alg = "vpdtw"))
 })
 
 test_that("correct_rt works with vpdtw", {
@@ -77,16 +67,25 @@ test_that("correct_rt works with vpdtw", {
   warp <- correct_rt(dat.pr, lambdas = "210", alg="vpdtw")
   expect_equal(names(warp), names(dat.pr[1:2]))
   expect_equal(colnames(warp[[1]]), colnames(dat.pr[[1]]), ignore_attr=TRUE)
-  expect_error(correct_rt(dat.pr, lambdas = c("210","260"), alg="vpdtw"))
+  expect_error(correct_rt(dat.pr, lambdas = c("210","260"), alg="vpdtw",  progress_bar = FALSE))
   expect_error(correct_rt(dat.pr, lambdas = c("x"), alg="vpdtw"))
+})
+
+test_that("plot_chroms works to plot alignments", {
+  skip_if_not_installed("vdiffr")
+  alignment <- function(){
+    par(mfrow=c(2,1))
+    plot_chroms(warp, lambdas="210")
+    plot_chroms(dat.pr, lambdas="210")
+  }
+  vdiffr::expect_doppelganger("alignment", alignment)
 })
 
 
 ### test get_peaks ###
-# lam <- c("260") # tests fail if I use multiple wavelengths here
 lam <- c("210","318")
-pks_egh <- get_peaks(dat.pr, lambdas = lam, fit = "egh", smooth_type = "none")
-pks_gaussian <- get_peaks(dat.pr, lambdas = lam, fit = "gaussian", smooth_type = "none")
+pks_egh <- get_peaks(dat.pr, lambdas = lam, fit = "egh", smooth_type = "none", progress_bar = FALSE)
+pks_gaussian <- get_peaks(dat.pr, lambdas = lam, fit = "gaussian", smooth_type = "none", progress_bar = FALSE)
 
 test_that("get_peaks works", {
   expect_equal(names(pks_egh), names(dat.pr))
@@ -146,15 +145,14 @@ test_that("attach_metadata works", {
   expect_warning(attach_metadata(pk_tab, metadata=meta[-1,], column ="vial"))
 })
 
-pk_tab <- attach_ref_spectra(pk_tab, chrom_list = dat.pr, ref="max.cor")
+pk_tab <- attach_ref_spectra(pk_tab, chrom_list = dat.pr, ref = "max.cor")
 test_that("attach_ref_spectra works", {
   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$ref_spectra))
   expect_equal(pk_tab$args[["reference_spectra"]], "max.cor")
-  pk_tab <- attach_ref_spectra(pk_tab, chrom_list=dat.pr, ref = "max.int")
+  pk_tab <- attach_ref_spectra(pk_tab, chrom_list = dat.pr, ref = "max.int")
   expect_equal(pk_tab$args[["reference_spectra"]], "max.int")
   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$ref_spectra))
   expect_error(attach_ref_spectra(pk_tab, chrom_list = dat.pr, ref = "x"))
-  
 })
 
 # test filter_peaktable
@@ -182,7 +180,7 @@ test_that("normalize_data works", {
   expect_equal(rownames(pk_tab_norm$tab), rownames(pk_tab$tab))
   expect_equal(class(pk_tab_norm), class(pk_tab))
   expect_equal(colnames(pk_tab_norm$tab), colnames(pk_tab$tab))
-  chroms <- normalize_data(pk_tab, chrom_list=dat.pr, column = "mass",what = "chrom_list")
+  chroms <- normalize_data(pk_tab, chrom_list=dat.pr, column = "mass", what = "chrom_list")
   expect_equal(dim(chroms), dim(dat.pr))
   expect_error(normalize_data(pk_tab, chrom_list = dat.pr, column = "x"))
   expect_error(normalize_data(pk_tab, chrom_list = dat.pr, column = "mass", what="x"))
@@ -281,6 +279,14 @@ test_that("mirror_plot works", {
                 var = "trt", legend_size=2)
   }
   vdiffr::expect_doppelganger("mirror1", mirror1)
+})
+
+test_that("plot_peak.list works", {
+  skip_if_not_installed("vdiffr")
+  plot_peaklist <- function(){
+    plot(pks_egh, chrom_list = dat.pr, index=2)
+  }
+  vdiffr::expect_doppelganger("plot_peaklist", plot_peaklist)
 })
 
 test_that("cluster_spectra works", {

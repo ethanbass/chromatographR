@@ -4,15 +4,21 @@
 #' 
 #' Find peaks by looking for zero-crossings in the smoothed first derivative of
 #' the signal (\code{y}) that exceed the specified slope threshold
-#' (\code{slope_thresh}). Peaks can also be filtered by supplying a minimal
-#' amplitude threshold (\code{amp_thresh}), to filter out peaks below the
-#' specified height. 
+#' (\code{slope_thresh}). Additionally, peaks can be filtered by supplying a minimal
+#' amplitude threshold (\code{amp_thresh}), filtering out peaks below the
+#' specified height. Smoothing is intended to prevent the algorithm from
+#' getting caught up on local minima and maxima that do not represent true
+#' features. Several smoothing options are available, including \code{gaussian},
+#' box kernel (\code{box}), savitzky-golay smoothing (\code{savgol}),
+#' moving average (\code{mva}), triangular moving average (\code{tmva}), or 
+#' no smoothing (\code{none}).
 #' 
 #' It is recommended to do pre-processing using the \code{\link{preprocess}}
 #' function before peak detection. Overly high chromatographic resolution can 
 #' sometimes lead to peaks being split into multiple segments. In this case,
-#' it is recommended to reduce the chromatogram resolution using the \code{dim2}
-#' argument before proceeding with further analyses.
+#' it is recommended to increase the \code{smooth_window} or reduce the
+#' resolution along the time axis by adjusting the \code{dim2} argument before
+#' proceeding with further analyses.
 #' 
 #' @importFrom caTools runmean
 #' @importFrom minpack.lm nlsLM
@@ -34,8 +40,8 @@
 #' @return If bounds == TRUE, returns a data.frame containing the center, start,
 #' and end of each identified peak. Otherwise, returns a numeric vector of peak
 #' centers. All locations are expressed as indices.
-#' @note The \code{find_peaks} function is adapted from matlab code in Prof.
-#' Tom O'Haver's
+#' @note The \code{find_peaks} function is adapted from MATLAB code included in
+#' Prof. Tom O'Haver's
 #' \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{
 #' Pragmatic Introduction to Signal Processing}.
 #' @author Ethan Bass
@@ -54,7 +60,7 @@ find_peaks <- function(y, smooth_type=c("gaussian", "box", "savgol", "mva","tmva
   if (smooth_window < 1){
     smooth_window <- length(y)*smooth_window
   }
-  #compute derivative (with or without smoothing)
+  # compute derivative (with or without smoothing)
   if (smooth_type == "savgol"){
     if ((smooth_window %% 2) == 0){smooth_window <- smooth_window + 1}
     d <- savgol(diff(y), fl = smooth_window)
@@ -115,6 +121,8 @@ find_peaks <- function(y, smooth_type=c("gaussian", "box", "savgol", "mva","tmva
 #' without fitting a peak shape. Defaults to \code{egh}.)
 #' @param max.iter Maximum number of iterations to use in nonlinear least
 #' squares peak-fitting. (Defaults to 1000).
+#' @param estimate_purity Logical. Whether to estimate purity or not. Defaults
+#' to TRUE.
 #' @param noise_threshold Noise threshold. Input to \code{get_purity}.
 #' @param ... Additional arguments to \code{find_peaks}.
 #' @return Function \code{fit_peaks} returns a matrix, whose columns contain
@@ -152,12 +160,15 @@ find_peaks <- function(y, smooth_type=c("gaussian", "box", "savgol", "mva","tmva
 #' /bold{26}: 285-296. \doi{10.1007/BF02268168}.
 #' @export fit_peaks
 fit_peaks <- function (x, lambda, pos = NULL, sd.max = 50,
-                       fit = c("egh", "gaussian", "raw"), 
-                       max.iter = 1000, noise_threshold=.001, ...){
+                       fit = c("egh", "gaussian", "raw"),  max.iter = 1000, 
+                       estimate_purity = TRUE, noise_threshold=.001, ...){
   y <- x[,lambda]
   fit <- match.arg(fit, c("egh", "gaussian", "raw"))
   if (is.null(pos)){
     pos <- find_peaks(y, ...)
+  }
+  if (ncol(x) == 1){
+    estimate_purity <- FALSE
   }
   tabnames <- switch(fit,
                      "gaussian" = c("rt", "start", "end", "sd", "FWHM", 
@@ -184,6 +195,7 @@ fit_peaks <- function (x, lambda, pos = NULL, sd.max = 50,
   
   huhn <- data.frame(t(apply(pos, 1, fitpk, x = x,
                              lambda = lambda, max.iter = max.iter,
+                             estimate_purity = estimate_purity,
                              noise_threshold = noise_threshold)))
   colnames(huhn) <- tabnames
   huhn <- data.frame(sapply(huhn, as.numeric, simplify = FALSE))
@@ -216,7 +228,8 @@ gaussian <- function(x, center=0, width=1, height=NULL, floor=0) {
 #' @importFrom stats coef fitted lm nls.control quantile residuals
 #' @noRd
 
-fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height=NULL,
+fit_gaussian <- function(x, y, start.center = NULL,
+                         start.width = NULL, start.height=NULL,
                          start.floor=NULL, fit.floor=FALSE, max.iter=1000) {
   # estimate starting values
   who.max <- which.max(y)
@@ -225,16 +238,16 @@ fit_gaussian <- function(x, y, start.center=NULL, start.width=NULL, start.height
   if ( is.null( start.width)) start.width <- sum( y > (start.height/2)) / 2
   
   # call the Nonlinear Least Squares, either fitting the floor too or not
-  controlList <- nls.control( maxiter = max.iter, minFactor=1/512, warnOnly=TRUE)
-  starts <- list( "center"=start.center, "width"=start.width, "height"=start.height)
+  controlList <- nls.control( maxiter = max.iter, minFactor=1/512, warnOnly = TRUE)
+  starts <- list( "center" = start.center, "width" = start.width, "height" = start.height)
   if ( ! fit.floor) {
     nlsAns <- try(nlsLM( y ~ gaussian(x, center, width, height),
-                         start=starts, control=controlList), silent=TRUE)
+                         start=starts, control=controlList), silent = TRUE)
   } else{
     if (is.null( start.floor)) start.floor <- quantile( y, seq(0,1,0.1))[2]
     starts <- c(starts,"floor"=start.floor)
     nlsAns <- try(nlsLM( y ~ gaussian( x, center, width, height, floor),
-                         start=starts, control=controlList), silent=TRUE)
+                         start = starts, control = controlList), silent = TRUE)
   }
   
   # package up the results to pass back
@@ -325,7 +338,8 @@ fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
 }
 
 #' @noRd
-fitpk_gaussian <- function(x, pos, lambda, max.iter, noise_threshold = .001, ...){
+fitpk_gaussian <- function(x, pos, lambda, max.iter,
+                           estimate_purity = TRUE, noise_threshold = .001, ...){
   
   y <- x[,lambda]
   xloc <- pos[1]
@@ -337,14 +351,16 @@ fitpk_gaussian <- function(x, pos, lambda, max.iter, noise_threshold = .001, ...
   )
   area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
   r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=TRUE)
-  purity <- ifelse(dim(x)[2] > 1, try(get_purity(x, pos, noise_threshold = noise_threshold)), NA)
+  purity <- get_purity(x = x, pos = pos, try = estimate_purity,
+                       noise_threshold = noise_threshold)
   c("rt" = m$center, "start" = pos[2], "end" = pos[3], 
     "sd" = m$width, "FWHM" = 2.35 * m$width,
-    "height" = y[xloc], "area" = area, "r.squared" = r.squared, purity=purity)
+    "height" = y[xloc], "area" = area, "r.squared" = r.squared, purity = purity)
 }
 
 #' @noRd
-fitpk_egh <- function(x, pos, lambda, max.iter, noise_threshold = .001){
+fitpk_egh <- function(x, pos, lambda, max.iter,
+                      estimate_purity = TRUE, noise_threshold = .001){
   y <- x[,lambda]
   xloc <- pos[1]
   peak.loc <- seq.int(pos[2], pos[3])
@@ -352,7 +368,8 @@ fitpk_egh <- function(x, pos, lambda, max.iter, noise_threshold = .001){
                                 start.height = y[xloc], max.iter = max.iter)
   )
   r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=TRUE)
-  purity <- ifelse(dim(x)[2] > 1, try(get_purity(x, pos, noise_threshold)), NA)
+  purity <- get_purity(x = x, pos = pos, try = estimate_purity,
+                       noise_threshold = noise_threshold)
   area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
   c("rt" = m$center, "start" = pos[2], "end" = pos[3], 
     "sd" = m$width, "tau" = m$tau, "FWHM" = 2.35 * m$width,
@@ -360,12 +377,15 @@ fitpk_egh <- function(x, pos, lambda, max.iter, noise_threshold = .001){
 }
 
 #' @noRd
-fitpk_raw <- function(x, pos, lambda, max.iter, noise_threshold = .001){
+fitpk_raw <- function(x, pos, lambda, max.iter,
+                      estimate_purity = TRUE, noise_threshold = .001){
   y <- x[,lambda]
   xloc <- pos[1]
   peak.loc <- seq.int(pos[2], pos[3])
-  area <- sum(diff(peak.loc) * mean(c(y[peak.loc][-1], tail(y[peak.loc],-1)))) # trapezoidal integration
-  purity <- ifelse(dim(x)[2] > 1, try(get_purity(x, pos, noise_threshold)), NA)
+  # perform trapezoidal integration on raw signal
+  area <- sum(diff(peak.loc) * mean(c(y[peak.loc][-1], tail(y[peak.loc],-1))))
+  purity <- get_purity(x = x, pos = pos, try = estimate_purity,
+                       noise_threshold = noise_threshold)
   c("rt" = pos[1], "start" = pos[2], "end" = pos[3], 
     "sd" = pos[3]-pos[2], "FWHM" = 2.35 * pos[3]-pos[2],
     "height" = y[xloc], "area" = area, purity = purity)
@@ -378,7 +398,10 @@ fitpk_raw <- function(x, pos, lambda, max.iter, noise_threshold = .001){
 #' @param fl Filter length (for instance fl = 51..151), has to be odd.
 #' @param forder filter order Filter order (2 = quadratic filter, 4 = quartic).
 #' @param dorder Derivative order (0 = smoothing, 1 = first derivative, etc.).
+#' @note This function is ported from \href{https://cran.r-project.org/web/packages/pracma/index.html}{pracma},
+#' where it is licensed under GPL (>= 3).
 #' @importFrom stats convolve
+#' @noRd
 savgol <- function(T, fl, forder = 4, dorder = 0) {
   stopifnot(is.numeric(T), is.numeric(fl))
   if (fl <= 1 || fl %% 2 == 0)
@@ -397,7 +420,11 @@ savgol <- function(T, fl, forder = 4, dorder = 0) {
   Tsg <- (-1)^dorder * T2
   return( Tsg )
 }
+
 #' pinv port from pracma
+#' @author Hans W. Borchers
+#' @note This function is ported from \href{https://cran.r-project.org/web/packages/pracma/index.html}{pracma},
+#' where it is licensed under GPL (>= 3).
 #' @noRd
 pinv <- function (A, tol = .Machine$double.eps^(2/3)) {
   stopifnot(is.numeric(A) || is.complex(A), is.matrix(A))
@@ -413,9 +440,9 @@ pinv <- function (A, tol = .Machine$double.eps^(2/3)) {
   if (all(p)) {
     mp <- s$v %*% (1/s$d * t(s$u))
   } else if (any(p)) {
-    mp <- s$v[, p, drop=FALSE] %*% (1/s$d[p] * t(s$u[, p, drop=FALSE]))
+    mp <- s$v[, p, drop=FALSE] %*% (1/s$d[p] * t(s$u[, p, drop = FALSE]))
   } else {
-    mp <- matrix(0, nrow=ncol(A), ncol=nrow(A))
+    mp <- matrix(0, nrow = ncol(A), ncol = nrow(A))
   }
   
   return(mp)

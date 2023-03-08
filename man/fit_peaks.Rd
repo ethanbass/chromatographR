@@ -12,6 +12,7 @@ fit_peaks(
   sd.max = 50,
   fit = c("egh", "gaussian", "raw"),
   max.iter = 1000,
+  estimate_purity = TRUE,
   noise_threshold = 0.001,
   ...
 )
@@ -33,6 +34,9 @@ without fitting a peak shape. Defaults to \code{egh}.)}
 
 \item{max.iter}{Maximum number of iterations to use in nonlinear least
 squares peak-fitting. (Defaults to 1000).}
+
+\item{estimate_purity}{Logical. Whether to estimate purity or not. Defaults
+to TRUE.}
 
 \item{noise_threshold}{Noise threshold. Input to \code{get_purity}.}
 

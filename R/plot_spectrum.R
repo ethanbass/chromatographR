@@ -43,25 +43,27 @@
 #' @return If \code{export_spectrum} is TRUE, returns the spectrum as a \code{
 #' data.frame} with wavelengths as rows and a single column encoding the
 #' absorbance (or normalized absorbance, if \code{scale_spectrum} is TRUE)
-#' at each wavelength. Otherwise, there is no return value.
+#' at each wavelength. If \code{export_spectrum} is FALSE, the output depends on
+#' the plotting \code{engine}. If \code{engine == "plotly"}, returns a \code{plotly}
+#' object containing the specified plots. Otherwise, if \code{engine == "base"},
+#' there is no return value.
 #' @section Side effects:
-#' If \code{plot_trace} is TRUE, plots the chromatographic trace of the specified
+#' * If \code{plot_trace} is TRUE, plots the chromatographic trace of the specified
 #' chromatogram (\code{chr}), at the specified wavelength (\code{lambda}) with a
 #' dotted red line to indicate the retention time given by \code{loc}. The
 #' trace is a single column from the chromatographic matrix.
-#'
-#' If \code{plot_spectrum} is TRUE, plots the spectrum for the specified chromatogram
-#' at the specified retention time. The spectrum is a single row from the chromatographic
-#' matrix.
+#' * If \code{plot_spectrum} is TRUE, plots the spectrum for the specified
+#' chromatogram at the specified retention time. The spectrum is a single row
+#' from the chromatographic matrix.
 #' @author Ethan Bass
 #' @examplesIf interactive()
-# data(Sa)
-# pks <- get_peaks(Sa,lambda="220.00000")
-# pk_tab <- get_peaktable(pks)
-# oldpar <- par(no.readonly = TRUE)
-# par(mfrow=c(2,1))
-# plot_spectrum(loc = "V10", peak_table = pk_tab, what="peak")
-# par(oldpar)
+#' data(Sa)
+#' pks <- get_peaks(Sa,lambda="220.00000")
+#' pk_tab <- get_peaktable(pks)
+#' oldpar <- par(no.readonly = TRUE)
+#' par(mfrow=c(2,1))
+#' plot_spectrum(loc = "V10", peak_table = pk_tab, what="peak")
+#' par(oldpar)
 #' @export plot_spectrum
 #' @md
 
@@ -69,8 +71,9 @@ plot_spectrum <- function(loc = NULL, peak_table, chrom_list,
                           chr = 'max', lambda = 'max',
                           plot_spectrum = TRUE, plot_trace = TRUE,
                           spectrum_labels = TRUE, scale_spectrum = FALSE,
-                          export_spectrum = FALSE, verbose = TRUE, 
-                          what=c("peak", "rt", "idx", "click"), engine = c('base', "plotly"),
+                          export_spectrum = FALSE, verbose = TRUE,
+                          what=c("peak", "rt", "idx", "click"),
+                          engine = c('base', "plotly"),
                           ...){
   if (missing(chrom_list) & missing(peak_table))
     stop("Must provide either a peak_table or a chrom_list.")
@@ -127,7 +130,7 @@ plot_spectrum_plotly <- function(loc, peak_table, chrom_list,
                                  plot_spectrum = TRUE, plot_trace = TRUE,
                                  spectrum_labels = TRUE, scale_spectrum = FALSE,
                                  export_spectrum = FALSE, verbose = TRUE, 
-                                 what=c("peak", "rt", "idx", "click"),
+                                 what=c("peak", "rt", "idx", "click"), zoom = FALSE,
                                  ...){
   if (!requireNamespace("plotly", quietly = TRUE)) {
     stop("Package plotly must be installed:
@@ -177,6 +180,14 @@ plot_spectrum_plotly <- function(loc, peak_table, chrom_list,
   if (plot_spectrum){
     spectrum <- plotly_spec(y = y, spectrum_labels = spectrum_labels, ...)
   }
+  if (plot_spectrum & plot_trace){
+    sub <- plotly::subplot(trace, spectrum)
+  } else if (plot_spectrum & !plot_trace){
+    sub <- spectrum
+  } else if (!plot_spectrum & plot_trace){
+    sub <- trace
+  }
+  sub <- plotly::hide_legend(sub)
   if (export_spectrum){
     y <- data.frame(y)
     colnames(y) <- names(chrom_list)[chr]
@@ -186,16 +197,9 @@ plot_spectrum_plotly <- function(loc, peak_table, chrom_list,
     attr(y, "meta") <- a[-which(names(a) %in% c(
       "time_range", "time_interval", "dimnames", "row.names",
       "class", "dim", "format", "names"))]
-    print(y)
-  }
-  if (plot_spectrum & plot_trace){
-    sub <- plotly::subplot(trace, spectrum)
-  } else if (plot_spectrum & !plot_trace){
-    sub <- spectrum
-  } else if (!plot_spectrum & plot_trace){
-    sub <- trace
-  }
-  plotly::hide_legend(sub)
+    print(sub)
+    y
+  } else sub
 }
 
 #' Plot trace and/or spectrum with base R plotting engine
@@ -206,7 +210,7 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
                                plot_spectrum = TRUE, plot_trace = TRUE,
                                spectrum_labels = TRUE, scale_spectrum = FALSE,
                                export_spectrum = FALSE, verbose=TRUE, 
-                               what=c("peak", "rt", "idx", "click"),
+                               what=c("peak", "rt", "idx", "click"), zoom = FALSE,
                                ...){
   new.ts <- get_times(chrom_list)
   new.lambdas <- get_lambdas(chrom_list)

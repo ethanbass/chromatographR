@@ -4,7 +4,15 @@
 \alias{get_purity}
 \title{Calculate mean peak purity}
 \usage{
-get_purity(x, pos, weight = 1, cutoff = 0.05, noise_threshold = 0.01, lambdas)
+get_purity(
+  x,
+  pos,
+  weight = 1,
+  cutoff = 0.05,
+  noise_threshold = 0.01,
+  lambdas,
+  try = TRUE
+)
 }
 \arguments{
 \item{x}{A chromatogram in matrix format}
@@ -19,6 +27,8 @@ Argument to \code{\link{trim_peak}}.}
 \item{noise_threshold}{Threshold to define noise. Highest proportion of maximum absorbance.}
 
 \item{lambdas}{Wavelengths to include in calculations.}
+
+\item{try}{Logical. Whether to estimate the purity or not. Defaults to TRUE.}
 }
 \value{
 Returns the mean purity of the peak specified by \code{pos}, defined

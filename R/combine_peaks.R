@@ -62,3 +62,20 @@ combine_peaks <- function(peak_table, tol = .01, min.cor = 0.9,
   }
   peak_table
 }
+
+#' Merge split peaks in peak table
+#' 
+#' Merges the specified peaks, by selecting the largest value from each column.
+#' Utility function to combine split peaks into a single column of the peak table.
+#' @param peak_table Peak table from \code{\link{get_peaktable}}.
+#' @param peaks A vector specifying the names or indices of peaks to be merged.
+#' @return A peak table similar to the input peak table, but where the specified
+#' columns are combined combined. 
+#' @export
+
+merge_peaks <- function(peak_table, peaks){
+  check_peaktable(peak_table)
+  sel <- apply(peak_table$tab[,peaks], 1, which.max)
+  peak_table$tab[,peaks[1]] <- do.call(pmax, peak_table$tab[,peaks])
+  peak_table$pk_meta[,-peaks]
+}

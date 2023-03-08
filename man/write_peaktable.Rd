@@ -12,14 +12,23 @@ write_peaktable(
 )
 }
 \arguments{
-\item{peak_table}{Peak table object from}
+\item{peak_table}{Peak table object from \code{\link{get_peaktable}}.}
 
-\item{path}{path to write file}
+\item{path}{Path to write file.}
 
-\item{format}{format for export. Either \code{csv} or \code{xlsx}.}
+\item{format}{File format to export. Either \code{csv} or \code{xlsx}.}
 
-\item{what}{which elements of the \code{peak_table} to export.}
+\item{what}{Which elements of the \code{peak_table} to export.}
+}
+\value{
+No return value.
 }
 \description{
 Export peak table
 }
+\section{Side effects}{
+
+Exports peak_table object as \code{.csv} or \code{.xlsx} file according to the value
+of \code{format}.
+}
+

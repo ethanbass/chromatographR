@@ -26,9 +26,11 @@
 #' @param time.units Units of \code{sd}, \code{FWHM}, \code{area}, and \code{tau}
 #' (if applicable). Options are minutes \code{"min"}, seconds (\code{"s"}, or 
 #' milliseconds \code{"ms"}.
+#' @param estimate_purity Logical. Whether to estimate purity or not. Defaults
+#' to TRUE.
 #' @param noise_threshold Noise threshold. Argument to \code{get_purity}.
 #' @param progress_bar Logical. Whether to show progress bar. Defaults to 
-#' \code{FALSE}.
+#' \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.
 #' @param \dots Additional arguments to \code{\link{find_peaks}}.
 #' @return The result is an S3 object of class \code{peak_list}, containing a nested
 #' list of data.frames containing information about the peaks fitted for each
@@ -64,9 +66,10 @@
 #' @export get_peaks
 
 get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
-                       sd.max = 50, max.iter = 100,
+                      sd.max = 50, max.iter = 100,
                       time.units = c("min", "s", "ms"),
-                      noise_threshold = .001, progress_bar = FALSE, ...){
+                      estimate_purity = TRUE,  noise_threshold = .001,
+                      progress_bar, ...){
   time.units <- match.arg(time.units, c("min", "s", "ms"))
   tfac <- switch(time.units, "min" = 1, "s" = 60, "ms" = 60*1000)
   fit <- match.arg(fit, c("egh", "gaussian", "raw"))
@@ -87,12 +90,16 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
     names(chrom_list) <- seq_along(chrom_list)
   }
   peaks<-list()
+  if (missing(progress_bar)){
+    progress_bar <- check_for_pkg("pbapply", return_boolean = TRUE)
+  }
   laplee <- choose_apply_fnc(progress_bar)
   result <- laplee(seq_along(chrom_list), function(sample){
     suppressWarnings(ptable <- lapply(lambdas, function(lambda){
       cbind(sample = names(chrom_list)[sample], lambda,
             fit_peaks(chrom_list[[sample]], lambda=lambda, fit = fit,
-                      max.iter = max.iter, sd.max = sd.max, 
+                      max.iter = max.iter, sd.max = sd.max,
+                      estimate_purity = estimate_purity,
                       noise_threshold = noise_threshold, ...))
     }))
     names(ptable) <- lambdas
@@ -101,14 +108,12 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
   names(result) <- names(chrom_list)
   result <- lapply(result, function(sample) lapply(sample, function(pks){
     pks[which(apply(pks, 1, function(x){
-      !all(is.na(x)) & (x["rt"] > x["start"]) & x["rt"] < x["end"]})), , drop=FALSE]
+      !all(is.na(x)) & (x["rt"] > x["start"]) & x["rt"] < x["end"]})), , drop = FALSE]
   }))
-  # timepoints <- as.numeric(rownames(chrom_list[[1]]))
-  # tdiff <- median(diff(timepoints))
-  sample_names<-names(result)
+  sample_names <- names(result)
   result <- lapply(seq_along(result), function(i){
-    timepoints <- get_times(chrom_list, index=i)
-    tdiff <- get_time_resolution(chrom_list, index=i)
+    timepoints <- get_times(chrom_list, index = i)
+    tdiff <- get_time_resolution(chrom_list, index = i)
     lapply(result[[i]], function(lambda){
       x <- lambda
       x[, c('rt', 'start', 'end')] <- sapply(c('rt', 'start', 'end'),
@@ -125,15 +130,4 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
             max.iter = max.iter,
             time.units = time.units,
             class = "peak_list")
-}
-
-#'@noRd
-choose_apply_fnc <- function(progress_bar){
-  if (progress_bar){
-    check_for_pkg("pbapply")
-    fn <- pbapply::pblapply
-  } else{
-    fn <- lapply
-  }
-  fn
 }

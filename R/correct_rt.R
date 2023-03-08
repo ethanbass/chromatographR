@@ -2,18 +2,19 @@
 #' 
 #' Aligns chromatograms using parametric time warping, as 
 #' implemented in \code{\link[ptw]{ptw}}, or variable penalty dynamic 
-#' time warping, as implemented in \code{\link[VPdtw]{VPdtw}}.
+#' time warping, as implemented in \code{\link[VPdtw]{VPdtw}}. The
+#' \code{init.coef} and \code{n.traces} arguments apply only to \code{ptw}
+#' warping, while \code{penalty} and \code{maxshift} apply only to \code{vpdtw}
+#' warping.
 #' 
-#' To use variable penalty dynamic time warping, the \code{VPdtw} package must
-#' be manually installed: \code{install.packages('VPdtw')}.
-#'
 #' @aliases correct_rt
 #' @import ptw
 #' @importFrom scales rescale
 #' @importFrom stats approx
-#' @param chrom_list List of matrices containing concentration profiles.
+#' @param chrom_list List of chromatograms in matrix format.
 #' @param lambdas Select wavelengths to use by name.
-#' @param models List of models to warp by.
+#' @param models List of models to warp by. The models provided here (if any)
+#' must match the algorithm selected in \code{alg}.
 #' @param reference Index of the sample that is to be considered the reference
 #' sample.
 #' @param alg algorithm to use: parametric time warping (\code{ptw}) or variable
@@ -27,18 +28,20 @@
 #' @param trwdth width of the triangle in the WCC criterion.
 #' @param plot_it Logical. Whether to plot alignment.
 #' @param penalty The divisor used to calculate the penalty for
-#' \code{\link[VPdtw]{VPdtw}}. The penalty is calculated by dividing the
+#' \code{\link[VPdtw]{VPdtw}}. The warping penalty is calculated by dividing the
 #' \code{\link[VPdtw]{dilation}} by this number. Thus, a higher number will
 #' produce a lower penalty and be more permissive, while a lower number will 
 #' produce a higher penalty and allow less warping. Defaults to 5.
 #' @param maxshift Integer. Maximum allowable shift for \code{\link[VPdtw]{VPdtw}}.
+#' Defaults to 50.
 #' @param verbose Whether to print verbose output.
 #' @param progress_bar Logical. Whether to show progress bar. Defaults to 
-#' \code{FALSE}.
+#' \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed. Currently works 
+#' only for \code{ptw} alignments.
 #' @param \dots Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
 #' The only argument that cannot be changed is \code{warp.type}: this is always
 #' equal to \code{"global"}.
-#' @return A list of `ptw` objects or a list of warped absorbance profiles,
+#' @return A list of warping models or a list of warped absorbance profiles,
 #' depending on the value of the \code{what} argument.
 #' @author Ethan Bass
 #' @note Adapted from
@@ -77,9 +80,17 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
                        init.coef = c(0, 1, 0), n.traces = NULL, n.zeros = 0, 
                        scale = FALSE, trwdth = 200, plot_it = FALSE,
                        penalty = 5, maxshift = 50,
-                       verbose = FALSE, progress_bar = FALSE, ...){
+                       verbose = FALSE, progress_bar, ...){
   what <- match.arg(what, c("corrected.values", "models"))
   alg <- match.arg(alg, c("ptw", "vpdtw"))
+  
+  if (!is.null(models)){
+    model_class <- switch(alg, ptw = "ptw_list", "vpdtw" = "VPdtw")
+    if (!inherits(models, model_class)){
+      stop("The supplied models do not match the selected algorithm. Please check arguments
+           and try again.")
+    }
+  }
   if (missing(lambdas)){
     if (is.null(models) & is.null(n.traces)){
         stop("Must specify wavelengths ('lambdas') or number of traces ('n.traces')
@@ -105,99 +116,107 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
       t(x[, lambdas, drop = FALSE])}, simplify = "array")
     if (is.null(n.traces)){
       traces <- ifelse(length(lambdas) == 1, 1, list(lambdas))[[1]]
-    } else{
+    } else {
       traces <- select.traces(X = allmats.t, criterion='coda')
       traces <- traces$trace.nrs[1:n.traces]
     }
     # choose reference chromatogram
     if (reference == 'best'){
       best <- bestref(allmats.t)
-      reference <- as.numeric(names(sort(table(best$best.ref),decreasing=TRUE))[1])
+      reference <- as.numeric(names(sort(table(best$best.ref), decreasing = TRUE))[1])
       if (verbose) message(paste("Selected chromatogram", reference, "as best reference."))
     } else{
       reference <- reference
     }
+    args <- substitute(list(lambdas=lambdas, models=models, reference=reference, 
+                            alg=alg, init.coef=init.coef, n.traces = n.traces,
+                            n.zeros = n.zeros, scale = scale, trwdth = trwdth,
+                            penalty = penalty, maxshift = maxshift))
     if (alg == "ptw"){
-      if (!is.null(models)){
-        if(!(class(models) %in% c("ptw_list", "VPdtw"))){
-          stop("Model object not recognized.")
+      if (is.null(models)){
+        if (missing(progress_bar)){
+          progress_bar <- check_for_pkg("pbapply", return_boolean = TRUE)
         }
-        ptwmods <- models
-      } else{
         laplee <- choose_apply_fnc(progress_bar)
-        ptwmods <- laplee(seq_len(dim(allmats)[3]), function(ii){
+        models <- laplee(seq_len(dim(allmats)[3]), function(ii){
           ptw(allmats.t[,, reference],
               allmats.t[,, ii], selected.traces = traces, init.coef = init.coef,
               warp.type = "global", ...)})
-        class(ptwmods) <- "ptw_list"
-        if (plot_it) plot(ptwmods)
+        class(models) <- "ptw_list"
+        if (plot_it){
+          plot(models)
+        }
       }
       if (what == "corrected.values"){
         allmats <- sapply(chrom_list_og, identity, simplify = "array")
-        warp.coef <- lapply(ptwmods,FUN=function(x){
+        warp.coef <- lapply(models, FUN=function(x){
           x$warp.coef[1,]
         })
-        ptwmods <- lapply(seq_len(dim(allmats)[3]), function(ii){
-          ptw(t(allmats[,,1]), t(allmats[, , ii]), init.coef=warp.coef[[ii]],
-              try=TRUE, alg = ptwmods[[1]]$alg, warp.type = "global", ...)})
-        result <- lapply(ptwmods, function(x) t(x$warped.sample))
+        models <- lapply(seq_len(dim(allmats)[3]), function(ii){
+          ptw(t(allmats[,,1]), t(allmats[, , ii]), init.coef = warp.coef[[ii]],
+              try = TRUE, alg = models[[1]]$alg, warp.type = "global", ...)})
+        result <- lapply(models, function(x) t(x$warped.sample))
         for (i in seq_along(result)){
           rownames(result[[i]]) <- rownames(chrom_list[[i]])
           result[[i]] <- transfer_metadata(result[[i]], chrom_list_og[[i]])
+          result <- structure(result, warped = TRUE, warping_args = args)
         }
         names(result) <- names(chrom_list)
         result
-      } else {
-        ptwmods
-      }
+      } else {models}
   } else if (alg == "vpdtw"){
-    allmats <- sapply(chrom_list_og, function(x) x[,lambdas, drop = FALSE])
     if (length(lambdas) > 1)
       stop("VPdtw only supports warping by a single wavelength")
+    allmats <- sapply(chrom_list_og, function(x) x[, lambdas, drop = FALSE])
     if (is.null(models)){
       penalty <- VPdtw::dilation(allmats[,reference], 350) / penalty
       models <- VPdtw::VPdtw(query = allmats, reference = allmats[,reference],
                              penalty = penalty, maxshift = maxshift)
     }
-    if (plot_it)  VPdtw::plot.VPdtw(models)
+    if (plot_it){
+      VPdtw::plot.VPdtw(models)
+    }
     if (what == "corrected.values"){
       jset <- models$xVals + models$shift
       iset <- models$query
       jmax <- nrow(jset)
       short <- jmax - nrow(iset)
-      res <- median(diff(as.numeric(rownames(chrom_list_og[[1]]))))
-      result <- lapply(1:ncol(allmats), function(samp){
+      res <- get_time_resolution(chrom_list_og, index=reference)
+      result <- lapply(seq_len(ncol(allmats)), function(samp){
+        # warp retention times
         x <- apply(chrom_list_og[[samp]], 2, function(j){
           iset <- c(rep(NA, short), j)
           suppressWarnings(stats::approx(x = jset[,samp], y = iset, 1:jmax)$y)
         })
+      })
         # fix times
-        old_ts <- c(rep(NA,short), rownames(chrom_list_og[[samp]]))
-        times <- suppressWarnings(stats::approx(x = jset[,samp],
+        old_ts <- c(rep(NA,short), get_times(chrom_list_og, index = reference))
+        times <- suppressWarnings(stats::approx(x = jset[,reference],
                                                 y = old_ts, 1:jmax)$y)
-        mi <- min(which(!is.na(times)))
-        if (mi > 1){
-          beg <- sort(seq(from = times[mi]-res, by = -res, length.out = mi-1),
+        idx_start <- which.min(times)
+        if (idx_start > 1){
+          beg <- sort(seq(from = times[idx_start]-res, by = -res, length.out = idx_start-1),
                     decreasing = FALSE)
         } else beg <- NULL
-        ma <- max(which(!is.na(times)))
-        if (ma < length(times)){
-          end <- seq(from = times[ma]+res, length.out = length(times)-ma, by=res)
+        idx_end <- which.max(times)
+        if (idx_end < length(times)){
+          end <- seq(from = times[idx_end]+res, length.out = length(times) - idx_end, by = res)
         } else end <- NULL
-        new.times <- c(beg,times[!is.na(times)], end)
-        rownames(x) <- new.times
-        x <- transfer_metadata(x, chrom_list_og[[samp]])
-        x
-      })
+        new.times <- c(beg, times[!is.na(times)], end)
+        result <- mapply(function(x,idx){
+          rownames(x) <- new.times
+          x <- transfer_metadata(x, chrom_list_og[[idx]])
+          x
+        }, result, seq_along(result), SIMPLIFY = FALSE)
       names(result) <- names(chrom_list)
-      # replace NAs with 0s
-      result<-lapply(result, function(xx){
+      # replace NAs with 0s and add additional metadata
+      result <- lapply(result, function(xx){
           if(any(is.na(xx))){
             xx[which(is.na(xx))] <- 0
           }
+          xx <- structure(xx, warped = TRUE, warping_args = args)
           xx
         })
-      
       result
     } else{
       models
@@ -239,14 +258,6 @@ correct_peaks <- function(peak_list, mod_list){
            })},
     peak_list, mod_list, SIMPLIFY = FALSE)
 }
-
-transfer_metadata <- function(new_object, old_object,
-                              exclude = c('names','row.names','class','dim','dimnames')){
-    a <- attributes(old_object)
-    a[exclude] <- NULL
-    attributes(new_object) <- c(attributes(new_object), a)
-    new_object
-  }
 
 #' Plot PTW alignments
 #' @importFrom graphics matplot

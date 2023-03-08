@@ -10,6 +10,7 @@
 #' Argument to \code{\link{trim_peak}}.
 #' @param noise_threshold Threshold to define noise. Highest proportion of maximum absorbance.
 #' @param lambdas Wavelengths to include in calculations.
+#' @param try Logical. Whether to estimate the purity or not. Defaults to TRUE.
 #' @return Returns the mean purity of the peak specified by \code{pos}, defined
 #' as the proportion of timepoints with purity values below 1.
 #' @references
@@ -19,16 +20,21 @@
 #' @author Ethan Bass
 
 get_purity <- function(x, pos, weight = 1, cutoff = 0.05, noise_threshold = 0.01,
-                       lambdas){
-  if (missing(lambdas)){
-    lambdas <- seq_len(ncol(x))
-  }
-  if (is.character(lambdas)){
-    lambdas <- which(as.numeric(colnames(x)) %in% lambdas) 
-  }
-  p <- get_purity_values(x, pos, weight = weight, noise_threshold = noise_threshold,
-                         lambdas)
-  mean(p[trim_peak(x, pos, cutoff = cutoff)] < 1, na.rm = TRUE)
+                       lambdas, try = TRUE){
+  if (try){
+    try({
+      if (missing(lambdas)){
+        lambdas <- seq_len(ncol(x))
+      }
+      if (is.character(lambdas)){
+        lambdas <- which(as.numeric(colnames(x)) %in% lambdas) 
+      }
+      p <- get_purity_values(x, pos, weight = weight, noise_threshold = noise_threshold,
+                             lambdas)
+      mean(p[trim_peak(x, pos, cutoff = cutoff)] < 1, na.rm = TRUE)
+      }, NA
+    )
+  } else NA
 }
 
 #' Define noise spectra based on specified threshold

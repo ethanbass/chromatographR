@@ -1,11 +1,10 @@
-#' Check that peaktable is of proper class
+#' Check that peak_table is of proper class
 #' @author Ethan Bass
 #' @noRd
 check_peaktable <- function(peak_table){
   if (!inherits(peak_table, "peak_table"))
     stop("The provided peak_table must be of the `peak_table` class")
 }
-
 
 #' Retrieve chrom_list from peak_table object and check properties
 #' @param peak_table Peak table object
@@ -77,16 +76,18 @@ get_lambda_idx <- function(lambda, lambdas, y, allow_max = TRUE){
       stop("Wavelength (`lambda`) must be specified for interactive scanning.")
     }
   } else{
-    lambda.idx <- ifelse(length(lambdas == 1), 1,
+    lambda.idx <- ifelse((length(lambdas) == 1), 1,
                                 which(lambdas == as.numeric(lambda))
     )
   }
-  if (length(lambda.idx) == 0)
+  if (is.na(lambda.idx) | length(lambda.idx) == 0)
     stop("The specified wavelength (`lambda`) could not be found!")
   lambda.idx
 }
 
-check_chr <- function(chr, loc=NULL, peak_table, chrom_list, allow_max = TRUE){
+#' Check chromatogram
+#' @noRd
+check_chr <- function(chr, loc = NULL, peak_table, chrom_list, allow_max = TRUE){
   if (chr == 'max'){
     if (allow_max){
       chr <- which.max(peak_table$tab[,loc])
@@ -106,6 +107,8 @@ check_chr <- function(chr, loc=NULL, peak_table, chrom_list, allow_max = TRUE){
 #' @noRd
 elementwise.all.equal <- Vectorize(function(x, y, ...) {isTRUE(all.equal(x, y, ...))})
 
+#' Get times
+#' @return Numeric vector of retention times.
 #' @noRd
 get_times <- function(x, index=1){
   if (inherits(x, "chrom_list") | inherits(x, "list")){
@@ -115,35 +118,89 @@ get_times <- function(x, index=1){
   }
 }
 
+#' Get lambdas
+#' @return Numeric vector of wavelengths
 #' @noRd
 get_lambdas <- function(chrom_list){
   as.numeric(colnames(chrom_list[[1]]))
 }
 
+#' Get time resolution
+#' @return Returns average gap between time points.
 #' @noRd
 get_time_resolution <- function(chrom_list, index=1){
-  signif(median(diff(as.numeric(rownames(chrom_list[[index]])))))
+  ts <- get_times(x = chrom_list, index = index)
+  signif(median(diff(ts)))
 }
 
+#' Check for suggested package
 #' @noRd
-check_for_pkg <- function(pkg){
-  if (!requireNamespace(pkg, quietly = TRUE)) {
+check_for_pkg <- function(pkg, return_boolean = FALSE){
+  pkg_exists <- requireNamespace(pkg, quietly = TRUE)
+  if (!pkg_exists) {
     stop(paste(
       "Package", sQuote(pkg), "must be installed to perform this action:
           try", paste0("`install.packages('", pkg, "')`.")),
       call. = FALSE
     )
   }
+  if (return_boolean){
+    pkg_exists
+  }
 }
 
 #' Extract variables from the left-hand-side of a formula
-#'
 #' @param formula A \code{\link{formula}} object.
 #' @importFrom Formula Formula
 #' @noRd
 #' @note Adapted from https://github.com/adibender/pammtools/blob/master/R/formula-utils.R
+#' (c) Copyright © 2017 Andreas Bender and Fabian Scheipl under MIT license:
+#' Permission is hereby granted, free of charge, to any person obtaining a copy of
+#' this software and associated documentation files (the “Software”), to deal in 
+#' the Software without restriction, including without limitation the rights to use, 
+#' copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the 
+#' Software, and to permit persons to whom the Software is furnished to do so, 
+#' subject to the following conditions:
+#'   
+#' The above copyright notice and this permission notice shall be included in all 
+#' copies or substantial portions of the Software.
+#' 
+#' THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+#' IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+#' FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+#' AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
+#' WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+#' CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 get_lhs_vars <- function(formula) {
   if (is.character(formula) ) formula <- as.formula(formula)
   form <- formula(Formula::Formula(formula), lhs = TRUE, rhs = FALSE)
   all.vars(form)
+}
+
+#' Transfer metadata between objects
+#' @noRd
+transfer_metadata <- function(new_object, old_object,
+                              exclude = c('names','row.names','class','dim','dimnames')){
+  a <- attributes(old_object)
+  a[exclude] <- NULL
+  attributes(new_object) <- c(attributes(new_object), a)
+  new_object
+}
+
+
+#' Choose apply function
+#' @return Returns \code{\link[pbapply]{pblapply}} if \code{progress_bar == TRUE},
+#' otherwise returns \code{\link{lapply}}.
+#' @noRd
+choose_apply_fnc <- function(progress_bar, parallel = FALSE){
+  if (progress_bar){
+    check_for_pkg("pbapply")
+    fn <- pbapply::pblapply
+  } else if (!progress_bar && parallel){
+    fn <- parallel::mclapply
+    } else{
+    fn <- lapply
+  }
+  fn
 }

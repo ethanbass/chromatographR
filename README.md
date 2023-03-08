@@ -24,8 +24,8 @@ install.packages("chromatographR")
 You can also install the latest development version of chromatographR from GitHub using the devtools package:
 
 ```
-install.packages("devtools")
-devtools::install_github("https://github.com/ethanbass/chromatographR/")
+install.packages("remotes")
+remotes::install_github("https://github.com/ethanbass/chromatographR/")
 ```
 
 or from R Universe:
@@ -57,5 +57,5 @@ Also see the [contributing.md](https://github.com/ethanbass/chromatographR/blob/
 
 If you use chromatographR in published work, please cite it as follows:
 
-Bass, E. (2022). chromatographR: chromatographic data analysis toolset (version 0.4.5).
+Bass, E. (2022). chromatographR: chromatographic data analysis toolset (version 0.4.6).
 http://doi.org/10.5281/zenodo.6944334

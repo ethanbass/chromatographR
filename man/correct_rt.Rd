@@ -20,16 +20,17 @@ correct_rt(
   penalty = 5,
   maxshift = 50,
   verbose = FALSE,
-  progress_bar = FALSE,
+  progress_bar,
   ...
 )
 }
 \arguments{
-\item{chrom_list}{List of matrices containing concentration profiles.}
+\item{chrom_list}{List of chromatograms in matrix format.}
 
 \item{lambdas}{Select wavelengths to use by name.}
 
-\item{models}{List of models to warp by.}
+\item{models}{List of models to warp by. The models provided here (if any)
+must match the algorithm selected in \code{alg}.}
 
 \item{reference}{Index of the sample that is to be considered the reference
 sample.}
@@ -53,34 +54,35 @@ inspection) or the warping 'models' (for further programmatic use).}
 \item{plot_it}{Logical. Whether to plot alignment.}
 
 \item{penalty}{The divisor used to calculate the penalty for
-\code{\link[VPdtw]{VPdtw}}. The penalty is calculated by dividing the
+\code{\link[VPdtw]{VPdtw}}. The warping penalty is calculated by dividing the
 \code{\link[VPdtw]{dilation}} by this number. Thus, a higher number will
 produce a lower penalty and be more permissive, while a lower number will
 produce a higher penalty and allow less warping. Defaults to 5.}
 
-\item{maxshift}{Integer. Maximum allowable shift for \code{\link[VPdtw]{VPdtw}}.}
+\item{maxshift}{Integer. Maximum allowable shift for \code{\link[VPdtw]{VPdtw}}.
+Defaults to 50.}
 
 \item{verbose}{Whether to print verbose output.}
 
 \item{progress_bar}{Logical. Whether to show progress bar. Defaults to
-\code{FALSE}.}
+\code{TRUE} if \code{\link[pbapply]{pbapply}} is installed. Currently works
+only for \code{ptw} alignments.}
 
 \item{\dots}{Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
 The only argument that cannot be changed is \code{warp.type}: this is always
 equal to \code{"global"}.}
 }
 \value{
-A list of \code{ptw} objects or a list of warped absorbance profiles,
+A list of warping models or a list of warped absorbance profiles,
 depending on the value of the \code{what} argument.
 }
 \description{
 Aligns chromatograms using parametric time warping, as
 implemented in \code{\link[ptw]{ptw}}, or variable penalty dynamic
-time warping, as implemented in \code{\link[VPdtw]{VPdtw}}.
-}
-\details{
-To use variable penalty dynamic time warping, the \code{VPdtw} package must
-be manually installed: \code{install.packages('VPdtw')}.
+time warping, as implemented in \code{\link[VPdtw]{VPdtw}}. The
+\code{init.coef} and \code{n.traces} arguments apply only to \code{ptw}
+warping, while \code{penalty} and \code{maxshift} apply only to \code{vpdtw}
+warping.
 }
 \note{
 Adapted from

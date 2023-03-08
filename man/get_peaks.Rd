@@ -11,8 +11,9 @@ get_peaks(
   sd.max = 50,
   max.iter = 100,
   time.units = c("min", "s", "ms"),
+  estimate_purity = TRUE,
   noise_threshold = 0.001,
-  progress_bar = FALSE,
+  progress_bar,
   ...
 )
 }
@@ -35,10 +36,13 @@ in \code{\link{fit_peaks}}.}
 (if applicable). Options are minutes \code{"min"}, seconds (\code{"s"}, or 
 milliseconds \code{"ms"}.}
 
+\item{estimate_purity}{Logical. Whether to estimate purity or not. Defaults
+to TRUE.}
+
 \item{noise_threshold}{Noise threshold. Argument to \code{get_purity}.}
 
 \item{progress_bar}{Logical. Whether to show progress bar. Defaults to 
-\code{FALSE}.}
+\code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.}
 
 \item{\dots}{Additional arguments to \code{\link{find_peaks}}.}
 }

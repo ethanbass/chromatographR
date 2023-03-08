@@ -1,12 +1,14 @@
 #' Attach experimental metadata
 #' 
-#' Attaches experimental metadata to `peak_table` object. One of the columns in
+#' Attaches sample metadata to `peak_table` object. Metadata should be
+#' provided as a data.frame object. One of the columns in
 #' the supplied metadata must match exactly the row names of the peak table.
 #' 
 #' @aliases attach_metadata
 #' @param peak_table A `peak_table` object.
 #' @param metadata A `data.frame` containing the sample metadata.
-#' @param column The name of the column containing the sample names.
+#' @param column The name of the column in your \code{metadata} object containing the
+#' sample names. Sample names must match the row names of \code{peak_table$tab}.
 #' @return A \code{peak_table} object with attached metadata in the \code{
 #' $sample_meta} slot.
 #' @author Ethan Bass
@@ -92,7 +94,7 @@ get_reference_spectra <- function(peak_table, chrom_list,
   X <- colnames(peak_table$tab)
   if (ref == "max.cor"){
     sp.l <- lapply(X,function(pk){
-      x<-plot_all_spectra(peak = pk, peak_table, chrom_list,
+      x <- plot_all_spectra(peak = pk, peak_table, chrom_list,
                        plot_spectrum = FALSE, export_spectrum = TRUE,
                        scale_spectrum = TRUE)
       apply(x, 2, as.numeric)

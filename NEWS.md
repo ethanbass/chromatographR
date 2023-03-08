@@ -1,26 +1,41 @@
+# chromatographR 0.4.6
+
+### New Features
+
+* Added `plot_chroms` function for easily plotting multiple traces from a list of chromatograms.
+* Minor changes to internal syntax of `correct_rt` to give more informative error messages.
+* Added `estimate_purity` argument in `get_peaks` to toggle peak purity estimation.
+* Changed default setting for `progress_bar` in `correct_rt` and `get_peaks`. Now defaults to `TRUE` if `pbapply` is installed.
+* Added additional tests of utility functions and new `plot_chroms` function.
+* Minor changes to vignette.
+* Minor changes to documentation.
+
+### Bug fixes
+
+* Fixed bug causing mismatched time axes and alignment issues after VPdtw warping
+(again), so that it returns matrices with a consistent time axis.
+* Fixed y unit label in `boxplot.peak_table` function.
+* Fixed behavior of `plot_spectrum` so spectrum is exported properly when `engine == plotly`.
+* Fixed bug in `write_peaktable` when writing to `xlsx`.
+
 # chromatographR 0.4.5
 
-#### New features
-* Fixed bug causing mismatched time axes (and improper alignment of chromatograms) after variable penalty dynamic time warping (VPdtw). 
+### New Features
 * Added `reshape_chroms` function for converting chromatograms to "long" format.
-* Added `export.peaktable` function to easily write peak_table to `csv` or `xlsx`.
+* Added `write_peaktable` function to easily write peak_table to `csv` or `xlsx`.
 * Added `get_purity` function for assessing peak purity.
 * Allow multiple peaks as arguments to `plot.peaktable`.
 * Added functions for plotting traces and spectra with [plotly](https://plotly.com/r/):
 `plotly_trace` and `plotly_spec`.
 * Fixed `preprocess` so it will no longer try to interpolate along columns for 2D data.
 * Added stand-alone `boxplot` function for `peak_table` objects.
-* Fixed bug in `attach_metadata` that could result in disordered rows.
-* Changed `fit_peaks` function and syntax (see below).
 * Added a new class (`ptw_list`) and plotting function for lists of `ptw` alignment objects.
 * Added `plot_it` argument in `correct_rt` for plotting alignments.
 * Added [VPdtw](https://github.com/ethanbass/VPdtw/) as a dependency (instead of being only suggested).
-* Adjusted `cluster_spectra` and `combine_peaks` functions so messages can be suppressed with `verbose == FALSE`.
-* Fixed occasional test failure on MKL server by skipping `cluster_spectra` test on CRAN.
-* Updated find_peaks function with more and better smoothing options. The defaults smoothing is slightly changed.
-Find peaks will now do gaussian smoothing by default with
 * Added `progress_bar` option to `get_peaks` and `correct_rt`.
 * Improved error handling in `plot.peaklist`.
+* Updated find_peaks function with more and better smoothing options to improve peak-finding. Now defaults to gaussian smoothing.
+* Changed `fit_peaks` function and syntax (see below).
 * Minor updates to vignette.
 
 #### Changes to *fit_peaks* function:
@@ -31,6 +46,13 @@ Find peaks will now do gaussian smoothing by default with
 * Incorporated assessment of peak purity during peak fitting.
 * Added wavelength (`lambda`) to `peak_list` and `peak_table` metadata.
 * Fixed bug to allow fitting of a single peak with `fit_peaks`.
+
+### Bug fixes
+
+* Fixed bug causing mismatched time axes (and improper alignment of chromatograms) after variable penalty dynamic time warping (VPdtw). 
+* Fixed bug in `attach_metadata` that could result in disordered rows.
+* Fixed occasional test failure on MKL server by skipping `cluster_spectra` test on CRAN.
+* Adjusted `cluster_spectra` and `combine_peaks` functions so messages can be suppressed with `verbose == FALSE`.
 
 # chromatographR 0.4.4
 
