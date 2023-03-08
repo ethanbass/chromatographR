@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.6</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,21 +65,34 @@
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>peak_table</dt>
-<dd><p>Peak table object from</p></dd>
+<dd><p>Peak table object from <code><a href="get_peaktable.html">get_peaktable</a></code>.</p></dd>
 
 
 <dt>path</dt>
-<dd><p>path to write file</p></dd>
+<dd><p>Path to write file.</p></dd>
 
 
 <dt>format</dt>
-<dd><p>format for export. Either <code>csv</code> or <code>xlsx</code>.</p></dd>
+<dd><p>File format to export. Either <code>csv</code> or <code>xlsx</code>.</p></dd>
 
 
 <dt>what</dt>
-<dd><p>which elements of the <code>peak_table</code> to export.</p></dd>
+<dd><p>Which elements of the <code>peak_table</code> to export.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>No return value.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="side-effects">Side effects<a class="anchor" aria-label="anchor" href="#side-effects"></a></h2>
+    
+
+<p>Exports peak_table object as <code>.csv</code> or <code>.xlsx</code> file according to the value
+of <code>format</code>.</p>
+    </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>

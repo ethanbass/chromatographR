@@ -97,6 +97,9 @@
     <loc>https://ethanbass.github.io/chromatographR/reference/load_chroms.html</loc>
   </url>
   <url>
+    <loc>https://ethanbass.github.io/chromatographR/reference/merge_peaks.html</loc>
+  </url>
+  <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/mirror_plot.html</loc>
   </url>
   <url>
@@ -118,6 +121,9 @@
     <loc>https://ethanbass.github.io/chromatographR/reference/plot_all_spectra.html</loc>
   </url>
   <url>
+    <loc>https://ethanbass.github.io/chromatographR/reference/plot_chroms.html</loc>
+  </url>
+  <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/plot_spectrum.html</loc>
   </url>
   <url>
@@ -128,9 +134,6 @@
   </url>
   <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/reshape_chroms.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/savgol.html</loc>
   </url>
   <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/scan_chrom.html</loc>

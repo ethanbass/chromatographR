@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.6</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,36 +48,59 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.6" id="chromatographr-046">chromatographR 0.4.6<a class="anchor" aria-label="anchor" href="#chromatographr-046"></a></h2>
+<div class="section level4">
+<h4 id="new-features-0-4-6">New Features<a class="anchor" aria-label="anchor" href="#new-features-0-4-6"></a></h4>
+<ul><li>Added <code>plot_chroms</code> function for easily plotting multiple traces from a list of chromatograms.</li>
+<li>Minor changes to internal syntax of <code>correct_rt</code> to give more informative error messages.</li>
+<li>Added <code>estimate_purity</code> argument in <code>get_peaks</code> to toggle peak purity estimation.</li>
+<li>Changed default setting for <code>progress_bar</code> in <code>correct_rt</code> and <code>get_peaks</code>. Now defaults to <code>TRUE</code> if <code>pbapply</code> is installed.</li>
+<li>Added additional tests of utility functions and new <code>plot_chroms</code> function.</li>
+<li>Minor changes to vignette.</li>
+<li>Minor changes to documentation.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="bug-fixes-0-4-6">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-4-6"></a></h4>
+<ul><li>Fixed bug causing mismatched time axes and alignment issues after VPdtw warping (again), so that it returns matrices with a consistent time axis.</li>
+<li>Fixed y unit label in <code>boxplot.peak_table</code> function.</li>
+<li>Fixed behavior of <code>plot_spectrum</code> so spectrum is exported properly when <code>engine == plotly</code>.</li>
+<li>Fixed bug in <code>write_peaktable</code> when writing to <code>xlsx</code>.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.5" id="chromatographr-045">chromatographR 0.4.5<a class="anchor" aria-label="anchor" href="#chromatographr-045"></a></h2>
-<div class="section level5">
-<h5 id="new-features-0-4-5">New features<a class="anchor" aria-label="anchor" href="#new-features-0-4-5"></a></h5>
-<ul><li>Fixed bug causing mismatched time axes (and improper alignment of chromatograms) after variable penalty dynamic time warping (VPdtw).</li>
-<li>Added <code>reshape_chroms</code> function for converting chromatograms to “long” format.</li>
-<li>Added <code>export.peaktable</code> function to easily write peak_table to <code>csv</code> or <code>xlsx</code>.</li>
+<div class="section level4">
+<h4 id="new-features-0-4-5">New Features<a class="anchor" aria-label="anchor" href="#new-features-0-4-5"></a></h4>
+<ul><li>Added <code>reshape_chroms</code> function for converting chromatograms to “long” format.</li>
+<li>Added <code>write_peaktable</code> function to easily write peak_table to <code>csv</code> or <code>xlsx</code>.</li>
 <li>Added <code>get_purity</code> function for assessing peak purity.</li>
 <li>Allow multiple peaks as arguments to <code>plot.peaktable</code>.</li>
 <li>Added functions for plotting traces and spectra with <a href="https://plotly.com/r/" class="external-link">plotly</a>: <code>plotly_trace</code> and <code>plotly_spec</code>.</li>
 <li>Fixed <code>preprocess</code> so it will no longer try to interpolate along columns for 2D data.</li>
 <li>Added stand-alone <code>boxplot</code> function for <code>peak_table</code> objects.</li>
-<li>Fixed bug in <code>attach_metadata</code> that could result in disordered rows.</li>
-<li>Changed <code>fit_peaks</code> function and syntax (see below).</li>
 <li>Added a new class (<code>ptw_list</code>) and plotting function for lists of <code>ptw</code> alignment objects.</li>
 <li>Added <code>plot_it</code> argument in <code>correct_rt</code> for plotting alignments.</li>
 <li>Added <a href="https://github.com/ethanbass/VPdtw/" class="external-link">VPdtw</a> as a dependency (instead of being only suggested).</li>
-<li>Adjusted <code>cluster_spectra</code> and <code>combine_peaks</code> functions so messages can be suppressed with <code>verbose == FALSE</code>.</li>
-<li>Fixed occasional test failure on MKL server by skipping <code>cluster_spectra</code> test on CRAN.</li>
-<li>Updated find_peaks function with more and better smoothing options. The defaults smoothing is slightly changed. Find peaks will now do gaussian smoothing by default with</li>
 <li>Added <code>progress_bar</code> option to <code>get_peaks</code> and <code>correct_rt</code>.</li>
 <li>Improved error handling in <code>plot.peaklist</code>.</li>
+<li>Updated find_peaks function with more and better smoothing options to improve peak-finding. Now defaults to gaussian smoothing.</li>
+<li>Changed <code>fit_peaks</code> function and syntax (see below).</li>
 <li>Minor updates to vignette.</li>
-</ul></div>
-<div class="section level5">
+</ul><div class="section level5">
 <h5 id="changes-to-fit_peaks-function-0-4-5">Changes to <em>fit_peaks</em> function:<a class="anchor" aria-label="anchor" href="#changes-to-fit_peaks-function-0-4-5"></a></h5>
 <ul><li>Simplified logic in <code>fit_peaks</code> function.</li>
 <li>Modified <code>fit_peaks</code> syntax so it now takes a matrix (<code>x</code>) and a wavelength (<code>lambda</code>) instead of a numeric vector (<code>y</code>).</li>
 <li>Incorporated assessment of peak purity during peak fitting.</li>
 <li>Added wavelength (<code>lambda</code>) to <code>peak_list</code> and <code>peak_table</code> metadata.</li>
 <li>Fixed bug to allow fitting of a single peak with <code>fit_peaks</code>.</li>
+</ul></div>
+</div>
+<div class="section level4">
+<h4 id="bug-fixes-0-4-5">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-4-5"></a></h4>
+<ul><li>Fixed bug causing mismatched time axes (and improper alignment of chromatograms) after variable penalty dynamic time warping (VPdtw).</li>
+<li>Fixed bug in <code>attach_metadata</code> that could result in disordered rows.</li>
+<li>Fixed occasional test failure on MKL server by skipping <code>cluster_spectra</code> test on CRAN.</li>
+<li>Adjusted <code>cluster_spectra</code> and <code>combine_peaks</code> functions so messages can be suppressed with <code>verbose == FALSE</code>.</li>
 </ul></div>
 </div>
     <div class="section level2">

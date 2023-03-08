@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.6</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,7 +80,7 @@
 Bass<sup>1</sup>
 </h4>
             
-            <h4 data-toc-skip class="date">2023-01-31</h4>
+            <h4 data-toc-skip class="date">2023-03-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/HEAD/vignettes/chromatographR.Rmd" class="external-link"><code>vignettes/chromatographR.Rmd</code></a></small>
       <div class="d-none name"><code>chromatographR.Rmd</code></div>
@@ -123,6 +123,7 @@ table.</p>
 <div class="section level2">
 <h2 id="workflow">Workflow<a class="anchor" aria-label="anchor" href="#workflow"></a>
 </h2>
+<p>chromatographR is designed to .</p>
 <div class="section level3">
 <h3 id="loading-data">Loading data<a class="anchor" aria-label="anchor" href="#loading-data"></a>
 </h3>
@@ -138,12 +139,12 @@ documentation</a>). Select the appropriate file format by specifying the
 <code>chemstation_uv</code>, <code>masshunter_dad</code>,
 <code>chromeleon_uv</code>, <code>waters_arw</code>, etc).</p>
 <pre class="text"><code>&gt; # single folder
-&gt; read_chroms(paths = path, format_in = "csv")
+&gt; read_chroms(paths = path, format_in = "chemstation_csv")
 &gt; 
 &gt; # multiple folders
 &gt; path = 'foo' # path to parent directory
 &gt; folders &lt;- list.files(path = path, pattern = "EXPORT3D")
-&gt; dat &lt;- read_chroms(folders, format_in = "csv")</code></pre>
+&gt; dat &lt;- read_chroms(folders, format_in = "chemstation_csv")</code></pre>
 </div>
 <div class="section level3">
 <h3 id="example-data">Example data<a class="anchor" aria-label="anchor" href="#example-data"></a>
@@ -231,27 +232,19 @@ fewer peaks may sometimes yield better warping models. (Also see the
 documentation for <a href="https://CRAN.R-project.org/package=ptw" class="external-link">ptw</a> for more guidance
 on warp function optimization).</p>
 <pre class="text"><code>&gt; warping.models &lt;- correct_rt(dat.pr, what = "models", lambdas=c("210"), scale = TRUE)
-&gt; warp &lt;- correct_rt(chrom_list=dat.pr, models=warping.models, what="corrected.values")</code></pre>
+&gt; warp &lt;- correct_rt(chrom_list = dat.pr, models = warping.models, what = "corrected.values")</code></pre>
 <p>We can then use the following code snippet to compare the alignment
 of warped (top panel) and unwarped (bottom panel) chromatograms.</p>
-<pre class="text"><code>&gt; par(mfrow=c(2,1))
-&gt; lambdas=c('210','260')
-&gt; plot.new()
-&gt; ts &lt;- as.numeric(rownames(warp[[1]]))
-&gt; plot.window(xlim=c(head(ts,1), tail(ts,1)),ylim=c(0,1000))
-&gt; for (i in 1:length(warp)){
-+   matplot(ts, warp[[i]][,lambdas],type='l',add=T)
-+ }
+<pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE)
+&gt; par(mfrow=c(2,1))
+&gt; 
+&gt; plot_chroms(warp, lambdas = c("210","260"))
 &gt; legend("topright", legend="ptw", bty = "n")
 &gt; 
-&gt; plot.new()
-&gt; ts &lt;- as.numeric(rownames(dat.pr[[i]]))
-&gt; plot.window(xlim=c(head(ts,1),tail(ts,1)),ylim=c(0,1000))
-&gt; for (i in 1:length(dat.pr)){
-+   matplot(ts, dat.pr[[i]][,lambdas],type='l',add=T)
-+ }
+&gt; plot_chroms(dat.pr, lambdas = c("210","260"))
 &gt; legend("topright", legend="raw", bty = "n")</code></pre>
 <p><img src="chromatographR_files/figure-html/alignment_plot-1.png" width="576"></p>
+<pre class="text"><code>&gt; par(oldpar)</code></pre>
 <p>Clearly, the alignment is considerably improved after warping. You
 can also use the <code>correct_rt</code> function to do a global
 alignment on multiple wavelengths, by providing a list of wavelengths to
@@ -283,15 +276,17 @@ snippet below is not run, but shows how one could install
 <code>VPdtw</code> and use it to warp the example chromatograms. the
 <code>penalty</code> and <code>maxshift</code> parameters can be
 adjusted to control the degree of warping.</p>
-<pre class="text"><code>&gt; warp &lt;- correct_rt(chrom_list=dat.pr, alg="vpdtw", lambdas="210", what="corrected.values", reference=1)
-&gt; warping.models &lt;- correct_rt(dat.pr, what = "models", lambdas = c('210'), scale= TRUE, alg = 'vpdtw', reference=1)</code></pre>
-<pre class="text"><code>&gt; par(mfrow=c(2,1))
-&gt; matplot(sapply(warp,function(x)x[,"210"]),type='l')
+<pre class="text"><code>&gt; warp &lt;- correct_rt(chrom_list = dat.pr, alg = "vpdtw", lambdas = "210", what = "corrected.values", reference = 1)</code></pre>
+<pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE)
+&gt; 
+&gt; par(mfrow=c(2,1))
+&gt; plot_chroms(warp, lambdas = c("210","260"))
 &gt; legend("topright", legend="vpdtw", bty = "n")
 &gt; 
-&gt; matplot(sapply(dat.pr,function(x)x[,"210"]),type='l')
+&gt; plot_chroms(dat.pr, lambdas = c("210","260"))
 &gt; legend("topright", legend="raw", bty = "n")</code></pre>
 <p><img src="chromatographR_files/figure-html/unnamed-chunk-3-1.png" width="576"></p>
+<pre class="text"><code>&gt; par(oldpar)</code></pre>
 <p>In this case the alignments produced by the two algorithms are very
 similar, but in many cases one algorithm may dramatically out-perform
 the other, so it is useful to have more than one option available.</p>
@@ -310,9 +305,11 @@ estimated using trapezoidal approximation. Alternatively, peak area can
 be integrated without applying a model (<code>raw</code>). The function
 returns a nested list of data.frames containing parameters for the peaks
 identified in each chromatogram.</p>
-<pre class="text"><code>&gt; pks_gauss &lt;- get_peaks(warp, lambdas = c('210','260'), sd.max=40, fit="gaussian")
-&gt; pks_egh &lt;- get_peaks(warp, lambdas = c('210', '260'), sd.max=40, fit="egh")
-&gt; pks_raw &lt;- get_peaks(warp, lambdas = c('210', '260'), sd.max=100, fit="raw")</code></pre>
+<pre class="text"><code>&gt; pks_gauss &lt;- get_peaks(warp, lambdas = c('210','260'), sd.max = 40, fit = "gaussian")
+&gt; 
+&gt; pks_egh &lt;- get_peaks(warp, lambdas = c('210', '260'), sd.max = 40, fit="egh")
+&gt; 
+&gt; pks_raw &lt;- get_peaks(warp, lambdas = c('210', '260'), sd.max = 100, fit="raw")</code></pre>
 <div class="section level4">
 <h4 id="filtering">Filtering<a class="anchor" aria-label="anchor" href="#filtering"></a>
 </h4>
@@ -336,11 +333,13 @@ algorithms. Usually the egh function performs slightly better for
 asymmetrical peaks. Even though the peaks are fully filled in when the
 <code>raw</code> setting is selected, the results may not necessarily be
 more accurate.</p>
-<pre class="text"><code>&gt; par(mfrow=c(3,1))
+<pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE)
+&gt; par(mfrow=c(3,1))
 &gt; plot(pks_gauss, index=1, lambda='210')
 &gt; plot(pks_egh, index=1, lambda='210')
 &gt; plot(pks_raw, index=1, lambda='210')</code></pre>
 <p><img src="chromatographR_files/figure-html/plot_peaks-1.png" width="576"></p>
+<pre class="text"><code>&gt; par(oldpar)</code></pre>
 </div>
 </div>
 <div class="section level3">
@@ -350,21 +349,25 @@ more accurate.</p>
 function performs complete-linkage hierarchical clustering to link peaks
 across samples. It returns a <code>peak_table</code> object with samples
 as rows and peaks as columns. The <code>peak_table</code> object also
-has slots for holding various metadata about peaks, samples, and
-analyses. If you have a lot of samples, this step can be quite
-computationally expensive. Thus, it is suggested to filter the peak_list
-provided to <code>get_peaktable</code> in order to remove extraneous
-peaks (see <a href="#id_##Peak%20finding%20and%20fitting">Peak finding
-and fitting</a> section above). Peaks can also be filtered after
-<code>peak_table</code> assembly using the <code>filter_peaktable</code>
-function.</p>
-<pre class="text"><code>&gt; pk_tab &lt;- get_peaktable(pks_egh, response = "area")
+has slots for holding metadata about peaks, samples, and analyses. If
+you have a lot of samples, this step can be quite computationally
+expensive. Thus, it is suggested to filter the peak_list provided to
+<code>get_peaktable</code> in order to remove extraneous peaks (see
+<em>Peak finding and fitting</em> section above). Peaks can also be
+filtered after <code>peak_table</code> assembly using the
+<code>filter_peaktable</code> function. An important parameter here is
+<code>hmax</code> which controls the stringency with which retention
+times are matched across samples. A low value of <code>hmax</code> will
+increase the odds of splitting a single peaks across multiple columns,
+while a high value of <code>hmax</code> will increase the odds of
+erroneously combining multiple peaks into the same column.</p>
+<pre class="text"><code>&gt; pk_tab &lt;- get_peaktable(pks_egh, response = "area", hmax = 0.2)
 &gt; head(pk_tab$tab[,1:6])</code></pre>
-<pre><code>          V1       V2        V3        V4       V5        V6
-119 0.000000 5.476068 0.0000000 0.6477083 1.889422 15.144775
-121 0.000000 4.264338 1.0949622 0.6130032 0.000000  8.006312
-122 0.000000 8.400992 0.9467302 1.9957845 0.000000 25.950200
-458 5.934559 6.201729 2.2880101 1.9933859 5.308515 13.995000</code></pre>
+<pre><code>          V1        V2        V3       V4        V5        V6
+119 5.496455 0.0000000 0.6572183 1.991365 15.199917 0.3114568
+121 4.200859 1.0746359 0.6078366 0.000000  7.908693 0.0000000
+122 8.261218 0.9544689 1.9510595 0.000000 25.772683 1.7912076
+458 6.201729 2.2880101 1.9889770 5.308515 13.995000 0.2875473</code></pre>
 </div>
 <div class="section level3">
 <h3 id="further-analysis-and-data-visualization">Further analysis and data-visualization<a class="anchor" aria-label="anchor" href="#further-analysis-and-data-visualization"></a>
@@ -374,9 +377,15 @@ function.</p>
 </h4>
 <p>To begin analyzing your peak table, you will usually want to attach
 sample metadata to the <code>peak_table</code> object. This can be
-easily accomplished using the <code>attach_metadata</code> function. The
-peak table can then be normalized (e.g. by dividing out the sample
-weight) using the <code>normalize_data</code> function.</p>
+easily accomplished using the <code>attach_metadata</code> function.
+This function takes a <code>metadata</code> argument which should be
+supplied with a <code>data.frame</code> containing experimental
+metadata, where one of the columns matches the names of your samples.
+This column should be specified by supplying it as the
+<code>column</code> argument. This will attach the ordered metadata in
+the <code>sample_meta</code> slot of your peak table. The peak table can
+then be normalized (e.g. by dividing out the sample weight) using the
+<code>normalize_data</code> function.</p>
 <pre class="text"><code>&gt; path &lt;- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
 &gt; meta &lt;- read.csv(path)
 &gt; pk_tab &lt;- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
@@ -417,11 +426,11 @@ arguments.</p>
 <pre class="text"><code>&gt; par(oldpar)</code></pre>
 <p>The <code>plot_spectrum</code> function can also generate interactive
 plots using <a href="https://plotly.com/r/" class="external-link">plotly</a>.</p>
-<pre class="text"><code>&gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list=warp, verbose=FALSE, engine="plotly")</code></pre>
+<pre class="text"><code>&gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp, verbose = FALSE, engine = "plotly")</code></pre>
 <p>The <code>plot_all_spectra</code> function can be used to visually
 compare the spectra for a specified peak across all samples.</p>
-<pre class="text"><code>&gt; peak="V13"
-&gt; plot_all_spectra(peak, peak_table=pk_tab, export=F, overlapping=T)</code></pre>
+<pre class="text"><code>&gt; peak = "V13"
+&gt; plot_all_spectra(peak, peak_table = pk_tab, export = F, overlapping = TRUE)</code></pre>
 <p><img src="chromatographR_files/figure-html/plot_all-1.png" width="576"></p>
 </div>
 <div class="section level5">
@@ -514,7 +523,7 @@ Curve Resolution: The Alsace Package for <span>R</span>.”</span>
 <pre class="text"><code>&gt; sessionInfo()</code></pre>
 <pre><code>R version 4.2.2 (2022-10-31)
 Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Ubuntu 22.04.1 LTS
+Running under: Ubuntu 22.04.2 LTS
 
 Matrix products: default
 BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3
@@ -531,31 +540,32 @@ attached base packages:
 [8] base     
 
 other attached packages:
-[1] chromatographR_0.4.5 knitr_1.42          
+[1] chromatographR_0.4.6 knitr_1.42          
 
 loaded via a namespace (and not attached):
  [1] Rcpp_1.0.10           lattice_0.20-45       RcppDE_0.1.7         
  [4] tidyr_1.3.0           png_0.1-8             rprojroot_2.0.3      
- [7] digest_0.6.31         utf8_1.2.2            R6_2.5.1             
-[10] cellranger_1.1.0      dynamicTreeCut_1.63-1 evaluate_0.20        
-[13] highr_0.10            pillar_1.8.1          rlang_1.0.6          
-[16] readxl_1.4.1          jquerylib_0.1.4       Matrix_1.5-1         
-[19] reticulate_1.28       rmarkdown_2.20        pkgdown_2.0.7        
-[22] textshaping_0.3.6     desc_1.4.2            stringr_1.5.0        
-[25] munsell_0.5.0         compiler_4.2.2        xfun_0.36            
-[28] pkgconfig_2.0.3       systemfonts_1.0.4     htmltools_0.5.4      
-[31] tidyselect_1.2.0      tibble_3.1.8          fansi_1.0.4          
-[34] dplyr_1.1.0           bitops_1.0-7          grid_4.2.2           
-[37] jsonlite_1.8.4        lifecycle_1.0.3       magrittr_2.0.3       
-[40] scales_1.2.1          cli_3.6.0             stringi_1.7.12       
-[43] cachem_1.0.6          farver_2.1.1          ptw_1.9-16           
-[46] fs_1.6.0              xml2_1.3.3            bslib_0.4.2          
-[49] fastcluster_1.2.3     ragg_1.2.5            generics_0.1.3       
-[52] vctrs_0.5.2           Formula_1.2-4         tools_4.2.2          
-[55] pvclust_2.2-0         glue_1.6.2            purrr_1.0.1          
-[58] fastmap_1.1.0         yaml_2.3.7            colorspace_2.1-0     
-[61] caTools_1.18.2        memoise_2.0.1         minpack.lm_1.2-3     
-[64] chromConverter_0.2.1  sass_0.4.5           </code></pre>
+ [7] digest_0.6.31         utf8_1.2.3            R6_2.5.1             
+[10] cellranger_1.1.0      VPdtw_2.1-14          dynamicTreeCut_1.63-1
+[13] evaluate_0.20         highr_0.10            pillar_1.8.1         
+[16] rlang_1.0.6           readxl_1.4.2          jquerylib_0.1.4      
+[19] Matrix_1.5-1          reticulate_1.28       rmarkdown_2.20       
+[22] pkgdown_2.0.7         textshaping_0.3.6     desc_1.4.2           
+[25] stringr_1.5.0         munsell_0.5.0         compiler_4.2.2       
+[28] xfun_0.37             pkgconfig_2.0.3       systemfonts_1.0.4    
+[31] htmltools_0.5.4       tidyselect_1.2.0      tibble_3.2.0         
+[34] fansi_1.0.4           dplyr_1.1.0           bitops_1.0-7         
+[37] grid_4.2.2            jsonlite_1.8.4        lifecycle_1.0.3      
+[40] magrittr_2.0.3        scales_1.2.1          cli_3.6.0            
+[43] stringi_1.7.12        cachem_1.0.7          pbapply_1.7-0        
+[46] farver_2.1.1          ptw_1.9-16            fs_1.6.1             
+[49] xml2_1.3.3            bslib_0.4.2           fastcluster_1.2.3    
+[52] ragg_1.2.5            generics_0.1.3        vctrs_0.5.2          
+[55] Formula_1.2-5         tools_4.2.2           pvclust_2.2-0        
+[58] glue_1.6.2            purrr_1.0.1           fastmap_1.1.1        
+[61] yaml_2.3.7            colorspace_2.1-0      caTools_1.18.2       
+[64] memoise_2.0.1         minpack.lm_1.2-3      chromConverter_0.2.1 
+[67] sass_0.4.5           </code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>
