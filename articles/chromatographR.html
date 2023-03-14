@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.7</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,7 +80,7 @@
 Bass<sup>1</sup>
 </h4>
             
-            <h4 data-toc-skip class="date">2023-03-08</h4>
+            <h4 data-toc-skip class="date">2023-03-14</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/HEAD/vignettes/chromatographR.Rmd" class="external-link"><code>vignettes/chromatographR.Rmd</code></a></small>
       <div class="d-none name"><code>chromatographR.Rmd</code></div>
@@ -187,7 +187,7 @@ parameters before choosing values to use on your whole dataset.</p>
 +        type='l', ylab='Abs (mAU)', xlab='Time (min)')
 &gt; matplot(x=tpoints, y = ptw::baseline.corr(Sa[[i]][,lambda],p=.001,lambda=1e5),
 +        type='l', add = T, col='blue', lty = 3)</code></pre>
-<p><img src="chromatographR_files/figure-html/choosing%20parameters-1.png" width="576"></p>
+<p><img src="chromatographR_files/figure-html/choosing%20parameters-1.png" width="600px"></p>
 <pre class="text"><code>&gt; # choose dimensions for interpolation
 &gt; new.ts &lt;- seq(10,18.66,by=.01) # choose time-points
 &gt; new.lambdas &lt;- seq(200, 318, by = 2) # choose wavelengths
@@ -239,11 +239,11 @@ of warped (top panel) and unwarped (bottom panel) chromatograms.</p>
 &gt; par(mfrow=c(2,1))
 &gt; 
 &gt; plot_chroms(warp, lambdas = c("210","260"))
-&gt; legend("topright", legend="ptw", bty = "n")
+&gt; legend("topleft", legend="ptw", bty = "n")
 &gt; 
 &gt; plot_chroms(dat.pr, lambdas = c("210","260"))
-&gt; legend("topright", legend="raw", bty = "n")</code></pre>
-<p><img src="chromatographR_files/figure-html/alignment_plot-1.png" width="576"></p>
+&gt; legend("topleft", legend="raw", bty = "n")</code></pre>
+<p><img src="chromatographR_files/figure-html/alignment_plot-1.png" width="600px"></p>
 <pre class="text"><code>&gt; par(oldpar)</code></pre>
 <p>Clearly, the alignment is considerably improved after warping. You
 can also use the <code>correct_rt</code> function to do a global
@@ -281,11 +281,11 @@ adjusted to control the degree of warping.</p>
 &gt; 
 &gt; par(mfrow=c(2,1))
 &gt; plot_chroms(warp, lambdas = c("210","260"))
-&gt; legend("topright", legend="vpdtw", bty = "n")
+&gt; legend("topleft", legend="vpdtw", bty = "n")
 &gt; 
 &gt; plot_chroms(dat.pr, lambdas = c("210","260"))
-&gt; legend("topright", legend="raw", bty = "n")</code></pre>
-<p><img src="chromatographR_files/figure-html/unnamed-chunk-3-1.png" width="576"></p>
+&gt; legend("topleft", legend="raw", bty = "n")</code></pre>
+<p><img src="chromatographR_files/figure-html/unnamed-chunk-3-1.png" width="600px"></p>
 <pre class="text"><code>&gt; par(oldpar)</code></pre>
 <p>In this case the alignments produced by the two algorithms are very
 similar, but in many cases one algorithm may dramatically out-perform
@@ -338,7 +338,7 @@ more accurate.</p>
 &gt; plot(pks_gauss, index=1, lambda='210')
 &gt; plot(pks_egh, index=1, lambda='210')
 &gt; plot(pks_raw, index=1, lambda='210')</code></pre>
-<p><img src="chromatographR_files/figure-html/plot_peaks-1.png" width="576"></p>
+<p><img src="chromatographR_files/figure-html/plot_peaks-1.png" width="600px"></p>
 <pre class="text"><code>&gt; par(oldpar)</code></pre>
 </div>
 </div>
@@ -400,7 +400,7 @@ then be normalized (e.g. by dividing out the sample weight) using the
 <p>The <code>mirror_plot</code> function provides a quick way to
 visually compare results across treatment groups.</p>
 <pre class="text"><code>&gt; mirror_plot(pk_tab, lambdas = c("210","260"), var = "trt", legend_size=2)</code></pre>
-<p><img src="chromatographR_files/figure-html/unnamed-chunk-5-1.png" width="576"></p>
+<p><img src="chromatographR_files/figure-html/unnamed-chunk-5-1.png" width="600px"></p>
 </div>
 <div class="section level5">
 <h5 id="plotting-spectra">Plotting spectra<a class="anchor" aria-label="anchor" href="#plotting-spectra"></a>
@@ -422,7 +422,7 @@ arguments.</p>
 &gt; par(mfrow=c(2,1))
 &gt; peak="V7"
 &gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list=warp, verbose=FALSE)</code></pre>
-<p><img src="chromatographR_files/figure-html/plot%20spectra-1.png" width="576"></p>
+<p><img src="chromatographR_files/figure-html/plot%20spectra-1.png" width="600px"></p>
 <pre class="text"><code>&gt; par(oldpar)</code></pre>
 <p>The <code>plot_spectrum</code> function can also generate interactive
 plots using <a href="https://plotly.com/r/" class="external-link">plotly</a>.</p>
@@ -431,7 +431,7 @@ plots using <a href="https://plotly.com/r/" class="external-link">plotly</a>.</p
 compare the spectra for a specified peak across all samples.</p>
 <pre class="text"><code>&gt; peak = "V13"
 &gt; plot_all_spectra(peak, peak_table = pk_tab, export = F, overlapping = TRUE)</code></pre>
-<p><img src="chromatographR_files/figure-html/plot_all-1.png" width="576"></p>
+<p><img src="chromatographR_files/figure-html/plot_all-1.png" width="600px"></p>
 </div>
 <div class="section level5">
 <h5 id="plot-peak-table-function">Plot peak table function<a class="anchor" aria-label="anchor" href="#plot-peak-table-function"></a>
@@ -444,7 +444,7 @@ interface to the <code>plot_spectrum</code> and
 to quickly compare results across treatments by calling
 <code>boxplot</code>.</p>
 <pre class="text"><code>&gt; plot(pk_tab, loc = "V13", box_plot = TRUE, vars = "trt", verbose = FALSE)</code></pre>
-<p><img src="chromatographR_files/figure-html/plot.peaktable-1.png" width="576"><img src="chromatographR_files/figure-html/plot.peaktable-2.png" width="576"><img src="chromatographR_files/figure-html/plot.peaktable-3.png" width="576"></p>
+<p><img src="chromatographR_files/figure-html/plot.peaktable-1.png" width="600px"><img src="chromatographR_files/figure-html/plot.peaktable-2.png" width="600px"><img src="chromatographR_files/figure-html/plot.peaktable-3.png" width="600px"></p>
 </div>
 </div>
 </div>
@@ -540,7 +540,7 @@ attached base packages:
 [8] base     
 
 other attached packages:
-[1] chromatographR_0.4.6 knitr_1.42          
+[1] chromatographR_0.4.7 knitr_1.42          
 
 loaded via a namespace (and not attached):
  [1] Rcpp_1.0.10           lattice_0.20-45       RcppDE_0.1.7         
