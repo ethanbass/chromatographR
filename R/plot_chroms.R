@@ -39,7 +39,7 @@ plot_chroms <- function(x, lambdas, idx, ylab = "Absorbance", xlab = "",
     if (show_legend)
       legend("topright", legend = names(x[idx]), fill=seq_along(x[idx]))
   } else {
-    xx <- chromConverter:::reshape_chroms(x, idx=idx)
+    xx <- reshape_chroms(x, idx = idx, lambdas = )
     if (engine == "ggplot"){
       check_for_pkg("ggplot2")
       .data <- ggplot2::.data

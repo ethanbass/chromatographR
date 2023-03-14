@@ -1,3 +1,9 @@
+# chromatographR 0.4.7
+
+* Added `reshape_peaktable` function for conversion of peak tables to long format.
+* Turned off `estimate_purity` in `get_peaks` function by default.
+* Added option to filter by wavelength in `reshape_chroms`, speeding up `plot_chroms`.
+
 # chromatographR 0.4.6
 
 ### New Features

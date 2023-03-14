@@ -27,7 +27,7 @@
 #' (if applicable). Options are minutes \code{"min"}, seconds (\code{"s"}, or 
 #' milliseconds \code{"ms"}.
 #' @param estimate_purity Logical. Whether to estimate purity or not. Defaults
-#' to TRUE.
+#' to FALSE.
 #' @param noise_threshold Noise threshold. Argument to \code{get_purity}.
 #' @param progress_bar Logical. Whether to show progress bar. Defaults to 
 #' \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.
@@ -68,7 +68,7 @@
 get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
                       sd.max = 50, max.iter = 100,
                       time.units = c("min", "s", "ms"),
-                      estimate_purity = TRUE,  noise_threshold = .001,
+                      estimate_purity = FALSE,  noise_threshold = .001,
                       progress_bar, ...){
   time.units <- match.arg(time.units, c("min", "s", "ms"))
   tfac <- switch(time.units, "min" = 1, "s" = 60, "ms" = 60*1000)

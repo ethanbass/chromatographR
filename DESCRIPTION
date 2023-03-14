@@ -1,7 +1,7 @@
 Type: Package
 Package: chromatographR
 Title: Chromatographic Data Analysis Toolset
-Version: 0.4.6
+Version: 0.4.7
 Authors@R: 
     person("Ethan", "Bass", , "ethanbass@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6175-6739"))

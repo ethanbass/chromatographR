@@ -5,7 +5,7 @@ citEntry(
   title    = "chromatographR: chromatographic data analysis toolset",
   author   = "Ethan Bass",
   year     = "2022",
-  note     = "version 0.4.6",
+  note     = "version 0.4.7",
   url      = "https://ethanbass.github.io/chromatographR/",
   doi      = "10.5281/zenodo.6944334",
   textVersion = paste("Bass, E. (2022).",

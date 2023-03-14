@@ -17,7 +17,7 @@ library("knitr", quietly=TRUE)
 library(chromatographR)
 library(parallel)
 opts_chunk$set(prompt = TRUE, highlight = FALSE, comment=NA, 
-               fig.width=6)
+               dpi=200, fig.width=5, out.width="600px")
 suppressMessages(require(chromatographR, quiet=TRUE))
 ```
 
@@ -99,10 +99,10 @@ oldpar <- par(no.readonly = TRUE)
 par(mfrow=c(2,1))
 
 plot_chroms(warp, lambdas = c("210","260"))
-legend("topright", legend="ptw", bty = "n")
+legend("topleft", legend="ptw", bty = "n")
 
 plot_chroms(dat.pr, lambdas = c("210","260"))
-legend("topright", legend="raw", bty = "n")
+legend("topleft", legend="raw", bty = "n")
 par(oldpar)
 ```
 
@@ -121,10 +121,10 @@ oldpar <- par(no.readonly = TRUE)
 
 par(mfrow=c(2,1))
 plot_chroms(warp, lambdas = c("210","260"))
-legend("topright", legend="vpdtw", bty = "n")
+legend("topleft", legend="vpdtw", bty = "n")
 
 plot_chroms(dat.pr, lambdas = c("210","260"))
-legend("topright", legend="raw", bty = "n")
+legend("topleft", legend="raw", bty = "n")
 
 par(oldpar)
 ```

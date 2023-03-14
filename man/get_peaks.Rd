@@ -11,7 +11,7 @@ get_peaks(
   sd.max = 50,
   max.iter = 100,
   time.units = c("min", "s", "ms"),
-  estimate_purity = TRUE,
+  estimate_purity = FALSE,
   noise_threshold = 0.001,
   progress_bar,
   ...
@@ -37,7 +37,7 @@ in \code{\link{fit_peaks}}.}
 milliseconds \code{"ms"}.}
 
 \item{estimate_purity}{Logical. Whether to estimate purity or not. Defaults
-to TRUE.}
+to FALSE.}
 
 \item{noise_threshold}{Noise threshold. Argument to \code{get_purity}.}
 
