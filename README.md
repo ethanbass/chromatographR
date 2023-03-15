@@ -21,7 +21,7 @@ chromatographR can now be installed from CRAN:
 install.packages("chromatographR")
 ```
 
-You can also install the latest development version of chromatographR from GitHub using the devtools package:
+However, it's recommended to install the latest development version of chromatographR from GitHub using the devtools package:
 
 ```
 install.packages("remotes")
