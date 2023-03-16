@@ -1,3 +1,7 @@
+# chromatographR 0.4.8 dev
+
+* Fixed `merge_peaks` function so it works properly (to combine 2 or more peaks in peak table).
+
 # chromatographR 0.4.7
 
 * Added `reshape_peaktable` function for conversion of peak tables to long format.

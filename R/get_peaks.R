@@ -27,7 +27,7 @@
 #' (if applicable). Options are minutes \code{"min"}, seconds (\code{"s"}, or 
 #' milliseconds \code{"ms"}.
 #' @param estimate_purity Logical. Whether to estimate purity or not. Defaults
-#' to FALSE.
+#' to FALSE. (If TRUE, this will slow down the function significantly).
 #' @param noise_threshold Noise threshold. Argument to \code{get_purity}.
 #' @param progress_bar Logical. Whether to show progress bar. Defaults to 
 #' \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.

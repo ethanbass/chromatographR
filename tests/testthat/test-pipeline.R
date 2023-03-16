@@ -175,6 +175,14 @@ test_that("combine_peaks works", {
   expect_equal(rownames(pk_tab_c$tab), rownames(pk_tab$tab))
 })
 
+test_that("merge_peaks works", {
+  pk_tab_m <- merge_peaks(pk_tab, peaks=c("V10","V11"))
+  expect_equal(pk_tab_m$tab$V11, pmax(pk_tab$tab$V10, pk_tab$tab$V11))
+  expect_equal(ncol(pk_tab_m), ncol(pk_tab)-1)
+  expect_equal(ncol(pk_tab_m$pk_meta), ncol(pk_tab$pk_meta)-1)
+  expect_equal(rownames(pk_tab_m$tab), rownames(pk_tab$tab))
+})
+
 test_that("normalize_data works", {
   pk_tab_norm <- normalize_data(pk_tab, chrom_list = dat.pr, column = "mass")
   expect_equal(rownames(pk_tab_norm$tab), rownames(pk_tab$tab))

@@ -125,10 +125,6 @@ get_spectral_similarity <- function(x, pos){
   suppressWarnings(cor(x[as.numeric(pos[1]),], t(x[idx,])))
 }
 
-# calc_purity_value <- function(x, pos){
-#   get_spectral_similarity(x,pos) > get_agilent_threshold(x, pos)
-# }
-
 #' Calculate peak purity values
 #' @param x A chromatogram in matrix format
 #' @param pos A vector containing peak information

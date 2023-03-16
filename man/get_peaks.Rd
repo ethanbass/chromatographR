@@ -37,7 +37,7 @@ in \code{\link{fit_peaks}}.}
 milliseconds \code{"ms"}.}
 
 \item{estimate_purity}{Logical. Whether to estimate purity or not. Defaults
-to FALSE.}
+to FALSE. (If TRUE, this will slow down the function significantly).}
 
 \item{noise_threshold}{Noise threshold. Argument to \code{get_purity}.}
 

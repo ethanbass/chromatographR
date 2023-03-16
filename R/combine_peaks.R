@@ -5,6 +5,7 @@
 #' (\code{tol}) for retention time matching and minimum spectral correlation
 #' (\code{min.cor}) for a match.
 #' 
+#' @name combine_peaks
 #' @param peak_table Peak table from \code{\link{get_peaktable}}.
 #' @param tol Tolerance for matching retention times (maximum retention time
 #' difference).
@@ -67,15 +68,30 @@ combine_peaks <- function(peak_table, tol = .01, min.cor = 0.9,
 #' 
 #' Merges the specified peaks, by selecting the largest value from each column.
 #' Utility function to combine split peaks into a single column of the peak table.
+#'
+#' @name merge_peaks
 #' @param peak_table Peak table from \code{\link{get_peaktable}}.
 #' @param peaks A vector specifying the names or indices of peaks to be merged.
 #' @return A peak table similar to the input peak table, but where the specified
 #' columns are combined combined. 
+#' @author Ethan Bass
+#' @examples
+#' data(pk_tab)
+#' pk_tab <- merge_peaks(peak_table = pk_tab, peaks=c("V10","V11"))
 #' @export
 
 merge_peaks <- function(peak_table, peaks){
   check_peaktable(peak_table)
-  sel <- apply(peak_table$tab[,peaks], 1, which.max)
-  peak_table$tab[,peaks[1]] <- do.call(pmax, peak_table$tab[,peaks])
-  peak_table$pk_meta[,-peaks]
+  if (is.character(peaks)){
+    pks.idx <- which(colnames(peak_table$tab) %in% peaks)
+  }
+  sel <- which.max(colMeans(peak_table$tab[,peaks]))
+  sel.idx <- which(colnames(peak_table$tab)==peaks[sel])
+  peak_table$tab[,sel.idx] <- do.call(pmax, peak_table$tab[,peaks])
+  peak_table$pk_meta <- peak_table$pk_meta[,-pks.idx[-sel]]
+  peak_table$tab <- peak_table$tab[,-pks.idx[-sel]]
+  if (inherits(peak_table$ref_spectra,"matrix")){
+    peak_table$ref_spectra <- peak_table$ref_spectra[,-pks.idx[-sel]]
+  }
+  return(peak_table)
 }

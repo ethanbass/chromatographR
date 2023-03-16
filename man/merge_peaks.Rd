@@ -19,3 +19,10 @@ columns are combined combined.
 Merges the specified peaks, by selecting the largest value from each column.
 Utility function to combine split peaks into a single column of the peak table.
 }
+\examples{
+data(pk_tab)
+pk_tab <- merge_peaks(peak_table = pk_tab, peaks=c("V10","V11"))
+}
+\author{
+Ethan Bass
+}
