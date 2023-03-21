@@ -84,12 +84,14 @@ merge_peaks <- function(peak_table, peaks){
   check_peaktable(peak_table)
   if (is.character(peaks)){
     pks.idx <- which(colnames(peak_table$tab) %in% peaks)
+  } else {
+    pks.idx <- peaks
   }
-  sel <- which.max(colMeans(peak_table$tab[,peaks]))
-  sel.idx <- which(colnames(peak_table$tab)==peaks[sel])
-  peak_table$tab[,sel.idx] <- do.call(pmax, peak_table$tab[,peaks])
-  peak_table$pk_meta <- peak_table$pk_meta[,-pks.idx[-sel]]
+  sel <- which.max(colMeans(peak_table$tab[,pks.idx], na.rm=TRUE))
+  sel.idx <- which(colnames(peak_table$tab) == peaks[sel])
+  peak_table$tab[,sel.idx] <- do.call(pmax, peak_table$tab[,pks.idx])
   peak_table$tab <- peak_table$tab[,-pks.idx[-sel]]
+  peak_table$pk_meta <- peak_table$pk_meta[,-pks.idx[-sel]]
   if (inherits(peak_table$ref_spectra,"matrix")){
     peak_table$ref_spectra <- peak_table$ref_spectra[,-pks.idx[-sel]]
   }
