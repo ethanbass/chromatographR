@@ -79,7 +79,20 @@ test_that("plot_chroms works to plot alignments", {
     plot_chroms(dat.pr, lambdas="210")
   }
   vdiffr::expect_doppelganger("alignment", alignment)
+  expect_error(plot_chroms(pktab))
 })
+
+test_that("plot_chroms works to plot alignments with ggplot", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  skip_if_not_installed("ggplot2")
+  alignment_ggp <- function(){
+    plot_chroms(warp, lambdas="210", engine="ggplot")
+  }
+  vdiffr::expect_doppelganger("alignment_ggp", alignment_ggp)
+  expect_error(plot_chroms(pktab))
+})
+
 
 
 ### test get_peaks ###
@@ -210,9 +223,16 @@ test_that("normalize_data works", {
 
 test_that("plot.peak_list works", {
   skip_if_not_installed("vdiffr")
-  plot_peaks <- function() plot(pks_egh, chrom_list = dat.pr, points = TRUE,
+  plot_peaks <- function(){
+    plot(pks_egh, chrom_list = dat.pr, points = TRUE,
                                 ticks=TRUE)
+  }
   vdiffr::expect_doppelganger("plot.peak_list", plot_peaks)
+  plot_peaks_gaussian <- function(){
+    plot(pks_gaussian, chrom_list = dat.pr)
+  }
+  vdiffr::expect_doppelganger("plot.peak_list_gaussian", plot_peaks_gaussian)
+  
 })
 
 test_that("plot.peak_table works", {
@@ -268,6 +288,10 @@ test_that("plot_spectrum works", {
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="rt", chr=1))
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr, what="rt"))
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr, what="rt"))
+  expect_error(plot_spectrum(loc=12, chrom_list = pk_tab, what="rt", chr=1))
+  expect_error(plot_spectrum(loc=12, what="rt", chr=1))
+  expect_error(plot_spectrum(loc=12, chrom_list = chrom_list, what="peak", chr=1))
+  expect_error(plot_spectrum(loc=12, peak_table=pk_tab, chrom_list = chrom_list, what="peak", chr=1))
   
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click", engine="plotly"))
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click", chr=1, engine="plotly"))
@@ -287,6 +311,31 @@ test_that("mirror_plot works", {
                 var = "trt", legend_size=2)
   }
   vdiffr::expect_doppelganger("mirror1", mirror1)
+  
+  mirror2 <- function(){
+    mirror_plot(pk_tab, chrom_list = dat.pr, lambdas = c("210","260"),
+                var = "trt", legend_size=2, mirror = FALSE)
+  }
+  vdiffr::expect_doppelganger("mirror2", mirror2)
+})
+ 
+# data(pk_tab)
+# path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
+# meta <- read.csv(path)
+# pk_tab <- attach_metadata(pk_tab, metadata = meta, column="vial")
+
+test_that("boxplot works as expected", {
+  skip_if_not_installed("vdiffr")
+  boxplot1 <- function(){
+    boxplot(pk_tab, V11~trt)
+  }
+  vdiffr::expect_doppelganger("boxplot1", boxplot1)
+  
+  boxplot2 <- function(){
+    boxplot(pk_tab, V11~trt, las=2)
+  }
+  vdiffr::expect_doppelganger("boxplot2", boxplot2)
+  
 })
 
 test_that("plot_peak.list works", {

@@ -28,18 +28,21 @@ plot_chroms <- function(x, lambdas, idx, ylab = "Absorbance", xlab = "",
     idx <- seq_along(x)
   }
   if (engine == "base"){
-    matplot(get_times(x[1]), x[1][[1]][,lambdas], type = 'l', lwd = linewidth,
+    first <- which.max(sapply(x[idx], function(xx) max(xx[,lambdas])))
+    matplot(get_times(x[[idx[first]]]), x[[idx[first]]][,lambdas], type = 'l', lwd = linewidth,
             ylab = ylab, xlab = xlab, ...)
     if (length(idx) > 1){
-      for (i in idx[-1]){
-        matplot(get_times(x[idx]), x[[i]][,lambdas], type = 'l', add = TRUE,
-                col=i, lwd = linewidth, ...)
+      count=1
+      for (i in idx[-first]){
+        count <- count+1
+        matplot(get_times(x, index=i), x[[i]][,lambdas], type = 'l', add = TRUE,
+                col=count, lwd = linewidth, ...)
       }
     }
     if (show_legend)
       legend("topright", legend = names(x[idx]), fill=seq_along(x[idx]))
   } else {
-    xx <- reshape_chroms(x, idx = idx, lambdas = )
+    xx <- reshape_chroms(x, idx = idx, lambdas = lambdas)
     if (engine == "ggplot"){
       check_for_pkg("ggplot2")
       .data <- ggplot2::.data
