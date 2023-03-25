@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.8</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -192,8 +192,8 @@ parameters before choosing values to use on your whole dataset.</p>
 &gt; new.ts &lt;- seq(10,18.66,by=.01) # choose time-points
 &gt; new.lambdas &lt;- seq(200, 318, by = 2) # choose wavelengths
 &gt; 
-&gt; dat.pr &lt;- preprocess(Sa, dim1=new.ts, dim2=new.lambdas,
-+            parallel=FALSE, p=.001, lambda=1e5)</code></pre>
+&gt; dat.pr &lt;- preprocess(Sa, dim1 = new.ts, dim2 = new.lambdas,
++            parallel = FALSE, p = .001, lambda = 1e5)</code></pre>
 </div>
 <div class="section level3">
 <h3 id="alignment">Alignment<a class="anchor" aria-label="anchor" href="#alignment"></a>
@@ -540,7 +540,7 @@ attached base packages:
 [8] base     
 
 other attached packages:
-[1] chromatographR_0.4.7 knitr_1.42          
+[1] chromatographR_0.4.8 knitr_1.42          
 
 loaded via a namespace (and not attached):
  [1] Rcpp_1.0.10           lattice_0.20-45       RcppDE_0.1.7         
