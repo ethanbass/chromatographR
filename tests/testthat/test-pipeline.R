@@ -350,7 +350,7 @@ test_that("cluster_spectra works", {
   skip_on_cran()
   cl <- cluster_spectra(pk_tab, chrom_list = dat.pr, nboot = 10,
                           parallel = FALSE, verbose = FALSE, save = FALSE,
-                        output = "both", plot_dend = FALSE, plot_spectra = FALSE)
+                          output = "both", plot_dend = FALSE, plot_spectra = FALSE)
   expect_equal(class(cl[[1]]), "pvclust")
   expect_equal(class(cl[[2]]), "list")
 })
