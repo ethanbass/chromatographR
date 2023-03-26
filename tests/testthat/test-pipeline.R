@@ -15,7 +15,7 @@ data("Sa")
 new.ts <- seq(10,18.66,by=.01) # choose time-points
 new.lambdas <- seq(200, 318, by = 2) # choose wavelengths
 
-out <- preprocess(X = Sa[[1]], dim1 = new.ts, dim2 = new.lambdas)
+out <- preprocess(X = Sa[[1]], dim1 = new.ts, dim2 = new.lambdas, progress_bar = FALSE)
 
 test_that("preprocess works on matrix", {
   out <- preprocess_matrix(X = Sa[[1]], dim1 = new.ts, dim2 = new.lambdas, maxI = 1)
@@ -26,18 +26,19 @@ test_that("preprocess works on matrix", {
 
 
 test_that("preprocess returns correct errors", {
-  expect_error(preprocess(X=as.data.frame(Sa[[1]])))
+  expect_error(preprocess(X=as.data.frame(Sa[[1]]), progress_bar = FALSE))
 })
 
 
 test_that("preprocess works without interpolation", {
-  dat.pr <- preprocess(X=Sa[[1]], interpolate_cols = F, interpolate_rows=F)
+  dat.pr <- preprocess(X=Sa[[1]], interpolate_cols = FALSE,
+                       interpolate_rows=FALSE, progress_bar = FALSE)
   expect_equal(dim(dat.pr),dim(Sa[[1]]))
   expect_equal(rownames(dat.pr), rownames(Sa[[1]]))
   expect_equal(colnames(dat.pr), colnames(Sa[[1]]))
 })
 
-dat.pr <- preprocess(X = Sa[1:2], dim1 = new.ts, dim2 = new.lambdas)
+dat.pr <- preprocess(X = Sa[1:2], dim1 = new.ts, dim2 = new.lambdas, progress_bar = FALSE)
 
 test_that("preprocess works on a list", {
   expect_equal(length(dat.pr),length(Sa[1:2]))

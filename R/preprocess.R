@@ -33,6 +33,10 @@
 #' @param interpolate_cols Logical. Whether to interpolate along dim2. Defaults
 #' to TRUE.
 #' @param mc.cores How many cores to use for parallel processing. Defaults to 2.
+#' This argument has been deprecated and replaces with \code{cl}.
+#' @param cl  How many cores to use for parallel processing. Defaults to 2.
+#' @param progress_bar Logical. Whether to show progress bar. Defaults to 
+#' \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.
 #' @param \dots Further optional arguments to
 #' \code{\link[ptw:baseline.corr]{baseline.corr}}.
 #' @return The function returns the preprocessed data matrix, with row names and
@@ -64,7 +68,12 @@ preprocess <- function(X, dim1, ## time axis
                           maxI, parallel, 
                           interpolate_rows = TRUE,
                           interpolate_cols = TRUE,
-                          mc.cores=2, ...){
+                          mc.cores, cl = 2, progress_bar = TRUE, ...){
+  if (!missing(mc.cores)){
+    warning("The `mc.cores` is deprecated. Please use the `cl` argument instead.",
+            immediate. = TRUE)
+    cl <- mc.cores
+  }
   if (missing(parallel)){
     parallel <- .Platform$OS.type != "windows"
   } else if (parallel & .Platform$OS.type == "windows"){
@@ -95,29 +104,42 @@ preprocess <- function(X, dim1, ## time axis
             immediate. = TRUE)
     dim2 <- as.numeric(colnames(X[[1]]))
   }
-    if (parallel){
-      if (length(find.package('parallel', quiet=TRUE))==0){
-        stop("Parallel must be installed to enable parallel processing.")
-    }
-      X <- parallel::mclapply(X, FUN=preprocess_matrix,
-               dim1=dim1,
-               dim2=dim2,
-               remove.time.baseline = remove.time.baseline,
-               spec.smooth = spec.smooth, maxI = maxI,
-               interpolate_rows = interpolate_rows,
-               interpolate_cols = interpolate_cols,
-               mc.cores=mc.cores,
-               ...)
-    } else{
-      X <- lapply(X, FUN=preprocess_matrix,
-             dim1=dim1,
-             dim2=dim2,
-             remove.time.baseline = remove.time.baseline,
-             spec.smooth = spec.smooth, maxI = maxI,
-             interpolate_rows = interpolate_rows,
-             interpolate_cols = interpolate_cols,
-             ...)
-    }
+  if (missing(progress_bar)){
+    progress_bar <- check_for_pkg("pbapply", return_boolean = TRUE)
+  }
+  laplee <- choose_apply_fnc(progress_bar = progress_bar, parallel = parallel,
+                             cl = cl)
+  X <- laplee(X, FUN = preprocess_matrix,
+                          dim1 = dim1,
+                          dim2 = dim2,
+                          remove.time.baseline = remove.time.baseline,
+                          spec.smooth = spec.smooth, maxI = maxI,
+                          interpolate_rows = interpolate_rows,
+                          interpolate_cols = interpolate_cols,
+                          ...)
+    # if (parallel){
+    #   if (length(find.package('parallel', quiet=TRUE)) == 0){
+    #     stop("Parallel must be installed to enable parallel processing.")
+    # }
+    #   X <- parallel::mclapply(X, FUN=preprocess_matrix,
+    #            dim1=dim1,
+    #            dim2=dim2,
+    #            remove.time.baseline = remove.time.baseline,
+    #            spec.smooth = spec.smooth, maxI = maxI,
+    #            interpolate_rows = interpolate_rows,
+    #            interpolate_cols = interpolate_cols,
+    #            mc.cores=mc.cores,
+    #            ...)
+    # } else{
+    #   X <- lapply(X, FUN=preprocess_matrix,
+    #          dim1=dim1,
+    #          dim2=dim2,
+    #          remove.time.baseline = remove.time.baseline,
+    #          spec.smooth = spec.smooth, maxI = maxI,
+    #          interpolate_rows = interpolate_rows,
+    #          interpolate_cols = interpolate_cols,
+    #          ...)
+    # }
     if (return_matrix){
       X[[1]]
     } else X

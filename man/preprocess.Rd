@@ -14,7 +14,9 @@ preprocess(
   parallel,
   interpolate_rows = TRUE,
   interpolate_cols = TRUE,
-  mc.cores = 2,
+  mc.cores,
+  cl = 2,
+  progress_bar = TRUE,
   ...
 )
 }
@@ -51,7 +53,13 @@ to TRUE.}
 \item{interpolate_cols}{Logical. Whether to interpolate along dim2. Defaults
 to TRUE.}
 
-\item{mc.cores}{How many cores to use for parallel processing. Defaults to 2.}
+\item{mc.cores}{How many cores to use for parallel processing. Defaults to 2.
+This argument has been deprecated and replaces with \code{cl}.}
+
+\item{cl}{How many cores to use for parallel processing. Defaults to 2.}
+
+\item{progress_bar}{Logical. Whether to show progress bar. Defaults to
+\code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.}
 
 \item{\dots}{Further optional arguments to
 \code{\link[ptw:baseline.corr]{baseline.corr}}.}

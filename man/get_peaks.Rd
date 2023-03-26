@@ -14,6 +14,7 @@ get_peaks(
   estimate_purity = FALSE,
   noise_threshold = 0.001,
   progress_bar,
+  cl = 2,
   ...
 )
 }
@@ -43,6 +44,10 @@ to FALSE. (If TRUE, this will slow down the function significantly).}
 
 \item{progress_bar}{Logical. Whether to show progress bar. Defaults to 
 \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.}
+
+\item{cl}{Argument to \code{\link[pbapply]{pblapply}}. Either an integer
+specifying the number of clusters to use for parallel processing or a cluster
+object created by \code{\link[parallel]{makeCluster}}. Defaults to 2.}
 
 \item{\dots}{Additional arguments to \code{\link{find_peaks}}.}
 }

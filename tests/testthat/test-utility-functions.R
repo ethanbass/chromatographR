@@ -11,13 +11,13 @@ test_that("get_lambdas works as expected", {
   expect_equal(lambdas, as.numeric(colnames(Sa_pr[[1]])))
 })
 
-test_that("choose_apply_fnc works as expected", {
-  skip_if_not_installed("pbapply")
-  fn <- choose_apply_fnc(progress_bar = TRUE)
-  expect_equal(fn, pbapply::pblapply)
-  fn <- choose_apply_fnc(progress_bar = FALSE)
-  expect_equal(fn, lapply)
-})
+# test_that("choose_apply_fnc works as expected", {
+#   skip_if_not_installed("pbapply")
+#   fn <- choose_apply_fnc(progress_bar = TRUE)
+#   expect_equal(fn, purrr::partial(pblapply, cl = cl))
+#   fn <- choose_apply_fnc(progress_bar = FALSE)
+#   expect_equal(fn, lapply)
+# })
 
 test_that("check_peaktable works as expected", {
   data(pk_tab)

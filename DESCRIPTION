@@ -38,6 +38,7 @@ Imports:
     minpack.lm,
     parallel,
     ptw,
+    purrr,
     pvclust,
     scales,
     stats,

@@ -190,17 +190,32 @@ transfer_metadata <- function(new_object, old_object,
 
 
 #' Choose apply function
+#' @importFrom parallel mclapply
 #' @return Returns \code{\link[pbapply]{pblapply}} if \code{progress_bar == TRUE},
 #' otherwise returns \code{\link{lapply}}.
 #' @noRd
-choose_apply_fnc <- function(progress_bar, parallel = FALSE){
+choose_apply_fnc <- function(progress_bar, parallel = FALSE, cl = NULL){
   if (progress_bar){
     check_for_pkg("pbapply")
-    fn <- pbapply::pblapply
+    pblapply<-pbapply::pblapply
+    fn <- purrr::partial(pblapply, cl = cl)
+    # fn <- pbapply::pblapply
   } else if (!progress_bar && parallel){
-    fn <- parallel::mclapply
+    fn <- purrr::partial(mclapply, mc.cores = cl)
     } else{
     fn <- lapply
   }
   fn
 }
+
+# choose_apply_fnc <- function(progress_bar, parallel = FALSE, cl = NULL){
+#   if (progress_bar){
+#     check_for_pkg("pbapply")
+#     fn <- curry::curry(pbapply::pblapply, arg=(cl = cl))
+#   } else if (!progress_bar && parallel){
+#     fn <- curry::curry(parallel::mclapply, arg=(mc.cores = cl))
+#   } else{
+#     fn <- lapply
+#   }
+#   fn
+# }
