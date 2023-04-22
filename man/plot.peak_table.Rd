@@ -6,7 +6,6 @@
 \usage{
 \method{plot}{peak_table}(
   x,
-  ...,
   loc,
   chrom_list,
   what = "peak",
@@ -20,14 +19,13 @@
   scale_spectrum = FALSE,
   export_spectrum = FALSE,
   verbose = TRUE,
-  engine = c("base", "plotly")
+  engine = c("base", "plotly", "ggplot"),
+  ...
 )
 }
 \arguments{
 \item{x}{The peak table (output from \code{\link{get_peaktable}}
 function).}
-
-\item{...}{Additional arguments.}
 
 \item{loc}{A vector specifying the peak(s) or retention time(s) that you wish to plot.}
 
@@ -71,6 +69,8 @@ Defaults to FALSE.}
 to TRUE.}
 
 \item{engine}{Which plotting engine to use: either \code{base} or \code{plotly}.}
+
+\item{...}{Additional arguments to \code{\link[graphics]{boxplot}}.}
 }
 \value{
 If \code{export_spectrum} is TRUE, returns the spectrum as a \code{

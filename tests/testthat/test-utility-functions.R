@@ -11,13 +11,15 @@ test_that("get_lambdas works as expected", {
   expect_equal(lambdas, as.numeric(colnames(Sa_pr[[1]])))
 })
 
-# test_that("choose_apply_fnc works as expected", {
-#   skip_if_not_installed("pbapply")
-#   fn <- choose_apply_fnc(progress_bar = TRUE)
-#   expect_equal(fn, purrr::partial(pblapply, cl = cl))
-#   fn <- choose_apply_fnc(progress_bar = FALSE)
-#   expect_equal(fn, lapply)
-# })
+test_that("choose_apply_fnc works as expected", {
+  skip_if_not_installed("pbapply")
+  fn <- choose_apply_fnc(progress_bar = TRUE)
+  expect_equal(class(fn), c("purrr_function_partial","function"))
+  fn <- choose_apply_fnc(progress_bar = FALSE)
+  expect_equal(fn, lapply)
+  fn <- choose_apply_fnc(progress_bar = FALSE, parallel=TRUE)
+  expect_equal(class(fn), c("purrr_function_partial","function"))
+})
 
 test_that("check_peaktable works as expected", {
   data(pk_tab)
@@ -75,3 +77,10 @@ test_that("reshape_chroms works as expected", {
   expect_equal(nrow(chrom_list_long_subset), 2*nrow(Sa_pr[[1]]))
   expect_equal(unique(chrom_list_long_subset$sample), names(Sa_pr)[1:2])
 })
+
+test_that("get_purity works as intended", {
+  data(Sa_pr)
+  pos <- as.numeric(find_peaks(Sa_pr[[1]][,"210"])[1,])
+  expect_equal(class(get_purity(Sa_pr[[1]], pos)),"numeric")
+})
+

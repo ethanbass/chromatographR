@@ -17,7 +17,7 @@ plot_spectrum(
   export_spectrum = FALSE,
   verbose = TRUE,
   what = c("peak", "rt", "idx", "click"),
-  engine = c("base", "plotly"),
+  engine = c("base", "plotly", "ggplot2"),
   ...
 )
 }
@@ -62,7 +62,7 @@ for a certain peak, "rt" to scan by retention time, or "click" to manually
 select retention time by clicking on the chromatogram. Defaults to "peak"
 mode.}
 
-\item{engine}{Which plotting engine to use: either \code{base} or \code{plotly}.}
+\item{engine}{Which plotting engine to use: \code{base}, \code{ggplot2}, or \code{plotly}.}
 
 \item{...}{Additional arguments.}
 }

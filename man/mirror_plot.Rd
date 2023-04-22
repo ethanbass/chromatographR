@@ -5,7 +5,7 @@
 \title{Make mirror plot from peak table.}
 \usage{
 mirror_plot(
-  peak_table,
+  x,
   chrom_list,
   lambdas,
   var,
@@ -21,7 +21,7 @@ mirror_plot(
 )
 }
 \arguments{
-\item{peak_table}{The peak table (output from \code{\link{get_peaktable}}
+\item{x}{The peak table (output from \code{\link{get_peaktable}}
 function).}
 
 \item{chrom_list}{A list of chromatograms in matrix format (timepoints x
@@ -69,7 +69,6 @@ to variables defined in sample metadata.
 If \code{mirror_plot} is TRUE, plots a mirror plot comparing two treatments
 defined by \code{var} and \code{subset} (if more than two factors are present
 in \code{var}).
-
 Otherwise, if \code{mirror_plot} is FALSE, the treatments are plotted in two
 separate panes.
 }

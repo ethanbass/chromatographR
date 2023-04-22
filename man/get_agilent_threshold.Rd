@@ -4,14 +4,23 @@
 \alias{get_agilent_threshold}
 \title{Calculate purity thresholds}
 \usage{
-get_agilent_threshold(x, pos, weight = 1, noise_threshold = 0.005, lambdas)
+get_agilent_threshold(
+  x,
+  pos,
+  weight = 1,
+  noise_variance = NULL,
+  noise_threshold = 0.005,
+  lambdas
+)
 }
 \arguments{
 \item{x}{A chromatogram in matrix format}
 
 \item{pos}{A vector containing peak information}
 
-\item{weight}{scaling parameter affecting stringency of threshold}
+\item{weight}{scaling parameter affecting stringency of threshold.}
+
+\item{noise_variance}{Variance of noise. Argument to \code{\link{get_agilent_threshold}}.}
 
 \item{noise_threshold}{Threshold to define noise. Highest proportion of maximum absorbance.}
 

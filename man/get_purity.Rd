@@ -9,6 +9,7 @@ get_purity(
   pos,
   weight = 1,
   cutoff = 0.05,
+  noise_variance = NULL,
   noise_threshold = 0.01,
   lambdas,
   try = TRUE
@@ -17,12 +18,15 @@ get_purity(
 \arguments{
 \item{x}{A chromatogram in matrix format}
 
-\item{pos}{A vector containing peak information}
+\item{pos}{A vector containing the center, lower and upper bounds of a peak
+as numeric indices.}
 
-\item{weight}{weight provided to \code{\link{get_agilent_threshold}}}
+\item{weight}{Weight provided to \code{\link{get_agilent_threshold}}.}
 
 \item{cutoff}{Proportion of maximum absorbance to use as cutoff.
 Argument to \code{\link{trim_peak}}.}
+
+\item{noise_variance}{Variance of noise. Argument to \code{\link{get_agilent_threshold}}.}
 
 \item{noise_threshold}{Threshold to define noise. Highest proportion of maximum absorbance.}
 

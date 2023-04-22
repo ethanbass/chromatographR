@@ -56,9 +56,12 @@
 find_peaks <- function(y, smooth_type=c("gaussian", "box", "savgol", "mva","tmva","none"),
                        smooth_window = .001, slope_thresh = 0, amp_thresh = 0,
                        bounds = TRUE){
+  if (!is.vector(y)){
+    stop("Please provide a vector to argument `y` to proceed.")
+  }
   smooth_type <- match.arg(smooth_type, c("gaussian", "box","savgol", "mva","tmva","none"))
   if (smooth_window < 1){
-    smooth_window <- length(y)*smooth_window
+    smooth_window <- max(length(y) * smooth_window, 1)
   }
   # compute derivative (with or without smoothing)
   if (smooth_type == "savgol"){
@@ -71,7 +74,7 @@ find_peaks <- function(y, smooth_type=c("gaussian", "box", "savgol", "mva","tmva
   }  else if (smooth_type == "box"){
     d <- diff(ksmooth(seq_along(y), y, kernel = "box", bandwidth = smooth_window)$y)
   } else if (smooth_type == "tmva"){
-    d <- runmean(runmean(diff(y), k=smooth_window), k=smooth_window)
+    d <- runmean(runmean(diff(y), k = smooth_window), k = smooth_window)
   } else{
     d <- diff(y)
   }
@@ -159,6 +162,7 @@ find_peaks <- function(y, smooth_type=c("gaussian", "box", "savgol", "mva","tmva
 #' good model for chromatographic peaks in isocratic HPLC? \emph{Chromatographia},
 #' /bold{26}: 285-296. \doi{10.1007/BF02268168}.
 #' @export fit_peaks
+
 fit_peaks <- function (x, lambda, pos = NULL, sd.max = 50,
                        fit = c("egh", "gaussian", "raw"),  max.iter = 1000, 
                        estimate_purity = TRUE, noise_threshold=.001, ...){

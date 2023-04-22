@@ -188,7 +188,6 @@ transfer_metadata <- function(new_object, old_object,
   new_object
 }
 
-
 #' Choose apply function
 #' @importFrom parallel mclapply
 #' @return Returns \code{\link[pbapply]{pblapply}} if \code{progress_bar == TRUE},
@@ -207,15 +206,3 @@ choose_apply_fnc <- function(progress_bar, parallel = FALSE, cl = NULL){
   }
   fn
 }
-
-# choose_apply_fnc <- function(progress_bar, parallel = FALSE, cl = NULL){
-#   if (progress_bar){
-#     check_for_pkg("pbapply")
-#     fn <- curry::curry(pbapply::pblapply, arg=(cl = cl))
-#   } else if (!progress_bar && parallel){
-#     fn <- curry::curry(parallel::mclapply, arg=(mc.cores = cl))
-#   } else{
-#     fn <- lapply
-#   }
-#   fn
-# }

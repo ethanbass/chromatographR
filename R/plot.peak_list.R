@@ -45,7 +45,7 @@ plot.peak_list <- function(x, ..., chrom_list, index=1, lambda=NULL,
     lambda <- names(x[[1]])[1]
   }
   if (!(lambda %in% names(x[[1]]))){
-    stop('Error: lambda must match one of the wavelengths in your peak list')
+    stop('Wavelength (`lambda`) must match one of the wavelengths in your peak list.')
   }
   if (is.numeric(lambda)){
     lambda <- as.character(lambda)

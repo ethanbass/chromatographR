@@ -144,7 +144,7 @@ get_reference_spectra <- function(peak_table, chrom_list,
 
 attach_ref_spectra <- function(peak_table, chrom_list, ref = c("max.cor","max.int")){
   check_peaktable(peak_table)
-  peak_table$ref_spectra <- get_reference_spectra(peak_table, chrom_list, ref)
+  peak_table$ref_spectra <- get_reference_spectra(peak_table, chrom_list, ref = ref)
   peak_table$args["reference_spectra"] <- ref
   return(peak_table)
 }
@@ -193,7 +193,7 @@ normalize_data <- function(peak_table, column, chrom_list,
     })))
     rownames(pktab) <- rownames(peak_table$tab)
     peak_table$tab <- pktab
-    peak_table$args[c("normalized","normalization_by")] <- c(TRUE, column)
+    peak_table$args[c("normalized", "normalization_by")] <- c(TRUE, column)
     return(peak_table)
   } else if (what == "chrom_list"){
     if (missing(chrom_list)){

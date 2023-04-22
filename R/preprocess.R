@@ -90,18 +90,16 @@ preprocess <- function(X, dim1, ## time axis
     interpolate_cols <- FALSE
   }
   if (interpolate_rows && missing(dim1)){
-    warning("...Times not provided. Extrapolating from matrix dimensions for interpolation.",
-            immediate. = TRUE)
+    message("...Times not provided. Extrapolating from matrix dimensions for interpolation.")
     limits <- sapply(X,function(x){
       ts <- rownames(x)
       c(head(ts,1), tail(ts,1))})
-    start <- round(max(as.numeric(limits[1,])),2)
-    end <- floor(min(as.numeric(limits[2,])))
-    dim1 <- seq(start,end,by=.01)
+    start <- ceiling(max(as.numeric(limits[1,]))*100)/100
+    end <- floor((min(as.numeric(limits[2,])))*100)/100
+    dim1 <- seq(start, end, by = .01)
   }
   if (interpolate_cols && missing(dim2)){
-    warning("...Wavelengths not provided. Extrapolating from matrix dimensions for interpolation.",
-            immediate. = TRUE)
+    message("...Wavelengths not provided. Extrapolating from matrix dimensions for interpolation.")
     dim2 <- as.numeric(colnames(X[[1]]))
   }
   if (missing(progress_bar)){

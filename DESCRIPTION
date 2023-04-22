@@ -31,6 +31,7 @@ Imports:
     dynamicTreeCut,
     fastcluster,
     Formula,
+    fs,
     graphics,
     grDevices,
     lattice,
@@ -45,12 +46,15 @@ Imports:
     utils,
     VPdtw
 Suggests: 
+    cowplot,
     ggplot2,
     knitr,
     openxlsx,
     pbapply,
     plotly,
+    reticulate,
     rmarkdown,
+    rsvg,
     spelling,
     testthat (>= 3.0.0),
     vdiffr
