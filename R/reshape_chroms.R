@@ -14,6 +14,9 @@ reshape_chroms <- function(x, idx, sample_var = "sample",
   if (missing(idx)){
     idx <- seq_along(x)
   }
+  if (missing(lambdas)){
+    lambdas = colnames(x[[1]])
+  }
   dat <- lapply(idx, function(i){
     xx <- reshape_chrom(x = x[[i]], lambdas = lambdas, rts = rts)
     xx[,sample_var] <- names(x)[[i]]

@@ -1,4 +1,4 @@
-# chromatographR 0.4.8 dev
+# chromatographR 0.4.8
 
 #### New features
 

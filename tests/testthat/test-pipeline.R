@@ -113,8 +113,8 @@ test_that("plot_chroms works to plot alignments with ggplot", {
     plot_chroms(warp, lambdas="210", engine="ggplot")
   }
   vdiffr::expect_doppelganger("alignment_ggp", alignment_ggp)
+  expect_error(plot_chroms(pktab))
 })
-
 
 
 ### test get_peaks ###
@@ -133,7 +133,6 @@ test_that("get_peaks works", {
   expect_error(get_peaks(dat.pr)) # lambdas must be provided
   expect_error(get_peaks(dat.pr, lambdas="210", fit="nonsense"))
 })
-#44
 
 test_that("filter_peaks works", {
   pks_s <- filter_peaks(pks_egh, min_height = 10, min_area = 10, min_sd = .07)
@@ -247,7 +246,6 @@ test_that("normalize_data works", {
 
 test_that("plot.peak_list works", {
   skip_if_not_installed("vdiffr")
-  
   plot_peaks <- function(){
     plot(pks_egh, chrom_list = dat.pr, points = TRUE,
                                 ticks = TRUE, lambda = 210)
