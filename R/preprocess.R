@@ -34,7 +34,10 @@
 #' to TRUE.
 #' @param mc.cores How many cores to use for parallel processing. Defaults to 2.
 #' This argument has been deprecated and replaces with \code{cl}.
-#' @param cl  How many cores to use for parallel processing. Defaults to 2.
+#' @param cl Argument to \code{\link[pbapply]{pblapply}} or \code{\link[parallel]{mclapply}}.
+#' Either an integer specifying the number of clusters to use for parallel
+#' processing or a cluster object created by \code{\link[parallel]{makeCluster}}.
+#' Defaults to 2. On Windows integer values will be ignored.
 #' @param show_progress Logical. Whether to show progress bar. Defaults to 
 #' \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.
 #' @param \dots Further optional arguments to
@@ -70,16 +73,17 @@ preprocess <- function(X, dim1, ## time axis
                           interpolate_cols = TRUE,
                           mc.cores, cl = 2, show_progress = NULL, ...){
   if (!missing(mc.cores)){
-    warning("The `mc.cores` is deprecated. Please use the `cl` argument instead.",
+    warning("The `mc.cores` argument is deprecated. Please use the `cl` argument instead.",
             immediate. = TRUE)
     cl <- mc.cores
   }
-  if (is.null(parallel)){
-    parallel <- .Platform$OS.type != "windows"
-  } else if (parallel & .Platform$OS.type == "windows"){
-    parallel <- FALSE
-    warning("Parallel processing is not currently available on Windows.")
+  if (!is.null(parallel)){
+    warning("The `parallel` argument is deprecated. Just use the `cl` argument to enable
+            parallel processing.",
+            immediate. = TRUE)
   }
+  laplee <- choose_apply_fnc(show_progress = show_progress, parallel = parallel,
+                             cl = cl)
   if (is.matrix(X)){
     X <- list(X)
     return_matrix <- TRUE
@@ -102,8 +106,6 @@ preprocess <- function(X, dim1, ## time axis
     message("...Wavelengths not provided. Extrapolating from matrix dimensions for interpolation.")
     dim2 <- as.numeric(colnames(X[[1]]))
   }
-  laplee <- choose_apply_fnc(show_progress = show_progress, parallel = parallel,
-                             cl = cl)
   X <- laplee(X, FUN = preprocess_matrix,
                           dim1 = dim1,
                           dim2 = dim2,

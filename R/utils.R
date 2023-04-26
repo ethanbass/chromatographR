@@ -192,9 +192,21 @@ transfer_metadata <- function(new_object, old_object,
 #' @return Returns \code{\link[pbapply]{pblapply}} if \code{progress_bar == TRUE},
 #' otherwise returns \code{\link{lapply}}.
 #' @noRd
-choose_apply_fnc <- function(show_progress, parallel = FALSE, cl = NULL){
+choose_apply_fnc <- function(show_progress, parallel = NULL, cl = 2){
   if (is.null(show_progress)){
     show_progress <- check_for_pkg("pbapply", return_boolean = TRUE)
+  }
+  if (is.null(parallel)){
+    parallel <- .Platform$OS.type != "windows"
+  } else if (parallel & .Platform$OS.type == "windows"){
+    parallel <- FALSE
+    warning("Parallel processing is not currently available on Windows.")
+  }
+  if (is.null(cl) || cl == 1){
+    parallel <- FALSE
+  }
+  if (!parallel){
+    cl <- 1
   }
   if (show_progress){
     check_for_pkg("pbapply")

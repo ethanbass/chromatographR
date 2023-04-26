@@ -31,9 +31,10 @@
 #' @param noise_threshold Noise threshold. Argument to \code{get_purity}.
 #' @param show_progress Logical. Whether to show progress bar. Defaults to 
 #' \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.
-#' @param cl Argument to \code{\link[pbapply]{pblapply}}. Either an integer
-#' specifying the number of clusters to use for parallel processing or a cluster
-#' object created by \code{\link[parallel]{makeCluster}}. Defaults to 2.
+#' @param cl Argument to \code{\link[pbapply]{pblapply}} or \code{\link[parallel]{mclapply}}.
+#' Either an integer specifying the number of clusters to use for parallel
+#' processing or a cluster object created by \code{\link[parallel]{makeCluster}}.
+#' Defaults to 2. On Windows integer values will be ignored.
 #' @param \dots Additional arguments to \code{\link{find_peaks}}.
 #' @return The result is an S3 object of class \code{peak_list}, containing a nested
 #' list of data.frames containing information about the peaks fitted for each
@@ -93,7 +94,7 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
     names(chrom_list) <- seq_along(chrom_list)
   }
   peaks<-list()
-  laplee <- choose_apply_fnc(show_progress, cl=cl)
+  laplee <- choose_apply_fnc(show_progress, cl = cl)
   result <- laplee(seq_along(chrom_list), function(sample){
     suppressWarnings(ptable <- lapply(lambdas, function(lambda){
       cbind(sample = names(chrom_list)[sample], lambda,

@@ -15,15 +15,30 @@ test_that("choose_apply_fnc works as expected", {
   skip_if_not_installed("pbapply")
   fn <- choose_apply_fnc(show_progress = TRUE)
   expect_equal(class(fn), c("purrr_function_partial","function"))
-  fn <- choose_apply_fnc(show_progress = FALSE)
+  fn <- choose_apply_fnc(show_progress = TRUE, parallel=TRUE)
+  expect_equal(class(fn), c("purrr_function_partial","function"))
+  
+  fn <- choose_apply_fnc(show_progress = FALSE, parallel = FALSE)
   expect_equal(fn, lapply)
+  fn <- choose_apply_fnc(show_progress = FALSE, cl=1)
+  expect_equal(fn, lapply)
+  fn <- choose_apply_fnc(show_progress = FALSE, cl=NULL)
+  expect_equal(fn, lapply)
+  
   fn <- choose_apply_fnc(show_progress = FALSE, parallel=TRUE)
   expect_equal(class(fn), c("purrr_function_partial","function"))
 })
 
 test_that("choose_apply_fnc works as expected with NULL value", {
-  fn<-choose_apply_fnc(show_progress=NULL, parallel = FALSE)
   pbapply_exists <- check_for_pkg("pbapply", return_boolean=TRUE)
+  
+  fn<-choose_apply_fnc(show_progress=NULL, parallel = FALSE)
+  expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = FALSE))
+  
+  fn<-choose_apply_fnc(show_progress=NULL, cl=1)
+  expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = FALSE))
+  
+  fn<-choose_apply_fnc(show_progress=NULL, cl=NULL)
   expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = FALSE))
   
   fn<-choose_apply_fnc(show_progress=NULL, parallel = TRUE)

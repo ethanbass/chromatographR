@@ -69,9 +69,10 @@ Defaults to 50.}
 \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed. Currently works
 only for \code{ptw} alignments.}
 
-\item{cl}{Argument to \code{\link[pbapply]{pblapply}}. Either an integer
-specifying the number of clusters to use for parallel processing or a cluster
-object created by \code{\link[parallel]{makeCluster}}. Defaults to 2.}
+\item{cl}{Argument to \code{\link[pbapply]{pblapply}} or \code{\link[parallel]{mclapply}}.
+Either an integer specifying the number of clusters to use for parallel
+processing or a cluster object created by \code{\link[parallel]{makeCluster}}.
+Defaults to 2. On Windows integer values will be ignored.}
 
 \item{\dots}{Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
 The only argument that cannot be changed is \code{warp.type}: this is always

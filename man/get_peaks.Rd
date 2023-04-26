@@ -45,9 +45,10 @@ to FALSE. (If TRUE, this will slow down the function significantly).}
 \item{show_progress}{Logical. Whether to show progress bar. Defaults to 
 \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.}
 
-\item{cl}{Argument to \code{\link[pbapply]{pblapply}}. Either an integer
-specifying the number of clusters to use for parallel processing or a cluster
-object created by \code{\link[parallel]{makeCluster}}. Defaults to 2.}
+\item{cl}{Argument to \code{\link[pbapply]{pblapply}} or \code{\link[parallel]{mclapply}}.
+Either an integer specifying the number of clusters to use for parallel
+processing or a cluster object created by \code{\link[parallel]{makeCluster}}.
+Defaults to 2. On Windows integer values will be ignored.}
 
 \item{\dots}{Additional arguments to \code{\link{find_peaks}}.}
 }
