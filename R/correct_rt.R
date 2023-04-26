@@ -35,7 +35,7 @@
 #' @param maxshift Integer. Maximum allowable shift for \code{\link[VPdtw]{VPdtw}}.
 #' Defaults to 50.
 #' @param verbose Whether to print verbose output.
-#' @param progress_bar Logical. Whether to show progress bar. Defaults to 
+#' @param show_progress Logical. Whether to show progress bar. Defaults to 
 #' \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed. Currently works 
 #' only for \code{ptw} alignments.
 #' @param cl Argument to \code{\link[pbapply]{pblapply}}. Either an integer
@@ -83,7 +83,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
                        init.coef = c(0, 1, 0), n.traces = NULL, n.zeros = 0, 
                        scale = FALSE, trwdth = 200, plot_it = FALSE,
                        penalty = 5, maxshift = 50,
-                       verbose = FALSE, progress_bar, cl = 2, ...){
+                       verbose = FALSE, show_progress = NULL, cl = 2, ...){
   what <- match.arg(what, c("corrected.values", "models"))
   alg <- match.arg(alg, c("ptw", "vpdtw"))
   
@@ -137,10 +137,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
                             penalty = penalty, maxshift = maxshift))
     if (alg == "ptw"){
       if (is.null(models)){
-        if (missing(progress_bar)){
-          progress_bar <- check_for_pkg("pbapply", return_boolean = TRUE)
-        }
-        laplee <- choose_apply_fnc(progress_bar, cl = cl)
+        laplee <- choose_apply_fnc(show_progress, cl = cl)
         models <- laplee(seq_len(dim(allmats)[3]), function(ii){
           ptw(allmats.t[,, reference],
               allmats.t[,, ii], selected.traces = traces, init.coef = init.coef,

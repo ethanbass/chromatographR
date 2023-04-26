@@ -192,13 +192,15 @@ transfer_metadata <- function(new_object, old_object,
 #' @return Returns \code{\link[pbapply]{pblapply}} if \code{progress_bar == TRUE},
 #' otherwise returns \code{\link{lapply}}.
 #' @noRd
-choose_apply_fnc <- function(progress_bar, parallel = FALSE, cl = NULL){
-  if (progress_bar){
+choose_apply_fnc <- function(show_progress, parallel = FALSE, cl = NULL){
+  if (is.null(show_progress)){
+    show_progress <- check_for_pkg("pbapply", return_boolean = TRUE)
+  }
+  if (show_progress){
     check_for_pkg("pbapply")
-    pblapply<-pbapply::pblapply
+    pblapply <- pbapply::pblapply
     fn <- purrr::partial(pblapply, cl = cl)
-    # fn <- pbapply::pblapply
-  } else if (!progress_bar && parallel){
+  } else if (!show_progress && parallel){
     fn <- purrr::partial(mclapply, mc.cores = cl)
     } else{
     fn <- lapply

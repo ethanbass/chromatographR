@@ -13,7 +13,7 @@ get_peaks(
   time.units = c("min", "s", "ms"),
   estimate_purity = FALSE,
   noise_threshold = 0.001,
-  progress_bar,
+  show_progress = NULL,
   cl = 2,
   ...
 )
@@ -42,7 +42,7 @@ to FALSE. (If TRUE, this will slow down the function significantly).}
 
 \item{noise_threshold}{Noise threshold. Argument to \code{get_purity}.}
 
-\item{progress_bar}{Logical. Whether to show progress bar. Defaults to 
+\item{show_progress}{Logical. Whether to show progress bar. Defaults to 
 \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.}
 
 \item{cl}{Argument to \code{\link[pbapply]{pblapply}}. Either an integer

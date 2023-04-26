@@ -35,7 +35,7 @@
 #' @param mc.cores How many cores to use for parallel processing. Defaults to 2.
 #' This argument has been deprecated and replaces with \code{cl}.
 #' @param cl  How many cores to use for parallel processing. Defaults to 2.
-#' @param progress_bar Logical. Whether to show progress bar. Defaults to 
+#' @param show_progress Logical. Whether to show progress bar. Defaults to 
 #' \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.
 #' @param \dots Further optional arguments to
 #' \code{\link[ptw:baseline.corr]{baseline.corr}}.
@@ -65,16 +65,16 @@ preprocess <- function(X, dim1, ## time axis
                           dim2, ## spectral axis
                           remove.time.baseline = TRUE,
                           spec.smooth = TRUE,
-                          maxI, parallel, 
+                          maxI, parallel = NULL, 
                           interpolate_rows = TRUE,
                           interpolate_cols = TRUE,
-                          mc.cores, cl = 2, progress_bar = TRUE, ...){
+                          mc.cores, cl = 2, show_progress = NULL, ...){
   if (!missing(mc.cores)){
     warning("The `mc.cores` is deprecated. Please use the `cl` argument instead.",
             immediate. = TRUE)
     cl <- mc.cores
   }
-  if (missing(parallel)){
+  if (is.null(parallel)){
     parallel <- .Platform$OS.type != "windows"
   } else if (parallel & .Platform$OS.type == "windows"){
     parallel <- FALSE
@@ -102,10 +102,7 @@ preprocess <- function(X, dim1, ## time axis
     message("...Wavelengths not provided. Extrapolating from matrix dimensions for interpolation.")
     dim2 <- as.numeric(colnames(X[[1]]))
   }
-  if (missing(progress_bar)){
-    progress_bar <- check_for_pkg("pbapply", return_boolean = TRUE)
-  }
-  laplee <- choose_apply_fnc(progress_bar = progress_bar, parallel = parallel,
+  laplee <- choose_apply_fnc(show_progress = show_progress, parallel = parallel,
                              cl = cl)
   X <- laplee(X, FUN = preprocess_matrix,
                           dim1 = dim1,

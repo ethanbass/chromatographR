@@ -13,13 +13,23 @@ test_that("get_lambdas works as expected", {
 
 test_that("choose_apply_fnc works as expected", {
   skip_if_not_installed("pbapply")
-  fn <- choose_apply_fnc(progress_bar = TRUE)
+  fn <- choose_apply_fnc(show_progress = TRUE)
   expect_equal(class(fn), c("purrr_function_partial","function"))
-  fn <- choose_apply_fnc(progress_bar = FALSE)
+  fn <- choose_apply_fnc(show_progress = FALSE)
   expect_equal(fn, lapply)
-  fn <- choose_apply_fnc(progress_bar = FALSE, parallel=TRUE)
+  fn <- choose_apply_fnc(show_progress = FALSE, parallel=TRUE)
   expect_equal(class(fn), c("purrr_function_partial","function"))
 })
+
+test_that("choose_apply_fnc works as expected with NULL value", {
+  fn<-choose_apply_fnc(show_progress=NULL, parallel = FALSE)
+  pbapply_exists <- check_for_pkg("pbapply", return_boolean=TRUE)
+  expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = FALSE))
+  
+  fn<-choose_apply_fnc(show_progress=NULL, parallel = TRUE)
+  expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = TRUE))
+})
+
 
 test_that("check_peaktable works as expected", {
   data(pk_tab)

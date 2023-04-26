@@ -20,7 +20,7 @@ correct_rt(
   penalty = 5,
   maxshift = 50,
   verbose = FALSE,
-  progress_bar,
+  show_progress = NULL,
   cl = 2,
   ...
 )
@@ -65,7 +65,7 @@ Defaults to 50.}
 
 \item{verbose}{Whether to print verbose output.}
 
-\item{progress_bar}{Logical. Whether to show progress bar. Defaults to
+\item{show_progress}{Logical. Whether to show progress bar. Defaults to
 \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed. Currently works
 only for \code{ptw} alignments.}
 

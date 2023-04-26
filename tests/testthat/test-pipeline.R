@@ -17,7 +17,7 @@ data("Sa")
 new.ts <- seq(10,18.66,by=.01) # choose time-points
 new.lambdas <- seq(200, 318, by = 2) # choose wavelengths
 
-out <- preprocess(X = Sa[[1]], dim1 = new.ts, dim2 = new.lambdas, progress_bar = FALSE)
+out <- preprocess(X = Sa[[1]], dim1 = new.ts, dim2 = new.lambdas, show_progress = FALSE)
 
 test_that("preprocess works on matrix", {
   out <- preprocess_matrix(X = Sa[[1]], dim1 = new.ts, dim2 = new.lambdas, maxI = 1)
@@ -29,7 +29,7 @@ test_that("preprocess works on matrix", {
 })
 
 test_that("Preprocess works without providing dimensions", {
-  out <- suppressMessages(preprocess(X=(Sa[1]), progress_bar=FALSE))
+  out <- suppressMessages(preprocess(X=(Sa[1]), show_progress=FALSE))
   expect_equal(class(out), "list")
   expect_equal(class(out[[1]])[1],"matrix")
   expect_equal(rownames(out[[1]]), as.character(new.ts))
@@ -38,19 +38,19 @@ test_that("Preprocess works without providing dimensions", {
 
 
 test_that("preprocess returns correct errors", {
-  expect_error(preprocess(X=as.data.frame(Sa[[1]]), progress_bar = FALSE))
+  expect_error(preprocess(X=as.data.frame(Sa[[1]]), show_progress = FALSE))
 })
 
 
 test_that("preprocess works without interpolation", {
   dat.pr <- preprocess(X=Sa[[1]], interpolate_cols = FALSE,
-                       interpolate_rows=FALSE, progress_bar = FALSE)
+                       interpolate_rows=FALSE, show_progress = FALSE)
   expect_equal(dim(dat.pr),dim(Sa[[1]]))
   expect_equal(rownames(dat.pr), rownames(Sa[[1]]))
   expect_equal(colnames(dat.pr), colnames(Sa[[1]]))
 })
 
-dat.pr <- preprocess(X = Sa[1:2], dim1 = new.ts, dim2 = new.lambdas, progress_bar = FALSE)
+dat.pr <- preprocess(X = Sa[1:2], dim1 = new.ts, dim2 = new.lambdas, show_progress = FALSE)
 
 test_that("preprocess works on a list", {
   expect_equal(length(dat.pr),length(Sa[1:2]))
@@ -60,8 +60,8 @@ test_that("preprocess works on a list", {
 })
 
 ### test correct_rt ###
-warping.models <- correct_rt(dat.pr, lambdas = c('210','260','318'), what = "models", progress_bar = FALSE)
-warp <- correct_rt(chrom_list = dat.pr, models = warping.models, what = "corrected.values", progress_bar = FALSE)
+warping.models <- correct_rt(dat.pr, lambdas = c('210','260','318'), what = "models", show_progress = FALSE)
+warp <- correct_rt(chrom_list = dat.pr, models = warping.models, what = "corrected.values", show_progress = FALSE)
 
 test_that("correct_rt works", {
   equals(length(warping.models), length(warp), length(Sa[1:2]))
@@ -80,7 +80,7 @@ test_that("correct_rt works with vpdtw", {
   warp <- correct_rt(dat.pr, lambdas = "210", alg="vpdtw")
   expect_equal(names(warp), names(dat.pr[1:2]))
   expect_equal(colnames(warp[[1]]), colnames(dat.pr[[1]]), ignore_attr=TRUE)
-  expect_error(correct_rt(dat.pr, lambdas = c("210","260"), alg="vpdtw",  progress_bar = FALSE))
+  expect_error(correct_rt(dat.pr, lambdas = c("210","260"), alg="vpdtw",  show_progress = FALSE))
   expect_error(correct_rt(dat.pr, lambdas = c("x"), alg="vpdtw"))
 })
 
@@ -119,10 +119,10 @@ test_that("plot_chroms works to plot alignments with ggplot", {
 
 ### test get_peaks ###
 lam <- c("210","318")
-pks_egh <- get_peaks(dat.pr, lambdas = lam, fit = "egh", smooth_type = "none", progress_bar = FALSE)
-pks_gaussian <- get_peaks(dat.pr, lambdas = lam, fit = "gaussian", smooth_type = "none", progress_bar = FALSE)
+pks_egh <- get_peaks(dat.pr, lambdas = lam, fit = "egh", smooth_type = "none", show_progress = FALSE)
+pks_gaussian <- get_peaks(dat.pr, lambdas = lam, fit = "gaussian", smooth_type = "none", show_progress = FALSE)
 pks_raw <- get_peaks(dat.pr, lambdas = lam, fit = "raw", smooth_type = "savgol",
-                     progress_bar = FALSE, sd.max = 100, smooth_window=3)
+                     show_progress = FALSE, sd.max = 100, smooth_window=3)
 
 test_that("get_peaks works", {
   expect_equal(names(pks_egh), names(dat.pr))

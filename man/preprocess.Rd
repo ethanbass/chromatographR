@@ -11,12 +11,12 @@ preprocess(
   remove.time.baseline = TRUE,
   spec.smooth = TRUE,
   maxI,
-  parallel,
+  parallel = NULL,
   interpolate_rows = TRUE,
   interpolate_cols = TRUE,
   mc.cores,
   cl = 2,
-  progress_bar = TRUE,
+  show_progress = NULL,
   ...
 )
 }
@@ -58,7 +58,7 @@ This argument has been deprecated and replaces with \code{cl}.}
 
 \item{cl}{How many cores to use for parallel processing. Defaults to 2.}
 
-\item{progress_bar}{Logical. Whether to show progress bar. Defaults to
+\item{show_progress}{Logical. Whether to show progress bar. Defaults to
 \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.}
 
 \item{\dots}{Further optional arguments to
