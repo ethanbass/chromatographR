@@ -156,6 +156,7 @@ preprocess_matrix <- function(X,
     stop("X should be a matrix!")
   metadata <- attributes(X)
   metadata[c("dimnames", "names", "row.names", "dim", "class", "levels")] <- NULL
+  
   ## possibly resize matrix to a lower dimension - faster, noise averaging
   if (interpolate_rows){
     if (length(tpoints <- as.numeric(rownames(X))) == 0)
@@ -173,17 +174,21 @@ preprocess_matrix <- function(X,
       stop("No extrapolation allowed - check dim2 argument")
     X <- t(apply(X, 1, function(xx) approx(lambdas, xx, dim2)$y)) 
   } else dim2 <- colnames(X)
-  
-  if (spec.smooth)
+  if (ncol(X) == 1){
+    spec.smooth <- FALSE
+  }
+  if (spec.smooth){
     X <- t(apply(X, 1, function(xxx) smooth.spline(xxx)$y))
-  
-  if (remove.time.baseline)
+  }
+  if (remove.time.baseline){
     X <- apply(X, 2, baseline.corr, ...)
-  if (min(X, na.rm = TRUE) < 0)
-    # X <- X - min(X)
+  }
+  if (min(X, na.rm = TRUE) < 0){
     X[X < 0] <- 0
-  if (!missing(maxI))
+  }
+  if (!missing(maxI)){
     X <- maxI * X / max(X)
+  }
   dimnames(X) <- list(dim1, dim2)
   attributes(X) <- c(attributes(X), metadata)
   X
