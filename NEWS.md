@@ -1,4 +1,4 @@
-# chromatographR 0.4.8
+# chromatographR 0.5.0
 
 #### New features
 

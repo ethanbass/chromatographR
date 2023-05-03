@@ -165,7 +165,7 @@ find_peaks <- function(y, smooth_type=c("gaussian", "box", "savgol", "mva","tmva
 
 fit_peaks <- function (x, lambda, pos = NULL, sd.max = 50,
                        fit = c("egh", "gaussian", "raw"),  max.iter = 1000, 
-                       estimate_purity = TRUE, noise_threshold=.001, ...){
+                       estimate_purity = TRUE, noise_threshold = .001, ...){
   y <- x[,lambda]
   fit <- match.arg(fit, c("egh", "gaussian", "raw"))
   if (is.null(pos)){
@@ -213,7 +213,7 @@ fit_peaks <- function (x, lambda, pos = NULL, sd.max = 50,
 #' Gaussian function
 #' @note: Adapted from \href{https://github.com/robertdouglasmorrison/DuffyTools/blob/master/R/gaussian.R}
 #' @noRd
-gaussian <- function(x, center=0, width=1, height=NULL, floor=0) {
+gaussian <- function(x, center = 0, width = 1, height=NULL, floor=0) {
   
   # adapted from Earl F. Glynn;  Stowers Institute for Medical Research, 2007
   twoVar <- 2 * width * width
@@ -319,7 +319,7 @@ fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
     if (is.null( start.floor)) start.floor <- quantile( y1, seq(0,1,0.1))[2]
     starts <- c(starts, "floor"=start.floor)
     nlsAns <- try(nlsLM(y1 ~ egh(x1, center, width, height, tau, floor),
-                        start=starts, control=controlList), silent=TRUE)
+                        start = starts, control = controlList), silent = TRUE)
   }
   
   # package up the results to pass back
@@ -402,7 +402,7 @@ fitpk_raw <- function(x, pos, lambda, max.iter,
 #' @param fl Filter length (for instance fl = 51..151), has to be odd.
 #' @param forder filter order Filter order (2 = quadratic filter, 4 = quartic).
 #' @param dorder Derivative order (0 = smoothing, 1 = first derivative, etc.).
-#' @note This function is ported from \href{https://cran.r-project.org/web/packages/pracma/index.html}{pracma},
+#' @note This function is bundled from \href{https://cran.r-project.org/web/packages/pracma/index.html}{pracma},
 #' where it is licensed under GPL (>= 3).
 #' @importFrom stats convolve
 #' @noRd
