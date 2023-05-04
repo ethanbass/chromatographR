@@ -39,6 +39,19 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      
+      - name: Install kaleido
+        if: matrix.config.visual_tests == true
+        run: |
+          Rscript -e "reticulate::install_miniconda()"
+          Rscript -e "reticulate::conda_install('r-reticulate', 'python-kaleido')"
+          Rscript -e "reticulate::conda_install('r-reticulate', 'plotly', channel = 'plotly')"
+          Rscript -e "reticulate::use_miniconda('r-reticulate')"
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
