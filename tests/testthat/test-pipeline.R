@@ -101,6 +101,7 @@ test_that("plot_chroms works with plotly", {
   skip_if_not_installed("plotly")
   skip_if_not_installed("reticulate")
   skip_if_not_installed("rsvg")
+
   p <- plot_chroms(warp, lambdas="210", engine="plotly")
   suppressWarnings(expect_doppelganger_plotly(name = "alignment_plotly", p = p))
 })
@@ -332,7 +333,7 @@ test_that("plot_spectrum works with plotly engine", {
   skip_if_not_installed("plotly")
   skip_if_not_installed("reticulate")
   skip_if_not_installed("rsvg")
-  
+
   p1 <- plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr, export_spectrum = FALSE,
                    what = "rt", chr = 1, verbose = FALSE, engine = "plotly")
   expect_doppelganger_plotly("plot_both_plotly", p = p1)
@@ -355,9 +356,7 @@ test_that("plot_spectrum works with ggplot2", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
   skip_if_not_installed("ggplot2")
-  # skip_if_not_installed("reticulate")
-  # skip_if_not_installed("rsvg")
-  
+
   p1 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr, export_spectrum = FALSE,
                       what="rt", chr=1, verbose = FALSE, engine="ggplot")
   vdiffr::expect_doppelganger(title = "plot_both_ggplot", fig = p1)
@@ -416,11 +415,6 @@ test_that("mirror_plot works", {
   expect_error(mirror_plot(pk_tab, chrom_list))
   expect_error(mirror_plot(pk_tab, chrom_list, var = "invalid_variable"))
 })
- 
-# data(pk_tab)
-# path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
-# meta <- read.csv(path)
-# pk_tab <- attach_metadata(pk_tab, metadata = meta, column="vial")
 
 test_that("boxplot works as expected", {
   skip_if_not_installed("vdiffr")
