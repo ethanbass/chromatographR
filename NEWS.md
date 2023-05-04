@@ -13,6 +13,7 @@ retention times (`rts`).
 #### Other changes
 
 * Changed behavior of `preprocess` when inferring retention times so chromatograms are no longer rounded down to the largest integer.
+* In `preprocess`, spectral smoothing is no longer applied on 2D chromatograms, removing error message when preprocess is used with default settings.
 * Moved position of `...` argument to end in `plot.peak_table`.
 * Changed `progress_bar` argument to `show_progress` in `correct_rt`, `preprocess`
 and `get_peaks` to fix strange `pmatch` behavior with additional arguments to
