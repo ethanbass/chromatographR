@@ -45,7 +45,6 @@ jobs:
           python-version: 3.9
       
       - name: Install kaleido
-        if: matrix.config.visual_tests == true
         run: |
           Rscript -e "reticulate::install_miniconda()"
           Rscript -e "reticulate::conda_install('r-reticulate', 'python-kaleido')"
