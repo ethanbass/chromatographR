@@ -33,6 +33,7 @@ test_that("choose apply_fnc works as expected on unix/linux", {
   expect_equal(class(fn), c("purrr_function_partial","function"))
   
   fn<-choose_apply_fnc(show_progress=NULL, parallel = TRUE)
+  pbapply_exists <- check_for_pkg("pbapply", return_boolean=TRUE)
   expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = TRUE))
 })
 
