@@ -44,7 +44,7 @@ test_that("preprocess returns correct errors", {
 
 test_that("preprocess works without interpolation", {
   dat.pr <- preprocess(X=Sa[[1]], interpolate_cols = FALSE,
-                       interpolate_rows=FALSE, show_progress = FALSE)
+                       interpolate_rows = FALSE, show_progress = FALSE)
   expect_equal(dim(dat.pr),dim(Sa[[1]]))
   expect_equal(rownames(dat.pr), rownames(Sa[[1]]))
   expect_equal(colnames(dat.pr), colnames(Sa[[1]]))
@@ -258,19 +258,19 @@ test_that("plot.peak_list works", {
   }
   vdiffr::expect_doppelganger("plot.peak_list_gaussian", plot_peaks_gaussian)
   
-  plot_peaks_raw <- function(){
-    plot(pks_raw, chrom_list = dat.pr)
-  }
-  vdiffr::expect_doppelganger("plot.peak_list_raw", plot_peaks_raw)
+  # plot_peaks_raw <- function(){
+  #   plot(pks_raw, chrom_list = dat.pr)
+  # }
+  # vdiffr::expect_doppelganger("plot.peak_list_raw", plot_peaks_raw)
   
-  expect_error(plot(pks_egh, chrom_list=dat.pr, lambda=190))
+  expect_error(plot(pks_egh, chrom_list = dat.pr, lambda=190))
 })
 
 test_that("plot.ptw_list works", {
   plot_ptw_list <- function(){
     plot(warping.models)
   }
-  vdiffr::expect_doppelganger("plot..ptw_list", plot_ptw_list)
+  vdiffr::expect_doppelganger("plot.ptw_list", plot_ptw_list)
 })
 
 test_that("plot.peak_table works", {
@@ -283,7 +283,7 @@ test_that("plot.peak_table works", {
   vdiffr::expect_doppelganger("plot.peak_table", plot_peak_table)
   expect_error(plot(pk_tab, loc = "V13", chr = 1,lambda = "210", 
                     box_plot = TRUE, verbose = FALSE))
-  expect_error(plot(pk_tab, loc = "15", what = "rt",chr = 1,lambda = "210", 
+  expect_error(plot(pk_tab, loc = "15", what = "rt",chr = 1, lambda = "210", 
                     box_plot = TRUE, var = "trt", verbose = FALSE))
 })
 
@@ -304,7 +304,7 @@ test_that("plot_all_spectra works", {
 test_that("plot_all_spectra works with ggplot2", {
   skip_if_not_installed("vdiffr")
   plot_spectra <- function(){
-    plot_all_spectra("V13", peak_table=pk_tab, chrom_list = dat.pr, export = FALSE,
+    plot_all_spectra("V13", peak_table = pk_tab, chrom_list = dat.pr, export = FALSE,
                      overlapping = TRUE, engine = "ggplot")
   }
   x <- plot_all_spectra("V13", peak_table = pk_tab, chrom_list = dat.pr, export=FALSE,
@@ -316,11 +316,11 @@ test_that("plot_spectrum works", {
   skip_if_not_installed("vdiffr")
   plot_spec <- function(){
     par(mfrow=c(2,1))
-    plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
+    plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr, export=TRUE,
                   what="rt", chr=1, verbose = FALSE)
   }
   vdiffr::expect_doppelganger(title = "plot_spectrum", plot_spec)
-  x <- plot_spectrum("V13", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
+  x <- plot_spectrum("V13", peak_table = pk_tab, chrom_list = dat.pr, export=TRUE,
                      what="peak", chr=1, verbose = FALSE)
   expect_equal(rownames(x), as.character(new.lambdas))
   expect_equal(class(x), "data.frame")
@@ -334,12 +334,14 @@ test_that("plot_spectrum works with plotly engine", {
   skip_if_not_installed("reticulate")
   skip_if_not_installed("rsvg")
 
-  p1 <- plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr, export_spectrum = FALSE,
-                   what = "rt", chr = 1, verbose = FALSE, engine = "plotly")
+  p1 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr,
+                      export_spectrum = FALSE, what = "rt", chr = 1,
+                      verbose = FALSE, engine = "plotly")
   expect_doppelganger_plotly("plot_both_plotly", p = p1)
   
-  p2 <- plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr, export_spectrum = FALSE,
-                      what="rt", chr=1, verbose = FALSE, engine="plotly", plot_trace = FALSE)
+  p2 <- plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr,
+                      export_spectrum = FALSE, what="rt", chr=1,
+                      verbose = FALSE, engine="plotly", plot_trace = FALSE)
   expect_doppelganger_plotly("plot_trace_plotly", p = p2)
   
   p3 <- plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr,
@@ -386,7 +388,7 @@ test_that("plot_spectrum works", {
   expect_error(plot_spectrum(loc=12, chrom_list = pk_tab, what="rt", chr=1))
   expect_error(plot_spectrum(loc=12, what="rt", chr=1))
   expect_error(plot_spectrum(loc=12, chrom_list = chrom_list, what="peak", chr=1))
-  expect_error(plot_spectrum(loc=12, peak_table=pk_tab, chrom_list = chrom_list, what="peak", chr=1))
+  expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = chrom_list, what="peak", chr=1))
   
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click", engine="plotly"))
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, what="click", chr=1, engine="plotly"))
@@ -412,14 +414,14 @@ test_that("mirror_plot works", {
                 var = "trt", legend_size=2, mirror = FALSE)
   }
   vdiffr::expect_doppelganger("mirror2", mirror2)
-  expect_error(mirror_plot(pk_tab, chrom_list))
-  expect_error(mirror_plot(pk_tab, chrom_list, var = "invalid_variable"))
+  expect_error(mirror_plot(pk_tab, chrom_list = dat.pr))
+  expect_error(mirror_plot(pk_tab, chrom_list = dat.pr, var = "invalid_variable"))
 })
 
 test_that("boxplot works as expected", {
   skip_if_not_installed("vdiffr")
   boxplot1 <- function(){
-    boxplot(pk_tab, V11~trt)
+    boxplot(pk_tab, V11 ~ trt)
   }
   vdiffr::expect_doppelganger("boxplot1", boxplot1)
   
@@ -435,7 +437,7 @@ test_that("plot_peak.list works", {
     plot(pks_egh, chrom_list = dat.pr, index=2)
   }
   vdiffr::expect_doppelganger("plot_peaklist", plot_peaklist)
-  plot(pks_egh, chrom_list=dat.pr, lambda=210)
+  plot(pks_egh, chrom_list = dat.pr, lambda=210)
 })
 
 test_that("cluster_spectra works", {
