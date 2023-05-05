@@ -15,8 +15,6 @@ test_that("choose_apply_fnc works as expected", {
   skip_if_not_installed("pbapply")
   fn <- choose_apply_fnc(show_progress = TRUE)
   expect_equal(class(fn), c("purrr_function_partial","function"))
-  fn <- choose_apply_fnc(show_progress = TRUE, parallel=TRUE)
-  expect_equal(class(fn), c("purrr_function_partial","function"))
   
   fn <- choose_apply_fnc(show_progress = FALSE, parallel = FALSE)
   expect_equal(fn, lapply)
@@ -24,9 +22,25 @@ test_that("choose_apply_fnc works as expected", {
   expect_equal(fn, lapply)
   fn <- choose_apply_fnc(show_progress = FALSE, cl=NULL)
   expect_equal(fn, lapply)
+})
+
+test_that("choose apply_fnc works as expected on unix/linux", {
+  skip_on_os("windows")
+  fn <- choose_apply_fnc(show_progress = TRUE, parallel=TRUE)
+  expect_equal(class(fn), c("purrr_function_partial","function"))
   
   fn <- choose_apply_fnc(show_progress = FALSE, parallel=TRUE)
   expect_equal(class(fn), c("purrr_function_partial","function"))
+  
+  fn<-choose_apply_fnc(show_progress=NULL, parallel = TRUE)
+  expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = TRUE))
+})
+
+test_that("choose apply_fnc works as expected on windows", {
+  skip_on_os(c("mac","linux","solaris"))
+  expect_warning(choose_apply_fnc(show_progress = TRUE, parallel=TRUE))
+  expect_warning(choose_apply_fnc(show_progress = FALSE, parallel=TRUE))
+  expect_warning(choose_apply_fnc(show_progress=NULL, parallel = TRUE))
 })
 
 test_that("choose_apply_fnc works as expected with NULL value", {
@@ -40,9 +54,6 @@ test_that("choose_apply_fnc works as expected with NULL value", {
   
   fn<-choose_apply_fnc(show_progress=NULL, cl=NULL)
   expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = FALSE))
-  
-  fn<-choose_apply_fnc(show_progress=NULL, parallel = TRUE)
-  expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = TRUE))
 })
 
 
