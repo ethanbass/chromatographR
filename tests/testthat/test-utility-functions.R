@@ -25,6 +25,7 @@ test_that("choose_apply_fnc works as expected", {
 })
 
 test_that("choose apply_fnc works as expected on unix/linux", {
+  skip_on_os("windows")
   fn <- choose_apply_fnc(show_progress = TRUE, parallel=TRUE)
   expect_equal(class(fn), c("purrr_function_partial","function"))
   
@@ -36,6 +37,7 @@ test_that("choose apply_fnc works as expected on unix/linux", {
 })
 
 test_that("choose apply_fnc works as expected on windows", {
+  skip_on_os(c("mac","linux","solaris"))
   expect_warning(choose_apply_fnc(show_progress = TRUE, parallel=TRUE))
   expect_warning(choose_apply_fnc(show_progress = FALSE, parallel=TRUE))
   expect_warning(choose_apply_fnc(show_progress=NULL, parallel = TRUE))

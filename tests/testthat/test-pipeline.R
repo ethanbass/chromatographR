@@ -267,6 +267,7 @@ test_that("plot.peak_list works", {
 })
 
 test_that("plot.ptw_list works", {
+  skip_if_not_installed("vdiffr")
   plot_ptw_list <- function(){
     plot(warping.models)
   }
