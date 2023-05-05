@@ -20,8 +20,7 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-Sys.setenv(VISUAL_TESTS="true")
-Sys.setenv(NOT_CRAN = "true")
+# Sys.setenv(NOT_CRAN = "true")
 
 #' @noRd
 visual_testing <- grepl("true", Sys.getenv("VISUAL_TESTS"), fixed = TRUE)
