@@ -89,7 +89,7 @@
 #' get_peaktable(pks, response = "area")
 #' @seealso \code{\link{attach_ref_spectra}} \code{\link{attach_metadata}}
 #' @export get_peaktable
-#' 
+ 
 get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
                           use.cor = FALSE, hmax = 0.2, plot_it = FALSE,
                           ask = plot_it, clust = c("rt","sp.rt"),
@@ -132,18 +132,18 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
     }
     if (clust == 'sp.rt'){
       if (is.null(sigma.t)){
-        sigma.t <- .5*mean(do.call(rbind,unlist(pkLst,recursive = FALSE))$end - 
+        sigma.t <- 0.5 * mean(do.call(rbind,unlist(pkLst,recursive = FALSE))$end - 
                              do.call(rbind,unlist(pkLst,recursive = FALSE))$start)
       }
-      ts<- as.numeric(rownames(chrom_list[[1]]))
+      ts <- as.numeric(rownames(chrom_list[[1]]))
       sp <- sapply(seq_along(pkcenters), function(i){
         rescale(t(chrom_list[[file.idx[i]]][
           which(elementwise.all.equal(ts, pkcenters[i])),]))
       }, simplify=TRUE)
       cor.matrix <- cor(sp, method = "pearson")
       mint <- abs(outer(unlist(pkcenters), unlist(pkcenters), FUN="-"))
-      S <- (exp((-(1-abs(cor.matrix))^2)/(2*sigma.r^2)))*exp(-(mint^2)/(2*sigma.t^2))
-      D <- 1-S
+      S <- (exp((-(1 - abs(cor.matrix))^2)/(2*sigma.r^2)))*exp(-(mint^2)/(2*sigma.t^2))
+      D <- 1 - S
       linkage <- "average"
       pkcenters.hcl <- hclust(as.dist(D), method = linkage)
       pkcenters.cl <- cutreeDynamicTree(pkcenters.hcl, maxTreeHeight = hmax, 
@@ -151,9 +151,9 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
       sing <- which(pkcenters.cl == 0)
       pkcenters.cl[sing] <- max(pkcenters.cl) + seq_along(sing)
     }
-    cl.centers <- aggregate(cbind(rt,start,end,sd,tau,FWHM,r.squared,purity) ~ 
-                              pkcenters.cl, data=xx, "mean", na.rm=TRUE,
-                            na.action="na.pass")[,-1]
+    vars <- c("rt", "start", "end", "sd", "tau", "FWHM", "r.squared", "purity")
+    cl.centers <- aggregate(xx[,vars], by = list(pkcenters.cl), FUN = "mean",
+                            na.rm = TRUE, na.action = "na.pass")[,-1]
     ncl <- length(cl.centers$rt)
     
     ## re-order clusters from small to large rt

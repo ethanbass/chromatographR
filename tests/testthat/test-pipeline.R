@@ -144,7 +144,6 @@ test_that("filter_peaks works", {
   expect_lt(nrow(pks_s[[1]][[1]]), nrow(pks_egh[[1]][[1]]))
   expect_lt(nrow(pks_s[[2]][[1]]), nrow(pks_egh[[2]][[1]]))
   expect_warning(filter_peaks(pks_egh))
-  # expect_warning(filter_peaks(pks_egh, min_sd=0))
   expect_warning(filter_peaks(pks_egh, min_height=0))
   expect_warning(filter_peaks(pks_egh, min_area=0))
   expect_warning(filter_peaks(pks_egh, max_sd=Inf))
@@ -165,7 +164,7 @@ test_that("get_peaktable works", {
 })
 
 
-### test metadata attachment ###
+#### test metadata attachment ###
 
 path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
 meta <- read.csv(path)
@@ -282,20 +281,20 @@ test_that("plot.peak_table works", {
          vars = "trt", verbose = FALSE, spectrum_labels = TRUE)
   }
   vdiffr::expect_doppelganger("plot.peak_table", plot_peak_table)
-  expect_error(plot(pk_tab, loc = "V13", chr = 1,lambda = "210", 
+  expect_error(plot(pk_tab, loc = "V13", chr = 1, lambda = "210", 
                     box_plot = TRUE, verbose = FALSE))
-  expect_error(plot(pk_tab, loc = "15", what = "rt",chr = 1, lambda = "210", 
+  expect_error(plot(pk_tab, loc = "15", what = "rt", chr = 1, lambda = "210", 
                     box_plot = TRUE, var = "trt", verbose = FALSE))
 })
 
 test_that("plot_all_spectra works", {
   skip_if_not_installed("vdiffr")
   plot_spectra <- function(){
-    plot_all_spectra("V13", peak_table = pk_tab, chrom_list = dat.pr, export=TRUE,
-                     overlapping=TRUE)
+    plot_all_spectra("V13", peak_table = pk_tab, chrom_list = dat.pr, export = TRUE,
+                     overlapping = TRUE)
   }
-  x <- plot_all_spectra("V13", peak_table = pk_tab, chrom_list = dat.pr, export=TRUE,
-                        overlapping=TRUE)
+  x <- plot_all_spectra("V13", peak_table = pk_tab, chrom_list = dat.pr, export = TRUE,
+                        overlapping = TRUE)
   vdiffr::expect_doppelganger("plot_all_spectra", plot_spectra)
   expect_equal(class(x), "data.frame")
   expect_equal(rownames(x), as.character(new.lambdas))
@@ -438,7 +437,7 @@ test_that("plot_peak.list works", {
     plot(pks_egh, chrom_list = dat.pr, index=2)
   }
   vdiffr::expect_doppelganger("plot_peaklist", plot_peaklist)
-  plot(pks_egh, chrom_list = dat.pr, lambda=210)
+  plot(pks_egh, chrom_list = dat.pr, lambda = 210)
 })
 
 test_that("cluster_spectra works", {

@@ -57,7 +57,6 @@ test_that("choose_apply_fnc works as expected with NULL value", {
   expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = FALSE))
 })
 
-
 test_that("check_peaktable works as expected", {
   data(pk_tab)
   expect_null(check_peaktable(pk_tab))
