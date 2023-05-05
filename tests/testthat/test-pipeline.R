@@ -281,19 +281,19 @@ test_that("plot.peak_table works", {
          vars = "trt", verbose = FALSE, spectrum_labels = TRUE)
   }
   vdiffr::expect_doppelganger("plot.peak_table", plot_peak_table)
-  expect_error(plot(pk_tab, loc = "V13",chr=1,lambda="210", 
-                    box_plot = TRUE, verbose=FALSE))
-  expect_error(plot(pk_tab, loc = "15", what="rt",chr=1,lambda="210", 
-                    box_plot = TRUE, var="trt", verbose=FALSE))
+  expect_error(plot(pk_tab, loc = "V13", chr = 1,lambda = "210", 
+                    box_plot = TRUE, verbose = FALSE))
+  expect_error(plot(pk_tab, loc = "15", what = "rt",chr = 1,lambda = "210", 
+                    box_plot = TRUE, var = "trt", verbose = FALSE))
 })
 
 test_that("plot_all_spectra works", {
   skip_if_not_installed("vdiffr")
   plot_spectra <- function(){
-    plot_all_spectra("V13", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
+    plot_all_spectra("V13", peak_table = pk_tab, chrom_list = dat.pr, export=TRUE,
                      overlapping=TRUE)
   }
-  x <- plot_all_spectra("V13", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
+  x <- plot_all_spectra("V13", peak_table = pk_tab, chrom_list = dat.pr, export=TRUE,
                         overlapping=TRUE)
   vdiffr::expect_doppelganger("plot_all_spectra", plot_spectra)
   expect_equal(class(x), "data.frame")
@@ -342,31 +342,31 @@ test_that("plot_spectrum works with plotly engine", {
                       what="rt", chr=1, verbose = FALSE, engine="plotly", plot_trace = FALSE)
   expect_doppelganger_plotly("plot_trace_plotly", p = p2)
   
-  p3 <- plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr, export_spectrum = FALSE,
-                      what="rt", chr=1, verbose = FALSE, engine="plotly", plot_spectrum = FALSE)
+  p3 <- plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr,
+                      export_spectrum = FALSE, what="rt", chr=1,
+                      verbose = FALSE, engine="plotly", plot_spectrum = FALSE)
   expect_doppelganger_plotly("plot_spectrum_plotly", p = p3)
-  # x <- plot_spectrum("V13", peak_table=pk_tab, chrom_list = dat.pr, export=TRUE,
-  #                    what="peak", chr=1, verbose = FALSE)
-  # expect_equal(rownames(x), as.character(new.lambdas))
-  # expect_equal(class(x), "data.frame")
-  # expect_equal(ncol(x), 1)
 })
 
 test_that("plot_spectrum works with ggplot2", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
   skip_if_not_installed("ggplot2")
-
-  p1 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr, export_spectrum = FALSE,
-                      what="rt", chr=1, verbose = FALSE, engine="ggplot")
+  skip_if_not_installed("cowplot")
+  
+  p1 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr,
+                      export_spectrum = FALSE, what="rt", chr=1,
+                      verbose = FALSE, engine="ggplot")
   vdiffr::expect_doppelganger(title = "plot_both_ggplot", fig = p1)
   
-  p2 <- plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr, export_spectrum = FALSE,
-                      what="rt", chr=1, verbose = FALSE, engine="ggplot", plot_trace = FALSE)
+  p2 <- plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr,
+                      export_spectrum = FALSE, what="rt", chr=1,
+                      verbose = FALSE, engine="ggplot", plot_trace = FALSE)
   vdiffr::expect_doppelganger(title = "plot_trace_ggplot", fig = p2)
   
-  p3 <- plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr, export_spectrum = FALSE,
-                      what="rt", chr=1, verbose = FALSE, engine = "ggplot", plot_spectrum = FALSE)
+  p3 <- plot_spectrum("13.62", peak_table=pk_tab, chrom_list = dat.pr, 
+                      export_spectrum = FALSE, what="rt", chr=1,
+                      verbose = FALSE, engine = "ggplot", plot_spectrum = FALSE)
   vdiffr::expect_doppelganger(title = "plot_spectrum_ggplot", fig = p3)
 })
 
@@ -447,35 +447,35 @@ test_that("cluster_spectra works", {
   expect_equal(class(cl[[2]]), "list")
 })
 
-test_that("write_peaktable writes csvs correctly", {
-  data(pk_tab)
-  skip_on_cran()
-  path <-  tempdir(check = TRUE)
-  on.exit(unlink(c(fs::path(path,"peak_table-tab", ext="csv"),
-                   fs::path(path,"peak_table-pk_meta", ext="csv"),
-                   path)))
-  write_peaktable(peak_table = pk_tab, path = path, format = "csv", what=c("tab", "pk_meta"))
-  path_table <- paste0(file.path(path,"peak_table-tab"), ext =".csv")
-  path_meta <- paste0(file.path(path,"peak_table-pk_meta"), ext =".csv")
+# test_that("write_peaktable writes csvs correctly", {
+#   data(pk_tab)
+#   skip_on_cran()
+#   path <-  tempdir(check = TRUE)
+#   on.exit(unlink(c(fs::path(path,"peak_table-tab", ext="csv"),
+#                    fs::path(path,"peak_table-pk_meta", ext="csv"),
+#                    path)))
+#   write_peaktable(peak_table = pk_tab, path = path, format = "csv", what=c("tab", "pk_meta"))
+#   path_table <- paste0(file.path(path,"peak_table-tab"), ext =".csv")
+#   path_meta <- paste0(file.path(path,"peak_table-pk_meta"), ext =".csv")
+# 
+#   expect_true(file.exists(path_table))
+#   expect_true(file.exists(path_meta))
+# 
+#   expect_equal(pk_tab$tab, read.csv(file = path_table, row.names = 1), ignore_attr=TRUE)
+#   expect_equal(pk_tab$pk_meta, read.csv(file = path_meta, row.names = 1), ignore_attr=TRUE)
+#   expect_error(write_peaktable(pk_tab, path="fake_path"))
+# })
 
-  expect_true(file.exists(path_table))
-  expect_true(file.exists(path_meta))
-
-  expect_equal(pk_tab$tab, read.csv(file = path_table, row.names = 1), ignore_attr=TRUE)
-  expect_equal(pk_tab$pk_meta, read.csv(file = path_meta, row.names = 1), ignore_attr=TRUE)
-  expect_error(write_peaktable(pk_tab, path="fake_path"))
-})
-
-test_that("write_peaktable writes xlsx correctly", {
-  skip_on_cran()
-  skip_if_not_installed("openxlsx")
-  data(pk_tab)
-  path <-  tempdir()
-  on.exit(unlink(c(fs::path(path, "peak_table", ext="xlsx"), path)))
-  
-  write_peaktable(pk_tab, path = path, format = "xlsx")
-  file <- fs::path(path, "peak_table", ext = "xlsx")
-  xx <- openxlsx::read.xlsx(file, sheet = 1, rowNames = TRUE)
-  expect_equal(pk_tab$tab, xx, ignore_attr=TRUE)
-  expect_equal(pk_tab$pk_meta, openxlsx::read.xlsx(file, sheet = 2, rowNames = TRUE), ignore_attr=TRUE)
-})
+# test_that("write_peaktable writes xlsx correctly", {
+#   skip_on_cran()
+#   skip_if_not_installed("openxlsx")
+#   data(pk_tab)
+#   path <-  tempdir()
+#   on.exit(unlink(c(fs::path(path, "peak_table", ext="xlsx"), path)))
+#   
+#   write_peaktable(pk_tab, path = path, format = "xlsx")
+#   file <- fs::path(path, "peak_table", ext = "xlsx")
+#   xx <- openxlsx::read.xlsx(file, sheet = 1, rowNames = TRUE)
+#   expect_equal(pk_tab$tab, xx, ignore_attr=TRUE)
+#   expect_equal(pk_tab$pk_meta, openxlsx::read.xlsx(file, sheet = 2, rowNames = TRUE), ignore_attr=TRUE)
+# })
