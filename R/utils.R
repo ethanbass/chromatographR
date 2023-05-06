@@ -10,15 +10,65 @@ check_peaktable <- function(peak_table){
 #' @param peak_table Peak table object
 #' @author Ethan Bass
 #' @noRd
+
 get_chrom_list <- function(x, chrom_list, verbose = FALSE){
-  if (inherits(x, "peak_table")){
-    if (missing(chrom_list)){
-      chrom_list <- try(get(x$args[["chrom_list"]]))
-      if (inherits(chrom_list, "try-error")){
-        stop("Chromatograms not found! Please make sure the appropriate chrom_list
-             object has been loaded")
-      }
+  if (missing(chrom_list)){
+    if (inherits(x, "peak_table")){
+      string <- x$args[["chrom_list"]]
+    } else if (inherits(x, "peak_list")){
+      string <- attr(x, "chrom_list")
     }
+    if (grepl("\\[*\\]", string)){
+      subsetted <- TRUE
+      idx <- extract_idx(string)
+      string <- gsub("\\[\\[?(.*?)\\]?\\]", "", string)
+    } else{
+      subsetted <- FALSE
+    }
+    chrom_list <- try(get(string))
+    if (inherits(chrom_list, "try-error")){
+      stop("Chromatograms not found! Please make sure the appropriate chrom_list
+             object has been loaded")
+    }
+    if (subsetted){
+      chrom_list <- chrom_list[idx]
+    }
+  }
+  check_chrom_list(x, chrom_list, verbose = verbose)
+  chrom_list
+}
+
+#' Extract idx from string
+#' @noRd
+extract_idx <- function(string, chrom_names){
+  idx <- sub(".*?\\[(.*?)\\].*", "\\1", string)
+  if (any(grepl(":", idx))){
+    if (grepl("c(.*?)", idx)){
+      matches <- regmatches(idx, gregexpr('\\(.*\\)', idx))[[1]]
+      idx <- gsub('[()]', '', matches)
+    }
+    split <- as.numeric(strsplit(idx, ":")[[1]])
+    idx <- split[1]:split[2]
+  } else if (grepl("c(.*?)", idx)){
+    if (grepl("[']|[\"]", idx)){
+      matches <- regmatches(idx, gregexpr("'([^']*)'|\"([^\"]*)\"", idx))[[1]]
+      idx <- gsub('[\'\"]', '', matches)
+    } else{
+      matches <- regmatches(idx, gregexpr('\\(.*\\)', idx))[[1]]
+      idx <- gsub('[()]', '', matches)
+      idx <- strsplit(idx,",")[[1]]
+    }
+  }
+  if (any(!is.na(suppressWarnings(as.numeric(idx))))){
+    idx <- as.numeric(idx)
+  }
+  idx
+}
+
+#' Check that chrom_list is matching a peak table or peak list.
+#' @noRd
+check_chrom_list <- function(x, chrom_list, verbose = FALSE){
+  if (inherits(x, "peak_table")){
     if (length(chrom_list) != nrow(x$tab)){
       stop("Dimensions of chrom_list and peak_table do not match.")
     } else{
@@ -26,10 +76,6 @@ get_chrom_list <- function(x, chrom_list, verbose = FALSE){
         warning("Names of chromatograms do not match peak_table")
     }
   } else if (inherits(x, "peak_list")){
-    if (missing(chrom_list)){
-      chrom_list <- try(get(attr(x, "chrom_list")))
-      if (inherits(chrom_list, "try-error")) stop("Chromatograms not found!")
-    }
     if (length(chrom_list) != length(x)){
       stop("Dimensions of chrom_list and peak_list do not match.")
     } else{
@@ -37,7 +83,6 @@ get_chrom_list <- function(x, chrom_list, verbose = FALSE){
         warning("Names of chromatograms do not match peak_list")
     }
   }
-  chrom_list
 }
 
 #' Get retention index

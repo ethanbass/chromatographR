@@ -25,12 +25,14 @@ plotting engines.
 * Deprecated the `parallel` argument in `preprocess` in favor of just using `cl`.
 * Changed name of first argument in `mirror_plot` from `peak_table` to `x`. Otherwise the function has not changed.
 * Added additional tests, improving test coverage to 80%.
+* Updated `get_chrom_list` (internal) to allow parsing of subsetted lists.
 
-#### Bug fixes
+# chromatographR 0.4.8
 
-* Fixed bug in `merge_peaks` function so it works properly to combine two or 
-more peaks in a peak table.
-* Fixed bugs in `plot_chroms` preventing plotting with `ggplot2` and plotting wrong chromatograms in base R.
+* Fixed bug in `merge_peaks` function so it works properly (to combine 2 or more
+peaks in a peak table).
+* Fixed bugs in `plot_chroms` preventing plotting with `ggplot2` and plotting wrong chromatograms in base R. 
+* Added additional tests for `plot_chroms` and reshape functions.
 
 # chromatographR 0.4.7
 
