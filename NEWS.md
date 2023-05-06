@@ -1,4 +1,4 @@
-# chromatographR 0.4.8 dev
+# chromatographR 0.4.8
 
 * Fixed `merge_peaks` function so it works properly (to combine 2 or more peaks in peak table).
 * Fixed bugs in `plot_chroms` preventing plotting with `ggplot2` and plotting wrong chromatograms in base R. 
