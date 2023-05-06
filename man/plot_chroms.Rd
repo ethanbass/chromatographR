@@ -12,7 +12,7 @@ plot_chroms(
   xlab = "",
   engine = c("base", "ggplot", "plotly"),
   linewidth = 1,
-  show_legend = TRUE,
+  show_legend = FALSE,
   ...
 )
 }
@@ -32,7 +32,7 @@ plot_chroms(
 
 \item{linewidth}{Line width.}
 
-\item{show_legend}{Logical. Whether to display legend or not. Defaults to TRUE.}
+\item{show_legend}{Logical. Whether to display legend or not. Defaults to FALSE.}
 
 \item{...}{Additional arguments to plotting function specified by \code{engine}.}
 }

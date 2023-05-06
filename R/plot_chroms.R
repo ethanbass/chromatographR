@@ -10,7 +10,7 @@
 #' @param engine Plotting engine. Either \code{\link[graphics]{matplot}}, 
 #' \code{\link[plotly]{plotly}}, or \code{\link[ggplot2]{ggplot2-package}}.
 #' @param linewidth Line width.
-#' @param show_legend Logical. Whether to display legend or not. Defaults to TRUE.
+#' @param show_legend Logical. Whether to display legend or not. Defaults to FALSE.
 #' @param ... Additional arguments to plotting function specified by \code{engine}.
 #' @examples 
 #' data(Sa_pr)
@@ -19,7 +19,7 @@
 
 plot_chroms <- function(x, lambdas, idx, ylab = "Absorbance", xlab = "",
                         engine = c("base", "ggplot", "plotly"), linewidth = 1, 
-                        show_legend = TRUE, ...){
+                        show_legend = FALSE, ...){
   engine <- match.arg(engine, c("base","ggplot","plotly"))
   if (!class(x) %in% c("list", "chrom_list")){
     stop("Please supply list of chromatograms.")

@@ -91,8 +91,8 @@ test_that("plot_chroms works to plot alignments", {
   skip_if_not_installed("vdiffr")
   alignment <- function(){
     par(mfrow=c(2,1))
-    plot_chroms(warp, lambdas="210")
-    plot_chroms(dat.pr, lambdas="210")
+    plot_chroms(warp, lambdas="210", show_legend = TRUE)
+    plot_chroms(dat.pr, lambdas="210", show_legend = TRUE)
   }
   vdiffr::expect_doppelganger("alignment", alignment)
   expect_error(plot_chroms(pktab))
@@ -105,7 +105,7 @@ test_that("plot_chroms works with plotly", {
   skip_if_not_installed("reticulate")
   skip_if_not_installed("rsvg")
 
-  p <- plot_chroms(warp, lambdas="210", engine="plotly")
+  p <- plot_chroms(warp, lambdas="210", engine="plotly", show_legend = TRUE)
   suppressWarnings(expect_doppelganger_plotly(name = "alignment_plotly", p = p))
 })
 
