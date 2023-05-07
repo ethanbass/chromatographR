@@ -13,7 +13,6 @@
 #' @importFrom stats as.formula
 #' @param x The peak table (output from \code{\link{get_peaktable}}
 #' function).
-#' @param ... Additional arguments.
 #' @param loc A vector specifying the peak(s) or retention time(s) that you wish to plot.
 #' @param chrom_list A list of chromatograms in matrix format (timepoints x
 #' wavelengths). If no argument is provided here, the function will try to find the
@@ -43,6 +42,7 @@
 #' @param verbose Logical. If TRUE, prints verbose output to console. Defaults
 #' to TRUE.
 #' @param engine Which plotting engine to use: either \code{base} or \code{plotly}.
+#' @param ... Additional arguments to \code{\link[graphics]{boxplot}}.
 #' @return If \code{export_spectrum} is TRUE, returns the spectrum as a \code{
 #' data.frame} with wavelengths as rows and columns encoding the
 #' absorbance (or normalized absorbance, if \code{scale_spectrum} is TRUE) for 
@@ -63,14 +63,14 @@
 #' @rdname plot.peak_table
 #' @export
 
-plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
+plot.peak_table <- function(x, loc, chrom_list, what="peak",
                             chr = 'max', lambda = 'max',
                             plot_spectrum = TRUE, plot_trace = TRUE,
                             box_plot = FALSE, vars = NULL,
                             spectrum_labels = TRUE, scale_spectrum = FALSE,
                             export_spectrum = FALSE, verbose = TRUE,
-                            engine = c("base", "plotly")){
-  engine <- match.arg(engine, c("base", "plotly"))
+                            engine = c("base", "plotly", "ggplot"), ...){
+  engine <- match.arg(engine, c("base", "plotly", "ggplot"))
   if (what == "peak" & missing(loc)){
     loc <- readline(prompt="Which peak would you like to plot? \n")
     loc <- gsub('\\"', '', loc)
@@ -91,7 +91,7 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
                              plot_trace = plot_trace, spectrum_labels = spectrum_labels,
                              scale_spectrum = scale_spectrum,
                              export_spectrum = export_spectrum,
-                             verbose = verbose, what = what)
+                             verbose = verbose, what = what, engine = engine)
       }
     }
     if (box_plot){
@@ -107,14 +107,15 @@ plot.peak_table <- function(x, ..., loc, chrom_list, what="peak",
       boxplot(as.formula(paste("x[['tab']][,loc]", vars, sep="~")),
               data = x$sample_meta,
               main = paste(loc, '\n', 'RT = ', round(as.numeric(x$pk_meta['rt', loc]),2)),
-              ylab="abs", xlab="", ...)
+              ylab = "abs", xlab = "", ...)
     }
-    if (export_spectrum)
-      out
+    if (export_spectrum | engine %in% c("plotly","ggplot")){
+      return(out)
+    } 
   }
 }
 
-#' Make boxplot of variables from peak table.
+#' Make boxplot from peak table.
 #' 
 #' The function can take multiple response variables on the left hand side of the
 #' formula (separated by \code{+}). In this case, a separate boxplot will be
@@ -159,7 +160,7 @@ boxplot.peak_table <- function(x, formula, ...){
 #' 
 #' @importFrom graphics matplot legend plot.new plot.window par
 #' @importFrom utils head tail
-#' @param peak_table The peak table (output from \code{\link{get_peaktable}}
+#' @param x The peak table (output from \code{\link{get_peaktable}}
 #' function).
 #' @param chrom_list A list of chromatograms in matrix format (timepoints x
 #' wavelengths). If no argument is provided here, the function will try to find the
@@ -182,7 +183,6 @@ boxplot.peak_table <- function(x, formula, ...){
 #' If \code{mirror_plot} is TRUE, plots a mirror plot comparing two treatments
 #' defined by \code{var} and \code{subset} (if more than two factors are present
 #' in \code{var}).
-#'
 #' Otherwise, if \code{mirror_plot} is FALSE, the treatments are plotted in two
 #' separate panes.
 #' @author Ethan Bass
@@ -195,11 +195,11 @@ boxplot.peak_table <- function(x, formula, ...){
 #' mirror_plot(pk_tab,lambdas=c("210","260"), var="trt", mirror=TRUE, col=c("green","blue"))
 #' @export
 
-mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset = NULL,
+mirror_plot <- function(x, chrom_list, lambdas, var, subset = NULL,
                         print_legend = TRUE, legend_txt = NULL, legend_pos = "topright",
-                        legend_size = 1, mirror = TRUE, xlim=NULL, ylim=NULL, ...){
-  check_peaktable(peak_table)
-  meta <- peak_table$sample_meta
+                        legend_size = 1, mirror = TRUE, xlim = NULL, ylim = NULL, ...){
+  check_peaktable(x)
+  meta <- x$sample_meta
   if (!exists("var"))
     stop("Must provide independent variable or variables for mirror plot.")
   if (!is.data.frame(meta)){
@@ -209,8 +209,8 @@ mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset = NULL,
     stop(paste0("`", var, "`", " could not be found in sample metadata."))
   }
   if (missing(chrom_list)){
-    chrom_list <- get_chrom_list(peak_table)
-  } else get_chrom_list(peak_table, chrom_list)
+    chrom_list <- get_chrom_list(x)
+  } else get_chrom_list(x, chrom_list)
   new.ts <- round(as.numeric(rownames(chrom_list[[1]])),2)
   fac <- factor(meta[,var])
   if (is.null(subset) & length(levels(fac)) > 2)
@@ -234,21 +234,21 @@ mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset = NULL,
     legend_txt <- c(trt1,trt2)
   if (is.null(xlim))
     xlim <- c(head(new.ts,1),tail(new.ts,1))
-  y_max <- max(sapply(chrom_list, function(x){
-    max(x[,as.character(min(as.numeric(lambdas)))], na.rm=TRUE)
+  y_max <- max(sapply(chrom_list, function(xx){
+    max(xx[,as.character(min(as.numeric(lambdas)))], na.rm = TRUE)
   }))
   if (mirror){
     if (is.null(ylim))
       ylim <- c(-y_max, y_max)
     plot.new()
-    plot.window(xlim = xlim,ylim = ylim)
+    plot.window(xlim = xlim, ylim = ylim)
     for (i in set1){
-      matplot(new.ts, chrom_list[[i]][,lambdas], type='l', add=TRUE, ...)
+      matplot(new.ts, chrom_list[[i]][,lambdas], type = 'l', add = TRUE, ...)
     }
     if (print_legend)
       legend("topright", legend=legend_txt[[1]], cex=legend_size, bty = "n")
     for (i in set2){
-      matplot(new.ts, -chrom_list[[i]][,lambdas], type='l', add=TRUE, ...)
+      matplot(new.ts, -chrom_list[[i]][,lambdas], type = 'l', add = TRUE, ...)
     }
     if (print_legend)
       legend("bottomright", legend=legend_txt[[2]], cex=legend_size, bty = "n")
@@ -256,21 +256,22 @@ mirror_plot <- function(peak_table, chrom_list, lambdas, var, subset = NULL,
     oldpar <- par(no.readonly = TRUE)
     par(mfrow=c(2,1))
     if (is.null(ylim))
-      ylim <- c(0,y_max)
+      ylim <- c(0, y_max)
     plot.new()
     plot.window(xlim = xlim, ylim = ylim)
     for (i in set1){
-      matplot(new.ts, chrom_list[[i]][,lambdas], type='l', add=TRUE, ...)
+      matplot(new.ts, chrom_list[[i]][,lambdas], type = 'l', add = TRUE, ...)
     }
     if (print_legend)
-      legend(legend_pos, legend=legend_txt[[1]], cex=legend_size, bty = "n")
+      legend(legend_pos, legend = legend_txt[[1]], cex = legend_size, bty = "n")
     plot.new()
     plot.window(xlim = xlim, ylim = ylim)
     for (i in set2){
-      matplot(new.ts, chrom_list[[i]][,lambdas], type='l', add=TRUE, ...)
+      matplot(new.ts, chrom_list[[i]][,lambdas], type = 'l', add = TRUE, ...)
     }
     if (print_legend)
       legend(legend_pos, legend=legend_txt[[2]], cex=legend_size, bty = "n")
-    par(oldpar) #reset par
+    par(oldpar) # reset par
   }
 }
+

@@ -13,10 +13,48 @@ test_that("get_lambdas works as expected", {
 
 test_that("choose_apply_fnc works as expected", {
   skip_if_not_installed("pbapply")
-  fn <- choose_apply_fnc(progress_bar = TRUE)
-  expect_equal(fn, pbapply::pblapply)
-  fn <- choose_apply_fnc(progress_bar = FALSE)
+  fn <- choose_apply_fnc(show_progress = TRUE)
+  expect_equal(class(fn), c("purrr_function_partial","function"))
+  
+  fn <- choose_apply_fnc(show_progress = FALSE, parallel = FALSE)
   expect_equal(fn, lapply)
+  fn <- choose_apply_fnc(show_progress = FALSE, cl=1)
+  expect_equal(fn, lapply)
+  fn <- choose_apply_fnc(show_progress = FALSE, cl=NULL)
+  expect_equal(fn, lapply)
+})
+
+test_that("choose apply_fnc works as expected on unix/linux", {
+  skip_on_os("windows")
+  fn <- choose_apply_fnc(show_progress = TRUE, parallel=TRUE)
+  expect_equal(class(fn), c("purrr_function_partial","function"))
+  
+  fn <- choose_apply_fnc(show_progress = FALSE, parallel=TRUE)
+  expect_equal(class(fn), c("purrr_function_partial","function"))
+  
+  fn<-choose_apply_fnc(show_progress=NULL, parallel = TRUE)
+  pbapply_exists <- check_for_pkg("pbapply", return_boolean=TRUE)
+  expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = TRUE))
+})
+
+test_that("choose apply_fnc works as expected on windows", {
+  skip_on_os(c("mac","linux","solaris"))
+  expect_warning(choose_apply_fnc(show_progress = TRUE, parallel=TRUE))
+  expect_warning(choose_apply_fnc(show_progress = FALSE, parallel=TRUE))
+  expect_warning(choose_apply_fnc(show_progress=NULL, parallel = TRUE))
+})
+
+test_that("choose_apply_fnc works as expected with NULL value", {
+  pbapply_exists <- check_for_pkg("pbapply", return_boolean=TRUE)
+  
+  fn<-choose_apply_fnc(show_progress=NULL, parallel = FALSE)
+  expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = FALSE))
+  
+  fn<-choose_apply_fnc(show_progress=NULL, cl=1)
+  expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = FALSE))
+  
+  fn<-choose_apply_fnc(show_progress=NULL, cl=NULL)
+  expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = FALSE))
 })
 
 test_that("check_peaktable works as expected", {
@@ -75,3 +113,10 @@ test_that("reshape_chroms works as expected", {
   expect_equal(nrow(chrom_list_long_subset), 2*nrow(Sa_pr[[1]]))
   expect_equal(unique(chrom_list_long_subset$sample), names(Sa_pr)[1:2])
 })
+
+test_that("get_purity works as intended", {
+  data(Sa_pr)
+  pos <- as.numeric(find_peaks(Sa_pr[[1]][,"210"])[1,])
+  expect_equal(class(get_purity(Sa_pr[[1]], pos)),"numeric")
+})
+

@@ -1,10 +1,13 @@
 Type: Package
 Package: chromatographR
 Title: Chromatographic Data Analysis Toolset
-Version: 0.4.8
-Authors@R: 
+Version: 0.5.0
+Authors@R: c(
     person("Ethan", "Bass", , "ethanbass@gmail.com", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0002-6175-6739"))
+           comment = c(ORCID = "0000-0002-6175-6739")),
+    person(c("Hans","W"), "Borchers", role = c("ctb", "cph"),
+            comment = c("Author of savgol and pinv functions bundled from pracma"))
+    )
 Maintainer: Ethan Bass <ethanbass@gmail.com>
 Description: Tools for high-throughput analysis of HPLC-DAD/UV
     chromatograms (or similar data). Includes functions for preprocessing, alignment,
@@ -31,6 +34,7 @@ Imports:
     dynamicTreeCut,
     fastcluster,
     Formula,
+    fs,
     graphics,
     grDevices,
     lattice,
@@ -38,18 +42,22 @@ Imports:
     minpack.lm,
     parallel,
     ptw,
+    purrr,
     pvclust,
     scales,
     stats,
     utils,
     VPdtw
 Suggests: 
+    cowplot,
     ggplot2,
     knitr,
     openxlsx,
     pbapply,
     plotly,
+    reticulate,
     rmarkdown,
+    rsvg,
     spelling,
     testthat (>= 3.0.0),
     vdiffr

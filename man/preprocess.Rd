@@ -11,10 +11,12 @@ preprocess(
   remove.time.baseline = TRUE,
   spec.smooth = TRUE,
   maxI,
-  parallel,
+  parallel = NULL,
   interpolate_rows = TRUE,
   interpolate_cols = TRUE,
-  mc.cores = 2,
+  mc.cores,
+  cl = 2,
+  show_progress = NULL,
   ...
 )
 }
@@ -51,7 +53,16 @@ to TRUE.}
 \item{interpolate_cols}{Logical. Whether to interpolate along dim2. Defaults
 to TRUE.}
 
-\item{mc.cores}{How many cores to use for parallel processing. Defaults to 2.}
+\item{mc.cores}{How many cores to use for parallel processing. Defaults to 2.
+This argument has been deprecated and replaces with \code{cl}.}
+
+\item{cl}{Argument to \code{\link[pbapply]{pblapply}} or \code{\link[parallel]{mclapply}}.
+Either an integer specifying the number of clusters to use for parallel
+processing or a cluster object created by \code{\link[parallel]{makeCluster}}.
+Defaults to 2. On Windows integer values will be ignored.}
+
+\item{show_progress}{Logical. Whether to show progress bar. Defaults to
+\code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.}
 
 \item{\dots}{Further optional arguments to
 \code{\link[ptw:baseline.corr]{baseline.corr}}.}

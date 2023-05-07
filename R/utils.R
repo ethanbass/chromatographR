@@ -10,15 +10,65 @@ check_peaktable <- function(peak_table){
 #' @param peak_table Peak table object
 #' @author Ethan Bass
 #' @noRd
+
 get_chrom_list <- function(x, chrom_list, verbose = FALSE){
-  if (inherits(x, "peak_table")){
-    if (missing(chrom_list)){
-      chrom_list <- try(get(x$args[["chrom_list"]]))
-      if (inherits(chrom_list, "try-error")){
-        stop("Chromatograms not found! Please make sure the appropriate chrom_list
-             object has been loaded")
-      }
+  if (missing(chrom_list)){
+    if (inherits(x, "peak_table")){
+      string <- x$args[["chrom_list"]]
+    } else if (inherits(x, "peak_list")){
+      string <- attr(x, "chrom_list")
     }
+    if (grepl("\\[*\\]", string)){
+      subsetted <- TRUE
+      idx <- extract_idx(string)
+      string <- gsub("\\[\\[?(.*?)\\]?\\]", "", string)
+    } else{
+      subsetted <- FALSE
+    }
+    chrom_list <- try(get(string))
+    if (inherits(chrom_list, "try-error")){
+      stop("Chromatograms not found! Please make sure the appropriate chrom_list
+             object has been loaded")
+    }
+    if (subsetted){
+      chrom_list <- chrom_list[idx]
+    }
+  }
+  check_chrom_list(x, chrom_list, verbose = verbose)
+  chrom_list
+}
+
+#' Extract idx from string
+#' @noRd
+extract_idx <- function(string, chrom_names){
+  idx <- sub(".*?\\[(.*?)\\].*", "\\1", string)
+  if (any(grepl(":", idx))){
+    if (grepl("c(.*?)", idx)){
+      matches <- regmatches(idx, gregexpr('\\(.*\\)', idx))[[1]]
+      idx <- gsub('[()]', '', matches)
+    }
+    split <- as.numeric(strsplit(idx, ":")[[1]])
+    idx <- split[1]:split[2]
+  } else if (grepl("c(.*?)", idx)){
+    if (grepl("[']|[\"]", idx)){
+      matches <- regmatches(idx, gregexpr("'([^']*)'|\"([^\"]*)\"", idx))[[1]]
+      idx <- gsub('[\'\"]', '', matches)
+    } else{
+      matches <- regmatches(idx, gregexpr('\\(.*\\)', idx))[[1]]
+      idx <- gsub('[()]', '', matches)
+      idx <- strsplit(idx,",")[[1]]
+    }
+  }
+  if (any(!is.na(suppressWarnings(as.numeric(idx))))){
+    idx <- as.numeric(idx)
+  }
+  idx
+}
+
+#' Check that chrom_list is matching a peak table or peak list.
+#' @noRd
+check_chrom_list <- function(x, chrom_list, verbose = FALSE){
+  if (inherits(x, "peak_table")){
     if (length(chrom_list) != nrow(x$tab)){
       stop("Dimensions of chrom_list and peak_table do not match.")
     } else{
@@ -26,10 +76,6 @@ get_chrom_list <- function(x, chrom_list, verbose = FALSE){
         warning("Names of chromatograms do not match peak_table")
     }
   } else if (inherits(x, "peak_list")){
-    if (missing(chrom_list)){
-      chrom_list <- try(get(attr(x, "chrom_list")))
-      if (inherits(chrom_list, "try-error")) stop("Chromatograms not found!")
-    }
     if (length(chrom_list) != length(x)){
       stop("Dimensions of chrom_list and peak_list do not match.")
     } else{
@@ -37,7 +83,6 @@ get_chrom_list <- function(x, chrom_list, verbose = FALSE){
         warning("Names of chromatograms do not match peak_list")
     }
   }
-  chrom_list
 }
 
 #' Get retention index
@@ -187,17 +232,33 @@ transfer_metadata <- function(new_object, old_object,
   new_object
 }
 
-
 #' Choose apply function
+#' @importFrom parallel mclapply
 #' @return Returns \code{\link[pbapply]{pblapply}} if \code{progress_bar == TRUE},
 #' otherwise returns \code{\link{lapply}}.
 #' @noRd
-choose_apply_fnc <- function(progress_bar, parallel = FALSE){
-  if (progress_bar){
+choose_apply_fnc <- function(show_progress, parallel = NULL, cl = 2){
+  if (is.null(show_progress)){
+    show_progress <- check_for_pkg("pbapply", return_boolean = TRUE)
+  }
+  if (is.null(parallel)){
+    parallel <- .Platform$OS.type != "windows"
+  } else if (parallel & .Platform$OS.type == "windows"){
+    parallel <- FALSE
+    warning("Parallel processing is not currently available on Windows.")
+  }
+  if (is.null(cl) || cl == 1){
+    parallel <- FALSE
+  }
+  if (!parallel){
+    cl <- 1
+  }
+  if (show_progress){
     check_for_pkg("pbapply")
-    fn <- pbapply::pblapply
-  } else if (!progress_bar && parallel){
-    fn <- parallel::mclapply
+    pblapply <- pbapply::pblapply
+    fn <- purrr::partial(pblapply, cl = cl)
+  } else if (!show_progress && parallel){
+    fn <- purrr::partial(mclapply, mc.cores = cl)
     } else{
     fn <- lapply
   }

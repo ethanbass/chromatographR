@@ -18,13 +18,14 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest,   r: 'release'}
+          - {os: macos-latest,   r: 'release', visual_tests: true}
           - {os: windows-latest, r: 'release'}
           - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
           - {os: ubuntu-latest,   r: 'oldrel-1'}
 
     env:
+      VISUAL_TESTS: ${{ matrix.config.visual_tests }}
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
 
@@ -39,6 +40,11 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+      
       - name: Set up Python 3.9
         uses: actions/setup-python@v3
         with:
@@ -51,12 +57,7 @@ jobs:
           Rscript -e "reticulate::conda_install('r-reticulate', 'python-kaleido')"
           Rscript -e "reticulate::conda_install('r-reticulate', 'plotly', channel = 'plotly')"
           Rscript -e "reticulate::use_miniconda('r-reticulate')"
-
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          extra-packages: any::rcmdcheck
-          needs: check
-
+          
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true

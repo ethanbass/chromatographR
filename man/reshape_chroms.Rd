@@ -4,7 +4,7 @@
 \alias{reshape_chroms}
 \title{Reshapes list of chromatograms from wide to long format}
 \usage{
-reshape_chroms(x, idx, sample_var = "sample", lambdas)
+reshape_chroms(x, idx, sample_var = "sample", lambdas = NULL, rts = NULL)
 }
 \arguments{
 \item{x}{A list of chromatographic matrices in wide format.}
@@ -13,7 +13,9 @@ reshape_chroms(x, idx, sample_var = "sample", lambdas)
 
 \item{sample_var}{String with name of new column containing sample IDs.}
 
-\item{lambdas}{Wavelength(s) to include.}
+\item{lambdas}{Vector specifying wavelength(s) to include.}
+
+\item{rts}{Vector specifying retention times to include.}
 }
 \value{
 A list of chromatographic matrices in long format.

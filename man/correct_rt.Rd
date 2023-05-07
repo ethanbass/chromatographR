@@ -20,7 +20,8 @@ correct_rt(
   penalty = 5,
   maxshift = 50,
   verbose = FALSE,
-  progress_bar,
+  show_progress = NULL,
+  cl = 2,
   ...
 )
 }
@@ -64,9 +65,14 @@ Defaults to 50.}
 
 \item{verbose}{Whether to print verbose output.}
 
-\item{progress_bar}{Logical. Whether to show progress bar. Defaults to
+\item{show_progress}{Logical. Whether to show progress bar. Defaults to
 \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed. Currently works
 only for \code{ptw} alignments.}
+
+\item{cl}{Argument to \code{\link[pbapply]{pblapply}} or \code{\link[parallel]{mclapply}}.
+Either an integer specifying the number of clusters to use for parallel
+processing or a cluster object created by \code{\link[parallel]{makeCluster}}.
+Defaults to 2. On Windows integer values will be ignored.}
 
 \item{\dots}{Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
 The only argument that cannot be changed is \code{warp.type}: this is always

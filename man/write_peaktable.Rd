@@ -7,6 +7,7 @@
 write_peaktable(
   peak_table,
   path,
+  filename = "peak_table",
   format = c("csv", "xlsx"),
   what = c("tab", "pk_meta", "sample_meta", "ref_spectra", "args")
 )
@@ -15,6 +16,8 @@ write_peaktable(
 \item{peak_table}{Peak table object from \code{\link{get_peaktable}}.}
 
 \item{path}{Path to write file.}
+
+\item{filename}{File name. Defaults to "peak_table".}
 
 \item{format}{File format to export. Either \code{csv} or \code{xlsx}.}
 

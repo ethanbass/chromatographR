@@ -29,8 +29,12 @@
 #' @param estimate_purity Logical. Whether to estimate purity or not. Defaults
 #' to FALSE. (If TRUE, this will slow down the function significantly).
 #' @param noise_threshold Noise threshold. Argument to \code{get_purity}.
-#' @param progress_bar Logical. Whether to show progress bar. Defaults to 
+#' @param show_progress Logical. Whether to show progress bar. Defaults to 
 #' \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.
+#' @param cl Argument to \code{\link[pbapply]{pblapply}} or \code{\link[parallel]{mclapply}}.
+#' Either an integer specifying the number of clusters to use for parallel
+#' processing or a cluster object created by \code{\link[parallel]{makeCluster}}.
+#' Defaults to 2. On Windows integer values will be ignored.
 #' @param \dots Additional arguments to \code{\link{find_peaks}}.
 #' @return The result is an S3 object of class \code{peak_list}, containing a nested
 #' list of data.frames containing information about the peaks fitted for each
@@ -69,7 +73,7 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
                       sd.max = 50, max.iter = 100,
                       time.units = c("min", "s", "ms"),
                       estimate_purity = FALSE,  noise_threshold = .001,
-                      progress_bar, ...){
+                      show_progress = NULL, cl = 2, ...){
   time.units <- match.arg(time.units, c("min", "s", "ms"))
   tfac <- switch(time.units, "min" = 1, "s" = 60, "ms" = 60*1000)
   fit <- match.arg(fit, c("egh", "gaussian", "raw"))
@@ -90,10 +94,7 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
     names(chrom_list) <- seq_along(chrom_list)
   }
   peaks<-list()
-  if (missing(progress_bar)){
-    progress_bar <- check_for_pkg("pbapply", return_boolean = TRUE)
-  }
-  laplee <- choose_apply_fnc(progress_bar)
+  laplee <- choose_apply_fnc(show_progress, cl = cl)
   result <- laplee(seq_along(chrom_list), function(sample){
     suppressWarnings(ptable <- lapply(lambdas, function(lambda){
       cbind(sample = names(chrom_list)[sample], lambda,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.peak_table.R
 \name{boxplot.peak_table}
 \alias{boxplot.peak_table}
-\title{Make boxplot of variables from peak table.}
+\title{Make boxplot from peak table.}
 \usage{
 \method{boxplot}{peak_table}(x, formula, ...)
 }

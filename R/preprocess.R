@@ -33,6 +33,13 @@
 #' @param interpolate_cols Logical. Whether to interpolate along dim2. Defaults
 #' to TRUE.
 #' @param mc.cores How many cores to use for parallel processing. Defaults to 2.
+#' This argument has been deprecated and replaces with \code{cl}.
+#' @param cl Argument to \code{\link[pbapply]{pblapply}} or \code{\link[parallel]{mclapply}}.
+#' Either an integer specifying the number of clusters to use for parallel
+#' processing or a cluster object created by \code{\link[parallel]{makeCluster}}.
+#' Defaults to 2. On Windows integer values will be ignored.
+#' @param show_progress Logical. Whether to show progress bar. Defaults to 
+#' \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.
 #' @param \dots Further optional arguments to
 #' \code{\link[ptw:baseline.corr]{baseline.corr}}.
 #' @return The function returns the preprocessed data matrix, with row names and
@@ -61,16 +68,22 @@ preprocess <- function(X, dim1, ## time axis
                           dim2, ## spectral axis
                           remove.time.baseline = TRUE,
                           spec.smooth = TRUE,
-                          maxI, parallel, 
+                          maxI, parallel = NULL, 
                           interpolate_rows = TRUE,
                           interpolate_cols = TRUE,
-                          mc.cores=2, ...){
-  if (missing(parallel)){
-    parallel <- .Platform$OS.type != "windows"
-  } else if (parallel & .Platform$OS.type == "windows"){
-    parallel <- FALSE
-    warning("Parallel processing is not currently available on Windows.")
+                          mc.cores, cl = 2, show_progress = NULL, ...){
+  if (!missing(mc.cores)){
+    warning("The `mc.cores` argument is deprecated. Please use the `cl` argument instead.",
+            immediate. = TRUE)
+    cl <- mc.cores
   }
+  if (!is.null(parallel)){
+    warning("The `parallel` argument is deprecated. Just use the `cl` argument to enable
+            parallel processing.",
+            immediate. = TRUE)
+  }
+  laplee <- choose_apply_fnc(show_progress = show_progress, parallel = parallel,
+                             cl = cl)
   if (is.matrix(X)){
     X <- list(X)
     return_matrix <- TRUE
@@ -81,43 +94,49 @@ preprocess <- function(X, dim1, ## time axis
     interpolate_cols <- FALSE
   }
   if (interpolate_rows && missing(dim1)){
-    warning("...Times not provided. Extrapolating from matrix dimensions for interpolation.",
-            immediate. = TRUE)
+    message("...Times not provided. Extrapolating from matrix dimensions for interpolation.")
     limits <- sapply(X,function(x){
       ts <- rownames(x)
       c(head(ts,1), tail(ts,1))})
-    start <- round(max(as.numeric(limits[1,])),2)
-    end <- floor(min(as.numeric(limits[2,])))
-    dim1 <- seq(start,end,by=.01)
+    start <- ceiling(max(as.numeric(limits[1,]))*100)/100
+    end <- floor((min(as.numeric(limits[2,])))*100)/100
+    dim1 <- seq(start, end, by = .01)
   }
   if (interpolate_cols && missing(dim2)){
-    warning("...Wavelengths not provided. Extrapolating from matrix dimensions for interpolation.",
-            immediate. = TRUE)
+    message("...Wavelengths not provided. Extrapolating from matrix dimensions for interpolation.")
     dim2 <- as.numeric(colnames(X[[1]]))
   }
-    if (parallel){
-      if (length(find.package('parallel', quiet=TRUE))==0){
-        stop("Parallel must be installed to enable parallel processing.")
-    }
-      X <- parallel::mclapply(X, FUN=preprocess_matrix,
-               dim1=dim1,
-               dim2=dim2,
-               remove.time.baseline = remove.time.baseline,
-               spec.smooth = spec.smooth, maxI = maxI,
-               interpolate_rows = interpolate_rows,
-               interpolate_cols = interpolate_cols,
-               mc.cores=mc.cores,
-               ...)
-    } else{
-      X <- lapply(X, FUN=preprocess_matrix,
-             dim1=dim1,
-             dim2=dim2,
-             remove.time.baseline = remove.time.baseline,
-             spec.smooth = spec.smooth, maxI = maxI,
-             interpolate_rows = interpolate_rows,
-             interpolate_cols = interpolate_cols,
-             ...)
-    }
+  X <- laplee(X, FUN = preprocess_matrix,
+                          dim1 = dim1,
+                          dim2 = dim2,
+                          remove.time.baseline = remove.time.baseline,
+                          spec.smooth = spec.smooth, maxI = maxI,
+                          interpolate_rows = interpolate_rows,
+                          interpolate_cols = interpolate_cols,
+                          ...)
+    # if (parallel){
+    #   if (length(find.package('parallel', quiet=TRUE)) == 0){
+    #     stop("Parallel must be installed to enable parallel processing.")
+    # }
+    #   X <- parallel::mclapply(X, FUN=preprocess_matrix,
+    #            dim1=dim1,
+    #            dim2=dim2,
+    #            remove.time.baseline = remove.time.baseline,
+    #            spec.smooth = spec.smooth, maxI = maxI,
+    #            interpolate_rows = interpolate_rows,
+    #            interpolate_cols = interpolate_cols,
+    #            mc.cores=mc.cores,
+    #            ...)
+    # } else{
+    #   X <- lapply(X, FUN=preprocess_matrix,
+    #          dim1=dim1,
+    #          dim2=dim2,
+    #          remove.time.baseline = remove.time.baseline,
+    #          spec.smooth = spec.smooth, maxI = maxI,
+    #          interpolate_rows = interpolate_rows,
+    #          interpolate_cols = interpolate_cols,
+    #          ...)
+    # }
     if (return_matrix){
       X[[1]]
     } else X
@@ -137,6 +156,7 @@ preprocess_matrix <- function(X,
     stop("X should be a matrix!")
   metadata <- attributes(X)
   metadata[c("dimnames", "names", "row.names", "dim", "class", "levels")] <- NULL
+  
   ## possibly resize matrix to a lower dimension - faster, noise averaging
   if (interpolate_rows){
     if (length(tpoints <- as.numeric(rownames(X))) == 0)
@@ -154,17 +174,21 @@ preprocess_matrix <- function(X,
       stop("No extrapolation allowed - check dim2 argument")
     X <- t(apply(X, 1, function(xx) approx(lambdas, xx, dim2)$y)) 
   } else dim2 <- colnames(X)
-  
-  if (spec.smooth)
+  if (ncol(X) == 1){
+    spec.smooth <- FALSE
+  }
+  if (spec.smooth){
     X <- t(apply(X, 1, function(xxx) smooth.spline(xxx)$y))
-  
-  if (remove.time.baseline)
+  }
+  if (remove.time.baseline){
     X <- apply(X, 2, baseline.corr, ...)
-  if (min(X, na.rm = TRUE) < 0)
-    # X <- X - min(X)
+  }
+  if (min(X, na.rm = TRUE) < 0){
     X[X < 0] <- 0
-  if (!missing(maxI))
+  }
+  if (!missing(maxI)){
     X <- maxI * X / max(X)
+  }
   dimnames(X) <- list(dim1, dim2)
   attributes(X) <- c(attributes(X), metadata)
   X

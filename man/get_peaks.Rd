@@ -13,7 +13,8 @@ get_peaks(
   time.units = c("min", "s", "ms"),
   estimate_purity = FALSE,
   noise_threshold = 0.001,
-  progress_bar,
+  show_progress = NULL,
+  cl = 2,
   ...
 )
 }
@@ -41,8 +42,13 @@ to FALSE. (If TRUE, this will slow down the function significantly).}
 
 \item{noise_threshold}{Noise threshold. Argument to \code{get_purity}.}
 
-\item{progress_bar}{Logical. Whether to show progress bar. Defaults to 
+\item{show_progress}{Logical. Whether to show progress bar. Defaults to 
 \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.}
+
+\item{cl}{Argument to \code{\link[pbapply]{pblapply}} or \code{\link[parallel]{mclapply}}.
+Either an integer specifying the number of clusters to use for parallel
+processing or a cluster object created by \code{\link[parallel]{makeCluster}}.
+Defaults to 2. On Windows integer values will be ignored.}
 
 \item{\dots}{Additional arguments to \code{\link{find_peaks}}.}
 }

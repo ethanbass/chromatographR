@@ -9,6 +9,7 @@ plot_all_spectra(
   peak_table,
   chrom_list,
   chrs = "all",
+  engine = c("base", "ggplot2", "plotly"),
   plot_spectrum = TRUE,
   export_spectrum = TRUE,
   scale_spectrum = TRUE,
@@ -30,6 +31,9 @@ try to find the \code{chrom_list} object used to create the provided
 \code{peak_table}.}
 
 \item{chrs}{Vector of chromatograms to plot.}
+
+\item{engine}{Which plotting engine to use: \code{base}, \code{ggplot2},
+or \code{plotly}.}
 
 \item{plot_spectrum}{Logical. If TRUE, plots the spectrum of the chosen
 peak.}
