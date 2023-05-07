@@ -12,7 +12,7 @@ at the specified wavelengths."><meta property="og:image" content="https://ethanb
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +66,8 @@ at the specified wavelengths.</p>
 <span>  time.units <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"min"</span>, <span class="st">"s"</span>, <span class="st">"ms"</span><span class="op">)</span>,</span>
 <span>  estimate_purity <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  noise_threshold <span class="op">=</span> <span class="fl">0.001</span>,</span>
-<span>  <span class="va">progress_bar</span>,</span>
+<span>  show_progress <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  cl <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -112,9 +113,16 @@ to FALSE. (If TRUE, this will slow down the function significantly).</p></dd>
 <dd><p>Noise threshold. Argument to <code>get_purity</code>.</p></dd>
 
 
-<dt>progress_bar</dt>
+<dt>show_progress</dt>
 <dd><p>Logical. Whether to show progress bar. Defaults to 
 <code>TRUE</code> if <code><a href="https://rdrr.io/pkg/pbapply/man/pbapply.html" class="external-link">pbapply</a></code> is installed.</p></dd>
+
+
+<dt>cl</dt>
+<dd><p>Argument to <code><a href="https://rdrr.io/pkg/pbapply/man/pbapply.html" class="external-link">pblapply</a></code> or <code><a href="https://rdrr.io/r/parallel/mclapply.html" class="external-link">mclapply</a></code>.
+Either an integer specifying the number of clusters to use for parallel
+processing or a cluster object created by <code><a href="https://rdrr.io/r/parallel/makeCluster.html" class="external-link">makeCluster</a></code>.
+Defaults to 2. On Windows integer values will be ignored.</p></dd>
 
 
 <dt>...</dt>

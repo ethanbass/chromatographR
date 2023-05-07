@@ -12,7 +12,7 @@ comprising the peak, using the method described in Stahl 2003."><meta property="
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,6 +62,7 @@ comprising the peak, using the method described in Stahl 2003.</p>
 <span>  <span class="va">pos</span>,</span>
 <span>  weight <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  cutoff <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  noise_variance <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  noise_threshold <span class="op">=</span> <span class="fl">0.01</span>,</span>
 <span>  <span class="va">lambdas</span>,</span>
 <span>  try <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -75,16 +76,21 @@ comprising the peak, using the method described in Stahl 2003.</p>
 
 
 <dt>pos</dt>
-<dd><p>A vector containing peak information</p></dd>
+<dd><p>A vector containing the center, lower and upper bounds of a peak
+as numeric indices.</p></dd>
 
 
 <dt>weight</dt>
-<dd><p>weight provided to <code><a href="get_agilent_threshold.html">get_agilent_threshold</a></code></p></dd>
+<dd><p>Weight provided to <code><a href="get_agilent_threshold.html">get_agilent_threshold</a></code>.</p></dd>
 
 
 <dt>cutoff</dt>
 <dd><p>Proportion of maximum absorbance to use as cutoff.
 Argument to <code><a href="trim_peak.html">trim_peak</a></code>.</p></dd>
+
+
+<dt>noise_variance</dt>
+<dd><p>Variance of noise. Argument to <code><a href="get_agilent_threshold.html">get_agilent_threshold</a></code>.</p></dd>
 
 
 <dt>noise_threshold</dt>

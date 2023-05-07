@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,6 +57,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">write_peaktable</span><span class="op">(</span></span>
 <span>  <span class="va">peak_table</span>,</span>
 <span>  <span class="va">path</span>,</span>
+<span>  filename <span class="op">=</span> <span class="st">"peak_table"</span>,</span>
 <span>  format <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"csv"</span>, <span class="st">"xlsx"</span><span class="op">)</span>,</span>
 <span>  what <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tab"</span>, <span class="st">"pk_meta"</span>, <span class="st">"sample_meta"</span>, <span class="st">"ref_spectra"</span>, <span class="st">"args"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -70,6 +71,10 @@
 
 <dt>path</dt>
 <dd><p>Path to write file.</p></dd>
+
+
+<dt>filename</dt>
+<dd><p>File name. Defaults to "peak_table".</p></dd>
 
 
 <dt>format</dt>

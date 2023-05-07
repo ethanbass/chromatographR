@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,7 +80,7 @@
 Bass<sup>1</sup>
 </h4>
             
-            <h4 data-toc-skip class="date">2023-05-06</h4>
+            <h4 data-toc-skip class="date">2023-05-07</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/HEAD/vignettes/chromatographR.Rmd" class="external-link"><code>vignettes/chromatographR.Rmd</code></a></small>
       <div class="d-none name"><code>chromatographR.Rmd</code></div>
@@ -194,6 +194,8 @@ parameters before choosing values to use on your whole dataset.</p>
 &gt; 
 &gt; dat.pr &lt;- preprocess(Sa, dim1 = new.ts, dim2 = new.lambdas,
 +            parallel = FALSE, p = .001, lambda = 1e5)</code></pre>
+<pre><code>Warning in preprocess(Sa, dim1 = new.ts, dim2 = new.lambdas, parallel = FALSE, : The `parallel` argument is deprecated. Just use the `cl` argument to enable
+            parallel processing.</code></pre>
 </div>
 <div class="section level3">
 <h3 id="alignment">Alignment<a class="anchor" aria-label="anchor" href="#alignment"></a>
@@ -543,7 +545,7 @@ attached base packages:
 [8] base     
 
 other attached packages:
-[1] chromatographR_0.4.8 knitr_1.42          
+[1] chromatographR_0.5.0 knitr_1.42          
 
 loaded via a namespace (and not attached):
  [1] sass_0.4.6            utf8_1.2.3            generics_0.1.3       

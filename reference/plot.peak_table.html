@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,7 +57,6 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for peak_table</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
-<span>  <span class="va">...</span>,</span>
 <span>  <span class="va">loc</span>,</span>
 <span>  <span class="va">chrom_list</span>,</span>
 <span>  what <span class="op">=</span> <span class="st">"peak"</span>,</span>
@@ -71,7 +70,8 @@
 <span>  scale_spectrum <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  export_spectrum <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  engine <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"base"</span>, <span class="st">"plotly"</span><span class="op">)</span></span>
+<span>  engine <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"base"</span>, <span class="st">"plotly"</span>, <span class="st">"ggplot"</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -80,10 +80,6 @@
     <dl><dt>x</dt>
 <dd><p>The peak table (output from <code><a href="get_peaktable.html">get_peaktable</a></code>
 function).</p></dd>
-
-
-<dt>...</dt>
-<dd><p>Additional arguments.</p></dd>
 
 
 <dt>loc</dt>
@@ -155,6 +151,10 @@ to TRUE.</p></dd>
 
 <dt>engine</dt>
 <dd><p>Which plotting engine to use: either <code>base</code> or <code>plotly</code>.</p></dd>
+
+
+<dt>...</dt>
+<dd><p>Additional arguments to <code><a href="https://rdrr.io/r/graphics/boxplot.html" class="external-link">boxplot</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

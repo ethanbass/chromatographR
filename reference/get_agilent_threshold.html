@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,14 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_agilent_threshold</span><span class="op">(</span><span class="va">x</span>, <span class="va">pos</span>, weight <span class="op">=</span> <span class="fl">1</span>, noise_threshold <span class="op">=</span> <span class="fl">0.005</span>, <span class="va">lambdas</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_agilent_threshold</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">pos</span>,</span>
+<span>  weight <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  noise_variance <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  noise_threshold <span class="op">=</span> <span class="fl">0.005</span>,</span>
+<span>  <span class="va">lambdas</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -68,7 +75,11 @@
 
 
 <dt>weight</dt>
-<dd><p>scaling parameter affecting stringency of threshold</p></dd>
+<dd><p>scaling parameter affecting stringency of threshold.</p></dd>
+
+
+<dt>noise_variance</dt>
+<dd><p>Variance of noise. Argument to <code>get_agilent_threshold</code>.</p></dd>
 
 
 <dt>noise_threshold</dt>

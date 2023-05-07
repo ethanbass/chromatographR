@@ -12,7 +12,7 @@ plot_spectrum."><meta property="og:image" content="https://ethanbass.github.io/c
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,6 +62,7 @@ plot_spectrum."><meta property="og:image" content="https://ethanbass.github.io/c
 <span>  <span class="va">peak_table</span>,</span>
 <span>  <span class="va">chrom_list</span>,</span>
 <span>  chrs <span class="op">=</span> <span class="st">"all"</span>,</span>
+<span>  engine <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"base"</span>, <span class="st">"ggplot2"</span>, <span class="st">"plotly"</span><span class="op">)</span>,</span>
 <span>  plot_spectrum <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  export_spectrum <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  scale_spectrum <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -92,6 +93,11 @@ try to find the <code>chrom_list</code> object used to create the provided
 
 <dt>chrs</dt>
 <dd><p>Vector of chromatograms to plot.</p></dd>
+
+
+<dt>engine</dt>
+<dd><p>Which plotting engine to use: <code>base</code>, <code>ggplot2</code>,
+or <code>plotly</code>.</p></dd>
 
 
 <dt>plot_spectrum</dt>

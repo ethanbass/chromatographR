@@ -12,7 +12,7 @@ plots the spectrum a particular retention time for a given chromatogram."><meta 
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.4.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,7 +70,7 @@ plots the spectrum a particular retention time for a given chromatogram.</p>
 <span>  export_spectrum <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  what <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"peak"</span>, <span class="st">"rt"</span>, <span class="st">"idx"</span>, <span class="st">"click"</span><span class="op">)</span>,</span>
-<span>  engine <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"base"</span>, <span class="st">"plotly"</span><span class="op">)</span>,</span>
+<span>  engine <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"base"</span>, <span class="st">"plotly"</span>, <span class="st">"ggplot2"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -142,7 +142,7 @@ mode.</p></dd>
 
 
 <dt>engine</dt>
-<dd><p>Which plotting engine to use: either <code>base</code> or <code>plotly</code>.</p></dd>
+<dd><p>Which plotting engine to use: <code>base</code>, <code>ggplot2</code>, or <code>plotly</code>.</p></dd>
 
 
 <dt>...</dt>
