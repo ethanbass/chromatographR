@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,7 +80,7 @@
 Bass<sup>1</sup>
 </h4>
             
-            <h4 data-toc-skip class="date">2023-05-07</h4>
+            <h4 data-toc-skip class="date">2023-06-01</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/HEAD/vignettes/chromatographR.Rmd" class="external-link"><code>vignettes/chromatographR.Rmd</code></a></small>
       <div class="d-none name"><code>chromatographR.Rmd</code></div>
@@ -185,8 +185,8 @@ parameters before choosing values to use on your whole dataset.</p>
 &gt; 
 &gt; matplot(x=tpoints, y=Sa[[i]][,lambda],
 +        type='l', ylab='Abs (mAU)', xlab='Time (min)')
-&gt; matplot(x=tpoints, y = ptw::baseline.corr(Sa[[i]][,lambda],p=.001,lambda=1e5),
-+        type='l', add = T, col='blue', lty = 3)</code></pre>
+&gt; matplot(x=tpoints, y = ptw::baseline.corr(Sa[[i]][,lambda],p = .001,lambda = 1e5),
++        type='l', add = TRUE, col='blue', lty = 3)</code></pre>
 <p><img src="chromatographR_files/figure-html/choosing%20parameters-1.png" width="600px"></p>
 <pre class="text"><code>&gt; # choose dimensions for interpolation
 &gt; new.ts &lt;- seq(10,18.66,by=.01) # choose time-points
@@ -233,7 +233,7 @@ Sometimes less can actually be more here – for example, wavelengths with
 fewer peaks may sometimes yield better warping models. (Also see the
 documentation for <a href="https://CRAN.R-project.org/package=ptw" class="external-link">ptw</a> for more guidance
 on warp function optimization).</p>
-<pre class="text"><code>&gt; warping.models &lt;- correct_rt(dat.pr, what = "models", lambdas=c("210"), scale = TRUE)
+<pre class="text"><code>&gt; warping.models &lt;- correct_rt(dat.pr, what = "models", lambdas = c("210"), scale = TRUE)
 &gt; warp &lt;- correct_rt(chrom_list = dat.pr, models = warping.models, what = "corrected.values")</code></pre>
 <p>We can then use the following code snippet to compare the alignment
 of warped (top panel) and unwarped (bottom panel) chromatograms.</p>
@@ -283,10 +283,10 @@ adjusted to control the degree of warping.</p>
 &gt; 
 &gt; par(mfrow=c(2,1))
 &gt; plot_chroms(warp, lambdas = c("210","260"))
-&gt; legend("topleft", legend="vpdtw", bty = "n")
+&gt; legend("topleft", legend = "vpdtw", bty = "n")
 &gt; 
 &gt; plot_chroms(dat.pr, lambdas = c("210","260"))
-&gt; legend("topleft", legend="raw", bty = "n")</code></pre>
+&gt; legend("topleft", legend = "raw", bty = "n")</code></pre>
 <p><img src="chromatographR_files/figure-html/unnamed-chunk-3-1.png" width="600px"></p>
 <pre class="text"><code>&gt; par(oldpar)</code></pre>
 <p>In this case the alignments produced by the two algorithms are very
@@ -337,9 +337,9 @@ asymmetrical peaks. Even though the peaks are fully filled in when the
 more accurate.</p>
 <pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE)
 &gt; par(mfrow=c(3,1))
-&gt; plot(pks_gauss, index=1, lambda='210')
-&gt; plot(pks_egh, index=1, lambda='210')
-&gt; plot(pks_raw, index=1, lambda='210')</code></pre>
+&gt; plot(pks_gauss, index = 1, lambda = '210')
+&gt; plot(pks_egh, index = 1, lambda = '210')
+&gt; plot(pks_raw, index = 1, lambda = '210')</code></pre>
 <p><img src="chromatographR_files/figure-html/plot_peaks-1.png" width="600px"></p>
 <pre class="text"><code>&gt; par(oldpar)</code></pre>
 </div>
@@ -401,7 +401,7 @@ then be normalized (e.g. by dividing out the sample weight) using the
 </h5>
 <p>The <code>mirror_plot</code> function provides a quick way to
 visually compare results across treatment groups.</p>
-<pre class="text"><code>&gt; mirror_plot(pk_tab, lambdas = c("210","260"), var = "trt", legend_size=2)</code></pre>
+<pre class="text"><code>&gt; mirror_plot(pk_tab, lambdas = c("210","260"), var = "trt", legend_size = 2)</code></pre>
 <p><img src="chromatographR_files/figure-html/unnamed-chunk-5-1.png" width="600px"></p>
 </div>
 <div class="section level5">
@@ -421,9 +421,9 @@ peak in the peak table. Alternatively, you can choose the chromatogram
 index and wavelength using the <code>chr</code> and <code>lambda</code>
 arguments.</p>
 <pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE)
-&gt; par(mfrow=c(2,1))
-&gt; peak="V7"
-&gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list=warp, verbose=FALSE)</code></pre>
+&gt; par(mfrow = c(2,1))
+&gt; peak = "V7"
+&gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp, verbose = FALSE)</code></pre>
 <p><img src="chromatographR_files/figure-html/plot%20spectra-1.png" width="600px"></p>
 <pre class="text"><code>&gt; par(oldpar)</code></pre>
 <p>The <code>plot_spectrum</code> function can also generate interactive
@@ -545,14 +545,14 @@ attached base packages:
 [8] base     
 
 other attached packages:
-[1] chromatographR_0.5.0 knitr_1.42          
+[1] chromatographR_0.5.1 knitr_1.43          
 
 loaded via a namespace (and not attached):
  [1] sass_0.4.6            utf8_1.2.3            generics_0.1.3       
  [4] tidyr_1.3.0           bitops_1.0-7          xml2_1.3.4           
  [7] fastcluster_1.2.3     stringi_1.7.12        lattice_0.21-8       
 [10] digest_0.6.31         magrittr_2.0.3        caTools_1.18.2       
-[13] chromConverter_0.2.1  evaluate_0.20         grid_4.3.0           
+[13] chromConverter_0.2.1  evaluate_0.21         grid_4.3.0           
 [16] dynamicTreeCut_1.63-1 fastmap_1.1.1         cellranger_1.1.0     
 [19] rprojroot_2.0.3       jsonlite_1.8.4        Matrix_1.5-4         
 [22] Formula_1.2-5         purrr_1.0.1           fansi_1.0.4          
