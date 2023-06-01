@@ -152,8 +152,9 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
       pkcenters.cl[sing] <- max(pkcenters.cl) + seq_along(sing)
     }
     vars <- c("rt", "start", "end", "sd", "tau", "FWHM", "r.squared", "purity")
-    cl.centers <- aggregate(xx[,vars], by = list(pkcenters.cl), FUN = "mean",
-                            na.rm = TRUE, na.action = "na.pass")[,-1]
+    vars.idx <- which(colnames(xx) %in% vars)
+    cl.centers <- aggregate(xx[,vars.idx], by = list(pkcenters.cl), FUN = "mean",
+                            na.action = "na.pass")[,-1]
     ncl <- length(cl.centers$rt)
     
     ## re-order clusters from small to large rt

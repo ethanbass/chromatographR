@@ -1,3 +1,13 @@
+# chromatographR 0.5.1
+
+* In `plot_chroms`, `show_legend` now defaults to FALSE to prevent overloading of the plot.
+
+#### Bug fixes
+
+* Fixed syntactical bug in `get_peaktable` when applied to gaussian peak list.
+* Fixed bug caused by improper transfer of `time.units` metadata by `filter_peaks` function.
+* Added default for missing `time.units` in `plot.peak_list`.
+
 # chromatographR 0.5.0
 
 #### New features

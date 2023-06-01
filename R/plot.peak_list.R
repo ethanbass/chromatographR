@@ -32,12 +32,13 @@
 #' @rdname plot.peak_list
 #' @export
 
-plot.peak_list <- function(x, ..., chrom_list, index=1, lambda=NULL,
-                           points=FALSE, ticks=FALSE, a=0.5, color=NULL,
-                           cex.points=0.5, numbers = FALSE, cex.font = 0.5, 
+plot.peak_list <- function(x, ..., chrom_list, index = 1, lambda = NULL,
+                           points = FALSE, ticks = FALSE, a = 0.5, color = NULL,
+                           cex.points = 0.5, numbers = FALSE, cex.font = 0.5, 
                            y.offset = 25, plot_purity = FALSE, res){
   time.units <- attributes(x)$time.units
-  tfac <- switch(time.units, "min" = 1, "s" = 1/60, "ms" = 1/60000)
+  time.units <- ifelse(is.null(time.units), "", time.units)
+  tfac <- switch(time.units, "min" = 1, "s" = 1/60, "ms" = 1/60000, 1)
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(x)
   }
@@ -50,7 +51,7 @@ plot.peak_list <- function(x, ..., chrom_list, index=1, lambda=NULL,
   if (is.numeric(lambda)){
     lambda <- as.character(lambda)
   }
-  new.ts <- get_times(x=chrom_list, index=index)
+  new.ts <- get_times(x = chrom_list, index = index)
   y <- chrom_list[[index]][,lambda]
   pks <- data.frame(x[[index]][[lambda]])
   if ("r.squared" %in% colnames(pks)){
@@ -58,20 +59,20 @@ plot.peak_list <- function(x, ..., chrom_list, index=1, lambda=NULL,
   } else{
     fit <- "raw"
   }
-  plot(new.ts, y, type='l', xlab='', ylab='', xaxt='n', yaxt='n', ...)
+  plot(new.ts, y, type = 'l', xlab = '', ylab = '', xaxt = 'n', yaxt = 'n', ...)
   if (points){
-    points(pks$rt, pks$height, pch=20, cex=cex.points, col='red')
+    points(pks$rt, pks$height, pch = 20, cex=cex.points, col = 'red')
   }
   if (ticks){
-    arrows(pks$start, y[which(new.ts %in% pks$start)]-5,
-           pks$start, y[which(new.ts %in% pks$start)]+5,
-           col="blue", length=0)
-    arrows(pks$end, y[which(new.ts %in% pks$end)]-5,
-           pks$end,y[which(new.ts %in% pks$end)]+5,
-           col="blue", length=0)
+    arrows(pks$start, y[which(new.ts %in% pks$start)] - 5,
+           pks$start, y[which(new.ts %in% pks$start)] + 5,
+           col="blue", length = 0)
+    arrows(pks$end, y[which(new.ts %in% pks$end)] - 5,
+           pks$end,y[which(new.ts %in% pks$end)] + 5,
+           col="blue", length = 0)
   }
   if (numbers){
-    text(pks$rt, y[pks$rt] + y.offset, labels=seq_len(nrow(pks)), cex=cex.font)
+    text(pks$rt, y[pks$rt] + y.offset, labels=seq_len(nrow(pks)), cex = cex.font)
   }
   if (missing(res))
     res <- get_time_resolution(chrom_list)
@@ -87,7 +88,7 @@ plot.peak_list <- function(x, ..., chrom_list, index=1, lambda=NULL,
       else if (fit == "egh"){
         yvals <- egh(x = peak.loc, center = pks$rt[i],
                      width=pks$sd[i]*tfac, height = pks$height[i],
-                     tau=pks$tau[i]*tfac)
+                     tau = pks$tau[i]*tfac)
         if (is.null(color))
           color <- "purple"
       }
@@ -97,7 +98,7 @@ plot.peak_list <- function(x, ..., chrom_list, index=1, lambda=NULL,
           color <- "hotpink"
       }
       draw_trapezoid(peak.loc, yvals, color, a)
-    }, silent=TRUE)
+    }, silent = TRUE)
   }
   if (plot_purity){
     try({
@@ -113,10 +114,10 @@ plot.peak_list <- function(x, ..., chrom_list, index=1, lambda=NULL,
         p <- get_purity_values(chrom_list[[index]], pos)
         # lines(as.numeric(new.ts[idx]), -scales::rescale(p, c(0,20)), col = "darkgray", lty=3, lwd=1.5)
         lim=-20
-        draw_trapezoid(new.ts[idx], scales::rescale(p, c(0,lim)), color="black", a=0.6)
-        abline(h=lim, lty=3, col="darkgray")
+        draw_trapezoid(new.ts[idx], scales::rescale(p, c(0,lim)), color="black", a = 0.6)
+        abline(h = lim, lty = 3, col = "darkgray")
       })
-    }, silent=TRUE)
+    }, silent = TRUE)
   }
 }
 

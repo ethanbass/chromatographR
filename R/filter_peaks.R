@@ -62,17 +62,13 @@ filter_peaks <- function(peak_list, min_height, min_area,
            lapply(smpl,
                   function(comp)
                     comp[which(comp[,"sd"] < max_sd &
-                           comp[,"sd"] > min_sd &
-                           comp[,"height"] > min_height &
-                           comp[,"area"] > min_area &
-                           comp[,"rt"] > as.numeric(min_rt) &
-                           comp[,"rt"] < as.numeric(max_rt)), , drop = FALSE]))
+                           comp[, "sd"] > min_sd &
+                           comp[, "height"] > min_height &
+                           comp[, "area"] > min_area &
+                           comp[, "rt"] > as.numeric(min_rt) &
+                           comp[, "rt"] < as.numeric(max_rt)), , drop = FALSE]))
   att <- attributes(peak_list)
-  structure(result,
-            chrom_list = att$chrom_list,
-            lambdas = att$lambdas, fit=att$fit, sd.max=att$sd.max,
-            max.iter=att$max.iter,
-            class="peak_list")
+  transfer_metadata(result, peak_list, c('names','row.names','dim','dimnames'))
 }
 
 #' Filter peak table

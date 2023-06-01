@@ -57,5 +57,5 @@ Also see the [contributing.md](https://github.com/ethanbass/chromatographR/blob/
 
 If you use chromatographR in published work, please cite it as follows:
 
-Bass, E. (2023). chromatographR: chromatographic data analysis toolset (version 0.5.0).
+Bass, E. (2023). chromatographR: chromatographic data analysis toolset (version 0.5.1).
 http://doi.org/10.5281/zenodo.6944334
