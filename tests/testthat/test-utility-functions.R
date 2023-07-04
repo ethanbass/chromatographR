@@ -97,7 +97,7 @@ test_that("check_for_pkg functions as expected",{
 
 test_that("reshape_peaktable works as expected",{
   data(pk_tab)
-  pktab_long<-reshape_peaktable(pk_tab)
+  pktab_long <- reshape_peaktable(pk_tab)
   expect_equal(ncol(pktab_long),4)
   expect_equal(nrow(pktab_long), nrow(pk_tab)*ncol(pk_tab))
 })

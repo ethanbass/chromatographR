@@ -1,3 +1,8 @@
+# chromatographR 0.5.2
+
+* Added `metadata` argument to `reshape_peaktable` for filtering metadata fields.
+* Added option to for renaming peaks via `reshape_peaktable` by providing a named list.
+
 # chromatographR 0.5.1
 
 * In `plot_chroms`, `show_legend` now defaults to FALSE to prevent overloading of the plot.

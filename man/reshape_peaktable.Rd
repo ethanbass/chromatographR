@@ -4,12 +4,16 @@
 \alias{reshape_peaktable}
 \title{Reshapes peak table from wide to long format}
 \usage{
-reshape_peaktable(x, peaks)
+reshape_peaktable(x, peaks, metadata)
 }
 \arguments{
 \item{x}{A \code{peak_table} object.}
 
-\item{peaks}{A character vector specifying peaks to include.}
+\item{peaks}{A character vector specifying the peaks to include. If the
+character vector is named, the names of the vector elements will be used in
+place of the original peak names.}
+
+\item{metadata}{A character vector specifying the metadata fields to include.}
 }
 \value{
 A data.frame containing the information for the specified peaks in

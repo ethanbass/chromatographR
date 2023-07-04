@@ -191,17 +191,18 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
         })
       })
         # fix times
-        old_ts <- c(rep(NA,short), get_times(chrom_list_og, index = reference))
+        old_ts <- c(rep(NA, short), get_times(chrom_list_og, index = reference))
         times <- suppressWarnings(stats::approx(x = jset[,reference],
                                                 y = old_ts, 1:jmax)$y)
         idx_start <- which.min(times)
         if (idx_start > 1){
-          beg <- sort(seq(from = times[idx_start]-res, by = -res, length.out = idx_start-1),
-                    decreasing = FALSE)
+          beg <- sort(seq(from = times[idx_start] - res, by = -res,
+                          length.out = idx_start - 1), decreasing = FALSE)
         } else beg <- NULL
         idx_end <- which.max(times)
         if (idx_end < length(times)){
-          end <- seq(from = times[idx_end]+res, length.out = length(times) - idx_end, by = res)
+          end <- seq(from = times[idx_end] + res,
+                     length.out = length(times) - idx_end, by = res)
         } else end <- NULL
         new.times <- c(beg, times[!is.na(times)], end)
         result <- mapply(function(x,idx){
@@ -248,16 +249,15 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
 #' @export correct_peaks
 correct_peaks <- function(peak_list, mod_list){
   mapply(function(samp, mod){
-    lapply(samp,
-           function(profile){
-             if (nrow(profile) > 0) {
+    lapply(samp, function(profile){
+             if (nrow(profile) > 0){
                cbind(profile,
                      rt.cor = c(predict(mod, profile[,1], what = "time")))
              } else {
                cbind(profile, rt.cor = rep(0, 0))
              }
-           })},
-    peak_list, mod_list, SIMPLIFY = FALSE)
+           }
+        )}, peak_list, mod_list, SIMPLIFY = FALSE)
 }
 
 #' Plot PTW alignments
@@ -278,29 +278,33 @@ plot.ptw_list <- function(x, lambdas, legend = TRUE, ...){
   ts <- as.numeric(colnames(x[[1]]$sample))
   
   if (missing(lambdas)){
-    lambdas<-all.lambdas
+    lambdas <- all.lambdas
   }
   if (any(!(lambdas %in% all.lambdas))){
     stop("Lambdas not found. Please check argument and try again")
   }
   
   lambda.idx <- which(lambdas %in% all.lambdas)
-  
+  # plot warped samples
   plot.new()
   plot.window(xlim=c(head(ts,1), tail(ts,1)),
-              ylim=c(0, max(sapply(x, function(xx) xx$warped.sample), na.rm=TRUE)*1.2))
+              ylim=c(0, max(sapply(x, function(xx) xx$warped.sample), na.rm = TRUE)*1.2))
   for (i in seq_along(x)){
-    matplot(ts, t(x[[i]]$warped.sample[lambda.idx,, drop=FALSE]), type='l',add=TRUE)
+    matplot(ts, t(x[[i]]$warped.sample[lambda.idx, , drop = FALSE]),
+            type = 'l', add = TRUE)
   }
-  if (legend)
-    legend("topright", legend="ptw", bty = "n")
-  
+  if (legend){
+    legend("topright", legend = "ptw", bty = "n")
+  }
+  # plot reference
   plot.new()
-  plot.window(xlim=c(head(ts,1),tail(ts,1)),
-              ylim=c(0, max(x[[i]]$reference, na.rm = TRUE)*1.2))
+  plot.window(xlim = c(head(ts,1), tail(ts,1)),
+              ylim = c(0, max(x[[i]]$reference, na.rm = TRUE)*1.2))
   for (i in seq_along(x)){
-    matplot(ts, t(x[[i]]$sample[lambda.idx,, drop=FALSE]), type='l', add=TRUE)
+    matplot(ts, t(x[[i]]$sample[lambda.idx, , drop = FALSE]),
+            type = 'l', add = TRUE)
   }
-  if (legend)
-    legend("topright", legend="queries", bty = "n")
+  if (legend){
+    legend("topright", legend = "queries", bty = "n")
+  }
 }

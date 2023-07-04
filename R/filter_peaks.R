@@ -139,9 +139,9 @@ filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value, lambda,
   } else (idx.lambda <- seq_along(peak_table$tab))
   idx <- Reduce(intersect, list(idx.rt, idx.val, idx.lambda))
   peak_table$tab <- peak_table$tab[,idx, drop = FALSE]
-  peak_table$pk_meta <- peak_table$pk_meta[,idx, drop = FALSE]
+  peak_table$pk_meta <- peak_table$pk_meta[, idx, drop = FALSE]
   if (inherits(peak_table$ref_spectra, c("data.frame", "matrix"))){
-    peak_table$ref_spectra <- peak_table$ref_spectra[,idx, drop = FALSE]
+    peak_table$ref_spectra <- peak_table$ref_spectra[, idx, drop = FALSE]
   }
   peak_table
 }

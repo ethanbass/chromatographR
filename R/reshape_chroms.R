@@ -64,17 +64,26 @@ reshape_chrom <- function(x, lambdas = NULL, rts = NULL){
 #' Reshapes peak table from wide to long format
 #' @name reshape_peaktable
 #' @param x A \code{peak_table} object.
-#' @param peaks A character vector specifying peaks to include.
+#' @param peaks A character vector specifying the peaks to include. If the
+#' character vector is named, the names of the vector elements will be used in
+#' place of the original peak names.
+#' @param metadata A character vector specifying the metadata fields to include.
 #' @return A data.frame containing the information for the specified peaks in
 #' long format.
 #' @author Ethan Bass
 #' @export
 
-reshape_peaktable <- function(x, peaks){
+reshape_peaktable <- function(x, peaks, metadata){
   if (!missing(peaks)){
-    x$tab <- x$tab[,which(colnames(x$tab) %in% peaks), drop=FALSE]
+    x$tab <- x$tab[,which(colnames(x$tab) %in% peaks), drop = FALSE]
+    if (!is.null(names(peaks))){
+      colnames(x$tab) <- names(peaks)
+    }
   }
-  xx <- reshape(as.data.frame(chr=rownames(x$tab), x$tab), direction = "long",
+  if (!missing(metadata)){
+    x$sample_meta <- x$sample_meta[,which(colnames(x$sample_meta) %in% metadata), drop = FALSE]
+  }
+  xx <- reshape(as.data.frame(chr = rownames(x$tab), x$tab), direction = "long",
     varying = list(1:ncol(x$tab)), v.names = x$args[["response"]],
     times = colnames(x$tab), timevar = "peak",
     idvar = "sample", ids = rownames(x$tab))
