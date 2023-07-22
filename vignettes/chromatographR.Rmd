@@ -29,8 +29,6 @@ The *chromatographR* package began as a fork from the previously published *alsa
 
 ## Workflow
 
-chromatographR is designed to .
-
 ### Loading data
 
 chromatographR can import data from a growing list of proprietary file formats using the `read_chroms` function. Supported file formats include 'Agilent ChemStation' or 'MassHunter' (`.D`) files [@bovee2022; @bovee2022a], 'Thermo Raw' (`.raw`) [@hulstaert2020], 'Chromeleon' UV ASCII (`.txt`), 'Waters ARW' (`.arw`), 'Shimadzu' ASCII (`.txt`), and more. (For a full list, see the [chromConverter documentation](https://ethanbass.github.io/chromConverter/)). Select the appropriate file format by specifying the `format_in` argument (e.g. `csv`, `chemstation_uv`, `masshunter_dad`, `chromeleon_uv`, `waters_arw`, etc).
