@@ -54,7 +54,7 @@ table if `fit=="egh"`)}
 \item{height}{height of the peak (y)}
 \item{area}{peak area}
 \item{r.squared}{r-squared value for linear fit of model to data.}
-#' \item{purity}{spectral purity of peak as assessed by \code{\link{get_purity}}.}
+\item{purity}{spectral purity of peak as assessed by \code{\link{get_purity}}.}
 Again, the first five elements (rt, start, end, sd and FWHM) are expressed
 as indices, so not in terms of the real retention times. The transformation
 to "real" time is done in function \code{get_peaks}.
@@ -80,11 +80,11 @@ data(Sa_pr)
 fit_peaks(Sa_pr[[1]], lambda="220")
 }
 \references{
-Lan, K. & Jorgenson, J. W. 2001. A hybrid of exponential and gaussian
+* Lan, K. & Jorgenson, J. W. 2001. A hybrid of exponential and gaussian
 functions as a simple model of asymmetric chromatographic peaks. \emph{Journal of
 Chromatography A} \bold{915}:1-13. \doi{10.1016/S0021-9673(01)00594-5}.
 
-Naish, P. J. & Hartwell, S. 1988. Exponentially Modified Gaussian functions - A
+* Naish, P. J. & Hartwell, S. 1988. Exponentially Modified Gaussian functions - A
 good model for chromatographic peaks in isocratic HPLC? \emph{Chromatographia},
 /bold{26}: 285-296. \doi{10.1007/BF02268168}.
 }

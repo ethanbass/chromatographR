@@ -117,7 +117,7 @@ parametric time warping of peak lists. \emph{Bioinformatics},
 \bold{31}:3063-3065. \doi{10.1093/bioinformatics/btv299}.
 \item Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
 LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
-Metabolomics}, \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}
+Metabolomics}, \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}.
 }
 }
 \seealso{

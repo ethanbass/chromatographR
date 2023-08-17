@@ -12,8 +12,7 @@
 #' @importFrom utils head tail
 #' @param loc The name of the peak or retention time for which you wish to
 #' extract spectral data.
-#' @param peak_table The peak table (output from \code{\link{get_peaktable}}
-#' function).
+#' @param peak_table The peak table (output from \code{\link{get_peaktable}}).
 #' @param chrom_list A list of chromatograms in matrix format (timepoints x
 #' wavelengths). If no argument is provided here, the function will try to find
 #' the \code{chrom_list} object used to create the provided \code{peak_table}.

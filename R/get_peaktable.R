@@ -71,7 +71,7 @@
 #' * `args`: A vector of arguments given to \code{\link{get_peaktable}} to generate
 #' the peak table.
 #' @author Ethan Bass
-#' @note Adapted from
+#' @note This function is adapted from
 #' \href{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}{getPeakTable}
 #' function in the alsace package by Ron Wehrens.
 #' @md
@@ -79,10 +79,10 @@
 #' * Broeckling, C. D., Afsar F.A., Neumann S., Ben-Hur A., and Prenni J.E. 2014.
 #' RAMClust: A Novel Feature Clustering Method Enables Spectral-Matching-Based
 #' Annotation for Metabolomics Data. \emph{Anal. Chem.}
-#' \bold{86}:6812-6817. \doi{10.1021/ac501530d}
+#' \bold{86}:6812-6817. \doi{10.1021/ac501530d}.
 #' * Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
 #' LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
-#' Metabolomics} \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}
+#' Metabolomics} \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}.
 #' @examplesIf interactive()
 #' data(Sa_pr)
 #' pks <- get_peaks(Sa_pr, lambdas = c('210'))

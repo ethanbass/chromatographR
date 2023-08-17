@@ -101,7 +101,7 @@ lead to splitting of peaks across multiple clusters. Another option is to
 filter the peaks by intensity to remove small features.
 }
 \note{
-Adapted from
+This function is adapted from
 \href{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}{getPeakTable}
 function in the alsace package by Ron Wehrens.
 }
@@ -117,10 +117,10 @@ get_peaktable(pks, response = "area")
 \item Broeckling, C. D., Afsar F.A., Neumann S., Ben-Hur A., and Prenni J.E. 2014.
 RAMClust: A Novel Feature Clustering Method Enables Spectral-Matching-Based
 Annotation for Metabolomics Data. \emph{Anal. Chem.}
-\bold{86}:6812-6817. \doi{10.1021/ac501530d}
+\bold{86}:6812-6817. \doi{10.1021/ac501530d}.
 \item Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
 LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
-Metabolomics} \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}
+Metabolomics} \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}.
 }
 }
 \seealso{

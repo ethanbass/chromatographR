@@ -56,26 +56,27 @@
 #' peak values to the raw data. This approach is not really statistically valid
 #' but it can still be useful as a rough metric for "goodness-of-fit").
 #' @author Ethan Bass
-#' @note The function is adapted from the
+#' @note This function is adapted from the
 #' \href{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks}
 #' function authored by Ron Wehrens (though the underlying algorithms for peak
 #' identification and peak-fitting are not the same).
 #' @references 
-#' O'Haver, Tom. Pragmatic Introduction to Signal Processing:
-#' Applications in scientific measurement.
-#' /href{https://terpconnect.umd.edu/~toh/spectrum/} (Accessed January, 2022).
-#' 
-#' Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
-#' LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
-#' Metabolomics} \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}
-#' 
-#' #' Lan, K. & Jorgenson, J. W. 2001. A hybrid of exponential and gaussian
+#' * Lan, K. & Jorgenson, J. W. 2001. A hybrid of exponential and gaussian
 #' functions as a simple model of asymmetric chromatographic peaks. \emph{Journal of
 #' Chromatography A} \bold{915}:1-13. \doi{10.1016/S0021-9673(01)00594-5}.
 #'
-#' Naish, P. J. & Hartwell, S. 1988. Exponentially Modified Gaussian functions - A
+#' * Naish, P. J. & Hartwell, S. 1988. Exponentially Modified Gaussian functions - A
 #' good model for chromatographic peaks in isocratic HPLC? \emph{Chromatographia},
 #' /bold{26}: 285-296. \doi{10.1007/BF02268168}.
+#'
+#' * O'Haver, Tom. Pragmatic Introduction to Signal Processing:
+#' Applications in scientific measurement.
+#' \url{https://terpconnect.umd.edu/~toh/spectrum/} (Accessed January, 2022).
+#' 
+#' * Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
+#' LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
+#' Metabolomics} \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}.
+#' 
 #' @examplesIf interactive()
 #' data(Sa_pr)
 #' pks <- get_peaks(Sa_pr, lambdas = c('210'), sd.max=50, fit="egh")

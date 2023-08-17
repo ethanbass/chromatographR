@@ -71,7 +71,7 @@
 #' 
 #' * Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
 #' LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
-#' Metabolomics}, \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}
+#' Metabolomics}, \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}.
 #' 
 #' @examplesIf interactive()
 #' data(Sa_pr)
