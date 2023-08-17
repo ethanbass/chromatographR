@@ -50,10 +50,10 @@ test_that("choose_apply_fnc works as expected with NULL value", {
   fn<-choose_apply_fnc(show_progress=NULL, parallel = FALSE)
   expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = FALSE))
   
-  fn<-choose_apply_fnc(show_progress=NULL, cl=1)
+  fn<-choose_apply_fnc(show_progress = NULL, cl = 1)
   expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = FALSE))
   
-  fn<-choose_apply_fnc(show_progress=NULL, cl=NULL)
+  fn<-choose_apply_fnc(show_progress = NULL, cl = NULL)
   expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = FALSE))
 })
 

@@ -1,3 +1,8 @@
+# chromatographR 0.5.3
+
+* Fixed bug in `plot_chroms` causing mismatched legend labels in base R plot.
+* Added additional arguments to `plot_chroms` function: `xlim`,`ylim`, and `legend_position`. 
+
 # chromatographR 0.5.2
 
 * Added `metadata` argument to `reshape_peaktable` for filtering metadata fields.

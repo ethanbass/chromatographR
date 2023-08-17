@@ -8,11 +8,14 @@ plot_chroms(
   x,
   lambdas,
   idx,
-  ylab = "Absorbance",
+  xlim,
+  ylim,
   xlab = "",
+  ylab = "Absorbance",
   engine = c("base", "ggplot", "plotly"),
   linewidth = 1,
   show_legend = TRUE,
+  legend_position = "topright",
   ...
 )
 }
@@ -21,11 +24,16 @@ plot_chroms(
 
 \item{lambdas}{The wavelength(s) you wish to plot the trace at.}
 
-\item{idx}{A vector representing the names or numerical indices of the chromatograms to plot.}
+\item{idx}{A vector representing the names or numerical indices of the 
+chromatograms to plot.}
 
-\item{ylab}{Y label. Defaults to "abs".}
+\item{xlim}{Range of x axis.}
+
+\item{ylim}{Range of y axis.}
 
 \item{xlab}{X label.}
+
+\item{ylab}{Y label. Defaults to "Absorbance".}
 
 \item{engine}{Plotting engine. Either \code{\link[graphics]{matplot}}, 
 \code{\link[plotly]{plotly}}, or \code{\link[ggplot2]{ggplot2-package}}.}
@@ -33,6 +41,8 @@ plot_chroms(
 \item{linewidth}{Line width.}
 
 \item{show_legend}{Logical. Whether to display legend or not. Defaults to TRUE.}
+
+\item{legend_position}{Position of legend.}
 
 \item{...}{Additional arguments to plotting function specified by \code{engine}.}
 }
