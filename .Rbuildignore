@@ -8,3 +8,4 @@
 ^CRAN-SUBMISSION$
 ^LICENSE$
 ^\.DS_Store$
+^\.zenodo.json

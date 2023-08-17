@@ -1,3 +1,7 @@
+# chromatographR 0.5.4
+
+* Added `.zenodo.json` file.
+
 # chromatographR 0.5.3
 
 * Fixed bug in `plot_chroms` causing mismatched legend labels in base R plot.
