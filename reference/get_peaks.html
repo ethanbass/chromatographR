@@ -126,7 +126,11 @@ Defaults to 2. On Windows integer values will be ignored.</p></dd>
 
 
 <dt>...</dt>
-<dd><p>Additional arguments to <code><a href="find_peaks.html">find_peaks</a></code>.</p></dd>
+<dd><p>Additional arguments to <code><a href="find_peaks.html">find_peaks</a></code>. Arguments
+provided to <code><a href="find_peaks.html">find_peaks</a></code> can be used to fine-tune the peak-finding
+algorithm. Most importantly, the <code>smooth_window</code> should be increased if
+features are being split into multiple bins. Other arguments that can be used
+here include <code>smooth_type</code>, <code>slope_thresh</code>, and <code>amp_thresh</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -148,9 +152,14 @@ but it can still be useful as a rough metric for "goodness-of-fit").</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Peaks are located by finding zero-crossings in the smoothed first derivative
 of the specified chromatographic traces (function <code><a href="find_peaks.html">find_peaks</a></code>).
-At the given positions, an exponential-gaussian hybrid (or regular gaussian)
-function is fit to the signal using <code><a href="fit_peaks.html">fit_peaks</a></code>). The area is then
-calculated using a trapezoidal approximation.</p>
+Additional arguments can be provided to <code><a href="find_peaks.html">find_peaks</a></code> to fine-tune
+the peak-finding algorithm. For example, the <code>smooth_window</code> can be
+increased to prevent peaks from being split into multiple features. Overly
+aggressive smoothing may cause small peaks to be overlooked. At the given 
+positions, an exponential-gaussian hybrid (or regular gaussian)
+function is fit to the signal using <code><a href="fit_peaks.html">fit_peaks</a></code> according to the
+value of <code>fit</code>. Finally, the area is calculated using trapezoidal 
+approximation.</p>
 <p>The <code>sd</code>, <code>FWHM</code>, <code>tau</code>, and <code>area</code> are returned in units
 determined by <code>time.units</code>. By defaults the units are in minutes.</p>
     </div>
@@ -163,7 +172,10 @@ identification and peak-fitting are not the same).</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
-    <p>Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
+    <p>O'Haver, Tom. Pragmatic Introduction to Signal Processing:
+Applications in scientific measurement.
+/hrefhttps://terpconnect.umd.edu/~toh/spectrum/ (Accessed January, 2022).</p>
+<p>Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
 LC–DAD using multivariate curve resolution: the alsace package for R. <em>
 Metabolomics</em> <b>11</b>:143-154. <a href="https://doi.org/10.1007/s11306-014-0683-5" class="external-link">doi:10.1007/s11306-014-0683-5</a></p>
 <p>#' Lan, K. &amp; Jorgenson, J. W. 2001. A hybrid of exponential and gaussian
