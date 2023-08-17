@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.3</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,11 +58,14 @@
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">lambdas</span>,</span>
 <span>  <span class="va">idx</span>,</span>
-<span>  ylab <span class="op">=</span> <span class="st">"Absorbance"</span>,</span>
+<span>  <span class="va">xlim</span>,</span>
+<span>  <span class="va">ylim</span>,</span>
 <span>  xlab <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="st">"Absorbance"</span>,</span>
 <span>  engine <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"base"</span>, <span class="st">"ggplot"</span>, <span class="st">"plotly"</span><span class="op">)</span>,</span>
 <span>  linewidth <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  show_legend <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  legend_position <span class="op">=</span> <span class="st">"topright"</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -78,15 +81,24 @@
 
 
 <dt>idx</dt>
-<dd><p>A vector representing the names or numerical indices of the chromatograms to plot.</p></dd>
+<dd><p>A vector representing the names or numerical indices of the 
+chromatograms to plot.</p></dd>
 
 
-<dt>ylab</dt>
-<dd><p>Y label. Defaults to "abs".</p></dd>
+<dt>xlim</dt>
+<dd><p>Range of x axis.</p></dd>
+
+
+<dt>ylim</dt>
+<dd><p>Range of y axis.</p></dd>
 
 
 <dt>xlab</dt>
 <dd><p>X label.</p></dd>
+
+
+<dt>ylab</dt>
+<dd><p>Y label. Defaults to "Absorbance".</p></dd>
 
 
 <dt>engine</dt>
@@ -100,6 +112,10 @@
 
 <dt>show_legend</dt>
 <dd><p>Logical. Whether to display legend or not. Defaults to TRUE.</p></dd>
+
+
+<dt>legend_position</dt>
+<dd><p>Position of legend.</p></dd>
 
 
 <dt>...</dt>
