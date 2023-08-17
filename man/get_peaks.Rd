@@ -50,7 +50,11 @@ Either an integer specifying the number of clusters to use for parallel
 processing or a cluster object created by \code{\link[parallel]{makeCluster}}.
 Defaults to 2. On Windows integer values will be ignored.}
 
-\item{\dots}{Additional arguments to \code{\link{find_peaks}}.}
+\item{\dots}{Additional arguments to \code{\link{find_peaks}}. Arguments
+provided to \code{\link{find_peaks}} can be used to fine-tune the peak-finding
+algorithm. Most importantly, the \code{smooth_window} should be increased if
+features are being split into multiple bins. Other arguments that can be used
+here include \code{smooth_type}, \code{slope_thresh}, and \code{amp_thresh}.}
 }
 \value{
 The result is an S3 object of class \code{peak_list}, containing a nested
@@ -71,9 +75,14 @@ at the specified wavelengths.
 \details{
 Peaks are located by finding zero-crossings in the smoothed first derivative
 of the specified chromatographic traces (function \code{\link{find_peaks}}).
-At the given positions, an exponential-gaussian hybrid (or regular gaussian)
-function is fit to the signal using \code{\link{fit_peaks}}). The area is then
-calculated using a trapezoidal approximation.
+Additional arguments can be provided to \code{\link{find_peaks}} to fine-tune
+the peak-finding algorithm. For example, the \code{smooth_window} can be
+increased to prevent peaks from being split into multiple features. Overly
+aggressive smoothing may cause small peaks to be overlooked. At the given 
+positions, an exponential-gaussian hybrid (or regular gaussian)
+function is fit to the signal using \code{\link{fit_peaks}} according to the
+value of \code{fit}. Finally, the area is calculated using trapezoidal 
+approximation.
 
 The \code{sd}, \code{FWHM}, \code{tau}, and \code{area} are returned in units
 determined by \code{time.units}. By defaults the units are in minutes.
@@ -91,6 +100,10 @@ pks <- get_peaks(Sa_pr, lambdas = c('210'), sd.max=50, fit="egh")
 \dontshow{\}) # examplesIf}
 }
 \references{
+O'Haver, Tom. Pragmatic Introduction to Signal Processing:
+Applications in scientific measurement.
+/href{https://terpconnect.umd.edu/~toh/spectrum/} (Accessed January, 2022).
+
 Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
 LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
 Metabolomics} \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}

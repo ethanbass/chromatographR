@@ -2,6 +2,7 @@
 
 * Fixed bug in `plot_chroms` causing mismatched legend labels in base R plot.
 * Added additional arguments to `plot_chroms` function: `xlim`,`ylim`, and `legend_position`. 
+* Added additional information about arguments available in `get_peaks` for fine-tuning the peak-finding algorithm (in response to [#27](https://github.com/ethanbass/chromatographR/issues/27)).
 
 # chromatographR 0.5.2
 
