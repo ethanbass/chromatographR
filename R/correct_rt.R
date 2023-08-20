@@ -154,7 +154,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
           x$warp.coef[1,]
         })
         models <- lapply(seq_len(dim(allmats)[3]), function(ii){
-          ptw(t(allmats[,,1]), t(allmats[, , ii]), init.coef = warp.coef[[ii]],
+          ptw(t(allmats[,, 1]), t(allmats[,, ii]), init.coef = warp.coef[[ii]],
               try = TRUE, alg = models[[1]]$alg, warp.type = "global", ...)})
         result <- lapply(models, function(x) t(x$warped.sample))
         for (i in seq_along(result)){
