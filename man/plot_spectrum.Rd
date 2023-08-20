@@ -25,8 +25,7 @@ plot_spectrum(
 \item{loc}{The name of the peak or retention time for which you wish to
 extract spectral data.}
 
-\item{peak_table}{The peak table (output from \code{\link{get_peaktable}}
-function).}
+\item{peak_table}{The peak table (output from \code{\link{get_peaktable}}).}
 
 \item{chrom_list}{A list of chromatograms in matrix format (timepoints x
 wavelengths). If no argument is provided here, the function will try to find

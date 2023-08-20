@@ -26,12 +26,12 @@ no smoothing (\code{none}).}
 the window will be the absolute number of points to include in the window.
 (Defaults to .001).}
 
-\item{slope_thresh}{Minimum threshold for peak slope. (Defaults to 0).}
+\item{slope_thresh}{Minimum threshold for peak slope. (Defaults to \code{0}).}
 
-\item{amp_thresh}{Minimum threshold for peak amplitude. (Defaults to 0).}
+\item{amp_thresh}{Minimum threshold for peak amplitude. (Defaults to \code{0}).}
 
 \item{bounds}{Logical. If TRUE, includes peak boundaries in data.frame.
-(Defaults to TRUE).}
+(Defaults to \code{TRUE}).}
 }
 \value{
 If bounds == TRUE, returns a data.frame containing the center, start,
@@ -72,8 +72,8 @@ find_peaks(Sa_pr[[1]][,"220"])
 }
 \references{
 O'Haver, Tom. Pragmatic Introduction to Signal Processing:
-Applications in scientific measurement.
-/href{https://terpconnect.umd.edu/~toh/spectrum/} (Accessed January, 2022).
+Applications in scientific measurement. \url{https://terpconnect.umd.edu/~toh/spectrum/}
+(Accessed January, 2022).
 }
 \seealso{
 \code{\link{fit_peaks}}, \code{\link{get_peaks}}

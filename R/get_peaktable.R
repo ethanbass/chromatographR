@@ -71,7 +71,7 @@
 #' * `args`: A vector of arguments given to \code{\link{get_peaktable}} to generate
 #' the peak table.
 #' @author Ethan Bass
-#' @note Adapted from
+#' @note This function is adapted from
 #' \href{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}{getPeakTable}
 #' function in the alsace package by Ron Wehrens.
 #' @md

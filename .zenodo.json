@@ -1,0 +1,24 @@
+{
+    "upload_type": "software",
+
+    "creators": [
+        {
+            "orcid": "0000-0002-6175-6739",
+            "affiliation": "Cornell University, Department of Ecology and Evolutionary Biology",
+            "name": "Bass, Ethan"
+        }    ],
+
+    "license": "GPL (>= 2)",
+
+    "title": "chromatographR: Chromatographic Data Analysis Toolset",
+
+    "keywords": ["bioinformatics", "r", "cheminformatics", "reproducible-research", "open-data",
+    "open-science", "metabolomics", "r-package", "reproducibility", 
+    "chromatography", "hplc", "gc-fid", "hplc-dad", "hplv-uv", "hplc-pda"],
+
+    "contributors": [
+        {
+            "name": "Borchers, Hans W.",
+            "type": "RightsHolder"
+    }   ]
+}

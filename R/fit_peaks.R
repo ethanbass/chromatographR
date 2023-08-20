@@ -33,10 +33,10 @@
 #' 1, window will be interpreted as a proportion of points to include. Otherwise,
 #' the window will be the absolute number of points to include in the window.
 #' (Defaults to .001).
-#' @param slope_thresh Minimum threshold for peak slope. (Defaults to 0).
-#' @param amp_thresh Minimum threshold for peak amplitude. (Defaults to 0).
+#' @param slope_thresh Minimum threshold for peak slope. (Defaults to \code{0}).
+#' @param amp_thresh Minimum threshold for peak amplitude. (Defaults to \code{0}).
 #' @param bounds Logical. If TRUE, includes peak boundaries in data.frame.
-#' (Defaults to TRUE).
+#' (Defaults to \code{TRUE}).
 #' @return If bounds == TRUE, returns a data.frame containing the center, start,
 #' and end of each identified peak. Otherwise, returns a numeric vector of peak
 #' centers. All locations are expressed as indices.
@@ -50,8 +50,8 @@
 #' find_peaks(Sa_pr[[1]][,"220"])
 #' @seealso \code{\link{fit_peaks}}, \code{\link{get_peaks}}
 #' @references O'Haver, Tom. Pragmatic Introduction to Signal Processing:
-#' Applications in scientific measurement.
-#' /href{https://terpconnect.umd.edu/~toh/spectrum/} (Accessed January, 2022).
+#' Applications in scientific measurement. \url{https://terpconnect.umd.edu/~toh/spectrum/}
+#' (Accessed January, 2022).
 #' @export find_peaks
 find_peaks <- function(y, smooth_type=c("gaussian", "box", "savgol", "mva","tmva","none"),
                        smooth_window = .001, slope_thresh = 0, amp_thresh = 0,
@@ -139,7 +139,7 @@ find_peaks <- function(y, smooth_type=c("gaussian", "box", "savgol", "mva","tmva
 #' \item{height}{height of the peak (y)}
 #' \item{area}{peak area}
 #' \item{r.squared}{r-squared value for linear fit of model to data.}
-#' #' \item{purity}{spectral purity of peak as assessed by \code{\link{get_purity}}.}
+#' \item{purity}{spectral purity of peak as assessed by \code{\link{get_purity}}.}
 #' Again, the first five elements (rt, start, end, sd and FWHM) are expressed
 #' as indices, so not in terms of the real retention times. The transformation
 #' to "real" time is done in function \code{get_peaks}.
@@ -154,11 +154,11 @@ find_peaks <- function(y, smooth_type=c("gaussian", "box", "savgol", "mva","tmva
 #' fit_peaks(Sa_pr[[1]], lambda="220")
 #' @seealso \code{\link{find_peaks}}, \code{\link{get_peaks}}
 #' @references
-#' Lan, K. & Jorgenson, J. W. 2001. A hybrid of exponential and gaussian
+#' * Lan, K. & Jorgenson, J. W. 2001. A hybrid of exponential and gaussian
 #' functions as a simple model of asymmetric chromatographic peaks. \emph{Journal of
 #' Chromatography A} \bold{915}:1-13. \doi{10.1016/S0021-9673(01)00594-5}.
 #'
-#' Naish, P. J. & Hartwell, S. 1988. Exponentially Modified Gaussian functions - A
+#' * Naish, P. J. & Hartwell, S. 1988. Exponentially Modified Gaussian functions - A
 #' good model for chromatographic peaks in isocratic HPLC? \emph{Chromatographia},
 #' /bold{26}: 285-296. \doi{10.1007/BF02268168}.
 #' @export fit_peaks

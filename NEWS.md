@@ -10,6 +10,16 @@
 
 * Made some minor improvements to the vignette.
 
+# chromatographR 0.5.4
+
+* Added `.zenodo.json` file.
+
+# chromatographR 0.5.3
+
+* Fixed bug in `plot_chroms` causing mismatched legend labels in base R plot.
+* Added additional arguments to `plot_chroms` function: `xlim`,`ylim`, and `legend_position`. 
+* Added additional information about arguments available in `get_peaks` for fine-tuning the peak-finding algorithm (in response to [#27](https://github.com/ethanbass/chromatographR/issues/27)).
+
 # chromatographR 0.5.2
 
 * Added `metadata` argument to `reshape_peaktable` for filtering metadata fields.

@@ -101,7 +101,7 @@ lead to splitting of peaks across multiple clusters. Another option is to
 filter the peaks by intensity to remove small features.
 }
 \note{
-Adapted from
+This function is adapted from
 \href{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}{getPeakTable}
 function in the alsace package by Ron Wehrens.
 }
