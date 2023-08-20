@@ -239,34 +239,33 @@ transfer_metadata <- function(new_object, old_object,
 #' @noRd
 choose_apply_fnc <- function(show_progress, parallel = NULL, cl = 2){
   pbapply_installed <- check_for_pkg("pbapply", return_boolean = TRUE)
+  is_not_windows <- .Platform$OS.type != "windows"
+  
   if (is.null(show_progress)){
     show_progress <- pbapply_installed
   }
+  
   if (is.null(parallel)){
-    if (!is.null(cl) && (class(cl)[1] == "SOCKcluster" || cl > 1)){
+    if (!is.null(cl) && (class(cl)[1] == "SOCKcluster" || (is_not_windows && cl > 1))){
       parallel <- TRUE
     } else {
       parallel <- FALSE
     }
   }
-  if (.Platform$OS.type == "windows" && is.numeric(cl) && cl > 1){
-    stop("Parallel processing is only available on Windows through the parallel package.
-    Please supply a socket cluster object to the `cl` argument.")
-  }
-  
-  if (.Platform$OS.type == "windows" && parallel && !pbapply_installed){
-    stop("Please install the pbapply package to use parallel processing on Windows.")
-  }
   
   if (!parallel){
     cl <- 1
+  }
+
+  if (.Platform$OS.type == "windows" && parallel && !pbapply_installed){
+    stop("Please install the pbapply package to use parallel processing on Windows.")
   }
   
   if (show_progress){
     check_for_pkg("pbapply")
     pblapply <- pbapply::pblapply
     fn <- purrr::partial(pblapply, cl = cl)
-  } else if (!show_progress && is.numeric(cl) && cl > 1){
+  } else if (!show_progress && is_not_windows && is.numeric(cl) && cl > 1){
       fn <- purrr::partial(mclapply, mc.cores = cl)
   } else {
     fn <- lapply
