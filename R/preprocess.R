@@ -68,7 +68,7 @@ preprocess <- function(X, dim1, ## time axis
                           dim2, ## spectral axis
                           remove.time.baseline = TRUE,
                           spec.smooth = TRUE,
-                          maxI, parallel = NULL, 
+                          maxI = NULL, parallel = NULL, 
                           interpolate_rows = TRUE,
                           interpolate_cols = TRUE,
                           mc.cores, cl = 2, show_progress = NULL, ...){
@@ -148,7 +148,7 @@ preprocess_matrix <- function(X,
                               dim2, ## spectral axis
                               remove.time.baseline = TRUE,
                               spec.smooth = TRUE,
-                              maxI,
+                              maxI = NULL,
                               interpolate_rows = TRUE,
                               interpolate_cols = TRUE,
                               ...) {
@@ -186,7 +186,7 @@ preprocess_matrix <- function(X,
   if (min(X, na.rm = TRUE) < 0){
     X[X < 0] <- 0
   }
-  if (!missing(maxI)){
+  if (!is.null(maxI)){
     X <- maxI * X / max(X)
   }
   dimnames(X) <- list(dim1, dim2)
