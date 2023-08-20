@@ -8,7 +8,7 @@
             "name": "Bass, Ethan"
         }    ],
 
-    "license": "GPL (>= 2)",
+    "license": {"id":"GPL2"},
 
     "title": "chromatographR: Chromatographic Data Analysis Toolset",
 
