@@ -2,8 +2,7 @@
 
 #### New features
 
-* Enabled use of `parallel` package for parallel processing (in addition to current options using `mcapply`. 
-	(This requires the installation of suggested package `pbapply`).
+* Enabled use of `parallel` package for parallel processing (in addition to current options using `mcapply`). (These options require the installation of suggested package `pbapply`).
 * Updated `get_peaktable` for greater flexibility (e.g. for usage of Chemstation peak lists as input).
 
 #### Other changes
