@@ -1,7 +1,19 @@
+# chromatographR 0.6.0
+
+#### New features
+
+* Enabled use of `parallel` package for parallel processing (in addition to current options using `mcapply`. 
+	(This requires the installation of suggested package `pbapply`).
+* Updated `get_peaktable` for greater flexibility (e.g. for usage of Chemstation peak lists as input).
+
+#### Other changes
+
+* Made some minor improvements to the vignette.
+
 # chromatographR 0.5.2
 
 * Added `metadata` argument to `reshape_peaktable` for filtering metadata fields.
-* Added option to for renaming peaks via `reshape_peaktable` by providing a named list.
+* Added option for renaming peaks via `reshape_peaktable` by providing a named character vector.
 
 # chromatographR 0.5.1
 
