@@ -30,18 +30,21 @@ test_that("choose apply_fnc works as expected on unix/linux", {
   skip_on_cran()
   skip_on_os("windows")
   
-  fn <- choose_apply_fnc(show_progress = TRUE, parallel=TRUE)
+  fn <- choose_apply_fnc(show_progress = TRUE, parallel = TRUE)
   expect_equal(class(fn), c("purrr_function_partial","function"))
   
-  fn <- choose_apply_fnc(show_progress = FALSE, parallel=TRUE)
+  fn <- choose_apply_fnc(show_progress = FALSE, parallel = TRUE)
   expect_equal(class(fn), c("purrr_function_partial","function"))
   
   fn<-choose_apply_fnc(show_progress=NULL, parallel = TRUE)
-  pbapply_exists <- check_for_pkg("pbapply", return_boolean=TRUE)
+  pbapply_exists <- check_for_pkg("pbapply", return_boolean = TRUE)
   expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = TRUE))
   
-  fn <- choose_apply_fnc(show_progress = NULL, cl = parallel::makeCluster(2))
+  cl <- parallel::makeCluster(2)
+  fn <- choose_apply_fnc(show_progress = NULL, cl = cl)
   expect_equal(class(fn), c("purrr_function_partial", "function"))
+  parallel::stopCluster(cl)
+  
   fn <- choose_apply_fnc(show_progress = NULL, cl = 2)
   expect_equal(class(fn), c("purrr_function_partial", "function"))
 })
@@ -54,7 +57,10 @@ test_that("choose apply_fnc works as expected on windows", {
   expect_error(choose_apply_fnc(show_progress = TRUE, cl = 2))
   expect_error(choose_apply_fnc(show_progress = NULL, parallel = TRUE))
   
-  fn <- choose_apply_fnc(show_progress = FALSE, cl=parallel::makeCluster(2))
+  cl <- parallel::makeCluster(2)
+  fn <- choose_apply_fnc(show_progress = FALSE, cl = cl)
+  parallel::stopCluster(cl)
+  
   expect_equal(class(fn), c("purrr_function_partial", "function"))
 })
 
