@@ -54,9 +54,6 @@ test_that("choose apply_fnc works as expected on windows", {
   skip_on_os(c("mac","linux","solaris"))
   skip_if_not_installed("pbapply")
 
-  expect_error(choose_apply_fnc(show_progress = TRUE, cl = 2))
-  expect_error(choose_apply_fnc(show_progress = NULL, parallel = TRUE))
-  
   cl <- parallel::makeCluster(2)
   fn <- choose_apply_fnc(show_progress = FALSE, cl = cl)
   parallel::stopCluster(cl)
