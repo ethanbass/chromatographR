@@ -14,7 +14,6 @@ test_that("get_lambdas works as expected", {
 test_that("choose_apply_fnc works as expected", {
   skip_on_cran()
   skip_if_not_installed("pbapply")
-  skip_on_os("windows")
   fn <- choose_apply_fnc(show_progress = TRUE)
   expect_equal(class(fn), c("purrr_function_partial", "function"))
   
@@ -55,9 +54,8 @@ test_that("choose apply_fnc works as expected on windows", {
   skip_if_not_installed("pbapply")
 
   cl <- parallel::makeCluster(2)
-  fn <- choose_apply_fnc(show_progress = FALSE, cl = cl)
+  fn <- choose_apply_fnc(show_progress = NULL, cl = cl)
   parallel::stopCluster(cl)
-  
   expect_equal(class(fn), c("purrr_function_partial", "function"))
 })
 
