@@ -98,17 +98,6 @@ test_that("plot_chroms works to plot alignments", {
   expect_error(plot_chroms(pktab))
 })
 
-test_that("plot_chroms works with plotly", {
-  skip_on_cran()
-  skip_if_not_installed("vdiffr")
-  skip_if_not_installed("plotly")
-  skip_if_not_installed("reticulate")
-  skip_if_not_installed("rsvg")
-
-  p <- plot_chroms(warp, lambdas="210", engine="plotly")
-  suppressWarnings(expect_doppelganger_plotly(name = "alignment_plotly", p = p))
-})
-
 test_that("plot_chroms works to plot alignments with ggplot", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
@@ -356,6 +345,16 @@ test_that("plot_spectrum works with plotly engine", {
                       export_spectrum = FALSE, what="rt", chr=1,
                       verbose = FALSE, engine="plotly", plot_spectrum = FALSE)
   expect_doppelganger_plotly("plot_spectrum_plotly", p = p3)
+})
+
+test_that("plot_chroms works with plotly", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  skip_if_not_installed("plotly")
+  skip_if_not_installed("reticulate")
+  skip_if_not_installed("rsvg")
+  p <- plot_chroms(warp, lambdas="210", engine="plotly")
+  suppressWarnings(expect_doppelganger_plotly(name = "alignment_plotly", p = p))
 })
 
 test_that("plot_spectrum works with ggplot2", {

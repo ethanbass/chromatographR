@@ -9,6 +9,10 @@
 
 * Made some minor improvements to the vignette.
 
+#### Bug fixes
+
+* Fixed error in `attach_metadata` when there are NA values in merge column.
+
 # chromatographR 0.5.4
 
 * Added `.zenodo.json` file.

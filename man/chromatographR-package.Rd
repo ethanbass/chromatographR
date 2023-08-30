@@ -10,7 +10,7 @@ chromatographR
 }
 \details{
 \tabular{ll}{ Package: \tab chromatographR\cr Type: \tab Package\cr Version:
-\tab 0.5.3 \cr Date: \tab 2023-08-17\cr License: GPL (>= 2) }
+\tab 0.6.0 \cr Date: \tab 2023-08-20\cr License: GPL (>= 2) }
 }
 \author{
 Ethan Bass
