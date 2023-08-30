@@ -41,7 +41,7 @@
 #' be interpreted as the maximal inter-cluster retention time difference.
 #' @param plot_it Logical. If TRUE, for every component a stripplot will be
 #' shown indicating the clustering.
-#' @param ask Logical. Ask before showing new plot?
+#' @param ask Logical. Ask before showing new plot? Defaults to TRUE.
 #' @param clust Specify whether to perform hierarchical clustering based on
 #' spectral similarity and retention time (\code{sp.rt}) or retention time alone
 #' (\code{rt}). Defaults to \code{rt}. The \code{sp.rt} option is experimental
