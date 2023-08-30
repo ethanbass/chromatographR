@@ -159,6 +159,7 @@ test_that("get_peaktable works", {
 
 test_that("strip plot works", {
   skip_on_cran()
+  skip_on_os("windows")
   skip_if_not_installed("vdiffr")
   vdiffr::expect_doppelganger("peak_table_plot", 
                               get_peaktable(pks_egh, plot_it = TRUE,
