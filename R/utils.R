@@ -22,7 +22,7 @@ get_chrom_list <- function(x, chrom_list, verbose = FALSE){
       subsetted <- TRUE
       idx <- extract_idx(string)
       string <- gsub("\\[\\[?(.*?)\\]?\\]", "", string)
-    } else{
+    } else {
       subsetted <- FALSE
     }
     chrom_list <- try(get(string))

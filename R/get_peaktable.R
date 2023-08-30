@@ -41,7 +41,7 @@
 #' be interpreted as the maximal inter-cluster retention time difference.
 #' @param plot_it Logical. If TRUE, for every component a stripplot will be
 #' shown indicating the clustering.
-#' @param ask Logical. Ask before showing new plot?
+#' @param ask Logical. Ask before showing new plot? Defaults to TRUE.
 #' @param clust Specify whether to perform hierarchical clustering based on
 #' spectral similarity and retention time (\code{sp.rt}) or retention time alone
 #' (\code{rt}). Defaults to \code{rt}. The \code{sp.rt} option is experimental
@@ -116,10 +116,10 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
   clusterPeaks <- function(comp, pkLst){
     pkLst <- lapply(pkLst, function(x) lapply(x, function(y){
       if (nrow(y) > 0){
-        y[!is.na(y[, rt]), , drop = FALSE]
-      } else {
-        y
-      }}))
+      y[!is.na(y[, rt]), , drop = FALSE]
+    } else {
+      y
+    }}))
     xx <- do.call(rbind, sapply(pkLst, function(samp) samp[comp]))
     file.idx <- xx$sample
     pkcenters <- xx$rt
@@ -130,10 +130,10 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
       pkcenters.hcl <- hclust(dist(pkcenters), method = "complete")
       pkcenters.cl <- cutree(pkcenters.hcl, h = hmax)
     } else if (clust == 'sp.rt'){
-      if (is.null(sigma.t)){
-        sigma.t <- 0.5 * mean(do.call(rbind,unlist(pkLst,recursive = FALSE))$end - 
-                                do.call(rbind,unlist(pkLst,recursive = FALSE))$start)
-      }
+        if (is.null(sigma.t)){
+          sigma.t <- 0.5 * mean(do.call(rbind,unlist(pkLst,recursive = FALSE))$end - 
+                               do.call(rbind,unlist(pkLst,recursive = FALSE))$start)
+        }
       ts <- as.numeric(rownames(chrom_list[[1]]))
       sp <- sapply(seq_along(pkcenters), function(i){
         rescale(t(chrom_list[[file.idx[i]]][
@@ -146,14 +146,14 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
       linkage <- "average"
       pkcenters.hcl <- hclust(as.dist(D), method = linkage)
       pkcenters.cl <- cutreeDynamicTree(pkcenters.hcl, maxTreeHeight = hmax, 
-                                        deepSplit = deepSplit, minModuleSize = 2)
+                                      deepSplit = deepSplit, minModuleSize = 2)
       sing <- which(pkcenters.cl == 0)
       pkcenters.cl[sing] <- max(pkcenters.cl) + seq_along(sing)
     }
-    vars <- c("rt", "start", "end", "sd", "width", "tau", "FWHM", "r.squared", "purity")
+    vars <- c("rt", "start", "end", "sd", "tau", "FWHM", "r.squared", "purity")
     vars.idx <- which(colnames(xx) %in% vars)
-    cl.centers <- aggregate(xx[,vars.idx, drop = FALSE], by = list(pkcenters.cl), FUN = "mean",
-                            na.action = "na.pass")[,-1, drop = FALSE]
+    cl.centers <- aggregate(xx[,vars.idx], by = list(pkcenters.cl), FUN = "mean",
+                            na.action = "na.pass")[,-1]
     ncl <- length(cl.centers$rt)
     
     ## re-order clusters from small to large rt
@@ -162,56 +162,59 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
     metaInfo <- cbind(lambda = rep(as.numeric(names(peak_list[[1]])[comp]), ncl),
                       peak = 1:ncl, 
                       round(cl.centers,2)
-    )
+                      )
     rownames(metaInfo) <- NULL
     if (plot_it){
-      mycols <- myPalette(length(cl.centers))
-      cl.df <- data.frame(peaks = pkcenters, files = factor(file.idx), 
+      mycols <- myPalette(nrow(cl.centers))
+      cl.df <- data.frame(peaks = pkcenters, 
+                          files = factor(file.idx), 
                           cluster = pkcenters.cl)
-      message(stripplot(files ~ peaks, data = cl.df, col = mycols[pkcenters.cl], 
-                        pch = pkcenters.cl%%14, xlab = "Retention time", 
-                        ylab = "", main = paste("Component", comp),
-                        panel = function(...) {
-                          panel.stripplot(...)
-                          panel.abline(v = cl.centers, col = mycols)
-                        }))
+      print(stripplot(files ~ peaks, data = cl.df, 
+                      col = mycols[pkcenters.cl], 
+                      pch = pkcenters.cl %% 14,
+                      xlab = "Retention time", ylab = "",
+                      main = paste("Component", comp),
+                      panel = function(...) {
+                        panel.stripplot(...)
+                        panel.abline(v = cl.centers$rt, col = mycols)
+                      }))
     }
     if (verbose & max(clusCount <- table(file.idx, pkcenters.cl)) > 1) 
       warning(paste("More than one peak of one injection in the same cluster", 
-                    paste("for component ", comp, ".", sep = ""), 
-                    "Keeping only the most intense one.", "", sep = "\n"))
+                paste("for component ", comp, ".", sep = ""), 
+                "Keeping only the most intense one.", "", sep = "\n"))
     allIs <- unlist(lapply(pkLst, function(samp) samp[[comp]][, response]))
     Iinfo <- matrix(0, ncl, length(pkLst), dimnames = list(NULL, names(pkLst)))
     for (i in seq(along = allIs)){
       Iinfo[pkcenters.cl[i],  file.idx[i]] <- 
-        max(allIs[i], Iinfo[pkcenters.cl[i], file.idx[i]])
+      max(allIs[i], Iinfo[pkcenters.cl[i], file.idx[i]])
     }
     return(list(Iinfo, metaInfo))
   }
   as.structure <- switch(out, "data.frame" = as.data.frame,
-                         "matrix" = as.matrix)
+             "matrix" = as.matrix)
   result <- lapply(seq_len(ncomp), clusterPeaks, peak_list)
   result <- list(tab = as.structure(t(do.call("rbind", lapply(result,    
-                                                              function(x) x[[1]])))),
+                                                        function(x) x[[1]])))),
                  pk_meta = as.structure(t(do.call("rbind", lapply(result, 
-                                                                  function(x) x[[2]])))),
+                                                        function(x) x[[2]])))),
                  sample_meta = NA,
                  ref_spectra = NA,
                  args = list(peak_list = deparse(substitute(peak_list)),
-                             chrom_list = attr(peak_list, "chrom_list"),
-                             lambdas = list(names(peak_list[[1]])),
-                             response = response,
-                             use.cor = use.cor,
-                             hmax = hmax,
-                             clust = clust,
-                             sigma.t = sigma.t,
-                             sigma.r = sigma.r,
-                             deepSplit = deepSplit,
-                             reference_spectra = NA,
-                             metadata_path = NA,
-                             normalized = FALSE,
-                             normalization_by = NA
-                 ))
+                        chrom_list = attr(peak_list, "chrom_list"),
+                        lambdas = list(names(peak_list[[1]])),
+                        response = response,
+                        use.cor = use.cor,
+                        hmax = hmax,
+                        clust = clust,
+                        sigma.t = sigma.t,
+                        sigma.r = sigma.r,
+                        deepSplit = deepSplit,
+                        reference_spectra = NA,
+                        metadata_path = NA,
+                        normalized = FALSE,
+                        normalization_by = NA
+                        ))
   class(result) <- "peak_table"
   attr(result, "pk_args") <- attr(peak_list,"meta")
   result

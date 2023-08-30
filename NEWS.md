@@ -13,6 +13,10 @@
 
 * Fixed error in `attach_metadata` when there are NA values in merge column.
 
+# chromatographR 0.5.5
+
+* Fixed bug in `get_peaktable` causing failure to print strip plot when `plot_it == TRUE`.
+
 # chromatographR 0.5.4
 
 * Added `.zenodo.json` file.
