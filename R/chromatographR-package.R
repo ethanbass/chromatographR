@@ -3,7 +3,7 @@
 #' chromatographR
 #' 
 #' \tabular{ll}{ Package: \tab chromatographR\cr Type: \tab Package\cr Version:
-#' \tab 0.5.3 \cr Date: \tab 2023-08-17\cr License: GPL (>= 2) }
+#' \tab 0.5.5 \cr Date: \tab 2023-08-29\cr License: GPL (>= 2) }
 #' 
 #' @name chromatographR-package
 #' @aliases chromatographR-package chromatographR

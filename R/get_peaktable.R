@@ -127,14 +127,13 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
     if (length(pkcenters) < 2) 
       return(NULL)
     if (clust == 'rt'){
-    pkcenters.hcl <- hclust(dist(pkcenters), method = "complete")
-    pkcenters.cl <- cutree(pkcenters.hcl, h = hmax)
-    }
-    if (clust == 'sp.rt'){
-      if (is.null(sigma.t)){
-        sigma.t <- 0.5 * mean(do.call(rbind,unlist(pkLst,recursive = FALSE))$end - 
-                             do.call(rbind,unlist(pkLst,recursive = FALSE))$start)
-      }
+      pkcenters.hcl <- hclust(dist(pkcenters), method = "complete")
+      pkcenters.cl <- cutree(pkcenters.hcl, h = hmax)
+    } else if (clust == 'sp.rt'){
+        if (is.null(sigma.t)){
+          sigma.t <- 0.5 * mean(do.call(rbind,unlist(pkLst,recursive = FALSE))$end - 
+                               do.call(rbind,unlist(pkLst,recursive = FALSE))$start)
+        }
       ts <- as.numeric(rownames(chrom_list[[1]]))
       sp <- sapply(seq_along(pkcenters), function(i){
         rescale(t(chrom_list[[file.idx[i]]][
@@ -166,15 +165,18 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
                       )
     rownames(metaInfo) <- NULL
     if (plot_it){
-      mycols <- myPalette(length(cl.centers))
-      cl.df <- data.frame(peaks = pkcenters, files = factor(file.idx), 
+      mycols <- myPalette(nrow(cl.centers))
+      cl.df <- data.frame(peaks = pkcenters, 
+                          files = factor(file.idx), 
                           cluster = pkcenters.cl)
-      message(stripplot(files ~ peaks, data = cl.df, col = mycols[pkcenters.cl], 
-                      pch = pkcenters.cl%%14, xlab = "Retention time", 
-                      ylab = "", main = paste("Component", comp),
+      print(stripplot(files ~ peaks, data = cl.df, 
+                      col = mycols[pkcenters.cl], 
+                      pch = pkcenters.cl %% 14,
+                      xlab = "Retention time", ylab = "",
+                      main = paste("Component", comp),
                       panel = function(...) {
                         panel.stripplot(...)
-                        panel.abline(v = cl.centers, col = mycols)
+                        panel.abline(v = cl.centers$rt, col = mycols)
                       }))
     }
     if (verbose & max(clusCount <- table(file.idx, pkcenters.cl)) > 1) 
