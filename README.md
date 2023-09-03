@@ -53,6 +53,8 @@ Contributions are very welcome. Please get in touch (preferable by opening a Git
 
 Also see the [contributing.md](https://github.com/ethanbass/chromatographR/blob/master/docs/contributing.md) page for more details.
 
+(**Note:** Please post questions about file conversions to the [chromConverter](https://github.com/ethanbass/chromConverter/issues) page).
+
 ## Citation:
 
 If you use chromatographR in published work, please cite it as follows:
