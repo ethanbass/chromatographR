@@ -77,11 +77,12 @@ reshape_peaktable <- function(x, peaks, metadata){
   if (!missing(peaks)){
     x$tab <- x$tab[,which(colnames(x$tab) %in% peaks), drop = FALSE]
     if (!is.null(names(peaks))){
-      colnames(x$tab) <- names(peaks)
+      colnames(x$tab) <- names(peaks)[match(colnames(x$tab), peaks)]
     }
   }
   if (!missing(metadata)){
-    x$sample_meta <- x$sample_meta[,which(colnames(x$sample_meta) %in% metadata), drop = FALSE]
+    meta_idx <- which(colnames(x$sample_meta) %in% metadata)
+    x$sample_meta <- x$sample_meta[, meta_idx, drop = FALSE]
   }
   xx <- reshape(as.data.frame(chr = rownames(x$tab), x$tab), direction = "long",
     varying = list(1:ncol(x$tab)), v.names = x$args[["response"]],
