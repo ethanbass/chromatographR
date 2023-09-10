@@ -97,81 +97,81 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
   }
   if (missing(lambdas)){
     if (is.null(models) & is.null(n.traces)){
-        stop("Must specify wavelengths ('lambdas') or number of traces ('n.traces')
-             to use for alignment.")
-      } else lambdas <- colnames(chrom_list[[1]])
-    }
-    lambdas <- as.character(lambdas)
-    if (!all(lambdas %in% colnames(chrom_list[[1]]))){
-      stop("Lambdas not found!")
-    }
-    if (scale){
-      chrom_list <- lapply(chrom_list, rescale)
-    }
-    chrom_list_og <- chrom_list
-    if (n.zeros > 0){
+      stop("Must specify wavelengths ('lambdas') or number of traces ('n.traces')
+           to use for alignment.")
+    } else lambdas <- colnames(chrom_list[[1]])
+  }
+  lambdas <- as.character(lambdas)
+  if (!all(lambdas %in% colnames(chrom_list[[1]]))){
+    stop("Lambdas not found!")
+  }
+  if (scale){
+    chrom_list <- lapply(chrom_list, rescale)
+  }
+  chrom_list_og <- chrom_list
+  if (n.zeros > 0){
     chrom_list <- lapply(chrom_list, function(x){
       apply(x, 2, padzeros, nzeros = n.zeros, side = 'both')
     })
-    }
-    allmats <- sapply(chrom_list, function(x){
-      x[, lambdas, drop = FALSE]}, simplify = "array")
-    allmats.t <- sapply(chrom_list, function(x){
-      t(x[, lambdas, drop = FALSE])}, simplify = "array")
-    if (is.null(n.traces)){
-      traces <- ifelse(length(lambdas) == 1, 1, list(lambdas))[[1]]
-    } else {
-      traces <- select.traces(X = allmats.t, criterion='coda')
-      traces <- traces$trace.nrs[1:n.traces]
-    }
-    # choose reference chromatogram
-    if (reference == 'best'){
-      best <- bestref(allmats.t)
-      reference <- as.numeric(names(sort(table(best$best.ref), decreasing = TRUE))[1])
-      if (verbose) message(paste("Selected chromatogram", reference, "as best reference."))
-    } else{
-      reference <- reference
-    }
-    args <- substitute(list(lambdas=lambdas, models=models, reference=reference, 
-                            alg=alg, init.coef=init.coef, n.traces = n.traces,
-                            n.zeros = n.zeros, scale = scale, trwdth = trwdth,
-                            penalty = penalty, maxshift = maxshift))
-    if (alg == "ptw"){
-      if (is.null(models)){
-        laplee <- choose_apply_fnc(show_progress, cl = cl)
-        models <- laplee(seq_len(dim(allmats)[3]), function(ii){
-          ptw(allmats.t[,, reference],
-              allmats.t[,, ii], selected.traces = traces, init.coef = init.coef,
-              warp.type = "global", ...)})
-        class(models) <- "ptw_list"
-        if (plot_it){
-          plot(models)
-        }
+  }
+  allmats <- sapply(chrom_list, function(x){
+    x[, lambdas, drop = FALSE]}, simplify = "array")
+  allmats.t <- sapply(chrom_list, function(x){
+    t(x[, lambdas, drop = FALSE])}, simplify = "array")
+  if (is.null(n.traces)){
+    traces <- ifelse(length(lambdas) == 1, 1, list(lambdas))[[1]]
+  } else {
+    traces <- select.traces(X = allmats.t, criterion='coda')
+    traces <- traces$trace.nrs[1:n.traces]
+  }
+  # choose reference chromatogram
+  if (reference == 'best'){
+    best <- bestref(allmats.t)
+    reference <- as.numeric(names(sort(table(best$best.ref), decreasing = TRUE))[1])
+    if (verbose) message(paste("Selected chromatogram", reference, "as best reference."))
+  } else {
+    reference <- reference
+  }
+  args <- substitute(list(lambdas = lambdas, models = models, reference = reference, 
+                          alg = alg, init.coef = init.coef, n.traces = n.traces,
+                          n.zeros = n.zeros, scale = scale, trwdth = trwdth,
+                          penalty = penalty, maxshift = maxshift))
+  if (alg == "ptw"){
+    if (is.null(models)){
+      laplee <- choose_apply_fnc(show_progress, cl = cl)
+      models <- laplee(seq_len(dim(allmats)[3]), function(ii){
+        ptw(allmats.t[,, reference],
+            allmats.t[,, ii], selected.traces = traces, init.coef = init.coef,
+            warp.type = "global", ...)})
+      class(models) <- "ptw_list"
+      if (plot_it){
+        plot(models)
       }
-      if (what == "corrected.values"){
-        allmats <- sapply(chrom_list_og, identity, simplify = "array")
-        warp.coef <- lapply(models, FUN=function(x){
-          x$warp.coef[1,]
-        })
-        models <- lapply(seq_len(dim(allmats)[3]), function(ii){
-          ptw(t(allmats[,,1]), t(allmats[, , ii]), init.coef = warp.coef[[ii]],
-              try = TRUE, alg = models[[1]]$alg, warp.type = "global", ...)})
-        result <- lapply(models, function(x) t(x$warped.sample))
-        for (i in seq_along(result)){
-          rownames(result[[i]]) <- rownames(chrom_list[[i]])
-          result[[i]] <- transfer_metadata(result[[i]], chrom_list_og[[i]])
-          result <- structure(result, warped = TRUE, warping_args = args)
-        }
-        names(result) <- names(chrom_list)
-        result
-      } else {models}
+    }
+    if (what == "corrected.values"){
+      allmats <- sapply(chrom_list_og, identity, simplify = "array")
+      warp.coef <- lapply(models, FUN = function(x){
+        x$warp.coef[1,]
+      })
+      models <- lapply(seq_len(dim(allmats)[3]), function(ii){
+        ptw(t(allmats[,,1]), t(allmats[,,ii]), init.coef = warp.coef[[ii]],
+            try = TRUE, alg = models[[1]]$alg, warp.type = "global", ...)})
+      result <- lapply(models, function(x) t(x$warped.sample))
+      for (i in seq_along(result)){
+        rownames(result[[i]]) <- rownames(chrom_list[[i]])
+        result[[i]] <- transfer_metadata(result[[i]], chrom_list_og[[i]])
+        result <- structure(result, warped = TRUE, warping_args = args)
+      }
+      names(result) <- names(chrom_list)
+      result
+    } else {models}
   } else if (alg == "vpdtw"){
     if (length(lambdas) > 1)
       stop("VPdtw only supports warping by a single wavelength")
     allmats <- sapply(chrom_list_og, function(x) x[, lambdas, drop = FALSE])
     if (is.null(models)){
       penalty <- VPdtw::dilation(allmats[,reference], 350) / penalty
-      models <- VPdtw::VPdtw(query = allmats, reference = allmats[,reference],
+      models <- VPdtw::VPdtw(query = allmats, reference = allmats[, reference],
                              penalty = penalty, maxshift = maxshift)
     }
     if (plot_it){
@@ -192,7 +192,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
       })
         # fix times
         old_ts <- c(rep(NA, short), get_times(chrom_list_og, index = reference))
-        times <- suppressWarnings(stats::approx(x = jset[,reference],
+        times <- suppressWarnings(stats::approx(x = jset[, reference],
                                                 y = old_ts, 1:jmax)$y)
         idx_start <- which.min(times)
         if (idx_start > 1){
@@ -220,7 +220,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
           xx
         })
       result
-    } else{
+    } else {
       models
     }
   }
