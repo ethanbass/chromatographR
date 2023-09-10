@@ -41,7 +41,7 @@ be interpreted as the maximal inter-cluster retention time difference.}
 \item{plot_it}{Logical. If TRUE, for every component a stripplot will be
 shown indicating the clustering.}
 
-\item{ask}{Logical. Ask before showing new plot?}
+\item{ask}{Logical. Ask before showing new plot? Defaults to TRUE.}
 
 \item{clust}{Specify whether to perform hierarchical clustering based on
 spectral similarity and retention time (\code{sp.rt}) or retention time alone
