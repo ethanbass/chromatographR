@@ -31,11 +31,14 @@ plot_chroms <- function(x, lambdas, idx, xlim, ylim, xlab = "", ylab = "Absorban
   if (missing(idx)){
     idx <- seq_along(x)
   }
-  lambdas.idx <- sapply(lambdas, function(lambda){
-    get_lambda_idx(lambda, lambdas = get_lambdas(x),
-                               allow_max = FALSE)
-  })
-  
+  if (ncol(x[[1]]) == 1){
+    lambdas.idx <- 1
+  } else {
+    lambdas.idx <- sapply(lambdas, function(lambda){
+      get_lambda_idx(lambda, lambdas = get_lambdas(x),
+                     allow_max = FALSE)
+    }) 
+  }
   zoom_x <- TRUE
   zoom_y <- TRUE
   if (missing(xlim)){

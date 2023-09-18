@@ -1,3 +1,8 @@
+# chromatographR 0.5.6
+
+* Fixed bug in preprocess function causing fatal error due to misrecognition of matrices.
+* Fixed behavior of `plot_chroms` and `correct_rt` to allow automatic detection of `lambda` for 1D chromatograms.
+
 # chromatographR 0.5.5
 
 * Fixed bug in `get_peaktable` causing failure to print strip plot when `plot_it == TRUE`.

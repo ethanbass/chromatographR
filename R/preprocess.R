@@ -88,7 +88,7 @@ preprocess <- function(X, dim1, ## time axis
     X <- list(X)
     return_matrix <- TRUE
   } else return_matrix <- FALSE
-  if (!is.list(X) | mean(sapply(X,is.matrix)) != 1)
+  if (!is.list(X) | !all(mean(sapply(X, is.matrix))))
     stop("X should be a matrix or a list of matrices")
   if (ncol(X[[1]]) == 1){
     interpolate_cols <- FALSE

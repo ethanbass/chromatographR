@@ -96,6 +96,9 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
     }
   }
   if (missing(lambdas)){
+    if (ncol(chrom_list[[1]]) == 1){
+      lambdas <- colnames(chrom_list[[1]])
+    }
     if (is.null(models) & is.null(n.traces)){
       stop("Must specify wavelengths ('lambdas') or number of traces ('n.traces')
            to use for alignment.")
@@ -154,14 +157,15 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
         x$warp.coef[1,]
       })
       models <- lapply(seq_len(dim(allmats)[3]), function(ii){
-        ptw(t(allmats[,,1]), t(allmats[,,ii]), init.coef = warp.coef[[ii]],
+        ptw(t(allmats[,, 1]), t(allmats[,, ii]), init.coef = warp.coef[[ii]],
             try = TRUE, alg = models[[1]]$alg, warp.type = "global", ...)})
-      result <- lapply(models, function(x) t(x$warped.sample))
-      for (i in seq_along(result)){
-        rownames(result[[i]]) <- rownames(chrom_list[[i]])
-        result[[i]] <- transfer_metadata(result[[i]], chrom_list_og[[i]])
-        result <- structure(result, warped = TRUE, warping_args = args)
-      }
+      result <- lapply(seq_along(models), function(i){
+        x <- t(models[[i]]$warped.sample)
+        rownames(x) <- rownames(chrom_list[[i]])
+        colnames(x) <- colnames(chrom_list[[i]])
+        x <- transfer_metadata(x, chrom_list_og[[i]])
+      })
+      result <- structure(result, warped = TRUE, warping_args = args)
       names(result) <- names(chrom_list)
       result
     } else {models}
