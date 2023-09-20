@@ -9,22 +9,22 @@ combine_peaks(
   tol = 0.01,
   min.cor = 0.9,
   choose = "max",
-  verbose = TRUE
+  verbose = getOption("verbose")
 )
 }
 \arguments{
 \item{peak_table}{Peak table from \code{\link{get_peaktable}}.}
 
 \item{tol}{Tolerance for matching retention times (maximum retention time
-difference).}
+difference). Defaults to \code{.01}.}
 
-\item{min.cor}{Minimum spectral correlation to confirm a match.}
+\item{min.cor}{Minimum spectral correlation to confirm a match. Defaults to 
+\code{0.9}.}
 
-\item{choose}{If "max" will retain peak with highest intensity. Otherwise,
+\item{choose}{If \code{max} will retain peak with highest intensity. Otherwise,
 the first column in the data.frame will be retained.}
 
-\item{verbose}{Logical. Whether to print status to the console. Defaults to
-TRUE.}
+\item{verbose}{Logical. Whether to print status to the console.}
 }
 \value{
 A peak table similar to the input peak table, but with duplicate
