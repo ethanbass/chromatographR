@@ -11,7 +11,7 @@ filter_peaktable(
   max_rt,
   min_value,
   lambda,
-  what = c("median", "mean"),
+  what = c("median", "mean", "max"),
   tol = 0
 )
 }
@@ -24,12 +24,13 @@ filter_peaktable(
 
 \item{max_rt}{Maximum retention time to include in the peak table.}
 
-\item{min_value}{Minimal cutoff for average peak intensity.}
+\item{min_value}{Minimal cutoff for summarized peak intensity.}
 
 \item{lambda}{Component(s) to include in peak table (e.g. wavelengths if you
 are using HPLC-DAD/UV).}
 
-\item{what}{Whether to average intensities using \code{mean} or \code{median}.}
+\item{what}{Whether to summarize intensities using \code{mean}, \code{median}, 
+or \code{max}.}
 
 \item{tol}{Tolerance for matching of retention times to \code{rts}.}
 }
