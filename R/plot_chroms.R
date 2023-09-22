@@ -31,16 +31,24 @@ plot_chroms <- function(x, lambdas, idx, xlim, ylim, xlab = "", ylab = "Absorban
   if (missing(idx)){
     idx <- seq_along(x)
   }
+  if (ncol(x[[1]]) == 1){
+    lambdas.idx <- 1
+  } else {
+    lambdas.idx <- sapply(lambdas, function(lambda){
+      get_lambda_idx(lambda, lambdas = get_lambdas(x),
+                     allow_max = FALSE)
+    }) 
+  }
   zoom_x <- TRUE
   zoom_y <- TRUE
   if (missing(xlim)){
     zoom_x <- FALSE
-    xlim <- c(head(get_times(x),1), tail(get_times(x), 1))
+    xlim <- c(head(get_times(x), 1), tail(get_times(x), 1))
   }
   if (missing(ylim)){
     zoom_y <- FALSE
     ylim <- c(0, max(sapply(x[idx], function(xx){
-      max(xx[,lambdas], na.rm=TRUE)
+      max(xx[,lambdas.idx], na.rm = TRUE)
     }))*1.1)
   }
   if (engine == "base"){
@@ -50,20 +58,20 @@ plot_chroms <- function(x, lambdas, idx, xlim, ylim, xlab = "", ylab = "Absorban
     axis(1)
     axis(2)
     box()
-    chroms <- sapply(x[idx], function(xx) xx[,lambdas])
-    if (length(lambdas) == 1){
-      matplot(get_times(chroms), chroms, type = 'l', add = TRUE,
+    chroms <- sapply(x[idx], function(xx) xx[,lambdas.idx])
+    if (length(lambdas.idx) == 1){
+      matplot(get_times(x), chroms, type = 'l', add = TRUE,
               lwd = linewidth, lty = 1, ...)
     } else{
       for (i in seq_along(idx)){
-        matplot(get_times(x, index = idx[i]), x[[idx[i]]][,lambdas], type = 'l',
+        matplot(get_times(x, index = idx[i]), x[[idx[i]]][,lambdas.idx], type = 'l',
                 add = TRUE, col = i, lwd = linewidth, ...)
       }
     }
     if (show_legend)
       legend(x = legend_position, legend = names(x)[idx], fill = seq_along(x[idx]))
   } else {
-    xx <- reshape_chroms(x, idx = idx, lambdas = lambdas)
+    xx <- reshape_chroms(x, idx = idx, lambdas = lambdas.idx)
     if (engine == "ggplot"){
       check_for_pkg("ggplot2")
       .data <- ggplot2::.data
@@ -87,7 +95,7 @@ plot_chroms <- function(x, lambdas, idx, xlim, ylim, xlab = "", ylab = "Absorban
     } else if (engine == "plotly"){
       check_for_pkg("plotly")
       p <- plotly::plot_ly(data = xx[which(xx$lambda %in% lambdas),],
-                           x = ~rt,y = ~absorbance, color = ~sample,
+                           x = ~rt, y = ~absorbance, color = ~sample,
                            type='scatter', mode = 'lines',
                            line = list(width = linewidth, ...))
       p <-  plotly::layout(p, xaxis = list(title = xlab),

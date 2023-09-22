@@ -13,6 +13,13 @@
 
 * Fixed error in `attach_metadata` when there are NA values in merge column.
 
+# chromatographR 0.5.6
+
+* Fixed bug in preprocess function causing fatal error due to misrecognition of matrices.
+* Fixed behavior of `plot_chroms` and `correct_rt` to allow automatic detection of `lambda` for 1D chromatograms.
+* Fixed bug in `combine_peaks` (due to misplaced parenthesis).
+* Added new option to filter by maximum peak area or height in `filter_peaktable` (`what = "max"`), as suggested by Katherine Holmes.
+
 # chromatographR 0.5.5
 
 * Fixed bug in `get_peaktable` causing failure to print strip plot when `plot_it == TRUE`.

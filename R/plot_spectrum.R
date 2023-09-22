@@ -339,7 +339,7 @@ scan_chrom <- function(chrom_list, chr, lambda,
     chr <- as.numeric(readline(
       prompt="Which chromatogram do you wish to plot? \n"))
   }
-  chr <- check_chr(chr, loc=NULL, peak_table, chrom_list, allow_max = FALSE)
+  chr <- check_chr(chr, loc = NULL, peak_table, chrom_list, allow_max = FALSE)
 
   #check lambdas
   if (missing(lambda))
@@ -351,11 +351,11 @@ scan_chrom <- function(chrom_list, chr, lambda,
   
   if (plot_spectrum){
     plot_spectrum(loc = idx, chrom_list = chrom_list,
-                  chr = chr, lambda = lambda, what="idx",
+                  chr = chr, lambda = lambda, what = "idx",
                   scale_spectrum = scale_spectrum,
                   spectrum_labels = spectrum_labels, 
                   export_spectrum = export_spectrum,
-                  engine="base", ...)
+                  engine = "base", ...)
   }
   idx
 }
