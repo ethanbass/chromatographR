@@ -7,7 +7,7 @@
 
 #### Other changes
 
-* Made some minor improvements to the vignette.
+* Made some minor changes to vignette to improve clarity (e.g. using single wavelength for integration, etc.)
 
 #### Bug fixes
 

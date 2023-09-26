@@ -97,11 +97,11 @@ oldpar <- par(no.readonly = TRUE) # save current par settings
 
 par(mfrow=c(2,1))
 # plot warped data
-plot_chroms(warp, lambdas = c("210","260"))
+plot_chroms(warp, lambdas = c("210"))
 legend("topleft", legend="ptw", bty = "n")
 
 # plot unwarped data
-plot_chroms(dat.pr, lambdas = c("210","260"))
+plot_chroms(dat.pr, lambdas = c("210"))
 legend("topleft", legend="raw", bty = "n")
 par(oldpar) # restore par settings
 ```
@@ -121,10 +121,10 @@ warp <- correct_rt(chrom_list = dat.pr, alg = "vpdtw", lambdas = "210", what = "
 oldpar <- par(no.readonly = TRUE) # save current par settings
 
 par(mfrow=c(2,1))
-plot_chroms(warp, lambdas = c("210","260"))
+plot_chroms(warp, lambdas = c("210"))
 legend("topleft", legend = "vpdtw", bty = "n")
 
-plot_chroms(dat.pr, lambdas = c("210","260"))
+plot_chroms(dat.pr, lambdas = c("210"))
 legend("topleft", legend = "raw", bty = "n")
 
 par(oldpar) # restore par settings
@@ -138,13 +138,13 @@ The `get_peaks` function produced a nested list of peaks by looping through the 
 
 ```{r get_peaks, message=FALSE, warning=FALSE}
 # find and integrate peaks using gaussian peak fitting
-pks_gauss <- get_peaks(warp, lambdas = c('210','260'), sd.max = 40, fit = "gaussian")
+pks_gauss <- get_peaks(warp, lambdas = c('210'), sd.max = 40, fit = "gaussian")
 
 # find and integrate peaks using exponential-gaussian hybrid model
-pks_egh <- get_peaks(warp, lambdas = c('210', '260'), sd.max = 40, fit="egh")
+pks_egh <- get_peaks(warp, lambdas = c('210'), sd.max = 40, fit="egh")
 
 # find and integrate peaks without modeling peak shape
-pks_raw <- get_peaks(warp, lambdas = c('210', '260'), sd.max = 100, fit="raw")
+pks_raw <- get_peaks(warp, lambdas = c('210'), sd.max = 100, fit="raw")
 ```
 
 #### Filtering
@@ -199,7 +199,7 @@ pk_tab <- normalize_data(peak_table = pk_tab, column="mass")
 The `mirror_plot` function provides a quick way to visually compare results across treatment groups.
 
 ```{r mirror_plot}
-mirror_plot(pk_tab, lambdas = c("210","260"), var = "trt", legend_size = 2)
+mirror_plot(pk_tab, lambdas = c("210"), var = "trt", legend_size = 2)
 ```
 
 ##### Plotting spectra
