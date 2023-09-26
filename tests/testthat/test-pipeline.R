@@ -98,17 +98,6 @@ test_that("plot_chroms works to plot alignments", {
   expect_error(plot_chroms(pktab))
 })
 
-test_that("plot_chroms works with plotly", {
-  skip_on_cran()
-  skip_if_not_installed("vdiffr")
-  skip_if_not_installed("plotly")
-  skip_if_not_installed("reticulate")
-  skip_if_not_installed("rsvg")
-
-  p <- plot_chroms(warp, lambdas="210", engine="plotly")
-  suppressWarnings(expect_doppelganger_plotly(name = "alignment_plotly", p = p))
-})
-
 test_that("plot_chroms works to plot alignments with ggplot", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
@@ -366,6 +355,16 @@ test_that("plot_spectrum works with plotly engine", {
   expect_doppelganger_plotly("plot_spectrum_plotly", p = p3)
 })
 
+test_that("plot_chroms works with plotly", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  skip_if_not_installed("plotly")
+  skip_if_not_installed("reticulate")
+  skip_if_not_installed("rsvg")
+  p <- plot_chroms(warp, lambdas="210", engine="plotly")
+  suppressWarnings(expect_doppelganger_plotly(name = "alignment_plotly", p = p))
+})
+
 test_that("plot_spectrum works with ggplot2", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
@@ -465,35 +464,35 @@ test_that("cluster_spectra works", {
   expect_equal(class(cl[[2]]), "list")
 })
 
-# test_that("write_peaktable writes csvs correctly", {
-#   data(pk_tab)
-#   skip_on_cran()
-#   path <-  tempdir(check = TRUE)
-#   on.exit(unlink(c(fs::path(path,"peak_table-tab", ext="csv"),
-#                    fs::path(path,"peak_table-pk_meta", ext="csv"),
-#                    path)))
-#   write_peaktable(peak_table = pk_tab, path = path, format = "csv", what=c("tab", "pk_meta"))
-#   path_table <- paste0(file.path(path,"peak_table-tab"), ext =".csv")
-#   path_meta <- paste0(file.path(path,"peak_table-pk_meta"), ext =".csv")
-# 
-#   expect_true(file.exists(path_table))
-#   expect_true(file.exists(path_meta))
-# 
-#   expect_equal(pk_tab$tab, read.csv(file = path_table, row.names = 1), ignore_attr=TRUE)
-#   expect_equal(pk_tab$pk_meta, read.csv(file = path_meta, row.names = 1), ignore_attr=TRUE)
-#   expect_error(write_peaktable(pk_tab, path="fake_path"))
-# })
+test_that("write_peaktable writes csvs correctly", {
+  data(pk_tab)
+  skip_on_cran()
+  path <-  tempdir(check = TRUE)
+  on.exit(unlink(c(fs::path(path,"peak_table-tab", ext="csv"),
+                   fs::path(path,"peak_table-pk_meta", ext="csv"),
+                   path)))
+  write_peaktable(peak_table = pk_tab, path = path, format = "csv", what=c("tab", "pk_meta"))
+  path_table <- paste0(file.path(path,"peak_table-tab"), ext =".csv")
+  path_meta <- paste0(file.path(path,"peak_table-pk_meta"), ext =".csv")
 
-# test_that("write_peaktable writes xlsx correctly", {
-#   skip_on_cran()
-#   skip_if_not_installed("openxlsx")
-#   data(pk_tab)
-#   path <-  tempdir()
-#   on.exit(unlink(c(fs::path(path, "peak_table", ext="xlsx"), path)))
-#   
-#   write_peaktable(pk_tab, path = path, format = "xlsx")
-#   file <- fs::path(path, "peak_table", ext = "xlsx")
-#   xx <- openxlsx::read.xlsx(file, sheet = 1, rowNames = TRUE)
-#   expect_equal(pk_tab$tab, xx, ignore_attr=TRUE)
-#   expect_equal(pk_tab$pk_meta, openxlsx::read.xlsx(file, sheet = 2, rowNames = TRUE), ignore_attr=TRUE)
-# })
+  expect_true(file.exists(path_table))
+  expect_true(file.exists(path_meta))
+
+  expect_equal(pk_tab$tab, read.csv(file = path_table, row.names = 1), ignore_attr=TRUE)
+  expect_equal(pk_tab$pk_meta, read.csv(file = path_meta, row.names = 1), ignore_attr=TRUE)
+  expect_error(write_peaktable(pk_tab, path="fake_path"))
+})
+
+test_that("write_peaktable writes xlsx correctly", {
+  skip_on_cran()
+  skip_if_not_installed("openxlsx")
+  data(pk_tab)
+  path <-  tempdir()
+  on.exit(unlink(c(fs::path(path, "peak_table", ext="xlsx"), path)))
+
+  write_peaktable(pk_tab, path = path, format = "xlsx")
+  file <- fs::path(path, "peak_table", ext = "xlsx")
+  xx <- openxlsx::read.xlsx(file, sheet = 1, rowNames = TRUE)
+  expect_equal(pk_tab$tab, xx, ignore_attr=TRUE)
+  expect_equal(pk_tab$pk_meta, openxlsx::read.xlsx(file, sheet = 2, rowNames = TRUE), ignore_attr=TRUE)
+})

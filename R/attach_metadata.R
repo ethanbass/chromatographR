@@ -30,7 +30,7 @@ attach_metadata <- function(peak_table, metadata, column){
   }
   if (!(column %in% colnames(metadata)))
     stop(paste0("Column, ", column, ", is not found."))
-  if (sum((duplicated(metadata[,column]))) > 0)
+  if (sum((duplicated(metadata[,column], incomparables = NA))) > 0)
     stop(paste("Sample names must be unique. Please check column", sQuote(column),
     "for duplicates."))
   if (!inherits(peak_table,"peak_table"))

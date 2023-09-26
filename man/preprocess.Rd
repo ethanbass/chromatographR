@@ -10,7 +10,7 @@ preprocess(
   dim2,
   remove.time.baseline = TRUE,
   spec.smooth = TRUE,
-  maxI,
+  maxI = NULL,
   parallel = NULL,
   interpolate_rows = TRUE,
   interpolate_cols = TRUE,

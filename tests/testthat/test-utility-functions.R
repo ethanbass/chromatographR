@@ -12,40 +12,56 @@ test_that("get_lambdas works as expected", {
 })
 
 test_that("choose_apply_fnc works as expected", {
+  skip_on_cran()
   skip_if_not_installed("pbapply")
   fn <- choose_apply_fnc(show_progress = TRUE)
-  expect_equal(class(fn), c("purrr_function_partial","function"))
+  expect_equal(class(fn), c("purrr_function_partial", "function"))
   
   fn <- choose_apply_fnc(show_progress = FALSE, parallel = FALSE)
   expect_equal(fn, lapply)
-  fn <- choose_apply_fnc(show_progress = FALSE, cl=1)
+  fn <- choose_apply_fnc(show_progress = FALSE, cl = 1)
   expect_equal(fn, lapply)
-  fn <- choose_apply_fnc(show_progress = FALSE, cl=NULL)
+  fn <- choose_apply_fnc(show_progress = FALSE, cl = NULL)
   expect_equal(fn, lapply)
 })
 
 test_that("choose apply_fnc works as expected on unix/linux", {
+  skip_on_cran()
   skip_on_os("windows")
-  fn <- choose_apply_fnc(show_progress = TRUE, parallel=TRUE)
+  
+  fn <- choose_apply_fnc(show_progress = TRUE, parallel = TRUE)
   expect_equal(class(fn), c("purrr_function_partial","function"))
   
-  fn <- choose_apply_fnc(show_progress = FALSE, parallel=TRUE)
+  fn <- choose_apply_fnc(show_progress = FALSE, parallel = TRUE)
   expect_equal(class(fn), c("purrr_function_partial","function"))
   
   fn<-choose_apply_fnc(show_progress=NULL, parallel = TRUE)
-  pbapply_exists <- check_for_pkg("pbapply", return_boolean=TRUE)
+  pbapply_exists <- check_for_pkg("pbapply", return_boolean = TRUE)
   expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = TRUE))
+  
+  cl <- parallel::makeCluster(2)
+  fn <- choose_apply_fnc(show_progress = NULL, cl = cl)
+  expect_equal(class(fn), c("purrr_function_partial", "function"))
+  parallel::stopCluster(cl)
+  
+  fn <- choose_apply_fnc(show_progress = NULL, cl = 2)
+  expect_equal(class(fn), c("purrr_function_partial", "function"))
 })
 
 test_that("choose apply_fnc works as expected on windows", {
+  skip_on_cran()
   skip_on_os(c("mac","linux","solaris"))
-  expect_warning(choose_apply_fnc(show_progress = TRUE, parallel=TRUE))
-  expect_warning(choose_apply_fnc(show_progress = FALSE, parallel=TRUE))
-  expect_warning(choose_apply_fnc(show_progress=NULL, parallel = TRUE))
+  skip_if_not_installed("pbapply")
+
+  cl <- parallel::makeCluster(2)
+  fn <- choose_apply_fnc(show_progress = NULL, cl = cl)
+  parallel::stopCluster(cl)
+  expect_equal(class(fn), c("purrr_function_partial", "function"))
 })
 
 test_that("choose_apply_fnc works as expected with NULL value", {
-  pbapply_exists <- check_for_pkg("pbapply", return_boolean=TRUE)
+  skip_on_cran()
+  pbapply_exists <- check_for_pkg("pbapply", return_boolean = TRUE)
   
   fn<-choose_apply_fnc(show_progress=NULL, parallel = FALSE)
   expect_equal(fn, choose_apply_fnc(show_progress = pbapply_exists, parallel = FALSE))
