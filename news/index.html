@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,6 +48,22 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.0" id="chromatographr-060">chromatographR 0.6.0<a class="anchor" aria-label="anchor" href="#chromatographr-060"></a></h2>
+<div class="section level5">
+<h5 id="new-features-0-6-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-6-0"></a></h5>
+<ul><li>Enabled use of <code>parallel</code> package for parallel processing (in addition to current options using <code>mcapply</code>). (These options require the installation of suggested package <code>pbapply</code>).</li>
+<li>Updated <code>get_peaktable</code> for greater flexibility (e.g. for usage of ‘Chemstation’ peak lists as input).</li>
+</ul></div>
+<div class="section level5">
+<h5 id="other-changes-0-6-0">Other changes<a class="anchor" aria-label="anchor" href="#other-changes-0-6-0"></a></h5>
+<ul><li>Made some minor changes to vignette to improve clarity (e.g. using single wavelength for integration, etc.)</li>
+</ul></div>
+<div class="section level5">
+<h5 id="bug-fixes-0-6-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-6-0"></a></h5>
+<ul><li>Fixed error in <code>attach_metadata</code> when there are NA values in merge column.</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.6" id="chromatographr-056">chromatographR 0.5.6<a class="anchor" aria-label="anchor" href="#chromatographr-056"></a></h2>
 <ul><li>Fixed bug in preprocess function causing fatal error due to misrecognition of matrices.</li>
 <li>Fixed behavior of <code>plot_chroms</code> and <code>correct_rt</code> to allow automatic detection of <code>lambda</code> for 1D chromatograms.</li>
@@ -71,7 +87,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.2" id="chromatographr-052">chromatographR 0.5.2<a class="anchor" aria-label="anchor" href="#chromatographr-052"></a></h2>
 <ul><li>Added <code>metadata</code> argument to <code>reshape_peaktable</code> for filtering metadata fields.</li>
-<li>Added option to for renaming peaks via <code>reshape_peaktable</code> by providing a named list.</li>
+<li>Added option for renaming peaks via <code>reshape_peaktable</code> by providing a named character vector.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.1" id="chromatographr-051">chromatographR 0.5.1<a class="anchor" aria-label="anchor" href="#chromatographr-051"></a></h2>

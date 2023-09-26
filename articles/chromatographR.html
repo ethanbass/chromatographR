@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.5.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,7 +80,7 @@
 Bass<sup>1</sup>
 </h4>
             
-            <h4 data-toc-skip class="date">2023-09-22</h4>
+            <h4 data-toc-skip class="date">2023-09-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/HEAD/vignettes/chromatographR.Rmd" class="external-link"><code>vignettes/chromatographR.Rmd</code></a></small>
       <div class="d-none name"><code>chromatographR.Rmd</code></div>
@@ -117,7 +117,7 @@ conventional workflow that should seem more familiar to users of
 standard software tools for HPLC-DAD analysis. <em>chromatographR</em>
 includes tools for a) pre-processing, b) retention-time alignment, c)
 peak-finding, d) peak-integration and e) peak-table construction, as
-well as additional functions useful in analysis of the resulting peak
+well as additional functions useful for analyzing the resulting peak
 table.</p>
 </div>
 <div class="section level2">
@@ -148,10 +148,10 @@ documentation</a>). Select the appropriate file format by specifying the
 <div class="section level3">
 <h3 id="example-data">Example data<a class="anchor" aria-label="anchor" href="#example-data"></a>
 </h3>
-<p>We have included some example data consisting of root extracts from
-tall goldenrod (<em>Solidago altissima</em>). Roots were extracted in
-90% methanol and run on an Agilent 1100 HPLC coupled to a DAD detector,
-according to a previously described method <span class="citation">(Uesugi and Kessler 2013)</span>. The dataset is called
+<p>The package includes some example data consisting of root extracts
+from tall goldenrod (<em>Solidago altissima</em>). Roots were extracted
+in 90% methanol and run on an Agilent 1100 HPLC coupled to a DAD
+detector, according to a previously described method <span class="citation">(Uesugi and Kessler 2013)</span>. The dataset is called
 <code>Sa</code> (abbreviated from <em>Solidago altissima</em>).</p>
 <pre class="text"><code>&gt; data(Sa)</code></pre>
 </div>
@@ -186,7 +186,7 @@ parameters before choosing values to use on your whole dataset.</p>
 +        type='l', ylab='Abs (mAU)', xlab='Time (min)')
 &gt; matplot(x=tpoints, y = ptw::baseline.corr(Sa[[i]][,lambda],p = .001,lambda = 1e5),
 +        type='l', add = TRUE, col='blue', lty = 3)</code></pre>
-<p><img src="chromatographR_files/figure-html/Choose%20parameters%20for%20fitting%20baseline-1.png" width="600px"></p>
+<p><img src="chromatographR_files/figure-html/choose_parameters_for_fitting_baseline-1.png" width="600px"></p>
 <pre class="text"><code>&gt; # choose dimensions for interpolation
 &gt; new.ts &lt;- seq(10,18.66,by=.01) # choose time-points
 &gt; new.lambdas &lt;- seq(200, 318, by = 2) # choose wavelengths
@@ -212,10 +212,10 @@ of shifts. In <code>chromatographR</code>, parametric time warping
 (<code>vpdtw</code>) <span class="citation">(Clifford et al. 2009;
 Clifford and Stone 2012)</span> are available for correcting retention
 time shifts through the <code>correct_rt</code> function. Both warping
-functions aim to produce a better alignment of retention times by
-“warping” the time-axis of each supplied chromatogram to match a
-reference chromatogram. (The reference chromatogram can either be
-determined algorithmically or selected manually by setting the
+functions aim to produce a better alignment of features by “warping” the
+time-axis of each supplied chromatogram to match a reference
+chromatogram. (The reference chromatogram can either be determined
+algorithmically or selected manually by setting the
 <code>reference</code> argument).</p>
 <div class="section level4">
 <h4 id="parametric-time-warping">Parametric time warping<a class="anchor" aria-label="anchor" href="#parametric-time-warping"></a>
@@ -238,16 +238,18 @@ on warp function optimization).</p>
 &gt; warp &lt;- correct_rt(chrom_list = dat.pr, models = warping.models, what = "corrected.values")</code></pre>
 <p>We can then use the following code snippet to compare the alignment
 of warped (top panel) and unwarped (bottom panel) chromatograms.</p>
-<pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE)
-&gt; par(mfrow=c(2,1))
+<pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE) # save current par settings
 &gt; 
-&gt; plot_chroms(warp, lambdas = c("210","260"), show_legend = TRUE)
+&gt; par(mfrow=c(2,1))
+&gt; # plot warped data
+&gt; plot_chroms(warp, lambdas = c("210"))
 &gt; legend("topleft", legend="ptw", bty = "n")
 &gt; 
-&gt; plot_chroms(dat.pr, lambdas = c("210","260"))
+&gt; # plot unwarped data
+&gt; plot_chroms(dat.pr, lambdas = c("210"))
 &gt; legend("topleft", legend="raw", bty = "n")</code></pre>
 <p><img src="chromatographR_files/figure-html/alignment_plot-1.png" width="600px"></p>
-<pre class="text"><code>&gt; par(oldpar)</code></pre>
+<pre class="text"><code>&gt; par(oldpar) # restore par settings</code></pre>
 <p>Clearly, the alignment is considerably improved after warping. You
 can also use the <code>correct_rt</code> function to do a global
 alignment on multiple wavelengths, by providing a list of wavelengths to
@@ -275,24 +277,25 @@ peak distortion. VPdtw package is a suggested dependency since it
 requires a working C++ compiler. Unlike <code>ptw</code>,
 <code>VPdtw</code> can only take a single wavelength as input (but it
 returns a global warping on the whole chromatographic matrix). The code
-snippet below is not run, but shows how one could install
-<code>VPdtw</code> and use it to warp the example chromatograms. the
-<code>penalty</code> and <code>maxshift</code> parameters can be
-adjusted to control the degree of warping.</p>
-<pre class="text"><code>&gt; warp &lt;- correct_rt(chrom_list = dat.pr, alg = "vpdtw", lambdas = "210", what = "corrected.values", reference = 1)</code></pre>
-<pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE)
+snippet below uses VPdtw to warp the example chromatograms using the
+first chromatogram as a reference. The <code>penalty</code> and
+<code>maxshift</code> parameters can be adjusted to control the degree
+of warping.</p>
+<pre class="text"><code>&gt; # align chromatograms with variable penalty dynamic time warping
+&gt; warp &lt;- correct_rt(chrom_list = dat.pr, alg = "vpdtw", lambdas = "210", what = "corrected.values", reference = 1)</code></pre>
+<pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE) # save current par settings
 &gt; 
 &gt; par(mfrow=c(2,1))
-&gt; plot_chroms(warp, lambdas = c("210","260"))
+&gt; plot_chroms(warp, lambdas = c("210"))
 &gt; legend("topleft", legend = "vpdtw", bty = "n")
 &gt; 
-&gt; plot_chroms(dat.pr, lambdas = c("210","260"))
+&gt; plot_chroms(dat.pr, lambdas = c("210"))
 &gt; legend("topleft", legend = "raw", bty = "n")</code></pre>
-<p><img src="chromatographR_files/figure-html/unnamed-chunk-3-1.png" width="600px"></p>
-<pre class="text"><code>&gt; par(oldpar)</code></pre>
+<p><img src="chromatographR_files/figure-html/plot_chroms-1.png" width="600px"></p>
+<pre class="text"><code>&gt; par(oldpar) # restore par settings</code></pre>
 <p>In this case the alignments produced by the two algorithms are very
-similar, but in many cases one algorithm may dramatically out-perform
-the other, so it is useful to have more than one option available.</p>
+similar, but in many cases one algorithm may dramatically outperform the
+other.</p>
 </div>
 </div>
 <div class="section level3">
@@ -308,11 +311,14 @@ estimated using trapezoidal approximation. Alternatively, peak area can
 be integrated without applying a model (<code>raw</code>). The function
 returns a nested list of data.frames containing parameters for the peaks
 identified in each chromatogram.</p>
-<pre class="text"><code>&gt; pks_gauss &lt;- get_peaks(warp, lambdas = c('210','260'), sd.max = 40, fit = "gaussian")
+<pre class="text"><code>&gt; # find and integrate peaks using gaussian peak fitting
+&gt; pks_gauss &lt;- get_peaks(warp, lambdas = c('210'), sd.max = 40, fit = "gaussian")
 &gt; 
-&gt; pks_egh &lt;- get_peaks(warp, lambdas = c('210', '260'), sd.max = 40, fit="egh")
+&gt; # find and integrate peaks using exponential-gaussian hybrid model
+&gt; pks_egh &lt;- get_peaks(warp, lambdas = c('210'), sd.max = 40, fit="egh")
 &gt; 
-&gt; pks_raw &lt;- get_peaks(warp, lambdas = c('210', '260'), sd.max = 100, fit="raw")</code></pre>
+&gt; # find and integrate peaks without modeling peak shape
+&gt; pks_raw &lt;- get_peaks(warp, lambdas = c('210'), sd.max = 100, fit="raw")</code></pre>
 <div class="section level4">
 <h4 id="filtering">Filtering<a class="anchor" aria-label="anchor" href="#filtering"></a>
 </h4>
@@ -336,13 +342,13 @@ algorithms. Usually the egh function performs slightly better for
 asymmetrical peaks. Even though the peaks are fully filled in when the
 <code>raw</code> setting is selected, the results may not necessarily be
 more accurate.</p>
-<pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE)
+<pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE) # save current par settings
 &gt; par(mfrow=c(3,1))
 &gt; plot(pks_gauss, index = 1, lambda = '210')
 &gt; plot(pks_egh, index = 1, lambda = '210')
 &gt; plot(pks_raw, index = 1, lambda = '210')</code></pre>
 <p><img src="chromatographR_files/figure-html/plot_peaks-1.png" width="600px"></p>
-<pre class="text"><code>&gt; par(oldpar)</code></pre>
+<pre class="text"><code>&gt; par(oldpar) # restore par settings</code></pre>
 </div>
 </div>
 <div class="section level3">
@@ -364,7 +370,10 @@ times are matched across samples. A low value of <code>hmax</code> will
 increase the odds of splitting a single peaks across multiple columns,
 while a high value of <code>hmax</code> will increase the odds of
 erroneously combining multiple peaks into the same column.</p>
-<pre class="text"><code>&gt; pk_tab &lt;- get_peaktable(pks_egh, response = "area", hmax = 0.2)
+<pre class="text"><code>&gt; # assembly peak table from peak_list saved in `pks_egh`
+&gt; pk_tab &lt;- get_peaktable(pks_egh, response = "area", hmax = 0.2)
+&gt; 
+&gt; # print first six columns of peak table
 &gt; head(pk_tab$tab[,1:6])</code></pre>
 <pre><code>          V1        V2        V3       V4        V5        V6
 119 5.496455 0.0000000 0.6572183 1.991365 15.199917 0.3114568
@@ -384,14 +393,17 @@ easily accomplished using the <code>attach_metadata</code> function.
 This function takes a <code>metadata</code> argument which should be
 supplied with a <code>data.frame</code> containing experimental
 metadata, where one of the columns matches the names of your samples.
-This column should be specified by supplying it as the
-<code>column</code> argument. This will attach the ordered metadata in
-the <code>sample_meta</code> slot of your peak table. The peak table can
-then be normalized (e.g. by dividing out the sample weight) using the
-<code>normalize_data</code> function.</p>
-<pre class="text"><code>&gt; path &lt;- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
+This column should be specified by supplying the column name as a string
+to the <code>column</code> argument. This will attach the ordered
+metadata in the <code>sample_meta</code> slot of your peak table. The
+peak table can then be normalized (e.g. by dividing out the sample
+weight) using the <code>normalize_data</code> function.</p>
+<pre class="text"><code>&gt; # load example metadata
+&gt; path &lt;- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
 &gt; meta &lt;- read.csv(path)
+&gt; # attach metadata
 &gt; pk_tab &lt;- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
+&gt; # normalize peak table by sample mass
 &gt; pk_tab &lt;- normalize_data(peak_table = pk_tab, column="mass")</code></pre>
 </div>
 <div class="section level4">
@@ -402,8 +414,8 @@ then be normalized (e.g. by dividing out the sample weight) using the
 </h5>
 <p>The <code>mirror_plot</code> function provides a quick way to
 visually compare results across treatment groups.</p>
-<pre class="text"><code>&gt; mirror_plot(pk_tab, lambdas = c("210","260"), var = "trt", legend_size = 2)</code></pre>
-<p><img src="chromatographR_files/figure-html/unnamed-chunk-5-1.png" width="600px"></p>
+<pre class="text"><code>&gt; mirror_plot(pk_tab, lambdas = c("210"), var = "trt", legend_size = 2)</code></pre>
+<p><img src="chromatographR_files/figure-html/mirror_plot-1.png" width="600px"></p>
 </div>
 <div class="section level5">
 <h5 id="plotting-spectra">Plotting spectra<a class="anchor" aria-label="anchor" href="#plotting-spectra"></a>
@@ -421,20 +433,21 @@ will plot the trace and spectrum from the chromatogram with the largest
 peak in the peak table. Alternatively, you can choose the chromatogram
 index and wavelength using the <code>chr</code> and <code>lambda</code>
 arguments.</p>
-<pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE)
+<pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE) # save current par settings
+&gt; 
 &gt; par(mfrow = c(2,1))
 &gt; peak = "V7"
 &gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp, verbose = FALSE)</code></pre>
-<p><img src="chromatographR_files/figure-html/plot%20spectra-1.png" width="600px"></p>
-<pre class="text"><code>&gt; par(oldpar)</code></pre>
-<p>The <code>plot_spectrum</code> function can also generate interactive
-plots using <a href="https://plotly.com/r/" class="external-link">plotly</a>.</p>
+<p><img src="chromatographR_files/figure-html/plot_spectra-1.png" width="600px"></p>
+<pre class="text"><code>&gt; par(oldpar) # restore par settings</code></pre>
+<p>The <code>plot_spectrum</code> function can also be used to generate
+interactive plots using <a href="https://plotly.com/r/" class="external-link">plotly</a>.</p>
 <pre class="text"><code>&gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp, verbose = FALSE, engine = "plotly")</code></pre>
 <p>The <code>plot_all_spectra</code> function can be used to visually
 compare the spectra for a specified peak across all samples.</p>
 <pre class="text"><code>&gt; peak = "V13"
-&gt; plot_all_spectra(peak, peak_table = pk_tab, export = F, overlapping = TRUE)</code></pre>
-<p><img src="chromatographR_files/figure-html/plot_all-1.png" width="600px"></p>
+&gt; plot_all_spectra(peak, peak_table = pk_tab, export = FALSE)</code></pre>
+<p><img src="chromatographR_files/figure-html/plot_all_spectra-1.png" width="600px"></p>
 </div>
 <div class="section level5">
 <h5 id="plot-peak-table-function">Plot peak table function<a class="anchor" aria-label="anchor" href="#plot-peak-table-function"></a>
@@ -447,7 +460,7 @@ interface to the <code>plot_spectrum</code> and
 to quickly compare results across treatments by calling
 <code>boxplot</code>.</p>
 <pre class="text"><code>&gt; plot(pk_tab, loc = "V13", box_plot = TRUE, vars = "trt", verbose = FALSE)</code></pre>
-<p><img src="chromatographR_files/figure-html/plot.peaktable-1.png" width="600px"><img src="chromatographR_files/figure-html/plot.peaktable-2.png" width="600px"><img src="chromatographR_files/figure-html/plot.peaktable-3.png" width="600px"></p>
+<p><img src="chromatographR_files/figure-html/plot_peaktable-1.png" width="600px"><img src="chromatographR_files/figure-html/plot_peaktable-2.png" width="600px"><img src="chromatographR_files/figure-html/plot_peaktable-3.png" width="600px"></p>
 </div>
 </div>
 </div>
@@ -546,7 +559,7 @@ attached base packages:
 [8] base     
 
 other attached packages:
-[1] chromatographR_0.5.6 knitr_1.44          
+[1] chromatographR_0.6.0 knitr_1.44          
 
 loaded via a namespace (and not attached):
  [1] sass_0.4.7            utf8_1.2.3            generics_0.1.3       
