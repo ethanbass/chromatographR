@@ -155,7 +155,7 @@ elementwise.all.equal <- Vectorize(function(x, y, ...) {isTRUE(all.equal(x, y, .
 #' Get times
 #' @return Numeric vector of retention times.
 #' @noRd
-get_times <- function(x, index=1){
+get_times <- function(x, index = 1){
   if (inherits(x, "chrom_list") | inherits(x, "list")){
     as.numeric(rownames(x[[index]]))
   } else if (inherits(x, "matrix")){
@@ -173,7 +173,7 @@ get_lambdas <- function(chrom_list){
 #' Get time resolution
 #' @return Returns average gap between time points.
 #' @noRd
-get_time_resolution <- function(chrom_list, index=1){
+get_time_resolution <- function(chrom_list, index = 1){
   ts <- get_times(x = chrom_list, index = index)
   signif(median(diff(ts)))
 }
