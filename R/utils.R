@@ -272,3 +272,27 @@ choose_apply_fnc <- function(show_progress, parallel = NULL, cl = 2){
   }
   fn
 }
+
+#' Get maximum
+#' @noRd
+get_maximum <- function(x, idx, lambdas.idx){
+  max(sapply(x[idx], function(xx){
+    max(xx[, lambdas.idx], na.rm = TRUE)
+  }))
+}
+
+#' Get minimum
+#' @noRd
+get_minimum <- function(x, idx, lambdas.idx){
+  min(sapply(x[idx], function(xx){
+    min(xx[, lambdas.idx], na.rm = TRUE)
+  }))
+}
+
+#' Get y bounds
+#' @noRd
+get_y_bounds <- function(x, idx, lambdas.idx, pad = 1.1){
+  mn <- get_minimum(x, idx = idx, lambdas.idx = lambdas.idx)
+  mx <- get_maximum(x, idx, lambdas.idx = lambdas.idx)*pad
+  c(mn, mx)
+}

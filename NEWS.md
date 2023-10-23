@@ -1,3 +1,7 @@
+# chromatographR 0.6.1
+
+* Fixed bug in plot functions (e.g. `plot_chroms` and `plot_spectrum`) causing error when retention times are inconsistent between chromatograms.
+
 # chromatographR 0.6.0
 
 #### New features

@@ -47,9 +47,7 @@ plot_chroms <- function(x, lambdas, idx, xlim, ylim, xlab = "", ylab = "Absorban
   }
   if (missing(ylim)){
     zoom_y <- FALSE
-    ylim <- c(0, max(sapply(x[idx], function(xx){
-      max(xx[,lambdas.idx], na.rm = TRUE)
-    }))*1.1)
+    ylim <- get_y_bounds(x, idx, lambdas.idx)
   }
   if (engine == "base"){
     plot.new()
@@ -58,15 +56,9 @@ plot_chroms <- function(x, lambdas, idx, xlim, ylim, xlab = "", ylab = "Absorban
     axis(1)
     axis(2)
     box()
-    chroms <- sapply(x[idx], function(xx) xx[,lambdas.idx])
-    if (length(lambdas.idx) == 1){
-      matplot(get_times(x), chroms, type = 'l', add = TRUE,
-              lwd = linewidth, lty = 1, ...)
-    } else{
-      for (i in seq_along(idx)){
+    for (i in seq_along(idx)){
         matplot(get_times(x, index = idx[i]), x[[idx[i]]][,lambdas.idx], type = 'l',
                 add = TRUE, col = i, lwd = linewidth, ...)
-      }
     }
     if (show_legend)
       legend(x = legend_position, legend = names(x)[idx], fill = seq_along(x[idx]))

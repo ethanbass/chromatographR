@@ -92,12 +92,11 @@ plot_spectrum <- function(loc = NULL, peak_table, chrom_list,
   }
   what <- match.arg(what, c("peak", "rt", "idx", "click"))
   engine <- match.arg(engine, c("base", "plotly", "ggplot2"))
-  if (what %in% c("peak", "rt", "idx")){
-    if (is.null(loc)) stop("Please supply argument to `loc`")
+  if (what %in% c("peak", "rt", "idx") && is.null(loc)){
+    stop("Please supply argument to `loc`")
   }
   if ((plot_spectrum | export_spectrum) & ncol(chrom_list[[1]]) == 1)
     stop("Spectral data is unidimensional.")
-  
   if (what %in% c("rt", "idx", "click")){
     if (chr == "max")
       stop("Chromatogram must be specified for scan function.")
@@ -109,6 +108,7 @@ plot_spectrum <- function(loc = NULL, peak_table, chrom_list,
     if (!(loc %in% colnames(peak_table$tab))){
       stop(paste0("No match found for peak \'", loc, "\' in peak table."))}
   }
+  chr <- check_chr(chr, loc, peak_table, chrom_list)
   plt <- switch(engine,
                 "base" = plot_spectrum_base,
                 "plotly" = plot_spectrum_ggpl,
@@ -136,7 +136,7 @@ plot_spectrum_ggpl <- function(loc, peak_table, chrom_list,
   check_for_pkg(engine)
   if (what == "click")
     stop("The plotly engine does not currently support clicking.")
-  new.ts <- get_times(chrom_list)
+  new.ts <- get_times(chrom_list, index = chr)
   new.lambdas <- get_lambdas(chrom_list)
   sig <- max(nchar(gsub(".*\\.","",rownames(chrom_list[[1]]))))
   if (what == "peak"){
@@ -149,7 +149,7 @@ plot_spectrum_ggpl <- function(loc, peak_table, chrom_list,
     RT <- new.ts[idx]
   }
   idx <- get_retention_idx(RT, times = new.ts)
-  chr <- check_chr(chr, loc, peak_table, chrom_list)
+  # chr <- check_chr(chr, loc, peak_table, chrom_list)
   y <- unlist(chrom_list[[chr]][idx, , drop = TRUE])
   lambda.idx <- get_lambda_idx(lambda, lambdas = new.lambdas, y = y)
   if (plot_trace){
@@ -218,7 +218,7 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
                                what=c("peak", "rt", "idx", "click"), zoom = FALSE,
                                engine="base",
                                ...){
-  new.ts <- get_times(chrom_list)
+  new.ts <- get_times(chrom_list, index = chr)
   new.lambdas <- get_lambdas(chrom_list)
   sig <- max(nchar(gsub(".*\\.","",rownames(chrom_list[[1]]))))
   if (what == "peak"){
@@ -232,7 +232,7 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
   } else{
     idx <- scan_chrom(chrom_list = chrom_list, peak_table = peak_table,
                       chr = chr, lambda = lambda,
-                       plot_spectrum=FALSE)
+                       plot_spectrum = FALSE)
     RT <- new.ts[idx]
     plot_trace <- FALSE
   }
@@ -244,7 +244,8 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
   }
   lambda.idx <- get_lambda_idx(lambda, lambdas = new.lambdas, y = y)
   if (plot_trace){
-    idx <- plot_trace(chrom_list, chr, lambda.idx, idx, what = what)
+    idx <- plot_trace(chrom_list, chr, lambda.idx = lambda.idx, 
+                      idx = idx, what = what)
   }
   if (verbose){
     message(paste0("chrome no. ", chr, " (`", names(chrom_list)[chr], "`) \n",
@@ -330,7 +331,7 @@ scan_chrom <- function(chrom_list, chr, lambda,
     stop("List of chromatograms must be provided for scan function.")
   if (!(inherits(chrom_list, "list") | inherits(chrom_list, "chrom_list")))
     stop("`chrom_list` argument should be a list of chromatograms in matrix format")
-  new.ts <- get_times(chrom_list)
+  new.ts <- get_times(chrom_list, index = chr)
   new.lambdas <- get_lambdas(chrom_list)
   sig <- max(nchar(gsub(".*\\.","",rownames(chrom_list[[1]]))))
   
@@ -557,10 +558,10 @@ plotly_spec <- function(x, chr, RT, reshape = TRUE, color="black",
 # plotly_spec2(chrom_list,RT=15.5)
 
 plot_trace <- function(chrom_list, chr, lambda.idx, idx = NULL, what){
-  new.ts <- get_times(chrom_list)
+  new.ts <- get_times(chrom_list, index = chr)
   lambda <- colnames(chrom_list[[1]])[lambda.idx]
   y_trace <- chrom_list[[chr]][,lambda.idx]
-  matplot(x = new.ts, y = y_trace, type='l', ylab='', xlab='')
+  matplot(x = new.ts, y = y_trace, type = 'l', ylab = '', xlab = '')
   if (what == "click"){
     message("Click trace to select timepoint")
     idx <- identify(new.ts, y_trace, n = 1, plot = FALSE)
