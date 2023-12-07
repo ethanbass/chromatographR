@@ -35,12 +35,12 @@ chromatographR can import data from a growing list of proprietary file formats u
 
 ```{r, eval = FALSE}
 # single folder
-read_chroms(paths = path, format_in = "chemstation_csv")
+read_chroms(paths = path, format_in = "chemstation_uv")
 
 # multiple folders
 path = 'foo' # path to parent directory
-folders <- list.files(path = path, pattern = "EXPORT3D")
-dat <- read_chroms(folders, format_in = "chemstation_csv")
+folders <- list.files(path = path, full.names = TRUE)
+dat <- read_chroms(folders, format_in = "chemstation_uv")
 ```
 
 ### Example data
