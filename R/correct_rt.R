@@ -84,7 +84,8 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
                        init.coef = c(0, 1, 0), n.traces = NULL, n.zeros = 0, 
                        scale = FALSE, trwdth = 200, plot_it = FALSE,
                        penalty = 5, maxshift = 50,
-                       verbose = FALSE, show_progress = NULL, cl = 2, ...){
+                       verbose = getOption("verbose"), show_progress = NULL, 
+                       cl = 2, ...){
   what <- match.arg(what, c("corrected.values", "models"))
   alg <- match.arg(alg, c("ptw", "vpdtw"))
   
@@ -129,7 +130,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
   }
   # choose reference chromatogram
   if (reference == 'best'){
-    best <- bestref(allmats.t)
+    best <- ptw::bestref(allmats.t)
     reference <- as.numeric(names(sort(table(best$best.ref), decreasing = TRUE))[1])
     if (verbose) message(paste("Selected chromatogram", reference, "as best reference."))
   } else {
@@ -143,10 +144,15 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
     if (is.null(models)){
       laplee <- choose_apply_fnc(show_progress, cl = cl)
       models <- laplee(seq_len(dim(allmats)[3]), function(ii){
-        ptw(allmats.t[,, reference],
+        ptw::ptw(allmats.t[,, reference],
             allmats.t[,, ii], selected.traces = traces, init.coef = init.coef,
             warp.type = "global", ...)})
-      class(models) <- "ptw_list"
+      names(models) <- names(chrom_list)
+      models <- structure(models, chrom_list = deparse(substitute(chrom_list)), 
+                          reference = reference, init.coef = init.coef,
+                          n.traces = n.traces, n.zeros=n.zeros, scale = scale,
+                          trwdth = trwdth, penalty = penalty, 
+                          maxshift = maxshift, class="ptw_list")
       if (plot_it){
         plot(models)
       }
@@ -157,7 +163,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
         x$warp.coef[1,]
       })
       models <- lapply(seq_len(dim(allmats)[3]), function(ii){
-        ptw(t(allmats[,, 1]), t(allmats[,, ii]), init.coef = warp.coef[[ii]],
+        ptw::ptw(t(allmats[,, 1]), t(allmats[,, ii]), init.coef = warp.coef[[ii]],
             try = TRUE, alg = models[[1]]$alg, warp.type = "global", ...)})
       result <- lapply(seq_along(models), function(i){
         x <- t(models[[i]]$warped.sample)
@@ -240,28 +246,39 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
 #' in the list of peak tables.
 #' 
 #' @importFrom stats predict
-#' @param peak_list A nested list of peak tables: the first level is the sample,
-#' and the second level is the component. Every component is described by a
-#' matrix where every row is one peak, and the columns contain information on
-#' retention time, full width at half maximum (FWHM), peak width, height, and
+#' @param peak_list A `peak_list` object created by \code{\link{get_peaks}},
+#' containing a nested list of peak tables where the first level is the sample,
+#' and the second level is the spectral wavelength. Every component is described
+#' by a matrix where every row is one peak, and the columns contain information on
+#' retention time, peak width (FWHM), peak width, height, and
 #' area.
 #' @param mod_list A list of ptw models.
 #' @return The input list of peak tables is returned with extra columns
 #' containing the corrected retention time.
-#' @author Ron Wehrens
+#' @author Ron Wehrens, Ethan Bass
+#' @note This function is adapted from
+#' \href{https://github.com/rwehrens/alsace/blob/master/R/correctPeaks.R}{getPeakTable}
+#' function in the alsace package by Ron Wehrens.
 #' @seealso \code{\link{correct_rt}}
 #' @export correct_peaks
 correct_peaks <- function(peak_list, mod_list){
-  mapply(function(samp, mod){
+  if (missing(chrom_list)){
+    chrom_list <- get_chrom_list(mod_list)
+  }
+  ref_times <- get_times(chrom_list, index = attr(mod_list, "reference"))
+  corrected_pks <- mapply(function(samp, mod){
     lapply(samp, function(profile){
              if (nrow(profile) > 0){
                cbind(profile,
-                     rt.cor = c(predict(mod, profile[,1], what = "time")))
+                     rt.cor = c(predict.ptw(mod, profile[, "rt"], what = "time",
+                                                  RTref = ref_times)))
              } else {
                cbind(profile, rt.cor = rep(0, 0))
              }
            }
         )}, peak_list, mod_list, SIMPLIFY = FALSE)
+  corrected_pks <- transfer_metadata(corrected_pks, peak_list, transfer_class = TRUE)
+  corrected_pks
 }
 
 #' Plot PTW alignments
@@ -311,4 +328,51 @@ plot.ptw_list <- function(x, lambdas, legend = TRUE, ...){
   if (legend){
     legend("topright", legend = "queries", bty = "n")
   }
+}
+
+#' @note This is the function from the ptw package, reproduced here because it
+#' isn't exported from ptw.
+#' @noRd
+predict.ptw <- function (object, newdata, what = c("response", "time"), RTref = NULL, 
+                         ...) 
+{
+  what <- match.arg(what)
+  switch(what, response = {
+    if (missing(newdata)) return(object$warped.sample)
+    if (!is.matrix(newdata)) newdata <- matrix(newdata, nrow = 1)
+    if (object$warp.type == "individual" & nrow(newdata) > 
+        1 & nrow(newdata) != nrow(object$warp.fun)) stop("Incorrect number of rows in newdata")
+    if (object$warp.type == "individual") {
+      WF <- object$warp.fun
+    } else {
+      WF <- matrix(object$warp.fun, nrow(object$sample), 
+                   ncol(object$warp.fun), byrow = TRUE)
+    }
+    if (object$mode == "backward") {
+      t(sapply(1:nrow(newdata), function(i) approx(x = 1:ncol(newdata), 
+                                                   y = newdata[i, ], xout = WF[i, ])$y))
+    } else {
+      t(sapply(1:nrow(newdata), function(i) approx(x = WF[i, 
+      ], y = newdata[i, ], xout = 1:ncol(newdata))$y))
+    }
+  }, time = {
+    correctedTime <- switch(object$mode, backward = -sweep(object$warp.fun, 
+                                                           2, 2 * (1:ncol(object$ref)), FUN = "-"), object$warp.fun)
+    if (is.null(RTref)) {
+      if (is.null(colnames(object$ref))) {
+        RTref <- 1:ncol(object$ref)
+      } else {
+        RTref <- as.numeric(colnames(object$ref))
+      }
+    }
+    if (missing(newdata)) {
+      newdata <- RTref
+      newdataIndices <- 1:length(RTref)
+    } else {
+      newdataIndices <- round((newdata - min(RTref)) * 
+                                (length(RTref) - 1)/diff(range(RTref)) + 1)
+    }
+    t(sapply(1:nrow(correctedTime), function(i) approx(RTref, 
+                                                       NULL, correctedTime[i, newdataIndices])$y))
+  })
 }
