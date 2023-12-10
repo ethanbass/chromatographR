@@ -2,6 +2,7 @@
 
 * Fixed bug in plot functions (e.g. `plot_chroms` and `plot_spectrum`) causing error when retention times are inconsistent between chromatograms.
 * Eliminated spurious warning in preprocess function.
+* Updated `read_chroms` syntax in vignette.
 
 # chromatographR 0.6.0
 
