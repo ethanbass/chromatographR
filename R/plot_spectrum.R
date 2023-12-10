@@ -134,8 +134,9 @@ plot_spectrum_ggpl <- function(loc, peak_table, chrom_list,
                                  engine = c("plotly","ggplot2"),
                                  ...){
   check_for_pkg(engine)
-  if (what == "click")
-    stop("The plotly engine does not currently support clicking.")
+  if (what == "click"){
+    stop(paste0("The ", engine, " engine does not currently support clicking."))
+  }
   new.ts <- get_times(chrom_list, index = chr)
   new.lambdas <- get_lambdas(chrom_list)
   sig <- max(nchar(gsub(".*\\.","",rownames(chrom_list[[1]]))))
@@ -488,7 +489,7 @@ ggplot_spec <- function(x, chr, RT, spectrum_labels = TRUE, color="black", width
                         hide_legend = TRUE, group = TRUE, ...){
   check_for_pkg("ggplot2")
   .data <- ggplot2::.data
-  if (inherits(x,"numeric")){
+  if (inherits(x, "numeric")){
     df <- data.frame(lambda = as.numeric(names(x)), absorbance = x)
     group <- FALSE
   } else if (inherits(x, "list")){
