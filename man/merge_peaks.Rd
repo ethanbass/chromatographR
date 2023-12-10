@@ -11,7 +11,8 @@ merge_peaks(peak_table, peaks, method = c("max", "sum"))
 
 \item{peaks}{A vector specifying the names or indices of peaks to be merged.}
 
-\item{method}{Method to merge peaks. Either \code{max} or \code{sum}.}
+\item{method}{Method to merge peaks. Either \code{max} to select the largest
+peak from each sample or \code{sum} to sum the peaks together.}
 }
 \value{
 A peak table similar to the input peak table, but where the specified

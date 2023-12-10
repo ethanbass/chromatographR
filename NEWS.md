@@ -1,15 +1,30 @@
+# chromatographR 0.7.0
+
+* Added `fixed_levels` argument to `reshape_peaktable` so features can be plotted in the order they're provided by the user.
+* Updated `correct_peaks` function so it works properly to correct retention times in peak lists.
+* Added option for summing split peaks using the `merge_peaks` function by selecting `method = "sum"`.
+* Updated `get_peaktable` so that the `use.cor` argument works correctly (to use corrected retention times stored in a separate column).
+* Fixed `mirror_plot` so it can take numeric input for lambdas.
+* Changed default setting of `verbose` argument in `correct_rt` from `FALSE`
+to default setting.
+* Removed `load_chroms` function. Use `read_chroms` instead.
+
+#### Updates to vignette
+
+* Suggest numeric input to lambdas instead of character input to reduce confusion.
+
 # chromatographR 0.6.1
 
 * Fixed bug in plot functions (e.g. `plot_chroms` and `plot_spectrum`) causing error when retention times are inconsistent between chromatograms.
 * Eliminated spurious warning in preprocess function.
+* Updated `read_chroms` syntax in vignette.
 
 # chromatographR 0.6.0
 
 #### New features
 
 * Enabled use of `parallel` package for parallel processing (in addition to current options using `mcapply`). (These options require the installation of suggested package `pbapply`).
-* Updated `get_peaktable` for greater flexibility (e.g. for usage of 'Chemstation' peak lists as input).
-
+* Updated `get_peaktable` for greater flexibility (e.g. for usage of 'ChemStation' peak lists as input).
 #### Other changes
 
 * Made some minor changes to vignette to improve clarity (e.g. using single wavelength for integration, etc.)
