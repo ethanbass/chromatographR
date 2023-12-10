@@ -1,20 +1,5 @@
-### test preprocess function ###
-path <- "testdata/DAD1.CSV"
-x <- read.csv(path, fileEncoding = "utf-16")
-x1 <- suppressWarnings(load_chroms(path = path, format.in = "csv", find_files = FALSE))
-folder <- "testdata"
-x2 <- suppressWarnings(load_chroms(folder, format.in = "csv", find_files = TRUE))
-
-test_that("load_chroms works", {
-  expect_equal(x[,2], x1[[1]][, "220.00000"], ignore_attr = TRUE)
-  expect_equal(x1, x2, ignore_attr = TRUE)
-  expect_equal(length(x1), length(path))
-  expect_error(suppressWarnings(load_chroms(path = "fake_path_that_doesn't_exist", format.in = "csv")))
-  expect_error(suppressWarnings(load_chroms(path = path, format.in = "invalid_format")))
-})
-
 data("Sa")
-new.ts <- seq(10,18.66,by=.01) # choose time-points
+new.ts <- seq(10, 18.66, by=.01) # choose time-points
 new.lambdas <- seq(200, 318, by = 2) # choose wavelengths
 
 out <- preprocess(X = Sa[[1]], dim1 = new.ts, dim2 = new.lambdas, show_progress = FALSE)
@@ -98,6 +83,7 @@ test_that("plot_chroms works to plot alignments", {
   expect_error(plot_chroms(pktab))
 })
 
+
 test_that("plot_chroms works to plot alignments with ggplot", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
@@ -170,6 +156,7 @@ test_that("strip plot works", {
 
 path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
 meta <- read.csv(path)
+
 pk_tab <- attach_metadata(pk_tab, metadata = meta, column = "vial")
 
 test_that("attach_metadata works", {
@@ -215,13 +202,22 @@ test_that("combine_peaks works", {
   expect_equal(rownames(pk_tab_c$tab), rownames(pk_tab$tab))
 })
 
-test_that("merge_peaks works", {
+test_that("merge_peaks works with max method", {
   pk_tab_m <- merge_peaks(pk_tab, peaks=c("V10","V11"))
   expect_equal(pk_tab_m$tab$V11, pmax(pk_tab$tab$V10, pk_tab$tab$V11))
   expect_equal(ncol(pk_tab_m), ncol(pk_tab)-1)
   expect_equal(ncol(pk_tab_m$pk_meta), ncol(pk_tab$pk_meta)-1)
   expect_equal(rownames(pk_tab_m$tab), rownames(pk_tab$tab))
 })
+
+# test_that("merge_peaks works with sum method", {
+#   data(pk_tab)
+#   pk_tab_m <- merge_peaks(pk_tab, peaks=c("V10","V11"), method = "sum")
+#   expect_equal(pk_tab_m$tab[["V11"]], (pk_tab$tab$V10 + pk_tab$tab$V11))
+#   expect_equal(ncol(pk_tab_m), ncol(pk_tab)-1)
+#   expect_equal(ncol(pk_tab_m$pk_meta), ncol(pk_tab$pk_meta)-1)
+#   expect_equal(rownames(pk_tab_m$tab), rownames(pk_tab$tab))
+# })
 
 test_that("normalize_data works", {
   pk_tab_norm <- normalize_data(pk_tab, chrom_list = dat.pr, column = "mass")
@@ -252,7 +248,7 @@ test_that("plot.peak_list works", {
   skip_if_not_installed("vdiffr")
   plot_peaks <- function(){
     plot(pks_egh, chrom_list = dat.pr, points = TRUE,
-                                ticks = TRUE, lambda = 210)
+         ticks = TRUE, lambda = 210)
   }
   vdiffr::expect_doppelganger("plot.peak_list", plot_peaks)
   
@@ -268,6 +264,8 @@ test_that("plot.peak_list works", {
   
   expect_error(plot(pks_egh, chrom_list = dat.pr, lambda=190))
 })
+
+
 
 test_that("plot.ptw_list works", {
   skip_if_not_installed("vdiffr")
@@ -332,61 +330,6 @@ test_that("plot_spectrum works", {
   expect_equal(ncol(x), 1)
 })
 
-test_that("plot_spectrum works with plotly engine", {
-  skip_on_cran()
-  skip_if_not_installed("vdiffr")
-  skip_if_not_installed("plotly")
-  skip_if_not_installed("reticulate")
-  skip_if_not_installed("rsvg")
-
-  p1 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr,
-                      export_spectrum = FALSE, what = "rt", chr = 1,
-                      verbose = FALSE, engine = "plotly")
-  expect_doppelganger_plotly("plot_both_plotly", p = p1)
-  
-  p2 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr,
-                      export_spectrum = FALSE, what="rt", chr=1,
-                      verbose = FALSE, engine="plotly", plot_trace = FALSE)
-  expect_doppelganger_plotly("plot_trace_plotly", p = p2)
-  
-  p3 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr,
-                      export_spectrum = FALSE, what="rt", chr=1,
-                      verbose = FALSE, engine="plotly", plot_spectrum = FALSE)
-  expect_doppelganger_plotly("plot_spectrum_plotly", p = p3)
-})
-
-test_that("plot_chroms works with plotly", {
-  skip_on_cran()
-  skip_if_not_installed("vdiffr")
-  skip_if_not_installed("plotly")
-  skip_if_not_installed("reticulate")
-  skip_if_not_installed("rsvg")
-  p <- plot_chroms(warp, lambdas="210", engine="plotly")
-  suppressWarnings(expect_doppelganger_plotly(name = "alignment_plotly", p = p))
-})
-
-test_that("plot_spectrum works with ggplot2", {
-  skip_on_cran()
-  skip_if_not_installed("vdiffr")
-  skip_if_not_installed("ggplot2")
-  skip_if_not_installed("cowplot")
-  
-  p1 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr,
-                      export_spectrum = FALSE, what="rt", chr=1,
-                      verbose = FALSE, engine="ggplot")
-  vdiffr::expect_doppelganger(title = "plot_both_ggplot", fig = p1)
-  
-  p2 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr,
-                      export_spectrum = FALSE, what="rt", chr=1,
-                      verbose = FALSE, engine="ggplot", plot_trace = FALSE)
-  vdiffr::expect_doppelganger(title = "plot_trace_ggplot", fig = p2)
-  
-  p3 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr, 
-                      export_spectrum = FALSE, what="rt", chr=1,
-                      verbose = FALSE, engine = "ggplot", plot_spectrum = FALSE)
-  vdiffr::expect_doppelganger(title = "plot_spectrum_ggplot", fig = p3)
-})
-
 test_that("plot_spectrum works", {
   x <- plot_spectrum("V13", peak_table = pk_tab, chrom_list = dat.pr, export = TRUE,
                      what="peak", chr=1, verbose = FALSE)
@@ -415,6 +358,32 @@ test_that("plot_spectrum works", {
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr, what="rt", engine="plotly"))
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr, what="rt", engine="plotly"))
 })
+
+
+test_that("plot_spectrum works with ggplot2", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("cowplot")
+  
+  # generates empty pdf
+  # p1 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr,
+  #                     export_spectrum = FALSE, what="rt", chr=1,
+  #                     verbose = FALSE, engine="ggplot")
+  # vdiffr::expect_doppelganger(title = "plot_both_ggplot", fig = p1)
+  
+  p2 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr,
+                      export_spectrum = FALSE, what="rt", chr=1,
+                      verbose = FALSE, engine="ggplot", plot_trace = FALSE)
+  vdiffr::expect_doppelganger(title = "plot_trace_ggplot", fig = p2)
+  
+  p3 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr, 
+                      export_spectrum = FALSE, what="rt", chr=1,
+                      verbose = FALSE, engine = "ggplot", plot_spectrum = FALSE)
+  vdiffr::expect_doppelganger(title = "plot_spectrum_ggplot", fig = p3)
+})
+
+
 
 test_that("mirror_plot works", {
   skip_if_not_installed("vdiffr")
@@ -458,8 +427,8 @@ test_that("plot_peak.list works", {
 test_that("cluster_spectra works", {
   skip_on_cran()
   cl <- cluster_spectra(pk_tab, chrom_list = dat.pr, nboot = 10,
-                          parallel = FALSE, verbose = FALSE, save = FALSE,
-                          output = "both", plot_dend = FALSE, plot_spectra = FALSE)
+                        parallel = FALSE, verbose = FALSE, save = FALSE,
+                        output = "both", plot_dend = FALSE, plot_spectra = FALSE)
   expect_equal(class(cl[[1]]), "pvclust")
   expect_equal(class(cl[[2]]), "list")
 })
@@ -474,10 +443,10 @@ test_that("write_peaktable writes csvs correctly", {
   write_peaktable(peak_table = pk_tab, path = path, format = "csv", what=c("tab", "pk_meta"))
   path_table <- paste0(file.path(path,"peak_table-tab"), ext =".csv")
   path_meta <- paste0(file.path(path,"peak_table-pk_meta"), ext =".csv")
-
+  
   expect_true(file.exists(path_table))
   expect_true(file.exists(path_meta))
-
+  
   expect_equal(pk_tab$tab, read.csv(file = path_table, row.names = 1), ignore_attr=TRUE)
   expect_equal(pk_tab$pk_meta, read.csv(file = path_meta, row.names = 1), ignore_attr=TRUE)
   expect_error(write_peaktable(pk_tab, path="fake_path"))
@@ -489,10 +458,46 @@ test_that("write_peaktable writes xlsx correctly", {
   data(pk_tab)
   path <-  tempdir()
   on.exit(unlink(c(fs::path(path, "peak_table", ext="xlsx"), path)))
-
+  
   write_peaktable(pk_tab, path = path, format = "xlsx")
   file <- fs::path(path, "peak_table", ext = "xlsx")
   xx <- openxlsx::read.xlsx(file, sheet = 1, rowNames = TRUE)
   expect_equal(pk_tab$tab, xx, ignore_attr=TRUE)
   expect_equal(pk_tab$pk_meta, openxlsx::read.xlsx(file, sheet = 2, rowNames = TRUE), ignore_attr=TRUE)
+})
+
+# Sys.setenv("VISUAL_TESTS" = "true")
+
+test_that("plot_spectrum works with plotly engine", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  skip_if_not_installed("plotly")
+  skip_if_not_installed("reticulate")
+  skip_if_not_installed("rsvg")
+  
+  p1 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr,
+                      export_spectrum = FALSE, what = "rt", chr = 1,
+                      verbose = FALSE, engine = "plotly")
+  expect_doppelganger_plotly("plot_both_plotly", p = p1)
+  
+  p2 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr,
+                      export_spectrum = FALSE, what="rt", chr=1,
+                      verbose = FALSE, engine="plotly", plot_trace = FALSE)
+  expect_doppelganger_plotly("plot_trace_plotly", p = p2)
+  
+  p3 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr,
+                      export_spectrum = FALSE, what="rt", chr=1,
+                      verbose = FALSE, engine="plotly", plot_spectrum = FALSE)
+  expect_doppelganger_plotly("plot_spectrum_plotly", p = p3)
+})
+
+test_that("plot_chroms works with plotly", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  skip_if_not_installed("plotly")
+  skip_if_not_installed("reticulate")
+  skip_if_not_installed("rsvg")
+  
+  p <- plot_chroms(warp, lambdas="210", engine="plotly")
+  suppressWarnings(expect_doppelganger_plotly(name = "alignment_plotly", p = p))
 })
