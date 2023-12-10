@@ -29,7 +29,7 @@
 #' @importFrom graphics par
 #' @param peak_list A `peak_list` object created by \code{\link{get_peaks}},
 #' containing a nested list of peak tables: the first level is the
-#' sample, and the second level is the spectral component. Every component is
+#' sample, and the second level is the spectral wavelength. Every component is
 #' described by a data.frame where every row is one peak, and the columns contain
 #' information on various peak parameters.
 #' @param chrom_list A list of chromatographic matrices.
@@ -122,7 +122,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
     }}))
     xx <- do.call(rbind, sapply(pkLst, function(samp) samp[comp]))
     file.idx <- xx$sample
-    pkcenters <- xx$rt
+    pkcenters <- xx[,rt]
     names(pkcenters) <- NULL
     if (length(pkcenters) < 2) 
       return(NULL)
@@ -150,18 +150,18 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
       sing <- which(pkcenters.cl == 0)
       pkcenters.cl[sing] <- max(pkcenters.cl) + seq_along(sing)
     }
-    vars <- c("rt", "start", "end", "sd", "tau", "FWHM", "r.squared", "purity")
-    vars.idx <- which(colnames(xx) %in% vars)
+    vars <- c(rt, "start", "end", "sd", "tau", "FWHM", "r.squared", "purity")
+    vars.idx <- match(vars, colnames(xx))
     cl.centers <- aggregate(xx[,vars.idx], by = list(pkcenters.cl), FUN = "mean",
                             na.action = "na.pass")[,-1]
-    ncl <- length(cl.centers$rt)
+    ncl <- length(cl.centers[,rt])
     
     ## re-order clusters from small to large rt
-    pkcenters.cl <- order(order(cl.centers$rt))[pkcenters.cl]
-    cl.centers <- cl.centers[order(cl.centers$rt),]
+    pkcenters.cl <- order(order(cl.centers[,rt]))[pkcenters.cl]
+    cl.centers <- cl.centers[order(cl.centers[,rt]),]
     metaInfo <- cbind(lambda = rep(as.numeric(names(peak_list[[1]])[comp]), ncl),
                       peak = 1:ncl, 
-                      round(cl.centers,2)
+                      round(cl.centers, 2)
                       )
     rownames(metaInfo) <- NULL
     if (plot_it){
@@ -176,7 +176,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
                       main = paste("Component", comp),
                       panel = function(...) {
                         panel.stripplot(...)
-                        panel.abline(v = cl.centers$rt, col = mycols)
+                        panel.abline(v = cl.centers[,rt], col = mycols)
                       }))
     }
     if (verbose & max(clusCount <- table(file.idx, pkcenters.cl)) > 1) 

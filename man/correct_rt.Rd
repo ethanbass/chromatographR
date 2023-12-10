@@ -19,7 +19,7 @@ correct_rt(
   plot_it = FALSE,
   penalty = 5,
   maxshift = 50,
-  verbose = FALSE,
+  verbose = getOption("verbose"),
   show_progress = NULL,
   cl = 2,
   ...

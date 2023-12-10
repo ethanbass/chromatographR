@@ -23,7 +23,7 @@ get_peaktable(
 \arguments{
 \item{peak_list}{A \code{peak_list} object created by \code{\link{get_peaks}},
 containing a nested list of peak tables: the first level is the
-sample, and the second level is the spectral component. Every component is
+sample, and the second level is the spectral wavelength. Every component is
 described by a data.frame where every row is one peak, and the columns contain
 information on various peak parameters.}
 
