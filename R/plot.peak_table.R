@@ -211,7 +211,15 @@ mirror_plot <- function(x, chrom_list, lambdas, var, subset = NULL,
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(x)
   } else get_chrom_list(x, chrom_list)
-  new.ts <- round(as.numeric(rownames(chrom_list[[1]])),2)
+  new.ts <- round(as.numeric(rownames(chrom_list[[1]])), 2)
+  if (ncol(x[[1]]) == 1){
+    lambdas.idx <- 1
+  } else {
+    lambdas.idx <- sapply(lambdas, function(lambda){
+      get_lambda_idx(lambda, lambdas = get_lambdas(chrom_list),
+                     allow_max = FALSE)
+    }) 
+  }
   fac <- factor(meta[,var])
   if (is.null(subset) & length(levels(fac)) > 2)
     stop("The mirror plot can only compare two factor levels. Please use the
@@ -235,7 +243,7 @@ mirror_plot <- function(x, chrom_list, lambdas, var, subset = NULL,
   if (is.null(xlim))
     xlim <- c(head(new.ts,1),tail(new.ts,1))
   y_max <- max(sapply(chrom_list, function(xx){
-    max(xx[,as.character(min(as.numeric(lambdas)))], na.rm = TRUE)
+    max(xx[, as.character(min(as.numeric(lambdas)))], na.rm = TRUE)
   }))
   if (mirror){
     if (is.null(ylim))
@@ -243,12 +251,12 @@ mirror_plot <- function(x, chrom_list, lambdas, var, subset = NULL,
     plot.new()
     plot.window(xlim = xlim, ylim = ylim)
     for (i in set1){
-      matplot(new.ts, chrom_list[[i]][,lambdas], type = 'l', add = TRUE, ...)
+      matplot(new.ts, chrom_list[[i]][,lambdas.idx], type = 'l', add = TRUE, ...)
     }
     if (print_legend)
       legend("topright", legend=legend_txt[[1]], cex=legend_size, bty = "n")
     for (i in set2){
-      matplot(new.ts, -chrom_list[[i]][,lambdas], type = 'l', add = TRUE, ...)
+      matplot(new.ts, -chrom_list[[i]][,lambdas.idx], type = 'l', add = TRUE, ...)
     }
     if (print_legend)
       legend("bottomright", legend=legend_txt[[2]], cex=legend_size, bty = "n")
@@ -260,14 +268,14 @@ mirror_plot <- function(x, chrom_list, lambdas, var, subset = NULL,
     plot.new()
     plot.window(xlim = xlim, ylim = ylim)
     for (i in set1){
-      matplot(new.ts, chrom_list[[i]][,lambdas], type = 'l', add = TRUE, ...)
+      matplot(new.ts, chrom_list[[i]][,lambdas.idx], type = 'l', add = TRUE, ...)
     }
     if (print_legend)
       legend(legend_pos, legend = legend_txt[[1]], cex = legend_size, bty = "n")
     plot.new()
     plot.window(xlim = xlim, ylim = ylim)
     for (i in set2){
-      matplot(new.ts, chrom_list[[i]][,lambdas], type = 'l', add = TRUE, ...)
+      matplot(new.ts, chrom_list[[i]][,lambdas.idx], type = 'l', add = TRUE, ...)
     }
     if (print_legend)
       legend(legend_pos, legend=legend_txt[[2]], cex=legend_size, bty = "n")
