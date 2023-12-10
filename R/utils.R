@@ -15,7 +15,7 @@ get_chrom_list <- function(x, chrom_list, verbose = FALSE){
   if (missing(chrom_list)){
     if (inherits(x, "peak_table")){
       string <- x$args[["chrom_list"]]
-    } else if (inherits(x, "peak_list")){
+    } else if (inherits(x, "peak_list") | inherits(x, "ptw_list")){
       string <- attr(x, "chrom_list")
     }
     if (grepl("\\[*\\]", string)){
@@ -224,8 +224,11 @@ get_lhs_vars <- function(formula) {
 
 #' Transfer metadata between objects
 #' @noRd
-transfer_metadata <- function(new_object, old_object,
-                              exclude = c('names','row.names','class','dim','dimnames')){
+transfer_metadata <- function(new_object, old_object, transfer_class = TRUE,
+                              exclude = c('names','row.names','dim','dimnames')){
+  if (!transfer_class){
+    exclude <- c(exclude, "class")
+  }
   a <- attributes(old_object)
   a[exclude] <- NULL
   attributes(new_object) <- c(attributes(new_object), a)

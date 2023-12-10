@@ -4,16 +4,18 @@
 \alias{merge_peaks}
 \title{Merge split peaks in peak table}
 \usage{
-merge_peaks(peak_table, peaks)
+merge_peaks(peak_table, peaks, method = c("max", "sum"))
 }
 \arguments{
 \item{peak_table}{Peak table from \code{\link{get_peaktable}}.}
 
 \item{peaks}{A vector specifying the names or indices of peaks to be merged.}
+
+\item{method}{Method to merge peaks. Either \code{max} or \code{sum}.}
 }
 \value{
 A peak table similar to the input peak table, but where the specified
-columns are combined combined.
+columns are combined.
 }
 \description{
 Merges the specified peaks, by selecting the largest value from each column.
