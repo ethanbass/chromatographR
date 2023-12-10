@@ -210,14 +210,14 @@ test_that("merge_peaks works with max method", {
   expect_equal(rownames(pk_tab_m$tab), rownames(pk_tab$tab))
 })
 
-# test_that("merge_peaks works with sum method", {
-#   data(pk_tab)
-#   pk_tab_m <- merge_peaks(pk_tab, peaks=c("V10","V11"), method = "sum")
-#   expect_equal(pk_tab_m$tab[["V11"]], (pk_tab$tab$V10 + pk_tab$tab$V11))
-#   expect_equal(ncol(pk_tab_m), ncol(pk_tab)-1)
-#   expect_equal(ncol(pk_tab_m$pk_meta), ncol(pk_tab$pk_meta)-1)
-#   expect_equal(rownames(pk_tab_m$tab), rownames(pk_tab$tab))
-# })
+test_that("merge_peaks works with sum method", {
+  data(pk_tab)
+  pk_tab_m <- merge_peaks(pk_tab, peaks=c("V10","V11"), method = "sum")
+  expect_equal(pk_tab_m$tab[["V11"]], (pk_tab$tab$V10 + pk_tab$tab$V11))
+  expect_equal(ncol(pk_tab_m), ncol(pk_tab)-1)
+  expect_equal(ncol(pk_tab_m$pk_meta), ncol(pk_tab$pk_meta)-1)
+  expect_equal(rownames(pk_tab_m$tab), rownames(pk_tab$tab))
+})
 
 test_that("normalize_data works", {
   pk_tab_norm <- normalize_data(pk_tab, chrom_list = dat.pr, column = "mass")
@@ -366,11 +366,10 @@ test_that("plot_spectrum works with ggplot2", {
   skip_if_not_installed("ggplot2")
   skip_if_not_installed("cowplot")
   
-  # generates empty pdf
-  # p1 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr,
-  #                     export_spectrum = FALSE, what="rt", chr=1,
-  #                     verbose = FALSE, engine="ggplot")
-  # vdiffr::expect_doppelganger(title = "plot_both_ggplot", fig = p1)
+  p1 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr,
+                      export_spectrum = FALSE, what="rt", chr=1,
+                      verbose = FALSE, engine="ggplot")
+  vdiffr::expect_doppelganger(title = "plot_both_ggplot", fig = p1)
   
   p2 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr,
                       export_spectrum = FALSE, what="rt", chr=1,

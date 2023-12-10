@@ -95,7 +95,7 @@ merge_peaks <- function(peak_table, peaks, method = c("max", "sum")){
   if (method == "max"){
     peak_table$tab[[sel.idx]] <- do.call(pmax, peak_table$tab[, pks.idx])
   } else if (method == "sum"){
-    peak_table$tab[[sel.idx]] <- apply(pk_tab$tab[,pks.idx], 1, sum)
+    peak_table$tab[[sel.idx]] <- apply(peak_table$tab[,pks.idx], 1, sum)
   }
   peak_table$tab <- peak_table$tab[, -pks.idx[-sel]]
   peak_table$pk_meta <- peak_table$pk_meta[, -pks.idx[-sel]]
