@@ -144,6 +144,7 @@ get_reference_spectra <- function(peak_table, chrom_list,
 
 attach_ref_spectra <- function(peak_table, chrom_list, ref = c("max.cor","max.int")){
   check_peaktable(peak_table)
+  ref <- match.arg(ref, c("max.cor","max.int"))
   peak_table$ref_spectra <- get_reference_spectra(peak_table, chrom_list, ref = ref)
   peak_table$args["reference_spectra"] <- ref
   return(peak_table)
