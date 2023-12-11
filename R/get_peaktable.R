@@ -150,10 +150,11 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
       sing <- which(pkcenters.cl == 0)
       pkcenters.cl[sing] <- max(pkcenters.cl) + seq_along(sing)
     }
-    vars <- c(rt, "start", "end", "sd", "tau", "FWHM", "r.squared", "purity")
+    vars <- c(rt, "start", "end", "sd", "width", "tau", "FWHM", "r.squared", "purity")
+    vars <- vars[vars %in% colnames(xx)]
     vars.idx <- match(vars, colnames(xx))
     cl.centers <- aggregate(xx[, vars.idx], by = list(pkcenters.cl), FUN = "mean",
-                            na.action = "na.pass")[, -1]
+                            na.action = "na.pass")[, -1, drop = FALSE]
     ncl <- length(cl.centers[, rt])
     
     ## re-order clusters from small to large rt
@@ -179,10 +180,11 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
                         panel.abline(v = cl.centers[,rt], col = mycols)
                       }))
     }
-    if (verbose & max(clusCount <- table(file.idx, pkcenters.cl)) > 1) 
+    if (verbose & max(clusCount <- table(file.idx, pkcenters.cl)) > 1){
       warning(paste("More than one peak of one injection in the same cluster", 
                 paste("for component ", comp, ".", sep = ""), 
                 "Keeping only the most intense one.", "", sep = "\n"))
+    }
     allIs <- unlist(lapply(pkLst, function(samp) samp[[comp]][, response]))
     Iinfo <- matrix(0, ncl, length(pkLst), dimnames = list(NULL, names(pkLst)))
     for (i in seq(along = allIs)){
