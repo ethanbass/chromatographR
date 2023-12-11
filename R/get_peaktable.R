@@ -122,7 +122,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
     }}))
     xx <- do.call(rbind, sapply(pkLst, function(samp) samp[comp]))
     file.idx <- xx$sample
-    pkcenters <- xx[,rt]
+    pkcenters <- xx[, rt]
     names(pkcenters) <- NULL
     if (length(pkcenters) < 2) 
       return(NULL)
@@ -131,14 +131,14 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
       pkcenters.cl <- cutree(pkcenters.hcl, h = hmax)
     } else if (clust == 'sp.rt'){
         if (is.null(sigma.t)){
-          sigma.t <- 0.5 * mean(do.call(rbind,unlist(pkLst,recursive = FALSE))$end - 
-                               do.call(rbind,unlist(pkLst,recursive = FALSE))$start)
+          sigma.t <- 0.5 * mean(do.call(rbind, unlist(pkLst, recursive = FALSE))$end - 
+                               do.call(rbind, unlist(pkLst, recursive = FALSE))$start)
         }
       ts <- as.numeric(rownames(chrom_list[[1]]))
       sp <- sapply(seq_along(pkcenters), function(i){
         rescale(t(chrom_list[[file.idx[i]]][
           which(elementwise.all.equal(ts, pkcenters[i])),]))
-      }, simplify=TRUE)
+      }, simplify = TRUE)
       cor.matrix <- cor(sp, method = "pearson")
       mint <- abs(outer(unlist(pkcenters), unlist(pkcenters), FUN="-"))
       S <- (exp((-(1 - abs(cor.matrix))^2)/(2*sigma.r^2)))*exp(-(mint^2)/(2*sigma.t^2))
@@ -152,13 +152,13 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
     }
     vars <- c(rt, "start", "end", "sd", "tau", "FWHM", "r.squared", "purity")
     vars.idx <- match(vars, colnames(xx))
-    cl.centers <- aggregate(xx[,vars.idx], by = list(pkcenters.cl), FUN = "mean",
-                            na.action = "na.pass")[,-1]
-    ncl <- length(cl.centers[,rt])
+    cl.centers <- aggregate(xx[, vars.idx], by = list(pkcenters.cl), FUN = "mean",
+                            na.action = "na.pass")[, -1]
+    ncl <- length(cl.centers[, rt])
     
     ## re-order clusters from small to large rt
-    pkcenters.cl <- order(order(cl.centers[,rt]))[pkcenters.cl]
-    cl.centers <- cl.centers[order(cl.centers[,rt]),]
+    pkcenters.cl <- order(order(cl.centers[, rt]))[pkcenters.cl]
+    cl.centers <- cl.centers[order(cl.centers[, rt]),]
     metaInfo <- cbind(lambda = rep(as.numeric(names(peak_list[[1]])[comp]), ncl),
                       peak = 1:ncl, 
                       round(cl.centers, 2)
