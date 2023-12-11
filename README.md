@@ -44,7 +44,7 @@ Please see the [vignette](https://ethanbass.github.io/chromatographR/articles/ch
 
 ## Contributing
 
-Contributions are very welcome. Please get in touch (preferable by opening a GitHub [issue](https://github.com/ethanbass/chromatographR/issues)) to discuss any suggestions or to file a bug report. Some good reasons to file an issue:
+Contributions are always welcome. Please get in touch (preferable by opening a GitHub [issue](https://github.com/ethanbass/chromatographR/issues)) to discuss any suggestions or to file a bug report. Some good reasons to file an issue:
 
 - You've found an actual bug.  
 - You're getting a cryptic error message that you don't understand.  
