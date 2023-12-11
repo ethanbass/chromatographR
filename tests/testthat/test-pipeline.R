@@ -232,15 +232,14 @@ test_that("normalize_data works", {
   expect_equal(pk_tab_norm$args[["normalization_by"]], "mass")
 })
 
-### cluster
-
-# suppressWarnings(cl <- cluster_spectra(pk_tab, chrom_list = dat.pr, nboot = 10,
-#                                        parallel = FALSE, verbose = FALSE,
-#                                        save = FALSE, output = "both"))
-# test_that("cluster_spectra works", {
-#   expect_equal(class(cl[[1]]), "pvclust")
-#   expect_equal(class(cl[[2]]), "list")
-# })
+test_that("cluster_spectra works", {
+  skip_on_cran()
+  skip_if_not_installed("pvclust")
+  cl <- cluster_spectra(pk_tab, nboot = 10, parallel = FALSE, verbose = FALSE, 
+                        save = FALSE, plot_dend = FALSE, plot_spectra = FALSE)
+  expect_equal(class(cl[[1]]), "pvclust")
+  expect_equal(class(cl[[2]]), "list")
+})
 
 ### test plotting functions
 
@@ -421,15 +420,6 @@ test_that("plot_peak.list works", {
   }
   vdiffr::expect_doppelganger("plot_peaklist", plot_peaklist)
   plot(pks_egh, chrom_list = dat.pr, lambda = 210)
-})
-
-test_that("cluster_spectra works", {
-  skip_on_cran()
-  cl <- cluster_spectra(pk_tab, chrom_list = dat.pr, nboot = 10,
-                        parallel = FALSE, verbose = FALSE, save = FALSE,
-                        output = "both", plot_dend = FALSE, plot_spectra = FALSE)
-  expect_equal(class(cl[[1]]), "pvclust")
-  expect_equal(class(cl[[2]]), "list")
 })
 
 test_that("write_peaktable writes csvs correctly", {
