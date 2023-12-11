@@ -8,10 +8,18 @@
 * Changed default setting of `verbose` argument in `correct_rt` from `FALSE`
 to default setting.
 * Removed `load_chroms` function. Use `read_chroms` instead.
+* Eliminated spurious warning from `attach_ref_spectra` function.
+
+#### Refactoring of `cluster_spectra` function:
+
+* For simplicity, `cluster_spectra` now requires reference spectra to be attached to peak table.
+* Accordingly, the `chrom_list` argument is no longer needed.
+* Saving to RDS is now turned off by default.
+* The `pvclust` package is now suggested instead of required.
 
 #### Updates to vignette
 
-* Suggest numeric input to lambdas instead of character input to reduce confusion.
+* Suggest numeric input to lambdas instead of character input to reduce unnecessary confusion.
 
 # chromatographR 0.6.1
 
