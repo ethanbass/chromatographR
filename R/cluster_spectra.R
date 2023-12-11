@@ -25,14 +25,10 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' the confidence threshold will be returned.
 #'
 #' @name cluster_spectra
-#' @importFrom pvclust pvclust pvrect pvpick
 #' @importFrom stats cor
 #' @importFrom methods new
 #' @importFrom graphics matplot
 #' @param peak_table Peak table from \code{\link{get_peaktable}}.
-#' @param chrom_list A list of chromatograms in matrix format (timepoints x
-#' wavelengths). If no argument is provided here, the function will try to find
-#' the \code{chrom_list} object used to create the provided \code{peak_table}.
 #' @param peak_no Minimum and maximum thresholds for the number of peaks a
 #' cluster may have.
 #' @param alpha Confidence threshold for inclusion of cluster.
@@ -78,69 +74,75 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' @examples \donttest{
 #' data(pk_tab)
 #' data(Sa_warp)
+#' pk_tab <- attach_ref_spectra(pk_tab, Sa_warp, ref="max.int")
 #' cl <- cluster_spectra(pk_tab, nboot=100, max.only = FALSE, save = FALSE, alpha = .97)
 #' }
 #' @export cluster_spectra
 #' @md
 
-cluster_spectra <- function(peak_table, chrom_list, peak_no = c(5,100),
-                            alpha=0.95, nboot=1000, plot_dend=TRUE,
-                            plot_spectra=TRUE, verbose=TRUE, save=TRUE,
-                            parallel=TRUE, max.only=FALSE,
-                            output=c("clusters", "pvclust", "both"),
+cluster_spectra <- function(peak_table, peak_no = c(5,100), alpha = 0.95, 
+                            nboot = 1000, plot_dend = TRUE, plot_spectra = TRUE, 
+                            verbose = getOption("verbose"), 
+                            save = FALSE, parallel = TRUE, max.only = FALSE,
+                            output = c("pvclust", "clusters"),
                             ...){
+  check_for_pkg("pvclust")
   check_peaktable(peak_table)
-  if (missing(chrom_list)){
-    chrom_list <- get_chrom_list(peak_table)
-  } else get_chrom_list(peak_table, chrom_list)
-  output <- match.arg(output, c("clusters","pvclust","both"))
+  output <- match.arg(output, c("pvclust", "clusters"), several.ok = TRUE)
   if (is.data.frame(peak_table$ref_spectra) | is.matrix(peak_table$ref_spectra)){
-    rep <- peak_table$ref_spectra
-  } else{
-    if (verbose)
-      print('...collecting representative spectra')
-    rep <- sapply(colnames(peak_table[[1]]), function(j){
-      sp <- plot_spectrum(loc=j, peak_table=peak_table, chrom_list = chrom_list,
-                          scale_spectrum=TRUE, plot_trace=FALSE,
-                          export_spectrum=TRUE, plot_spectrum=FALSE, verbose=verbose)
-    })
-    rep <- data.frame(do.call(cbind,rep))
-    names(rep) <- paste0('V',seq_len(ncol(rep)))
+    spectra <- peak_table$ref_spectra
+  } else {
+    stop("Please attach reference spectra (using the `attach_ref_spectra` function) before running `cluster_spectra`.")
   }
-  rm <- which(apply(rep,2,sd)==0)
-  if (length(rm)>0)
-    rep <- rep[,-rm]
-  d <- 1 - abs(cor(rep, method="pearson"))
+  rm <- which(apply(spectra, 2, sd) == 0)
+  if (length(rm) > 0){
+    if (verbose){
+      message(paste0("Removing peaks due to bad spectra: ", paste(sQuote(colnames(spectra)[rm]),collapse=", ")))
+    }
+    spectra <- spectra[, -rm]
+  }
   if (verbose)
-    print('...clustering spectra')
-  result <- suppressWarnings(pvclust(rep, method.dist = "cor",
-                             nboot = nboot, parallel = parallel, quiet=!verbose, ...)
+    message('...clustering spectra')
+  result <- suppressWarnings(pvclust::pvclust(spectra, method.dist = "cor", 
+                                              nboot = nboot, parallel = parallel,
+                                              quiet = !verbose, ...)
   )
   if (plot_dend){
-    plot(result,labels = FALSE, cex.pv=0.5, print.pv = 'au',print.num = FALSE)
-    pvrect(result, alpha = alpha, max.only = max.only)
+    plot(result, labels = FALSE, cex.pv = 0.5, print.pv = 'au',
+         print.num = FALSE)
+    pvclust::pvrect(result, alpha = alpha, max.only = max.only)
   }
-  if (save) saveRDS(result, 'pvclust.RDS')
-  p <- pvpick(result, alpha = alpha, max.only = max.only)
-  l <- sapply(p$clusters, length)
-  sub <- p$clusters[which(l > peak_no[1] & l < peak_no[2])]
-  pval <- 1-result$edges[p$edges[which(l > peak_no[1] & l < peak_no[2])],'au']
-  sub <- lapply(seq_along(sub), function(i){
-    new("cluster", peaks=sub[[i]], pval=pval[i])})
-  pval <- format(round(
-    result$edges[p$edges[which(l > peak_no[1] & l < peak_no[2])],'au'],2),
-    nsmall=2)
-  names(sub) <- paste0('c', seq_along(sub))
+  if (save){
+    saveRDS(result, 'pvclust.RDS')
+  }
+  picks <- pvclust::pvpick(result, alpha = alpha, max.only = max.only)
+  cl_size <- sapply(picks$clusters, length)
   
-  if (plot_spectra){
-    if (verbose) print('...plotting clustered spectra')
-    new.lambdas <- colnames(chrom_list[[1]])
-    sapply(seq_along(sub), function(i){ 
-      matplot(new.lambdas,rep[,sub[[i]]@peaks],
-              type='l', ylab='', yaxt='n', xlab=expression(lambda),
-              main=paste0('cluster ', i, '; p = ',
-                          format(round(sub[[i]]@pval,2),nsmall=2))
-                          )})
+  ## filter clusters ##
+  cl_idx <- which(cl_size > peak_no[1] & cl_size < peak_no[2])
+  if (verbose && length(cl_idx) < length(cl_size)){
+    message(paste0("Removing ", length(cl_size) - length(cl_idx), " under- or oversized clusters from results."))
   }
-  switch(output, "clusters" = sub, "pvclust" = result, "both" = list(result,sub))
+  clusters <- picks$clusters[cl_idx]
+  pval <- 1 - result$edges[picks$edges[cl_idx], 'au']
+  clusters <- lapply(seq_along(clusters), function(i){
+    new("cluster", peaks = clusters[[i]], pval = pval[i])
+  })
+  if (length(clusters) != 0){
+    names(clusters) <- paste0('c', seq_along(clusters))
+    
+    if (plot_spectra){
+      if (verbose) message('...plotting clustered spectra')
+      lambdas <- as.numeric(rownames(spectra))
+      sapply(seq_along(clusters), function(i){ 
+        matplot(lambdas, spectra[, clusters[[i]]@peaks],
+                type = 'l', ylab = '', yaxt = 'n', xlab = expression(lambda),
+                main = paste0('cluster ', i, '; p = ',
+                              format(round(clusters[[i]]@pval, 2), nsmall = 2))
+        )
+      })
+    }
+  }
+  pvclust <- result
+  mget(output)
 }

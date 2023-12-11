@@ -6,26 +6,21 @@
 \usage{
 cluster_spectra(
   peak_table,
-  chrom_list,
   peak_no = c(5, 100),
   alpha = 0.95,
   nboot = 1000,
   plot_dend = TRUE,
   plot_spectra = TRUE,
-  verbose = TRUE,
-  save = TRUE,
+  verbose = getOption("verbose"),
+  save = FALSE,
   parallel = TRUE,
   max.only = FALSE,
-  output = c("clusters", "pvclust", "both"),
+  output = c("pvclust", "clusters"),
   ...
 )
 }
 \arguments{
 \item{peak_table}{Peak table from \code{\link{get_peaktable}}.}
-
-\item{chrom_list}{A list of chromatograms in matrix format (timepoints x
-wavelengths). If no argument is provided here, the function will try to find
-the \code{chrom_list} object used to create the provided \code{peak_table}.}
 
 \item{peak_no}{Minimum and maximum thresholds for the number of peaks a
 cluster may have.}
@@ -113,6 +108,7 @@ nboot = 10000}.
 \donttest{
 data(pk_tab)
 data(Sa_warp)
+pk_tab <- attach_ref_spectra(pk_tab, Sa_warp, ref="max.int")
 cl <- cluster_spectra(pk_tab, nboot=100, max.only = FALSE, save = FALSE, alpha = .97)
 }
 }
