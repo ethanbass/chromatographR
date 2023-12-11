@@ -4,7 +4,7 @@
 \alias{correct_peaks}
 \title{Correct peak positions according to a ptw warping model}
 \usage{
-correct_peaks(peak_list, mod_list)
+correct_peaks(peak_list, mod_list, chrom_list)
 }
 \arguments{
 \item{peak_list}{A `peak_list` object created by \code{\link{get_peaks}},
@@ -15,6 +15,8 @@ retention time, peak width (FWHM), peak width, height, and
 area.}
 
 \item{mod_list}{A list of ptw models.}
+
+\item{chrom_list}{List of chromatograms supplied to create ptw models.}
 }
 \value{
 The input list of peak tables is returned with extra columns

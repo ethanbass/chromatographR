@@ -253,6 +253,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
 #' retention time, peak width (FWHM), peak width, height, and
 #' area.
 #' @param mod_list A list of ptw models.
+#' @param chrom_list List of chromatograms supplied to create ptw models.
 #' @return The input list of peak tables is returned with extra columns
 #' containing the corrected retention time.
 #' @author Ron Wehrens, Ethan Bass
@@ -261,7 +262,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
 #' function in the alsace package by Ron Wehrens.
 #' @seealso \code{\link{correct_rt}}
 #' @export correct_peaks
-correct_peaks <- function(peak_list, mod_list){
+correct_peaks <- function(peak_list, mod_list, chrom_list){
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(mod_list)
   }
