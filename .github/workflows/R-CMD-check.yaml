@@ -57,7 +57,6 @@ jobs:
           Rscript -e "reticulate::conda_install('r-reticulate', 'python-kaleido')"
           Rscript -e "reticulate::conda_install('r-reticulate', 'plotly', channel = 'plotly')"
           Rscript -e "reticulate::use_miniconda('r-reticulate')"
-          Rscript -e "cowplot::set_null_device("cairo")"
           
       - uses: r-lib/actions/check-r-package@v2
         with:
