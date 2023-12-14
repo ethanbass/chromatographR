@@ -137,7 +137,7 @@ plot_spectrum_ggpl <- function(loc, peak_table, chrom_list,
   if (what == "click"){
     stop(paste0("The ", engine, " engine does not currently support clicking."))
   }
-  new.ts <- get_times(chrom_list, index = chr)
+  new.ts <- get_times(chrom_list, idx = chr)
   new.lambdas <- get_lambdas(chrom_list)
   sig <- max(nchar(gsub(".*\\.","",rownames(chrom_list[[1]]))))
   if (what == "peak"){
@@ -219,7 +219,7 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
                                what=c("peak", "rt", "idx", "click"), zoom = FALSE,
                                engine="base",
                                ...){
-  new.ts <- get_times(chrom_list, index = chr)
+  new.ts <- get_times(chrom_list, idx = chr)
   new.lambdas <- get_lambdas(chrom_list)
   sig <- max(nchar(gsub(".*\\.","",rownames(chrom_list[[1]]))))
   if (what == "peak"){
@@ -332,7 +332,7 @@ scan_chrom <- function(chrom_list, chr, lambda,
     stop("List of chromatograms must be provided for scan function.")
   if (!(inherits(chrom_list, "list") | inherits(chrom_list, "chrom_list")))
     stop("`chrom_list` argument should be a list of chromatograms in matrix format")
-  new.ts <- get_times(chrom_list, index = chr)
+  new.ts <- get_times(chrom_list, idx = chr)
   new.lambdas <- get_lambdas(chrom_list)
   sig <- max(nchar(gsub(".*\\.","",rownames(chrom_list[[1]]))))
   
@@ -559,7 +559,7 @@ plotly_spec <- function(x, chr, RT, reshape = TRUE, color="black",
 # plotly_spec2(chrom_list,RT=15.5)
 
 plot_trace <- function(chrom_list, chr, lambda.idx, idx = NULL, what){
-  new.ts <- get_times(chrom_list, index = chr)
+  new.ts <- get_times(chrom_list, idx = chr)
   lambda <- colnames(chrom_list[[1]])[lambda.idx]
   y_trace <- chrom_list[[chr]][,lambda.idx]
   matplot(x = new.ts, y = y_trace, type = 'l', ylab = '', xlab = '')

@@ -58,8 +58,8 @@
 #' @param out Specify `data.frame` or `matrix` as output. Defaults to
 #' `data.frame`.
 #' @md
-#' @return The function returns a `peak_table` object, consisting of the following
-#' elements:
+#' @return The function returns an S3 \code{peak_table} object, containing the
+#' following elements:
 #' * `tab`: the peak table itself -- a data-frame of intensities in a
 #' sample x peak configuration.
 #' * `pk_meta`: A data.frame containing peak meta-data (e.g. the spectral component,
@@ -145,7 +145,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
       D <- 1 - S
       linkage <- "average"
       pkcenters.hcl <- hclust(as.dist(D), method = linkage)
-      pkcenters.cl <- cutreeDynamicTree(pkcenters.hcl, maxTreeHeight = hmax, 
+      pkcenters.cl <- dynamicTreeCut::cutreeDynamicTree(pkcenters.hcl, maxTreeHeight = hmax, 
                                       deepSplit = deepSplit, minModuleSize = 2)
       sing <- which(pkcenters.cl == 0)
       pkcenters.cl[sing] <- max(pkcenters.cl) + seq_along(sing)

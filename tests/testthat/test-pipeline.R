@@ -28,7 +28,7 @@ test_that("preprocess returns correct errors", {
 
 
 test_that("preprocess works without interpolation", {
-  dat.pr <- preprocess(X=Sa[[1]], interpolate_cols = FALSE,
+  dat.pr <- preprocess(X = Sa[[1]], interpolate_cols = FALSE,
                        interpolate_rows = FALSE, show_progress = FALSE)
   expect_equal(dim(dat.pr),dim(Sa[[1]]))
   expect_equal(rownames(dat.pr), rownames(Sa[[1]]))
@@ -142,6 +142,33 @@ test_that("get_peaktable works", {
   expect_equal(class(pk_tab$pk_meta), "data.frame")
   expect_equal(class(pk_tab$args), "list")
 })
+
+# dat.pr <- Sa_pr
+# test_that("correct_peaks works", {
+#   skip_on_cran()
+#   pks <- get_peaks(dat.pr, lambdas = 210)
+#   warping.models <- correct_rt(chrom_list = dat.pr,lambdas = 210, what="models")
+#   pks.cor <- correct_peaks(pks, warping.models)
+#   pktab_cor <- get_peaktable(pks.cor, use.cor = TRUE)
+#   
+#   ptw_warp <- correct_rt(dat.pr, models=warping.models)
+#   pks_warp <- get_peaks(ptw_warp, lambdas = 210, fit = "egh", smooth_type = "none",
+#                        show_progress = FALSE)
+#   pktab_warp <- get_peaktable(pks_warp)
+#   
+#   pks_reg <- get_peaks(dat.pr, lambdas = 210, show_progress = FALSE)
+#   pktab_reg <- get_peaktable(pks_reg, plot_it = TRUE)
+#   
+#   mean(colMeans(abs(pktab_cor$tab - pktab_warp$tab)))
+#   mean(colMeans(abs(pktab_cor$tab - pktab_reg$tab)))
+#   
+#   expect_equal(rownames(pk_tab$tab), names(dat.pr))
+#   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$pk_meta))
+#   expect_equal(class(pk_tab), "peak_table")
+#   expect_equal(class(pk_tab$tab), "data.frame")
+#   expect_equal(class(pk_tab$pk_meta), "data.frame")
+#   expect_equal(class(pk_tab$args), "list")
+# })
 
 test_that("strip plot works", {
   skip_on_cran()
@@ -416,7 +443,7 @@ test_that("boxplot works as expected", {
 test_that("plot_peak.list works", {
   skip_if_not_installed("vdiffr")
   plot_peaklist <- function(){
-    plot(pks_egh, chrom_list = dat.pr, index=2)
+    plot(pks_egh, chrom_list = dat.pr, idx = 2)
   }
   vdiffr::expect_doppelganger("plot_peaklist", plot_peaklist)
   plot(pks_egh, chrom_list = dat.pr, lambda = 210)

@@ -1,10 +1,11 @@
 #' Correct retention time
 #' 
-#' Aligns chromatograms using parametric time warping, as 
-#' implemented in \code{\link[ptw]{ptw}}, or variable penalty dynamic 
-#' time warping, as implemented in \code{\link[VPdtw]{VPdtw}}. The
-#' \code{init.coef} and \code{n.traces} arguments apply only to \code{ptw}
-#' warping, while \code{penalty} and \code{maxshift} apply only to \code{vpdtw}
+#' Aligns chromatograms using one of two algorithms, according to the value of 
+#' \code{alg}: either parametric time warping, as implemented in 
+#' \code{\link[ptw]{ptw}}, or variable penalty dynamic time warping, as 
+#' implemented in \code{\link[VPdtw]{VPdtw}}. The \code{init.coef} and 
+#' \code{n.traces} arguments apply only to \code{ptw} warping, while 
+#' \code{penalty} and \code{maxshift} apply only to \code{vpdtw}
 #' warping.
 #' 
 #' @aliases correct_rt
@@ -75,7 +76,7 @@
 #' 
 #' @examplesIf interactive()
 #' data(Sa_pr)
-#' warping.models <- correct_rt(Sa_pr, what = "models", lambdas=c("210"))
+#' warping.models <- correct_rt(Sa_pr, what = "models", lambdas=c(210))
 #' warp <- correct_rt(chrom_list = Sa_pr, models = warping.models)
 #' @md
 #' @export correct_rt
@@ -192,7 +193,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
       iset <- models$query
       jmax <- nrow(jset)
       short <- jmax - nrow(iset)
-      res <- get_time_resolution(chrom_list_og, index=reference)
+      res <- get_time_resolution(chrom_list_og, idx = reference)
       result <- lapply(seq_len(ncol(allmats)), function(samp){
         # warp retention times
         x <- apply(chrom_list_og[[samp]], 2, function(j){
@@ -201,7 +202,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
         })
       })
         # fix times
-        old_ts <- c(rep(NA, short), get_times(chrom_list_og, index = reference))
+        old_ts <- c(rep(NA, short), get_times(chrom_list_og, idx = reference))
         times <- suppressWarnings(stats::approx(x = jset[, reference],
                                                 y = old_ts, 1:jmax)$y)
         idx_start <- which.min(times)
@@ -266,7 +267,10 @@ correct_peaks <- function(peak_list, mod_list, chrom_list){
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(mod_list)
   }
-  ref_times <- get_times(chrom_list, index = attr(mod_list, "reference"))
+  ref_times <- get_times(chrom_list, idx = attr(mod_list, "reference"))
+  if (length(ref_times) != length(mod_list[[1]]$warp.fun)){
+    stop("Dimensions of the warping models and chromatograms do not match.")
+  }
   corrected_pks <- mapply(function(samp, mod){
     lapply(samp, function(profile){
              if (nrow(profile) > 0){

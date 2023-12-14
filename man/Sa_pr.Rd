@@ -3,10 +3,11 @@
 \docType{data}
 \name{Sa_pr}
 \alias{Sa_pr}
-\title{HPLC-DAD data of goldenrod root extracts.}
+\title{Preprocessed goldenrod root chromatograms}
 \format{
 Four pre-processed matrices (time x wavelength) to use in examples.
 }
 \description{
-Pre-processed chromatograms.
+These are the pre-processed chromatograms derived from the raw data stored in
+\code{Sa}.
 }

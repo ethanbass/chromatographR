@@ -65,8 +65,8 @@ single time window. Defaults to \code{FALSE}.}
 \code{data.frame}.}
 }
 \value{
-The function returns a \code{peak_table} object, consisting of the following
-elements:
+The function returns an S3 \code{peak_table} object, containing the
+following elements:
 \itemize{
 \item \code{tab}: the peak table itself -- a data-frame of intensities in a
 sample x peak configuration.

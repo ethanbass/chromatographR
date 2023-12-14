@@ -105,3 +105,4 @@ specified peak with groups provided by \code{vars}.
 \author{
 Ethan Bass
 }
+\concept{Visualization}

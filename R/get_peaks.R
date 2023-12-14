@@ -5,17 +5,20 @@
 #' 
 #' Peaks are located by finding zero-crossings in the smoothed first derivative
 #' of the specified chromatographic traces (function \code{\link{find_peaks}}).
-#' Additional arguments can be provided to \code{\link{find_peaks}} to fine-tune
-#' the peak-finding algorithm. For example, the \code{smooth_window} can be
-#' increased to prevent peaks from being split into multiple features. Overly
-#' aggressive smoothing may cause small peaks to be overlooked. At the given 
-#' positions, an exponential-gaussian hybrid (or regular gaussian)
+#' At the given positions, an exponential-gaussian hybrid (or regular gaussian)
 #' function is fit to the signal using \code{\link{fit_peaks}} according to the
 #' value of \code{fit}. Finally, the area is calculated using trapezoidal 
 #' approximation.
+#'
+#' Additional arguments can be provided to \code{\link{find_peaks}} to fine-tune
+#' the peak-finding algorithm. For example, the \code{smooth_window} can be
+#' increased to prevent peaks from being split into multiple features. Overly
+#' aggressive smoothing may cause small peaks to be overlooked. 
 #' 
-#' The \code{sd}, \code{FWHM}, \code{tau}, and \code{area} are returned in units
-#' determined by \code{time.units}. By defaults the units are in minutes.
+#' The standard deviation (\code{sd}), full-width at half maximum (\code{FWHM}),
+#' tau \code{tau}, and \code{area} are returned in units determined by 
+#' \code{time.units}. By default, the units are in minutes. To compare directly
+#' with 'ChemStation' integration results, the time units should be in seconds.
 #' 
 #' @aliases get_peaks
 #' @importFrom stats median
@@ -45,29 +48,41 @@
 #' algorithm. Most importantly, the \code{smooth_window} should be increased if
 #' features are being split into multiple bins. Other arguments that can be used
 #' here include \code{smooth_type}, \code{slope_thresh}, and \code{amp_thresh}.
-#' @return The result is an S3 object of class \code{peak_list}, containing a nested
-#' list of data.frames containing information about the peaks fitted for each
-#' chromatogram at each specified wavelength. The data.frame includes information
-#' about the retention time (\code{rt}), \code{start} and \code{end} of each peak,
-#' as well as the standard deviation (\code{sd}), \code{tau} (if \code{egh} is 
-#' selected), full width at half maximum (\code{FWHM}), \code{height}, \code{area},
-#' \code{r.squared} (coefficient of determination), and \code{purity}. (*Note:*
-#' the \code{r.squared} is calculated by fitting a linear model of the fitted
-#' peak values to the raw data. This approach is not really statistically valid
-#' but it can still be useful as a rough metric for "goodness-of-fit").
+#' @return The result is an S3 object of class \code{peak_list}, containing a 
+#' nested list of data.frames containing information about the peaks fitted for 
+#' each chromatogram at each of wavelengths specified by the \code{lamdas}
+#' argument. Each row in these data.frames is a peak and the columns contain 
+#' information about various peak parameters:
+#' * `rt`: The retention time of the peak maximum.
+#' * \code{start}: The retention time where the peak is estimated to begin.
+#' * \code{end}: The retention time where the peak is estimated to end.
+#' * \code{sd}: The standard deviation of the fitted peak shape.
+#' * \code{tau} The value of parameter \eqn{\tau}. This parameter determines 
+#' peak asymmetry for peaks fit with an exponential-gaussian hybrid function.
+#' (This column will only appear if \code{fit = egh}.
+#' * \code{FWHM}: The full-width at half maximum.
+#' * \code{height}: The height of the peak.
+#' * \code{area}: The area of the peak as determined by trapezoidal approximation.
+#' * \code{r.squared} The coefficient of determination (\eqn{R^2}) of the fitted
+#' model to the raw data. (\strong{Note}: this value is calculated by fitting a
+#' linear model of the fitted peak values to the raw data. This approach is
+#' statistically questionable, since the models are fit using non-linear least
+#' squares. Nevertheless, it can still be useful as a rough metric for 
+#' "goodness-of-fit").
+#' * \code{purity} The peak purity.
 #' @author Ethan Bass
-#' @note This function is adapted from the
+#' @note The bones of this function are adapted from the
 #' \href{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks}
 #' function authored by Ron Wehrens (though the underlying algorithms for peak
 #' identification and peak-fitting are not the same).
 #' @references 
 #' * Lan, K. & Jorgenson, J. W. 2001. A hybrid of exponential and gaussian
 #' functions as a simple model of asymmetric chromatographic peaks. \emph{Journal of
-#' Chromatography A} \bold{915}:1-13. \doi{10.1016/S0021-9673(01)00594-5}.
+#' Chromatography A} \strong{915}:1-13. \doi{10.1016/S0021-9673(01)00594-5}.
 #'
 #' * Naish, P. J. & Hartwell, S. 1988. Exponentially Modified Gaussian functions - A
 #' good model for chromatographic peaks in isocratic HPLC? \emph{Chromatographia},
-#' /bold{26}: 285-296. \doi{10.1007/BF02268168}.
+#' \strong{26}: 285-296. \doi{10.1007/BF02268168}.
 #'
 #' * O'Haver, Tom. Pragmatic Introduction to Signal Processing:
 #' Applications in scientific measurement.
@@ -82,6 +97,7 @@
 #' pks <- get_peaks(Sa_pr, lambdas = c('210'), sd.max=50, fit="egh")
 #' @seealso \code{\link{find_peaks}}, \code{\link{fit_peaks}}
 #' @export get_peaks
+#' @md
 
 get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
                       sd.max = 50, max.iter = 100,
@@ -127,8 +143,8 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
   }))
   sample_names <- names(result)
   result <- lapply(seq_along(result), function(i){
-    timepoints <- get_times(chrom_list, index = i)
-    tdiff <- get_time_resolution(chrom_list, index = i)
+    timepoints <- get_times(chrom_list, idx = i)
+    tdiff <- get_time_resolution(chrom_list, idx = i)
     lapply(result[[i]], function(lambda){
       x <- lambda
       x[, c('rt', 'start', 'end')] <- sapply(c('rt', 'start', 'end'),

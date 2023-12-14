@@ -8,5 +8,5 @@
 A \code{peak_table} object.
 }
 \description{
-Peak table generated from example goldenrod extracts for examples.
+Peak table generated from exemplary goldenrod root extracts for use in examples.
 }

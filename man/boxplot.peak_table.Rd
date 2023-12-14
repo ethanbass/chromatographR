@@ -25,3 +25,4 @@ meta <- read.csv(path)
 pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
 boxplot(pk_tab, formula=V11 ~ trt)
 }
+\concept{Visualization}

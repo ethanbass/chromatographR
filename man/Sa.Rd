@@ -3,11 +3,12 @@
 \docType{data}
 \name{Sa}
 \alias{Sa}
-\title{HPLC-DAD data of goldenrod root extracts.}
+\title{Raw goldenrod root chromatograms}
 \format{
 A list of four matrices (time x wavelength).
 }
 \description{
-Four HPLC-DAD data matrices of *Solidago altissima* roots extracted in 90
-percent methanol.
+Four HPLC-DAD data matrices of *Solidago altissima* roots extracted in 90%
+methanol. The time axis is compressed to save space so the
+data are a little choppy.
 }

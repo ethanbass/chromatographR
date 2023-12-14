@@ -8,7 +8,8 @@
   x,
   ...,
   chrom_list,
-  index = 1,
+  idx = 1,
+  index = NULL,
   lambda = NULL,
   points = FALSE,
   ticks = FALSE,
@@ -30,7 +31,9 @@
 \item{chrom_list}{List of chromatograms (retention time x wavelength
 matrices)}
 
-\item{index}{Index or name of chromatogram to be plotted.}
+\item{idx}{Index or name of chromatogram to be plotted.}
+
+\item{index}{This argument is deprecated. Please use \code{idx} instead.}
 
 \item{lambda}{Wavelength for plotting.}
 
@@ -74,3 +77,4 @@ provided \code{peak_list} drawn underneath the curve.
 \author{
 Ethan Bass
 }
+\concept{Visualization}

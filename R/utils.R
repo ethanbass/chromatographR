@@ -10,7 +10,6 @@ check_peaktable <- function(peak_table){
 #' @param peak_table Peak table object
 #' @author Ethan Bass
 #' @noRd
-
 get_chrom_list <- function(x, chrom_list, verbose = FALSE){
   if (missing(chrom_list)){
     if (inherits(x, "peak_table")){
@@ -155,9 +154,9 @@ elementwise.all.equal <- Vectorize(function(x, y, ...) {isTRUE(all.equal(x, y, .
 #' Get times
 #' @return Numeric vector of retention times.
 #' @noRd
-get_times <- function(x, index = 1){
+get_times <- function(x, idx = 1){
   if (inherits(x, "chrom_list") | inherits(x, "list")){
-    as.numeric(rownames(x[[index]]))
+    as.numeric(rownames(x[[idx]]))
   } else if (inherits(x, "matrix")){
     as.numeric(rownames(x))
   }
@@ -173,8 +172,8 @@ get_lambdas <- function(chrom_list){
 #' Get time resolution
 #' @return Returns average gap between time points.
 #' @noRd
-get_time_resolution <- function(chrom_list, index = 1){
-  ts <- get_times(x = chrom_list, index = index)
+get_time_resolution <- function(chrom_list, idx = 1){
+  ts <- get_times(x = chrom_list, idx = idx)
   signif(median(diff(ts)))
 }
 

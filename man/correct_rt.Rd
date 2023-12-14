@@ -83,11 +83,12 @@ A list of warping models or a list of warped absorbance profiles,
 depending on the value of the \code{what} argument.
 }
 \description{
-Aligns chromatograms using parametric time warping, as
-implemented in \code{\link[ptw]{ptw}}, or variable penalty dynamic
-time warping, as implemented in \code{\link[VPdtw]{VPdtw}}. The
-\code{init.coef} and \code{n.traces} arguments apply only to \code{ptw}
-warping, while \code{penalty} and \code{maxshift} apply only to \code{vpdtw}
+Aligns chromatograms using one of two algorithms, according to the value of
+\code{alg}: either parametric time warping, as implemented in
+\code{\link[ptw]{ptw}}, or variable penalty dynamic time warping, as
+implemented in \code{\link[VPdtw]{VPdtw}}. The \code{init.coef} and
+\code{n.traces} arguments apply only to \code{ptw} warping, while
+\code{penalty} and \code{maxshift} apply only to \code{vpdtw}
 warping.
 }
 \note{
@@ -98,7 +99,7 @@ function in the alsace package by Ron Wehrens.
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 data(Sa_pr)
-warping.models <- correct_rt(Sa_pr, what = "models", lambdas=c("210"))
+warping.models <- correct_rt(Sa_pr, what = "models", lambdas=c(210))
 warp <- correct_rt(chrom_list = Sa_pr, models = warping.models)
 \dontshow{\}) # examplesIf}
 }
