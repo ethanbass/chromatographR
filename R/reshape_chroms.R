@@ -81,7 +81,6 @@ reshape_peaktable <- function(x, peaks, metadata, fixed_levels = TRUE){
       peaks <- colnames(x$tab)[peaks]
     }
     df <- x$tab[, match(peaks, colnames(x$tab)), drop = FALSE]
-    # x$tab <- x$tab[,which(colnames(x$tab) %in% peaks), drop = FALSE]
     if (!is.null(names(peaks))){
       colnames(df) <- names(peaks)
       peaks <- colnames(df)
@@ -99,8 +98,10 @@ reshape_peaktable <- function(x, peaks, metadata, fixed_levels = TRUE){
     idvar = "sample", ids = rownames(df))
   rownames(xx) <- NULL
   xx <- xx[,c(3,1,2)]
-  xx <- merge(xx, data.frame(sample = row.names(df), x$sample_meta),
-              by = "sample", all.x = TRUE)
+  if (!is.null(dim(x$sample_meta))){
+    xx <- merge(xx, data.frame(sample = row.names(df), x$sample_meta),
+                by = "sample", all.x = TRUE)
+  }
   if (fixed_levels){
     xx$peak <- factor(xx$peak, levels = peaks)
   }
