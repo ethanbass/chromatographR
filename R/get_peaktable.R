@@ -100,6 +100,8 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
   clust <- match.arg(clust, c("rt","sp.rt"))
   out <- match.arg(out, c('data.frame', 'matrix'))
   rt <- ifelse(use.cor, "rt.cor", "rt")
+  start <- ifelse(use.cor, "start.cor", "start")
+  end <- ifelse(use.cor, "end.cor", "end")
   if (!inherits(peak_list, "peak_list"))
     stop("Peak list must be of the associated class.")
   if (clust == "sp.rt"){
@@ -150,7 +152,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
       sing <- which(pkcenters.cl == 0)
       pkcenters.cl[sing] <- max(pkcenters.cl) + seq_along(sing)
     }
-    vars <- c(rt, "start", "end", "sd", "width", "tau", "FWHM", "r.squared", "purity")
+    vars <- c(rt, start, end, "sd", "width", "tau", "FWHM", "r.squared", "purity")
     vars <- vars[vars %in% colnames(xx)]
     vars.idx <- match(vars, colnames(xx))
     cl.centers <- aggregate(xx[, vars.idx], by = list(pkcenters.cl), FUN = "mean",

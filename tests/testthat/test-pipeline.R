@@ -150,32 +150,35 @@ test_that("get_peaktable works", {
   expect_equal(class(pk_tab$args), "list")
 })
 
-# dat.pr <- Sa_pr
-# test_that("correct_peaks works", {
-#   skip_on_cran()
-#   pks <- get_peaks(dat.pr, lambdas = 210)
-#   warping.models <- correct_rt(chrom_list = dat.pr,lambdas = 210, what="models")
-#   pks.cor <- correct_peaks(pks, warping.models)
-#   pktab_cor <- get_peaktable(pks.cor, use.cor = TRUE)
-#   
-#   ptw_warp <- correct_rt(dat.pr, models=warping.models)
-#   pks_warp <- get_peaks(ptw_warp, lambdas = 210, fit = "egh", smooth_type = "none",
-#                        show_progress = FALSE)
-#   pktab_warp <- get_peaktable(pks_warp)
-#   
-#   pks_reg <- get_peaks(dat.pr, lambdas = 210, show_progress = FALSE)
-#   pktab_reg <- get_peaktable(pks_reg, plot_it = TRUE)
-#   
-#   mean(colMeans(abs(pktab_cor$tab - pktab_warp$tab)))
-#   mean(colMeans(abs(pktab_cor$tab - pktab_reg$tab)))
-#   
-#   expect_equal(rownames(pk_tab$tab), names(dat.pr))
-#   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$pk_meta))
-#   expect_equal(class(pk_tab), "peak_table")
-#   expect_equal(class(pk_tab$tab), "data.frame")
-#   expect_equal(class(pk_tab$pk_meta), "data.frame")
-#   expect_equal(class(pk_tab$args), "list")
-# })
+test_that("correct_peaks works", {
+  skip_on_cran()
+  data(Sa_pr)
+  pks <- get_peaks(Sa_pr, lambdas = 210, show_progress = FALSE)
+  
+  warping.models <- correct_rt(chrom_list = Sa_pr, lambdas = 210, 
+                               what = "models", show_progress = FALSE)
+  pks_cor <- correct_peaks(pks, warping.models)
+  pktab_cor <- get_peaktable(pks_cor, use.cor = TRUE)
+
+  ptw_warp <- correct_rt(Sa_pr, models = warping.models)
+  pks_warp <- get_peaks(ptw_warp, lambdas = 210, show_progress = FALSE)
+  pktab_warp <- get_peaktable(pks_warp)
+  
+  expect_equal(pks_cor[[1]][[1]]$rt.cor[-33], pks_warp[[1]][[1]]$rt, 
+               tolerance = .001)
+  expect_equal(pks_cor[[2]][[1]]$rt.cor, pks_warp[[2]][[1]]$rt[-6], 
+               tolerance = .001)
+  
+  pks_reg <- get_peaks(Sa_pr, lambdas = 210, show_progress = FALSE)
+  pktab_reg <- get_peaktable(pks_reg)
+
+  expect_equal(row.names(pktab_cor), names(Sa_pr))
+  expect_equal(row.names(pktab_reg), names(Sa_pr))
+  expect_equal(row.names(pktab_warp), names(Sa_pr))
+  
+  expect_lt(ncol(pktab_warp), ncol(pktab_reg))
+  expect_lt(ncol(pktab_cor), ncol(pktab_reg))
+})
 
 test_that("strip plot works", {
   skip_on_cran()

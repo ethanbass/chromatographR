@@ -276,7 +276,11 @@ correct_peaks <- function(peak_list, mod_list, chrom_list){
              if (nrow(profile) > 0){
                cbind(profile,
                      rt.cor = c(predict.ptw(mod, profile[, "rt"], what = "time",
-                                                  RTref = ref_times)))
+                                                  RTref = ref_times)),
+                     start.cor = c(predict.ptw(mod, profile[, "start"], what = "time",
+                                            RTref = ref_times)),
+                     end.cor = c(predict.ptw(mod, profile[, "end"], what = "time",
+                                            RTref = ref_times)))
              } else {
                cbind(profile, rt.cor = rep(0, 0))
              }
