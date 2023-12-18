@@ -34,10 +34,10 @@
 #' @concept Visualization
 #' @export
 
-plot.peak_list <- function(x, ..., chrom_list, idx = 1, index = NULL, lambda = NULL,
+plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
                            points = FALSE, ticks = FALSE, a = 0.5, color = NULL,
                            cex.points = 0.5, numbers = FALSE, cex.font = 0.5, 
-                           y.offset = 25, plot_purity = FALSE, res){
+                           y.offset = 25, plot_purity = FALSE, res, index = NULL){
   if (!is.null(index)){
     idx <- index
     message("The `index` argument is deprecated. Please use `idx` instead")
@@ -115,9 +115,9 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, index = NULL, lambda = N
         pos[1] <- which(new.ts %in% pos[[1]])
         pos[2] <- which(new.ts %in% pos[[2]])
         pos[3] <- which(new.ts %in% pos[[3]])
-        pk_indices <- seq(pos[2], pos[3])
+        pk_indices <- seq(pos[[2]], pos[[3]])
         yvals <- chrom_list[[idx]][,lambda][pk_indices]
-        p <- get_purity_values(chrom_list[[pk_indices]], pos)
+        p <- get_purity_values(chrom_list[[idx]], pos)
         lim = -20
         draw_trapezoid(new.ts[pk_indices], scales::rescale(p, c(0, lim)), 
                        color = "black", a = 0.6)
@@ -130,7 +130,7 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, index = NULL, lambda = N
 #' @noRd
 draw_trapezoid <- function(peak.loc, yvals, color, a){
   sapply(1:(length(peak.loc) - 1), function(i){
-    polygon(peak.loc[c(i, i, (i+1), (i+1))], c(0, yvals[i:(i+1)], 0),
-            col=alpha(color, a), lty=3, border = NA)
+    polygon(peak.loc[c(i, i, (i + 1), (i + 1))], c(0, yvals[i:(i + 1)], 0),
+            col=alpha(color, a), lty = 3, border = NA)
   })
 }

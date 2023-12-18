@@ -19,7 +19,7 @@
 #' @param what What to look for. Either \code{peak} to extract spectral information
 #' for a certain peak, \code{rt} to scan by retention time, or \code{click} to manually
 #' select retention time by clicking on the chromatogram. Defaults to \code{peak}.
-#' @param chr Numerical index of chromatogram you wish to plot; "max" to
+#' @param idx Numerical index of chromatogram you wish to plot; "max" to
 #' plot the chromatogram with the largest signal; or "all" to plot spectra
 #' for all chromatograms.
 #' @param lambda The wavelength you wish to plot the trace at (if
@@ -41,6 +41,7 @@
 #' @param verbose Logical. If TRUE, prints verbose output to console. Defaults
 #' to TRUE.
 #' @param engine Which plotting engine to use: either \code{base} or \code{plotly}.
+#' @param chr Deprecated. Please use \code{idx} instead.
 #' @param ... Additional arguments to \code{\link[graphics]{boxplot}}.
 #' @return If \code{export_spectrum} is TRUE, returns the spectrum as a \code{
 #' data.frame} with wavelengths as rows and columns encoding the
@@ -64,12 +65,13 @@
 #' @export
 
 plot.peak_table <- function(x, loc, chrom_list, what="peak",
-                            chr = 'max', lambda = 'max',
+                            idx = 'max', lambda = 'max',
                             plot_spectrum = TRUE, plot_trace = TRUE,
                             box_plot = FALSE, vars = NULL,
                             spectrum_labels = TRUE, scale_spectrum = FALSE,
                             export_spectrum = FALSE, verbose = TRUE,
-                            engine = c("base", "plotly", "ggplot"), ...){
+                            engine = c("base", "plotly", "ggplot"), 
+                            chr = NULL, ...){
   engine <- match.arg(engine, c("base", "plotly", "ggplot"))
   if (what == "peak" & missing(loc)){
     loc <- readline(prompt="Which peak would you like to plot? \n")
@@ -80,13 +82,13 @@ plot.peak_table <- function(x, loc, chrom_list, what="peak",
   }
   for (loc in loc){
     if (plot_spectrum | plot_trace){
-      if (chr == "all"){
+      if (idx == "all"){
         out <- plot_all_spectra(loc, x, chrom_list,
                                 plot_spectrum = plot_spectrum,
                                 export_spectrum = export_spectrum,
                                 verbose = verbose, what = what)
       } else{
-        out <- plot_spectrum(loc, x, chrom_list, chr=chr,
+        out <- plot_spectrum(loc, x, chrom_list, idx = idx,
                              lambda = lambda, plot_spectrum = plot_spectrum,
                              plot_trace = plot_trace, spectrum_labels = spectrum_labels,
                              scale_spectrum = scale_spectrum,

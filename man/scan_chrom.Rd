@@ -6,13 +6,14 @@
 \usage{
 scan_chrom(
   chrom_list,
-  chr,
+  idx,
   lambda,
   plot_spectrum = TRUE,
   peak_table = NULL,
   scale_spectrum = FALSE,
   spectrum_labels = TRUE,
   export_spectrum = FALSE,
+  chr = NULL,
   ...
 )
 }
@@ -21,7 +22,7 @@ scan_chrom(
 wavelengths). If no argument is provided here, the function will try to find
 the \code{chrom_list} object used to create the provided \code{peak_table}.}
 
-\item{chr}{Numerical index of chromatogram you wish to plot.}
+\item{idx}{Numerical index of chromatogram you wish to plot.}
 
 \item{lambda}{The wavelength to plot the trace at.}
 
@@ -38,6 +39,8 @@ plot. Defaults to TRUE.}
 
 \item{export_spectrum}{Logical. If TRUE, exports spectrum to console.
 Defaults to FALSE.}
+
+\item{chr}{Deprecated. Please use \code{idx} instead.}
 
 \item{...}{Additional arguments.}
 }

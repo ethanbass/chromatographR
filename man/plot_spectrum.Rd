@@ -8,7 +8,7 @@ plot_spectrum(
   loc = NULL,
   peak_table,
   chrom_list,
-  chr = "max",
+  idx = "max",
   lambda = "max",
   plot_spectrum = TRUE,
   plot_trace = TRUE,
@@ -18,6 +18,7 @@ plot_spectrum(
   verbose = TRUE,
   what = c("peak", "rt", "idx", "click"),
   engine = c("base", "plotly", "ggplot2"),
+  chr = NULL,
   ...
 )
 }
@@ -31,7 +32,7 @@ extract spectral data.}
 wavelengths). If no argument is provided here, the function will try to find
 the \code{chrom_list} object used to create the provided \code{peak_table}.}
 
-\item{chr}{Numerical index of chromatogram you wish to plot, or "max" to
+\item{idx}{Numerical index of chromatogram you wish to plot, or "max" to
 automatically plot the chromatogram with the largest signal.}
 
 \item{lambda}{The wavelength you wish to plot the trace at if plot_trace ==
@@ -62,6 +63,8 @@ select retention time by clicking on the chromatogram. Defaults to "peak"
 mode.}
 
 \item{engine}{Which plotting engine to use: \code{base}, \code{ggplot2}, or \code{plotly}.}
+
+\item{chr}{Deprecated. Please use \code{idx} instead.}
 
 \item{...}{Additional arguments.}
 }

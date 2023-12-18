@@ -8,7 +8,8 @@ plot_all_spectra(
   peak,
   peak_table,
   chrom_list,
-  chrs = "all",
+  idx = "all",
+  chrs = NULL,
   engine = c("base", "ggplot2", "plotly"),
   plot_spectrum = TRUE,
   export_spectrum = TRUE,
@@ -30,7 +31,9 @@ components). If no argument is provided here, the function will
 try to find the \code{chrom_list} object used to create the provided
 \code{peak_table}.}
 
-\item{chrs}{Vector of chromatograms to plot.}
+\item{idx}{Vector of chromatograms to plot.}
+
+\item{chrs}{Deprecated. Please use \code{idx} instead.}
 
 \item{engine}{Which plotting engine to use: \code{base}, \code{ggplot2},
 or \code{plotly}.}

@@ -9,7 +9,6 @@
   ...,
   chrom_list,
   idx = 1,
-  index = NULL,
   lambda = NULL,
   points = FALSE,
   ticks = FALSE,
@@ -20,7 +19,8 @@
   cex.font = 0.5,
   y.offset = 25,
   plot_purity = FALSE,
-  res
+  res,
+  index = NULL
 )
 }
 \arguments{
@@ -32,8 +32,6 @@
 matrices)}
 
 \item{idx}{Index or name of chromatogram to be plotted.}
-
-\item{index}{This argument is deprecated. Please use \code{idx} instead.}
 
 \item{lambda}{Wavelength for plotting.}
 
@@ -57,6 +55,8 @@ to FALSE.}
 \item{plot_purity}{Whether to add visualization of peak purity.}
 
 \item{res}{time resolution for peak fitting}
+
+\item{index}{This argument is deprecated. Please use \code{idx} instead.}
 }
 \value{
 No return value, called for side effects.
