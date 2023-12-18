@@ -1,7 +1,7 @@
 # chromatographR 0.7.0
 
+* Updated `correct_peaks` function so it works properly for correcting retention times in peak lists.
 * Added `fixed_levels` argument to `reshape_peaktable` so features can be plotted in the order they're provided by the user.
-* Updated `correct_peaks` function so it works properly to correct retention times in peak lists.
 * Added option for summing split peaks using the `merge_peaks` function by selecting `method = "sum"`.
 * Updated `get_peaktable` so that the `use.cor` argument works correctly (to use corrected retention times stored in a separate column).
 * Fixed `mirror_plot` so it can take numeric input for lambdas.
@@ -9,6 +9,10 @@
 to default setting.
 * Removed `load_chroms` function. Use `read_chroms` instead.
 * Eliminated spurious warning from `attach_ref_spectra` function.
+* Changed name of `index` argument in `plot.peak_list` to `idx`. The original argument is  now deprecated.
+* Fixed bug affecting `plot_purity` argument in `plot.peak_list`.
+* Fixed bug in `reshape_chroms` so empty metadata column no longer appears.
+* Added additional tests.
 
 #### Refactoring of `cluster_spectra` function:
 
@@ -17,7 +21,7 @@ to default setting.
 * Saving to RDS is now turned off by default.
 * The `pvclust` package is now suggested instead of required.
 
-#### Updates to vignette
+#### Updates to vignette and documentation
 
 * Suggest numeric input to lambdas instead of character input to reduce unnecessary confusion.
 
