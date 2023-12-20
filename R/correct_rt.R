@@ -98,10 +98,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
     }
   }
   if (missing(lambdas)){
-    if (ncol(chrom_list[[1]]) == 1){
-      lambdas <- colnames(chrom_list[[1]])
-    }
-    if (is.null(models) & is.null(n.traces)){
+    if (ncol(chrom_list[[1]]) != 1 & is.null(models) & is.null(n.traces)){
       stop("Must specify wavelengths ('lambdas') or number of traces ('n.traces')
            to use for alignment.")
     } else lambdas <- colnames(chrom_list[[1]])
