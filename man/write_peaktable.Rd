@@ -24,7 +24,7 @@ write_peaktable(
 \item{what}{Which elements of the \code{peak_table} to export.}
 }
 \value{
-No return value.
+No return value. The function is called for its side effects.
 }
 \description{
 Export peak table
