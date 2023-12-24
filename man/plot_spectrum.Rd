@@ -102,7 +102,7 @@ from the chromatographic matrix.
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 data(Sa)
-pks <- get_peaks(Sa,lambda="220.00000")
+pks <- get_peaks(Sa, lambda="220.00000")
 pk_tab <- get_peaktable(pks)
 oldpar <- par(no.readonly = TRUE)
 par(mfrow=c(2,1))

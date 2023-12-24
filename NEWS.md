@@ -12,18 +12,22 @@ to default setting.
 * Changed name of `index` argument in `plot.peak_list` to `idx`. The original argument is  now deprecated.
 * Fixed bug affecting `plot_purity` argument in `plot.peak_list`.
 * Fixed bug in `reshape_chroms` so empty metadata column no longer appears.
-* Added additional tests.
+* Plot titles with peak names when plotting spectra.
+* Fixed `correct_rt` so it no longer requires user-provided `lambdas` for 1D chromatograms.
+* Added `subset.peak_table` function for easily sub-setting peak_tables (e.g. to exclude specific
+peaks or samples).
 
 #### Refactoring of `cluster_spectra` function:
 
 * For simplicity, `cluster_spectra` now requires reference spectra to be attached to peak table.
 * Accordingly, the `chrom_list` argument is no longer needed.
 * Saving to RDS is now turned off by default.
-* The `pvclust` package is now suggested instead of required.
+* The `pvclust` package is now suggested instead of being required.
 
 #### Updates to vignette and documentation
 
 * Suggest numeric input to lambdas instead of character input to reduce unnecessary confusion.
+* Made other small changes to text of vignette to (hopefully) improve clarity.
 
 # chromatographR 0.6.1
 
