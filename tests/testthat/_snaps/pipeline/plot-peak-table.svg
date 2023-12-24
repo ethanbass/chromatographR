@@ -122,6 +122,7 @@
   </clipPath>
 </defs>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MTkyLjAwfDM4NC4wMA==)'>
+<text x='369.50' y='214.75' text-anchor='middle' style='font-size: 9.50px; font-weight: bold; font-family: sans;' textLength='16.91px' lengthAdjust='spacingAndGlyphs'>V13</text>
 <text x='369.50' y='371.64' text-anchor='middle' style='font-size: 7.92px; font-family: sans;' textLength='60.31px' lengthAdjust='spacingAndGlyphs'>Wavelength (nm)</text>
 <text transform='translate(8.55,283.25) rotate(-90)' text-anchor='middle' style='font-size: 7.92px; font-family: sans;' textLength='29.50px' lengthAdjust='spacingAndGlyphs'>Intensity</text>
 </g>

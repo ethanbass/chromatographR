@@ -58,7 +58,7 @@
 #' @author Ethan Bass
 #' @examplesIf interactive()
 #' data(Sa)
-#' pks <- get_peaks(Sa,lambda="220.00000")
+#' pks <- get_peaks(Sa, lambda="220.00000")
 #' pk_tab <- get_peaktable(pks)
 #' oldpar <- par(no.readonly = TRUE)
 #' par(mfrow=c(2,1))
@@ -70,9 +70,9 @@
 plot_spectrum <- function(loc = NULL, peak_table, chrom_list,
                           idx = 'max', lambda = 'max',
                           plot_spectrum = TRUE, plot_trace = TRUE,
-                          spectrum_labels = TRUE, scale_spectrum = FALSE,
-                          export_spectrum = FALSE, verbose = TRUE,
-                          what=c("peak", "rt", "idx", "click"),
+                          spectrum_labels = TRUE, scale_spectrum = FALSE, 
+                          export_spectrum = FALSE, verbose = TRUE, 
+                          what = c("peak", "rt", "idx", "click"),
                           engine = c('base', "plotly", "ggplot2"),
                           chr = NULL, ...){
   if (missing(chrom_list) & missing(peak_table))
@@ -273,7 +273,7 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
     y <- rescale(y)
   }
   if (plot_spectrum){
-    plot_spec(y = y, spectrum_labels = spectrum_labels, ...)
+    plot_spec(y = y, spectrum_labels = spectrum_labels, main = loc, ...)
   }
   if (export_spectrum){
     y <- data.frame(y)
