@@ -1,4 +1,7 @@
 #' Check that peak_table is of proper class
+#' 
+#' This function validates that the provided object is of the \code{peak_table}
+#' class.
 #' @author Ethan Bass
 #' @noRd
 check_peaktable <- function(peak_table){
@@ -37,7 +40,8 @@ get_chrom_list <- function(x, chrom_list, verbose = FALSE){
   chrom_list
 }
 
-#' Extract idx from string
+#' Extracts idx from string
+#' 
 #' @noRd
 extract_idx <- function(string, chrom_names){
   idx <- sub(".*?\\[(.*?)\\].*", "\\1", string)
@@ -178,6 +182,11 @@ get_time_resolution <- function(chrom_list, idx = 1){
 }
 
 #' Check for suggested package
+#' 
+#' This function checks for a suggested package and returns an error if the 
+#' package is not installed (if \code{return_boolean} is FALSE. Otherwise, it 
+#' returns a boolean value.
+#' 
 #' @noRd
 check_for_pkg <- function(pkg, return_boolean = FALSE){
   pkg_exists <- requireNamespace(pkg, quietly = TRUE)
@@ -192,7 +201,7 @@ check_for_pkg <- function(pkg, return_boolean = FALSE){
   }
 }
 
-#' Extract variables from the left-hand-side of a formula
+#' Extract variables from the left-hand-side of a formula.
 #' @param formula A \code{\link{formula}} object.
 #' @importFrom Formula Formula
 #' @noRd
@@ -221,7 +230,8 @@ get_lhs_vars <- function(formula) {
   all.vars(form)
 }
 
-#' Transfer metadata between objects
+#' Transfer metadata
+#' Transfers metadata attributes between objects.
 #' @noRd
 transfer_metadata <- function(new_object, old_object, transfer_class = TRUE,
                               exclude = c('names','row.names','dim','dimnames')){
@@ -235,6 +245,8 @@ transfer_metadata <- function(new_object, old_object, transfer_class = TRUE,
 }
 
 #' Choose apply function
+#' This function chooses an apply function based on arguments provided by the
+#' user. The options are \code{lapply}, \code{pblapply} and \code{mclapply}.
 #' @importFrom parallel mclapply
 #' @return Returns \code{\link[pbapply]{pblapply}} if \code{progress_bar == TRUE},
 #' otherwise returns \code{\link{lapply}}.
@@ -248,7 +260,8 @@ choose_apply_fnc <- function(show_progress, parallel = NULL, cl = 2){
   }
   
   if (is.null(parallel)){
-    if (!is.null(cl) && (class(cl)[1] == "SOCKcluster" || (is_not_windows && cl > 1))){
+    if (!is.null(cl) && 
+        (class(cl)[1] == "SOCKcluster" || (is_not_windows && cl > 1))){
       parallel <- TRUE
     } else {
       parallel <- FALSE
@@ -275,6 +288,14 @@ choose_apply_fnc <- function(show_progress, parallel = NULL, cl = 2){
   fn
 }
 
+#' Get y bounds
+#' @noRd
+get_y_bounds <- function(x, idx, lambdas.idx, pad = 1.1){
+  mn <- get_minimum(x, idx = idx, lambdas.idx = lambdas.idx)
+  mx <- get_maximum(x, idx, lambdas.idx = lambdas.idx)*pad
+  c(mn, mx)
+}
+
 #' Get maximum
 #' @noRd
 get_maximum <- function(x, idx, lambdas.idx){
@@ -289,12 +310,4 @@ get_minimum <- function(x, idx, lambdas.idx){
   min(sapply(x[idx], function(xx){
     min(xx[, lambdas.idx], na.rm = TRUE)
   }))
-}
-
-#' Get y bounds
-#' @noRd
-get_y_bounds <- function(x, idx, lambdas.idx, pad = 1.1){
-  mn <- get_minimum(x, idx = idx, lambdas.idx = lambdas.idx)
-  mx <- get_maximum(x, idx, lambdas.idx = lambdas.idx)*pad
-  c(mn, mx)
 }
