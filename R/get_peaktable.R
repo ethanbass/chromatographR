@@ -257,3 +257,29 @@ dim.peak_table <- function(x){
 row.names.peak_table <- function(x){
   row.names(x$tab)
 }
+
+#' Subset peak table
+#' Return subset of \code{peak_table} object.
+#' @param x A \code{peak_table} object
+#' @param subset Logical expression indicating rows (samples) to keep from
+#' \code{peak_table}; missing values are taken as false.
+#' @param select Logical expression indicating columns (peaks) to select from
+#' \code{peak_table}.
+#' @param drop Logical. Passed to indexing operator.
+#' @return A \code{peak_table} object with samples specified by \code{subset}
+#' and peaks specified by \code{select}.
+#' @author Ethan Bass
+subset.peak_table <- function(x, subset, select, drop = FALSE){
+  x$tab <- subset(x$tab, subset = subset, 
+                  select = select, drop = drop)
+  if (!is.null(dim(x$ref_spectra))){
+    x$sample_meta <- subset(x$sample_meta, subset = subset, drop = drop)
+  }
+  if (!missing(select)){
+    x$pk_meta <- subset(x$pk_meta, select = select, drop = drop)
+    if (!is.null(dim(x$ref_spectra))){
+      x$ref_spectra <- subset(x$ref_spectra, select = select, drop = drop)
+    }
+  }
+  x
+}

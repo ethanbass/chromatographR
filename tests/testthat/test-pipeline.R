@@ -220,6 +220,24 @@ test_that("attach_ref_spectra works", {
   expect_error(attach_ref_spectra(pk_tab, chrom_list = dat.pr, ref = "x"))
 })
 
+test_that("subset.peaktable works", {
+  sub <- subset(pk_tab, subset = pk_tab$sample_meta$trt == "+")
+  
+  expect_equal(sub$tab, pk_tab$tab[1,])
+  expect_equal(sub$pk_meta, pk_tab$pk_meta)
+  expect_equal(sub$sample_meta, pk_tab$sample_meta[1,])
+  expect_equal(sub$ref_spectra, pk_tab$ref_spectra)
+  
+  sub <- subset(pk_tab, subset = pk_tab$sample_meta$trt == "-", 
+                select = c("V10","V12"))
+  
+  expect_equal(sub$tab, pk_tab$tab[c(2),c("V10","V12")])
+  expect_equal(sub$pk_meta, pk_tab$pk_meta[,c("V10", "V12")])
+  expect_equal(sub$sample_meta, pk_tab$sample_meta[2,])
+  expect_equal(sub$ref_spectra, pk_tab$ref_spectra[,c("V10", "V12")])
+})
+
+
 # test filter_peaktable
 
 test_that("filter_peaktable works", {
