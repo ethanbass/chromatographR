@@ -28,6 +28,7 @@ peaks or samples).
 
 * Suggest numeric input to lambdas instead of character input to reduce unnecessary confusion.
 * Made other small changes to text of vignette to (hopefully) improve clarity.
+* Added a short section on the attachment of reference spectra.
 
 # chromatographR 0.6.1
 
