@@ -123,12 +123,12 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
             immediate. = TRUE)
     names(chrom_list) <- seq_along(chrom_list)
   }
-  peaks<-list()
+  peaks <- list()
   laplee <- choose_apply_fnc(show_progress, cl = cl)
   result <- laplee(seq_along(chrom_list), function(sample){
     suppressWarnings(ptable <- lapply(lambdas, function(lambda){
       cbind(sample = names(chrom_list)[sample], lambda,
-            fit_peaks(chrom_list[[sample]], lambda=lambda, fit = fit,
+            fit_peaks(chrom_list[[sample]], lambda = lambda, fit = fit,
                       max.iter = max.iter, sd.max = sd.max,
                       estimate_purity = estimate_purity,
                       noise_threshold = noise_threshold, ...))
