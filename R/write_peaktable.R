@@ -9,6 +9,11 @@
 #' @section Side effects:
 #' Exports peak_table object as \code{.csv} or \code{.xlsx} file according to the value
 #' of \code{format}.
+#' @examples \donttest{
+#' data(pk_tab)
+#' path_out = tempdir()
+#' write_peaktable(pk_tab, path = path_out, what = c("tab"))
+#' }
 #' @export
 
 write_peaktable <- function(peak_table, path, filename = "peak_table",

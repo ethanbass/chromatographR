@@ -35,3 +35,10 @@ Exports peak_table object as \code{.csv} or \code{.xlsx} file according to the v
 of \code{format}.
 }
 
+\examples{
+\donttest{
+data(pk_tab)
+path_out = tempdir()
+write_peaktable(pk_tab, path = path_out, what = c("tab"))
+}
+}
