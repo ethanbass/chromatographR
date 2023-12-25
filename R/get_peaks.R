@@ -43,6 +43,8 @@
 #' Either an integer specifying the number of clusters to use for parallel
 #' processing or a cluster object created by \code{\link[parallel]{makeCluster}}.
 #' Defaults to 2. On Windows integer values will be ignored.
+#' @param collapse Logical. Whether to collapse multiple peak lists per sample
+#' into a single list when multiple wavelengths (\code{lambdas}) are provided.
 #' @param \dots Additional arguments to \code{\link{find_peaks}}. Arguments
 #' provided to \code{\link{find_peaks}} can be used to fine-tune the peak-finding
 #' algorithm. Most importantly, the \code{smooth_window} should be increased if
@@ -103,7 +105,7 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
                       sd.max = 50, max.iter = 100,
                       time.units = c("min", "s", "ms"),
                       estimate_purity = FALSE,  noise_threshold = .001,
-                      show_progress = NULL, cl = 2, ...){
+                      show_progress = NULL, cl = 2, collapse = FALSE, ...){
   time.units <- match.arg(time.units, c("min", "s", "ms"))
   tfac <- switch(time.units, "min" = 1, "s" = 60, "ms" = 60*1000)
   fit <- match.arg(fit, c("egh", "gaussian", "raw"))
@@ -125,40 +127,58 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
   }
   peaks <- list()
   laplee <- choose_apply_fnc(show_progress, cl = cl)
+  
   result <- laplee(seq_along(chrom_list), function(sample){
     suppressWarnings(ptable <- lapply(lambdas, function(lambda){
-      cbind(sample = names(chrom_list)[sample], lambda,
-            fit_peaks(chrom_list[[sample]], lambda = lambda, fit = fit,
-                      max.iter = max.iter, sd.max = sd.max,
-                      estimate_purity = estimate_purity,
-                      noise_threshold = noise_threshold, ...))
+      pks <- fit_peaks(chrom_list[[sample]], lambda = lambda, fit = fit,
+                       max.iter = max.iter, sd.max = sd.max,
+                       estimate_purity = estimate_purity,
+                       noise_threshold = noise_threshold, ...)
+      pks <- cbind(sample = names(chrom_list)[sample], lambda, pks)
+      pks <- remove_bad_peaks(pks)
+      pks <- convert_indices_to_times(pks, chrom_list = chrom_list, 
+                                      idx = sample, tfac = tfac)
+      pks
     }))
     names(ptable) <- lambdas
+    if (collapse){
+      ptable <- do.call(rbind, ptable)
+    }
     ptable
   })
   names(result) <- names(chrom_list)
-  result <- lapply(result, function(sample) lapply(sample, function(pks){
-    pks[which(apply(pks, 1, function(x){
-      !all(is.na(x)) & (x["rt"] > x["start"]) & x["rt"] < x["end"]})), , drop = FALSE]
-  }))
-  sample_names <- names(result)
-  result <- lapply(seq_along(result), function(i){
-    timepoints <- get_times(chrom_list, idx = i)
-    tdiff <- get_time_resolution(chrom_list, idx = i)
-    lapply(result[[i]], function(lambda){
-      x <- lambda
-      x[, c('rt', 'start', 'end')] <- sapply(c('rt', 'start', 'end'),
-                                             function(j) timepoints[x[,j]])
-      x[, c('sd', 'FWHM', 'area')] <- x[, c('sd', 'FWHM', 'area')] * tdiff * tfac
-      if (!is.null(x$tau)){x[, c('tau')] <- x[, c('tau')] * tdiff * tfac} 
-      x
-    })
-  })
-  names(result) <- sample_names
   structure(result,
             chrom_list = chrom_list_string,
             lambdas = lambdas, fit = fit, sd.max = sd.max,
             max.iter = max.iter,
             time.units = time.units,
             class = "peak_list")
+}
+
+#' Remove bad peaks
+#' This function is called internally by \code{get_peaks}.
+#' @author Ethan Bass
+#' @noRd
+remove_bad_peaks <- function(pks){
+  pks[which(
+    apply(pks, 1, function(x){
+      !all(is.na(x)) & (x["rt"] > x["start"]) & x["rt"] < x["end"]
+    })
+  ), , drop = FALSE]
+}
+
+#' Convert indices to times
+#' This function is called internally by \code{get_peaks}.
+#' @author Ethan Bass
+#' @noRd
+convert_indices_to_times <- function(x, chrom_list, idx, tfac){
+  timepoints <- get_times(chrom_list, idx = idx)
+  tdiff <- get_time_resolution(chrom_list, idx = idx)
+  x[, c('rt', 'start', 'end')] <- sapply(c('rt', 'start', 'end'),
+                                         function(j) timepoints[x[, j]])
+  x[, c('sd', 'FWHM', 'area')] <- x[, c('sd', 'FWHM', 'area')] * tdiff * tfac
+  if (!is.null(x$tau)){
+    x[, c('tau')] <- x[, c('tau')] * tdiff * tfac
+  } 
+  x
 }

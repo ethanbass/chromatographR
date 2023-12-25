@@ -15,6 +15,7 @@ get_peaks(
   noise_threshold = 0.001,
   show_progress = NULL,
   cl = 2,
+  collapse = FALSE,
   ...
 )
 }
@@ -49,6 +50,9 @@ to FALSE. (If TRUE, this will slow down the function significantly).}
 Either an integer specifying the number of clusters to use for parallel
 processing or a cluster object created by \code{\link[parallel]{makeCluster}}.
 Defaults to 2. On Windows integer values will be ignored.}
+
+\item{collapse}{Logical. Whether to collapse multiple peak lists per sample
+into a single list when multiple wavelengths (\code{lambdas}) are provided.}
 
 \item{\dots}{Additional arguments to \code{\link{find_peaks}}. Arguments
 provided to \code{\link{find_peaks}} can be used to fine-tune the peak-finding
