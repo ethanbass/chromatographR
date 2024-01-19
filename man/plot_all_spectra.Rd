@@ -16,6 +16,7 @@ plot_all_spectra(
   scale_spectrum = TRUE,
   overlapping = TRUE,
   verbose = FALSE,
+  what = c("peak", "rt", "idx"),
   ...
 )
 }
@@ -49,6 +50,10 @@ Defaults to FALSE.}
 \item{overlapping}{Logical. If TRUE, plot spectra in single plot.}
 
 \item{verbose}{Logical. If TRUE, prints verbose output to console.}
+
+\item{what}{What to look for. Either \code{peak} to extract spectral 
+information for a certain peak, \code{rt} to scan by retention time, or 
+\code{idx} to scan by numeric index. Defaults to "peak" mode.}
 
 \item{\dots}{Additional arguments to plot_spectrum.}
 }

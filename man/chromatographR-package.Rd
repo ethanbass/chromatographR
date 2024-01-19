@@ -28,6 +28,15 @@ suggested workflow.
 \tabular{ll}{ Package: \tab chromatographR\cr Type: \tab Package\cr Version:
 \tab 0.7.0 \cr Date: \tab 2023-10-23\cr License: GPL (>= 2) }
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://ethanbass.github.io/chromatographR/}
+  \item \url{https://github.com/ethanbass/chromatographR/}
+  \item Report bugs at \url{https://github.com/ethanbass/chromatographR/issues/}
+}
+
+}
 \author{
 Ethan Bass
 }

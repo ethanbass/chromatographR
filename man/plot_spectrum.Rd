@@ -57,10 +57,10 @@ Defaults to FALSE.}
 \item{verbose}{Logical. If TRUE, prints verbose output to console. Defaults
 to TRUE.}
 
-\item{what}{What to look for. Either "peak" to extract spectral information
-for a certain peak, "rt" to scan by retention time, or "click" to manually
-select retention time by clicking on the chromatogram. Defaults to "peak"
-mode.}
+\item{what}{What to look for. Either \code{peak} to extract spectral
+information for a certain peak, \code{rt} to scan by retention time,
+\code{idx} to scan by numeric index, or \code{click} to manually select
+retention time by clicking on the chromatogram. Defaults to "peak" mode.}
 
 \item{engine}{Which plotting engine to use: \code{base}, \code{ggplot2}, or \code{plotly}.}
 
