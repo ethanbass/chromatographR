@@ -326,7 +326,7 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
 #' @author Ethan Bass
 #' @examplesIf interactive()
 #' data(Sa_pr)
-#' scan_chrom(Sa_pr, lambda="210", chr=2, export_spectrum=TRUE)
+#' scan_chrom(Sa_pr, lambda = "210", idx = 2, export_spectrum = TRUE)
 #' @export scan_chrom
 
 scan_chrom <- function(chrom_list, idx, lambda,
