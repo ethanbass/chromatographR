@@ -38,7 +38,7 @@ chromatographR can import data from a growing list of proprietary file formats u
 read_chroms(paths = path, format_in = "chemstation_uv")
 
 # multiple folders
-path = 'foo' # path to parent directory
+path <- 'foo' # path to parent directory
 folders <- list.files(path = path, full.names = TRUE)
 dat <- read_chroms(folders, format_in = "chemstation_uv")
 ```
@@ -58,21 +58,21 @@ Data from liquid chromatography often suffer from a variety of non-informative a
 To select a narrower range of times and/or wavelengths, arguments can be provided to the optional `dim1` and `dim2` arguments. The `baseline_cor` function from the *ptw* package [@bloemberg2010] takes arguments `p` (an asymmetry parameter) and `lambda` (a smoothing parameter). You can read more about these in the documentation for `ptw::asysm`. You may want to experiment with these parameters before choosing values to use on your whole dataset.
 
 ```{r choose_parameters_for_fitting_baseline}
-i=2 # chromatogram number in list of data
+i <- 2 # chromatogram number in list of data
 tpoints <- as.numeric(rownames(Sa[[i]]))
-lambda='200.00000'
+lambda <- '200.00000'
 
-matplot(x=tpoints, y=Sa[[i]][,lambda],
-       type='l', ylab='Abs (mAU)', xlab='Time (min)')
-matplot(x=tpoints, y = ptw::baseline.corr(Sa[[i]][,lambda], p = .001, lambda = 1e5),
-       type='l', add = TRUE, col='blue', lty = 3)
+matplot(x = tpoints, y = Sa[[i]][,lambda],
+       type = 'l', ylab = 'Abs (mAU)', xlab = 'Time (min)')
+matplot(x = tpoints, y = ptw::baseline.corr(Sa[[i]][,lambda], p = .001, lambda = 1e5),
+       type = 'l', add = TRUE, col='blue', lty = 3)
 ```
 
 After selecting parameters for baseline correction, you can proceed with the pre-processing step as shown below.
 
 ```{r preprocessing}
 # choose dimensions for interpolation
-new.ts <- seq(10,18.66,by=.01) # choose time-points
+new.ts <- seq(10, 18.66, by = .01) # choose time-points
 new.lambdas <- seq(200, 318, by = 2) # choose wavelengths
 
 dat.pr <- preprocess(Sa, dim1 = new.ts, dim2 = new.lambdas,
@@ -234,7 +234,7 @@ The `plot_spectrum` function allows you to easily plot or record the spectra ass
 oldpar <- par(no.readonly = TRUE) # save current par settings
 
 par(mfrow = c(2,1))
-peak = "V7"
+peak <- "V7"
 plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp, 
               verbose = FALSE)
 
@@ -251,7 +251,7 @@ plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp,
 The `plot_all_spectra` function can be used to visually compare the spectra for a specified peak across all samples.
 
 ```{r plot_all_spectra}
-peak = "V13"
+peak <- "V13"
 plot_all_spectra(peak, peak_table = pk_tab, export = FALSE)
 ```
 
