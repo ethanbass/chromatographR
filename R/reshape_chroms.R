@@ -15,14 +15,14 @@ reshape_chroms <- function(x, idx, sample_var = "sample",
     idx <- seq_along(x)
   }
   if (missing(lambdas)){
-    lambdas = colnames(x[[1]])
+    lambdas <- colnames(x[[1]])
   }
   dat <- lapply(idx, function(i){
     xx <- reshape_chrom(x = x[[i]], lambdas = lambdas, rts = rts)
-    xx[,sample_var] <- names(x)[[i]]
+    xx[, sample_var] <- names(x)[[i]]
     xx
   })
-  do.call(rbind,dat)
+  do.call(rbind, dat)
 }
 
 #' Reshapes a single chromatogram from wide to long format
@@ -93,7 +93,7 @@ reshape_peaktable <- function(x, peaks, metadata, fixed_levels = TRUE){
     x$sample_meta <- x$sample_meta[, meta_idx, drop = FALSE]
   }
   xx <- reshape(as.data.frame(chr = rownames(df), df), direction = "long",
-    varying = list(1:ncol(df)), v.names = x$args[["response"]],
+    varying = list(seq_len(ncol(df))), v.names = x$args[["response"]],
     times = colnames(df), timevar = "peak",
     idvar = "sample", ids = rownames(df))
   rownames(xx) <- NULL
