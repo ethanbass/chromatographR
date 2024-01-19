@@ -41,7 +41,7 @@ attach_metadata <- function(peak_table, metadata, column){
   missing_meta <- !(meta[, column] %in% metadata[, column])
   if (sum(missing_meta) > 0)
     warning("The supplied metadata does not include all samples.")
-  meta <- keep_order(meta, merge, y=metadata, all.x = TRUE, all.y = FALSE,
+  meta <- keep_order(meta, merge, y = metadata, all.x = TRUE, all.y = FALSE,
                      sort = FALSE, by = column)
   peak_table$sample_meta <- meta
   return(peak_table)
@@ -100,11 +100,13 @@ get_reference_spectra <- function(peak_table, chrom_list,
       apply(x, 2, as.numeric)
     })
     sp.ref <- sapply(seq_along(sp.l), function(i){
-      sp.l[[i]][,which.max(colMeans(cor(sp.l[[i]][,which(apply((sp.l[[i]]), 2, sd)!=0), drop=FALSE])))]
+      sp.l[[i]][, which.max(
+        colMeans(cor(sp.l[[i]][, which(apply((sp.l[[i]]), 2, sd)!=0), 
+                                                          drop = FALSE])))]
     })
   } else {
     sp.ref <- sapply(colnames(peak_table$tab), function(pk){
-      try(plot_spectrum(loc = pk, peak_table, chrom_list, plot_trace=FALSE,
+      try(plot_spectrum(loc = pk, peak_table, chrom_list, plot_trace = FALSE,
                     plot_spectrum = FALSE, export_spectrum = TRUE,
                     verbose = FALSE,
                     scale_spectrum = TRUE, engine = "base")
