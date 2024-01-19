@@ -5,10 +5,14 @@
 \alias{Sa}
 \title{Raw goldenrod root chromatograms}
 \format{
-A list of four matrices (time x wavelength).
+A list of four matrices (1301 times x 60 wavelengths).
+}
+\usage{
+data(Sa)
 }
 \description{
-Four HPLC-DAD data matrices of *Solidago altissima* roots extracted in 90%
-methanol. The time axis is compressed to save space so the
-data are a little choppy.
+A list of four HPLC-DAD data matrices of \emph{Solidago altissima} roots
+extracted in 90\% methanol. Retention times are stored in rows and 
+wavelengths are stored in columns.
 }
+\keyword{data}

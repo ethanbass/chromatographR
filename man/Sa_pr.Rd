@@ -5,9 +5,15 @@
 \alias{Sa_pr}
 \title{Preprocessed goldenrod root chromatograms}
 \format{
-Four pre-processed matrices (time x wavelength) to use in examples.
+A list of four pre-processed matrices (434 retention times x 60 wavelengths).
+}
+\usage{
+data(Sa_pr)
 }
 \description{
-These are the pre-processed chromatograms derived from the raw data stored in
-\code{Sa}.
+A list of four pre-processed HPLC-DAD chromatograms derived from the raw data
+stored in \code{Sa}. Retention times are stored in rows and wavelengths
+are stored in columns. The time axis is compressed to save space and 
+processing time so the data are a little choppy.
 }
+\keyword{data}

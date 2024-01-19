@@ -5,10 +5,13 @@
 \alias{Sa_warp}
 \title{Warped goldenrod root chromatograms.}
 \format{
-Four pre-processed and warped matrices (time x wavelength) to use in
-examples.
+A list of four pre-processed and warped matrices (434 times x 60 wavelengths).
+}
+\usage{
+data(Sa_warp)
 }
 \description{
-These are pre-processed and warped goldenrod root chromatograms derived from
-the raw data stored in \code{Sa}.
+A list of four pre-processed and warped goldenrod root chromatograms derived
+from the raw data stored in \code{Sa}.
 }
+\keyword{data}

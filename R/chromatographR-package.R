@@ -23,44 +23,50 @@
 
 #' Raw goldenrod root chromatograms
 #' 
-#' Four HPLC-DAD data matrices of *Solidago altissima* roots extracted in 90%
-#' methanol. The time axis is compressed to save space so the
-#' data are a little choppy.
+#' A list of four HPLC-DAD data matrices of \emph{Solidago altissima} roots
+#' extracted in 90\% methanol. Retention times are stored in rows and 
+#' wavelengths are stored in columns.
 #' 
 #' @name Sa
 #' @docType data
-#' @format  A list of four matrices (time x wavelength).
-
+#' @keywords data
+#' @usage data(Sa)
+#' @format  A list of four matrices (1301 times x 60 wavelengths).
 NULL
 
 #' Preprocessed goldenrod root chromatograms
 #' 
-#' These are the pre-processed chromatograms derived from the raw data stored in
-#' \code{Sa}.
+#' A list of four pre-processed HPLC-DAD chromatograms derived from the raw data
+#' stored in \code{Sa}. Retention times are stored in rows and wavelengths
+#' are stored in columns. The time axis is compressed to save space and 
+#' processing time so the data are a little choppy. 
 #'
 #' @name Sa_pr
+#' @keywords data
 #' @docType data
-#' @format  Four pre-processed matrices (time x wavelength) to use in examples.
+#' @usage data(Sa_pr)
+#' @format  A list of four pre-processed matrices (434 retention times x 60 wavelengths).
 NULL
 
 #' Warped goldenrod root chromatograms.
 #' 
-#' These are pre-processed and warped goldenrod root chromatograms derived from
-#' the raw data stored in \code{Sa}.
+#' A list of four pre-processed and warped goldenrod root chromatograms derived
+#' from the raw data stored in \code{Sa}.
 #'
 #' @name Sa_warp
 #' @docType data
-#' @format  Four pre-processed and warped matrices (time x wavelength) to use in
-#' examples.
+#' @keywords data
+#' @usage data(Sa_warp)
+#' @format  A list of four pre-processed and warped matrices (434 times x 60 wavelengths).
 NULL
 
 #' Goldenrod peak table
 #' 
-#' Peak table generated from exemplary goldenrod root extracts for use in examples.
+#' Peak table generated from exemplary goldenrod root extracts.
 #'
 #' @name pk_tab
 #' @docType data
+#' @keywords data
+#' @usage data(pk_tab)
 #' @format  A \code{peak_table} object.
 NULL
-
-
