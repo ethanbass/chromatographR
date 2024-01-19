@@ -9,13 +9,14 @@
 to default setting.
 * Removed `load_chroms` function. Use `read_chroms` instead.
 * Eliminated spurious warning from `attach_ref_spectra` function.
-* Changed name of `index` argument in `plot.peak_list` to `idx`. The original argument is  now deprecated.
+* Changed name of `index` argument in `plot.peak_list` to `idx`. The original argument is now deprecated.
 * Fixed bug affecting `plot_purity` argument in `plot.peak_list`.
 * Fixed bug in `reshape_chroms` so empty metadata column no longer appears.
-* Plot titles with peak names when plotting spectra.
+* The `plot_spectrum` function now includes the peak names when plotting spectra.
 * Fixed `correct_rt` so it no longer requires user-provided `lambdas` for 1D chromatograms.
-* Added `subset.peak_table` function for easily sub-setting peak_tables (e.g. to exclude specific
+* Added `subset.peak_table` function for easily subsetting peak_tables (e.g. to exclude specific
 peaks or samples).
+* Added `what` argument for `plot_all_spectra` (e.g. to plot multiple spectra at a particular retention time).
 
 #### Refactoring of `cluster_spectra` function:
 
@@ -43,7 +44,6 @@ peaks or samples).
 * Enabled use of `parallel` package for parallel processing (in addition to current options using `mcapply`). (These options require the installation of suggested package `pbapply`).
 * Updated `get_peaktable` for greater flexibility (e.g. for usage of 'ChemStation' peak lists as input).
 #### Other changes
-
 * Made some minor changes to vignette to improve clarity (e.g. using single wavelength for integration, etc.)
 
 #### Bug fixes
