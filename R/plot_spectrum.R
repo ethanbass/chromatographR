@@ -34,10 +34,10 @@
 #' Defaults to FALSE.
 #' @param verbose Logical. If TRUE, prints verbose output to console. Defaults
 #' to TRUE.
-#' @param what What to look for. Either "peak" to extract spectral information
-#' for a certain peak, "rt" to scan by retention time, or "click" to manually
-#' select retention time by clicking on the chromatogram. Defaults to "peak"
-#' mode.
+#' @param what What to look for. Either \code{peak} to extract spectral 
+#' information for a certain peak, \code{rt} to scan by retention time, 
+#' \code{idx} to scan by numeric index, or \code{click} to manually select 
+#' retention time by clicking on the chromatogram. Defaults to "peak" mode.
 #' @param engine Which plotting engine to use: \code{base}, \code{ggplot2}, or \code{plotly}.
 #' @param ... Additional arguments.
 #' @return If \code{export_spectrum} is TRUE, returns the spectrum as a \code{
@@ -397,6 +397,9 @@ scan_chrom <- function(chrom_list, idx, lambda,
 #' @param scale_spectrum Logical. If TRUE, scales spectrum to unit height.
 #' @param overlapping Logical. If TRUE, plot spectra in single plot.
 #' @param verbose Logical. If TRUE, prints verbose output to console.
+#' @param what What to look for. Either \code{peak} to extract spectral 
+#' information for a certain peak, \code{rt} to scan by retention time, or 
+#' \code{idx} to scan by numeric index. Defaults to "peak" mode.
 #' @param \dots Additional arguments to plot_spectrum.
 #' @return If \code{export_spectrum} is TRUE, returns the spectra as a \code{
 #' data.frame} with wavelengths as rows and one column for each sample in the
@@ -420,8 +423,10 @@ plot_all_spectra <- function(peak, peak_table, chrom_list, idx = "all",
                              chrs = NULL, engine = c("base","ggplot2","plotly"),
                              plot_spectrum = TRUE, export_spectrum = TRUE,
                              scale_spectrum = TRUE, overlapping = TRUE,
-                             verbose = FALSE, ...){
+                             verbose = FALSE, 
+                             what = c("peak", "rt", "idx"), ...){
   engine <- match.arg(engine, c("base","ggplot2","plotly"))
+  what <- match.arg(what, c("peak", "rt", "idx"))
   check_peaktable(peak_table)
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(peak_table)
@@ -439,7 +444,7 @@ plot_all_spectra <- function(peak, peak_table, chrom_list, idx = "all",
     try(plot_spectrum(loc = peak, peak_table = peak_table, chrom_list = chrom_list,
                   idx = chr, plot_spectrum = FALSE, plot_trace = FALSE, 
                   export_spectrum = TRUE, scale_spectrum = scale_spectrum,
-                  verbose = verbose, what = "peak", engine = "base")
+                  verbose = verbose, what = what, engine = "base")
     )
   })
   if (engine == "base"){
