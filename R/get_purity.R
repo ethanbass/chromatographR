@@ -20,6 +20,7 @@
 #' Agilent Technologies, April 1, 2003, 16.
 #' /href{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
 #' @author Ethan Bass
+#' @keywords internal
 #' @export
 
 get_purity <- function(x, pos, weight = 1, cutoff = 0.05, 
@@ -84,7 +85,7 @@ find_noise <- function(x, noise_threshold = 0.01, lambdas){
 #' @param x A chromatogram in matrix format
 #' @param pos A vector containing peak information
 #' @param weight scaling parameter affecting stringency of threshold.
-#' @param noise_variance Variance of noise. Argument to \code{\link{get_agilent_threshold}}.
+#' @param noise_variance Variance of noise.
 #' @param noise_threshold Threshold to define noise. Highest proportion of maximum absorbance.
 #' @param lambdas Wavelengths to include
 #' @return Returns a vector of purity thresholds at each retention time index
@@ -94,7 +95,8 @@ find_noise <- function(x, noise_threshold = 0.01, lambdas){
 #' Agilent Technologies, April 1, 2003, 16.
 #' /href{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
 #' @author Ethan Bass
-#' @noRd
+#' @keywords internal
+#' @export
 
 get_agilent_threshold <- function(x, pos, weight = 1, noise_variance = NULL,
                                   noise_threshold = .005,
@@ -170,7 +172,8 @@ get_purity_values <- function(x, pos, weight = 1, noise_variance = NULL,
 #' @return Returns indices within the peak specified by \code{pos} with a higher
 #' signal intensity than the specified cutoff.
 #' @author Ethan Bass
-#' @noRd
+#' @keywords internal
+#' @export
 
 trim_peak <- function(x, pos, cutoff = 0.05){
   idx <- pos[2]:pos[3]
