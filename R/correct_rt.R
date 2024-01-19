@@ -124,7 +124,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
     traces <- ifelse(length(lambdas) == 1, 1, list(lambdas))[[1]]
   } else {
     traces <- select.traces(X = allmats.t, criterion='coda')
-    traces <- traces$trace.nrs[1:n.traces]
+    traces <- traces$trace.nrs[seq_len(n.traces)]
   }
   # choose reference chromatogram
   if (reference == 'best'){
@@ -195,13 +195,13 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
         # warp retention times
         x <- apply(chrom_list_og[[samp]], 2, function(j){
           iset <- c(rep(NA, short), j)
-          suppressWarnings(stats::approx(x = jset[,samp], y = iset, 1:jmax)$y)
+          suppressWarnings(stats::approx(x = jset[,samp], y = iset, seq_len(jmax))$y)
         })
       })
         # fix times
         old_ts <- c(rep(NA, short), get_times(chrom_list_og, idx = reference))
         times <- suppressWarnings(stats::approx(x = jset[, reference],
-                                                y = old_ts, 1:jmax)$y)
+                                                y = old_ts, seq_len(jmax))$y)
         idx_start <- which.min(times)
         if (idx_start > 1){
           beg <- sort(seq(from = times[idx_start] - res, by = -res,
@@ -355,30 +355,30 @@ predict.ptw <- function (object, newdata, what = c("response", "time"), RTref = 
                    ncol(object$warp.fun), byrow = TRUE)
     }
     if (object$mode == "backward") {
-      t(sapply(1:nrow(newdata), function(i) approx(x = 1:ncol(newdata), 
+      t(sapply(seq_len(nrow(newdata)), function(i) approx(x = seq_len(ncol(newdata)), 
                                                    y = newdata[i, ], xout = WF[i, ])$y))
     } else {
-      t(sapply(1:nrow(newdata), function(i) approx(x = WF[i, 
-      ], y = newdata[i, ], xout = 1:ncol(newdata))$y))
+      t(sapply(seq_len(nrow(newdata)), function(i) approx(x = WF[i, 
+      ], y = newdata[i, ], xout = seq_len(ncol(newdata)))$y))
     }
   }, time = {
     correctedTime <- switch(object$mode, backward = -sweep(object$warp.fun, 
-                                                           2, 2 * (1:ncol(object$ref)), FUN = "-"), object$warp.fun)
+                                                           2, 2 * (seq_len(ncol(object$ref))), FUN = "-"), object$warp.fun)
     if (is.null(RTref)) {
       if (is.null(colnames(object$ref))) {
-        RTref <- 1:ncol(object$ref)
+        RTref <- seq_len(ncol(object$ref))
       } else {
         RTref <- as.numeric(colnames(object$ref))
       }
     }
     if (missing(newdata)) {
       newdata <- RTref
-      newdataIndices <- 1:length(RTref)
+      newdataIndices <- seq_len(length(RTref))
     } else {
       newdataIndices <- round((newdata - min(RTref)) * 
                                 (length(RTref) - 1)/diff(range(RTref)) + 1)
     }
-    t(sapply(1:nrow(correctedTime), function(i) approx(RTref, 
+    t(sapply(seq_len(nrow(correctedTime)), function(i) approx(RTref, 
                                                        NULL, correctedTime[i, newdataIndices])$y))
   })
 }

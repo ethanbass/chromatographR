@@ -52,7 +52,7 @@ attach_metadata <- function(peak_table, metadata, column){
 #' @noRd
 keep_order <- function(data, fn, ...) { 
   col <- ".sortColumn"
-  data[,col] <- 1:nrow(data) 
+  data[,col] <- seq_len(nrow(data))
   out <- fn(data, ...) 
   if (!col %in% colnames(out)) stop("Ordering column not preserved by function") 
   out <- out[order(out[,col]),] 

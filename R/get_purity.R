@@ -20,7 +20,7 @@
 #' Agilent Technologies, April 1, 2003, 16.
 #' /href{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
 #' @author Ethan Bass
-#' @noRd
+#' @export
 
 get_purity <- function(x, pos, weight = 1, cutoff = 0.05, 
                        noise_variance = NULL, 

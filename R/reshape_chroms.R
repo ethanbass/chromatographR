@@ -51,7 +51,7 @@ reshape_chrom <- function(x, lambdas = NULL, rts = NULL){
     xx <- xx[rts.idx, , drop = FALSE]
   }
   data <- reshape(as.data.frame(rt = rownames(xx), xx), direction = "long",
-                  varying = list(1:ncol(xx)), v.names = "absorbance",
+                  varying = list(seq_len(ncol(xx))), v.names = "absorbance",
                   times = colnames(xx), timevar = "lambda",
                   idvar = "rt", ids = rownames(xx))
   rownames(data) <- NULL
