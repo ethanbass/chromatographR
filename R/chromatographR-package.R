@@ -7,26 +7,19 @@
 #' peak-finding and fitting, peak-table construction, data-visualization, etc.
 #' Preprocessing and peak-table construction follow the rough formula laid out
 #' in alsace (Wehrens, R., Bloemberg, T.G., and Eilers P.H.C., 2015.
-#' <doi:10.1093/bioinformatics/btv299>. Alignment of chromatograms is available
+#' \doi{10.1093/bioinformatics/btv299}). Alignment of chromatograms is available
 #' using parametric time warping (ptw) (Wehrens, R., Bloemberg, T.G., and Eilers
-#' P.H.C. 2015. <doi:10.1093/bioinformatics/btv299>) or variable penalty dynamic
-#' time warping (VPdtw) (Clifford, D., & Stone, G. 2012. <doi:10.18637/jss.v047.i08>).
-#' Peak-finding uses the algorithm by Tom O'Haver
-#' <https://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm>.
-#' Peaks are then fitted to a gaussian or exponential-gaussian hybrid peak shape
-#' using non-linear least squares (Lan, K. & Jorgenson, J. W. 2001.
-#' <doi:10.1016/S0021-9673(01)00594-5>). See the vignette for more details and
-#' suggested workflow.
-#' 
-#' \tabular{ll}{ Package: \tab chromatographR\cr Type: \tab Package\cr Version:
-#' \tab 0.7.0 \cr Date: \tab 2023-10-23\cr License: GPL (>= 2) }
-#' 
-#' @name chromatographR-package
-#' @aliases chromatographR-package chromatographR
-#' @docType package
+#' P.H.C. 2015. \doi{10.1093/bioinformatics/btv299}) or variable penalty dynamic
+#' time warping (VPdtw) (Clifford, D., & Stone, G. 2012. \doi{10.18637/jss.v047.i08}).
+#' Peak-finding relies on the algorithm suggested by Tom O'Haver in his
+#' \href{https://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{
+#' Pragmatic Introduction to Signal Processing}. Peaks are then fitted to a 
+#' gaussian or exponential-gaussian hybrid peak shape using non-linear least 
+#' squares (Lan, K. & Jorgenson, J. W. 2001. \doi{10.1016/S0021-9673(01)00594-5}). 
+#' More details on package usage and a suggested workflow can be found in the 
+#' vignette.
 #' @author Ethan Bass
-
-NULL
+"_PACKAGE"
 
 #' Raw goldenrod root chromatograms
 #' 
