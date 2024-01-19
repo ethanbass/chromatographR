@@ -8,7 +8,6 @@ Broeckling
 CMD
 Carvalho
 ChemStation
-Chemstation
 Chromatograms
 Chromatographia
 Chromatographic
@@ -17,7 +16,6 @@ DOI
 DTW
 DuffyTools
 Eilers
-Entab
 FID
 FWHM
 GC
@@ -37,10 +35,10 @@ Neumann
 O'Haver
 O'Haver's
 PTW
-Parsers
 Pre
 Prenni
 Preprocess
+Preprocessed
 Pvclust
 RAMClust
 Reproducibility
@@ -70,6 +68,8 @@ chromConverter
 chromatogram
 chromatograms
 chromatographic
+chromophore
+chromophores
 correctRT
 devtools
 doi
@@ -77,6 +77,7 @@ egh
 et
 getAllPeaks
 getPeakTable
+ggplot
 golay
 href
 https
@@ -91,12 +92,12 @@ plotly
 pre
 preprocess
 preprocessed
+programmatically
 ptw
 pvclust
 savitzky
 sd
 stripplot
 timepoint
-toolset
 unwarped
 www
