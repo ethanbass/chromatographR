@@ -8,7 +8,7 @@
   x,
   ...,
   chrom_list,
-  index = 1,
+  idx = 1,
   lambda = NULL,
   points = FALSE,
   ticks = FALSE,
@@ -19,7 +19,8 @@
   cex.font = 0.5,
   y.offset = 25,
   plot_purity = FALSE,
-  res
+  res,
+  index = NULL
 )
 }
 \arguments{
@@ -30,7 +31,7 @@
 \item{chrom_list}{List of chromatograms (retention time x wavelength
 matrices)}
 
-\item{index}{Index or name of chromatogram to be plotted.}
+\item{idx}{Index or name of chromatogram to be plotted.}
 
 \item{lambda}{Wavelength for plotting.}
 
@@ -54,6 +55,8 @@ to FALSE.}
 \item{plot_purity}{Whether to add visualization of peak purity.}
 
 \item{res}{time resolution for peak fitting}
+
+\item{index}{This argument is deprecated. Please use \code{idx} instead.}
 }
 \value{
 No return value, called for side effects.
@@ -74,3 +77,4 @@ provided \code{peak_list} drawn underneath the curve.
 \author{
 Ethan Bass
 }
+\concept{Visualization}

@@ -3,7 +3,7 @@ CRAN repository db overrides:
   X-CRAN-Comment: Archived on 2022-11-07 as recurring issues were not
     corrected in time. and policy violation, sending HTML.
     
-* The package was archived because of a test that was sporadically failing on one of the CRAN test machines used to run Additional tests (MKL). I apparently did not succeed in fixing this issue as intended with the patch I introduced in version 0.4.4. I believe I have now remedied this problem by setting the failing test to be skipped on CRAN. The test in question does currently work on most machines (and usually even on the MKL test machine where it occasionally fails). I also violated the CRAN policy against sending html email to a CRAN maintainer, for which I apologize. I will certainly be very careful to avoid this in the future.
+* The package was archived because of a test that was sporadically failing on one of the CRAN test machines used to run Additional tests (MKL). I have now re-factored the function and I think that the test should no longer fail. To be safe, I have also set the failing test to be skipped on CRAN. I also violated the CRAN policy against sending html-formatted email to a CRAN maintainer, for which I sincerely apologize. I will certainly be very careful to avoid this in the future.
 
 ## R CMD check results
 

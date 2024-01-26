@@ -10,15 +10,22 @@
 #' @param ylim Range of y axis.
 #' @param ylab Y label. Defaults to "Absorbance".
 #' @param xlab X label.
-#' @param engine Plotting engine. Either \code{\link[graphics]{matplot}}, 
+#' @param engine Plotting engine. Either \code{base} (\code{\link[graphics]{matplot}}), 
 #' \code{\link[plotly]{plotly}}, or \code{\link[ggplot2]{ggplot2-package}}.
 #' @param linewidth Line width.
 #' @param show_legend Logical. Whether to display legend or not. Defaults to TRUE.
 #' @param legend_position Position of legend.
 #' @param ... Additional arguments to plotting function specified by \code{engine}.
+#' @return No return value, called for side effects.
+#' @section Side effects:
+#' Plots the traces of the specified chromatograms \code{idx} at the specified
+#' wavelengths \code{lambdas}. Plots can be produced using base graphics, ggplot2,
+#' or plotly, according to the value of \code{engine}.
+#' @author Ethan Bass
 #' @examples 
 #' data(Sa_pr)
-#' plot_chroms(Sa_pr, idx=1:2, lambdas=c("210"))
+#' plot_chroms(Sa_pr, idx=1:2, lambdas=c(210))
+#' @concept Visualization
 #' @export
 
 plot_chroms <- function(x, lambdas, idx, xlim, ylim, xlab = "", ylab = "Absorbance",
@@ -57,7 +64,7 @@ plot_chroms <- function(x, lambdas, idx, xlim, ylim, xlab = "", ylab = "Absorban
     axis(2)
     box()
     for (i in seq_along(idx)){
-        matplot(get_times(x, index = idx[i]), x[[idx[i]]][,lambdas.idx], type = 'l',
+        matplot(get_times(x, idx = idx[i]), x[[idx[i]]][,lambdas.idx], type = 'l',
                 add = TRUE, col = i, lwd = linewidth, ...)
     }
     if (show_legend)

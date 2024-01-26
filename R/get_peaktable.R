@@ -29,7 +29,7 @@
 #' @importFrom graphics par
 #' @param peak_list A `peak_list` object created by \code{\link{get_peaks}},
 #' containing a nested list of peak tables: the first level is the
-#' sample, and the second level is the spectral component. Every component is
+#' sample, and the second level is the spectral wavelength. Every component is
 #' described by a data.frame where every row is one peak, and the columns contain
 #' information on various peak parameters.
 #' @param chrom_list A list of chromatographic matrices.
@@ -58,8 +58,8 @@
 #' @param out Specify `data.frame` or `matrix` as output. Defaults to
 #' `data.frame`.
 #' @md
-#' @return The function returns a `peak_table` object, consisting of the following
-#' elements:
+#' @return The function returns an S3 \code{peak_table} object, containing the
+#' following elements:
 #' * `tab`: the peak table itself -- a data-frame of intensities in a
 #' sample x peak configuration.
 #' * `pk_meta`: A data.frame containing peak meta-data (e.g. the spectral component,
@@ -100,6 +100,8 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
   clust <- match.arg(clust, c("rt","sp.rt"))
   out <- match.arg(out, c('data.frame', 'matrix'))
   rt <- ifelse(use.cor, "rt.cor", "rt")
+  start <- ifelse(use.cor, "start.cor", "start")
+  end <- ifelse(use.cor, "end.cor", "end")
   if (!inherits(peak_list, "peak_list"))
     stop("Peak list must be of the associated class.")
   if (clust == "sp.rt"){
@@ -122,7 +124,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
     }}))
     xx <- do.call(rbind, sapply(pkLst, function(samp) samp[comp]))
     file.idx <- xx$sample
-    pkcenters <- xx$rt
+    pkcenters <- xx[, rt]
     names(pkcenters) <- NULL
     if (length(pkcenters) < 2) 
       return(NULL)
@@ -131,37 +133,38 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
       pkcenters.cl <- cutree(pkcenters.hcl, h = hmax)
     } else if (clust == 'sp.rt'){
         if (is.null(sigma.t)){
-          sigma.t <- 0.5 * mean(do.call(rbind,unlist(pkLst,recursive = FALSE))$end - 
-                               do.call(rbind,unlist(pkLst,recursive = FALSE))$start)
+          sigma.t <- 0.5 * mean(do.call(rbind, unlist(pkLst, recursive = FALSE))$end - 
+                               do.call(rbind, unlist(pkLst, recursive = FALSE))$start)
         }
       ts <- as.numeric(rownames(chrom_list[[1]]))
       sp <- sapply(seq_along(pkcenters), function(i){
         rescale(t(chrom_list[[file.idx[i]]][
           which(elementwise.all.equal(ts, pkcenters[i])),]))
-      }, simplify=TRUE)
+      }, simplify = TRUE)
       cor.matrix <- cor(sp, method = "pearson")
       mint <- abs(outer(unlist(pkcenters), unlist(pkcenters), FUN="-"))
       S <- (exp((-(1 - abs(cor.matrix))^2)/(2*sigma.r^2)))*exp(-(mint^2)/(2*sigma.t^2))
       D <- 1 - S
       linkage <- "average"
       pkcenters.hcl <- hclust(as.dist(D), method = linkage)
-      pkcenters.cl <- cutreeDynamicTree(pkcenters.hcl, maxTreeHeight = hmax, 
+      pkcenters.cl <- dynamicTreeCut::cutreeDynamicTree(pkcenters.hcl, maxTreeHeight = hmax, 
                                       deepSplit = deepSplit, minModuleSize = 2)
       sing <- which(pkcenters.cl == 0)
       pkcenters.cl[sing] <- max(pkcenters.cl) + seq_along(sing)
     }
-    vars <- c("rt", "start", "end", "sd", "tau", "FWHM", "r.squared", "purity")
-    vars.idx <- which(colnames(xx) %in% vars)
-    cl.centers <- aggregate(xx[,vars.idx], by = list(pkcenters.cl), FUN = "mean",
-                            na.action = "na.pass")[,-1]
-    ncl <- length(cl.centers$rt)
+    vars <- c(rt, start, end, "sd", "width", "tau", "FWHM", "r.squared", "purity")
+    vars <- vars[vars %in% colnames(xx)]
+    vars.idx <- match(vars, colnames(xx))
+    cl.centers <- aggregate(xx[, vars.idx], by = list(pkcenters.cl), FUN = "mean",
+                            na.action = "na.pass")[, -1, drop = FALSE]
+    ncl <- length(cl.centers[, rt])
     
     ## re-order clusters from small to large rt
-    pkcenters.cl <- order(order(cl.centers$rt))[pkcenters.cl]
-    cl.centers <- cl.centers[order(cl.centers$rt),]
+    pkcenters.cl <- order(order(cl.centers[, rt]))[pkcenters.cl]
+    cl.centers <- cl.centers[order(cl.centers[, rt]),]
     metaInfo <- cbind(lambda = rep(as.numeric(names(peak_list[[1]])[comp]), ncl),
                       peak = 1:ncl, 
-                      round(cl.centers,2)
+                      round(cl.centers, 2)
                       )
     rownames(metaInfo) <- NULL
     if (plot_it){
@@ -176,13 +179,14 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
                       main = paste("Component", comp),
                       panel = function(...) {
                         panel.stripplot(...)
-                        panel.abline(v = cl.centers$rt, col = mycols)
+                        panel.abline(v = cl.centers[,rt], col = mycols)
                       }))
     }
-    if (verbose & max(clusCount <- table(file.idx, pkcenters.cl)) > 1) 
+    if (verbose & max(clusCount <- table(file.idx, pkcenters.cl)) > 1){
       warning(paste("More than one peak of one injection in the same cluster", 
                 paste("for component ", comp, ".", sep = ""), 
                 "Keeping only the most intense one.", "", sep = "\n"))
+    }
     allIs <- unlist(lapply(pkLst, function(samp) samp[[comp]][, response]))
     Iinfo <- matrix(0, ncl, length(pkLst), dimnames = list(NULL, names(pkLst)))
     for (i in seq(along = allIs)){
@@ -252,4 +256,30 @@ dim.peak_table <- function(x){
 #' @export
 row.names.peak_table <- function(x){
   row.names(x$tab)
+}
+
+#' Subset peak table
+#' Return subset of \code{peak_table} object.
+#' @param x A \code{peak_table} object
+#' @param subset Logical expression indicating rows (samples) to keep from
+#' \code{peak_table}; missing values are taken as false.
+#' @param select Logical expression indicating columns (peaks) to select from
+#' \code{peak_table}.
+#' @param drop Logical. Passed to indexing operator.
+#' @return A \code{peak_table} object with samples specified by \code{subset}
+#' and peaks specified by \code{select}.
+#' @author Ethan Bass
+subset.peak_table <- function(x, subset, select, drop = FALSE){
+  x$tab <- subset(x$tab, subset = subset, 
+                  select = select, drop = drop)
+  if (!is.null(dim(x$ref_spectra))){
+    x$sample_meta <- subset(x$sample_meta, subset = subset, drop = drop)
+  }
+  if (!missing(select)){
+    x$pk_meta <- subset(x$pk_meta, select = select, drop = drop)
+    if (!is.null(dim(x$ref_spectra))){
+      x$ref_spectra <- subset(x$ref_spectra, select = select, drop = drop)
+    }
+  }
+  x
 }

@@ -53,13 +53,14 @@
 #' Applications in scientific measurement. \url{https://terpconnect.umd.edu/~toh/spectrum/}
 #' (Accessed January, 2022).
 #' @export find_peaks
-find_peaks <- function(y, smooth_type=c("gaussian", "box", "savgol", "mva","tmva","none"),
+find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva", "tmva", "none"),
                        smooth_window = .001, slope_thresh = 0, amp_thresh = 0,
                        bounds = TRUE){
   if (!is.vector(y)){
     stop("Please provide a vector to argument `y` to proceed.")
   }
-  smooth_type <- match.arg(smooth_type, c("gaussian", "box","savgol", "mva","tmva","none"))
+  smooth_type <- match.arg(smooth_type, c("gaussian", "box", "savgol", "mva",
+                                          "tmva", "none"))
   if (smooth_window < 1){
     smooth_window <- max(length(y) * smooth_window, 1)
   }
@@ -108,10 +109,10 @@ find_peaks <- function(y, smooth_type=c("gaussian", "box", "savgol", "mva","tmva
 #' 
 #' Fit peak parameters using exponential-gaussian hybrid or gaussian function.
 #' 
-#' Peak parameters are calculated using \code{fit_peaks}, which fits the data
+#' Peak parameters are calculated by fitting the data
 #' to a gaussian or exponential-gaussian hybrid curve using non-linear least
 #' squares estimation as implemented in \code{\link[minpack.lm:nlsLM]{nlsLM}}.
-#' Area under the fitted curve is estimated using trapezoidal estimation.
+#' Area under the fitted curve is then estimated using trapezoidal estimation.
 #' 
 #' @param x A chromatogram in matrix format.
 #' @param lambda Wavelength to fit peaks at.
@@ -128,18 +129,18 @@ find_peaks <- function(y, smooth_type=c("gaussian", "box", "savgol", "mva","tmva
 #' to TRUE.
 #' @param noise_threshold Noise threshold. Input to \code{get_purity}.
 #' @param ... Additional arguments to \code{find_peaks}.
-#' @return Function \code{fit_peaks} returns a matrix, whose columns contain
-#' the following information:
-#' \item{rt}{location of the maximum of the peak (x)}
-#' \item{start}{start of peak (only included in table if `bounds==TRUE`)}
-#' \item{end}{end of peak (only included in table if `bounds==TRUE`)}
-#' \item{sd}{width of the peak (x)} \item{tau}{tau parameter (only included in
-#' table if `fit=="egh"`)}
-#' \item{FWHM}{full width at half maximum (x)}
-#' \item{height}{height of the peak (y)}
-#' \item{area}{peak area}
-#' \item{r.squared}{r-squared value for linear fit of model to data.}
-#' \item{purity}{spectral purity of peak as assessed by \code{\link{get_purity}}.}
+#' @return The \code{fit_peaks} function returns a matrix, whose columns contain
+#' the following information about each peak:
+#' \item{rt}{Location of the peak maximum.}
+#' \item{start}{Start of peak (only included in table if \code{bounds = TRUE}).}
+#' \item{end}{End of peak (only included in table if \code{bounds = TRUE}).}
+#' \item{sd}{The standard deviation of the peak.}
+#' \item{tau}{\eqn{\tau} parameter (only included in table if \code{fit = "egh"}).}
+#' \item{FWHM}{The full width at half maximum.}
+#' \item{height}{Peak height.}
+#' \item{area}{Peak area.}
+#' \item{r.squared}{The R-squared value for linear fit of the model to the data.}
+#' \item{purity}{The spectral purity of peak as assessed by \code{\link{get_purity}}.}
 #' Again, the first five elements (rt, start, end, sd and FWHM) are expressed
 #' as indices, so not in terms of the real retention times. The transformation
 #' to "real" time is done in function \code{get_peaks}.
@@ -151,7 +152,7 @@ find_peaks <- function(y, smooth_type=c("gaussian", "box", "savgol", "mva","tmva
 #' @author Ethan Bass
 #' @examples
 #' data(Sa_pr)
-#' fit_peaks(Sa_pr[[1]], lambda="220")
+#' fit_peaks(Sa_pr[[1]], lambda = 220)
 #' @seealso \code{\link{find_peaks}}, \code{\link{get_peaks}}
 #' @references
 #' * Lan, K. & Jorgenson, J. W. 2001. A hybrid of exponential and gaussian
@@ -166,7 +167,8 @@ find_peaks <- function(y, smooth_type=c("gaussian", "box", "savgol", "mva","tmva
 fit_peaks <- function (x, lambda, pos = NULL, sd.max = 50,
                        fit = c("egh", "gaussian", "raw"),  max.iter = 1000, 
                        estimate_purity = TRUE, noise_threshold = .001, ...){
-  y <- x[,lambda]
+  lambda.idx <- get_lambda_idx(lambda, as.numeric(colnames(x)))
+  y <- x[,lambda.idx]
   fit <- match.arg(fit, c("egh", "gaussian", "raw"))
   if (is.null(pos)){
     pos <- find_peaks(y, ...)
@@ -198,7 +200,7 @@ fit_peaks <- function (x, lambda, pos = NULL, sd.max = 50,
                   "raw" = fitpk_raw)
   
   huhn <- data.frame(t(apply(pos, 1, fitpk, x = x,
-                             lambda = lambda, max.iter = max.iter,
+                             lambda = lambda.idx, max.iter = max.iter,
                              estimate_purity = estimate_purity,
                              noise_threshold = noise_threshold)))
   colnames(huhn) <- tabnames

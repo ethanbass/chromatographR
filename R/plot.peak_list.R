@@ -9,7 +9,8 @@
 #' @param ... Additional arguments to main plot function.
 #' @param chrom_list List of chromatograms (retention time x wavelength
 #' matrices)
-#' @param index Index or name of chromatogram to be plotted.
+#' @param idx Index or name of chromatogram to be plotted.
+#' @param index This argument is deprecated. Please use \code{idx} instead.
 #' @param lambda Wavelength for plotting.
 #' @param points Logical. If TRUE, plot peak maxima. Defaults to FALSE.
 #' @param ticks Logical. If TRUE, mark beginning and end of each peak. Defaults
@@ -30,12 +31,17 @@
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaks}}
 #' @rdname plot.peak_list
+#' @concept Visualization
 #' @export
 
-plot.peak_list <- function(x, ..., chrom_list, index = 1, lambda = NULL,
+plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
                            points = FALSE, ticks = FALSE, a = 0.5, color = NULL,
                            cex.points = 0.5, numbers = FALSE, cex.font = 0.5, 
-                           y.offset = 25, plot_purity = FALSE, res){
+                           y.offset = 25, plot_purity = FALSE, res, index = NULL){
+  if (!is.null(index)){
+    idx <- index
+    message("The `index` argument is deprecated. Please use `idx` instead")
+  }
   time.units <- attributes(x)$time.units
   time.units <- ifelse(is.null(time.units), "", time.units)
   tfac <- switch(time.units, "min" = 1, "s" = 1/60, "ms" = 1/60000, 1)
@@ -51,9 +57,9 @@ plot.peak_list <- function(x, ..., chrom_list, index = 1, lambda = NULL,
   if (is.numeric(lambda)){
     lambda <- as.character(lambda)
   }
-  new.ts <- get_times(x = chrom_list, index = index)
-  y <- chrom_list[[index]][,lambda]
-  pks <- data.frame(x[[index]][[lambda]])
+  new.ts <- get_times(x = chrom_list, idx = idx)
+  y <- chrom_list[[idx]][,lambda]
+  pks <- data.frame(x[[idx]][[lambda]])
   if ("r.squared" %in% colnames(pks)){
     fit <- ifelse("tau" %in% colnames(pks), "egh", "gaussian")
   } else{
@@ -93,7 +99,7 @@ plot.peak_list <- function(x, ..., chrom_list, index = 1, lambda = NULL,
           color <- "purple"
       }
       else if (fit == "raw"){
-        yvals <- chrom_list[[index]][as.character(peak.loc), lambda]
+        yvals <- chrom_list[[idx]][as.character(peak.loc), lambda]
         if (is.null(color))
           color <- "hotpink"
       }
@@ -102,19 +108,19 @@ plot.peak_list <- function(x, ..., chrom_list, index = 1, lambda = NULL,
   }
   if (plot_purity){
     try({
-      peaks <- x[[index]][[lambda]][,3:5]
+      peaks <- x[[idx]][[lambda]][,3:5]
       # color <- "#FFB000"
       color="black"
       p <- apply(peaks, 1, function(pos){
         pos[1] <- which(new.ts %in% pos[[1]])
         pos[2] <- which(new.ts %in% pos[[2]])
         pos[3] <- which(new.ts %in% pos[[3]])
-        idx <- seq(pos[2], pos[3])
-        yvals <- chrom_list[[index]][,lambda][idx]
-        p <- get_purity_values(chrom_list[[index]], pos)
-        # lines(as.numeric(new.ts[idx]), -scales::rescale(p, c(0,20)), col = "darkgray", lty=3, lwd=1.5)
-        lim=-20
-        draw_trapezoid(new.ts[idx], scales::rescale(p, c(0,lim)), color="black", a = 0.6)
+        pk_indices <- seq(pos[[2]], pos[[3]])
+        yvals <- chrom_list[[idx]][,lambda][pk_indices]
+        p <- get_purity_values(chrom_list[[idx]], pos)
+        lim = -20
+        draw_trapezoid(new.ts[pk_indices], scales::rescale(p, c(0, lim)), 
+                       color = "black", a = 0.6)
         abline(h = lim, lty = 3, col = "darkgray")
       })
     }, silent = TRUE)
@@ -124,7 +130,7 @@ plot.peak_list <- function(x, ..., chrom_list, index = 1, lambda = NULL,
 #' @noRd
 draw_trapezoid <- function(peak.loc, yvals, color, a){
   sapply(1:(length(peak.loc) - 1), function(i){
-    polygon(peak.loc[c(i, i, (i+1), (i+1))], c(0, yvals[i:(i+1)], 0),
-            col=alpha(color, a), lty=3, border = NA)
+    polygon(peak.loc[c(i, i, (i + 1), (i + 1))], c(0, yvals[i:(i + 1)], 0),
+            col=alpha(color, a), lty = 3, border = NA)
   })
 }

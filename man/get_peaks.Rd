@@ -15,6 +15,7 @@ get_peaks(
   noise_threshold = 0.001,
   show_progress = NULL,
   cl = 2,
+  collapse = FALSE,
   ...
 )
 }
@@ -34,7 +35,7 @@ trapezoidal integration directly on the raw data without fitting a peak shape.}
 in \code{\link{fit_peaks}}.}
 
 \item{time.units}{Units of \code{sd}, \code{FWHM}, \code{area}, and \code{tau}
-(if applicable). Options are minutes \code{"min"}, seconds (\code{"s"}, or 
+(if applicable). Options are minutes \code{"min"}, seconds (\code{"s"}, or
 milliseconds \code{"ms"}.}
 
 \item{estimate_purity}{Logical. Whether to estimate purity or not. Defaults
@@ -42,13 +43,16 @@ to FALSE. (If TRUE, this will slow down the function significantly).}
 
 \item{noise_threshold}{Noise threshold. Argument to \code{get_purity}.}
 
-\item{show_progress}{Logical. Whether to show progress bar. Defaults to 
+\item{show_progress}{Logical. Whether to show progress bar. Defaults to
 \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.}
 
 \item{cl}{Argument to \code{\link[pbapply]{pblapply}} or \code{\link[parallel]{mclapply}}.
 Either an integer specifying the number of clusters to use for parallel
 processing or a cluster object created by \code{\link[parallel]{makeCluster}}.
 Defaults to 2. On Windows integer values will be ignored.}
+
+\item{collapse}{Logical. Whether to collapse multiple peak lists per sample
+into a single list when multiple wavelengths (\code{lambdas}) are provided.}
 
 \item{\dots}{Additional arguments to \code{\link{find_peaks}}. Arguments
 provided to \code{\link{find_peaks}} can be used to fine-tune the peak-finding
@@ -57,16 +61,30 @@ features are being split into multiple bins. Other arguments that can be used
 here include \code{smooth_type}, \code{slope_thresh}, and \code{amp_thresh}.}
 }
 \value{
-The result is an S3 object of class \code{peak_list}, containing a nested
-list of data.frames containing information about the peaks fitted for each
-chromatogram at each specified wavelength. The data.frame includes information
-about the retention time (\code{rt}), \code{start} and \code{end} of each peak,
-as well as the standard deviation (\code{sd}), \code{tau} (if \code{egh} is 
-selected), full width at half maximum (\code{FWHM}), \code{height}, \code{area},
-\code{r.squared} (coefficient of determination), and \code{purity}. (*Note:*
-the \code{r.squared} is calculated by fitting a linear model of the fitted
-peak values to the raw data. This approach is not really statistically valid
-but it can still be useful as a rough metric for "goodness-of-fit").
+The result is an S3 object of class \code{peak_list}, containing a
+nested list of data.frames containing information about the peaks fitted for
+each chromatogram at each of wavelengths specified by the \code{lamdas}
+argument. Each row in these data.frames is a peak and the columns contain
+information about various peak parameters:
+\itemize{
+\item \code{rt}: The retention time of the peak maximum.
+\item \code{start}: The retention time where the peak is estimated to begin.
+\item \code{end}: The retention time where the peak is estimated to end.
+\item \code{sd}: The standard deviation of the fitted peak shape.
+\item \code{tau} The value of parameter \eqn{\tau}. This parameter determines
+peak asymmetry for peaks fit with an exponential-gaussian hybrid function.
+(This column will only appear if \code{fit = egh}.
+\item \code{FWHM}: The full-width at half maximum.
+\item \code{height}: The height of the peak.
+\item \code{area}: The area of the peak as determined by trapezoidal approximation.
+\item \code{r.squared} The coefficient of determination (\eqn{R^2}) of the fitted
+model to the raw data. (\strong{Note}: this value is calculated by fitting a
+linear model of the fitted peak values to the raw data. This approach is
+statistically questionable, since the models are fit using non-linear least
+squares. Nevertheless, it can still be useful as a rough metric for
+"goodness-of-fit").
+\item \code{purity} The peak purity.
+}
 }
 \description{
 Finds and fits peaks and extracts peak parameters from a list of chromatograms
@@ -75,20 +93,23 @@ at the specified wavelengths.
 \details{
 Peaks are located by finding zero-crossings in the smoothed first derivative
 of the specified chromatographic traces (function \code{\link{find_peaks}}).
+At the given positions, an exponential-gaussian hybrid (or regular gaussian)
+function is fit to the signal using \code{\link{fit_peaks}} according to the
+value of \code{fit}. Finally, the area is calculated using trapezoidal
+approximation.
+
 Additional arguments can be provided to \code{\link{find_peaks}} to fine-tune
 the peak-finding algorithm. For example, the \code{smooth_window} can be
 increased to prevent peaks from being split into multiple features. Overly
-aggressive smoothing may cause small peaks to be overlooked. At the given 
-positions, an exponential-gaussian hybrid (or regular gaussian)
-function is fit to the signal using \code{\link{fit_peaks}} according to the
-value of \code{fit}. Finally, the area is calculated using trapezoidal 
-approximation.
+aggressive smoothing may cause small peaks to be overlooked.
 
-The \code{sd}, \code{FWHM}, \code{tau}, and \code{area} are returned in units
-determined by \code{time.units}. By defaults the units are in minutes.
+The standard deviation (\code{sd}), full-width at half maximum (\code{FWHM}),
+tau \code{tau}, and \code{area} are returned in units determined by
+\code{time.units}. By default, the units are in minutes. To compare directly
+with 'ChemStation' integration results, the time units should be in seconds.
 }
 \note{
-This function is adapted from the
+The bones of this function are adapted from the
 \href{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks}
 function authored by Ron Wehrens (though the underlying algorithms for peak
 identification and peak-fitting are not the same).
@@ -100,21 +121,20 @@ pks <- get_peaks(Sa_pr, lambdas = c('210'), sd.max=50, fit="egh")
 \dontshow{\}) # examplesIf}
 }
 \references{
-* Lan, K. & Jorgenson, J. W. 2001. A hybrid of exponential and gaussian
+\itemize{
+\item Lan, K. & Jorgenson, J. W. 2001. A hybrid of exponential and gaussian
 functions as a simple model of asymmetric chromatographic peaks. \emph{Journal of
-Chromatography A} \bold{915}:1-13. \doi{10.1016/S0021-9673(01)00594-5}.
-
-* Naish, P. J. & Hartwell, S. 1988. Exponentially Modified Gaussian functions - A
+Chromatography A} \strong{915}:1-13. \doi{10.1016/S0021-9673(01)00594-5}.
+\item Naish, P. J. & Hartwell, S. 1988. Exponentially Modified Gaussian functions - A
 good model for chromatographic peaks in isocratic HPLC? \emph{Chromatographia},
-/bold{26}: 285-296. \doi{10.1007/BF02268168}.
-
-* O'Haver, Tom. Pragmatic Introduction to Signal Processing:
+\strong{26}: 285-296. \doi{10.1007/BF02268168}.
+\item O'Haver, Tom. Pragmatic Introduction to Signal Processing:
 Applications in scientific measurement.
 \url{https://terpconnect.umd.edu/~toh/spectrum/} (Accessed January, 2022).
-
-* Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
+\item Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
 LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
 Metabolomics} \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}.
+}
 }
 \seealso{
 \code{\link{find_peaks}}, \code{\link{fit_peaks}}

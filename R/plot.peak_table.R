@@ -1,4 +1,3 @@
-
 #' Plot spectrum from peak table
 #' 
 #' Plots the trace and/or spectrum for a given peak in peak table. 
@@ -20,7 +19,7 @@
 #' @param what What to look for. Either \code{peak} to extract spectral information
 #' for a certain peak, \code{rt} to scan by retention time, or \code{click} to manually
 #' select retention time by clicking on the chromatogram. Defaults to \code{peak}.
-#' @param chr Numerical index of chromatogram you wish to plot; "max" to
+#' @param idx Numerical index of chromatogram you wish to plot; "max" to
 #' plot the chromatogram with the largest signal; or "all" to plot spectra
 #' for all chromatograms.
 #' @param lambda The wavelength you wish to plot the trace at (if
@@ -42,6 +41,7 @@
 #' @param verbose Logical. If TRUE, prints verbose output to console. Defaults
 #' to TRUE.
 #' @param engine Which plotting engine to use: either \code{base} or \code{plotly}.
+#' @param chr Deprecated. Please use \code{idx} instead.
 #' @param ... Additional arguments to \code{\link[graphics]{boxplot}}.
 #' @return If \code{export_spectrum} is TRUE, returns the spectrum as a \code{
 #' data.frame} with wavelengths as rows and columns encoding the
@@ -61,15 +61,17 @@
 #' specified peak with groups provided by \code{vars}.
 #' @author Ethan Bass
 #' @rdname plot.peak_table
+#' @concept Visualization
 #' @export
 
 plot.peak_table <- function(x, loc, chrom_list, what="peak",
-                            chr = 'max', lambda = 'max',
+                            idx = 'max', lambda = 'max',
                             plot_spectrum = TRUE, plot_trace = TRUE,
                             box_plot = FALSE, vars = NULL,
                             spectrum_labels = TRUE, scale_spectrum = FALSE,
                             export_spectrum = FALSE, verbose = TRUE,
-                            engine = c("base", "plotly", "ggplot"), ...){
+                            engine = c("base", "plotly", "ggplot"), 
+                            chr = NULL, ...){
   engine <- match.arg(engine, c("base", "plotly", "ggplot"))
   if (what == "peak" & missing(loc)){
     loc <- readline(prompt="Which peak would you like to plot? \n")
@@ -80,13 +82,13 @@ plot.peak_table <- function(x, loc, chrom_list, what="peak",
   }
   for (loc in loc){
     if (plot_spectrum | plot_trace){
-      if (chr == "all"){
+      if (idx == "all"){
         out <- plot_all_spectra(loc, x, chrom_list,
                                 plot_spectrum = plot_spectrum,
                                 export_spectrum = export_spectrum,
                                 verbose = verbose, what = what)
       } else{
-        out <- plot_spectrum(loc, x, chrom_list, chr=chr,
+        out <- plot_spectrum(loc, x, chrom_list, idx = idx,
                              lambda = lambda, plot_spectrum = plot_spectrum,
                              plot_trace = plot_trace, spectrum_labels = spectrum_labels,
                              scale_spectrum = scale_spectrum,
@@ -132,6 +134,7 @@ plot.peak_table <- function(x, loc, chrom_list, what="peak",
 #' meta <- read.csv(path)
 #' pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
 #' boxplot(pk_tab, formula=V11 ~ trt)
+#' @concept Visualization
 #' @export
 
 boxplot.peak_table <- function(x, formula, ...){
@@ -193,6 +196,7 @@ boxplot.peak_table <- function(x, formula, ...){
 #' meta <- read.csv(path)
 #' pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
 #' mirror_plot(pk_tab,lambdas=c("210","260"), var="trt", mirror=TRUE, col=c("green","blue"))
+#' @concept Visualization
 #' @export
 
 mirror_plot <- function(x, chrom_list, lambdas, var, subset = NULL,
@@ -211,7 +215,15 @@ mirror_plot <- function(x, chrom_list, lambdas, var, subset = NULL,
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(x)
   } else get_chrom_list(x, chrom_list)
-  new.ts <- round(as.numeric(rownames(chrom_list[[1]])),2)
+  new.ts <- round(as.numeric(rownames(chrom_list[[1]])), 2)
+  if (ncol(x[[1]]) == 1){
+    lambdas.idx <- 1
+  } else {
+    lambdas.idx <- sapply(lambdas, function(lambda){
+      get_lambda_idx(lambda, lambdas = get_lambdas(chrom_list),
+                     allow_max = FALSE)
+    }) 
+  }
   fac <- factor(meta[,var])
   if (is.null(subset) & length(levels(fac)) > 2)
     stop("The mirror plot can only compare two factor levels. Please use the
@@ -235,7 +247,7 @@ mirror_plot <- function(x, chrom_list, lambdas, var, subset = NULL,
   if (is.null(xlim))
     xlim <- c(head(new.ts,1),tail(new.ts,1))
   y_max <- max(sapply(chrom_list, function(xx){
-    max(xx[,as.character(min(as.numeric(lambdas)))], na.rm = TRUE)
+    max(xx[, as.character(min(as.numeric(lambdas)))], na.rm = TRUE)
   }))
   if (mirror){
     if (is.null(ylim))
@@ -243,12 +255,12 @@ mirror_plot <- function(x, chrom_list, lambdas, var, subset = NULL,
     plot.new()
     plot.window(xlim = xlim, ylim = ylim)
     for (i in set1){
-      matplot(new.ts, chrom_list[[i]][,lambdas], type = 'l', add = TRUE, ...)
+      matplot(new.ts, chrom_list[[i]][,lambdas.idx], type = 'l', add = TRUE, ...)
     }
     if (print_legend)
       legend("topright", legend=legend_txt[[1]], cex=legend_size, bty = "n")
     for (i in set2){
-      matplot(new.ts, -chrom_list[[i]][,lambdas], type = 'l', add = TRUE, ...)
+      matplot(new.ts, -chrom_list[[i]][,lambdas.idx], type = 'l', add = TRUE, ...)
     }
     if (print_legend)
       legend("bottomright", legend=legend_txt[[2]], cex=legend_size, bty = "n")
@@ -260,18 +272,17 @@ mirror_plot <- function(x, chrom_list, lambdas, var, subset = NULL,
     plot.new()
     plot.window(xlim = xlim, ylim = ylim)
     for (i in set1){
-      matplot(new.ts, chrom_list[[i]][,lambdas], type = 'l', add = TRUE, ...)
+      matplot(new.ts, chrom_list[[i]][,lambdas.idx], type = 'l', add = TRUE, ...)
     }
     if (print_legend)
       legend(legend_pos, legend = legend_txt[[1]], cex = legend_size, bty = "n")
     plot.new()
     plot.window(xlim = xlim, ylim = ylim)
     for (i in set2){
-      matplot(new.ts, chrom_list[[i]][,lambdas], type = 'l', add = TRUE, ...)
+      matplot(new.ts, chrom_list[[i]][,lambdas.idx], type = 'l', add = TRUE, ...)
     }
     if (print_legend)
       legend(legend_pos, legend=legend_txt[[2]], cex=legend_size, bty = "n")
     par(oldpar) # reset par
   }
 }
-

@@ -23,7 +23,7 @@ get_peaktable(
 \arguments{
 \item{peak_list}{A \code{peak_list} object created by \code{\link{get_peaks}},
 containing a nested list of peak tables: the first level is the
-sample, and the second level is the spectral component. Every component is
+sample, and the second level is the spectral wavelength. Every component is
 described by a data.frame where every row is one peak, and the columns contain
 information on various peak parameters.}
 
@@ -65,8 +65,8 @@ single time window. Defaults to \code{FALSE}.}
 \code{data.frame}.}
 }
 \value{
-The function returns a \code{peak_table} object, consisting of the following
-elements:
+The function returns an S3 \code{peak_table} object, containing the
+following elements:
 \itemize{
 \item \code{tab}: the peak table itself -- a data-frame of intensities in a
 sample x peak configuration.

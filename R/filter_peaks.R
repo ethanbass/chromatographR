@@ -68,7 +68,7 @@ filter_peaks <- function(peak_list, min_height, min_area,
                            comp[, "rt"] > as.numeric(min_rt) &
                            comp[, "rt"] < as.numeric(max_rt)), , drop = FALSE]))
   att <- attributes(peak_list)
-  transfer_metadata(result, peak_list, c('names','row.names','dim','dimnames'))
+  transfer_metadata(result, peak_list, transfer_class = TRUE)
 }
 
 #' Filter peak table

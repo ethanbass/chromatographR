@@ -3,11 +3,15 @@
 \docType{data}
 \name{Sa_warp}
 \alias{Sa_warp}
-\title{HPLC-DAD data of goldenrod root extracts.}
+\title{Warped goldenrod root chromatograms.}
 \format{
-Four pre-processed and warped matrices (time x wavelength) to use in
-examples.
+A list of four pre-processed and warped matrices (434 times x 60 wavelengths).
+}
+\usage{
+data(Sa_warp)
 }
 \description{
-Pre-processed and warped chromatograms.
+A list of four pre-processed and warped goldenrod root chromatograms derived
+from the raw data stored in \code{Sa}.
 }
+\keyword{data}

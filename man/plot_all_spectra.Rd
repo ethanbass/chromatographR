@@ -8,13 +8,15 @@ plot_all_spectra(
   peak,
   peak_table,
   chrom_list,
-  chrs = "all",
+  idx = "all",
+  chrs = NULL,
   engine = c("base", "ggplot2", "plotly"),
   plot_spectrum = TRUE,
   export_spectrum = TRUE,
   scale_spectrum = TRUE,
   overlapping = TRUE,
   verbose = FALSE,
+  what = c("peak", "rt", "idx"),
   ...
 )
 }
@@ -30,7 +32,9 @@ components). If no argument is provided here, the function will
 try to find the \code{chrom_list} object used to create the provided
 \code{peak_table}.}
 
-\item{chrs}{Vector of chromatograms to plot.}
+\item{idx}{Vector of chromatograms to plot.}
+
+\item{chrs}{Deprecated. Please use \code{idx} instead.}
 
 \item{engine}{Which plotting engine to use: \code{base}, \code{ggplot2},
 or \code{plotly}.}
@@ -46,6 +50,10 @@ Defaults to FALSE.}
 \item{overlapping}{Logical. If TRUE, plot spectra in single plot.}
 
 \item{verbose}{Logical. If TRUE, prints verbose output to console.}
+
+\item{what}{What to look for. Either \code{peak} to extract spectral 
+information for a certain peak, \code{rt} to scan by retention time, or 
+\code{idx} to scan by numeric index. Defaults to "peak" mode.}
 
 \item{\dots}{Additional arguments to plot_spectrum.}
 }

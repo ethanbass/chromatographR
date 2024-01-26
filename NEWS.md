@@ -1,3 +1,36 @@
+# chromatographR 0.7.0
+
+* Updated `correct_peaks` function so it works properly for correcting retention times in peak lists.
+* Added `fixed_levels` argument to `reshape_peaktable` so features can be plotted in the order they're provided by the user.
+* Added option for summing split peaks using the `merge_peaks` function by selecting `method = "sum"`.
+* Updated `get_peaktable` so that the `use.cor` argument works correctly (to use corrected retention times stored in a separate column).
+* Fixed `mirror_plot` so it can take numeric input for lambdas.
+* Changed default setting of `verbose` argument in `correct_rt` from `FALSE`
+to default setting.
+* Removed `load_chroms` function. Use `read_chroms` instead.
+* Eliminated spurious warning from `attach_ref_spectra` function.
+* Changed name of `index` argument in `plot.peak_list` to `idx`. The original argument is now deprecated.
+* Fixed bug affecting `plot_purity` argument in `plot.peak_list`.
+* Fixed bug in `reshape_chroms` so empty metadata column no longer appears.
+* The `plot_spectrum` function now includes the peak names when plotting spectra.
+* Fixed `correct_rt` so it no longer requires user-provided `lambdas` for 1D chromatograms.
+* Added `subset.peak_table` function for easily subsetting peak_tables (e.g. to exclude specific
+peaks or samples).
+* Added `what` argument for `plot_all_spectra` (e.g. to plot multiple spectra at a particular retention time).
+
+#### Refactoring of `cluster_spectra` function:
+
+* For simplicity, `cluster_spectra` now requires reference spectra to be attached to peak table.
+* Accordingly, the `chrom_list` argument is no longer needed.
+* Saving to RDS is now turned off by default.
+* The `pvclust` package is now suggested instead of being required.
+
+#### Updates to vignette and documentation
+
+* Suggest numeric input to lambdas instead of character input to reduce unnecessary confusion.
+* Made other minor changes to text of vignette to (hopefully) improve clarity.
+* Added a short section on the attachment of reference spectra.
+
 # chromatographR 0.6.1
 
 * Fixed bug in plot functions (e.g. `plot_chroms` and `plot_spectrum`) causing error when retention times are inconsistent between chromatograms.
@@ -12,7 +45,6 @@
 * Updated `get_peaktable` for greater flexibility (e.g. for usage of 'ChemStation' peak lists as input).
 
 #### Other changes
-
 * Made some minor changes to vignette to improve clarity (e.g. using single wavelength for integration, etc.)
 
 #### Bug fixes

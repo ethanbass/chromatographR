@@ -20,7 +20,7 @@ get_agilent_threshold(
 
 \item{weight}{scaling parameter affecting stringency of threshold.}
 
-\item{noise_variance}{Variance of noise. Argument to \code{\link{get_agilent_threshold}}.}
+\item{noise_variance}{Variance of noise.}
 
 \item{noise_threshold}{Threshold to define noise. Highest proportion of maximum absorbance.}
 
@@ -41,3 +41,4 @@ Agilent Technologies, April 1, 2003, 16.
 \author{
 Ethan Bass
 }
+\keyword{internal}

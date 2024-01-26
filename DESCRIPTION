@@ -1,7 +1,7 @@
 Type: Package
 Package: chromatographR
 Title: Chromatographic Data Analysis Toolset
-Version: 0.6.1
+Version: 0.7.0
 Authors@R: c(
     person("Ethan", "Bass", , "ethanbass@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6175-6739")),
@@ -43,7 +43,6 @@ Imports:
     parallel,
     ptw,
     purrr,
-    pvclust,
     scales,
     stats,
     utils,
@@ -55,6 +54,7 @@ Suggests:
     openxlsx,
     pbapply,
     plotly,
+    pvclust,
     reticulate,
     rmarkdown,
     rsvg,
@@ -68,4 +68,4 @@ Encoding: UTF-8
 Language: en-US
 LazyData: true
 LazyDataCompression: xz
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.0

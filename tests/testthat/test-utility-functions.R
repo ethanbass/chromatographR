@@ -1,4 +1,4 @@
-#### test utilities
+#### test utilities #### 
 data(Sa_pr)
 
 test_that("get_times works as expected", {
@@ -113,9 +113,17 @@ test_that("check_for_pkg functions as expected",{
 
 test_that("reshape_peaktable works as expected",{
   data(pk_tab)
+  path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
+  meta <- read.csv(path)
+  pk_tab <- attach_metadata(pk_tab, metadata = meta, column = "vial")
+  
   pktab_long <- reshape_peaktable(pk_tab)
-  expect_equal(ncol(pktab_long),4)
+  expect_equal(ncol(pktab_long), 3 + ncol(pk_tab$sample_meta))
   expect_equal(nrow(pktab_long), nrow(pk_tab)*ncol(pk_tab))
+  
+  pktab_long <- reshape_peaktable(pk_tab, peaks = c("V51","V60"), metadata = "trt")
+  expect_equal(ncol(pktab_long), 3 + 1)
+  expect_equal(nrow(pktab_long), nrow(pk_tab)*2)
 })
 
 test_that("reshape_chroms works as expected", {
@@ -134,5 +142,11 @@ test_that("get_purity works as intended", {
   data(Sa_pr)
   pos <- as.numeric(find_peaks(Sa_pr[[1]][,"210"])[1,])
   expect_equal(class(get_purity(Sa_pr[[1]], pos)),"numeric")
+})
+
+test_that("extract_idx function works as expected", {
+  expect_equal(extract_idx("dat.pr[[1]]"), 1)
+  expect_equal(extract_idx("dat.pr[1:3]"), 1:3)
+  expect_equal(extract_idx("dat.pr[c(1,5,7)]"), c(1,5,7))
 })
 

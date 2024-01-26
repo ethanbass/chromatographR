@@ -23,3 +23,4 @@ Trim peak
 \author{
 Ethan Bass
 }
+\keyword{internal}

@@ -72,28 +72,35 @@ combine_peaks <- function(peak_table, tol = .01, min.cor = 0.9,
 #' @name merge_peaks
 #' @param peak_table Peak table from \code{\link{get_peaktable}}.
 #' @param peaks A vector specifying the names or indices of peaks to be merged.
+#' @param method Method to merge peaks. Either \code{max} to select the largest
+#' peak from each sample or \code{sum} to sum the peaks together.
 #' @return A peak table similar to the input peak table, but where the specified
-#' columns are combined combined. 
+#' columns are combined. 
 #' @author Ethan Bass
 #' @examples
 #' data(pk_tab)
 #' pk_tab <- merge_peaks(peak_table = pk_tab, peaks=c("V10","V11"))
 #' @export
 
-merge_peaks <- function(peak_table, peaks){
+merge_peaks <- function(peak_table, peaks, method = c("max", "sum")){
   check_peaktable(peak_table)
+  method <- match.arg(method, c("max", "sum"))
   if (is.character(peaks)){
     pks.idx <- which(colnames(peak_table$tab) %in% peaks)
   } else {
     pks.idx <- peaks
   }
-  sel <- which.max(colMeans(peak_table$tab[,pks.idx], na.rm=TRUE))
+  sel <- which.max(colMeans(peak_table$tab[, pks.idx], na.rm = TRUE))
   sel.idx <- which(colnames(peak_table$tab) == peaks[sel])
-  peak_table$tab[,sel.idx] <- do.call(pmax, peak_table$tab[,pks.idx])
-  peak_table$tab <- peak_table$tab[,-pks.idx[-sel]]
-  peak_table$pk_meta <- peak_table$pk_meta[,-pks.idx[-sel]]
+  if (method == "max"){
+    peak_table$tab[[sel.idx]] <- do.call(pmax, peak_table$tab[, pks.idx])
+  } else if (method == "sum"){
+    peak_table$tab[[sel.idx]] <- apply(peak_table$tab[,pks.idx], 1, sum)
+  }
+  peak_table$tab <- peak_table$tab[, -pks.idx[-sel]]
+  peak_table$pk_meta <- peak_table$pk_meta[, -pks.idx[-sel]]
   if (inherits(peak_table$ref_spectra,"matrix")){
-    peak_table$ref_spectra <- peak_table$ref_spectra[,-pks.idx[-sel]]
+    peak_table$ref_spectra <- peak_table$ref_spectra[, -pks.idx[-sel]]
   }
   return(peak_table)
 }

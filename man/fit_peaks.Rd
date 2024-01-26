@@ -43,18 +43,18 @@ to TRUE.}
 \item{...}{Additional arguments to \code{find_peaks}.}
 }
 \value{
-Function \code{fit_peaks} returns a matrix, whose columns contain
-the following information:
-\item{rt}{location of the maximum of the peak (x)}
-\item{start}{start of peak (only included in table if `bounds==TRUE`)}
-\item{end}{end of peak (only included in table if `bounds==TRUE`)}
-\item{sd}{width of the peak (x)} \item{tau}{tau parameter (only included in
-table if `fit=="egh"`)}
-\item{FWHM}{full width at half maximum (x)}
-\item{height}{height of the peak (y)}
-\item{area}{peak area}
-\item{r.squared}{r-squared value for linear fit of model to data.}
-\item{purity}{spectral purity of peak as assessed by \code{\link{get_purity}}.}
+The \code{fit_peaks} function returns a matrix, whose columns contain
+the following information about each peak:
+\item{rt}{Location of the peak maximum.}
+\item{start}{Start of peak (only included in table if \code{bounds = TRUE}).}
+\item{end}{End of peak (only included in table if \code{bounds = TRUE}).}
+\item{sd}{The standard deviation of the peak.}
+\item{tau}{\eqn{\tau} parameter (only included in table if \code{fit = "egh"}).}
+\item{FWHM}{The full width at half maximum.}
+\item{height}{Peak height.}
+\item{area}{Peak area.}
+\item{r.squared}{The R-squared value for linear fit of the model to the data.}
+\item{purity}{The spectral purity of peak as assessed by \code{\link{get_purity}}.}
 Again, the first five elements (rt, start, end, sd and FWHM) are expressed
 as indices, so not in terms of the real retention times. The transformation
 to "real" time is done in function \code{get_peaks}.
@@ -63,10 +63,10 @@ to "real" time is done in function \code{get_peaks}.
 Fit peak parameters using exponential-gaussian hybrid or gaussian function.
 }
 \details{
-Peak parameters are calculated using \code{fit_peaks}, which fits the data
+Peak parameters are calculated by fitting the data
 to a gaussian or exponential-gaussian hybrid curve using non-linear least
 squares estimation as implemented in \code{\link[minpack.lm:nlsLM]{nlsLM}}.
-Area under the fitted curve is estimated using trapezoidal estimation.
+Area under the fitted curve is then estimated using trapezoidal estimation.
 }
 \note{
 The \code{\link{fit_peaks}} function is adapted from Dr. Robert
@@ -77,7 +77,7 @@ as well as code published in Ron Wehrens'
 }
 \examples{
 data(Sa_pr)
-fit_peaks(Sa_pr[[1]], lambda="220")
+fit_peaks(Sa_pr[[1]], lambda = 220)
 }
 \references{
 * Lan, K. & Jorgenson, J. W. 2001. A hybrid of exponential and gaussian

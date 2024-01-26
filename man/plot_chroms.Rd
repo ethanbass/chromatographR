@@ -35,7 +35,7 @@ chromatograms to plot.}
 
 \item{ylab}{Y label. Defaults to "Absorbance".}
 
-\item{engine}{Plotting engine. Either \code{\link[graphics]{matplot}}, 
+\item{engine}{Plotting engine. Either \code{base} (\code{\link[graphics]{matplot}}), 
 \code{\link[plotly]{plotly}}, or \code{\link[ggplot2]{ggplot2-package}}.}
 
 \item{linewidth}{Line width.}
@@ -46,10 +46,24 @@ chromatograms to plot.}
 
 \item{...}{Additional arguments to plotting function specified by \code{engine}.}
 }
+\value{
+No return value, called for side effects.
+}
 \description{
 Plots the specified traces from a list of chromatograms.
 }
+\section{Side effects}{
+
+Plots the traces of the specified chromatograms \code{idx} at the specified
+wavelengths \code{lambdas}. Plots can be produced using base graphics, ggplot2,
+or plotly, according to the value of \code{engine}.
+}
+
 \examples{
 data(Sa_pr)
-plot_chroms(Sa_pr, idx=1:2, lambdas=c("210"))
+plot_chroms(Sa_pr, idx=1:2, lambdas=c(210))
 }
+\author{
+Ethan Bass
+}
+\concept{Visualization}

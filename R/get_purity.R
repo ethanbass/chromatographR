@@ -20,6 +20,8 @@
 #' Agilent Technologies, April 1, 2003, 16.
 #' /href{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
 #' @author Ethan Bass
+#' @keywords internal
+#' @export
 
 get_purity <- function(x, pos, weight = 1, cutoff = 0.05, 
                        noise_variance = NULL, 
@@ -50,6 +52,8 @@ get_purity <- function(x, pos, weight = 1, cutoff = 0.05,
 #' @return Returns the average variance of the signal over the retention times
 #' defined as noise according to \code{\link{find_noise}}.
 #' @author Ethan Bass
+#' @noRd
+
 get_noise_variance <- function(x, noise_threshold = .01, lambdas){
   if (missing(lambdas)){
     lambdas <- seq_len(ncol(x))
@@ -70,25 +74,18 @@ get_noise_variance <- function(x, noise_threshold = .01, lambdas){
 #' @return Returns indices of retention times where the signal falls below the
 #' specified noise threshold.
 #' @author Ethan Bass
+#' @noRd
+
 find_noise <- function(x, noise_threshold = 0.01, lambdas){
   max_abs <- apply(x[,lambdas, drop = FALSE], 1, max)
   which(max_abs < max(max_abs, na.rm = TRUE) * noise_threshold)
 }
 
-# alternatively, we cuould define the baseline as areas where no peak is detected,
-# since we've already done peak detection.
-
-# matplot(chrom[,lambda],type='l')
-# i<-find_noise(chrom, thresh=.005, lambdas=c(220:400))
-# points(i, chrom[i,lambda],col="red",pch=20)
-
-# noise_variance <- get_noise_variance(chrom)
-
 #' Calculate purity thresholds
 #' @param x A chromatogram in matrix format
 #' @param pos A vector containing peak information
 #' @param weight scaling parameter affecting stringency of threshold.
-#' @param noise_variance Variance of noise. Argument to \code{\link{get_agilent_threshold}}.
+#' @param noise_variance Variance of noise.
 #' @param noise_threshold Threshold to define noise. Highest proportion of maximum absorbance.
 #' @param lambdas Wavelengths to include
 #' @return Returns a vector of purity thresholds at each retention time index
@@ -98,6 +95,9 @@ find_noise <- function(x, noise_threshold = 0.01, lambdas){
 #' Agilent Technologies, April 1, 2003, 16.
 #' /href{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
 #' @author Ethan Bass
+#' @keywords internal
+#' @export
+
 get_agilent_threshold <- function(x, pos, weight = 1, noise_variance = NULL,
                                   noise_threshold = .005,
                                   lambdas){
@@ -129,6 +129,7 @@ get_agilent_threshold <- function(x, pos, weight = 1, noise_variance = NULL,
 #' Agilent Technologies, April 1, 2003, 16.
 #' /href{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
 #' @author Ethan Bass
+#'@noRd
 
 get_spectral_similarity <- function(x, pos){
   idx <- seq(as.numeric(pos[2]), as.numeric(pos[3]))
@@ -149,6 +150,7 @@ get_spectral_similarity <- function(x, pos){
 #' Agilent Technologies, April 1, 2003, 16.
 #' /href{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
 #' @author Ethan Bass
+#' @noRd
 
 get_purity_values <- function(x, pos, weight = 1, noise_variance = NULL, 
                               noise_threshold = 0.005,
@@ -170,6 +172,9 @@ get_purity_values <- function(x, pos, weight = 1, noise_variance = NULL,
 #' @return Returns indices within the peak specified by \code{pos} with a higher
 #' signal intensity than the specified cutoff.
 #' @author Ethan Bass
+#' @keywords internal
+#' @export
+
 trim_peak <- function(x, pos, cutoff = 0.05){
   idx <- pos[2]:pos[3]
   which(x[idx] > cutoff*x[pos[1]])

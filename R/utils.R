@@ -1,4 +1,7 @@
 #' Check that peak_table is of proper class
+#' 
+#' This function validates that the provided object is of the \code{peak_table}
+#' class.
 #' @author Ethan Bass
 #' @noRd
 check_peaktable <- function(peak_table){
@@ -10,12 +13,11 @@ check_peaktable <- function(peak_table){
 #' @param peak_table Peak table object
 #' @author Ethan Bass
 #' @noRd
-
 get_chrom_list <- function(x, chrom_list, verbose = FALSE){
   if (missing(chrom_list)){
     if (inherits(x, "peak_table")){
       string <- x$args[["chrom_list"]]
-    } else if (inherits(x, "peak_list")){
+    } else if (inherits(x, "peak_list") | inherits(x, "ptw_list")){
       string <- attr(x, "chrom_list")
     }
     if (grepl("\\[*\\]", string)){
@@ -38,7 +40,8 @@ get_chrom_list <- function(x, chrom_list, verbose = FALSE){
   chrom_list
 }
 
-#' Extract idx from string
+#' Extracts idx from string
+#' 
 #' @noRd
 extract_idx <- function(string, chrom_names){
   idx <- sub(".*?\\[(.*?)\\].*", "\\1", string)
@@ -155,9 +158,9 @@ elementwise.all.equal <- Vectorize(function(x, y, ...) {isTRUE(all.equal(x, y, .
 #' Get times
 #' @return Numeric vector of retention times.
 #' @noRd
-get_times <- function(x, index = 1){
+get_times <- function(x, idx = 1){
   if (inherits(x, "chrom_list") | inherits(x, "list")){
-    as.numeric(rownames(x[[index]]))
+    as.numeric(rownames(x[[idx]]))
   } else if (inherits(x, "matrix")){
     as.numeric(rownames(x))
   }
@@ -173,12 +176,17 @@ get_lambdas <- function(chrom_list){
 #' Get time resolution
 #' @return Returns average gap between time points.
 #' @noRd
-get_time_resolution <- function(chrom_list, index = 1){
-  ts <- get_times(x = chrom_list, index = index)
+get_time_resolution <- function(chrom_list, idx = 1){
+  ts <- get_times(x = chrom_list, idx = idx)
   signif(median(diff(ts)))
 }
 
 #' Check for suggested package
+#' 
+#' This function checks for a suggested package and returns an error if the 
+#' package is not installed (if \code{return_boolean} is FALSE. Otherwise, it 
+#' returns a boolean value.
+#' 
 #' @noRd
 check_for_pkg <- function(pkg, return_boolean = FALSE){
   pkg_exists <- requireNamespace(pkg, quietly = TRUE)
@@ -193,7 +201,7 @@ check_for_pkg <- function(pkg, return_boolean = FALSE){
   }
 }
 
-#' Extract variables from the left-hand-side of a formula
+#' Extract variables from the left-hand-side of a formula.
 #' @param formula A \code{\link{formula}} object.
 #' @importFrom Formula Formula
 #' @noRd
@@ -222,10 +230,14 @@ get_lhs_vars <- function(formula) {
   all.vars(form)
 }
 
-#' Transfer metadata between objects
+#' Transfer metadata
+#' Transfers metadata attributes between objects.
 #' @noRd
-transfer_metadata <- function(new_object, old_object,
-                              exclude = c('names','row.names','class','dim','dimnames')){
+transfer_metadata <- function(new_object, old_object, transfer_class = TRUE,
+                              exclude = c('names','row.names','dim','dimnames')){
+  if (!transfer_class){
+    exclude <- c(exclude, "class")
+  }
   a <- attributes(old_object)
   a[exclude] <- NULL
   attributes(new_object) <- c(attributes(new_object), a)
@@ -233,6 +245,8 @@ transfer_metadata <- function(new_object, old_object,
 }
 
 #' Choose apply function
+#' This function chooses an apply function based on arguments provided by the
+#' user. The options are \code{lapply}, \code{pblapply} and \code{mclapply}.
 #' @importFrom parallel mclapply
 #' @return Returns \code{\link[pbapply]{pblapply}} if \code{progress_bar == TRUE},
 #' otherwise returns \code{\link{lapply}}.
@@ -246,7 +260,8 @@ choose_apply_fnc <- function(show_progress, parallel = NULL, cl = 2){
   }
   
   if (is.null(parallel)){
-    if (!is.null(cl) && (class(cl)[1] == "SOCKcluster" || (is_not_windows && cl > 1))){
+    if (!is.null(cl) && 
+        (class(cl)[1] == "SOCKcluster" || (is_not_windows && cl > 1))){
       parallel <- TRUE
     } else {
       parallel <- FALSE
@@ -273,6 +288,14 @@ choose_apply_fnc <- function(show_progress, parallel = NULL, cl = 2){
   fn
 }
 
+#' Get y bounds
+#' @noRd
+get_y_bounds <- function(x, idx, lambdas.idx, pad = 1.1){
+  mn <- get_minimum(x, idx = idx, lambdas.idx = lambdas.idx)
+  mx <- get_maximum(x, idx, lambdas.idx = lambdas.idx)*pad
+  c(mn, mx)
+}
+
 #' Get maximum
 #' @noRd
 get_maximum <- function(x, idx, lambdas.idx){
@@ -287,12 +310,4 @@ get_minimum <- function(x, idx, lambdas.idx){
   min(sapply(x[idx], function(xx){
     min(xx[, lambdas.idx], na.rm = TRUE)
   }))
-}
-
-#' Get y bounds
-#' @noRd
-get_y_bounds <- function(x, idx, lambdas.idx, pad = 1.1){
-  mn <- get_minimum(x, idx = idx, lambdas.idx = lambdas.idx)
-  mx <- get_maximum(x, idx, lambdas.idx = lambdas.idx)*pad
-  c(mn, mx)
 }

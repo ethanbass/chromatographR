@@ -9,7 +9,7 @@
   loc,
   chrom_list,
   what = "peak",
-  chr = "max",
+  idx = "max",
   lambda = "max",
   plot_spectrum = TRUE,
   plot_trace = TRUE,
@@ -20,6 +20,7 @@
   export_spectrum = FALSE,
   verbose = TRUE,
   engine = c("base", "plotly", "ggplot"),
+  chr = NULL,
   ...
 )
 }
@@ -37,7 +38,7 @@ wavelengths). If no argument is provided here, the function will try to find the
 for a certain peak, \code{rt} to scan by retention time, or \code{click} to manually
 select retention time by clicking on the chromatogram. Defaults to \code{peak}.}
 
-\item{chr}{Numerical index of chromatogram you wish to plot; "max" to
+\item{idx}{Numerical index of chromatogram you wish to plot; "max" to
 plot the chromatogram with the largest signal; or "all" to plot spectra
 for all chromatograms.}
 
@@ -69,6 +70,8 @@ Defaults to FALSE.}
 to TRUE.}
 
 \item{engine}{Which plotting engine to use: either \code{base} or \code{plotly}.}
+
+\item{chr}{Deprecated. Please use \code{idx} instead.}
 
 \item{...}{Additional arguments to \code{\link[graphics]{boxplot}}.}
 }
@@ -105,3 +108,4 @@ specified peak with groups provided by \code{vars}.
 \author{
 Ethan Bass
 }
+\concept{Visualization}

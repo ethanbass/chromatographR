@@ -4,7 +4,7 @@
 \alias{reshape_peaktable}
 \title{Reshapes peak table from wide to long format}
 \usage{
-reshape_peaktable(x, peaks, metadata)
+reshape_peaktable(x, peaks, metadata, fixed_levels = TRUE)
 }
 \arguments{
 \item{x}{A \code{peak_table} object.}
@@ -14,6 +14,9 @@ character vector is named, the names of the vector elements will be used in
 place of the original peak names.}
 
 \item{metadata}{A character vector specifying the metadata fields to include.}
+
+\item{fixed_levels}{Logical. Whether to fix factor levels of features in the
+order provided. Defaults to \code{TRUE}.}
 }
 \value{
 A data.frame containing the information for the specified peaks in

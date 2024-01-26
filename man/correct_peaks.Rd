@@ -4,16 +4,19 @@
 \alias{correct_peaks}
 \title{Correct peak positions according to a ptw warping model}
 \usage{
-correct_peaks(peak_list, mod_list)
+correct_peaks(peak_list, mod_list, chrom_list)
 }
 \arguments{
-\item{peak_list}{A nested list of peak tables: the first level is the sample,
-and the second level is the component. Every component is described by a
-matrix where every row is one peak, and the columns contain information on
-retention time, full width at half maximum (FWHM), peak width, height, and
+\item{peak_list}{A `peak_list` object created by \code{\link{get_peaks}},
+containing a nested list of peak tables where the first level is the sample,
+and the second level is the spectral wavelength. Every component is described
+by a matrix where every row is one peak, and the columns contain information on
+retention time, peak width (FWHM), peak width, height, and
 area.}
 
 \item{mod_list}{A list of ptw models.}
+
+\item{chrom_list}{List of chromatograms supplied to create ptw models.}
 }
 \value{
 The input list of peak tables is returned with extra columns
@@ -28,9 +31,14 @@ Once an appropriate warping model has been established, corrected retention
 times can be predicted for each peak. These are stored in a separate column
 in the list of peak tables.
 }
+\note{
+This function is adapted from
+\href{https://github.com/rwehrens/alsace/blob/master/R/correctPeaks.R}{getPeakTable}
+function in the alsace package by Ron Wehrens.
+}
 \seealso{
 \code{\link{correct_rt}}
 }
 \author{
-Ron Wehrens
+Ron Wehrens, Ethan Bass
 }
