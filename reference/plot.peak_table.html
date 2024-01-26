@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,7 @@
 <span>  <span class="va">loc</span>,</span>
 <span>  <span class="va">chrom_list</span>,</span>
 <span>  what <span class="op">=</span> <span class="st">"peak"</span>,</span>
-<span>  chr <span class="op">=</span> <span class="st">"max"</span>,</span>
+<span>  idx <span class="op">=</span> <span class="st">"max"</span>,</span>
 <span>  lambda <span class="op">=</span> <span class="st">"max"</span>,</span>
 <span>  plot_spectrum <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  plot_trace <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -71,6 +71,7 @@
 <span>  export_spectrum <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  engine <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"base"</span>, <span class="st">"plotly"</span>, <span class="st">"ggplot"</span><span class="op">)</span>,</span>
+<span>  chr <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -98,7 +99,7 @@ for a certain peak, <code>rt</code> to scan by retention time, or <code>click</c
 select retention time by clicking on the chromatogram. Defaults to <code>peak</code>.</p></dd>
 
 
-<dt>chr</dt>
+<dt>idx</dt>
 <dd><p>Numerical index of chromatogram you wish to plot; "max" to
 plot the chromatogram with the largest signal; or "all" to plot spectra
 for all chromatograms.</p></dd>
@@ -151,6 +152,10 @@ to TRUE.</p></dd>
 
 <dt>engine</dt>
 <dd><p>Which plotting engine to use: either <code>base</code> or <code>plotly</code>.</p></dd>
+
+
+<dt>chr</dt>
+<dd><p>Deprecated. Please use <code>idx</code> instead.</p></dd>
 
 
 <dt>...</dt>

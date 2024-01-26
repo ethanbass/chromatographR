@@ -16,7 +16,7 @@ were integrated at more than one wavelength or component. Specify tolerance
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -118,7 +118,6 @@ columns combined according to the specified criteria.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">pk_tab</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Sa_warp</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">pk_tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="attach_ref_spectra.html">attach_ref_spectra</a></span><span class="op">(</span><span class="va">pk_tab</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>number of items to replace is not a multiple of replacement length</span>
 <span class="r-in"><span><span class="fu">combine_peaks</span><span class="op">(</span><span class="va">pk_tab</span>, tol <span class="op">=</span> <span class="fl">.02</span>, min.cor <span class="op">=</span> <span class="fl">.9</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           V1        V2        V3       V4        V5        V6        V7</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 119 547.5999   0.00000  64.73611 188.9210 1514.4775  31.08266  7972.271</span>

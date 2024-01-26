@@ -12,7 +12,7 @@ implemented in ptw."><meta property="og:image" content="https://ethanbass.github
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,21 +57,26 @@ implemented in <code><a href="https://rdrr.io/pkg/ptw/man/ptw.html" class="exter
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">correct_peaks</span><span class="op">(</span><span class="va">peak_list</span>, <span class="va">mod_list</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">correct_peaks</span><span class="op">(</span><span class="va">peak_list</span>, <span class="va">mod_list</span>, <span class="va">chrom_list</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
     <dl><dt>peak_list</dt>
-<dd><p>A nested list of peak tables: the first level is the sample,
-and the second level is the component. Every component is described by a
-matrix where every row is one peak, and the columns contain information on
-retention time, full width at half maximum (FWHM), peak width, height, and
+<dd><p>A `peak_list` object created by <code><a href="get_peaks.html">get_peaks</a></code>,
+containing a nested list of peak tables where the first level is the sample,
+and the second level is the spectral wavelength. Every component is described
+by a matrix where every row is one peak, and the columns contain information on
+retention time, peak width (FWHM), peak width, height, and
 area.</p></dd>
 
 
 <dt>mod_list</dt>
 <dd><p>A list of ptw models.</p></dd>
+
+
+<dt>chrom_list</dt>
+<dd><p>List of chromatograms supplied to create ptw models.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -88,12 +93,18 @@ times can be predicted for each peak. These are stored in a separate column
 in the list of peak tables.</p>
     </div>
     <div class="section level2">
+    <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
+    <p>This function is adapted from
+<a href="https://github.com/rwehrens/alsace/blob/master/R/correctPeaks.R" class="external-link">getPeakTable</a>
+function in the alsace package by Ron Wehrens.</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p><code><a href="correct_rt.html">correct_rt</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
-    <p>Ron Wehrens</p>
+    <p>Ron Wehrens, Ethan Bass</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

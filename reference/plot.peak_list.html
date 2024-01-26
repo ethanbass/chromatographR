@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,7 +59,7 @@
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  <span class="va">chrom_list</span>,</span>
-<span>  index <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  idx <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  lambda <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  points <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ticks <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -70,7 +70,8 @@
 <span>  cex.font <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  y.offset <span class="op">=</span> <span class="fl">25</span>,</span>
 <span>  plot_purity <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  <span class="va">res</span></span>
+<span>  <span class="va">res</span>,</span>
+<span>  index <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -89,7 +90,7 @@
 matrices)</p></dd>
 
 
-<dt>index</dt>
+<dt>idx</dt>
 <dd><p>Index or name of chromatogram to be plotted.</p></dd>
 
 
@@ -136,6 +137,10 @@ to FALSE.</p></dd>
 
 <dt>res</dt>
 <dd><p>time resolution for peak fitting</p></dd>
+
+
+<dt>index</dt>
+<dd><p>This argument is deprecated. Please use <code>idx</code> instead.</p></dd>
 
 </dl></div>
     <div class="section level2">

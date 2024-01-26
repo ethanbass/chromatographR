@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,13 +56,14 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">scan_chrom</span><span class="op">(</span></span>
 <span>  <span class="va">chrom_list</span>,</span>
-<span>  <span class="va">chr</span>,</span>
+<span>  <span class="va">idx</span>,</span>
 <span>  <span class="va">lambda</span>,</span>
 <span>  plot_spectrum <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  peak_table <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  scale_spectrum <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  spectrum_labels <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  export_spectrum <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  chr <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -75,7 +76,7 @@ wavelengths). If no argument is provided here, the function will try to find
 the <code>chrom_list</code> object used to create the provided <code>peak_table</code>.</p></dd>
 
 
-<dt>chr</dt>
+<dt>idx</dt>
 <dd><p>Numerical index of chromatogram you wish to plot.</p></dd>
 
 
@@ -105,6 +106,10 @@ plot. Defaults to TRUE.</p></dd>
 <dt>export_spectrum</dt>
 <dd><p>Logical. If TRUE, exports spectrum to console.
 Defaults to FALSE.</p></dd>
+
+
+<dt>chr</dt>
+<dd><p>Deprecated. Please use <code>idx</code> instead.</p></dd>
 
 
 <dt>...</dt>
@@ -140,7 +145,7 @@ chromatogram at the user-specified retention time. The spectrum is a single</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># interactive()</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Sa_pr</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">scan_chrom</span><span class="op">(</span><span class="va">Sa_pr</span>, lambda<span class="op">=</span><span class="st">"210"</span>, chr<span class="op">=</span><span class="fl">2</span>, export_spectrum<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">scan_chrom</span><span class="op">(</span><span class="va">Sa_pr</span>, lambda <span class="op">=</span> <span class="st">"210"</span>, idx <span class="op">=</span> <span class="fl">2</span>, export_spectrum <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>

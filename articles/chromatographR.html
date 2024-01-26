@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,7 +80,7 @@
 Bass<sup>1</sup>
 </h4>
             
-            <h4 data-toc-skip class="date">2023-12-10</h4>
+            <h4 data-toc-skip class="date">2024-01-26</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/HEAD/vignettes/chromatographR.Rmd" class="external-link"><code>vignettes/chromatographR.Rmd</code></a></small>
       <div class="d-none name"><code>chromatographR.Rmd</code></div>
@@ -128,9 +128,8 @@ table.</p>
 </h3>
 <p>chromatographR can import data from a growing list of proprietary
 file formats using the <code>read_chroms</code> function. Supported file
-formats include ‘Agilent ChemStation’ or ‘MassHunter’ (<code>.D</code>)
-files <span class="citation">(Bovee, Bass, and Johnson 2022; Bovee
-2022)</span>, ‘Thermo Raw’ (<code>.raw</code>) <span class="citation">(Hulstaert et al. 2020)</span>, ‘Chromeleon’ UV ASCII
+formats include ‘Agilent ChemStation’ and ‘MassHunter’ (<code>.D</code>)
+files, ‘Thermo Raw’ (<code>.raw</code>), ‘Chromeleon’ UV ASCII
 (<code>.txt</code>), ‘Waters ARW’ (<code>.arw</code>), ‘Shimadzu’ ASCII
 (<code>.txt</code>), and more. (For a full list, see the <a href="https://ethanbass.github.io/chromConverter/" class="external-link">chromConverter
 documentation</a>). Select the appropriate file format by specifying the
@@ -141,7 +140,7 @@ documentation</a>). Select the appropriate file format by specifying the
 &gt; read_chroms(paths = path, format_in = "chemstation_uv")
 &gt; 
 &gt; # multiple folders
-&gt; path = 'foo' # path to parent directory
+&gt; path &lt;- 'foo' # path to parent directory
 &gt; folders &lt;- list.files(path = path, full.names = TRUE)
 &gt; dat &lt;- read_chroms(folders, format_in = "chemstation_uv")</code></pre>
 </div>
@@ -172,23 +171,27 @@ downstream analyses. All of these functions (smoothing, baseline
 correction, and interpolation) are available through the
 <code>preprocess</code> function and are enabled by default.</p>
 <p>To select a narrower range of times and/or wavelengths, arguments can
-be provided to <code>dim1</code> and <code>dim2</code> arguments. The
-<code>baseline_cor</code> function from the <em>ptw</em> package <span class="citation">(Bloemberg et al. 2010)</span> takes arguments
-<code>p</code> (an asymmetry parameter) and <code>lambda</code> (a
-smoothing parameter). You can read more about these in the documentation
-for <code><a href="https://rdrr.io/pkg/ptw/man/asysm.html" class="external-link">ptw::asysm</a></code>. You may want to experiment with these
-parameters before choosing values to use on your whole dataset.</p>
-<pre class="text"><code>&gt; i=2 # chromatogram number in list of data
+be provided to the optional <code>dim1</code> and <code>dim2</code>
+arguments. The <code>baseline_cor</code> function from the <em>ptw</em>
+package <span class="citation">(Bloemberg et al. 2010)</span> takes
+arguments <code>p</code> (an asymmetry parameter) and
+<code>lambda</code> (a smoothing parameter). You can read more about
+these in the documentation for <code><a href="https://rdrr.io/pkg/ptw/man/asysm.html" class="external-link">ptw::asysm</a></code>. You may want to
+experiment with these parameters before choosing values to use on your
+whole dataset.</p>
+<pre class="text"><code>&gt; i &lt;- 2 # chromatogram number in list of data
 &gt; tpoints &lt;- as.numeric(rownames(Sa[[i]]))
-&gt; lambda='200.00000'
+&gt; lambda &lt;- '200.00000'
 &gt; 
-&gt; matplot(x=tpoints, y=Sa[[i]][,lambda],
-+        type='l', ylab='Abs (mAU)', xlab='Time (min)')
-&gt; matplot(x=tpoints, y = ptw::baseline.corr(Sa[[i]][,lambda],p = .001,lambda = 1e5),
-+        type='l', add = TRUE, col='blue', lty = 3)</code></pre>
+&gt; matplot(x = tpoints, y = Sa[[i]][,lambda],
++        type = 'l', ylab = 'Abs (mAU)', xlab = 'Time (min)')
+&gt; matplot(x = tpoints, y = ptw::baseline.corr(Sa[[i]][,lambda], p = .001, lambda = 1e5),
++        type = 'l', add = TRUE, col='blue', lty = 3)</code></pre>
 <p><img src="chromatographR_files/figure-html/choose_parameters_for_fitting_baseline-1.png" width="600px"></p>
+<p>After selecting parameters for baseline correction, you can proceed
+with the pre-processing step as shown below.</p>
 <pre class="text"><code>&gt; # choose dimensions for interpolation
-&gt; new.ts &lt;- seq(10,18.66,by=.01) # choose time-points
+&gt; new.ts &lt;- seq(10, 18.66, by = .01) # choose time-points
 &gt; new.lambdas &lt;- seq(200, 318, by = 2) # choose wavelengths
 &gt; 
 &gt; dat.pr &lt;- preprocess(Sa, dim1 = new.ts, dim2 = new.lambdas,
@@ -215,6 +218,14 @@ time-axis of each supplied chromatogram to match a reference
 chromatogram. (The reference chromatogram can either be determined
 algorithmically or selected manually by setting the
 <code>reference</code> argument).</p>
+<p>First, we check the alignment of our chromatograms using the
+<code>plot_chroms</code> function.</p>
+<pre class="text"><code>&gt; plot_chroms(dat.pr, lambdas = 210)</code></pre>
+<p><img src="chromatographR_files/figure-html/check%20alignment-1.png" width="600px"></p>
+<p>Our chromatograms appear to be shifted, as shown by the poor overlap
+of the chromatograms across our four samples. To remedy this problem, we
+can try to “warp” our chromatograms using one of the two options
+described above.</p>
 <div class="section level4">
 <h4 id="parametric-time-warping">Parametric time warping<a class="anchor" aria-label="anchor" href="#parametric-time-warping"></a>
 </h4>
@@ -232,7 +243,7 @@ Sometimes less can actually be more here – for example, wavelengths with
 fewer peaks may sometimes yield better warping models. (Also see the
 documentation for <a href="https://CRAN.R-project.org/package=ptw" class="external-link">ptw</a> for more guidance
 on warp function optimization).</p>
-<pre class="text"><code>&gt; warping.models &lt;- correct_rt(dat.pr, what = "models", lambdas = c("210"), scale = TRUE)
+<pre class="text"><code>&gt; warping.models &lt;- correct_rt(dat.pr, what = "models", lambdas = c(210), scale = TRUE)
 &gt; warp &lt;- correct_rt(chrom_list = dat.pr, models = warping.models, what = "corrected.values")</code></pre>
 <p>We can then use the following code snippet to compare the alignment
 of warped (top panel) and unwarped (bottom panel) chromatograms.</p>
@@ -240,11 +251,11 @@ of warped (top panel) and unwarped (bottom panel) chromatograms.</p>
 &gt; 
 &gt; par(mfrow=c(2,1))
 &gt; # plot warped data
-&gt; plot_chroms(warp, lambdas = c("210"))
+&gt; plot_chroms(warp, lambdas = c(210))
 &gt; legend("topleft", legend="ptw", bty = "n")
 &gt; 
 &gt; # plot unwarped data
-&gt; plot_chroms(dat.pr, lambdas = c("210"))
+&gt; plot_chroms(dat.pr, lambdas = c(210))
 &gt; legend("topleft", legend="raw", bty = "n")</code></pre>
 <p><img src="chromatographR_files/figure-html/alignment_plot-1.png" width="600px"></p>
 <pre class="text"><code>&gt; par(oldpar) # restore par settings</code></pre>
@@ -280,43 +291,44 @@ first chromatogram as a reference. The <code>penalty</code> and
 <code>maxshift</code> parameters can be adjusted to control the degree
 of warping.</p>
 <pre class="text"><code>&gt; # align chromatograms with variable penalty dynamic time warping
-&gt; warp &lt;- correct_rt(chrom_list = dat.pr, alg = "vpdtw", lambdas = "210", what = "corrected.values", reference = 1)</code></pre>
+&gt; warp &lt;- correct_rt(chrom_list = dat.pr, alg = "vpdtw", lambdas = 210, what = "corrected.values", reference = 1)</code></pre>
 <pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE) # save current par settings
 &gt; 
 &gt; par(mfrow=c(2,1))
-&gt; plot_chroms(warp, lambdas = c("210"))
+&gt; plot_chroms(warp, lambdas = c(210))
 &gt; legend("topleft", legend = "vpdtw", bty = "n")
 &gt; 
-&gt; plot_chroms(dat.pr, lambdas = c("210"))
+&gt; plot_chroms(dat.pr, lambdas = c(210))
 &gt; legend("topleft", legend = "raw", bty = "n")</code></pre>
 <p><img src="chromatographR_files/figure-html/plot_chroms-1.png" width="600px"></p>
 <pre class="text"><code>&gt; par(oldpar) # restore par settings</code></pre>
 <p>In this case the alignments produced by the two algorithms are very
-similar, but in many cases one algorithm may dramatically outperform the
+similar, but in some cases one algorithm may dramatically outperform the
 other.</p>
 </div>
 </div>
 <div class="section level3">
-<h3 id="peak-finding-and-fitting">Peak finding and fitting<a class="anchor" aria-label="anchor" href="#peak-finding-and-fitting"></a>
+<h3 id="peak-detection-and-integration">Peak detection and integration<a class="anchor" aria-label="anchor" href="#peak-detection-and-integration"></a>
 </h3>
 <p>The <code>get_peaks</code> function produced a nested list of peaks
 by looping through the supplied chromatograms at the specified
 wavelengths, finding peaks, and fitting them to the specified function
-using non-linear least squares. The current peak-shape options are
-exponential-gaussian hybrid (<code>egh</code>) <span class="citation">(Lan and Jorgenson 2001)</span>, <code>gaussian</code>,
-or (<code>raw</code>) . The area under the curve for each peak is then
-estimated using trapezoidal approximation. Alternatively, peak area can
-be integrated without applying a model (<code>raw</code>). The function
-returns a nested list of data.frames containing parameters for the peaks
+using non-linear least squares. The area under the curve for each peak
+is then estimated using trapezoidal approximation. The <code>fit</code>
+argument can be used to specify a peak-fitting model. The current
+options are exponential-gaussian hybrid (<code>egh</code>) <span class="citation">(Lan and Jorgenson 2001)</span> (the default setting)
+or <code>gaussian</code>. Alternatively, peak areas can be integrated
+without applying a model (<code>fit = raw</code>). The function returns
+a nested list of data.frames containing parameters for the peaks
 identified in each chromatogram.</p>
 <pre class="text"><code>&gt; # find and integrate peaks using gaussian peak fitting
-&gt; pks_gauss &lt;- get_peaks(warp, lambdas = c('210'), sd.max = 40, fit = "gaussian")
+&gt; pks_gauss &lt;- get_peaks(warp, lambdas = c(210), sd.max = 40, fit = "gaussian")
 &gt; 
 &gt; # find and integrate peaks using exponential-gaussian hybrid model
-&gt; pks_egh &lt;- get_peaks(warp, lambdas = c('210'), sd.max = 40, fit="egh")
+&gt; pks_egh &lt;- get_peaks(warp, lambdas = c(210), sd.max = 40, fit="egh")
 &gt; 
 &gt; # find and integrate peaks without modeling peak shape
-&gt; pks_raw &lt;- get_peaks(warp, lambdas = c('210'), sd.max = 100, fit="raw")</code></pre>
+&gt; pks_raw &lt;- get_peaks(warp, lambdas = c(210), sd.max = 100, fit="raw")</code></pre>
 <div class="section level4">
 <h4 id="filtering">Filtering<a class="anchor" aria-label="anchor" href="#filtering"></a>
 </h4>
@@ -335,16 +347,16 @@ construction. This can be accomplished directly by using the arguments
 </h4>
 <p>The <code>plot.peak_list</code> function allows you to visually
 assess the peak integration accuracy. Below we compare the peaks fitted
-for the first chromatogram (<code>index = 1</code>) using the two
+for the first chromatogram (<code>idx = 1</code>) using the two
 algorithms. Usually the egh function performs slightly better for
 asymmetrical peaks. Even though the peaks are fully filled in when the
 <code>raw</code> setting is selected, the results may not necessarily be
 more accurate.</p>
 <pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE) # save current par settings
 &gt; par(mfrow=c(3,1))
-&gt; plot(pks_gauss, index = 1, lambda = '210')
-&gt; plot(pks_egh, index = 1, lambda = '210')
-&gt; plot(pks_raw, index = 1, lambda = '210')</code></pre>
+&gt; plot(pks_gauss, idx = 1, lambda = 210)
+&gt; plot(pks_egh, idx = 1, lambda = 210)
+&gt; plot(pks_raw, idx = 1, lambda = 210)</code></pre>
 <p><img src="chromatographR_files/figure-html/plot_peaks-1.png" width="600px"></p>
 <pre class="text"><code>&gt; par(oldpar) # restore par settings</code></pre>
 </div>
@@ -356,14 +368,14 @@ more accurate.</p>
 function performs complete-linkage hierarchical clustering to link peaks
 across samples. It returns a <code>peak_table</code> object with samples
 as rows and peaks as columns. The <code>peak_table</code> object also
-has slots for holding metadata about peaks, samples, and analyses. If
-you have a lot of samples, this step can be quite computationally
-expensive. Thus, it is suggested to filter the peak_list provided to
-<code>get_peaktable</code> in order to remove extraneous peaks (see
-<em>Peak finding and fitting</em> section above). Peaks can also be
-filtered after <code>peak_table</code> assembly using the
-<code>filter_peaktable</code> function. An important parameter here is
-<code>hmax</code> which controls the stringency with which retention
+has slots for holding metadata about peaks, samples, and the parameters
+used in the analysis. If you have a lot of samples, this step can be
+quite computationally expensive. Thus, it is suggested to filter the
+peak_list provided to <code>get_peaktable</code> in order to remove
+extraneous peaks (see <em>Peak finding and fitting</em> section above).
+Peaks can also be filtered after <code>peak_table</code> assembly using
+the <code>filter_peaktable</code> function. An important parameter here
+is <code>hmax</code> which controls the stringency with which retention
 times are matched across samples. A low value of <code>hmax</code> will
 increase the odds of splitting a single peaks across multiple columns,
 while a high value of <code>hmax</code> will increase the odds of
@@ -402,17 +414,39 @@ weight) using the <code>normalize_data</code> function.</p>
 &gt; # attach metadata
 &gt; pk_tab &lt;- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
 &gt; # normalize peak table by sample mass
-&gt; pk_tab &lt;- normalize_data(peak_table = pk_tab, column="mass")</code></pre>
+&gt; pk_tab &lt;- normalize_data(peak_table = pk_tab, column = "mass")</code></pre>
 </div>
 <div class="section level4">
-<h4 id="data-exploration">Data exploration<a class="anchor" aria-label="anchor" href="#data-exploration"></a>
+<h4 id="attaching-reference-spectra">Attaching reference spectra<a class="anchor" aria-label="anchor" href="#attaching-reference-spectra"></a>
+</h4>
+<p>Optionally, you can attach scaled reference spectra to the peak_table
+using the <code>attach_ref_spectra</code> function. This can be helpful
+for working with UV spectra programmatically (e.g. to sort peaks by
+their chromophores). Reference spectra are defined either as the
+spectrum with the highest intensity for each peak (when
+<code>ref = "max.int"</code>) or as the spectrum with the highest
+average correlation to the other spectra associated with the peak (when
+<code>ref = "max.cor</code>). Below, we show how these spectra can be
+used to construct a correlation matrix to find peaks matching a
+particular chromophore.</p>
+<pre class="text"><code>&gt; pk_tab &lt;- attach_ref_spectra(pk_tab, ref="max.int")
+&gt; cor_matrix &lt;- cor(pk_tab$ref_spectra)
+&gt; hx &lt;- names(which(cor_matrix[,"V20"] &gt; .99))
+&gt; matplot(x = as.numeric(rownames(pk_tab$ref_spectra)),
++                    y = pk_tab$ref_spectra[,hx], type = 'l',
++                    ylab = "Abs (mAU)", 
++                    xlab = "Wavelength (nm)")</code></pre>
+<p><img src="chromatographR_files/figure-html/unnamed-chunk-3-1.png" width="600px"></p>
+</div>
+<div class="section level4">
+<h4 id="data-visualization">Data visualization<a class="anchor" aria-label="anchor" href="#data-visualization"></a>
 </h4>
 <div class="section level5">
 <h5 id="mirror-plot">Mirror plot<a class="anchor" aria-label="anchor" href="#mirror-plot"></a>
 </h5>
 <p>The <code>mirror_plot</code> function provides a quick way to
 visually compare results across treatment groups.</p>
-<pre class="text"><code>&gt; mirror_plot(pk_tab, lambdas = c("210"), var = "trt", legend_size = 2)</code></pre>
+<pre class="text"><code>&gt; mirror_plot(pk_tab, lambdas = c(210), var = "trt", legend_size = 2)</code></pre>
 <p><img src="chromatographR_files/figure-html/mirror_plot-1.png" width="600px"></p>
 </div>
 <div class="section level5">
@@ -429,21 +463,23 @@ spectrum or only the chromatographic trace using the arguments
 <code>plot_spectrum</code> and <code>plot_trace</code>. By default it
 will plot the trace and spectrum from the chromatogram with the largest
 peak in the peak table. Alternatively, you can choose the chromatogram
-index and wavelength using the <code>chr</code> and <code>lambda</code>
+index and wavelength using the <code>idx</code> and <code>lambda</code>
 arguments.</p>
 <pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE) # save current par settings
 &gt; 
 &gt; par(mfrow = c(2,1))
-&gt; peak = "V7"
-&gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp, verbose = FALSE)</code></pre>
+&gt; peak &lt;- "V7"
+&gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp, 
++               verbose = FALSE)</code></pre>
 <p><img src="chromatographR_files/figure-html/plot_spectra-1.png" width="600px"></p>
 <pre class="text"><code>&gt; par(oldpar) # restore par settings</code></pre>
 <p>The <code>plot_spectrum</code> function can also be used to generate
 interactive plots using <a href="https://plotly.com/r/" class="external-link">plotly</a>.</p>
-<pre class="text"><code>&gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp, verbose = FALSE, engine = "plotly")</code></pre>
+<pre class="text"><code>&gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp, 
++               verbose = FALSE, engine = "plotly")</code></pre>
 <p>The <code>plot_all_spectra</code> function can be used to visually
 compare the spectra for a specified peak across all samples.</p>
-<pre class="text"><code>&gt; peak = "V13"
+<pre class="text"><code>&gt; peak &lt;- "V13"
 &gt; plot_all_spectra(peak, peak_table = pk_tab, export = FALSE)</code></pre>
 <p><img src="chromatographR_files/figure-html/plot_all_spectra-1.png" width="600px"></p>
 </div>
@@ -475,13 +511,6 @@ H. C. Eilers, Lutgarde M. C. Buydens, and Ron Wehrens. 2010.
 <em>Chemometrics and Intelligent Laboratory Systems</em>,
 <span>OMICS</span>, 104 (1): 65–74. <a href="https://doi.org/10.1016/j.chemolab.2010.04.008" class="external-link">https://doi.org/10.1016/j.chemolab.2010.04.008</a>.
 </div>
-<div id="ref-bovee2022a" class="csl-entry">
-Bovee, Roderick. 2022. <span>“Aston.”</span>
-</div>
-<div id="ref-bovee2022" class="csl-entry">
-Bovee, Roderick, Ethan Bass, and Nate Johnson. 2022. <span>“Bovee/Entab:
-V0.3.1.”</span> Zenodo. <a href="https://doi.org/10.5281/zenodo.7098719" class="external-link">https://doi.org/10.5281/zenodo.7098719</a>.
-</div>
 <div id="ref-clifford2012" class="csl-entry">
 Clifford, David, and Glenn Stone. 2012. <span>“Variable <span>Penalty
 Dynamic Time Warping Code</span> for <span>Aligning Mass Spectrometry
@@ -498,14 +527,6 @@ Warping</span>.”</span> <em>Analytical Chemistry</em> 81 (3): 1000–1007.
 <div id="ref-eilers2004" class="csl-entry">
 Eilers, Paul H. C. 2004. <span>“Parametric <span>Time
 Warping</span>.”</span> <em>Analytical Chemistry</em> 76 (2): 404–11. <a href="https://doi.org/10.1021/ac034800e" class="external-link">https://doi.org/10.1021/ac034800e</a>.
-</div>
-<div id="ref-hulstaert2020" class="csl-entry">
-Hulstaert, Niels, Jim Shofstahl, Timo Sachsenberg, Mathias Walzer,
-Harald Barsnes, Lennart Martens, and Yasset Perez-Riverol. 2020.
-<span>“<span>ThermoRawFileParser</span>: <span>Modular</span>,
-<span>Scalable</span>, and <span>Cross-Platform RAW File
-Conversion</span>.”</span> <em>Journal of Proteome Research</em> 19 (1):
-537–42. <a href="https://doi.org/10.1021/acs.jproteome.9b00328" class="external-link">https://doi.org/10.1021/acs.jproteome.9b00328</a>.
 </div>
 <div id="ref-lan2001" class="csl-entry">
 Lan, Kevin, and James W. Jorgenson. 2001. <span>“A Hybrid of Exponential
@@ -557,32 +578,31 @@ attached base packages:
 [8] base     
 
 other attached packages:
-[1] chromatographR_0.6.1 knitr_1.45          
+[1] chromatographR_0.7.0 knitr_1.45          
 
 loaded via a namespace (and not attached):
  [1] sass_0.4.8            utf8_1.2.4            generics_0.1.3       
- [4] tidyr_1.3.0           bitops_1.0-7          xml2_1.3.6           
- [7] fastcluster_1.2.3     stringi_1.8.2         lattice_0.21-9       
-[10] digest_0.6.33         magrittr_2.0.3        caTools_1.18.2       
+ [4] tidyr_1.3.1           bitops_1.0-7          xml2_1.3.6           
+ [7] fastcluster_1.2.6     stringi_1.8.3         lattice_0.21-9       
+[10] digest_0.6.34         magrittr_2.0.3        caTools_1.18.2       
 [13] chromConverter_0.2.1  evaluate_0.23         grid_4.3.2           
 [16] dynamicTreeCut_1.63-1 fastmap_1.1.1         cellranger_1.1.0     
-[19] rprojroot_2.0.4       jsonlite_1.8.8        Matrix_1.6-1.1       
-[22] Formula_1.2-5         purrr_1.0.2           fansi_1.0.5          
-[25] scales_1.3.0          pbapply_1.7-2         textshaping_0.3.7    
-[28] jquerylib_0.1.4       cli_3.6.1             rlang_1.1.2          
-[31] munsell_0.5.0         ptw_1.9-16            cachem_1.0.8         
-[34] yaml_2.3.7            tools_4.3.2           minpack.lm_1.2-4     
-[37] memoise_2.0.1         dplyr_1.1.4           colorspace_2.1-0     
-[40] pvclust_2.2-0         RcppDE_0.1.7          reticulate_1.34.0    
-[43] vctrs_0.6.5           R6_2.5.1              png_0.1-8            
-[46] lifecycle_1.0.4       stringr_1.5.1         fs_1.6.3             
-[49] ragg_1.2.6            pkgconfig_2.0.3       desc_1.4.2           
-[52] pkgdown_2.0.7         bslib_0.6.1           pillar_1.9.0         
-[55] VPdtw_2.1-14          glue_1.6.2            Rcpp_1.0.11          
-[58] systemfonts_1.0.5     highr_0.10            xfun_0.41            
-[61] tibble_3.2.1          tidyselect_1.2.0      farver_2.1.1         
-[64] htmltools_0.5.7       rmarkdown_2.25        compiler_4.3.2       
-[67] readxl_1.4.3         </code></pre>
+[19] jsonlite_1.8.8        Matrix_1.6-1.1        Formula_1.2-5        
+[22] purrr_1.0.2           fansi_1.0.6           scales_1.3.0         
+[25] pbapply_1.7-2         textshaping_0.3.7     jquerylib_0.1.4      
+[28] cli_3.6.2             rlang_1.1.3           munsell_0.5.0        
+[31] ptw_1.9-16            cachem_1.0.8          yaml_2.3.8           
+[34] tools_4.3.2           minpack.lm_1.2-4      memoise_2.0.1        
+[37] dplyr_1.1.4           colorspace_2.1-0      RcppDE_0.1.7         
+[40] reticulate_1.34.0     vctrs_0.6.5           R6_2.5.1             
+[43] png_0.1-8             lifecycle_1.0.4       stringr_1.5.1        
+[46] fs_1.6.3              ragg_1.2.7            pkgconfig_2.0.3      
+[49] desc_1.4.3            pkgdown_2.0.7         bslib_0.6.1          
+[52] pillar_1.9.0          VPdtw_2.1-14          glue_1.7.0           
+[55] Rcpp_1.0.12           systemfonts_1.0.5     highr_0.10           
+[58] tidyselect_1.2.0      xfun_0.41             tibble_3.2.1         
+[61] farver_2.1.1          htmltools_0.5.7       rmarkdown_2.25       
+[64] compiler_4.3.2        readxl_1.4.3         </code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

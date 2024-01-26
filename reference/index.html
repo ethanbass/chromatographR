@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,17 +61,17 @@
           
           <code><a href="Sa.html">Sa</a></code> 
         </dt>
-        <dd>HPLC-DAD data of goldenrod root extracts.</dd>
+        <dd>Raw goldenrod root chromatograms</dd>
       </dl><dl><dt>
           
           <code><a href="Sa_pr.html">Sa_pr</a></code> 
         </dt>
-        <dd>HPLC-DAD data of goldenrod root extracts.</dd>
+        <dd>Preprocessed goldenrod root chromatograms</dd>
       </dl><dl><dt>
           
           <code><a href="Sa_warp.html">Sa_warp</a></code> 
         </dt>
-        <dd>HPLC-DAD data of goldenrod root extracts.</dd>
+        <dd>Warped goldenrod root chromatograms.</dd>
       </dl><dl><dt>
           
           <code><a href="attach_metadata.html">attach_metadata()</a></code> 
@@ -89,7 +89,7 @@
         <dd>Make boxplot from peak table.</dd>
       </dl><dl><dt>
           
-          <code><a href="chromatographR-package.html">chromatographR-package</a></code> <code><a href="chromatographR-package.html">chromatographR</a></code> 
+          <code><a href="chromatographR-package.html">chromatographR</a></code> <code><a href="chromatographR-package.html">chromatographR-package</a></code> 
         </dt>
         <dd>chromatographR</dd>
       </dl><dl><dt>
@@ -124,11 +124,6 @@
         <dd>Filter peak table</dd>
       </dl><dl><dt>
           
-          <code><a href="find_noise.html">find_noise()</a></code> 
-        </dt>
-        <dd>Define noise spectra based on specified threshold</dd>
-      </dl><dl><dt>
-          
           <code><a href="find_peaks.html">find_peaks()</a></code> 
         </dt>
         <dd>Find peaks in chromatographic profile</dd>
@@ -140,16 +135,6 @@
 profile</dd>
       </dl><dl><dt>
           
-          <code><a href="get_agilent_threshold.html">get_agilent_threshold()</a></code> 
-        </dt>
-        <dd>Calculate purity thresholds</dd>
-      </dl><dl><dt>
-          
-          <code><a href="get_noise_variance.html">get_noise_variance()</a></code> 
-        </dt>
-        <dd>Calculate variance of noise regions</dd>
-      </dl><dl><dt>
-          
           <code><a href="get_peaks.html">get_peaks()</a></code> 
         </dt>
         <dd>Get peak list.</dd>
@@ -158,26 +143,6 @@ profile</dd>
           <code><a href="get_peaktable.html">get_peaktable()</a></code> 
         </dt>
         <dd>Convert peak list into an ordered peak table.</dd>
-      </dl><dl><dt>
-          
-          <code><a href="get_purity.html">get_purity()</a></code> 
-        </dt>
-        <dd>Calculate mean peak purity</dd>
-      </dl><dl><dt>
-          
-          <code><a href="get_purity_values.html">get_purity_values()</a></code> 
-        </dt>
-        <dd>Calculate peak purity values</dd>
-      </dl><dl><dt>
-          
-          <code><a href="get_spectral_similarity.html">get_spectral_similarity()</a></code> 
-        </dt>
-        <dd>Calculate spectral similarity</dd>
-      </dl><dl><dt>
-          
-          <code><a href="load_chroms.html">load_chroms()</a></code> 
-        </dt>
-        <dd>Import chromatograms.</dd>
       </dl><dl><dt>
           
           <code><a href="merge_peaks.html">merge_peaks()</a></code> 
@@ -250,9 +215,10 @@ profile</dd>
         <dd>Plot spectra by clicking on the chromatogram</dd>
       </dl><dl><dt>
           
-          <code><a href="trim_peak.html">trim_peak()</a></code> 
+          <code><a href="subset.peak_table.html">subset(<i>&lt;peak_table&gt;</i>)</a></code> 
         </dt>
-        <dd>Trim peak</dd>
+        <dd>Subset peak table
+Return subset of <code>peak_table</code> object.</dd>
       </dl><dl><dt>
           
           <code><a href="write_peaktable.html">write_peaktable()</a></code> 

@@ -12,7 +12,7 @@ plots the spectrum a particular retention time for a given chromatogram."><meta 
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,7 +61,7 @@ plots the spectrum a particular retention time for a given chromatogram.</p>
 <span>  loc <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">peak_table</span>,</span>
 <span>  <span class="va">chrom_list</span>,</span>
-<span>  chr <span class="op">=</span> <span class="st">"max"</span>,</span>
+<span>  idx <span class="op">=</span> <span class="st">"max"</span>,</span>
 <span>  lambda <span class="op">=</span> <span class="st">"max"</span>,</span>
 <span>  plot_spectrum <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  plot_trace <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -71,6 +71,7 @@ plots the spectrum a particular retention time for a given chromatogram.</p>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  what <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"peak"</span>, <span class="st">"rt"</span>, <span class="st">"idx"</span>, <span class="st">"click"</span><span class="op">)</span>,</span>
 <span>  engine <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"base"</span>, <span class="st">"plotly"</span>, <span class="st">"ggplot2"</span><span class="op">)</span>,</span>
+<span>  chr <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -92,7 +93,7 @@ wavelengths). If no argument is provided here, the function will try to find
 the <code>chrom_list</code> object used to create the provided <code>peak_table</code>.</p></dd>
 
 
-<dt>chr</dt>
+<dt>idx</dt>
 <dd><p>Numerical index of chromatogram you wish to plot, or "max" to
 automatically plot the chromatogram with the largest signal.</p></dd>
 
@@ -134,14 +135,18 @@ to TRUE.</p></dd>
 
 
 <dt>what</dt>
-<dd><p>What to look for. Either "peak" to extract spectral information
-for a certain peak, "rt" to scan by retention time, or "click" to manually
-select retention time by clicking on the chromatogram. Defaults to "peak"
-mode.</p></dd>
+<dd><p>What to look for. Either <code>peak</code> to extract spectral
+information for a certain peak, <code>rt</code> to scan by retention time,
+<code>idx</code> to scan by numeric index, or <code>click</code> to manually select
+retention time by clicking on the chromatogram. Defaults to "peak" mode.</p></dd>
 
 
 <dt>engine</dt>
 <dd><p>Which plotting engine to use: <code>base</code>, <code>ggplot2</code>, or <code>plotly</code>.</p></dd>
+
+
+<dt>chr</dt>
+<dd><p>Deprecated. Please use <code>idx</code> instead.</p></dd>
 
 
 <dt>...</dt>
@@ -189,7 +194,7 @@ from the chromatographic matrix.</p></li>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># interactive()</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Sa</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">pks</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_peaks.html">get_peaks</a></span><span class="op">(</span><span class="va">Sa</span>,lambda<span class="op">=</span><span class="st">"220.00000"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">pks</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_peaks.html">get_peaks</a></span><span class="op">(</span><span class="va">Sa</span>, lambda<span class="op">=</span><span class="st">"220.00000"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">pk_tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_peaktable.html">get_peaktable</a></span><span class="op">(</span><span class="va">pks</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">oldpar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>no.readonly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>

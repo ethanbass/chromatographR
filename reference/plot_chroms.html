@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -102,7 +102,7 @@ chromatograms to plot.</p></dd>
 
 
 <dt>engine</dt>
-<dd><p>Plotting engine. Either <code><a href="https://rdrr.io/r/graphics/matplot.html" class="external-link">matplot</a></code>, 
+<dd><p>Plotting engine. Either <code>base</code> (<code><a href="https://rdrr.io/r/graphics/matplot.html" class="external-link">matplot</a></code>), 
 <code><a href="https://rdrr.io/pkg/plotly/man/plotly.html" class="external-link">plotly</a></code>, or <code><a href="https://ggplot2.tidyverse.org/reference/ggplot2-package.html" class="external-link">ggplot2-package</a></code>.</p></dd>
 
 
@@ -122,11 +122,29 @@ chromatograms to plot.</p></dd>
 <dd><p>Additional arguments to plotting function specified by <code>engine</code>.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    
+
+<p>No return value, called for side effects.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="side-effects">Side effects<a class="anchor" aria-label="anchor" href="#side-effects"></a></h2>
+    
+
+<p>Plots the traces of the specified chromatograms <code>idx</code> at the specified
+wavelengths <code>lambdas</code>. Plots can be produced using base graphics, ggplot2,
+or plotly, according to the value of <code>engine</code>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
+    <p>Ethan Bass</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Sa_pr</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">plot_chroms</span><span class="op">(</span><span class="va">Sa_pr</span>, idx<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, lambdas<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"210"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_chroms</span><span class="op">(</span><span class="va">Sa_pr</span>, idx<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, lambdas<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">210</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_chroms-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>

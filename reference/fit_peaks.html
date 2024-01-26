@@ -12,7 +12,7 @@ profile — fit_peaks"><meta property="og:description" content="Fit peak paramet
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -118,37 +118,37 @@ to TRUE.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>Function <code>fit_peaks</code> returns a matrix, whose columns contain
-the following information:</p>
+<p>The <code>fit_peaks</code> function returns a matrix, whose columns contain
+the following information about each peak:</p>
 <dl><dt>rt</dt>
-<dd><p>location of the maximum of the peak (x)</p></dd>
+<dd><p>Location of the peak maximum.</p></dd>
 
 <dt>start</dt>
-<dd><p>start of peak (only included in table if `bounds==TRUE`)</p></dd>
+<dd><p>Start of peak (only included in table if <code>bounds = TRUE</code>).</p></dd>
 
 <dt>end</dt>
-<dd><p>end of peak (only included in table if `bounds==TRUE`)</p></dd>
+<dd><p>End of peak (only included in table if <code>bounds = TRUE</code>).</p></dd>
 
 <dt>sd</dt>
-<dd><p>width of the peak (x)</p></dd>
- <dt>tau</dt>
-<dd><p>tau parameter (only included in
-table if `fit=="egh"`)</p></dd>
+<dd><p>The standard deviation of the peak.</p></dd>
+
+<dt>tau</dt>
+<dd><p>\(\tau\) parameter (only included in table if <code>fit = "egh"</code>).</p></dd>
 
 <dt>FWHM</dt>
-<dd><p>full width at half maximum (x)</p></dd>
+<dd><p>The full width at half maximum.</p></dd>
 
 <dt>height</dt>
-<dd><p>height of the peak (y)</p></dd>
+<dd><p>Peak height.</p></dd>
 
 <dt>area</dt>
-<dd><p>peak area</p></dd>
+<dd><p>Peak area.</p></dd>
 
 <dt>r.squared</dt>
-<dd><p>r-squared value for linear fit of model to data.</p></dd>
+<dd><p>The R-squared value for linear fit of the model to the data.</p></dd>
 
 <dt>purity</dt>
-<dd><p>spectral purity of peak as assessed by <code><a href="get_purity.html">get_purity</a></code>.</p></dd>
+<dd><p>The spectral purity of peak as assessed by <code><a href="get_purity.html">get_purity</a></code>.</p></dd>
 
 </dl><p>Again, the first five elements (rt, start, end, sd and FWHM) are expressed
 as indices, so not in terms of the real retention times. The transformation
@@ -156,10 +156,10 @@ to "real" time is done in function <code>get_peaks</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Peak parameters are calculated using <code>fit_peaks</code>, which fits the data
+    <p>Peak parameters are calculated by fitting the data
 to a gaussian or exponential-gaussian hybrid curve using non-linear least
 squares estimation as implemented in <code><a href="https://rdrr.io/pkg/minpack.lm/man/nlsLM.html" class="external-link">nlsLM</a></code>.
-Area under the fitted curve is estimated using trapezoidal estimation.</p>
+Area under the fitted curve is then estimated using trapezoidal estimation.</p>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
@@ -192,7 +192,7 @@ good model for chromatographic peaks in isocratic HPLC? <em>Chromatographia</em>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Sa_pr</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">fit_peaks</span><span class="op">(</span><span class="va">Sa_pr</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, lambda<span class="op">=</span><span class="st">"220"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">fit_peaks</span><span class="op">(</span><span class="va">Sa_pr</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, lambda <span class="op">=</span> <span class="fl">220</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           rt start end        sd           tau      FWHM      height</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1   30.69332    14  46 6.2865644    1.20769992 14.773426   8.9910726</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2   50.94330    46  52 0.5711967  -11.41366848  1.342312   0.3652505</span>

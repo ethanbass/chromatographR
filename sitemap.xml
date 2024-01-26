@@ -61,9 +61,6 @@
     <loc>https://ethanbass.github.io/chromatographR/reference/filter_peaktable.html</loc>
   </url>
   <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/find_noise.html</loc>
-  </url>
-  <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/find_peaks.html</loc>
   </url>
   <url>
@@ -71,9 +68,6 @@
   </url>
   <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/get_agilent_threshold.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/get_noise_variance.html</loc>
   </url>
   <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/get_peaks.html</loc>
@@ -85,16 +79,7 @@
     <loc>https://ethanbass.github.io/chromatographR/reference/get_purity.html</loc>
   </url>
   <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/get_purity_values.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/get_spectral_similarity.html</loc>
-  </url>
-  <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/load_chroms.html</loc>
   </url>
   <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/merge_peaks.html</loc>
@@ -130,7 +115,7 @@
     <loc>https://ethanbass.github.io/chromatographR/reference/preprocess.html</loc>
   </url>
   <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/read_chroms.html</loc>
+    <loc>https://ethanbass.github.io/chromatographR/reference/reexports.html</loc>
   </url>
   <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/reshape_chroms.html</loc>
@@ -140,6 +125,9 @@
   </url>
   <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/scan_chrom.html</loc>
+  </url>
+  <url>
+    <loc>https://ethanbass.github.io/chromatographR/reference/subset.peak_table.html</loc>
   </url>
   <url>
     <loc>https://ethanbass.github.io/chromatographR/reference/trim_peak.html</loc>

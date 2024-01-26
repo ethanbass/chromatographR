@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.6.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,37 @@
       <small>Source: <a href="https://github.com/ethanbass/chromatographR/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.7.0" id="chromatographr-070">chromatographR 0.7.0<a class="anchor" aria-label="anchor" href="#chromatographr-070"></a></h2>
+<ul><li>Updated <code>correct_peaks</code> function so it works properly for correcting retention times in peak lists.</li>
+<li>Added <code>fixed_levels</code> argument to <code>reshape_peaktable</code> so features can be plotted in the order they’re provided by the user.</li>
+<li>Added option for summing split peaks using the <code>merge_peaks</code> function by selecting <code>method = "sum"</code>.</li>
+<li>Updated <code>get_peaktable</code> so that the <code>use.cor</code> argument works correctly (to use corrected retention times stored in a separate column).</li>
+<li>Fixed <code>mirror_plot</code> so it can take numeric input for lambdas.</li>
+<li>Changed default setting of <code>verbose</code> argument in <code>correct_rt</code> from <code>FALSE</code> to default setting.</li>
+<li>Removed <code>load_chroms</code> function. Use <code>read_chroms</code> instead.</li>
+<li>Eliminated spurious warning from <code>attach_ref_spectra</code> function.</li>
+<li>Changed name of <code>index</code> argument in <code>plot.peak_list</code> to <code>idx</code>. The original argument is now deprecated.</li>
+<li>Fixed bug affecting <code>plot_purity</code> argument in <code>plot.peak_list</code>.</li>
+<li>Fixed bug in <code>reshape_chroms</code> so empty metadata column no longer appears.</li>
+<li>The <code>plot_spectrum</code> function now includes the peak names when plotting spectra.</li>
+<li>Fixed <code>correct_rt</code> so it no longer requires user-provided <code>lambdas</code> for 1D chromatograms.</li>
+<li>Added <code>subset.peak_table</code> function for easily subsetting peak_tables (e.g. to exclude specific peaks or samples).</li>
+<li>Added <code>what</code> argument for <code>plot_all_spectra</code> (e.g. to plot multiple spectra at a particular retention time).</li>
+</ul><div class="section level5">
+<h5 id="refactoring-of-cluster_spectra-function-0-7-0">Refactoring of <code>cluster_spectra</code> function:<a class="anchor" aria-label="anchor" href="#refactoring-of-cluster_spectra-function-0-7-0"></a></h5>
+<ul><li>For simplicity, <code>cluster_spectra</code> now requires reference spectra to be attached to peak table.</li>
+<li>Accordingly, the <code>chrom_list</code> argument is no longer needed.</li>
+<li>Saving to RDS is now turned off by default.</li>
+<li>The <code>pvclust</code> package is now suggested instead of being required.</li>
+</ul></div>
+<div class="section level5">
+<h5 id="updates-to-vignette-and-documentation-0-7-0">Updates to vignette and documentation<a class="anchor" aria-label="anchor" href="#updates-to-vignette-and-documentation-0-7-0"></a></h5>
+<ul><li>Suggest numeric input to lambdas instead of character input to reduce unnecessary confusion.</li>
+<li>Made other minor changes to text of vignette to (hopefully) improve clarity.</li>
+<li>Added a short section on the attachment of reference spectra.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.6.1" id="chromatographr-061">chromatographR 0.6.1<a class="anchor" aria-label="anchor" href="#chromatographr-061"></a></h2>
 <ul><li>Fixed bug in plot functions (e.g. <code>plot_chroms</code> and <code>plot_spectrum</code>) causing error when retention times are inconsistent between chromatograms.</li>
