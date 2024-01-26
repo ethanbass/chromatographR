@@ -28,7 +28,7 @@ peaks or samples).
 #### Updates to vignette and documentation
 
 * Suggest numeric input to lambdas instead of character input to reduce unnecessary confusion.
-* Made other small changes to text of vignette to (hopefully) improve clarity.
+* Made other minor changes to text of vignette to (hopefully) improve clarity.
 * Added a short section on the attachment of reference spectra.
 
 # chromatographR 0.6.1
@@ -43,6 +43,7 @@ peaks or samples).
 
 * Enabled use of `parallel` package for parallel processing (in addition to current options using `mcapply`). (These options require the installation of suggested package `pbapply`).
 * Updated `get_peaktable` for greater flexibility (e.g. for usage of 'ChemStation' peak lists as input).
+
 #### Other changes
 * Made some minor changes to vignette to improve clarity (e.g. using single wavelength for integration, etc.)
 
