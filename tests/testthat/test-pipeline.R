@@ -14,7 +14,7 @@ test_that("preprocess works on matrix", {
 })
 
 test_that("Preprocess works without providing dimensions", {
-  out <- suppressMessages(preprocess(X=(Sa[1]), show_progress=FALSE))
+  out <- suppressMessages(preprocess(X = (Sa[1]), show_progress = FALSE))
   expect_equal(class(out), "list")
   expect_equal(class(out[[1]])[1],"matrix")
   expect_equal(rownames(out[[1]]), as.character(new.ts))
@@ -23,7 +23,7 @@ test_that("Preprocess works without providing dimensions", {
 
 
 test_that("preprocess returns correct errors", {
-  expect_error(preprocess(X=as.data.frame(Sa[[1]]), show_progress = FALSE))
+  expect_error(preprocess(X = as.data.frame(Sa[[1]]), show_progress = FALSE))
 })
 
 
