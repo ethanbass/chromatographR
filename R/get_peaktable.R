@@ -36,7 +36,9 @@
 #' @param response Indicates whether peak area or peak height is to be used
 #' as intensity measure. Defaults to `area` setting.
 #' @param use.cor Logical. Indicates whether to use corrected retention times
-#' (by default) or raw retention times (not advised!).
+#' (\code{rt.cor} column) or raw retention times (\code{rt} column). Unless
+#' otherwise specified, the \code{rt.cor} column will be used by default if it 
+#' exists in the provided \code{peak_list}.
 #' @param hmax Height at which the complete linkage dendrogram will be cut. Can
 #' be interpreted as the maximal inter-cluster retention time difference.
 #' @param plot_it Logical. If TRUE, for every component a stripplot will be
@@ -91,7 +93,7 @@
 #' @export get_peaktable
 
 get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
-                          use.cor = FALSE, hmax = 0.2, plot_it = FALSE,
+                          use.cor = NULL, hmax = 0.2, plot_it = FALSE,
                           ask = plot_it, clust = c("rt","sp.rt"),
                           sigma.t = NULL, sigma.r = 0.5,
                           deepSplit = FALSE, verbose = FALSE,
@@ -99,6 +101,9 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
   response <- match.arg(response, c("area", "height"))
   clust <- match.arg(clust, c("rt","sp.rt"))
   out <- match.arg(out, c('data.frame', 'matrix'))
+  if (is.null(use.cor)){
+    use.cor <- "rt.cor" %in% colnames(peak_list[[1]][[1]])
+  }
   rt <- ifelse(use.cor, "rt.cor", "rt")
   start <- ifelse(use.cor, "start.cor", "start")
   end <- ifelse(use.cor, "end.cor", "end")

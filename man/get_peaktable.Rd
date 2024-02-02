@@ -8,7 +8,7 @@ get_peaktable(
   peak_list,
   chrom_list,
   response = c("area", "height"),
-  use.cor = FALSE,
+  use.cor = NULL,
   hmax = 0.2,
   plot_it = FALSE,
   ask = plot_it,
@@ -33,7 +33,9 @@ information on various peak parameters.}
 as intensity measure. Defaults to \code{area} setting.}
 
 \item{use.cor}{Logical. Indicates whether to use corrected retention times
-(by default) or raw retention times (not advised!).}
+(\code{rt.cor} column) or raw retention times (\code{rt} column). Unless
+otherwise specified, the \code{rt.cor} column will be used by default if it
+exists in the provided \code{peak_list}.}
 
 \item{hmax}{Height at which the complete linkage dendrogram will be cut. Can
 be interpreted as the maximal inter-cluster retention time difference.}
