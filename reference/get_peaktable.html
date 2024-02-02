@@ -67,7 +67,7 @@ samples, and experimental settings.</p>
 <span>  <span class="va">peak_list</span>,</span>
 <span>  <span class="va">chrom_list</span>,</span>
 <span>  response <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"area"</span>, <span class="st">"height"</span><span class="op">)</span>,</span>
-<span>  use.cor <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  use.cor <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  hmax <span class="op">=</span> <span class="fl">0.2</span>,</span>
 <span>  plot_it <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ask <span class="op">=</span> <span class="va">plot_it</span>,</span>
@@ -101,7 +101,9 @@ as intensity measure. Defaults to <code>area</code> setting.</p></dd>
 
 <dt>use.cor</dt>
 <dd><p>Logical. Indicates whether to use corrected retention times
-(by default) or raw retention times (not advised!).</p></dd>
+(<code>rt.cor</code> column) or raw retention times (<code>rt</code> column). Unless
+otherwise specified, the <code>rt.cor</code> column will be used by default if it
+exists in the provided <code>peak_list</code>.</p></dd>
 
 
 <dt>hmax</dt>
