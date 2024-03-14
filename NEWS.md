@@ -1,3 +1,7 @@
+# chromatographR 0.7.1
+
+* Fixed bug in `get_peaks` causing peaks to erroneously filtered out in some cases.
+
 # chromatographR 0.7.0
 
 * Updated `correct_peaks` function so it works properly for correcting retention times in peak lists.
