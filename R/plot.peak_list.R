@@ -129,8 +129,8 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
 
 #' @noRd
 draw_trapezoid <- function(peak.loc, yvals, color, a){
-  sapply(1:(length(peak.loc) - 1), function(i){
+  sapply(seq_len(length(peak.loc) - 1), function(i){
     polygon(peak.loc[c(i, i, (i + 1), (i + 1))], c(0, yvals[i:(i + 1)], 0),
-            col=alpha(color, a), lty = 3, border = NA)
+            col = scales::alpha(color, a), lty = 3, border = NA)
   })
 }
