@@ -160,11 +160,9 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
 #' @author Ethan Bass
 #' @noRd
 remove_bad_peaks <- function(pks){
-  pks[which(
-    apply(pks, 1, function(x){
-      !all(is.na(x)) & (x["rt"] > x["start"]) & x["rt"] < x["end"]
-    })
-  ), , drop = FALSE]
+  pks[which(apply(pks,1,function(x)!all(is.na(x))) & 
+              length(pks[,"rt"] > pks[,"start"]) &
+              length(pks[,"rt"] < pks[,"end"])), , drop = FALSE]
 }
 
 #' Convert indices to times
