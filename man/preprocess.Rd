@@ -26,12 +26,10 @@ are not allowed. If rownames or colnames attributes are used, they should be
 numerical and signify time points and wavelengths, respectively.}
 
 \item{dim1}{A new, usually shorter, set of time points (numerical). The
-range of these should not be outside the range of the original time points,
-otherwise the function stops with an error message.}
+range of these should not exceed the range of the original time points.}
 
 \item{dim2}{A new, usually shorter, set of wavelengths (numerical). The
-range of these should not be outside the range of the original wavelengths,
-otherwise the function stops with an error message.}
+range of these should not exceed the range of the original wavelengths.}
 
 \item{remove.time.baseline}{Logical, indicating whether baseline correction
 should be done in the time direction, according to
@@ -47,11 +45,11 @@ value.}
 \item{parallel}{Logical, indicating whether to use parallel processing.
 Defaults to TRUE (unless you're on Windows).}
 
-\item{interpolate_rows}{Logical. Whether to interpolate along dim1. Defaults
-to TRUE.}
+\item{interpolate_rows}{Logical. Whether to interpolate along the time axis
+(\code{dim1}). Defaults to TRUE.}
 
-\item{interpolate_cols}{Logical. Whether to interpolate along dim2. Defaults
-to TRUE.}
+\item{interpolate_cols}{Logical. Whether to interpolate along the spectral
+axis (\code{dim2}). Defaults to TRUE.}
 
 \item{mc.cores}{How many cores to use for parallel processing. Defaults to 2.
 This argument has been deprecated and replaces with \code{cl}.}
@@ -68,8 +66,9 @@ Defaults to 2. On Windows integer values will be ignored.}
 \code{\link[ptw:baseline.corr]{baseline.corr}}.}
 }
 \value{
-The function returns the preprocessed data matrix, with row names and
-column names indicating the time points and wavelengths, respectively.
+The function returns the preprocessed data matrix (or list of
+matrices), with row names and column names indicating the time points and
+wavelengths, respectively.
 }
 \description{
 Standard pre-processing of response matrices, consisting of a time axis and
@@ -80,7 +79,7 @@ the data are baseline-corrected in the time direction
 spectral dimension using cubic smoothing splines (\code{\link[stats:smooth.spline]{smooth.spline}}.
 }
 \note{
-Adapted from
+Adapted from the
 \href{https://github.com/rwehrens/alsace/blob/master/R/preprocess.R}{preprocess}
 function in the alsace package by Ron Wehrens.
 }

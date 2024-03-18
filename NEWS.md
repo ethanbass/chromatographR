@@ -1,6 +1,7 @@
 # chromatographR 0.7.1
 
 * Fixed bug in `get_peaks` causing peaks to erroneously filtered out in some cases.
+* Small updates to documentation (in `preprocess` and `fit_peaks` functions) to better describe arguments.
 
 # chromatographR 0.7.0
 

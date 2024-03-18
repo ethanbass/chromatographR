@@ -21,14 +21,19 @@ box kernel (\code{box}), savitzky-golay smoothing (\code{savgol}),
 moving average (\code{mva}), triangular moving average (\code{tmva}), or 
 no smoothing (\code{none}).}
 
-\item{smooth_window}{Smoothing window. If the supplied value is between 0 and
+\item{smooth_window}{Smoothing window. Larger values of this parameter will 
+exclude sharp, narrow features. If the supplied value is between 0 and
 1, window will be interpreted as a proportion of points to include. Otherwise,
 the window will be the absolute number of points to include in the window.
 (Defaults to .001).}
 
-\item{slope_thresh}{Minimum threshold for peak slope. (Defaults to \code{0}).}
+\item{slope_thresh}{Minimum threshold for slope of the smoothed first
+derivative. This parameter filters on the basis of peak width, such that
+larger values will exclude broad peaks from the peak list. (Defaults to \code{0}).}
 
-\item{amp_thresh}{Minimum threshold for peak amplitude. (Defaults to \code{0}).}
+\item{amp_thresh}{Minimum threshold for peak amplitude. This parameter
+filters on the basis of peak height, such that larger values will
+exclude small peaks from the peak list. (Defaults to \code{0}).}
 
 \item{bounds}{Logical. If TRUE, includes peak boundaries in data.frame.
 (Defaults to \code{TRUE}).}
@@ -55,10 +60,10 @@ no smoothing (\code{none}).
 
 It is recommended to do pre-processing using the \code{\link{preprocess}}
 function before peak detection. Overly high chromatographic resolution can 
-sometimes lead to peaks being split into multiple segments. In this case,
+sometimes cause peaks to be split into multiple segments. In this case,
 it is recommended to increase the \code{smooth_window} or reduce the
-resolution along the time axis by adjusting the \code{dim2} argument before
-proceeding with further analyses.
+resolution along the time axis by adjusting the \code{dim1} argument during
+preprocessing.
 }
 \note{
 The \code{find_peaks} function is adapted from MATLAB code included in

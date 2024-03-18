@@ -13,11 +13,9 @@
 #' are not allowed. If rownames or colnames attributes are used, they should be
 #' numerical and signify time points and wavelengths, respectively.
 #' @param dim1 A new, usually shorter, set of time points (numerical). The
-#' range of these should not be outside the range of the original time points,
-#' otherwise the function stops with an error message.
+#' range of these should not exceed the range of the original time points.
 #' @param dim2 A new, usually shorter, set of wavelengths (numerical). The
-#' range of these should not be outside the range of the original wavelengths,
-#' otherwise the function stops with an error message.
+#' range of these should not exceed the range of the original wavelengths.
 #' @param remove.time.baseline Logical, indicating whether baseline correction
 #' should be done in the time direction, according to
 #' \code{\link[ptw:baseline.corr]{baseline.corr}}. Default is TRUE.
@@ -28,10 +26,10 @@
 #' value.
 #' @param parallel Logical, indicating whether to use parallel processing.
 #' Defaults to TRUE (unless you're on Windows).
-#' @param interpolate_rows Logical. Whether to interpolate along dim1. Defaults
-#' to TRUE.
-#' @param interpolate_cols Logical. Whether to interpolate along dim2. Defaults
-#' to TRUE.
+#' @param interpolate_rows Logical. Whether to interpolate along the time axis 
+#' (\code{dim1}). Defaults to TRUE.
+#' @param interpolate_cols Logical. Whether to interpolate along the spectral 
+#' axis (\code{dim2}). Defaults to TRUE.
 #' @param mc.cores How many cores to use for parallel processing. Defaults to 2.
 #' This argument has been deprecated and replaces with \code{cl}.
 #' @param cl Argument to \code{\link[pbapply]{pblapply}} or \code{\link[parallel]{mclapply}}.
@@ -42,10 +40,11 @@
 #' \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.
 #' @param \dots Further optional arguments to
 #' \code{\link[ptw:baseline.corr]{baseline.corr}}.
-#' @return The function returns the preprocessed data matrix, with row names and
-#' column names indicating the time points and wavelengths, respectively.
+#' @return The function returns the preprocessed data matrix (or list of 
+#' matrices), with row names and column names indicating the time points and 
+#' wavelengths, respectively.
 #' @author Ethan Bass
-#' @note Adapted from
+#' @note Adapted from the
 #' \href{https://github.com/rwehrens/alsace/blob/master/R/preprocess.R}{preprocess}
 #' function in the alsace package by Ron Wehrens.
 #' @references 
