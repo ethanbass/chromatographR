@@ -96,14 +96,12 @@ numerical and signify time points and wavelengths, respectively.</p></dd>
 
 <dt>dim1</dt>
 <dd><p>A new, usually shorter, set of time points (numerical). The
-range of these should not be outside the range of the original time points,
-otherwise the function stops with an error message.</p></dd>
+range of these should not exceed the range of the original time points.</p></dd>
 
 
 <dt>dim2</dt>
 <dd><p>A new, usually shorter, set of wavelengths (numerical). The
-range of these should not be outside the range of the original wavelengths,
-otherwise the function stops with an error message.</p></dd>
+range of these should not exceed the range of the original wavelengths.</p></dd>
 
 
 <dt>remove.time.baseline</dt>
@@ -129,13 +127,13 @@ Defaults to TRUE (unless you're on Windows).</p></dd>
 
 
 <dt>interpolate_rows</dt>
-<dd><p>Logical. Whether to interpolate along dim1. Defaults
-to TRUE.</p></dd>
+<dd><p>Logical. Whether to interpolate along the time axis
+(<code>dim1</code>). Defaults to TRUE.</p></dd>
 
 
 <dt>interpolate_cols</dt>
-<dd><p>Logical. Whether to interpolate along dim2. Defaults
-to TRUE.</p></dd>
+<dd><p>Logical. Whether to interpolate along the spectral
+axis (<code>dim2</code>). Defaults to TRUE.</p></dd>
 
 
 <dt>mc.cores</dt>
@@ -164,12 +162,13 @@ Defaults to 2. On Windows integer values will be ignored.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>The function returns the preprocessed data matrix, with row names and
-column names indicating the time points and wavelengths, respectively.</p>
+<p>The function returns the preprocessed data matrix (or list of
+matrices), with row names and column names indicating the time points and
+wavelengths, respectively.</p>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
-    <p>Adapted from
+    <p>Adapted from the
 <a href="https://github.com/rwehrens/alsace/blob/master/R/preprocess.R" class="external-link">preprocess</a>
 function in the alsace package by Ron Wehrens.</p>
     </div>
