@@ -202,7 +202,9 @@ test_that("attach_metadata works", {
   expect_equal(colnames(pk_tab$sample_meta), colnames(meta))
   
   ### check errors & warnings ###
-  expect_error(attach_metadata(pk_tab))
+  expect_error(attach_metadata())
+  expect_error(attach_metadata(warp))
+  expect_error(attach_metadata(pk_tab, metadata = warp))
   expect_error(attach_metadata(pk_tab, metadata=meta, column ="x"))
   expect_error(attach_metadata(pk_tab$tab, metadata=meta, column ="vial"))
   expect_error(attach_metadata(pk_tab, metadata=rbind(meta,meta), column ="vial"))
@@ -217,6 +219,9 @@ test_that("attach_ref_spectra works", {
   pk_tab <- attach_ref_spectra(pk_tab, chrom_list = dat.pr, ref = "max.int")
   expect_equal(pk_tab$args[["reference_spectra"]], "max.int")
   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$ref_spectra))
+  
+  # test errors
+  expect_error(attach_ref_spectra(peak_table = warp))
   expect_error(attach_ref_spectra(pk_tab, chrom_list = dat.pr, ref = "x"))
 })
 

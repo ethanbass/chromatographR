@@ -1,7 +1,9 @@
 # chromatographR 0.7.1
 
 * Fixed bug in `get_peaks` causing peaks to erroneously filtered out in some cases.
-* Small updates to documentation (in `preprocess` and `fit_peaks` functions) to better describe arguments.
+* Made small updates to documentation (in `preprocess` and `fit_peaks` functions) to better describe arguments.
+* Added warning in `mirror_plot` when `var` contains more than two levels and levels aren't specified.
+* Fixed bug to allow `mirror_plot` to work properly with 2D data.
 
 # chromatographR 0.7.0
 

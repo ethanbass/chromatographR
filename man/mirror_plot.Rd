@@ -7,7 +7,7 @@
 mirror_plot(
   x,
   chrom_list,
-  lambdas,
+  lambdas = NULL,
   var,
   subset = NULL,
   print_legend = TRUE,

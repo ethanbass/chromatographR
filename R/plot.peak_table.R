@@ -199,7 +199,7 @@ boxplot.peak_table <- function(x, formula, ...){
 #' @concept Visualization
 #' @export
 
-mirror_plot <- function(x, chrom_list, lambdas, var, subset = NULL,
+mirror_plot <- function(x, chrom_list, lambdas = NULL, var, subset = NULL,
                         print_legend = TRUE, legend_txt = NULL, legend_pos = "topright",
                         legend_size = 1, mirror = TRUE, xlim = NULL, ylim = NULL, ...){
   check_peaktable(x)
@@ -214,9 +214,11 @@ mirror_plot <- function(x, chrom_list, lambdas, var, subset = NULL,
   }
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(x)
-  } else get_chrom_list(x, chrom_list)
+  } else {
+    get_chrom_list(x, chrom_list)
+  }
   new.ts <- round(as.numeric(rownames(chrom_list[[1]])), 2)
-  if (ncol(x[[1]]) == 1){
+  if (ncol(chrom_list[[1]]) == 1){
     lambdas.idx <- 1
   } else {
     lambdas.idx <- sapply(lambdas, function(lambda){
@@ -234,6 +236,10 @@ mirror_plot <- function(x, chrom_list, lambdas, var, subset = NULL,
     }
   }
   if (is.null(subset)){
+    if (nlevels(fac)>2){
+      warning(paste0("Selecting first two levels of ", sQuote(var)), ". To choose different levels,
+              use the `subset` argument to specify the desired levels.")
+    }
     trt1 <- levels(fac)[1]
     trt2 <- levels(fac)[2]
   } else {
@@ -245,9 +251,9 @@ mirror_plot <- function(x, chrom_list, lambdas, var, subset = NULL,
   if (print_legend & is.null(legend_txt))
     legend_txt <- c(trt1,trt2)
   if (is.null(xlim))
-    xlim <- c(head(new.ts,1),tail(new.ts,1))
+    xlim <- c(head(new.ts, 1), tail(new.ts, 1))
   y_max <- max(sapply(chrom_list, function(xx){
-    max(xx[, as.character(min(as.numeric(lambdas)))], na.rm = TRUE)
+    max(xx[, lambdas.idx], na.rm = TRUE)
   }))
   if (mirror){
     if (is.null(ylim))
