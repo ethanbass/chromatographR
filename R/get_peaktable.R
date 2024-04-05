@@ -134,7 +134,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
     if (length(pkcenters) < 2) 
       return(NULL)
     if (clust == 'rt'){
-      pkcenters.hcl <- hclust(dist(pkcenters), method = "complete")
+      pkcenters.hcl <- fastcluster::hclust(dist(pkcenters), method = "complete")
       pkcenters.cl <- cutree(pkcenters.hcl, h = hmax)
     } else if (clust == 'sp.rt'){
         if (is.null(sigma.t)){
@@ -151,7 +151,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
       S <- (exp((-(1 - abs(cor.matrix))^2)/(2*sigma.r^2)))*exp(-(mint^2)/(2*sigma.t^2))
       D <- 1 - S
       linkage <- "average"
-      pkcenters.hcl <- hclust(as.dist(D), method = linkage)
+      pkcenters.hcl <- fastcluster::hclust(as.dist(D), method = linkage)
       pkcenters.cl <- dynamicTreeCut::cutreeDynamicTree(pkcenters.hcl, maxTreeHeight = hmax, 
                                       deepSplit = deepSplit, minModuleSize = 2)
       sing <- which(pkcenters.cl == 0)

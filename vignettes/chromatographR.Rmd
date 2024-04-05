@@ -5,9 +5,11 @@ date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 bibliography: references.bib
 vignette: >
+  %\VignetteEncoding{UTF-8}
   %\VignetteIndexEntry{chromatographR: An introduction to HPLC-DAD analysis}
   %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ^1^ Department of Ecology and Evolutionary Biology, Cornell University, Ithaca NY
@@ -204,7 +206,7 @@ pk_tab <- normalize_data(peak_table = pk_tab, column = "mass")
 
 #### Attaching reference spectra
 
-Optionally, you can attach scaled reference spectra to the peak_table using the `attach_ref_spectra` function. This can be helpful for working with UV spectra programmatically (e.g. to sort peaks by their chromophores). Reference spectra are defined either as the spectrum with the highest intensity for each peak (when `ref = "max.int"`) or as the spectrum with the highest average correlation to the other spectra associated with the peak (when `ref = "max.cor`). Below, we show how these spectra can be used to construct a correlation matrix to find peaks matching a particular chromophore.
+Optionally, you can attach scaled reference spectra to the peak_table using the `attach_ref_spectra` function. This can be helpful for working with UV spectra programmatically (e.g. to sort peaks by their chromophores). Reference spectra are defined either as the spectrum with the highest intensity for each peak (when `ref = "max.int"`) or as the spectrum with the highest average correlation to the other spectra associated with the peak (when `ref = "max.cor"`). Below, we show how these spectra can be used to construct a correlation matrix to find peaks matching a particular chromophore.
 
 ```{r}
 pk_tab <- attach_ref_spectra(pk_tab, ref="max.int")
