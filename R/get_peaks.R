@@ -23,7 +23,7 @@
 #' @aliases get_peaks
 #' @importFrom stats median
 #' @param chrom_list A list of profile matrices, each of the same dimensions
-#' (timepoints x wavelengths).
+#' (timepoints × wavelengths).
 #' @param lambdas Character vector of wavelengths to find peaks at.
 #' @param fit What type of fit to use. Current options are exponential-gaussian
 #' hybrid (\code{egh}), gaussian or raw. The \code{raw} setting performs
@@ -32,10 +32,10 @@
 #' @param max.iter Maximum number of iterations for non-linear least squares
 #' in \code{\link{fit_peaks}}.
 #' @param time.units Units of \code{sd}, \code{FWHM}, \code{area}, and \code{tau}
-#' (if applicable). Options are minutes \code{"min"}, seconds (\code{"s"}, or 
-#' milliseconds \code{"ms"}.
+#' (if applicable). Options are minutes (\code{"min"}), seconds (\code{"s"}), or 
+#' milliseconds (\code{"ms"}).
 #' @param estimate_purity Logical. Whether to estimate purity or not. Defaults
-#' to FALSE. (If TRUE, this will slow down the function significantly).
+#' to \code{FALSE}. (If \code{TRUE}, this will slow down the function significantly).
 #' @param noise_threshold Noise threshold. Argument to \code{get_purity}.
 #' @param show_progress Logical. Whether to show progress bar. Defaults to 
 #' \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.

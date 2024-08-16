@@ -14,22 +14,23 @@ find_peaks(
 )
 }
 \arguments{
-\item{y}{response (numerical vector)}
+\item{y}{Signal (as a numerical vector).}
 
-\item{smooth_type}{Type of smoothing. Either gaussian kernel (\code{gaussian}),
-box kernel (\code{box}), savitzky-golay smoothing (\code{savgol}),
-moving average (\code{mva}), triangular moving average (\code{tmva}), or 
-no smoothing (\code{none}).}
+\item{smooth_type}{Type of smoothing. Either gaussian kernel (\code{"gaussian"}),
+box kernel (\code{"box"}), savitzky-golay smoothing (\code{"savgol"}),
+moving average (\code{"mva"}), triangular moving average (\code{"tmva"}), or 
+no smoothing (\code{"none"}).}
 
 \item{smooth_window}{Smoothing window. Larger values of this parameter will 
 exclude sharp, narrow features. If the supplied value is between 0 and
 1, window will be interpreted as a proportion of points to include. Otherwise,
 the window will be the absolute number of points to include in the window.
-(Defaults to .001).}
+(Defaults to \code{.001}).}
 
 \item{slope_thresh}{Minimum threshold for slope of the smoothed first
 derivative. This parameter filters on the basis of peak width, such that
-larger values will exclude broad peaks from the peak list. (Defaults to \code{0}).}
+larger values will exclude broad peaks from the peak list. (Defaults to
+\code{0}).}
 
 \item{amp_thresh}{Minimum threshold for peak amplitude. This parameter
 filters on the basis of peak height, such that larger values will
@@ -39,9 +40,9 @@ exclude small peaks from the peak list. (Defaults to \code{0}).}
 (Defaults to \code{TRUE}).}
 }
 \value{
-If bounds == TRUE, returns a data.frame containing the center, start,
-and end of each identified peak. Otherwise, returns a numeric vector of peak
-centers. All locations are expressed as indices.
+If bounds == \code{TRUE}, returns a data.frame containing the center,
+start, and end of each identified peak. Otherwise, returns a numeric vector
+of peak centers. All locations are expressed as indices.
 }
 \description{
 Find peaks in chromatographic profile.
@@ -53,10 +54,10 @@ the signal (\code{y}) that exceed the specified slope threshold
 amplitude threshold (\code{amp_thresh}), filtering out peaks below the
 specified height. Smoothing is intended to prevent the algorithm from
 getting caught up on local minima and maxima that do not represent true
-features. Several smoothing options are available, including \code{gaussian},
-box kernel (\code{box}), savitzky-golay smoothing (\code{savgol}),
-moving average (\code{mva}), triangular moving average (\code{tmva}), or 
-no smoothing (\code{none}).
+features. Several smoothing options are available, including \code{"gaussian"},
+box kernel (\code{"box"}), savitzky-golay smoothing (\code{"savgol"}),
+moving average (\code{"mva"}), triangular moving average (\code{"tmva"}), or 
+no smoothing (\code{"none"}).
 
 It is recommended to do pre-processing using the \code{\link{preprocess}}
 function before peak detection. Overly high chromatographic resolution can 

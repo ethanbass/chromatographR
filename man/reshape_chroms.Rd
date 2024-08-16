@@ -2,7 +2,8 @@
 % Please edit documentation in R/reshape_chroms.R
 \name{reshape_chroms}
 \alias{reshape_chroms}
-\title{Reshapes list of chromatograms from wide to long format}
+\title{Reshape chromatograms
+Reshapes a list of chromatograms from wide to long format.}
 \usage{
 reshape_chroms(x, idx, sample_var = "sample", lambdas = NULL, rts = NULL)
 }
@@ -21,7 +22,8 @@ reshape_chroms(x, idx, sample_var = "sample", lambdas = NULL, rts = NULL)
 A list of chromatographic matrices in long format.
 }
 \description{
-Reshapes list of chromatograms from wide to long format
+Reshape chromatograms
+Reshapes a list of chromatograms from wide to long format.
 }
 \author{
 Ethan Bass

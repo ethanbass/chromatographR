@@ -8,9 +8,11 @@
 #' as numeric indices.
 #' @param weight Weight provided to \code{\link{get_agilent_threshold}}.
 #' @param cutoff Proportion of maximum absorbance to use as cutoff.
-#' Argument to \code{\link{trim_peak}}.
-#' @param noise_variance Variance of noise. Argument to \code{\link{get_agilent_threshold}}.
-#' @param noise_threshold Threshold to define noise. Highest proportion of maximum absorbance.
+#' Argument to \code{\link{trim_peak}}. Defaults to \code{.05}.
+#' @param noise_variance Variance of noise. Argument to 
+#' \code{\link{get_agilent_threshold}}.
+#' @param noise_threshold Threshold to define noise. Highest proportion of 
+#' maximum absorbance. Defaults to \code{.01}.
 #' @param lambdas Wavelengths to include in calculations.
 #' @param try Logical. Whether to estimate the purity or not. Defaults to TRUE.
 #' @return Returns the mean purity of the peak specified by \code{pos}, defined
@@ -46,8 +48,9 @@ get_purity <- function(x, pos, weight = 1, cutoff = 0.05,
 
 #' Calculate variance of noise regions
 #' @param x A chromatogram in matrix format
-#' @param noise_threshold Threshold to define noise. Highest proportion of maximum absorbance.
-#' @param lambdas Wavelengths to include
+#' @param noise_threshold Threshold to define noise. Highest proportion of 
+#' maximum absorbance. Defaults to \code{.01}.
+#' @param lambdas Wavelengths to include.
 #' @importFrom stats var
 #' @return Returns the average variance of the signal over the retention times
 #' defined as noise according to \code{\link{find_noise}}.
@@ -84,9 +87,11 @@ find_noise <- function(x, noise_threshold = 0.01, lambdas){
 #' Calculate purity thresholds
 #' @param x A chromatogram in matrix format
 #' @param pos A vector containing peak information
-#' @param weight scaling parameter affecting stringency of threshold.
+#' @param weight Scaling parameter affecting stringency of threshold. Defaults
+#' to \code{1}.
 #' @param noise_variance Variance of noise.
-#' @param noise_threshold Threshold to define noise. Highest proportion of maximum absorbance.
+#' @param noise_threshold Threshold to define noise. Highest proportion of 
+#' maximum absorbance. Defaults to \code{.005}.
 #' @param lambdas Wavelengths to include
 #' @return Returns a vector of purity thresholds at each retention time index
 #' within the peak specified by \code{pos}.
@@ -121,7 +126,7 @@ get_agilent_threshold <- function(x, pos, weight = 1, noise_variance = NULL,
 
 #' Calculate spectral similarity
 #' @param x A chromatogram in matrix format
-#' @param pos A vector containing peak information
+#' @param pos A vector containing peak information.
 #' @return Returns a vector of spectral similarities of the reference spectrum
 #' to the spectrum at each timepoint within the peak specified by \code{pos}.
 #' @references
@@ -140,8 +145,11 @@ get_spectral_similarity <- function(x, pos){
 #' @param x A chromatogram in matrix format
 #' @param pos A vector containing peak information
 #' @param weight weight provided to \code{\link{get_agilent_threshold}}.
-#' @param noise_variance Variance of noise. Argument to \code{\link{get_agilent_threshold}}.
-#' @param noise_threshold Threshold to define noise. Highest proportion of maximum absorbance.
+#' Defaults to \code{1}.
+#' @param noise_variance Variance of noise. Argument to 
+#' \code{\link{get_agilent_threshold}}.
+#' @param noise_threshold Threshold to define noise. Highest proportion of 
+#' maximum absorbance. Defaults to \code{.005}.
 #' @param lambdas Wavelengths to include in calculations.
 #' @return Returns a vector of peak purity values at each timepoint within the
 #' peak specified by \code{pos}.
@@ -168,7 +176,8 @@ get_purity_values <- function(x, pos, weight = 1, noise_variance = NULL,
 #' Trim peak
 #' @param x A chromatogram in matrix format
 #' @param pos A vector containing peak information
-#' @param cutoff Proportion of maximum absorbance to use as cutoff.
+#' @param cutoff Proportion of maximum absorbance to use as cutoff. Defaults to
+#' \code{.05}.
 #' @return Returns indices within the peak specified by \code{pos} with a higher
 #' signal intensity than the specified cutoff.
 #' @author Ethan Bass

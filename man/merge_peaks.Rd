@@ -2,7 +2,7 @@
 % Please edit documentation in R/combine_peaks.R
 \name{merge_peaks}
 \alias{merge_peaks}
-\title{Merge split peaks in peak table}
+\title{Merge split peaks}
 \usage{
 merge_peaks(peak_table, peaks, method = c("max", "sum"))
 }
@@ -19,8 +19,13 @@ A peak table similar to the input peak table, but where the specified
 columns are combined.
 }
 \description{
-Merges the specified peaks, by selecting the largest value from each column.
-Utility function to combine split peaks into a single column of the peak table.
+Utility function to combine split peaks into a single column of the peak 
+table.
+}
+\details{
+Merges the specified peaks in peak table, by selecting the largest value from 
+each column if \code{method} is \code{"max"}. If \code{method} is
+\code{"sum"}, merges peak by summing their values.
 }
 \examples{
 data(pk_tab)

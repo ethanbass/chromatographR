@@ -2,7 +2,7 @@
 % Please edit documentation in R/combine_peaks.R
 \name{combine_peaks}
 \alias{combine_peaks}
-\title{Combine peaks in peak table}
+\title{Combine peaks}
 \usage{
 combine_peaks(
   peak_table,

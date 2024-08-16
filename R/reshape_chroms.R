@@ -1,4 +1,5 @@
-#' Reshapes list of chromatograms from wide to long format
+#' Reshape chromatograms
+#' Reshapes a list of chromatograms from wide to long format.
 #' @name reshape_chroms
 #' @param x A list of chromatographic matrices in wide format.
 #' @param idx Indices of chromatograms to convert

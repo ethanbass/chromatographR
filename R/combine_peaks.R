@@ -1,4 +1,4 @@
-#' Combine peaks in peak table
+#' Combine peaks
 #' 
 #' Utility function to combine duplicate peaks in peak table, i.e. peaks that
 #' were integrated at more than one wavelength or component. Specify tolerance
@@ -64,10 +64,14 @@ combine_peaks <- function(peak_table, tol = .01, min.cor = 0.9,
   peak_table
 }
 
-#' Merge split peaks in peak table
+#' Merge split peaks
 #' 
-#' Merges the specified peaks, by selecting the largest value from each column.
-#' Utility function to combine split peaks into a single column of the peak table.
+#' Utility function to combine split peaks into a single column of the peak 
+#' table.
+#' 
+#' Merges the specified peaks in peak table, by selecting the largest value from 
+#' each column if \code{method} is \code{"max"}. If \code{method} is
+#' \code{"sum"}, merges peak by summing their values.
 #'
 #' @name merge_peaks
 #' @param peak_table Peak table from \code{\link{get_peaktable}}.

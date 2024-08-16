@@ -24,11 +24,13 @@ as numeric indices.}
 \item{weight}{Weight provided to \code{\link{get_agilent_threshold}}.}
 
 \item{cutoff}{Proportion of maximum absorbance to use as cutoff.
-Argument to \code{\link{trim_peak}}.}
+Argument to \code{\link{trim_peak}}. Defaults to \code{.05}.}
 
-\item{noise_variance}{Variance of noise. Argument to \code{\link{get_agilent_threshold}}.}
+\item{noise_variance}{Variance of noise. Argument to 
+\code{\link{get_agilent_threshold}}.}
 
-\item{noise_threshold}{Threshold to define noise. Highest proportion of maximum absorbance.}
+\item{noise_threshold}{Threshold to define noise. Highest proportion of 
+maximum absorbance. Defaults to \code{.01}.}
 
 \item{lambdas}{Wavelengths to include in calculations.}
 

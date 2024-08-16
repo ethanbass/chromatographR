@@ -21,7 +21,7 @@ get_peaks(
 }
 \arguments{
 \item{chrom_list}{A list of profile matrices, each of the same dimensions
-(timepoints x wavelengths).}
+(timepoints × wavelengths).}
 
 \item{lambdas}{Character vector of wavelengths to find peaks at.}
 
@@ -35,11 +35,11 @@ trapezoidal integration directly on the raw data without fitting a peak shape.}
 in \code{\link{fit_peaks}}.}
 
 \item{time.units}{Units of \code{sd}, \code{FWHM}, \code{area}, and \code{tau}
-(if applicable). Options are minutes \code{"min"}, seconds (\code{"s"}, or
-milliseconds \code{"ms"}.}
+(if applicable). Options are minutes (\code{"min"}), seconds (\code{"s"}), or
+milliseconds (\code{"ms"}).}
 
 \item{estimate_purity}{Logical. Whether to estimate purity or not. Defaults
-to FALSE. (If TRUE, this will slow down the function significantly).}
+to \code{FALSE}. (If \code{TRUE}, this will slow down the function significantly).}
 
 \item{noise_threshold}{Noise threshold. Argument to \code{get_purity}.}
 

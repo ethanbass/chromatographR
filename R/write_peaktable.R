@@ -69,10 +69,10 @@ write_peaktable <- function(peak_table, path, filename = "peak_table",
 
 #' Write CSV from peak_table
 #' @noRd
-write_csvs <- function(x, file, filename="peak_table", rowNames){
+write_csvs <- function(x, file, filename = "peak_table", rowNames){
   # file <- gsub(suffix, "", file)
   x <- lapply(names(x), function(i){
-    file <- fs::path(file, paste(filename, i, sep="-"), ext = "csv")
+    file <- fs::path(file, paste(filename, i, sep = "-"), ext = "csv")
     write.csv(x = x[[i]],
               file = file,
               row.names = rowNames)

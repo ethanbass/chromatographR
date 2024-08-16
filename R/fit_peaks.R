@@ -8,10 +8,10 @@
 #' amplitude threshold (\code{amp_thresh}), filtering out peaks below the
 #' specified height. Smoothing is intended to prevent the algorithm from
 #' getting caught up on local minima and maxima that do not represent true
-#' features. Several smoothing options are available, including \code{gaussian},
-#' box kernel (\code{box}), savitzky-golay smoothing (\code{savgol}),
-#' moving average (\code{mva}), triangular moving average (\code{tmva}), or 
-#' no smoothing (\code{none}).
+#' features. Several smoothing options are available, including \code{"gaussian"},
+#' box kernel (\code{"box"}), savitzky-golay smoothing (\code{"savgol"}),
+#' moving average (\code{"mva"}), triangular moving average (\code{"tmva"}), or 
+#' no smoothing (\code{"none"}).
 #' 
 #' It is recommended to do pre-processing using the \code{\link{preprocess}}
 #' function before peak detection. Overly high chromatographic resolution can 
@@ -24,27 +24,28 @@
 #' @importFrom minpack.lm nlsLM
 #' @importFrom stats deriv lm ksmooth
 #' @importFrom utils tail
-#' @param y response (numerical vector)
-#' @param smooth_type Type of smoothing. Either gaussian kernel (\code{gaussian}),
-#' box kernel (\code{box}), savitzky-golay smoothing (\code{savgol}),
-#' moving average (\code{mva}), triangular moving average (\code{tmva}), or 
-#' no smoothing (\code{none}).
+#' @param y Signal (as a numerical vector).
+#' @param smooth_type Type of smoothing. Either gaussian kernel (\code{"gaussian"}),
+#' box kernel (\code{"box"}), savitzky-golay smoothing (\code{"savgol"}),
+#' moving average (\code{"mva"}), triangular moving average (\code{"tmva"}), or 
+#' no smoothing (\code{"none"}).
 #' @param smooth_window Smoothing window. Larger values of this parameter will 
 #' exclude sharp, narrow features. If the supplied value is between 0 and
 #' 1, window will be interpreted as a proportion of points to include. Otherwise,
 #' the window will be the absolute number of points to include in the window.
-#' (Defaults to .001).
+#' (Defaults to \code{.001}).
 #' @param slope_thresh Minimum threshold for slope of the smoothed first
 #' derivative. This parameter filters on the basis of peak width, such that
-#' larger values will exclude broad peaks from the peak list. (Defaults to \code{0}).
+#' larger values will exclude broad peaks from the peak list. (Defaults to
+#' \code{0}).
 #' @param amp_thresh Minimum threshold for peak amplitude. This parameter
 #' filters on the basis of peak height, such that larger values will
 #' exclude small peaks from the peak list. (Defaults to \code{0}).
 #' @param bounds Logical. If TRUE, includes peak boundaries in data.frame.
 #' (Defaults to \code{TRUE}).
-#' @return If bounds == TRUE, returns a data.frame containing the center, start,
-#' and end of each identified peak. Otherwise, returns a numeric vector of peak
-#' centers. All locations are expressed as indices.
+#' @return If bounds == \code{TRUE}, returns a data.frame containing the center,
+#' start, and end of each identified peak. Otherwise, returns a numeric vector
+#' of peak centers. All locations are expressed as indices.
 #' @note The \code{find_peaks} function is adapted from MATLAB code included in
 #' Prof. Tom O'Haver's
 #' \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{
@@ -117,7 +118,7 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva", "t
 #' Peak parameters are calculated by fitting the data
 #' to a gaussian or exponential-gaussian hybrid curve using non-linear least
 #' squares estimation as implemented in \code{\link[minpack.lm:nlsLM]{nlsLM}}.
-#' Area under the fitted curve is then estimated using trapezoidal estimation.
+#' Area under the fitted curve is then estimated using trapezoidal approximation.
 #' 
 #' @param x A chromatogram in matrix format.
 #' @param lambda Wavelength to fit peaks at.

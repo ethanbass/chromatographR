@@ -18,11 +18,13 @@ get_agilent_threshold(
 
 \item{pos}{A vector containing peak information}
 
-\item{weight}{scaling parameter affecting stringency of threshold.}
+\item{weight}{Scaling parameter affecting stringency of threshold. Defaults
+to \code{1}.}
 
 \item{noise_variance}{Variance of noise.}
 
-\item{noise_threshold}{Threshold to define noise. Highest proportion of maximum absorbance.}
+\item{noise_threshold}{Threshold to define noise. Highest proportion of 
+maximum absorbance. Defaults to \code{.005}.}
 
 \item{lambdas}{Wavelengths to include}
 }

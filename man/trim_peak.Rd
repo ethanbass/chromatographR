@@ -11,7 +11,8 @@ trim_peak(x, pos, cutoff = 0.05)
 
 \item{pos}{A vector containing peak information}
 
-\item{cutoff}{Proportion of maximum absorbance to use as cutoff.}
+\item{cutoff}{Proportion of maximum absorbance to use as cutoff. Defaults to
+\code{.05}.}
 }
 \value{
 Returns indices within the peak specified by \code{pos} with a higher
