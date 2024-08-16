@@ -59,7 +59,8 @@
 #' Applications in scientific measurement. \url{https://terpconnect.umd.edu/~toh/spectrum/}
 #' (Accessed January, 2022).
 #' @export find_peaks
-find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva", "tmva", "none"),
+find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol",
+                                          "mva", "tmva", "none"),
                        smooth_window = .001, slope_thresh = 0, amp_thresh = 0,
                        bounds = TRUE){
   if (!is.vector(y)){
@@ -72,14 +73,18 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva", "t
   }
   # compute derivative (with or without smoothing)
   if (smooth_type == "savgol"){
-    if ((smooth_window %% 2) == 0){smooth_window <- smooth_window + 1}
+    if ((smooth_window %% 2) == 0){
+      smooth_window <- smooth_window + 1
+    }
     d <- savgol(diff(y), fl = smooth_window)
   } else if (smooth_type == "mva"){
     d <- caTools::runmean(diff(y), k = smooth_window)
   } else if (smooth_type == 'gaussian'){
-    d <- diff(ksmooth(seq_along(y), y, kernel = "normal", bandwidth = smooth_window)$y)
+    d <- diff(ksmooth(seq_along(y), y, kernel = "normal",
+                      bandwidth = smooth_window)$y)
   }  else if (smooth_type == "box"){
-    d <- diff(ksmooth(seq_along(y), y, kernel = "box", bandwidth = smooth_window)$y)
+    d <- diff(ksmooth(seq_along(y), y, kernel = "box",
+                      bandwidth = smooth_window)$y)
   } else if (smooth_type == "tmva"){
     d <- runmean(runmean(diff(y), k = smooth_window), k = smooth_window)
   } else{
@@ -215,13 +220,13 @@ fit_peaks <- function (x, lambda, pos = NULL, sd.max = 50,
     huhn <- huhn[huhn$sd < sd.max, ]
   }
   x <- try(huhn[huhn$rt > 0,], silent=TRUE)
-  if(inherits(x,  "try-error")){NA} else {x}
+  if(inherits(x, "try-error")) NA else x
 }
 
 #' Gaussian function
 #' @note: Adapted from \href{https://github.com/robertdouglasmorrison/DuffyTools/blob/master/R/gaussian.R}
 #' @noRd
-gaussian <- function(x, center = 0, width = 1, height=NULL, floor=0) {
+gaussian <- function(x, center = 0, width = 1, height = NULL, floor = 0){
   
   # adapted from Earl F. Glynn;  Stowers Institute for Medical Research, 2007
   twoVar <- 2 * width * width
@@ -241,8 +246,8 @@ gaussian <- function(x, center = 0, width = 1, height=NULL, floor=0) {
 #' @noRd
 
 fit_gaussian <- function(x, y, start.center = NULL,
-                         start.width = NULL, start.height=NULL,
-                         start.floor=NULL, fit.floor=FALSE, max.iter=1000) {
+                         start.width = NULL, start.height = NULL,
+                         start.floor = NULL, fit.floor = FALSE, max.iter = 1000) {
   # estimate starting values
   who.max <- which.max(y)
   if ( is.null( start.center)) start.center <- x[ who.max]
@@ -250,11 +255,13 @@ fit_gaussian <- function(x, y, start.center = NULL,
   if ( is.null( start.width)) start.width <- sum( y > (start.height/2)) / 2
   
   # call the Nonlinear Least Squares, either fitting the floor too or not
-  controlList <- nls.control( maxiter = max.iter, minFactor=1/512, warnOnly = TRUE)
-  starts <- list( "center" = start.center, "width" = start.width, "height" = start.height)
-  if ( ! fit.floor) {
+  controlList <- nls.control( maxiter = max.iter, minFactor=1/512,
+                              warnOnly = TRUE)
+  starts <- list( "center" = start.center, "width" = start.width,
+                  "height" = start.height)
+  if (!fit.floor) {
     nlsAns <- try(nlsLM( y ~ gaussian(x, center, width, height),
-                         start=starts, control=controlList), silent = TRUE)
+                         start = starts, control = controlList), silent = TRUE)
   } else{
     if (is.null( start.floor)) start.floor <- quantile( y, seq(0,1,0.1))[2]
     starts <- c(starts,"floor"=start.floor)
@@ -266,17 +273,18 @@ fit_gaussian <- function(x, y, start.center = NULL,
   
     if (inherits(nlsAns, "try-error")){
       yAns <- gaussian(x, start.center, start.width, start.height, start.floor)
-      out <- list("center"=start.center, "width"=start.width, "height"=start.height,
-                  "y"=yAns, "residual"= y - yAns)
-      floorAns <- if ( fit.floor) start.floor else 0
+      out <- list("center" = start.center, "width" = start.width,
+                  "height" = start.height,
+                  "y" = yAns, "residual" = y - yAns)
+      floorAns <- if (fit.floor) start.floor else 0
     } else {
       coefs <-coef(nlsAns)
-      out <- list( "center"=coefs[1], "width"=coefs[2], "height"=coefs[3],
-                   "y"=fitted( nlsAns), "residual"=residuals(nlsAns))
-      floorAns <- if ( fit.floor) coefs[4] else 0
+      out <- list( "center" = coefs[1], "width" = coefs[2], "height" = coefs[3],
+                   "y" = fitted(nlsAns), "residual" = residuals(nlsAns))
+      floorAns <- if (fit.floor) coefs[4] else 0
     }
     if (fit.floor) {
-      out <- c( out, "floor"=floorAns)
+      out <- c( out, "floor" = floorAns)
     }
   return( out)
 }
@@ -285,10 +293,10 @@ fit_gaussian <- function(x, y, start.center = NULL,
 
 #' Expontential-gaussian hybrid
 #' @noRd
-egh <- function(x, center, width,  height, tau, floor=0){
+egh <- function(x, center, width,  height, tau, floor = 0){
     result <- rep(0, length(x))
     index <- which(2*width^2 + tau*(x-center)>0)
-    result[index] <- height*exp(-(x[index]-center)^2/(2*width^2 + tau*(x[index]-center)))
+    result[index] <- height*exp(-(x[index] - center)^2/(2*width^2 + tau*(x[index] - center)))
     return(result)
   }
 
@@ -296,9 +304,9 @@ egh <- function(x, center, width,  height, tau, floor=0){
 #' Fit exponential-gaussian hybrid peak
 #' @importFrom stats coef fitted lm nls.control quantile residuals
 #' @noRd
-fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
-                    start.height=NULL, start.floor=NULL, fit.floor=FALSE,
-                    max.iter=1000) {
+fit_egh <- function(x1, y1, start.center = NULL, start.width = NULL,
+                    start.tau = NULL, start.height = NULL, start.floor = NULL,
+                    fit.floor = FALSE, max.iter = 1000) {
   
   # try to find the best egh to fit the given data
   
@@ -317,34 +325,38 @@ fit_egh <- function(x1, y1, start.center=NULL, start.width=NULL, start.tau=NULL,
     start.tau <- 0
   }
   # call the Nonlinear Least Squares, either fitting the floor too or not
-  controlList <- nls.control(maxiter=max.iter, minFactor=1/512, warnOnly=TRUE)
-  starts <- list("center"=start.center, "width"=start.width, 
-                 "height"=start.height, "tau"=start.tau)
+  controlList <- nls.control(maxiter = max.iter, minFactor = 1/512,
+                             warnOnly = TRUE)
+  starts <- list("center" = start.center, "width" = start.width, 
+                 "height" = start.height, "tau" = start.tau)
   if (!fit.floor){
     nlsAns <- try(nlsLM(y1 ~ egh(x1, center, width, height, tau),
-                        start=starts, control=controlList), silent=TRUE)
+                        start = starts, control = controlList), silent = TRUE)
   } else{
-    if (is.null( start.floor)) start.floor <- quantile( y1, seq(0,1,0.1))[2]
-    starts <- c(starts, "floor"=start.floor)
+    if (is.null( start.floor)) start.floor <- quantile( y1, seq(0, 1, 0.1))[2]
+    starts <- c(starts, "floor" = start.floor)
     nlsAns <- try(nlsLM(y1 ~ egh(x1, center, width, height, tau, floor),
                         start = starts, control = controlList), silent = TRUE)
   }
   
   # package up the results to pass back
   if (inherits(nlsAns, "try-error")) {
-    yAns <- egh(x1, start.center, start.width, start.height, start.tau, start.floor)
-    out <- list("center"=start.center, "width"=start.width, "height"=start.height, "tau"=start.tau,
-                "y"=yAns, "residual"= y1 - yAns)
-    floorAns <- if ( fit.floor) start.floor else 0
+    yAns <- egh(x1, start.center, start.width, start.height,
+                start.tau, start.floor)
+    out <- list("center" = start.center, "width" = start.width,
+                "height" = start.height, "tau" = start.tau,
+                "y" = yAns, "residual" = y1 - yAns)
+    floorAns <- if (fit.floor) start.floor else 0
   } else {
     coefs <-coef(nlsAns)
-    out <- list( "center"=coefs[1], "width"=coefs[2], "height"=coefs[3], "tau"=coefs[4],
-                 "y"=fitted( nlsAns), "residual"=residuals(nlsAns))
-    floorAns <- if ( fit.floor) coefs[5] else 0
+    out <- list( "center" = coefs[1], "width" = coefs[2], "height" = coefs[3],
+                 "tau" = coefs[4], "y"=fitted(nlsAns),
+                 "residual" = residuals(nlsAns))
+    floorAns <- if (fit.floor) coefs[5] else 0
   }
   
   if (fit.floor) {
-    out <- c( out, "floor"=floorAns)
+    out <- c( out, "floor" = floorAns)
   }
   return(out)
 }
@@ -379,13 +391,14 @@ fitpk_egh <- function(x, pos, lambda, max.iter,
   suppressWarnings(m <- fit_egh(peak.loc, y[peak.loc], start.center = xloc,
                                 start.height = y[xloc], max.iter = max.iter)
   )
-  r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=TRUE)
+  r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE)
   purity <- get_purity(x = x, pos = pos, try = estimate_purity,
                        noise_threshold = noise_threshold)
-  area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
+  # trapezoidal integration
+  area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y, -1))))
   c("rt" = m$center, "start" = pos[2], "end" = pos[3], 
     "sd" = m$width, "tau" = m$tau, "FWHM" = 2.35 * m$width,
-    "height" = y[xloc], "area" = area, "r.squared" = r.squared, purity=purity)
+    "height" = y[xloc], "area" = area, "r.squared" = r.squared, purity = purity)
 }
 
 #' @noRd
@@ -399,7 +412,7 @@ fitpk_raw <- function(x, pos, lambda, max.iter,
   purity <- get_purity(x = x, pos = pos, try = estimate_purity,
                        noise_threshold = noise_threshold)
   c("rt" = pos[1], "start" = pos[2], "end" = pos[3], 
-    "sd" = pos[3]-pos[2], "FWHM" = 2.35 * pos[3]-pos[2],
+    "sd" = pos[3] - pos[2], "FWHM" = 2.35 * pos[3] - pos[2],
     "height" = y[xloc], "area" = area, purity = purity)
 }
 
@@ -452,7 +465,7 @@ pinv <- function (A, tol = .Machine$double.eps^(2/3)) {
   if (all(p)) {
     mp <- s$v %*% (1/s$d * t(s$u))
   } else if (any(p)) {
-    mp <- s$v[, p, drop=FALSE] %*% (1/s$d[p] * t(s$u[, p, drop = FALSE]))
+    mp <- s$v[, p, drop = FALSE] %*% (1/s$d[p] * t(s$u[, p, drop = FALSE]))
   } else {
     mp <- matrix(0, nrow = ncol(A), ncol = nrow(A))
   }
