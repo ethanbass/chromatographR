@@ -218,7 +218,7 @@ test_that("attach_metadata works", {
   expect_error(attach_metadata(pk_tab$tab, metadata = meta, column = "vial"))
   expect_error(attach_metadata(pk_tab, metadata = rbind(meta,meta), 
                                column = "vial"))
-  expect_warning(attach_metadata(pk_tab, metadata. =meta[-1,], column = "vial"))
+  expect_warning(attach_metadata(pk_tab, metadata = meta[-1,], column = "vial"))
 })
 
 pk_tab <- attach_ref_spectra(pk_tab, chrom_list = dat.pr, ref = "max.cor")
