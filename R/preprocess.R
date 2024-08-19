@@ -5,7 +5,8 @@
 #' the size of the matrix can be reduced by interpolation. By default,
 #' the data are baseline-corrected in the time direction
 #' (\code{\link[ptw:baseline.corr]{baseline.corr}}) and smoothed in the 
-#' spectral dimension using cubic smoothing splines (\code{\link[stats:smooth.spline]{smooth.spline}}.
+#' spectral dimension using cubic smoothing splines
+#' (\code{\link[stats:smooth.spline]{smooth.spline}}.
 #' 
 #' @import ptw
 #' @importFrom stats approx smooth.spline

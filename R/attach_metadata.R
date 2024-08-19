@@ -192,7 +192,7 @@ normalize_data <- function(peak_table, column, chrom_list,
   df <- switch(by, meta = peak_table$sample_meta, peak = peak_table$tab)
   if (what == "peak_table"){
     pktab <- as.data.frame(t(sapply(seq_len(nrow(peak_table$tab)), function(samp){
-      as.numeric(as.vector(peak_table$tab[samp,]))/df[samp,column]
+      as.numeric(as.vector(peak_table$tab[samp,]))/df[samp, column]
     })))
     rownames(pktab) <- rownames(peak_table$tab)
     peak_table$tab <- pktab
@@ -205,7 +205,7 @@ normalize_data <- function(peak_table, column, chrom_list,
     if (mean(elementwise.all.equal(names(chrom_list), rownames(peak_table$tab))) < 1)
       stop("Names of chromatograms do not match the peak table.")
     chrom_list <- lapply(seq_len(nrow(peak_table$tab)), function(samp){
-      chrom_list[[samp]]/df[samp,column]
+      chrom_list[[samp]]/df[samp, column]
     })
     return(chrom_list)
   }

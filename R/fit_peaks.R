@@ -219,7 +219,7 @@ fit_peaks <- function (x, lambda, pos = NULL, sd.max = 50,
   if (!is.null(sd.max)) {
     huhn <- huhn[huhn$sd < sd.max, ]
   }
-  x <- try(huhn[huhn$rt > 0,], silent=TRUE)
+  x <- try(huhn[huhn$rt > 0,], silent = TRUE)
   if(inherits(x, "try-error")) NA else x
 }
 
@@ -247,15 +247,16 @@ gaussian <- function(x, center = 0, width = 1, height = NULL, floor = 0){
 
 fit_gaussian <- function(x, y, start.center = NULL,
                          start.width = NULL, start.height = NULL,
-                         start.floor = NULL, fit.floor = FALSE, max.iter = 1000) {
+                         start.floor = NULL, fit.floor = FALSE,
+                         max.iter = 1000){
   # estimate starting values
   who.max <- which.max(y)
-  if ( is.null( start.center)) start.center <- x[ who.max]
-  if ( is.null( start.height)) start.height <- y[ who.max]
-  if ( is.null( start.width)) start.width <- sum( y > (start.height/2)) / 2
+  if (is.null(start.center)) start.center <- x[who.max]
+  if (is.null(start.height)) start.height <- y[who.max]
+  if (is.null(start.width)) start.width <- sum( y > (start.height/2)) / 2
   
   # call the Nonlinear Least Squares, either fitting the floor too or not
-  controlList <- nls.control( maxiter = max.iter, minFactor=1/512,
+  controlList <- nls.control(maxiter = max.iter, minFactor = 1/512,
                               warnOnly = TRUE)
   starts <- list( "center" = start.center, "width" = start.width,
                   "height" = start.height)
@@ -263,9 +264,9 @@ fit_gaussian <- function(x, y, start.center = NULL,
     nlsAns <- try(nlsLM( y ~ gaussian(x, center, width, height),
                          start = starts, control = controlList), silent = TRUE)
   } else{
-    if (is.null( start.floor)) start.floor <- quantile( y, seq(0,1,0.1))[2]
-    starts <- c(starts,"floor"=start.floor)
-    nlsAns <- try(nlsLM( y ~ gaussian( x, center, width, height, floor),
+    if (is.null(start.floor)) start.floor <- quantile(y, seq(0, 1, 0.1))[2]
+    starts <- c(starts, "floor" = start.floor)
+    nlsAns <- try(nlsLM( y ~ gaussian(x, center, width, height, floor),
                          start = starts, control = controlList), silent = TRUE)
   }
   
@@ -294,11 +295,11 @@ fit_gaussian <- function(x, y, start.center = NULL,
 #' Expontential-gaussian hybrid
 #' @noRd
 egh <- function(x, center, width,  height, tau, floor = 0){
-    result <- rep(0, length(x))
-    index <- which(2*width^2 + tau*(x-center)>0)
-    result[index] <- height*exp(-(x[index] - center)^2/(2*width^2 + tau*(x[index] - center)))
-    return(result)
-  }
+  result <- rep(0, length(x))
+  index <- which(2*width^2 + tau*(x-center)>0)
+  result[index] <- height*exp(-(x[index] - center)^2/(2*width^2 + tau*(x[index] - center)))
+  return(result)
+}
 
 
 #' Fit exponential-gaussian hybrid peak
@@ -350,7 +351,7 @@ fit_egh <- function(x1, y1, start.center = NULL, start.width = NULL,
   } else {
     coefs <-coef(nlsAns)
     out <- list( "center" = coefs[1], "width" = coefs[2], "height" = coefs[3],
-                 "tau" = coefs[4], "y"=fitted(nlsAns),
+                 "tau" = coefs[4], "y" = fitted(nlsAns),
                  "residual" = residuals(nlsAns))
     floorAns <- if (fit.floor) coefs[5] else 0
   }
@@ -374,7 +375,7 @@ fitpk_gaussian <- function(x, pos, lambda, max.iter,
                                      max.iter = max.iter)
   )
   area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
-  r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent=TRUE)
+  r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE)
   purity <- get_purity(x = x, pos = pos, try = estimate_purity,
                        noise_threshold = noise_threshold)
   c("rt" = m$center, "start" = pos[2], "end" = pos[3], 
@@ -435,11 +436,11 @@ savgol <- function(T, fl, forder = 4, dorder = 0) {
   
   # -- calculate filter coefficients --
   fc <- (fl-1)/2                          # index: window left and right
-  X <- outer(-fc:fc, 0:forder, FUN="^")   # polynomial terms and coeffs
+  X <- outer(-fc:fc, 0:forder, FUN = "^")   # polynomial terms and coeffs
   Y <- pinv(X);                           # pseudoinverse
   
   # -- filter via convolution and take care of the end points --
-  T2 <- convolve(T, rev(Y[(dorder+1),]), type="o")   # convolve(...)
+  T2 <- convolve(T, rev(Y[(dorder+1),]), type = "o")   # convolve(...)
   T2 <- T2[(fc+1):(length(T2)-fc)]
   
   Tsg <- (-1)^dorder * T2
