@@ -48,8 +48,10 @@ test_that("preprocess works on a list", {
 })
 
 ### test correct_rt ###
+
 warping.models <- correct_rt(dat.pr, lambdas = c('210','260','318'),
                              what = "models", show_progress = FALSE)
+
 warp <- correct_rt(chrom_list = dat.pr, models = warping.models,
                    what = "corrected.values", show_progress = FALSE)
 
@@ -75,6 +77,15 @@ test_that("correct_rt works with vpdtw", {
   expect_error(correct_rt(dat.pr, lambdas = c("210", "260"),
                           alg="vpdtw",  show_progress = FALSE))
   expect_error(correct_rt(dat.pr, lambdas = c("x"), alg = "vpdtw"))
+})
+
+test_that("VPdtw plot displays correctly", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  vpdtw_alignment <- function(){
+    warp <- correct_rt(dat.pr, lambdas = "210", alg="vpdtw", plot_it=TRUE)
+  }
+  vdiffr::expect_doppelganger("vpdtw_alignment", vpdtw_alignment)
 })
 
 test_that("plot_chroms works to plot alignments", {
