@@ -1,138 +1,49 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/404.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/articles/chromatographR.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/index.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/Sa.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/Sa_pr.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/Sa_warp.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/attach_metadata.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/attach_ref_spectra.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/boxplot.peak_table.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/chromatographR-package.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/cluster_spectra.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/combine_peaks.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/correct_peaks.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/correct_rt.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/filter_peaks.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/filter_peaktable.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/find_peaks.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/fit_peaks.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/get_agilent_threshold.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/get_peaks.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/get_peaktable.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/get_purity.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/merge_peaks.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/mirror_plot.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/normalize_data.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/pk_tab.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/plot.peak_list.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/plot.peak_table.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/plot.ptw_list.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/plot_all_spectra.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/plot_chroms.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/plot_spectrum.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/preprocess.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/reexports.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/reshape_chroms.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/reshape_peaktable.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/scan_chrom.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/subset.peak_table.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/trim_peak.html</loc>
-  </url>
-  <url>
-    <loc>https://ethanbass.github.io/chromatographR/reference/write_peaktable.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://ethanbass.github.io/chromatographR/404.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/LICENSE-text.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/articles/chromatographR.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/articles/index.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/authors.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/contributing.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/index.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/news/index.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/Sa.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/Sa_pr.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/Sa_warp.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/attach_metadata.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/attach_ref_spectra.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/boxplot.peak_table.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/chromatographR-package.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/cluster_spectra.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/combine_peaks.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/correct_peaks.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/correct_rt.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/filter_peaks.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/filter_peaktable.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/find_peaks.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/fit_peaks.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/get_agilent_threshold.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/get_peaks.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/get_peaktable.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/get_purity.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/index.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/merge_peaks.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/mirror_plot.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/normalize_data.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/pk_tab.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/plot.peak_list.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/plot.peak_table.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/plot.ptw_list.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/plot_all_spectra.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/plot_chroms.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/plot_spectrum.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/preprocess.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/reexports.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/reshape_chroms.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/reshape_peaktable.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/scan_chrom.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/subset.peak_table.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/trim_peak.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/write_peaktable.html</loc></url>
 </urlset>
+
