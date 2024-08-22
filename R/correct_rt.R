@@ -129,28 +129,41 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
   # choose reference chromatogram
   if (reference == 'best'){
     best <- ptw::bestref(allmats.t)
-    reference <- as.numeric(names(sort(table(best$best.ref), decreasing = TRUE))[1])
-    if (verbose) message(paste("Selected chromatogram", reference, "as best reference."))
+    reference <- as.numeric(names(sort(table(best$best.ref), 
+                                       decreasing = TRUE))[1])
+    if (verbose) message(paste("Selected chromatogram", reference, 
+                               "as best reference."))
   } else {
     reference <- reference
   }
-  args <- substitute(list(lambdas = lambdas, models = models, reference = reference, 
-                          alg = alg, init.coef = init.coef, n.traces = n.traces,
+  args <- substitute(list(lambdas = lambdas, models = models, 
+                          reference = reference, alg = alg, 
+                          init.coef = init.coef, n.traces = n.traces,
                           n.zeros = n.zeros, scale = scale, trwdth = trwdth,
                           penalty = penalty, maxshift = maxshift))
   if (alg == "ptw"){
     if (is.null(models)){
       laplee <- choose_apply_fnc(show_progress, cl = cl)
       models <- laplee(seq_len(dim(allmats)[3]), function(ii){
-        ptw::ptw(allmats.t[,, reference],
+        pw <- ptw::ptw(allmats.t[,, reference],
             allmats.t[,, ii], selected.traces = traces, init.coef = init.coef,
-            warp.type = "global", ...)})
+            warp.type = "global", ...)
+        if (nrow(pw$reference) == 1){
+          colnames(pw$reference) <- get_times(chrom_list)
+          colnames(pw$sample) <- get_times(chrom_list)
+          colnames(pw$warped.sample) <- get_times(chrom_list)
+          rownames(pw$reference) <- lambdas
+          rownames(pw$sample) <- lambdas
+          rownames(pw$warped.sample) <- lambdas
+        }
+        pw
+        })
       names(models) <- names(chrom_list)
       models <- structure(models, chrom_list = deparse(substitute(chrom_list)), 
                           reference = reference, init.coef = init.coef,
                           n.traces = n.traces, n.zeros=n.zeros, scale = scale,
                           trwdth = trwdth, penalty = penalty, 
-                          maxshift = maxshift, class="ptw_list")
+                          maxshift = maxshift, class = "ptw_list")
       if (plot_it){
         plot(models)
       }
@@ -195,7 +208,8 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
         # warp retention times
         x <- apply(chrom_list_og[[samp]], 2, function(j){
           iset <- c(rep(NA, short), j)
-          suppressWarnings(stats::approx(x = jset[,samp], y = iset, seq_len(jmax))$y)
+          suppressWarnings(stats::approx(x = jset[,samp], y = iset, 
+                                         seq_len(jmax))$y)
         })
       })
         # fix times

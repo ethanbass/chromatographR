@@ -4,6 +4,7 @@
 * Made small updates to documentation (in `preprocess` and `fit_peaks` functions) to better describe arguments.
 * Added warning in `mirror_plot` when `var` contains more than two levels and levels aren't specified.
 * Fixed bug to allow `mirror_plot` to work properly with 2D data.
+* Return dimnames for 1D ptw model objects returned by `correct_rt`.
 
 # chromatographR 0.7.0
 
