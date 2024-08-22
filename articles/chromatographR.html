@@ -169,9 +169,8 @@ with the pre-processing step as shown below.</p>
 &gt; new.ts &lt;- seq(10, 18.66, by = .01) # choose time-points
 &gt; new.lambdas &lt;- seq(200, 318, by = 2) # choose wavelengths
 &gt; 
-&gt; dat.pr &lt;- preprocess(Sa, dim1 = new.ts, dim2 = new.lambdas,
-+            parallel = FALSE, p = .001, lambda = 1e5)</code></pre>
-<pre><code>Warning in preprocess(Sa, dim1 = new.ts, dim2 = new.lambdas, parallel = FALSE, : The `parallel` argument is deprecated. Just use the `cl` argument to enable
+&gt; dat.pr &lt;- preprocess(Sa, dim1 = new.ts, dim2 = new.lambdas, p = .001, lambda = 1e5, cl = 1)</code></pre>
+<pre><code>Warning in preprocess(Sa, dim1 = new.ts, dim2 = new.lambdas, p = 0.001, : The `parallel` argument is deprecated. Just use the `cl` argument to enable
             parallel processing.</code></pre>
 </div>
 <div class="section level3">
@@ -222,18 +221,15 @@ on warp function optimization).</p>
 &gt; warp &lt;- correct_rt(chrom_list = dat.pr, models = warping.models, what = "corrected.values")</code></pre>
 <p>We can then use the following code snippet to compare the alignment
 of warped (top panel) and unwarped (bottom panel) chromatograms.</p>
-<pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE) # save current par settings
-&gt; 
-&gt; par(mfrow=c(2,1))
+<pre class="text"><code>&gt; par(mfrow=c(2,1))
 &gt; # plot warped data
 &gt; plot_chroms(warp, lambdas = c(210))
-&gt; legend("topleft", legend="ptw", bty = "n")
+&gt; legend("topleft", legend = "ptw", bty = "n")
 &gt; 
 &gt; # plot unwarped data
 &gt; plot_chroms(dat.pr, lambdas = c(210))
-&gt; legend("topleft", legend="raw", bty = "n")</code></pre>
+&gt; legend("topleft", legend = "raw", bty = "n")</code></pre>
 <p><img src="chromatographR_files/figure-html/alignment_plot-1.png" width="600px"></p>
-<pre class="text"><code>&gt; par(oldpar) # restore par settings</code></pre>
 <p>Clearly, the alignment is considerably improved after warping. You
 can also use the <code>correct_rt</code> function to do a global
 alignment on multiple wavelengths, by providing a list of wavelengths to
@@ -265,18 +261,15 @@ snippet below uses VPdtw to warp the example chromatograms using the
 first chromatogram as a reference. The <code>penalty</code> and
 <code>maxshift</code> parameters can be adjusted to control the degree
 of warping.</p>
-<pre class="text"><code>&gt; # align chromatograms with variable penalty dynamic time warping
-&gt; warp &lt;- correct_rt(chrom_list = dat.pr, alg = "vpdtw", lambdas = 210, what = "corrected.values", reference = 1)</code></pre>
-<pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE) # save current par settings
-&gt; 
-&gt; par(mfrow=c(2,1))
+<pre class="text"><code>&gt; warp &lt;- correct_rt(chrom_list = dat.pr, alg = "vpdtw", lambdas = 210, 
++                    what = "corrected.values", reference = 1)</code></pre>
+<pre class="text"><code>&gt; par(mfrow=c(2,1))
 &gt; plot_chroms(warp, lambdas = c(210))
 &gt; legend("topleft", legend = "vpdtw", bty = "n")
 &gt; 
 &gt; plot_chroms(dat.pr, lambdas = c(210))
 &gt; legend("topleft", legend = "raw", bty = "n")</code></pre>
 <p><img src="chromatographR_files/figure-html/plot_chroms-1.png" width="600px"></p>
-<pre class="text"><code>&gt; par(oldpar) # restore par settings</code></pre>
 <p>In this case the alignments produced by the two algorithms are very
 similar, but in some cases one algorithm may dramatically outperform the
 other.</p>
@@ -300,10 +293,10 @@ identified in each chromatogram.</p>
 &gt; pks_gauss &lt;- get_peaks(warp, lambdas = c(210), sd.max = 40, fit = "gaussian")
 &gt; 
 &gt; # find and integrate peaks using exponential-gaussian hybrid model
-&gt; pks_egh &lt;- get_peaks(warp, lambdas = c(210), sd.max = 40, fit="egh")
+&gt; pks_egh &lt;- get_peaks(warp, lambdas = c(210), sd.max = 40, fit = "egh")
 &gt; 
 &gt; # find and integrate peaks without modeling peak shape
-&gt; pks_raw &lt;- get_peaks(warp, lambdas = c(210), sd.max = 100, fit="raw")</code></pre>
+&gt; pks_raw &lt;- get_peaks(warp, lambdas = c(210), sd.max = 100, fit = "raw")</code></pre>
 <div class="section level4">
 <h4 id="filtering">Filtering<a class="anchor" aria-label="anchor" href="#filtering"></a>
 </h4>
@@ -327,13 +320,16 @@ algorithms. Usually the egh function performs slightly better for
 asymmetrical peaks. Even though the peaks are fully filled in when the
 <code>raw</code> setting is selected, the results may not necessarily be
 more accurate.</p>
-<pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE) # save current par settings
-&gt; par(mfrow=c(3,1))
+<pre class="text"><code>&gt; par(mfrow=c(3,1))
 &gt; plot(pks_gauss, idx = 1, lambda = 210)
+&gt; legend("topright", "Gaussian", bty = "n")
+&gt; 
 &gt; plot(pks_egh, idx = 1, lambda = 210)
-&gt; plot(pks_raw, idx = 1, lambda = 210)</code></pre>
+&gt; legend("topright", "Exponential-gaussian hybrid", bty = "n")
+&gt; 
+&gt; plot(pks_raw, idx = 1, lambda = 210)
+&gt; legend("topright", "Raw", bty = "n")</code></pre>
 <p><img src="chromatographR_files/figure-html/plot_peaks-1.png" width="600px"></p>
-<pre class="text"><code>&gt; par(oldpar) # restore par settings</code></pre>
 </div>
 </div>
 <div class="section level3">
@@ -387,7 +383,7 @@ weight) using the <code>normalize_data</code> function.</p>
 &gt; path &lt;- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
 &gt; meta &lt;- read.csv(path)
 &gt; # attach metadata
-&gt; pk_tab &lt;- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
+&gt; pk_tab &lt;- attach_metadata(peak_table = pk_tab, metadata = meta, column = "vial")
 &gt; # normalize peak table by sample mass
 &gt; pk_tab &lt;- normalize_data(peak_table = pk_tab, column = "mass")</code></pre>
 </div>
@@ -404,14 +400,14 @@ average correlation to the other spectra associated with the peak (when
 <code>ref = "max.cor"</code>). Below, we show how these spectra can be
 used to construct a correlation matrix to find peaks matching a
 particular chromophore.</p>
-<pre class="text"><code>&gt; pk_tab &lt;- attach_ref_spectra(pk_tab, ref="max.int")
+<pre class="text"><code>&gt; pk_tab &lt;- attach_ref_spectra(pk_tab, ref = "max.int")
 &gt; cor_matrix &lt;- cor(pk_tab$ref_spectra)
 &gt; hx &lt;- names(which(cor_matrix[,"V20"] &gt; .99))
 &gt; matplot(x = as.numeric(rownames(pk_tab$ref_spectra)),
-+                    y = pk_tab$ref_spectra[,hx], type = 'l',
++                    y = pk_tab$ref_spectra[, hx], type = 'l',
 +                    ylab = "Abs (mAU)", 
 +                    xlab = "Wavelength (nm)")</code></pre>
-<p><img src="chromatographR_files/figure-html/unnamed-chunk-3-1.png" width="600px"></p>
+<p><img src="chromatographR_files/figure-html/unnamed-chunk-8-1.png" width="600px"></p>
 </div>
 <div class="section level4">
 <h4 id="data-visualization">Data visualization<a class="anchor" aria-label="anchor" href="#data-visualization"></a>
@@ -440,14 +436,11 @@ will plot the trace and spectrum from the chromatogram with the largest
 peak in the peak table. Alternatively, you can choose the chromatogram
 index and wavelength using the <code>idx</code> and <code>lambda</code>
 arguments.</p>
-<pre class="text"><code>&gt; oldpar &lt;- par(no.readonly = TRUE) # save current par settings
-&gt; 
-&gt; par(mfrow = c(2,1))
+<pre class="text"><code>&gt; par(mfrow = c(2,1))
 &gt; peak &lt;- "V7"
 &gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp, 
 +               verbose = FALSE)</code></pre>
 <p><img src="chromatographR_files/figure-html/plot_spectra-1.png" width="600px"></p>
-<pre class="text"><code>&gt; par(oldpar) # restore par settings</code></pre>
 <p>The <code>plot_spectrum</code> function can also be used to generate
 interactive plots using <a href="https://plotly.com/r/" class="external-link">plotly</a>.</p>
 <pre class="text"><code>&gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp, 
