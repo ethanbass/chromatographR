@@ -79,7 +79,8 @@ data(pk_tab)
 path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
 meta <- read.csv(path)
 pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
-mirror_plot(pk_tab,lambdas=c("210","260"), var="trt", mirror=TRUE, col=c("green","blue"))
+mirror_plot(pk_tab,lambdas = c("210","260"), var = "trt", mirror = TRUE, 
+  col = c("green","blue"))
 }
 \author{
 Ethan Bass

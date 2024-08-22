@@ -108,10 +108,11 @@ plot.peak_table <- function(x, loc, chrom_list, what="peak",
       }
       boxplot(as.formula(paste("x[['tab']][,loc]", vars, sep="~")),
               data = x$sample_meta,
-              main = paste(loc, '\n', 'RT = ', round(as.numeric(x$pk_meta['rt', loc]),2)),
+              main = paste(loc, '\n', 'RT = ',
+                           round(as.numeric(x$pk_meta['rt', loc]), 2)),
               ylab = "abs", xlab = "", ...)
     }
-    if (export_spectrum | engine %in% c("plotly","ggplot")){
+    if (export_spectrum | engine %in% c("plotly", "ggplot")){
       return(out)
     } 
   }
@@ -147,7 +148,8 @@ boxplot.peak_table <- function(x, formula, ...){
     form <- reformulate(labels(terms(formula)), response = response)
     boxplot(form,
             data = x$sample_meta,
-            main = paste(li, '\n', 'RT = ', round(as.numeric(x$pk_meta['rt', li]), 2)),
+            main = paste(li, '\n',
+                         'RT = ', round(as.numeric(x$pk_meta['rt', li]), 2)),
             ylab = x$args[["response"]], xlab = "", ...)
   }
 }
@@ -195,13 +197,15 @@ boxplot.peak_table <- function(x, formula, ...){
 #' path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
 #' meta <- read.csv(path)
 #' pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
-#' mirror_plot(pk_tab,lambdas=c("210","260"), var="trt", mirror=TRUE, col=c("green","blue"))
+#' mirror_plot(pk_tab,lambdas = c("210","260"), var = "trt", mirror = TRUE, 
+#'   col = c("green","blue"))
 #' @concept Visualization
 #' @export
 
 mirror_plot <- function(x, chrom_list, lambdas = NULL, var, subset = NULL,
-                        print_legend = TRUE, legend_txt = NULL, legend_pos = "topright",
-                        legend_size = 1, mirror = TRUE, xlim = NULL, ylim = NULL, ...){
+                        print_legend = TRUE, legend_txt = NULL,
+                        legend_pos = "topright", legend_size = 1, mirror = TRUE, 
+                        xlim = NULL, ylim = NULL, ...){
   check_peaktable(x)
   meta <- x$sample_meta
   if (!exists("var"))
@@ -237,8 +241,9 @@ mirror_plot <- function(x, chrom_list, lambdas = NULL, var, subset = NULL,
   }
   if (is.null(subset)){
     if (nlevels(fac)>2){
-      warning(paste0("Selecting first two levels of ", sQuote(var)), ". To choose different levels,
-              use the `subset` argument to specify the desired levels.")
+      warning(paste0("Selecting first two levels of ", sQuote(var)),
+      ". To choose different levels, use the `subset` argument 
+        to specify the desired levels.")
     }
     trt1 <- levels(fac)[1]
     trt2 <- levels(fac)[2]
@@ -261,16 +266,19 @@ mirror_plot <- function(x, chrom_list, lambdas = NULL, var, subset = NULL,
     plot.new()
     plot.window(xlim = xlim, ylim = ylim)
     for (i in set1){
-      matplot(new.ts, chrom_list[[i]][,lambdas.idx], type = 'l', add = TRUE, ...)
+      matplot(new.ts, chrom_list[[i]][,lambdas.idx], type = 'l', 
+              add = TRUE, ...)
     }
     if (print_legend)
-      legend("topright", legend=legend_txt[[1]], cex=legend_size, bty = "n")
+      legend("topright", legend=legend_txt[[1]], cex = legend_size, bty = "n")
     for (i in set2){
-      matplot(new.ts, -chrom_list[[i]][,lambdas.idx], type = 'l', add = TRUE, ...)
+      matplot(new.ts, -chrom_list[[i]][,lambdas.idx], type = 'l', 
+              add = TRUE, ...)
     }
     if (print_legend)
-      legend("bottomright", legend=legend_txt[[2]], cex=legend_size, bty = "n")
-  } else{
+      legend("bottomright", legend = legend_txt[[2]], 
+             cex = legend_size, bty = "n")
+  } else {
     oldpar <- par(no.readonly = TRUE)
     par(mfrow=c(2,1))
     if (is.null(ylim))
@@ -278,17 +286,19 @@ mirror_plot <- function(x, chrom_list, lambdas = NULL, var, subset = NULL,
     plot.new()
     plot.window(xlim = xlim, ylim = ylim)
     for (i in set1){
-      matplot(new.ts, chrom_list[[i]][,lambdas.idx], type = 'l', add = TRUE, ...)
+      matplot(new.ts, chrom_list[[i]][,lambdas.idx], type = 'l', 
+              add = TRUE, ...)
     }
     if (print_legend)
       legend(legend_pos, legend = legend_txt[[1]], cex = legend_size, bty = "n")
     plot.new()
     plot.window(xlim = xlim, ylim = ylim)
     for (i in set2){
-      matplot(new.ts, chrom_list[[i]][,lambdas.idx], type = 'l', add = TRUE, ...)
+      matplot(new.ts, chrom_list[[i]][,lambdas.idx], type = 'l', 
+              add = TRUE, ...)
     }
     if (print_legend)
-      legend(legend_pos, legend=legend_txt[[2]], cex=legend_size, bty = "n")
+      legend(legend_pos, legend = legend_txt[[2]], cex = legend_size, bty = "n")
     par(oldpar) # reset par
   }
 }

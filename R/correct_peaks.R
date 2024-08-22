@@ -66,7 +66,8 @@ correct_peaks <- function(peak_list, mod_list, chrom_list, match_names = TRUE){
       profile
     }
     )}, peak_list, mod_list, SIMPLIFY = FALSE)
-  corrected_pks <- transfer_metadata(corrected_pks, peak_list, transfer_class = TRUE)
+  corrected_pks <- transfer_metadata(corrected_pks, peak_list, 
+                                     transfer_class = TRUE)
   corrected_pks
 }
 
@@ -82,7 +83,7 @@ correct_peaks <- function(peak_list, mod_list, chrom_list, match_names = TRUE){
 plot.ptw_list <- function(x, lambdas, legend = TRUE, ...){
   oldpar <- par(no.readonly = TRUE)
   on.exit(par(oldpar))
-  par(mfrow=c(2,1), mar=c(2,3,2,3))
+  par(mfrow=c(2, 1), mar=c(2, 3, 2, 3))
   
   all.lambdas <- as.numeric(rownames(x[[1]]$warped.sample))
   ts <- as.numeric(colnames(x[[1]]$sample))
@@ -97,8 +98,9 @@ plot.ptw_list <- function(x, lambdas, legend = TRUE, ...){
   lambda.idx <- which(lambdas %in% all.lambdas)
   # plot warped samples
   plot.new()
-  plot.window(xlim=c(head(ts,1), tail(ts,1)),
-              ylim=c(0, max(sapply(x, function(xx) xx$warped.sample), na.rm = TRUE)*1.2))
+  plot.window(xlim = c(head(ts,1), tail(ts,1)),
+              ylim = c(0, max(sapply(x, function(xx) xx$warped.sample), 
+                              na.rm = TRUE)*1.2))
   for (i in seq_along(x)){
     matplot(ts, t(x[[i]]$warped.sample[lambda.idx, , drop = FALSE]),
             type = 'l', add = TRUE)
@@ -122,31 +124,37 @@ plot.ptw_list <- function(x, lambdas, legend = TRUE, ...){
 #' @note This is the function from the ptw package, reproduced here because it
 #' isn't exported from ptw.
 #' @noRd
-predict.ptw <- function (object, newdata, what = c("response", "time"), RTref = NULL, 
-                         ...) 
-{
+predict.ptw <- function (object, newdata, what = c("response", "time"), 
+                         RTref = NULL, 
+                         ...){
   what <- match.arg(what)
   switch(what, response = {
     if (missing(newdata)) return(object$warped.sample)
     if (!is.matrix(newdata)) newdata <- matrix(newdata, nrow = 1)
     if (object$warp.type == "individual" & nrow(newdata) > 
-        1 & nrow(newdata) != nrow(object$warp.fun)) stop("Incorrect number of rows in newdata")
+        1 & nrow(newdata) != nrow(object$warp.fun))
+      stop("Incorrect number of rows in newdata")
     if (object$warp.type == "individual") {
       WF <- object$warp.fun
-    } else {
+    } else{
       WF <- matrix(object$warp.fun, nrow(object$sample), 
                    ncol(object$warp.fun), byrow = TRUE)
     }
     if (object$mode == "backward") {
-      t(sapply(seq_len(nrow(newdata)), function(i) approx(x = seq_len(ncol(newdata)), 
-                                                          y = newdata[i, ], xout = WF[i, ])$y))
-    } else {
-      t(sapply(seq_len(nrow(newdata)), function(i) approx(x = WF[i, 
-      ], y = newdata[i, ], xout = seq_len(ncol(newdata)))$y))
+      t(sapply(seq_len(nrow(newdata)), function(i){
+        approx(x = seq_len(ncol(newdata)), y = newdata[i, ], xout = WF[i, ])$y
+        }))
+    } else{
+      t(sapply(seq_len(nrow(newdata)), function(i){
+        approx(x = WF[i,], y = newdata[i, ], xout = seq_len(ncol(newdata)))$y
+      }))
     }
   }, time = {
-    correctedTime <- switch(object$mode, backward = -sweep(object$warp.fun, 
-                                                           2, 2 * (seq_len(ncol(object$ref))), FUN = "-"), object$warp.fun)
+    correctedTime <- switch(object$mode, 
+                            backward = -sweep(object$warp.fun, 2, 2 * 
+                                                (seq_len(ncol(object$ref))), 
+                                              FUN = "-"),
+                            object$warp.fun)
     if (is.null(RTref)) {
       if (is.null(colnames(object$ref))) {
         RTref <- seq_len(ncol(object$ref))
@@ -154,14 +162,15 @@ predict.ptw <- function (object, newdata, what = c("response", "time"), RTref = 
         RTref <- as.numeric(colnames(object$ref))
       }
     }
-    if (missing(newdata)) {
+    if (missing(newdata)){
       newdata <- RTref
       newdataIndices <- seq_len(length(RTref))
-    } else {
+    } else{
       newdataIndices <- round((newdata - min(RTref)) * 
                                 (length(RTref) - 1)/diff(range(RTref)) + 1)
     }
-    t(sapply(seq_len(nrow(correctedTime)), function(i) approx(RTref, 
-                                                              NULL, correctedTime[i, newdataIndices])$y))
+    t(sapply(seq_len(nrow(correctedTime)), function(i){
+      approx(RTref, NULL, correctedTime[i, newdataIndices])$y
+      }))
   })
 }

@@ -258,10 +258,10 @@ fit_gaussian <- function(x, y, start.center = NULL,
   # call the Nonlinear Least Squares, either fitting the floor too or not
   controlList <- nls.control(maxiter = max.iter, minFactor = 1/512,
                               warnOnly = TRUE)
-  starts <- list( "center" = start.center, "width" = start.width,
+  starts <- list("center" = start.center, "width" = start.width,
                   "height" = start.height)
   if (!fit.floor) {
-    nlsAns <- try(nlsLM( y ~ gaussian(x, center, width, height),
+    nlsAns <- try(nlsLM(y ~ gaussian(x, center, width, height),
                          start = starts, control = controlList), silent = TRUE)
   } else{
     if (is.null(start.floor)) start.floor <- quantile(y, seq(0, 1, 0.1))[2]

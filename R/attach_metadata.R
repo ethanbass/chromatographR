@@ -180,7 +180,7 @@ attach_ref_spectra <- function(peak_table, chrom_list, ref = c("max.cor","max.in
 #' @export normalize_data
 
 normalize_data <- function(peak_table, column, chrom_list,
-                           what = c('peak_table','chrom_list'),
+                           what = c('peak_table', 'chrom_list'),
                            by=c("meta", "peak")){
   check_peaktable(peak_table)
   if (!is.data.frame(peak_table$sample_meta))

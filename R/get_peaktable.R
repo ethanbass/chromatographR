@@ -94,12 +94,12 @@
 
 get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
                           use.cor = NULL, hmax = 0.2, plot_it = FALSE,
-                          ask = plot_it, clust = c("rt","sp.rt"),
+                          ask = plot_it, clust = c("rt", "sp.rt"),
                           sigma.t = NULL, sigma.r = 0.5,
                           deepSplit = FALSE, verbose = FALSE,
                           out = c('data.frame', 'matrix')){
   response <- match.arg(response, c("area", "height"))
-  clust <- match.arg(clust, c("rt","sp.rt"))
+  clust <- match.arg(clust, c("rt", "sp.rt"))
   out <- match.arg(out, c('data.frame', 'matrix'))
   if (is.null(use.cor)){
     use.cor <- "rt.cor" %in% colnames(peak_list[[1]][[1]])
