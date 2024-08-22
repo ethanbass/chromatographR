@@ -83,17 +83,27 @@ test_that("VPdtw plot displays correctly", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
   vpdtw_alignment <- function(){
-    warp <- correct_rt(dat.pr, lambdas = "210", alg="vpdtw", plot_it=TRUE)
+    warp <- correct_rt(dat.pr, lambdas = "210", alg = "vpdtw", plot_it = TRUE)
   }
   vdiffr::expect_doppelganger("vpdtw_alignment", vpdtw_alignment)
 })
+
+test_that("PTW plot displays correctly", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  ptw_alignment <- function(){
+    warp <- correct_rt(dat.pr, lambdas = "210", alg = "ptw", plot_it = TRUE)
+  }
+  vdiffr::expect_doppelganger("ptw_alignment", ptw_alignment)
+})
+
 
 test_that("plot_chroms works to plot alignments", {
   skip_if_not_installed("vdiffr")
   alignment <- function(){
     par(mfrow=c(2,1))
-    plot_chroms(warp, lambdas="210")
-    plot_chroms(dat.pr, lambdas="210")
+    plot_chroms(warp, lambdas = "210")
+    plot_chroms(dat.pr, lambdas = "210")
   }
   vdiffr::expect_doppelganger("alignment", alignment)
   expect_error(plot_chroms(pktab))
