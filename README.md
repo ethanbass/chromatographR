@@ -51,7 +51,7 @@ Contributions are always welcome. Please get in touch (preferable by opening a G
 - You have a file format you'd like to read that isn't currently supported by chromatographR.  (If you do this, please make sure to include a link to an example file!)  
 - You have a new feature you'd like to see implemented.  
 
-Also see the [contributing.md](https://github.com/ethanbass/chromatographR/blob/master/docs/contributing.md) page for more details.
+Also see the [contributing.md](https://github.com/ethanbass/chromatographR/blob/master/.github/contributing.md) page for more details.
 
 (**Note:** Please post questions about file conversions to the [chromConverter](https://github.com/ethanbass/chromConverter/issues) page).
 
