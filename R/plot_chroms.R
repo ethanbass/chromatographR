@@ -1,6 +1,7 @@
 #' Plot traces from list of chromatograms.
 #' 
-#' Plots the specified traces from a list of chromatograms. 
+#' Plots the specified traces from a list of chromatograms.
+#' 
 #' @importFrom graphics matplot axis box
 #' @param x A list of chromatograms in matrix format (timepoints x wavelengths).
 #' @param lambdas The wavelength(s) you wish to plot the trace at.
@@ -24,7 +25,7 @@
 #' @author Ethan Bass
 #' @examples 
 #' data(Sa_pr)
-#' plot_chroms(Sa_pr, idx=1:2, lambdas=c(210))
+#' plot_chroms(Sa_pr, idx = c(1:2), lambdas = c(210))
 #' @concept Visualization
 #' @export
 

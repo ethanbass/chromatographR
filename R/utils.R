@@ -41,7 +41,6 @@ get_chrom_list <- function(x, chrom_list, verbose = FALSE){
 }
 
 #' Extracts idx from string
-#' 
 #' @noRd
 extract_idx <- function(string, chrom_names){
   idx <- sub(".*?\\[(.*?)\\].*", "\\1", string)
@@ -153,7 +152,9 @@ check_chr <- function(chr, loc = NULL, peak_table, chrom_list, allow_max = TRUE)
 #' @author Brian Diggs
 #' @references https://stackoverflow.com/questions/9508518/why-are-these-numbers-not-equal
 #' @noRd
-elementwise.all.equal <- Vectorize(function(x, y, ...) {isTRUE(all.equal(x, y, ...))})
+elementwise.all.equal <- Vectorize(function(x, y, ...){
+  isTRUE(all.equal(x, y, ...))
+})
 
 #' Get times
 #' @return Numeric vector of retention times.

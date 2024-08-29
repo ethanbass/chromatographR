@@ -104,8 +104,7 @@ find_noise <- function(x, noise_threshold = 0.01, lambdas){
 #' @export
 
 get_agilent_threshold <- function(x, pos, weight = 1, noise_variance = NULL,
-                                  noise_threshold = .005,
-                                  lambdas){
+                                  noise_threshold = .005, lambdas){
   if (missing(lambdas)){
     lambdas <- seq_len(ncol(x))
   }
@@ -161,8 +160,7 @@ get_spectral_similarity <- function(x, pos){
 #' @noRd
 
 get_purity_values <- function(x, pos, weight = 1, noise_variance = NULL, 
-                              noise_threshold = 0.005,
-                              lambdas){
+                              noise_threshold = 0.005, lambdas){
   if (missing(lambdas)){
     lambdas <- seq_len(ncol(x))
   }

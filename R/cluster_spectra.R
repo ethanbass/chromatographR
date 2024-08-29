@@ -74,13 +74,14 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' @examples \donttest{
 #' data(pk_tab)
 #' data(Sa_warp)
-#' pk_tab <- attach_ref_spectra(pk_tab, Sa_warp, ref="max.int")
-#' cl <- cluster_spectra(pk_tab, nboot=100, max.only = FALSE, save = FALSE, alpha = .97)
+#' pk_tab <- attach_ref_spectra(pk_tab, Sa_warp, ref = "max.int")
+#' cl <- cluster_spectra(pk_tab, nboot = 100, max.only = FALSE, 
+#' save = FALSE, alpha = .97)
 #' }
 #' @export cluster_spectra
 #' @md
 
-cluster_spectra <- function(peak_table, peak_no = c(5,100), alpha = 0.95, 
+cluster_spectra <- function(peak_table, peak_no = c(5, 100), alpha = 0.95, 
                             nboot = 1000, plot_dend = TRUE, plot_spectra = TRUE, 
                             verbose = getOption("verbose"), 
                             save = FALSE, parallel = TRUE, max.only = FALSE,
@@ -97,7 +98,8 @@ cluster_spectra <- function(peak_table, peak_no = c(5,100), alpha = 0.95,
   rm <- which(apply(spectra, 2, sd) == 0)
   if (length(rm) > 0){
     if (verbose){
-      message(paste0("Removing peaks due to bad spectra: ", paste(sQuote(colnames(spectra)[rm]),collapse=", ")))
+      message(paste0("Removing peaks due to bad spectra: ",
+                     paste(sQuote(colnames(spectra)[rm]),collapse=", ")))
     }
     spectra <- spectra[, -rm]
   }
@@ -121,7 +123,8 @@ cluster_spectra <- function(peak_table, peak_no = c(5,100), alpha = 0.95,
   ## filter clusters ##
   cl_idx <- which(cl_size > peak_no[1] & cl_size < peak_no[2])
   if (verbose && length(cl_idx) < length(cl_size)){
-    message(paste0("Removing ", length(cl_size) - length(cl_idx), " under- or oversized clusters from results."))
+    message(paste0("Removing ", length(cl_size) - length(cl_idx),
+                   " under- or oversized clusters from results."))
   }
   clusters <- picks$clusters[cl_idx]
   pval <- 1 - result$edges[picks$edges[cl_idx], 'au']

@@ -101,7 +101,7 @@ get_reference_spectra <- function(peak_table, chrom_list,
     })
     sp.ref <- sapply(seq_along(sp.l), function(i){
       sp.l[[i]][, which.max(
-        colMeans(cor(sp.l[[i]][, which(apply((sp.l[[i]]), 2, sd)!=0), 
+        colMeans(cor(sp.l[[i]][, which(apply((sp.l[[i]]), 2, sd) != 0), 
                                                           drop = FALSE])))]
     })
   } else {
@@ -181,7 +181,7 @@ attach_ref_spectra <- function(peak_table, chrom_list, ref = c("max.cor","max.in
 
 normalize_data <- function(peak_table, column, chrom_list,
                            what = c('peak_table', 'chrom_list'),
-                           by=c("meta", "peak")){
+                           by = c("meta", "peak")){
   check_peaktable(peak_table)
   if (!is.data.frame(peak_table$sample_meta))
     stop("Metadata must be attached to peak_table prior to normalization.")

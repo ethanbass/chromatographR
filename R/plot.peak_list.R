@@ -78,7 +78,8 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
            col="blue", length = 0)
   }
   if (numbers){
-    text(pks$rt, y[pks$rt] + y.offset, labels=seq_len(nrow(pks)), cex = cex.font)
+    text(pks$rt, y[pks$rt] + y.offset, labels = seq_len(nrow(pks)), 
+         cex = cex.font)
   }
   if (missing(res))
     res <- get_time_resolution(chrom_list)
