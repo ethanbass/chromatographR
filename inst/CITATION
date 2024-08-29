@@ -1,7 +1,7 @@
 citHeader("To cite chromatographR in publications, please use:")
 
-citEntry(
-  entry    = "manual",
+bibentry(
+  bibtype    = "manual",
   title    = "chromatographR: Chromatographic Data Analysis Toolset",
   author   = "Ethan Bass",
   year     = "2023",
