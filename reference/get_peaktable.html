@@ -40,7 +40,7 @@ samples, and experimental settings."><meta property="og:image" content="https://
     </div>
 
     <div class="ref-description section level2">
-    <p>Returns a peak_table object. The first slot contains a matrix of
+    <p>Returns a <code>peak_table</code> object. The first slot contains a matrix of
 intensities, where rows correspond to samples and columns correspond to
 aligned features. The rest of the slots contain various meta-data about peaks,
 samples, and experimental settings.</p>
@@ -73,8 +73,8 @@ samples, and experimental settings.</p>
 <dd><p>A <code>peak_list</code> object created by <code><a href="get_peaks.html">get_peaks</a></code>,
 containing a nested list of peak tables: the first level is the
 sample, and the second level is the spectral wavelength. Every component is
-described by a data.frame where every row is one peak, and the columns contain
-information on various peak parameters.</p></dd>
+described by a <code>data.frame</code> with a row for each peak and columns
+containing information on various peak parameters.</p></dd>
 
 
 <dt id="arg-chrom-list">chrom_list<a class="anchor" aria-label="anchor" href="#arg-chrom-list"></a></dt>
@@ -95,16 +95,16 @@ exists in the provided <code>peak_list</code>.</p></dd>
 
 <dt id="arg-hmax">hmax<a class="anchor" aria-label="anchor" href="#arg-hmax"></a></dt>
 <dd><p>Height at which the complete linkage dendrogram will be cut. Can
-be interpreted as the maximal inter-cluster retention time difference.</p></dd>
+be interpreted as the maximal intercluster retention time difference.</p></dd>
 
 
 <dt id="arg-plot-it">plot_it<a class="anchor" aria-label="anchor" href="#arg-plot-it"></a></dt>
-<dd><p>Logical. If TRUE, for every component a stripplot will be
+<dd><p>Logical. If <code>TRUE</code>, for every component a strip plot will be
 shown indicating the clustering.</p></dd>
 
 
 <dt id="arg-ask">ask<a class="anchor" aria-label="anchor" href="#arg-ask"></a></dt>
-<dd><p>Logical. Ask before showing new plot? Defaults to TRUE.</p></dd>
+<dd><p>Logical. Ask before showing new plot? Defaults to <code>TRUE</code>.</p></dd>
 
 
 <dt id="arg-clust">clust<a class="anchor" aria-label="anchor" href="#arg-clust"></a></dt>
@@ -145,12 +145,12 @@ single time window. Defaults to <code>FALSE</code>.</p></dd>
     <p>The function returns an S3 <code>peak_table</code> object, containing the
 following elements:</p><ul><li><p><code>tab</code>: the peak table itself – a data-frame of intensities in a
 sample x peak configuration.</p></li>
-<li><p><code>pk_meta</code>: A data.frame containing peak meta-data (e.g. the spectral component,
+<li><p><code>pk_meta</code>: A data.frame containing peak meta-data (e.g., the spectral component,
 peak number, and average retention time).</p></li>
 <li><p><code>sample_meta</code>: A data.frame of sample meta-data. Must be added using
-<code><a href="attach_metadata.html">attach_metadata</a></code>).</p></li>
+<code><a href="attach_metadata.html">attach_metadata</a></code>.</p></li>
 <li><p><code>ref_spectra</code>: A data.frame of reference spectra (in a wavelength x peak
-configuration). Must be added using <code><a href="attach_ref_spectra.html">attach_ref_spectra</a></code></p></li>
+configuration). Must be added using <code><a href="attach_ref_spectra.html">attach_ref_spectra</a></code>.</p></li>
 <li><p><code>args</code>: A vector of arguments given to <code>get_peaktable</code> to generate
 the peak table.</p></li>
 </ul></div>
@@ -215,7 +215,7 @@ Metabolomics</em> <b>11</b>:143-154. <a href="https://doi.org/10.1007/s11306-014
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>

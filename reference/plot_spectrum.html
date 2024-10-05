@@ -92,33 +92,33 @@ abundance.</p></dd>
 
 
 <dt id="arg-plot-spectrum">plot_spectrum<a class="anchor" aria-label="anchor" href="#arg-plot-spectrum"></a></dt>
-<dd><p>Logical. If TRUE, plots the spectrum of the chosen
-peak. Defaults to TRUE.</p></dd>
+<dd><p>Logical. If <code>TRUE</code>, plots the spectrum of the chosen
+peak. Defaults to <code>TRUE</code>.</p></dd>
 
 
 <dt id="arg-plot-trace">plot_trace<a class="anchor" aria-label="anchor" href="#arg-plot-trace"></a></dt>
-<dd><p>Logical. If TRUE, plots the trace of the chosen peak at
-lambda. Defaults to TRUE.</p></dd>
+<dd><p>Logical. If <code>TRUE</code>, plots the trace of the chosen peak at
+lambda. Defaults to <code>TRUE</code>.</p></dd>
 
 
 <dt id="arg-spectrum-labels">spectrum_labels<a class="anchor" aria-label="anchor" href="#arg-spectrum-labels"></a></dt>
-<dd><p>Logical. If TRUE, plots labels on maxima in spectral
-plot. Defaults to TRUE.</p></dd>
+<dd><p>Logical. If <code>TRUE</code>, plots labels on maxima in spectral
+plot. Defaults to <code>TRUE</code>.</p></dd>
 
 
 <dt id="arg-scale-spectrum">scale_spectrum<a class="anchor" aria-label="anchor" href="#arg-scale-spectrum"></a></dt>
-<dd><p>Logical. If TRUE, scales spectrum to unit height.
-Defaults to FALSE.</p></dd>
+<dd><p>Logical. If <code>TRUE</code>, scales spectrum to unit height.
+Defaults to <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-export-spectrum">export_spectrum<a class="anchor" aria-label="anchor" href="#arg-export-spectrum"></a></dt>
-<dd><p>Logical. If TRUE, exports spectrum to console.
-Defaults to FALSE.</p></dd>
+<dd><p>Logical. If <code>TRUE</code>, exports spectrum to console.
+Defaults to <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
-<dd><p>Logical. If TRUE, prints verbose output to console. Defaults
-to TRUE.</p></dd>
+<dd><p>Logical. If <code>TRUE</code>, prints verbose output to console.
+Defaults to <code>TRUE</code>.</p></dd>
 
 
 <dt id="arg-what">what<a class="anchor" aria-label="anchor" href="#arg-what"></a></dt>
@@ -129,7 +129,8 @@ retention time by clicking on the chromatogram. Defaults to "peak" mode.</p></dd
 
 
 <dt id="arg-engine">engine<a class="anchor" aria-label="anchor" href="#arg-engine"></a></dt>
-<dd><p>Which plotting engine to use: <code>base</code>, <code>ggplot2</code>, or <code>plotly</code>.</p></dd>
+<dd><p>Which plotting engine to use: <code>base</code>, <code>ggplot2</code>, or
+<code>plotly</code>.</p></dd>
 
 
 <dt id="arg-chr">chr<a class="anchor" aria-label="anchor" href="#arg-chr"></a></dt>
@@ -154,17 +155,17 @@ there is no return value.</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Can be used to confirm the identity of a peak or check that a particular
 column in the peak table represents a single compound. Retention times can
-also be selected by clicking on the plotted trace if what == 'click'.</p>
+also be selected by clicking on the plotted trace if <code>what == 'click'</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="side-effects">Side effects<a class="anchor" aria-label="anchor" href="#side-effects"></a></h2>
 
 
-<ul><li><p>If <code>plot_trace</code> is TRUE, plots the chromatographic trace of the specified
-chromatogram (<code>chr</code>), at the specified wavelength (<code>lambda</code>) with a
-dotted red line to indicate the retention time given by <code>loc</code>. The
-trace is a single column from the chromatographic matrix.</p></li>
-<li><p>If <code>plot_spectrum</code> is TRUE, plots the spectrum for the specified
+<ul><li><p>If <code>plot_trace</code> is <code>TRUE</code>, plots the chromatographic trace of the
+specified chromatogram (<code>idx</code>), at the specified wavelength
+(<code>lambda</code>) with a dotted red line to indicate the retention time given
+by <code>loc</code>. The trace is a single column from the chromatographic matrix.</p></li>
+<li><p>If <code>plot_spectrum</code> is <code>TRUE</code>, plots the spectrum for the specified
 chromatogram at the specified retention time. The spectrum is a single row
 from the chromatographic matrix.</p></li>
 </ul></div>
@@ -177,11 +178,11 @@ from the chromatographic matrix.</p></li>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># interactive()</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Sa</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">pks</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_peaks.html">get_peaks</a></span><span class="op">(</span><span class="va">Sa</span>, lambda<span class="op">=</span><span class="st">"220.00000"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">pks</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_peaks.html">get_peaks</a></span><span class="op">(</span><span class="va">Sa</span>, lambda <span class="op">=</span> <span class="st">"220.00000"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">pk_tab</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_peaktable.html">get_peaktable</a></span><span class="op">(</span><span class="va">pks</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">oldpar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>no.readonly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">plot_spectrum</span><span class="op">(</span>loc <span class="op">=</span> <span class="st">"V10"</span>, peak_table <span class="op">=</span> <span class="va">pk_tab</span>, what<span class="op">=</span><span class="st">"peak"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_spectrum</span><span class="op">(</span>loc <span class="op">=</span> <span class="st">"V10"</span>, peak_table <span class="op">=</span> <span class="va">pk_tab</span>, what <span class="op">=</span> <span class="st">"peak"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">oldpar</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
@@ -195,7 +196,7 @@ from the chromatographic matrix.</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer></div>
