@@ -35,6 +35,7 @@ reshape_chroms <- function(x, idx, sample_var = "sample",
 #' @return A chromatographic matrix in long format.
 #' @author Ethan Bass
 #' @noRd
+
 reshape_chrom <- function(x, lambdas = NULL, rts = NULL){
   if (ncol(x) == 1)
     stop("The provided data is already in long format!")
@@ -71,8 +72,8 @@ reshape_chrom <- function(x, lambdas = NULL, rts = NULL){
 #' @param metadata A character vector specifying the metadata fields to include.
 #' @param fixed_levels Logical. Whether to fix factor levels of features in the
 #' order provided. Defaults to \code{TRUE}.
-#' @return A data.frame containing the information for the specified peaks in
-#' long format.
+#' @return A data.frame containing the information for the specified 
+#' \code{peaks} in long format.
 #' @author Ethan Bass
 #' @export
 
@@ -108,8 +109,3 @@ reshape_peaktable <- function(x, peaks, metadata, fixed_levels = TRUE){
   }
   xx
 }
-
-# reshape <- function(x,...){
-#   UseMethod("reshape")
-# }
-

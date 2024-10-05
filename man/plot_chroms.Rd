@@ -61,7 +61,7 @@ or plotly, according to the value of \code{engine}.
 
 \examples{
 data(Sa_pr)
-plot_chroms(Sa_pr, idx=1:2, lambdas=c(210))
+plot_chroms(Sa_pr, idx = c(1:2), lambdas = c(210))
 }
 \author{
 Ethan Bass

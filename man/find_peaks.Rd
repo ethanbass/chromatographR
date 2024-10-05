@@ -2,7 +2,7 @@
 % Please edit documentation in R/fit_peaks.R
 \name{find_peaks}
 \alias{find_peaks}
-\title{Find peaks in chromatographic profile}
+\title{Find peaks}
 \usage{
 find_peaks(
   y,
@@ -40,7 +40,7 @@ exclude small peaks from the peak list. (Defaults to \code{0}).}
 (Defaults to \code{TRUE}).}
 }
 \value{
-If bounds == \code{TRUE}, returns a data.frame containing the center,
+If \code{bounds == TRUE}, returns a data.frame containing the center,
 start, and end of each identified peak. Otherwise, returns a numeric vector
 of peak centers. All locations are expressed as indices.
 }

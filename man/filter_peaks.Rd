@@ -30,8 +30,8 @@ A peak list similar to the input, with all rows removed
 from that do not satisfy the specified criteria.
 }
 \description{
-Utility function to remove peaks from a peak list, e.g. because their
-intensity is too low. Currently one can filter on peak height, peak area,
+Utility function to remove peaks from a peak list (e.g., because their
+intensity is too low). Currently one can filter on peak height, peak area,
 standard deviation, and/or retention time.
 }
 \seealso{

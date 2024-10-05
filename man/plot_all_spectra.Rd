@@ -71,7 +71,7 @@ Plot multiple for a given peak in peak table. Wrapper for
 \section{Side effects}{
 
 If \code{plot_spectrum} is TRUE, plots the spectra for the specified chromatogram
-(\code{chr}) of the given \code{peak}. The spectrum is a single row
+(\code{idx}) of the given \code{peak}. The spectrum is a single row
 from the chromatographic matrix.
 }
 

@@ -1,7 +1,7 @@
 #' Filter peak lists
 #' 
-#' Utility function to remove peaks from a peak list, e.g. because their
-#' intensity is too low. Currently one can filter on peak height, peak area,
+#' Utility function to remove peaks from a peak list (e.g., because their
+#' intensity is too low). Currently one can filter on peak height, peak area,
 #' standard deviation, and/or retention time.
 #' 
 #' @param peak_list A peak_list object, consisting of a nested list of peak
@@ -73,7 +73,7 @@ filter_peaks <- function(peak_list, min_height, min_area,
 
 #' Filter peak table
 #' 
-#' Utility function to remove peaks from peak table, e.g. because their
+#' Utility function to remove peaks from peak table, e.g., because their
 #' intensity is too low. Currently one can filter on mean or median peak intensity,
 #' or retention time.
 #' 

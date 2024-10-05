@@ -39,7 +39,7 @@ A peak table similar to the input, with all columns removed
 from the peak table that do not satisfy the specified criteria.
 }
 \description{
-Utility function to remove peaks from peak table, e.g. because their
+Utility function to remove peaks from peak table, e.g., because their
 intensity is too low. Currently one can filter on mean or median peak intensity,
 or retention time.
 }

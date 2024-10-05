@@ -1,4 +1,8 @@
 #' Export peak table
+#' 
+#' Export peak table in \code{csv} or \code{xlsx} format according to the value
+#' of \code{format}.
+#' 
 #' @param peak_table Peak table object from \code{\link{get_peaktable}}.
 #' @param path Path to write file.
 #' @param filename File name. Defaults to "peak_table".
@@ -18,9 +22,8 @@
 
 write_peaktable <- function(peak_table, path, filename = "peak_table",
                             format=c("csv", "xlsx"),
-                             what = c("tab", "pk_meta",
-                                      "sample_meta", "ref_spectra",
-                                      "args")){
+                             what = c("tab", "pk_meta", "sample_meta",
+                                      "ref_spectra", "args")){
   check_peaktable(peak_table)
   if (missing(path)){
     stop("Please provide a path to write the files.")
@@ -30,7 +33,7 @@ write_peaktable <- function(peak_table, path, filename = "peak_table",
   }
   what <- match.arg(what, c("tab", "pk_meta",
                             "sample_meta", "ref_spectra",
-                            "args"), several.ok=TRUE)
+                            "args"), several.ok = TRUE)
   format <- match.arg(format, c("csv", "xlsx"))
   sheets <- list("tab" = peak_table$tab,
                  "pk_meta" = peak_table$pk_meta,
@@ -54,15 +57,6 @@ write_peaktable <- function(peak_table, path, filename = "peak_table",
       path <- fs::path(path, filename, ext = "xlsx")
       writer <- openxlsx::write.xlsx
   } 
-  # else if (format == "html" & !requireNamespace("ymlthis", quietly = TRUE)) {
-  #   stop(
-  #     "Package `ymlthis` must be installed to export html peak table:
-  #     try `install.packages('ymlthis')`",
-  #     call. = FALSE
-  #   )
-  #   suffix = "html"
-  # }
-  
   # write sheets
   writer(sheets, file = path, rowNames = TRUE)
 }

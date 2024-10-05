@@ -24,8 +24,8 @@ get_peaktable(
 \item{peak_list}{A \code{peak_list} object created by \code{\link{get_peaks}},
 containing a nested list of peak tables: the first level is the
 sample, and the second level is the spectral wavelength. Every component is
-described by a data.frame where every row is one peak, and the columns contain
-information on various peak parameters.}
+described by a \code{data.frame} with a row for each peak and columns
+containing information on various peak parameters.}
 
 \item{chrom_list}{A list of chromatographic matrices.}
 
@@ -38,12 +38,12 @@ otherwise specified, the \code{rt.cor} column will be used by default if it
 exists in the provided \code{peak_list}.}
 
 \item{hmax}{Height at which the complete linkage dendrogram will be cut. Can
-be interpreted as the maximal inter-cluster retention time difference.}
+be interpreted as the maximal intercluster retention time difference.}
 
-\item{plot_it}{Logical. If TRUE, for every component a stripplot will be
+\item{plot_it}{Logical. If \code{TRUE}, for every component a strip plot will be
 shown indicating the clustering.}
 
-\item{ask}{Logical. Ask before showing new plot? Defaults to TRUE.}
+\item{ask}{Logical. Ask before showing new plot? Defaults to \code{TRUE}.}
 
 \item{clust}{Specify whether to perform hierarchical clustering based on
 spectral similarity and retention time (\code{sp.rt}) or retention time alone
@@ -72,18 +72,18 @@ following elements:
 \itemize{
 \item \code{tab}: the peak table itself -- a data-frame of intensities in a
 sample x peak configuration.
-\item \code{pk_meta}: A data.frame containing peak meta-data (e.g. the spectral component,
+\item \code{pk_meta}: A data.frame containing peak meta-data (e.g., the spectral component,
 peak number, and average retention time).
 \item \code{sample_meta}: A data.frame of sample meta-data. Must be added using
-\code{\link{attach_metadata}}).
+\code{\link{attach_metadata}}.
 \item \code{ref_spectra}: A data.frame of reference spectra (in a wavelength x peak
-configuration). Must be added using \code{\link{attach_ref_spectra}}
+configuration). Must be added using \code{\link{attach_ref_spectra}}.
 \item \code{args}: A vector of arguments given to \code{\link{get_peaktable}} to generate
 the peak table.
 }
 }
 \description{
-Returns a peak_table object. The first slot contains a matrix of
+Returns a \code{peak_table} object. The first slot contains a matrix of
 intensities, where rows correspond to samples and columns correspond to
 aligned features. The rest of the slots contain various meta-data about peaks,
 samples, and experimental settings.

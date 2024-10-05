@@ -108,8 +108,9 @@ nboot = 10000}.
 \donttest{
 data(pk_tab)
 data(Sa_warp)
-pk_tab <- attach_ref_spectra(pk_tab, Sa_warp, ref="max.int")
-cl <- cluster_spectra(pk_tab, nboot=100, max.only = FALSE, save = FALSE, alpha = .97)
+pk_tab <- attach_ref_spectra(pk_tab, Sa_warp, ref = "max.int")
+cl <- cluster_spectra(pk_tab, nboot = 100, max.only = FALSE, 
+save = FALSE, alpha = .97)
 }
 }
 \references{

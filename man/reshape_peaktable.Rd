@@ -19,8 +19,8 @@ place of the original peak names.}
 order provided. Defaults to \code{TRUE}.}
 }
 \value{
-A data.frame containing the information for the specified peaks in
-long format.
+A data.frame containing the information for the specified 
+\code{peaks} in long format.
 }
 \description{
 Reshapes peak table from wide to long format

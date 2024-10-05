@@ -48,10 +48,10 @@
 #' absorbance (or normalized absorbance, if \code{scale_spectrum} is TRUE) for 
 #' the specified sample(s). Otherwise, there is no return value.
 #' @section Side effects:
-#' If \code{plot_trace} is TRUE, plots the chromatographic trace of the specified
-#' chromatogram (\code{chr}), at the specified wavelength (\code{lambda}) with a
-#' dotted red line to indicate the retention time given by \code{loc}. The
-#' trace is a single column from the chromatographic matrix.
+#' If \code{plot_trace} is \code{TRUE}, plots the chromatographic trace of the 
+#' specified chromatogram (\code{idx}), at the specified wavelength 
+#' (\code{lambda}) with a dotted red line to indicate the retention time given 
+#' by \code{loc}. The trace is a single column from the chromatographic matrix.
 #'
 #' If \code{plot_spectrum} is TRUE, plots the spectrum for the specified chromatogram
 #' at the specified retention time. The spectrum is a single row from the chromatographic

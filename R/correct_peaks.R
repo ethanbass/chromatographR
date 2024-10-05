@@ -1,5 +1,4 @@
-
-#' Correct peak positions according to a ptw warping model
+#' Correct peak positions according to a PTW warping model
 #' 
 #' Corrects retention time differences using parametric time warping as 
 #' implemented in \code{\link[ptw]{ptw}}.
@@ -13,8 +12,7 @@
 #' containing a nested list of peak tables where the first level is the sample,
 #' and the second level is the spectral wavelength. Every component is described
 #' by a matrix where every row is one peak, and the columns contain information on
-#' retention time, peak width (FWHM), peak width, height, and
-#' area.
+#' retention time, peak width (FWHM), peak width, height, and area.
 #' @param mod_list A list of ptw models.
 #' @param chrom_list List of chromatograms supplied to create ptw models.
 #' @param match_names Logical. Whether to actively match the names of the 
@@ -121,6 +119,7 @@ plot.ptw_list <- function(x, lambdas, legend = TRUE, ...){
   }
 }
 
+#' Predict PTW
 #' @note This is the function from the ptw package, reproduced here because it
 #' isn't exported from ptw.
 #' @noRd

@@ -9,3 +9,5 @@
 ^LICENSE$
 ^\.DS_Store$
 ^\.zenodo.json
+^vignettes/articles$
+^\.httr-oauth$

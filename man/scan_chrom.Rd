@@ -55,13 +55,14 @@ Plot spectra by clicking on the chromatogram
 }
 \section{Side effects}{
 
-Plots a chromatographic trace from the specified chromatogram (\code{chr}),
+Plots a chromatographic trace from the specified chromatogram (\code{idx}),
 at the specified wavelength (\code{lambda}) with a dotted red line to indicate
 the user-selected retention time. The trace is a single column from the
 chromatographic matrix.
 
 If \code{plot_spectrum} is TRUE, plots the spectrum for the specified
 chromatogram at the user-specified retention time. The spectrum is a single
+row from the chromatographic matrix.
 }
 
 \examples{

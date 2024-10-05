@@ -8,3 +8,4 @@ doc/chromatographR_vignette.html
 doc/chromatographR_vignette.R
 inst/doc
 chromatographR.Rcheck
+.httr-oauth

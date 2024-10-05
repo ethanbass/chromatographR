@@ -2,7 +2,7 @@
 % Please edit documentation in R/correct_peaks.R
 \name{correct_peaks}
 \alias{correct_peaks}
-\title{Correct peak positions according to a ptw warping model}
+\title{Correct peak positions according to a PTW warping model}
 \usage{
 correct_peaks(peak_list, mod_list, chrom_list, match_names = TRUE)
 }
@@ -11,8 +11,7 @@ correct_peaks(peak_list, mod_list, chrom_list, match_names = TRUE)
 containing a nested list of peak tables where the first level is the sample,
 and the second level is the spectral wavelength. Every component is described
 by a matrix where every row is one peak, and the columns contain information on
-retention time, peak width (FWHM), peak width, height, and
-area.}
+retention time, peak width (FWHM), peak width, height, and area.}
 
 \item{mod_list}{A list of ptw models.}
 

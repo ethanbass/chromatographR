@@ -1,4 +1,4 @@
-#' Find peaks in chromatographic profile
+#' Find peaks
 #' 
 #' Find peaks in chromatographic profile.
 #' 
@@ -43,7 +43,7 @@
 #' exclude small peaks from the peak list. (Defaults to \code{0}).
 #' @param bounds Logical. If TRUE, includes peak boundaries in data.frame.
 #' (Defaults to \code{TRUE}).
-#' @return If bounds == \code{TRUE}, returns a data.frame containing the center,
+#' @return If \code{bounds == TRUE}, returns a data.frame containing the center,
 #' start, and end of each identified peak. Otherwise, returns a numeric vector
 #' of peak centers. All locations are expressed as indices.
 #' @note The \code{find_peaks} function is adapted from MATLAB code included in
@@ -362,6 +362,7 @@ fit_egh <- function(x1, y1, start.center = NULL, start.width = NULL,
   return(out)
 }
 
+#' Fit peak (gaussian)
 #' @noRd
 fitpk_gaussian <- function(x, pos, lambda, max.iter,
                            estimate_purity = TRUE, noise_threshold = .001, ...){
@@ -383,6 +384,7 @@ fitpk_gaussian <- function(x, pos, lambda, max.iter,
     "height" = y[xloc], "area" = area, "r.squared" = r.squared, purity = purity)
 }
 
+#' Fit peak (exponential-gaussian hybrid)
 #' @noRd
 fitpk_egh <- function(x, pos, lambda, max.iter,
                       estimate_purity = TRUE, noise_threshold = .001){
@@ -402,12 +404,14 @@ fitpk_egh <- function(x, pos, lambda, max.iter,
     "height" = y[xloc], "area" = area, "r.squared" = r.squared, purity = purity)
 }
 
+#' Fit peak (raw)
 #' @noRd
 fitpk_raw <- function(x, pos, lambda, max.iter,
                       estimate_purity = TRUE, noise_threshold = .001){
   y <- x[,lambda]
   xloc <- pos[1]
   peak.loc <- seq.int(pos[2], pos[3])
+  
   # perform trapezoidal integration on raw signal
   area <- sum(diff(peak.loc) * mean(c(y[peak.loc][-1], tail(y[peak.loc],-1))))
   purity <- get_purity(x = x, pos = pos, try = estimate_purity,
@@ -418,7 +422,7 @@ fitpk_raw <- function(x, pos, lambda, max.iter,
 }
 
 
-#' Savitsky Golay Smoothing from pracma
+#' Savitsky Golay Smoothing ported from pracma
 #' @author Hans W. Borchers
 #' @param T Vector of signals to be filtered
 #' @param fl Filter length (for instance fl = 51..151), has to be odd.
@@ -440,14 +444,14 @@ savgol <- function(T, fl, forder = 4, dorder = 0) {
   Y <- pinv(X);                           # pseudoinverse
   
   # -- filter via convolution and take care of the end points --
-  T2 <- convolve(T, rev(Y[(dorder+1),]), type = "o")   # convolve(...)
+  T2 <- convolve(T, rev(Y[(dorder + 1),]), type = "o")   # convolve(...)
   T2 <- T2[(fc+1):(length(T2)-fc)]
   
   Tsg <- (-1)^dorder * T2
   return( Tsg )
 }
 
-#' pinv port from pracma
+#' 'pinv' port from pracma
 #' @author Hans W. Borchers
 #' @note This function is ported from \href{https://cran.r-project.org/web/packages/pracma/index.html}{pracma},
 #' where it is licensed under GPL (>= 3).
@@ -456,10 +460,7 @@ pinv <- function (A, tol = .Machine$double.eps^(2/3)) {
   stopifnot(is.numeric(A) || is.complex(A), is.matrix(A))
   
   s <- svd(A)
-  # D <- diag(s$d); Dinv <- diag(1/s$d)
-  # U <- s$u; V <- s$v
-  # A = U D V'
-  # X = V Dinv U'
+
   if (is.complex(A)) s$u <- Conj(s$u)
   
   p <- ( s$d > max(tol * s$d[1], 0) )

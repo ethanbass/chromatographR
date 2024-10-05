@@ -5,7 +5,7 @@
 #' 
 #' Can be used to confirm the identity of a peak or check that a particular
 #' column in the peak table represents a single compound. Retention times can
-#' also be selected by clicking on the plotted trace if what == 'click'.
+#' also be selected by clicking on the plotted trace if \code{what == 'click'}.
 #' 
 #' @importFrom scales rescale
 #' @importFrom graphics identify title text
@@ -22,23 +22,24 @@
 #' @param lambda The wavelength you wish to plot the trace at if plot_trace ==
 #' TRUE and/or the wavelength to be used for the determination of signal
 #' abundance.
-#' @param plot_spectrum Logical. If TRUE, plots the spectrum of the chosen
-#' peak. Defaults to TRUE.
-#' @param plot_trace Logical. If TRUE, plots the trace of the chosen peak at
-#' lambda. Defaults to TRUE.
-#' @param spectrum_labels Logical. If TRUE, plots labels on maxima in spectral
-#' plot. Defaults to TRUE.
-#' @param scale_spectrum Logical. If TRUE, scales spectrum to unit height.
-#' Defaults to FALSE.
-#' @param export_spectrum Logical. If TRUE, exports spectrum to console.
-#' Defaults to FALSE.
-#' @param verbose Logical. If TRUE, prints verbose output to console. Defaults
-#' to TRUE.
+#' @param plot_spectrum Logical. If \code{TRUE}, plots the spectrum of the chosen
+#' peak. Defaults to \code{TRUE}.
+#' @param plot_trace Logical. If \code{TRUE}, plots the trace of the chosen peak at
+#' lambda. Defaults to \code{TRUE}.
+#' @param spectrum_labels Logical. If \code{TRUE}, plots labels on maxima in spectral
+#' plot. Defaults to \code{TRUE}.
+#' @param scale_spectrum Logical. If \code{TRUE}, scales spectrum to unit height.
+#' Defaults to \code{FALSE}.
+#' @param export_spectrum Logical. If \code{TRUE}, exports spectrum to console.
+#' Defaults to \code{FALSE}.
+#' @param verbose Logical. If \code{TRUE}, prints verbose output to console.
+#' Defaults to \code{TRUE}.
 #' @param what What to look for. Either \code{peak} to extract spectral 
 #' information for a certain peak, \code{rt} to scan by retention time, 
 #' \code{idx} to scan by numeric index, or \code{click} to manually select 
 #' retention time by clicking on the chromatogram. Defaults to "peak" mode.
-#' @param engine Which plotting engine to use: \code{base}, \code{ggplot2}, or \code{plotly}.
+#' @param engine Which plotting engine to use: \code{base}, \code{ggplot2}, or
+#' \code{plotly}.
 #' @param ... Additional arguments.
 #' @return If \code{export_spectrum} is TRUE, returns the spectrum as a \code{
 #' data.frame} with wavelengths as rows and a single column encoding the
@@ -48,21 +49,21 @@
 #' object containing the specified plots. Otherwise, if \code{engine == "base"},
 #' there is no return value.
 #' @section Side effects:
-#' * If \code{plot_trace} is TRUE, plots the chromatographic trace of the specified
-#' chromatogram (\code{chr}), at the specified wavelength (\code{lambda}) with a
-#' dotted red line to indicate the retention time given by \code{loc}. The
-#' trace is a single column from the chromatographic matrix.
-#' * If \code{plot_spectrum} is TRUE, plots the spectrum for the specified
+#' * If \code{plot_trace} is \code{TRUE}, plots the chromatographic trace of the
+#' specified chromatogram (\code{idx}), at the specified wavelength 
+#' (\code{lambda}) with a dotted red line to indicate the retention time given 
+#' by \code{loc}. The trace is a single column from the chromatographic matrix.
+#' * If \code{plot_spectrum} is \code{TRUE}, plots the spectrum for the specified
 #' chromatogram at the specified retention time. The spectrum is a single row
 #' from the chromatographic matrix.
 #' @author Ethan Bass
 #' @examplesIf interactive()
 #' data(Sa)
-#' pks <- get_peaks(Sa, lambda="220.00000")
+#' pks <- get_peaks(Sa, lambda = "220.00000")
 #' pk_tab <- get_peaktable(pks)
 #' oldpar <- par(no.readonly = TRUE)
-#' par(mfrow=c(2,1))
-#' plot_spectrum(loc = "V10", peak_table = pk_tab, what="peak")
+#' par(mfrow = c(2, 1))
+#' plot_spectrum(loc = "V10", peak_table = pk_tab, what = "peak")
 #' par(oldpar)
 #' @export plot_spectrum
 #' @md
@@ -314,20 +315,22 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
 #' absorbance (or normalized absorbance, if \code{scale_spectrum} is TRUE)
 #' at each wavelength. Otherwise, there is no return value.
 #' @section Side effects:
-#' Plots a chromatographic trace from the specified chromatogram (\code{chr}),
+#' Plots a chromatographic trace from the specified chromatogram (\code{idx}),
 #' at the specified wavelength (\code{lambda}) with a dotted red line to indicate
 #' the user-selected retention time. The trace is a single column from the
 #' chromatographic matrix.
 #' 
 #' If \code{plot_spectrum} is TRUE, plots the spectrum for the specified
 #' chromatogram at the user-specified retention time. The spectrum is a single
-#" row from the chromatographic matrix.
-#' @md
+#' row from the chromatographic matrix.
+#' 
 #' @author Ethan Bass
 #' @examplesIf interactive()
 #' data(Sa_pr)
 #' scan_chrom(Sa_pr, lambda = "210", idx = 2, export_spectrum = TRUE)
 #' @export scan_chrom
+#' @md
+
 
 scan_chrom <- function(chrom_list, idx, lambda,
                         plot_spectrum = TRUE, peak_table=NULL,
@@ -408,7 +411,7 @@ scan_chrom <- function(chrom_list, idx, lambda,
 #' return value.
 #' @section Side effects:
 #' If \code{plot_spectrum} is TRUE, plots the spectra for the specified chromatogram
-#' (\code{chr}) of the given \code{peak}. The spectrum is a single row
+#' (\code{idx}) of the given \code{peak}. The spectrum is a single row
 #' from the chromatographic matrix.
 #' @author Ethan Bass
 #' @seealso \code{\link{plot_spectrum}}

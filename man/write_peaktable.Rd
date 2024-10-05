@@ -27,7 +27,8 @@ write_peaktable(
 No return value. The function is called for its side effects.
 }
 \description{
-Export peak table
+Export peak table in \code{csv} or \code{xlsx} format according to the value
+of \code{format}.
 }
 \section{Side effects}{
 

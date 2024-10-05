@@ -39,30 +39,31 @@ automatically plot the chromatogram with the largest signal.}
 TRUE and/or the wavelength to be used for the determination of signal
 abundance.}
 
-\item{plot_spectrum}{Logical. If TRUE, plots the spectrum of the chosen
-peak. Defaults to TRUE.}
+\item{plot_spectrum}{Logical. If \code{TRUE}, plots the spectrum of the chosen
+peak. Defaults to \code{TRUE}.}
 
-\item{plot_trace}{Logical. If TRUE, plots the trace of the chosen peak at
-lambda. Defaults to TRUE.}
+\item{plot_trace}{Logical. If \code{TRUE}, plots the trace of the chosen peak at
+lambda. Defaults to \code{TRUE}.}
 
-\item{spectrum_labels}{Logical. If TRUE, plots labels on maxima in spectral
-plot. Defaults to TRUE.}
+\item{spectrum_labels}{Logical. If \code{TRUE}, plots labels on maxima in spectral
+plot. Defaults to \code{TRUE}.}
 
-\item{scale_spectrum}{Logical. If TRUE, scales spectrum to unit height.
-Defaults to FALSE.}
+\item{scale_spectrum}{Logical. If \code{TRUE}, scales spectrum to unit height.
+Defaults to \code{FALSE}.}
 
-\item{export_spectrum}{Logical. If TRUE, exports spectrum to console.
-Defaults to FALSE.}
+\item{export_spectrum}{Logical. If \code{TRUE}, exports spectrum to console.
+Defaults to \code{FALSE}.}
 
-\item{verbose}{Logical. If TRUE, prints verbose output to console. Defaults
-to TRUE.}
+\item{verbose}{Logical. If \code{TRUE}, prints verbose output to console.
+Defaults to \code{TRUE}.}
 
 \item{what}{What to look for. Either \code{peak} to extract spectral
 information for a certain peak, \code{rt} to scan by retention time,
 \code{idx} to scan by numeric index, or \code{click} to manually select
 retention time by clicking on the chromatogram. Defaults to "peak" mode.}
 
-\item{engine}{Which plotting engine to use: \code{base}, \code{ggplot2}, or \code{plotly}.}
+\item{engine}{Which plotting engine to use: \code{base}, \code{ggplot2}, or
+\code{plotly}.}
 
 \item{chr}{Deprecated. Please use \code{idx} instead.}
 
@@ -84,16 +85,16 @@ plots the spectrum a particular retention time for a given chromatogram.
 \details{
 Can be used to confirm the identity of a peak or check that a particular
 column in the peak table represents a single compound. Retention times can
-also be selected by clicking on the plotted trace if what == 'click'.
+also be selected by clicking on the plotted trace if \code{what == 'click'}.
 }
 \section{Side effects}{
 
 \itemize{
-\item If \code{plot_trace} is TRUE, plots the chromatographic trace of the specified
-chromatogram (\code{chr}), at the specified wavelength (\code{lambda}) with a
-dotted red line to indicate the retention time given by \code{loc}. The
-trace is a single column from the chromatographic matrix.
-\item If \code{plot_spectrum} is TRUE, plots the spectrum for the specified
+\item If \code{plot_trace} is \code{TRUE}, plots the chromatographic trace of the
+specified chromatogram (\code{idx}), at the specified wavelength
+(\code{lambda}) with a dotted red line to indicate the retention time given
+by \code{loc}. The trace is a single column from the chromatographic matrix.
+\item If \code{plot_spectrum} is \code{TRUE}, plots the spectrum for the specified
 chromatogram at the specified retention time. The spectrum is a single row
 from the chromatographic matrix.
 }
@@ -102,11 +103,11 @@ from the chromatographic matrix.
 \examples{
 \dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 data(Sa)
-pks <- get_peaks(Sa, lambda="220.00000")
+pks <- get_peaks(Sa, lambda = "220.00000")
 pk_tab <- get_peaktable(pks)
 oldpar <- par(no.readonly = TRUE)
-par(mfrow=c(2,1))
-plot_spectrum(loc = "V10", peak_table = pk_tab, what="peak")
+par(mfrow = c(2, 1))
+plot_spectrum(loc = "V10", peak_table = pk_tab, what = "peak")
 par(oldpar)
 \dontshow{\}) # examplesIf}
 }
