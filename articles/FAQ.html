@@ -67,19 +67,36 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ethanbass.github.io/chromatographR/">chromatographR</a></span><span class="op">)</span></span></code></pre></div>
-<p><strong>Q</strong>: Some of my peaks aren’t being integrated when I
-run <code>get_peaks</code>.</p>
-<p><strong>A</strong>: Try adjusting the value of the
-<code>sd.max</code> argument, especially if you are seeing that your
-wider peaks are the ones that aren’t being integrated. This argument
-controls the maximum peak width. We have tried to set the default value
-(<code>sd.max = 50</code>) to a sensible number, but what is “sensible”
-can vary with the resolution of your data. For example, in the example
-shown below, wider peaks will not be picked up with
-<code>sd.max = 2.5</code> but if we increase <code>sd.max</code> to
-<code>10</code>, we are able to successfully integrate all of our peaks.
-If this fails, try adjusting the <code>smooth_window</code>.</p>
+<div class="section level5">
+<h5 id="how-should-i-format-my-data-for-analysis-in-chromatographr">1. How should I format my data for analysis in
+<code>chromatographR</code>?<a class="anchor" aria-label="anchor" href="#how-should-i-format-my-data-for-analysis-in-chromatographr"></a>
+</h5>
+<p><code>chromatographR</code> functions expect chromatograms to be in
+wide format with retention times as rownames. Thus, if you have a csv
+file with retention times in the first column, you should be able to
+read the files into R as follows:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">vector_of_file_paths</span>, <span class="kw">function</span><span class="op">(</span><span class="va">f</span><span class="op">)</span><span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">f</span>, row.names <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
+<p>If you have chromatograms in “long” format, you will need to reshape
+them into wide format before proceeding with the analysis.</p>
+</div>
+<div class="section level5">
+<h5 id="some-of-my-peaks-arent-being-integrated-when-i-run-get_peaks-">2. Some of my peaks aren’t being integrated when I run
+<code>get_peaks</code>.<a class="anchor" aria-label="anchor" href="#some-of-my-peaks-arent-being-integrated-when-i-run-get_peaks-"></a>
+</h5>
+<p>Try adjusting the value of the <code>sd.max</code> argument,
+especially if you are seeing that your wider peaks are the ones that
+aren’t being integrated. This argument controls the maximum peak width.
+We have tried to set the default value (<code>sd.max = 50</code>) to a
+sensible number, but what is “sensible” can vary with the resolution of
+your data. For example, in the example shown below, wider peaks will not
+be picked up with <code>sd.max = 2.5</code> but if we increase
+<code>sd.max</code> to <code>10</code>, we are able to successfully
+integrate all of our peaks. If this fails, try adjusting the
+<code>smooth_window</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Sa_pr</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">pks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_peaks.html">get_peaks</a></span><span class="op">(</span><span class="va">Sa_warp</span>, lambdas <span class="op">=</span> <span class="st">"210"</span>, fit <span class="op">=</span> <span class="st">"egh"</span>, sd.max <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span>
@@ -87,8 +104,10 @@ If this fails, try adjusting the <code>smooth_window</code>.</p>
 <span></span>
 <span><span class="va">pks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_peaks.html">get_peaks</a></span><span class="op">(</span><span class="va">Sa_warp</span>, lambdas <span class="op">=</span> <span class="st">"210"</span>, fit <span class="op">=</span> <span class="st">"egh"</span>, sd.max <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pks</span>, main <span class="op">=</span> <span class="st">"'sd.max' = 10"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="FAQ_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
-  </main>
+<p><img src="FAQ_files/figure-html/unnamed-chunk-3-1.png" width="700"></p>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
