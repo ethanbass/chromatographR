@@ -96,11 +96,11 @@ test_that("check_idx works as expected", {
 })
 
 test_that("get_lambda_idx works as expected", {
-  lam <- get_lambda_idx(lambda = 200, lambdas = get_lambdas(chrom_list = Sa_pr))
+  lam <- get_lambda_idx(lambda = 200, lambdas = get_lambdas(x = Sa_pr))
   expect_equal(lam, 1)
-  expect_error(get_lambda_idx(lambda=190, lambdas = get_lambdas(chrom_list = Sa_pr)))
-  expect_error(get_lambda_idx(lambda=400, lambdas = get_lambdas(chrom_list = Sa_pr)))
-  expect_error(get_lambda_idx(lambda="max", lambdas = get_lambdas(chrom_list = Sa_pr),
+  expect_error(get_lambda_idx(lambda=190, lambdas = get_lambdas(x = Sa_pr)))
+  expect_error(get_lambda_idx(lambda=400, lambdas = get_lambdas(x = Sa_pr)))
+  expect_error(get_lambda_idx(lambda="max", lambdas = get_lambdas(x = Sa_pr),
                               allow_max = FALSE))
   # lam <- get_lambda_idx(lambda="max", lambdas = get_lambdas(chrom_list = dat.pr),
   #                       y = unlist(dat.pr[[1]][500, , drop = TRUE]),

@@ -156,10 +156,19 @@ elementwise.all.equal <- Vectorize(function(x, y, ...){
   isTRUE(all.equal(x, y, ...))
 })
 
-#' Get times
-#' @return Numeric vector of retention times.
-#' @noRd
+#' Get retention times
+#' 
+#' Get retention times from a list of chromatograms or a peak_table object.
+#' 
+#' @param x List of chromatograms or \code{peak_table} object.
+#' @param idx Index of chromatogram from which to extract times
+#' @return Numeric vector of retention times from the chromatogram specified by
+#' \code{idx}.
+#' @export
 get_times <- function(x, idx = 1){
+  if (inherits(x, "peak_table")){
+    x <- get_chrom_list(x)
+  }
   if (inherits(x, "chrom_list") | inherits(x, "list")){
     as.numeric(rownames(x[[idx]]))
   } else if (inherits(x, "matrix")){
@@ -168,10 +177,21 @@ get_times <- function(x, idx = 1){
 }
 
 #' Get lambdas
-#' @return Numeric vector of wavelengths
-#' @noRd
-get_lambdas <- function(chrom_list){
-  as.numeric(colnames(chrom_list[[1]]))
+#' 
+#' Get wavelengths from a list of chromatograms or a peak_table object.
+#' 
+#' @param x List of chromatograms or \code{peak_table} object.
+#' @return Numeric vector of wavelengths.
+#' @export
+get_lambdas <- function(x){
+  if (inherits(x, "peak_table")){
+    x <- get_chrom_list(x)
+  }
+  if (inherits(x, "chrom_list") | inherits(x, "list")){
+    as.numeric(colnames(x[[1]]))
+  } else if (inherits(x, "matrix")){
+    as.numeric(colnames(x))
+  }
 }
 
 #' Get time resolution
