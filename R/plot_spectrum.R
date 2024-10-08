@@ -166,11 +166,11 @@ plot_spectrum_ggpl <- function(loc, peak_table, chrom_list,
                             lambda.idx = lambda.idx, line.idx = idx)
   }
   if (verbose){
-    message(paste0("chrome no. ", chr, " (`", names(chrom_list)[chr], "`) \n",
-                   "RT: ", round(RT, 2), "; \n",
-                   "lambda = ", new.lambdas[lambda.idx], " nm; \n",
-                   "abs = ", round(chrom_list[[chr]][,lambda.idx][idx], 2)))
-    
+    message(sprintf("chrome no. %d (`%s`); \n RT = %g; \n lambda = %g nm; \n abs = %g",
+                    chr, names(chrom_list)[chr],
+                    round(RT, 2), new.lambdas[lambda.idx], 
+                    round(chrom_list[[chr]][,lambda.idx][idx], 2)))
+
     ### report closest match ###
     if (!missing(peak_table) & what != "peak"){
       pk <- names(which.min(abs(peak_table$pk_meta["rt",] - RT)))
@@ -222,7 +222,7 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
                                chr = 'max', lambda = 'max',
                                plot_spectrum = TRUE, plot_trace = TRUE,
                                spectrum_labels = TRUE, scale_spectrum = FALSE,
-                               export_spectrum = FALSE, verbose=TRUE, 
+                               export_spectrum = FALSE, verbose = TRUE, 
                                what=c("peak", "rt", "idx", "click"), zoom = FALSE,
                                engine="base",
                                ...){
@@ -256,10 +256,10 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
                       line.idx = idx, what = what)
   }
   if (verbose){
-    message(paste0("chrome no. ", chr, " (`", names(chrom_list)[chr], "`) \n",
-                   "RT: ", round(RT, 2), "; \n",
-                   "lambda = ", new.lambdas[lambda.idx], " nm; \n",
-                   "abs = ", round(chrom_list[[chr]][,lambda.idx][idx], 2)))
+    message(sprintf("chrome no. %d (`%s`); \n RT = %g; \n lambda = %g nm; \n abs = %g",
+                    chr, names(chrom_list)[chr],
+                    round(RT, 2), new.lambdas[lambda.idx], 
+                    round(chrom_list[[chr]][,lambda.idx][idx], 2)))
     
     ### report closest match ###
     if (!missing(peak_table) & what != "peak"){
