@@ -95,7 +95,7 @@ as the maximal inter-cluster retention time difference) in the simple case
 based on retention times. Clustering can also incorporate information about
 spectral similarity using a distance function adapted from Broeckling et al.,
 2014:
-\deqn{latexascii}{e^{-\frac{(1-c_{ij})^2}{2\sigma_r^2}}* e^{-\frac{(1-(t_i-t_j)^2}{2\sigma_t^2}}}
+\deqn{e^{-\frac{(1-c_{ij})^2}{2\sigma_r^2}} \cdot e^{-\frac{(1-(t_i-t_j)^2)}{2\sigma_t^2}}}
 If two peaks from the same sample are assigned to the same cluster, a warning
 message is printed to the console. These warnings can usually be ignored, but
 one could also consider reducing the \code{hmax} variable. However, this may
