@@ -445,10 +445,11 @@ plot_all_spectra <- function(peak, peak_table, chrom_list, idx = "all",
   if ("all" %in% idx)
     idx <- seq_along(chrom_list)
   sp <- sapply(idx, function(chr){
-    try(plot_spectrum(loc = peak, peak_table = peak_table, chrom_list = chrom_list,
+    tryCatch(plot_spectrum(loc = peak, peak_table = peak_table, chrom_list = chrom_list,
                   idx = chr, plot_spectrum = FALSE, plot_trace = FALSE, 
                   export_spectrum = TRUE, scale_spectrum = scale_spectrum,
-                  verbose = verbose, what = what, engine = "base")
+                  verbose = verbose, what = what, engine = "base"), 
+             error = function(e) NA
     )
   })
   if (engine == "base"){
