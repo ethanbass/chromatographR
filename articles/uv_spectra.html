@@ -68,28 +68,21 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ethanbass.github.io/chromatographR/">chromatographR</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Sa_warp"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"pk_tab"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Sa_warp"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_peaks.html">get_peaks</a></span><span class="op">(</span><span class="va">Sa_warp</span>,lambdas<span class="op">=</span><span class="fl">210</span><span class="op">)</span></span>
 <span><span class="va">pktab</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_peaktable.html">get_peaktable</a></span><span class="op">(</span><span class="va">pks</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pktab</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/attach_ref_spectra.html">attach_ref_spectra</a></span><span class="op">(</span><span class="va">pktab</span>, ref <span class="op">=</span> <span class="st">"max.cor"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_spectrum.html">plot_spectrum</a></span><span class="op">(</span>peak_table <span class="op">=</span> <span class="va">pk_tab</span>, what<span class="op">=</span><span class="st">"click"</span>, idx<span class="op">=</span><span class="fl">1</span>, lambda<span class="op">=</span><span class="fl">210</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/plot_all_spectra.html">plot_all_spectra</a></span><span class="op">(</span><span class="st">"V50"</span>, <span class="va">pk_tab</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/plot_all_spectra.html">plot_all_spectra</a></span><span class="op">(</span><span class="st">"V7"</span>, <span class="va">pk_tab</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="fu"><a href="../reference/get_lambdas.html">get_lambdas</a></span><span class="op">(</span><span class="va">pk_tab</span><span class="op">)</span>, <span class="va">pk_tab</span><span class="op">$</span><span class="va">ref_spectra</span><span class="op">[</span>,<span class="st">"V7"</span><span class="op">]</span>,type<span class="op">=</span><span class="st">'l'</span>,col<span class="op">=</span><span class="st">"pink"</span><span class="op">)</span></span></code></pre></div>
 <p>After assigning reference spectra to our peak table, we can use
 pearson correlations to easily locate peaks falling within a certain
 similarity threshold to a reference spectrum. To do this, we must first
 construct correlation matrix using the <code>cor</code> function.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cor_mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="va">pktab</span><span class="op">$</span><span class="va">ref_spectra</span><span class="op">)</span></span></code></pre></div>
 <p>We can then plot spectra falling within a desired similarity
 threshold (<code>t</code>) to a reference peak (in this case ‘V21’).</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">idx_90</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">cor_mat</span><span class="op">[</span>,<span class="st">"V21"</span><span class="op">]</span> <span class="op">&gt;</span> <span class="fl">.9</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/matplot.html" class="external-link">matplot</a></span><span class="op">(</span><span class="va">pktab</span><span class="op">$</span><span class="va">ref_spectra</span><span class="op">[</span>,<span class="va">idx_90</span><span class="op">]</span>,type<span class="op">=</span><span class="st">'l'</span>, ylab<span class="op">=</span><span class="st">"Abs"</span><span class="op">)</span></span>
@@ -106,28 +99,28 @@ threshold (<code>t</code>) to a reference peak (in this case ‘V21’).</p>
 <span><span class="va">idx_99</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">cor_mat</span><span class="op">[</span>,<span class="st">"V21"</span><span class="op">]</span> <span class="op">&gt;</span> <span class="fl">.99</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/matplot.html" class="external-link">matplot</a></span><span class="op">(</span><span class="va">pktab</span><span class="op">$</span><span class="va">ref_spectra</span><span class="op">[</span>,<span class="va">idx_99</span><span class="op">]</span>,type<span class="op">=</span><span class="st">'l'</span>, ylab<span class="op">=</span><span class="st">"Abs"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"top"</span>, <span class="st">"t = 0.99"</span>, bty <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="uv_spectra_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+<p><img src="uv_spectra_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
 <p>We can also extract retention times for spectra above the desired
 spectral similarity threshold with the reference spectra.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">rts_99</span> <span class="op">=</span> <span class="va">pk_tab</span><span class="op">$</span><span class="va">pk_meta</span><span class="op">[</span><span class="st">"rt"</span>, <span class="va">idx_99</span><span class="op">]</span></span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rts_99</span> <span class="op">=</span> <span class="va">pktab</span><span class="op">$</span><span class="va">pk_meta</span><span class="op">[</span><span class="st">"rt"</span>, <span class="va">idx_99</span><span class="op">]</span></span>
 <span><span class="va">rts_99</span></span>
-<span><span class="co">#&gt;       V9   V17  V21   V26</span></span>
-<span><span class="co">#&gt; rt 12.81 14.85 15.8 16.82</span></span></code></pre></div>
+<span><span class="co">#&gt;       V9   V17   V21   V26</span></span>
+<span><span class="co">#&gt; rt 12.18 14.44 15.51 16.78</span></span></code></pre></div>
 <p>Below we plot traces of our four chromatograms at 210 nm. The 4 peaks
 that match the reference spectrum at the 99% level are marked with solid
 black lines and the 6 peaks that match the reference spectrum at the 97%
 level are marked with dotted gray lines.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot_chroms.html">plot_chroms</a></span><span class="op">(</span><span class="va">Sa_warp</span>, lambdas<span class="op">=</span><span class="fl">210</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v <span class="op">=</span> <span class="va">rts_99</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v <span class="op">=</span> <span class="va">pk_tab</span><span class="op">$</span><span class="va">pk_meta</span><span class="op">[</span><span class="st">"rt"</span>, <span class="va">idx_97</span><span class="op">]</span>, lty<span class="op">=</span><span class="fl">2</span>, col <span class="op">=</span> <span class="st">"darkgray"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="uv_spectra_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v <span class="op">=</span> <span class="va">pktab</span><span class="op">$</span><span class="va">pk_meta</span><span class="op">[</span><span class="st">"rt"</span>, <span class="va">idx_97</span><span class="op">]</span>, lty<span class="op">=</span><span class="fl">2</span>, col <span class="op">=</span> <span class="st">"darkgray"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="uv_spectra_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 <p>If we are interested in the combined area of these peaks, we could
 also use these indices to sum them together.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">pktab</span><span class="op">$</span><span class="va">tab</span><span class="op">[</span>,<span class="va">idx_99</span><span class="op">]</span>, <span class="fl">1</span>, <span class="va">sum</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      119      121      122      458 </span></span>
 <span><span class="co">#&gt; 143.6671 100.9055 112.6122 171.6950</span></span></code></pre></div>
@@ -137,10 +130,10 @@ clustering. We can set the seed with the <code>iseed</code> argument to
 ensure repeatability among instantiations of this vignette. For
 simplicity, we use the argument <code>max.only = TRUE</code> to return
 only the largest clusters.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cluster_spectra.html">cluster_spectra</a></span><span class="op">(</span><span class="va">pktab</span>, alpha <span class="op">=</span> <span class="fl">0.01</span>, iseed <span class="op">=</span> <span class="fl">1</span>, max.only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="uv_spectra_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<p><img src="uv_spectra_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 <p>The output is a dendrogram of peaks annotated with bootstrap values
 showing the support for each node and spectra of the clusters with
 p-values below the significance level specified by <code>alpha</code>.
@@ -148,14 +141,14 @@ In this case, we recovered two clusters, representing two different
 classes of compounds distinguished by their chromophores. The second
 cluster closely matches the spectrum represented by peak ‘V21’. We can
 access the peaks in cluster 2 as follows:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cl2</span> <span class="op">&lt;-</span> <span class="va">cl</span><span class="op">$</span><span class="va">clusters</span><span class="op">$</span><span class="va">c2</span><span class="op">@</span><span class="va">peaks</span></span>
 <span><span class="va">cl2</span></span>
 <span><span class="co">#&gt;  [1] "V6"  "V9"  "V11" "V14" "V15" "V17" "V19" "V21" "V22" "V23" "V26"</span></span></code></pre></div>
 <p>In this case, the peaks in cluster 2 happen to overlap completely
 with the peaks recovered through pearson correlation at the 90%
 threshold.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">cl2</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">idx_90</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
   </main>
