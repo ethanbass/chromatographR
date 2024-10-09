@@ -1,0 +1,102 @@
+---
+title: "Programmatic analysis of UV spectra"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(chromatographR)
+data("Sa_warp")
+data("pk_tab")
+```
+
+
+```{r}
+pks <- get_peaks(Sa_warp,lambdas=210)
+pktab <- get_peaktable(pks)
+```
+
+```{r}
+pktab <- attach_ref_spectra(pktab, ref = "max.cor")
+```
+
+```{r, eval =FALSE}
+plot_spectrum(peak_table = pk_tab, what="click", idx=1, lambda=210)
+plot_all_spectra("V50", pk_tab)
+plot_all_spectra("V7", pk_tab)
+
+lines(get_lambdas(pk_tab), pk_tab$ref_spectra[,"V7"],type='l',col="pink")
+```
+
+After assigning reference spectra to our peak table, we can use pearson correlations to easily locate peaks falling within a certain similarity threshold to a reference spectrum. To do this, we must first construct correlation matrix using the `cor` function.
+
+```{r}
+cor_mat <- cor(pktab$ref_spectra)
+```
+
+We can then plot spectra falling within a desired similarity threshold (`t`) to a reference peak (in this case 'V21').
+
+```{r}
+par(mfrow=c(2,2))
+idx_90 <- which(cor_mat[,"V21"] > .9)
+matplot(pktab$ref_spectra[,idx_90],type='l', ylab="Abs")
+legend("top", "t = 0.90", bty = "n")
+
+idx_95 <- which(cor_mat[,"V21"] > .95)
+matplot(pktab$ref_spectra[,idx_95],type='l', ylab="Abs")
+legend("top", "t = 0.95", bty = "n")
+
+idx_97 <- which(cor_mat[,"V21"] > .97)
+matplot(pktab$ref_spectra[,idx_97],type='l', ylab="Abs")
+legend("top", "t = 0.97", bty = "n")
+
+idx_99 <- which(cor_mat[,"V21"] > .99)
+matplot(pktab$ref_spectra[,idx_99],type='l', ylab="Abs")
+legend("top", "t = 0.99", bty = "n")
+```
+
+We can then extract retention times for spectra above the desired spectral similarity threshold with the reference spectra.
+
+```{r}
+rts_99 = pk_tab$pk_meta["rt", idx_99]
+rts_99
+```
+
+And identify peaks that match the desired criteria. Below the `r length(idx_99)` peaks that match the reference peak at the 99% level are marked with solid black lines and the `r length(idx_97)` peaks that match the reference at the 97% level are marked with dotted gray lines.
+
+```{r}
+par(mfrow = c(1, 1))
+plot_chroms(Sa_warp, lambdas=210)
+
+abline(v = rts_99)
+abline(v = pk_tab$pk_meta["rt", idx_97], lty=2, col = "darkgray")
+```
+
+If we are interested in the combined area of these peaks, we could also use these indices to sum them together.
+
+`chromatographR` also includes a function (`cluster_spectra`) to group spectra using hierarchical clustering. We can set the seed with the `iseed` argument to ensure repeatability among instantiations of this vignette.
+
+```{r}
+par(mfrow=c(2,2))
+cl <- cluster_spectra(pktab, alpha = 0.05, iseed = 2, peak_no = c(5, ncol(pktab)))
+```
+
+The output is a dendrogram of peaks annotated with bootstrap values showing the support for each node and spectra of the clusters with p-values below the significance level specified by `alpha`. In this case, we recovered three clusters, presumably representing different classes of compounds with different chromophores. The second cluster closely matches the spectrum represented by peak 'V21'. We can access the peaks in cluster 2 as follows:
+
+```{r}
+cl2 <- cl$clusters$c2@peaks
+cl2
+```
+
+In this case, the peaks in cluster 2 happen to overlap completely with the peaks recovered through pearson correlation at the 90% threshold.
+
+```{r}
+all.equal(cl2, names(idx_90))
+```
