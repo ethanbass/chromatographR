@@ -5,8 +5,8 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' Function to cluster peaks by spectral similarity. A representative spectrum
 #' is selected for each peak in the provided peak table and used to construct a
 #' distance matrix based on spectral similarity (pearson correlation) between
-#' peaks. Hierarchical clustering with bootstrap resampling is performed on the resulting
-#' correlation matrix to classify peaks into by their spectral similarity.
+#' peaks. Hierarchical clustering with bootstrap resampling is performed on the 
+#' resulting correlation matrix to classify peaks by spectral similarity.
 #'
 #' A representative spectrum is selected for each peak in the provided peak table
 #' and used to construct a distance matrix based on spectral similarity
@@ -141,7 +141,8 @@ cluster_spectra <- function(peak_table, peak_no = c(5, 100), alpha = 0.95,
         matplot(lambdas, spectra[, clusters[[i]]@peaks],
                 type = 'l', ylab = '', yaxt = 'n', xlab = expression(lambda),
                 main = paste0('cluster ', i, '; p = ',
-                              format(round(clusters[[i]]@pval, 2), nsmall = 2))
+                              format.pval(clusters[[i]]@pval, .015, eps=.001, 
+                                          digits=2, nsmall=2))
         )
       })
     }
