@@ -4,7 +4,8 @@ pkgdown_sha: ~
 articles:
   chromatographR: chromatographR.html
   articles/FAQ: FAQ.html
-last_built: 2024-10-06T20:03Z
+  articles/uv_spectra: uv_spectra.html
+last_built: 2024-10-09T15:15Z
 urls:
   reference: https://ethanbass.github.io/chromatographR/reference
   article: https://ethanbass.github.io/chromatographR/articles

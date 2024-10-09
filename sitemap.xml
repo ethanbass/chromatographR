@@ -4,6 +4,7 @@
 <url><loc>https://ethanbass.github.io/chromatographR/articles/FAQ.html</loc></url>
 <url><loc>https://ethanbass.github.io/chromatographR/articles/chromatographR.html</loc></url>
 <url><loc>https://ethanbass.github.io/chromatographR/articles/index.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/articles/uv_spectra.html</loc></url>
 <url><loc>https://ethanbass.github.io/chromatographR/authors.html</loc></url>
 <url><loc>https://ethanbass.github.io/chromatographR/contributing.html</loc></url>
 <url><loc>https://ethanbass.github.io/chromatographR/index.html</loc></url>
@@ -24,9 +25,11 @@
 <url><loc>https://ethanbass.github.io/chromatographR/reference/find_peaks.html</loc></url>
 <url><loc>https://ethanbass.github.io/chromatographR/reference/fit_peaks.html</loc></url>
 <url><loc>https://ethanbass.github.io/chromatographR/reference/get_agilent_threshold.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/get_lambdas.html</loc></url>
 <url><loc>https://ethanbass.github.io/chromatographR/reference/get_peaks.html</loc></url>
 <url><loc>https://ethanbass.github.io/chromatographR/reference/get_peaktable.html</loc></url>
 <url><loc>https://ethanbass.github.io/chromatographR/reference/get_purity.html</loc></url>
+<url><loc>https://ethanbass.github.io/chromatographR/reference/get_times.html</loc></url>
 <url><loc>https://ethanbass.github.io/chromatographR/reference/index.html</loc></url>
 <url><loc>https://ethanbass.github.io/chromatographR/reference/merge_peaks.html</loc></url>
 <url><loc>https://ethanbass.github.io/chromatographR/reference/mirror_plot.html</loc></url>
