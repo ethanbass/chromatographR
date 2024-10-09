@@ -1,36 +1,34 @@
 setClass("cluster", representation(peaks = "character", pval = "numeric"))
 
+#' Cluster spectra
+#' 
 #' Cluster peaks by spectral similarity.
 #' 
-#' Function to cluster peaks by spectral similarity. A representative spectrum
-#' is selected for each peak in the provided peak table and used to construct a
-#' distance matrix based on spectral similarity (pearson correlation) between
-#' peaks. Hierarchical clustering with bootstrap resampling is performed on the 
-#' resulting correlation matrix to classify peaks by spectral similarity.
-#'
-#' A representative spectrum is selected for each peak in the provided peak table
-#' and used to construct a distance matrix based on spectral similarity
-#' (pearson correlation) between peaks. It is suggested to attach representative
-#' spectra to the \code{peak_table} using \code{\link{attach_ref_spectra}}.
-#' Otherwise, representative spectra are obtained from the chromatogram with the
-#' highest absorbance at lambda max.
-#'
-#' Hierarchical clustering with bootstrap
-#' resampling is performed on the resulting correlation matrix, as implemented in
-#' \code{\link[pvclust:pvclust]{pvclust}}. Finally, bootstrap values can be used
-#' to select clusters that exceed a certain confidence threshold as defined by
-#' \code{alpha}. Clusters can also be filtered by the minimum and maximum
-#' size of the cluster using the argument \code{peak_no}. If \code{max_only}
-#' is TRUE, only the largest cluster in a nested dendrogram of clusters meeting
-#' the confidence threshold will be returned.
+#' Function to cluster peaks by spectral similarity. Before using this function,
+#' reference spectra must be attached to the \code{peak_table} using the \code{
+#' attach_ref_spectra} function. These reference spectra are then used to
+#' construct a distance matrix based on spectral similarity (pearson correlation)
+#' between peaks. Hierarchical clustering with bootstrap resampling is performed
+#' on the resulting correlation matrix to classify peaks by spectral similarity,
+#' as implemented in \code{\link[pvclust:pvclust]{pvclust}}. Finally, bootstrap
+#' values can be used to select clusters that exceed a certain confidence 
+#' threshold as defined by \code{alpha}. 
+#' 
+#' Clusters can be filtered by the minimum and maximum size of the cluster using
+#' the \code{min_size} and \code{max_size} arguments respectively. If 
+#' \code{max_only} is TRUE, only the largest cluster in a nested tree of 
+#' clusters meeting the specified confidence threshold will be returned.
 #'
 #' @name cluster_spectra
 #' @importFrom stats cor
 #' @importFrom methods new
 #' @importFrom graphics matplot
 #' @param peak_table Peak table from \code{\link{get_peaktable}}.
+#' @param min_size Minimum number of peaks a cluster may have.
+#' @param max_size Maximum number of peaks a cluster may have.
 #' @param peak_no Minimum and maximum thresholds for the number of peaks a
-#' cluster may have.
+#' cluster may have. This argument is deprecated in favor of \code{min_size} and
+#' \code{max_size}.
 #' @param alpha Confidence threshold for inclusion of cluster.
 #' @param nboot Number of bootstrap replicates for
 #' \code{\link[pvclust:pvclust]{pvclust}}.
@@ -76,12 +74,13 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' data(Sa_warp)
 #' pk_tab <- attach_ref_spectra(pk_tab, Sa_warp, ref = "max.int")
 #' cl <- cluster_spectra(pk_tab, nboot = 100, max.only = FALSE, 
-#' save = FALSE, alpha = .97)
+#' save = FALSE, alpha = 0.03)
 #' }
 #' @export cluster_spectra
 #' @md
 
-cluster_spectra <- function(peak_table, peak_no = c(5, 100), alpha = 0.95, 
+cluster_spectra <- function(peak_table, peak_no = NULL, alpha = 0.05, 
+                            min_size = 5, max_size = NULL,
                             nboot = 1000, plot_dend = TRUE, plot_spectra = TRUE, 
                             verbose = getOption("verbose"), 
                             save = FALSE, parallel = TRUE, max.only = FALSE,
@@ -89,6 +88,13 @@ cluster_spectra <- function(peak_table, peak_no = c(5, 100), alpha = 0.95,
                             ...){
   check_for_pkg("pvclust")
   check_peaktable(peak_table)
+  if (!is.null(peak_no)){
+    min_size <- peak_no[1]
+    max_size <- peak_no[2]
+    warning("The `peak_no` argument is deprecated. Please use `min_size` and
+            `max_size` instead.", .immediate=TRUE)
+  }
+  if (is.null(max_size)) max_size <- ncol(peak_table)
   output <- match.arg(output, c("pvclust", "clusters"), several.ok = TRUE)
   if (is.data.frame(peak_table$ref_spectra) | is.matrix(peak_table$ref_spectra)){
     spectra <- peak_table$ref_spectra
@@ -112,16 +118,16 @@ cluster_spectra <- function(peak_table, peak_no = c(5, 100), alpha = 0.95,
   if (plot_dend){
     plot(result, labels = FALSE, cex.pv = 0.5, print.pv = 'au',
          print.num = FALSE)
-    pvclust::pvrect(result, alpha = alpha, max.only = max.only)
+    pvclust::pvrect(result, alpha = (1-alpha), max.only = max.only)
   }
   if (save){
     saveRDS(result, 'pvclust.RDS')
   }
-  picks <- pvclust::pvpick(result, alpha = alpha, max.only = max.only)
+  picks <- pvclust::pvpick(result, alpha = (1-alpha), max.only = max.only)
   cl_size <- sapply(picks$clusters, length)
   
   ## filter clusters ##
-  cl_idx <- which(cl_size > peak_no[1] & cl_size < peak_no[2])
+  cl_idx <- which(cl_size > min_size & cl_size < max_size)
   if (verbose && length(cl_idx) < length(cl_size)){
     message(paste0("Removing ", length(cl_size) - length(cl_idx),
                    " under- or oversized clusters from results."))

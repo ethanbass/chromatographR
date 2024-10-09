@@ -2,12 +2,14 @@
 % Please edit documentation in R/cluster_spectra.R
 \name{cluster_spectra}
 \alias{cluster_spectra}
-\title{Cluster peaks by spectral similarity.}
+\title{Cluster spectra}
 \usage{
 cluster_spectra(
   peak_table,
-  peak_no = c(5, 100),
-  alpha = 0.95,
+  peak_no = NULL,
+  alpha = 0.05,
+  min_size = 5,
+  max_size = NULL,
   nboot = 1000,
   plot_dend = TRUE,
   plot_spectra = TRUE,
@@ -23,9 +25,14 @@ cluster_spectra(
 \item{peak_table}{Peak table from \code{\link{get_peaktable}}.}
 
 \item{peak_no}{Minimum and maximum thresholds for the number of peaks a
-cluster may have.}
+cluster may have. This argument is deprecated in favor of \code{min_size} and
+\code{max_size}.}
 
 \item{alpha}{Confidence threshold for inclusion of cluster.}
+
+\item{min_size}{Minimum number of peaks a cluster may have.}
+
+\item{max_size}{Maximum number of peaks a cluster may have.}
 
 \item{nboot}{Number of bootstrap replicates for
 \code{\link[pvclust:pvclust]{pvclust}}.}
@@ -71,28 +78,23 @@ the bootstrap p-value (au) for the given cluster.
 }
 }
 \description{
-Function to cluster peaks by spectral similarity. A representative spectrum
-is selected for each peak in the provided peak table and used to construct a
-distance matrix based on spectral similarity (pearson correlation) between
-peaks. Hierarchical clustering with bootstrap resampling is performed on the resulting
-correlation matrix to classify peaks into by their spectral similarity.
+Cluster peaks by spectral similarity.
 }
 \details{
-A representative spectrum is selected for each peak in the provided peak table
-and used to construct a distance matrix based on spectral similarity
-(pearson correlation) between peaks. It is suggested to attach representative
-spectra to the \code{peak_table} using \code{\link{attach_ref_spectra}}.
-Otherwise, representative spectra are obtained from the chromatogram with the
-highest absorbance at lambda max.
+Function to cluster peaks by spectral similarity. Before using this function,
+reference spectra must be attached to the \code{peak_table} using the \code{
+attach_ref_spectra} function. These reference spectra are then used to
+construct a distance matrix based on spectral similarity (pearson correlation)
+between peaks. Hierarchical clustering with bootstrap resampling is performed
+on the resulting correlation matrix to classify peaks by spectral similarity,
+as implemented in \code{\link[pvclust:pvclust]{pvclust}}. Finally, bootstrap
+values can be used to select clusters that exceed a certain confidence
+threshold as defined by \code{alpha}.
 
-Hierarchical clustering with bootstrap
-resampling is performed on the resulting correlation matrix, as implemented in
-\code{\link[pvclust:pvclust]{pvclust}}. Finally, bootstrap values can be used
-to select clusters that exceed a certain confidence threshold as defined by
-\code{alpha}. Clusters can also be filtered by the minimum and maximum
-size of the cluster using the argument \code{peak_no}. If \code{max_only}
-is TRUE, only the largest cluster in a nested dendrogram of clusters meeting
-the confidence threshold will be returned.
+Clusters can be filtered by the minimum and maximum size of the cluster using
+the \code{min_size} and \code{max_size} arguments respectively. If
+\code{max_only} is TRUE, only the largest cluster in a nested tree of
+clusters meeting the specified confidence threshold will be returned.
 }
 \note{
 \itemize{
@@ -110,7 +112,7 @@ data(pk_tab)
 data(Sa_warp)
 pk_tab <- attach_ref_spectra(pk_tab, Sa_warp, ref = "max.int")
 cl <- cluster_spectra(pk_tab, nboot = 100, max.only = FALSE, 
-save = FALSE, alpha = .97)
+save = FALSE, alpha = 0.03)
 }
 }
 \references{

@@ -81,14 +81,14 @@ abline(v = pk_tab$pk_meta["rt", idx_97], lty=2, col = "darkgray")
 
 If we are interested in the combined area of these peaks, we could also use these indices to sum them together.
 
-`chromatographR` also includes a function (`cluster_spectra`) to group spectra using hierarchical clustering. We can set the seed with the `iseed` argument to ensure repeatability among instantiations of this vignette.
+`chromatographR` also includes a function (`cluster_spectra`) to group spectra using hierarchical clustering. We can set the seed with the `iseed` argument to ensure repeatability among instantiations of this vignette. For simplicity, we use the argument `max.only = TRUE` to return only the largest clusters.
 
 ```{r}
 par(mfrow=c(2,2))
-cl <- cluster_spectra(pktab, alpha = 0.05, iseed = 2, peak_no = c(5, ncol(pktab)))
+cl <- cluster_spectra(pktab, alpha = 0.01, iseed = 1, max.only = TRUE)
 ```
 
-The output is a dendrogram of peaks annotated with bootstrap values showing the support for each node and spectra of the clusters with p-values below the significance level specified by `alpha`. In this case, we recovered three clusters, presumably representing different classes of compounds with different chromophores. The second cluster closely matches the spectrum represented by peak 'V21'. We can access the peaks in cluster 2 as follows:
+The output is a dendrogram of peaks annotated with bootstrap values showing the support for each node and spectra of the clusters with p-values below the significance level specified by `alpha`. In this case, we recovered two clusters, representing two different classes of compounds distinguished by their chromophores. The second cluster closely matches the spectrum represented by peak 'V21'. We can access the peaks in cluster 2 as follows:
 
 ```{r}
 cl2 <- cl$clusters$c2@peaks
