@@ -14,7 +14,6 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(chromatographR)
 data("Sa_warp")
-data("pk_tab")
 ```
 
 
@@ -25,14 +24,6 @@ pktab <- get_peaktable(pks)
 
 ```{r}
 pktab <- attach_ref_spectra(pktab, ref = "max.cor")
-```
-
-```{r, eval =FALSE}
-plot_spectrum(peak_table = pk_tab, what="click", idx=1, lambda=210)
-plot_all_spectra("V50", pk_tab)
-plot_all_spectra("V7", pk_tab)
-
-lines(get_lambdas(pk_tab), pk_tab$ref_spectra[,"V7"],type='l',col="pink")
 ```
 
 After assigning reference spectra to our peak table, we can use pearson correlations to easily locate peaks falling within a certain similarity threshold to a reference spectrum. To do this, we must first construct correlation matrix using the `cor` function.
@@ -62,24 +53,28 @@ matplot(pktab$ref_spectra[,idx_99],type='l', ylab="Abs")
 legend("top", "t = 0.99", bty = "n")
 ```
 
-We can then extract retention times for spectra above the desired spectral similarity threshold with the reference spectra.
+We can also extract retention times for spectra above the desired spectral similarity threshold with the reference spectra.
 
 ```{r}
-rts_99 = pk_tab$pk_meta["rt", idx_99]
+rts_99 = pktab$pk_meta["rt", idx_99]
 rts_99
 ```
 
-And identify peaks that match the desired criteria. Below the `r length(idx_99)` peaks that match the reference peak at the 99% level are marked with solid black lines and the `r length(idx_97)` peaks that match the reference at the 97% level are marked with dotted gray lines.
+Below we plot traces of our four chromatograms at 210 nm. The `r length(idx_99)` peaks that match the reference spectrum at the 99% level are marked with solid black lines and the `r length(idx_97)` peaks that match the reference spectrum at the 97% level are marked with dotted gray lines.
 
 ```{r}
 par(mfrow = c(1, 1))
 plot_chroms(Sa_warp, lambdas=210)
 
 abline(v = rts_99)
-abline(v = pk_tab$pk_meta["rt", idx_97], lty=2, col = "darkgray")
+abline(v = pktab$pk_meta["rt", idx_97], lty=2, col = "darkgray")
 ```
 
 If we are interested in the combined area of these peaks, we could also use these indices to sum them together.
+
+```{r}
+apply(pktab$tab[,idx_99], 1, sum)
+```
 
 `chromatographR` also includes a function (`cluster_spectra`) to group spectra using hierarchical clustering. We can set the seed with the `iseed` argument to ensure repeatability among instantiations of this vignette. For simplicity, we use the argument `max.only = TRUE` to return only the largest clusters.
 
