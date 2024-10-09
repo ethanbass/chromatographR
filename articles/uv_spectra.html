@@ -130,29 +130,30 @@ also use these indices to sum them together.</p>
 <p><code>chromatographR</code> also includes a function
 (<code>cluster_spectra</code>) to group spectra using hierarchical
 clustering. We can set the seed with the <code>iseed</code> argument to
-ensure repeatability among instantiations of this vignette.</p>
+ensure repeatability among instantiations of this vignette. For
+simplicity, we use the argument <code>max.only = TRUE</code> to return
+only the largest clusters.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cluster_spectra.html">cluster_spectra</a></span><span class="op">(</span><span class="va">pktab</span>, alpha <span class="op">=</span> <span class="fl">0.05</span>, iseed <span class="op">=</span> <span class="fl">2</span>, peak_no <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">pktab</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="uv_spectra_files/figure-html/unnamed-chunk-9-1.png" width="700"><img src="uv_spectra_files/figure-html/unnamed-chunk-9-2.png" width="700"><img src="uv_spectra_files/figure-html/unnamed-chunk-9-3.png" width="700"><img src="uv_spectra_files/figure-html/unnamed-chunk-9-4.png" width="700"></p>
+<span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cluster_spectra.html">cluster_spectra</a></span><span class="op">(</span><span class="va">pktab</span>, alpha <span class="op">=</span> <span class="fl">0.01</span>, iseed <span class="op">=</span> <span class="fl">1</span>, max.only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="uv_spectra_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 <p>The output is a dendrogram of peaks annotated with bootstrap values
 showing the support for each node and spectra of the clusters with
 p-values below the significance level specified by <code>alpha</code>.
-In this case, we recovered three clusters, presumably representing
-different classes of compounds with different chromophores. The second
+In this case, we recovered two clusters, representing two different
+classes of compounds distinguished by their chromophores. The second
 cluster closely matches the spectrum represented by peak ‘V21’. We can
 access the peaks in cluster 2 as follows:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cl2</span> <span class="op">&lt;-</span> <span class="va">cl</span><span class="op">$</span><span class="va">clusters</span><span class="op">$</span><span class="va">c2</span><span class="op">@</span><span class="va">peaks</span></span>
 <span><span class="va">cl2</span></span>
-<span><span class="co">#&gt; [1] "V6"  "V9"  "V17" "V21" "V22" "V26"</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] "V6"  "V9"  "V11" "V14" "V15" "V17" "V19" "V21" "V22" "V23" "V26"</span></span></code></pre></div>
 <p>In this case, the peaks in cluster 2 happen to overlap completely
 with the peaks recovered through pearson correlation at the 90%
 threshold.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">cl2</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">idx_90</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Lengths (6, 11) differ (string compare on first 6)"</span></span>
-<span><span class="co">#&gt; [2] "4 string mismatches"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
   </main>
 </div>
 
