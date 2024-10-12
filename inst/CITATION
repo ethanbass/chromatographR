@@ -5,11 +5,11 @@ bibentry(
   title    = "chromatographR: Chromatographic Data Analysis Toolset",
   author   = "Ethan Bass",
   year     = "2023",
-  note     = "version 0.7.1",
+  note     = "version 0.7.2",
   url      = "https://ethanbass.github.io/chromatographR/",
   doi      = "10.5281/zenodo.6944334",
   textVersion = paste("Bass, E. (2023).",
-        "chromatographR: Chromatographic Data Analysis Toolset (version 0.7.1).",
+        "chromatographR: Chromatographic Data Analysis Toolset (version 0.7.2).",
         "http://doi.org/10.5281/zenodo.6944334"
         )
   )

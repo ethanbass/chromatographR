@@ -16,18 +16,19 @@ knitr::opts_chunk$set(
 library(chromatographR)
 library(rdryad)
 library(vegan)
+library(ggplot2)
 ```
 
 ### Introduction
 
 While the basic workflow is similar for analyzing different types of chromatographic data with `chromatographR`, there are a few important differences when analyzing GC-FID data (or other 1-dimensional data). This vignette highlights some important considerations when using chromatographR to analyze GC-FID data (or other 2D chromatography data).
 
-To demonstrate the use of `chromatographR` for the analysis GC-FID data, we will analyze a dataset on cuticular hydrocarbons (CHCs) composition in four species of paper wasps (*Polistes spp.*) collected by Dr. Andrew Legan [@legan2022; @legan2022a]. The dataset includes CHCs collected from *Polistes dominula* (european paper wasp), *Polistes exclamans* (common paper wasp), *P. fuscatus* (northern paper wasp), and *P. metricus* (metric paper wasp). As in other social insects, cuticular hydrocarbons serve as chemical cues mediating a number of social behaviors in paper wasps [@legan2021], including nestmate recognition [@gamboa1986; @gamboa1996; @bruschini2011], establishment of social hierarchies [@jandt2014] and mate choice [@reed1990] in many social insects.
+To demonstrate the use of `chromatographR` for the analysis GC-FID data, we will analyze a dataset on cuticular hydrocarbons (CHCs) composition in four species of paper wasps (*Polistes spp.*) collected by Dr. Andrew Legan [@legan2022; @legan2022a]. The dataset includes CHCs collected from *Polistes dominula* (european paper wasp), *Polistes exclamans* (common paper wasp), *P. fuscatus* (northern paper wasp), and *P. metricus* (metric paper wasp). As in other social insects, cuticular hydrocarbons serve as chemical cues mediating a number of social behaviors in paper wasps [@legan2021], including nestmate recognition [@gamboa1986; @gamboa1996; @bruschini2011], establishment of social hierarchies [@jandt2014] and mate choice [@reed1990].
 
 
 ::: {#fig-polistes layout-ncol=2 layout-nrow=2}
 
-![*P. dominula* [@kranz2022]](images/pdom_pipe_c.jpg){height=300}
+![*P. dominula* [@kranz2020]](images/pdom_pipe_c.jpg){height=300}
 
 ![*P. exclamans* © Andrew Legan](images/PEXC_multiple_adults_on_nest_c.png){height=300}
 
@@ -229,7 +230,7 @@ gg_ordiplot <- function (ord, groups, shape = NULL, scaling = 1, choices = c(1, 
   }
   df_ord <- vegan::scores(ord, display = "sites", scaling = scaling, 
                           choices = choices)
-  axis.labels <- ord_labels(ord)[choices]
+  axis.labels <- ggordiplots::ord_labels(ord)[choices]
   df_ord <- data.frame(x = df_ord[, 1], y = df_ord[, 2], Group = groups)
   if (!is.null(shape)){
     df_ord <- data.frame(df_ord, shape = shape)
@@ -313,6 +314,7 @@ gg_ordiplot <- function (ord, groups, shape = NULL, scaling = 1, choices = c(1, 
                  plot = plt))
 }
 ```
+
 ```{r}
 ord <- vegan::rda(pktab$tab, scale = TRUE)
 pktab$sample_meta$SEX_SP <- interaction(pktab$sample_meta$SEX,

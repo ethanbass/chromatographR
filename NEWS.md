@@ -1,3 +1,14 @@
+# chromatographR 0.7.2
+
+* Export `get_times` and `get_lambdas` functions.
+* Small revisions to documentation.
+* Use `tryCatch` to allow for missing spectra in `plot_all_spectra`.
+* Fixed rounding of p-values in `cluster_spectra`.
+* Changed `alpha` in `cluster_peaks` to match common usage, such that the 
+`alpha` parameter now specifies the significance level rather than the 
+confidence level (1-alpha).
+* Deprecated `peak_no` argument in `cluster_peaks` in favor of new `min_size` and `max_size` arguments.
+
 # chromatographR 0.7.1
 
 * Fixed bug in `get_peaks` causing peaks to erroneously filtered out in some cases.
