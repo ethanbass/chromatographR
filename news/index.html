@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -20,6 +20,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/FAQ.html">Frequently asked questions</a></li>
+    <li><a class="dropdown-item" href="../articles/GC-FID.html">Analysis of *Polistes* cuticular hydrocarbons with GC-FID</a></li>
     <li><a class="dropdown-item" href="../articles/uv_spectra.html">Programmatic analysis of UV spectra</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -37,6 +38,15 @@
       <small>Source: <a href="https://github.com/ethanbass/chromatographR/blob/master/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.7.2" id="chromatographr-072">chromatographR 0.7.2<a class="anchor" aria-label="anchor" href="#chromatographr-072"></a></h2>
+<ul><li>Export <code>get_times</code> and <code>get_lambdas</code> functions.</li>
+<li>Small revisions to documentation.</li>
+<li>Use <code>tryCatch</code> to allow for missing spectra in <code>plot_all_spectra</code>.</li>
+<li>Fixed rounding of p-values in <code>cluster_spectra</code>.</li>
+<li>Changed <code>alpha</code> in <code>cluster_peaks</code> to match common usage, such that the <code>alpha</code> parameter now specifies the significance level rather than the confidence level (1-alpha).</li>
+<li>Deprecated <code>peak_no</code> argument in <code>cluster_peaks</code> in favor of new <code>min_size</code> and <code>max_size</code> arguments.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.7.1" id="chromatographr-071">chromatographR 0.7.1<a class="anchor" aria-label="anchor" href="#chromatographr-071"></a></h2>
 <ul><li>Fixed bug in <code>get_peaks</code> causing peaks to erroneously filtered out in some cases.</li>
@@ -297,7 +307,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
 </div>
 
     </footer></div>
