@@ -30,7 +30,7 @@ To demonstrate the use of `chromatographR` for the analysis GC-FID data, we will
 
 ![*P. dominula* [@kranz2020]](images/pdom_pipe_c.jpg){height=300}
 
-![*P. exclamans* © Andrew Legan](images/PEXC_multiple_adults_on_nest_c.png){height=300}
+![*P. exclamans* (© Andrew Legan)](images/PEXC_multiple_adults_on_nest_c.png){height=300}
 
 ![*P. fuscatus* [@cook2022]](images/fuscatus.jpeg){width=300}
 
@@ -43,7 +43,8 @@ To demonstrate the use of `chromatographR` for the analysis GC-FID data, we will
 ```{r download_data}
 # load chromatograms from Legan et al 2022
 files <- rdryad::dryad_download("10.5061/dryad.wpzgmsbr8")[[1]]
-chrom_paths <- grep("README|METADATA|ANNOTATED", files, invert = TRUE, value = TRUE)
+chrom_paths <- grep("README|METADATA|ANNOTATED", files, invert = TRUE, 
+                    value = TRUE)
 dat <- read_chroms(chrom_paths, format_in = "shimadzu_fid")
 
 # load metadata
@@ -64,8 +65,9 @@ species <- c(dominula = "DOMINULA", exclamans.= "EXCLAMANS",
              fuscatus = "FUSCATUS", metricus = "METRICUS")
 
 species_idx <- lapply(species, function(sp){
-  which(names(dat.pr) %in% gsub(".txt","", 
-                           meta[which(meta$POLISTES_SPECIES == sp), "SAMPLE_ID"]))
+  which(names(dat.pr) %in% gsub(".txt", "",
+                                meta[which(meta$POLISTES_SPECIES == sp),
+                                     "SAMPLE_ID"]))
 })
 ```
 
@@ -92,18 +94,20 @@ alkanes <- read.csv(path_to_annotated_alkanes, sep="\t")
 par(mfrow=c(1,2))
 
 plot(pks_f$ALKANE_LADDER$Intensity$area ~ alkanes$Area[-1], pch = 20,
-     xlab = "Area (LabSolutions)", ylab = "Area (chromatographR)", main = "Area")
+     xlab = "Area (LabSolutions)", ylab = "Area (chromatographR)", 
+     main = "Area")
 m <- lm(pks_f$ALKANE_LADDER$Intensity$area ~ alkanes$Area[-1])
 abline(m)
-legend("bottomright", bty="n", legend = paste("R2 =", 
-  format(summary(m)$adj.r.squared, digits = 4)))
+legend("bottomright", bty = "n", 
+       legend = bquote(R^2 == .(format(summary(m)$adj.r.squared, digits = 4))))
 
 plot(pks_f$ALKANE_LADDER$Intensity$height ~ alkanes$Height[-1], pch = 20,
-     xlab = "Area (LabSolutions)", ylab = "Area (chromatographR)", main = "Height")
+     xlab = "Area (LabSolutions)", ylab = "Area (chromatographR)", 
+     main = "Height")
 m <- lm(pks_f$ALKANE_LADDER$Intensity$height ~ alkanes$Height[-1])
 abline(m)
-legend("bottomright", bty="n", legend=paste("R2 =", 
-  format(summary(m)$adj.r.squared, digits = 4)))
+legend("bottomright", bty = "n", 
+       legend = bquote(R^2 == .(format(summary(m)$adj.r.squared, digits = 4))))
 ```
 
 Reassuringly, the peak areas and heights estimated by chromatographR are very similar to the results provided by LabSolutions.
@@ -114,17 +118,20 @@ We can align chromatograms by species using variable dynamic time warping.
 
 ```{r single_species_alignments}
 warp_dominula <- suppressWarnings(correct_rt(dat.pr[species_idx$dominula], 
-                                            alg = "vpdtw", what = "corrected.values", 
+                                            alg = "vpdtw", 
+                                            what = "corrected.values", 
                                             plot_it = TRUE, verbose = TRUE, 
                                             penalty = 1, maxshift = 100))
 
 warp_metricus <- suppressWarnings(correct_rt(dat.pr[species_idx$metricus], 
-                                            alg = "vpdtw", what = "corrected.values", 
+                                            alg = "vpdtw", 
+                                            what = "corrected.values", 
                                             plot_it = FALSE, verbose = FALSE, 
                                             penalty = 2, maxshift=100))
 
 warp_exclamans <- suppressWarnings(correct_rt(dat.pr[species_idx$exclamans],
-                                             alg = "vpdtw", what = "corrected.values", 
+                                             alg = "vpdtw",
+                                             what = "corrected.values", 
                                              plot_it = FALSE, verbose = FALSE, 
                                              penalty = 2, maxshift=200))
 
@@ -146,27 +153,29 @@ As a sanity check, we can compare the single species alignments for each species
 par(mfrow=c(3,1))
 plot_chroms(warp_all[grep("PMET",names(warp_all))],show_legend = FALSE)
 legend("topright", expression(paste(italic("P. metricus"), 
-                                    " (multi-species)")), bty="n")
+                                    " (multi-species)")), bty = "n")
 plot_chroms(warp_metricus, show_legend = FALSE)
 legend("topright", expression(paste(italic("P. metricus"), 
-                                    " (single-species)")), bty="n")
+                                    " (single-species)")), bty = "n")
 plot_chroms(dat.pr[species_idx$metricus], show_legend = FALSE)
 legend("topright", expression(paste(italic("P. metricus"), 
-                                    " (raw)")), bty="n")
+                                    " (raw)")), bty = "n")
 ```
 
 
 ```{r plot_fuscatus_alignments}
 par(mfrow=c(3,1))
 plot_chroms(warp_all[grep("PFUS",names(warp_all))],show_legend = FALSE)
-legend("topright", expression(paste(italic("P. fuscatus"), " (multi-species)")), bty="n")
+legend("topright", expression(paste(italic("P. fuscatus"), " (multi-species)")),
+       bty = "n")
 
 plot_chroms(warp_fuscatus, show_legend = FALSE)
-legend("topright", expression(paste(italic("P. fuscatus"), " (single-species)")), bty="n")
+legend("topright", expression(paste(italic("P. fuscatus"), " (single-species)")),
+       bty = "n")
 
 plot_chroms(dat.pr[species_idx$fuscatus], show_legend = FALSE)
 legend("topright", expression(paste(italic("P. fuscatus"), 
-                                    " (raw)")), bty="n")
+                                    " (raw)")), bty = "n")
 ```
 
 ```{r plot_dominula_alignments}
@@ -183,16 +192,18 @@ legend("topright", expression(paste(italic("P. dominula"),
 ```
 
 ```{r plot_exclamans_alignments}
-par(mfrow=c(3,1))
+par(mfrow = c(3,1))
 plot_chroms(warp_all[grep("PEXC", names(warp_all))],show_legend = FALSE)
-legend("topright", expression(paste(italic("P. exclamans"), " (multi-species)")), bty="n")
+legend("topright", expression(paste(italic("P. exclamans"), " (multi-species)")),
+       bty = "n")
 
 plot_chroms(warp_exclamans, show_legend = FALSE)
-legend("topright", expression(paste(italic("P. exclamans"), " (single-species)")), bty="n")
+legend("topright", expression(paste(italic("P. exclamans"), " (single-species)")),
+       bty = "n")
 
 plot_chroms(dat.pr[species_idx$exclamans], show_legend = FALSE)
 legend("topright", expression(paste(italic("P. exclamans"), 
-                                    " (raw)")), bty="n")
+                                    " (raw)")), bty = "n")
 ```
 
 In general, the results are quite similar between multispecies and single species alignments.
@@ -209,12 +220,12 @@ pktab <- attach_metadata(pktab, metadata = meta, column = "SAMPLE_ID")
 
 ```{r}
 m <- vegan::adonis2(pktab$tab ~ POLISTES_SPECIES + STATE + SEX + LAT + LON,
-               data = pktab$sample_meta, method="manhattan",
+               data = pktab$sample_meta, method = "manhattan",
                na.action = na.omit)
 m
 ```
 
-As one would expect, the permanova shows that species is the largest contributor to the variance in CHC profiles (R^2 = `r m$R2[1]`), followed by state of origin (R^2 = `r m$R2[2]`) and sex (R^2 = `r m$R2[3]`).
+As one would expect, the permanova shows that species is the largest contributor to the variance in CHC profiles (R^2^ = `r m$R2[1]`), followed by state of origin (R^2^ = `r m$R2[2]`) and sex (R^2^ = `r m$R2[3]`).
 
 ```{r modified_ggordiplot}
 # ggordiplot function (modified from https://github.com/jfq3/ggordiplots/blob/master/R/gg_ordiplot.R) with added shape argument
@@ -242,24 +253,28 @@ gg_ordiplot <- function (ord, groups, shape = NULL, scaling = 1, choices = c(1, 
   ]
   if (is.null(conf)) {
     rslt <- vegan::ordiellipse(ord, groups = groups, display = "sites", 
-                               scaling = scaling, choices = choices, kind = kind, 
-                               show.groups = show.groups, draw = "none", label = label)
+                               scaling = scaling, choices = choices, 
+                               kind = kind, show.groups = show.groups,
+                               draw = "none", label = label)
   } else {
     rslt <- vegan::ordiellipse(ord, groups = groups, display = "sites", 
-                               scaling = scaling, choices = choices, kind = kind, 
-                               show.groups = show.groups, draw = "none", conf = conf, 
+                               scaling = scaling, choices = choices, 
+                               kind = kind, show.groups = show.groups,
+                               draw = "none", conf = conf, 
                                label = label)
   }
   df_ellipse <- data.frame()
   for (g in show.groups) {
-    df_ellipse <- rbind(df_ellipse, cbind(as.data.frame(with(df_ord[df_ord$Group == 
-                                                                      g, ], vegan:::veganCovEllipse(rslt[[g]]$cov, rslt[[g]]$center, 
-                                                                                                    rslt[[g]]$scale))), Group = g))
+    df_ellipse <- rbind(df_ellipse, 
+                        cbind(as.data.frame(with(df_ord[df_ord$Group == g, ],
+                      vegan:::veganCovEllipse(rslt[[g]]$cov, rslt[[g]]$center,
+                                              rslt[[g]]$scale))), Group = g))
   }
   colnames(df_ellipse) <- c("x", "y", "Group")
   df_ellipse <- df_ellipse[, c(3, 1, 2)]
   rslt.hull <- vegan::ordihull(ord, groups = groups, scaling = scaling, 
-                               choices = choices, show.groups = show.groups, draw = "none")
+                               choices = choices, show.groups = show.groups,
+                               draw = "none")
   df_hull <- data.frame()
   df_temp <- data.frame()
   for (g in show.groups) {
@@ -273,8 +288,8 @@ gg_ordiplot <- function (ord, groups, shape = NULL, scaling = 1, choices = c(1, 
   df_spiders$cntr.x <- NA
   df_spiders$cntr.y <- NA
   for (g in show.groups) {
-    df_spiders[which(df_spiders$Group == g), 4:5] <- df_mean.ord[which(df_mean.ord == 
-                                                                         g), 2:3]
+    df_spiders[which(df_spiders$Group == g), 4:5] <- 
+      df_mean.ord[which(df_mean.ord == g), 2:3]
   }
   df_spiders <- df_spiders[, c(3, 4, 5, 1, 2)]
   df_spiders <- df_spiders[order(df_spiders$Group), ]
@@ -291,26 +306,31 @@ gg_ordiplot <- function (ord, groups, shape = NULL, scaling = 1, choices = c(1, 
     ylab(ylab)
   if (ellipse == TRUE) {
     plt <- plt + geom_path(data = df_ellipse, aes(x = x, 
-                                                  y = y, color = Group), show.legend = FALSE)
+                                                  y = y, color = Group),
+                           show.legend = FALSE)
   }
   if (label == TRUE) {
-    plt <- plt + geom_text(data = df_mean.ord, aes(x = x, 
-                                                   y = y, label = Group, color = Group), show.legend = FALSE)
+    plt <- plt + geom_text(data = df_mean.ord, 
+                           aes(x = x, y = y, label = Group, color = Group),
+                           show.legend = FALSE)
   }
   if (hull == TRUE) {
-    plt <- plt + geom_path(data = df_hull, aes(x = x, y = y, 
-                                               color = Group), show.legend = FALSE)
+    plt <- plt + geom_path(data = df_hull, 
+                           aes(x = x, y = y, color = Group), 
+                           show.legend = FALSE)
   }
   if (spiders == TRUE) {
-    plt <- plt + geom_segment(data = df_spiders, aes(x = cntr.x, 
-                                                     xend = x, y = cntr.y, yend = y, color = Group), show.legend = FALSE)
+    plt <- plt + geom_segment(data = df_spiders, 
+                              aes(x = cntr.x, xend = x, y = cntr.y, yend = y,
+                                  color = Group), show.legend = FALSE)
   }
   plt <- plt + coord_fixed(ratio = 1)
   if (plot) {
     print(plt)
   }
   invisible(list(df_ord = df_ord, df_mean.ord = df_mean.ord, 
-                 df_ellipse = df_ellipse, df_hull = df_hull, df_spiders = df_spiders, 
+                 df_ellipse = df_ellipse, df_hull = df_hull,
+                 df_spiders = df_spiders, 
                  plot = plt))
 }
 ```
@@ -321,8 +341,9 @@ pktab$sample_meta$SEX_SP <- interaction(pktab$sample_meta$SEX,
                                       pktab$sample_meta$POLISTES_SPECIES)
 
 gg_ordiplot(ord, groups = pktab$sample_meta[,"POLISTES_SPECIES"],
-            shape = pktab$sample_meta[,"SEX"], plot=FALSE)$plot +
-  scale_shape_manual(values=c(19,21))
+            shape = pktab$sample_meta[,"SEX"], plot = FALSE)$plot +
+  scale_shape_manual(values = c(19,21), name = "Sex") +
+  labs(colour = "Species")
 ```
 
 Principal componenets analysis shows decent separation between species, with *P. dominula*, *P. fuscatus* and *P. dominula* separating along PC2 and *P. exclamans* separating from the other species along PC1.
@@ -333,19 +354,22 @@ We can get even better separation if we break down our data by sex, though there
 cond <- which(pktab$sample_meta$SEX == "M")
 ord_m <- vegan::rda(pktab$tab[cond,],scale=TRUE)
 
-gg_ordiplot(ord_m, groups = pktab$sample_meta[cond,"POLISTES_SPECIES"], plot=FALSE)$plot + 
+gg_ordiplot(ord_m, groups = pktab$sample_meta[cond,"POLISTES_SPECIES"], 
+            plot = FALSE)$plot + 
   ggtitle("Males") +
   theme_classic() +
-  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5))
+  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5)) +
+  labs(colour = "Species")
 
 cond <- which(pktab$sample_meta$SEX == "F")
 ord_f <- vegan::rda(pktab$tab[cond,],scale=TRUE)
 
 gg_ordiplot(ord_f, groups = pktab$sample_meta[cond,"POLISTES_SPECIES"],
-                         plot=FALSE)$plot + 
+                         plot = FALSE)$plot + 
   ggtitle("Females") + 
   theme_classic() +
-  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5)) 
+  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5)) +
+  labs(colour = "Species")
 ```
 
 ### References
