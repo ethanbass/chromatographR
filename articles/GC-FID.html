@@ -223,13 +223,13 @@ Figure 1: <em>Polistes</em> species includes in this study.
 <span>                                            alg <span class="op">=</span> <span class="st">"vpdtw"</span>, </span>
 <span>                                            what <span class="op">=</span> <span class="st">"corrected.values"</span>, </span>
 <span>                                            plot_it <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span>, </span>
-<span>                                            penalty <span class="op">=</span> <span class="fl">2</span>, maxshift<span class="op">=</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span>                                            penalty <span class="op">=</span> <span class="fl">2</span>, maxshift <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">warp_exclamans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="../reference/correct_rt.html">correct_rt</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">[</span><span class="va">species_idx</span><span class="op">$</span><span class="va">exclamans</span><span class="op">]</span>,</span>
 <span>                                             alg <span class="op">=</span> <span class="st">"vpdtw"</span>,</span>
 <span>                                             what <span class="op">=</span> <span class="st">"corrected.values"</span>, </span>
 <span>                                             plot_it <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span>, </span>
-<span>                                             penalty <span class="op">=</span> <span class="fl">2</span>, maxshift<span class="op">=</span><span class="fl">200</span><span class="op">)</span><span class="op">)</span></span>
+<span>                                             penalty <span class="op">=</span> <span class="fl">2</span>, maxshift <span class="op">=</span> <span class="fl">200</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">warp_fuscatus</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="../reference/correct_rt.html">correct_rt</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">[</span><span class="va">species_idx</span><span class="op">$</span><span class="va">fuscatus</span><span class="op">]</span>,</span>
 <span>                            alg <span class="op">=</span> <span class="st">"vpdtw"</span>, what <span class="op">=</span> <span class="st">"corrected.values"</span>,</span>
@@ -249,9 +249,11 @@ Figure 1: <em>Polistes</em> species includes in this study.
 <span><span class="fu"><a href="../reference/plot_chroms.html">plot_chroms</a></span><span class="op">(</span><span class="va">warp_all</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"PMET"</span>,<span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">warp_all</span><span class="op">)</span><span class="op">)</span><span class="op">]</span>,show_legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu">italic</span><span class="op">(</span><span class="st">"P. metricus"</span><span class="op">)</span>, </span>
 <span>                                    <span class="st">" (multi-species)"</span><span class="op">)</span><span class="op">)</span>, bty <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu"><a href="../reference/plot_chroms.html">plot_chroms</a></span><span class="op">(</span><span class="va">warp_metricus</span>, show_legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu">italic</span><span class="op">(</span><span class="st">"P. metricus"</span><span class="op">)</span>, </span>
 <span>                                    <span class="st">" (single-species)"</span><span class="op">)</span><span class="op">)</span>, bty <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span></span>
+<span></span>
 <span><span class="fu"><a href="../reference/plot_chroms.html">plot_chroms</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">[</span><span class="va">species_idx</span><span class="op">$</span><span class="va">metricus</span><span class="op">]</span>, show_legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu">italic</span><span class="op">(</span><span class="st">"P. metricus"</span><span class="op">)</span>, </span>
 <span>                                    <span class="st">" (raw)"</span><span class="op">)</span><span class="op">)</span>, bty <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span></span></code></pre></div>
@@ -354,7 +356,7 @@ Figure 1: <em>Polistes</em> species includes in this study.
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 </div>
-<p>As one would expect, the permanova shows that species is the largest contributor to the variance in CHC profiles (R<sup>2</sup> = 0.515822), followed by state of origin (R<sup>2</sup> = 0.484178) and sex (R<sup>2</sup> = 1).</p>
+<p>As one would expect, the permanova shows that species is the largest contributor to the variance in CHC profiles (R<sup>2</sup> = 0.52), followed by state of origin (R<sup>2</sup> = 0.48) and sex (R<sup>2</sup> = 1).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># ggordiplot function (modified from https://github.com/jfq3/ggordiplots/blob/master/R/gg_ordiplot.R) with added shape argument</span></span>
@@ -471,7 +473,7 @@ Figure 1: <em>Polistes</em> species includes in this study.
 <span></span>
 <span><span class="fu">gg_ordiplot</span><span class="op">(</span><span class="va">ord</span>, groups <span class="op">=</span> <span class="va">pktab</span><span class="op">$</span><span class="va">sample_meta</span><span class="op">[</span>,<span class="st">"POLISTES_SPECIES"</span><span class="op">]</span>,</span>
 <span>            shape <span class="op">=</span> <span class="va">pktab</span><span class="op">$</span><span class="va">sample_meta</span><span class="op">[</span>,<span class="st">"SEX"</span><span class="op">]</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">plot</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_shape_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">19</span>,<span class="fl">21</span><span class="op">)</span>, name <span class="op">=</span> <span class="st">"Sex"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_shape_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">19</span>, <span class="fl">21</span><span class="op">)</span>, name <span class="op">=</span> <span class="st">"Sex"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"Species"</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
@@ -485,7 +487,7 @@ Figure 1: <em>Polistes</em> species includes in this study.
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cond</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">pktab</span><span class="op">$</span><span class="va">sample_meta</span><span class="op">$</span><span class="va">SEX</span> <span class="op">==</span> <span class="st">"M"</span><span class="op">)</span></span>
-<span><span class="va">ord_m</span> <span class="op">&lt;-</span> <span class="fu">vegan</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vegan/man/cca.html" class="external-link">rda</a></span><span class="op">(</span><span class="va">pktab</span><span class="op">$</span><span class="va">tab</span><span class="op">[</span><span class="va">cond</span>,<span class="op">]</span>,scale<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">ord_m</span> <span class="op">&lt;-</span> <span class="fu">vegan</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vegan/man/cca.html" class="external-link">rda</a></span><span class="op">(</span><span class="va">pktab</span><span class="op">$</span><span class="va">tab</span><span class="op">[</span><span class="va">cond</span>,<span class="op">]</span>, scale <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">gg_ordiplot</span><span class="op">(</span><span class="va">ord_m</span>, groups <span class="op">=</span> <span class="va">pktab</span><span class="op">$</span><span class="va">sample_meta</span><span class="op">[</span><span class="va">cond</span>,<span class="st">"POLISTES_SPECIES"</span><span class="op">]</span>, </span>
 <span>            plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">plot</span> <span class="op">+</span> </span>
@@ -559,7 +561,7 @@ Reed, H. C., and P. J. Landolt. 1990. <span>“Sex Attraction in Paper Wasp,<spa
 <div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; R version 4.4.1 (2024-06-14)</span></span>
+<span><span class="co">#&gt; R version 4.4.2 (2024-10-31)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
 <span><span class="co">#&gt; Running under: Ubuntu 22.04.5 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -584,29 +586,29 @@ Reed, H. C., and P. J. Landolt. 1990. <span>“Sex Attraction in Paper Wasp,<spa
 <span><span class="co">#&gt; [4] permute_0.9-7        rdryad_1.0.0         chromatographR_0.7.2</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] gtable_0.3.5          xfun_0.48             caTools_1.18.3       </span></span>
-<span><span class="co">#&gt;  [4] vctrs_0.6.5           tools_4.4.1           bitops_1.0-9         </span></span>
-<span><span class="co">#&gt;  [7] generics_0.1.3        curl_5.2.3            parallel_4.4.1       </span></span>
+<span><span class="co">#&gt;  [1] gtable_0.3.6          xfun_0.49             caTools_1.18.3       </span></span>
+<span><span class="co">#&gt;  [4] vctrs_0.6.5           tools_4.4.2           bitops_1.0-9         </span></span>
+<span><span class="co">#&gt;  [7] generics_0.1.3        curl_5.2.3            parallel_4.4.2       </span></span>
 <span><span class="co">#&gt; [10] tibble_3.2.1          fansi_1.0.6           cluster_2.1.6        </span></span>
-<span><span class="co">#&gt; [13] pkgconfig_2.0.3       Matrix_1.7-0          readxl_1.4.3         </span></span>
-<span><span class="co">#&gt; [16] lifecycle_1.0.4       farver_2.1.2          compiler_4.4.1       </span></span>
+<span><span class="co">#&gt; [13] pkgconfig_2.0.3       Matrix_1.7-1          readxl_1.4.3         </span></span>
+<span><span class="co">#&gt; [16] lifecycle_1.0.4       farver_2.1.2          compiler_4.4.2       </span></span>
 <span><span class="co">#&gt; [19] stringr_1.5.1         ptw_1.9-16            munsell_0.5.1        </span></span>
 <span><span class="co">#&gt; [22] RcppDE_0.1.7          minpack.lm_1.2-4      htmltools_0.5.8.1    </span></span>
 <span><span class="co">#&gt; [25] yaml_2.3.10           Formula_1.2-5         pillar_1.9.0         </span></span>
-<span><span class="co">#&gt; [28] tidyr_1.3.1           MASS_7.3-60.2         nlme_3.1-164         </span></span>
+<span><span class="co">#&gt; [28] tidyr_1.3.1           MASS_7.3-61           nlme_3.1-166         </span></span>
 <span><span class="co">#&gt; [31] mime_0.12             tidyselect_1.2.1      zip_2.3.1            </span></span>
 <span><span class="co">#&gt; [34] digest_0.6.37         stringi_1.8.4         dplyr_1.1.4          </span></span>
 <span><span class="co">#&gt; [37] purrr_1.0.2           labeling_0.4.3        VPdtw_2.2.1          </span></span>
-<span><span class="co">#&gt; [40] splines_4.4.1         fastmap_1.2.0         grid_4.4.1           </span></span>
+<span><span class="co">#&gt; [40] splines_4.4.2         fastmap_1.2.0         grid_4.4.2           </span></span>
 <span><span class="co">#&gt; [43] colorspace_2.1-1      cli_3.6.3             chromConverter_0.2.1 </span></span>
 <span><span class="co">#&gt; [46] magrittr_2.0.3        triebeard_0.4.1       crul_1.5.0           </span></span>
-<span><span class="co">#&gt; [49] dynamicTreeCut_1.63-1 utf8_1.2.4            withr_3.0.1          </span></span>
+<span><span class="co">#&gt; [49] dynamicTreeCut_1.63-1 utf8_1.2.4            withr_3.0.2          </span></span>
 <span><span class="co">#&gt; [52] ggordiplots_0.4.3     scales_1.3.0          rappdirs_0.3.3       </span></span>
 <span><span class="co">#&gt; [55] rmarkdown_2.28        reticulate_1.39.0     cellranger_1.1.0     </span></span>
 <span><span class="co">#&gt; [58] fastcluster_1.2.6     png_0.1-8             pbapply_1.7-2        </span></span>
 <span><span class="co">#&gt; [61] evaluate_1.0.1        knitr_1.48            hoardr_0.5.4         </span></span>
 <span><span class="co">#&gt; [64] mgcv_1.9-1            urltools_1.7.3        rlang_1.1.4          </span></span>
-<span><span class="co">#&gt; [67] Rcpp_1.0.13           glue_1.8.0            httpcode_0.3.0       </span></span>
+<span><span class="co">#&gt; [67] Rcpp_1.0.13-1         glue_1.8.0            httpcode_0.3.0       </span></span>
 <span><span class="co">#&gt; [70] xml2_1.3.6            jsonlite_1.8.9        R6_2.5.1</span></span></code></pre></div>
 </div>
 </section><script id="quarto-html-after-body" type="application/javascript">
