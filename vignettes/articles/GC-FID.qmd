@@ -127,13 +127,13 @@ warp_metricus <- suppressWarnings(correct_rt(dat.pr[species_idx$metricus],
                                             alg = "vpdtw", 
                                             what = "corrected.values", 
                                             plot_it = FALSE, verbose = FALSE, 
-                                            penalty = 2, maxshift=100))
+                                            penalty = 2, maxshift = 100))
 
 warp_exclamans <- suppressWarnings(correct_rt(dat.pr[species_idx$exclamans],
                                              alg = "vpdtw",
                                              what = "corrected.values", 
                                              plot_it = FALSE, verbose = FALSE, 
-                                             penalty = 2, maxshift=200))
+                                             penalty = 2, maxshift = 200))
 
 warp_fuscatus <- suppressWarnings(correct_rt(dat.pr[species_idx$fuscatus],
                             alg = "vpdtw", what = "corrected.values",
@@ -154,9 +154,11 @@ par(mfrow=c(3,1))
 plot_chroms(warp_all[grep("PMET",names(warp_all))],show_legend = FALSE)
 legend("topright", expression(paste(italic("P. metricus"), 
                                     " (multi-species)")), bty = "n")
+
 plot_chroms(warp_metricus, show_legend = FALSE)
 legend("topright", expression(paste(italic("P. metricus"), 
                                     " (single-species)")), bty = "n")
+
 plot_chroms(dat.pr[species_idx$metricus], show_legend = FALSE)
 legend("topright", expression(paste(italic("P. metricus"), 
                                     " (raw)")), bty = "n")
@@ -225,7 +227,7 @@ m <- vegan::adonis2(pktab$tab ~ POLISTES_SPECIES + STATE + SEX + LAT + LON,
 m
 ```
 
-As one would expect, the permanova shows that species is the largest contributor to the variance in CHC profiles (R^2^ = `r m$R2[1]`), followed by state of origin (R^2^ = `r m$R2[2]`) and sex (R^2^ = `r m$R2[3]`).
+As one would expect, the permanova shows that species is the largest contributor to the variance in CHC profiles (R^2^ = `r round(m$R2[1], digits = 2)`), followed by state of origin (R^2^ = `r round(m$R2[2], digits = 2)`) and sex (R^2^ = `r round(m$R2[3], digits=2)`).
 
 ```{r modified_ggordiplot}
 # ggordiplot function (modified from https://github.com/jfq3/ggordiplots/blob/master/R/gg_ordiplot.R) with added shape argument
@@ -342,7 +344,7 @@ pktab$sample_meta$SEX_SP <- interaction(pktab$sample_meta$SEX,
 
 gg_ordiplot(ord, groups = pktab$sample_meta[,"POLISTES_SPECIES"],
             shape = pktab$sample_meta[,"SEX"], plot = FALSE)$plot +
-  scale_shape_manual(values = c(19,21), name = "Sex") +
+  scale_shape_manual(values = c(19, 21), name = "Sex") +
   labs(colour = "Species")
 ```
 
@@ -352,7 +354,7 @@ We can get even better separation if we break down our data by sex, though there
 
 ```{r}
 cond <- which(pktab$sample_meta$SEX == "M")
-ord_m <- vegan::rda(pktab$tab[cond,],scale=TRUE)
+ord_m <- vegan::rda(pktab$tab[cond,], scale = TRUE)
 
 gg_ordiplot(ord_m, groups = pktab$sample_meta[cond,"POLISTES_SPECIES"], 
             plot = FALSE)$plot + 
