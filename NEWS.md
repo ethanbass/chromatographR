@@ -1,3 +1,8 @@
+#chromatographR 0.7.3
+
+* Updated `reshape_peaktable` function to include wavelength and retention time data.
+* Updated `pk_tab` data file to latest peak table format.
+
 # chromatographR 0.7.2
 
 * Export `get_times` and `get_lambdas` functions.

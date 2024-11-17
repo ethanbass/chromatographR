@@ -118,11 +118,11 @@ test_that("reshape_peaktable works as expected",{
   pk_tab <- attach_metadata(pk_tab, metadata = meta, column = "vial")
   
   pktab_long <- reshape_peaktable(pk_tab)
-  expect_equal(ncol(pktab_long), 3 + ncol(pk_tab$sample_meta))
+  expect_equal(ncol(pktab_long), 5 + ncol(pk_tab$sample_meta))
   expect_equal(nrow(pktab_long), nrow(pk_tab)*ncol(pk_tab))
   
   pktab_long <- reshape_peaktable(pk_tab, peaks = c("V51","V60"), metadata = "trt")
-  expect_equal(ncol(pktab_long), 3 + 1)
+  expect_equal(ncol(pktab_long), 5 + 1)
   expect_equal(nrow(pktab_long), nrow(pk_tab)*2)
 })
 
