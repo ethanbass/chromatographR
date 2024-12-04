@@ -1,7 +1,8 @@
-#chromatographR 0.7.3
+# chromatographR 0.7.3
 
 * Updated `reshape_peaktable` function to include wavelength and retention time data.
 * Updated `pk_tab` data file to latest peak table format.
+* Fixed minor issues with roxygen formatting.
 
 # chromatographR 0.7.2
 
