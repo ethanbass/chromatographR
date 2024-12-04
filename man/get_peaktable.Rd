@@ -58,7 +58,7 @@ weight given to spectral correlation if \code{sp.rt} is selected.}
 
 \item{deepSplit}{Logical. Controls sensitivity to cluster splitting. If
 \code{TRUE}, function will return more smaller clusters. See documentation for
-\code{\link{cutreeDynamic}} for additional information.}
+\code{\link[dynamicTreeCut]{cutreeDynamic}} for additional information.}
 
 \item{verbose}{Logical. Whether to print warning when combining peaks into
 single time window. Defaults to \code{FALSE}.}

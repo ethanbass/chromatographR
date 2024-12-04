@@ -38,7 +38,7 @@ Calculate purity thresholds
 \references{
 Stahl, Mark. “Peak Purity Analysis in HPLC and CE Using Diode-Array Technology.”
 Agilent Technologies, April 1, 2003, 16.
-/href{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
+\url{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
 }
 \author{
 Ethan Bass

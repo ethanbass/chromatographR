@@ -172,9 +172,9 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol",
 #'
 #' * Naish, P. J. & Hartwell, S. 1988. Exponentially Modified Gaussian functions - A
 #' good model for chromatographic peaks in isocratic HPLC? \emph{Chromatographia},
-#' /bold{26}: 285-296. \doi{10.1007/BF02268168}.
+#' \bold{26}: 285-296. \doi{10.1007/BF02268168}.
 #' @export fit_peaks
-
+#' @md
 fit_peaks <- function (x, lambda, pos = NULL, sd.max = 50,
                        fit = c("egh", "gaussian", "raw"),  max.iter = 1000, 
                        estimate_purity = TRUE, noise_threshold = .001, ...){

@@ -80,13 +80,14 @@ data(Sa_pr)
 fit_peaks(Sa_pr[[1]], lambda = 220)
 }
 \references{
-* Lan, K. & Jorgenson, J. W. 2001. A hybrid of exponential and gaussian
+\itemize{
+\item Lan, K. & Jorgenson, J. W. 2001. A hybrid of exponential and gaussian
 functions as a simple model of asymmetric chromatographic peaks. \emph{Journal of
 Chromatography A} \bold{915}:1-13. \doi{10.1016/S0021-9673(01)00594-5}.
-
-* Naish, P. J. & Hartwell, S. 1988. Exponentially Modified Gaussian functions - A
+\item Naish, P. J. & Hartwell, S. 1988. Exponentially Modified Gaussian functions - A
 good model for chromatographic peaks in isocratic HPLC? \emph{Chromatographia},
-/bold{26}: 285-296. \doi{10.1007/BF02268168}.
+\bold{26}: 285-296. \doi{10.1007/BF02268168}.
+}
 }
 \seealso{
 \code{\link{find_peaks}}, \code{\link{get_peaks}}

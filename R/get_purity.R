@@ -20,7 +20,7 @@
 #' @references
 #' Stahl, Mark. “Peak Purity Analysis in HPLC and CE Using Diode-Array Technology.”
 #' Agilent Technologies, April 1, 2003, 16.
-#' /href{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
+#' \url{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
 #' @author Ethan Bass
 #' @keywords internal
 #' @export
@@ -98,7 +98,7 @@ find_noise <- function(x, noise_threshold = 0.01, lambdas){
 #' @references
 #' Stahl, Mark. “Peak Purity Analysis in HPLC and CE Using Diode-Array Technology.”
 #' Agilent Technologies, April 1, 2003, 16.
-#' /href{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
+#' \url{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
 #' @author Ethan Bass
 #' @keywords internal
 #' @export
@@ -131,7 +131,7 @@ get_agilent_threshold <- function(x, pos, weight = 1, noise_variance = NULL,
 #' @references
 #' Stahl, Mark. “Peak Purity Analysis in HPLC and CE Using Diode-Array Technology.”
 #' Agilent Technologies, April 1, 2003, 16.
-#' /href{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
+#' \url{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
 #' @author Ethan Bass
 #'@noRd
 
@@ -155,7 +155,7 @@ get_spectral_similarity <- function(x, pos){
 #' @references
 #' Stahl, Mark. “Peak Purity Analysis in HPLC and CE Using Diode-Array Technology.”
 #' Agilent Technologies, April 1, 2003, 16.
-#' /href{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
+#' \url{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
 #' @author Ethan Bass
 #' @noRd
 
