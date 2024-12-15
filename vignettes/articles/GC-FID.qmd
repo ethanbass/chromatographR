@@ -1,5 +1,5 @@
 ---
-title: "Analysis of *Polistes* cuticular hydrocarbons with GC-FID"
+title: "Analysis of <i>Polistes</i> cuticular hydrocarbons with GC-FID"
 editor_options: 
   chunk_output_type: console
 bibliography: fid_article.bib
