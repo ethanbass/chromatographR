@@ -77,7 +77,8 @@ After selecting parameters for baseline correction, you can proceed with the pre
 new.ts <- seq(10, 18.66, by = .01) # choose time-points
 new.lambdas <- seq(200, 318, by = 2) # choose wavelengths
 
-dat.pr <- preprocess(Sa, dim1 = new.ts, dim2 = new.lambdas, p = .001, lambda = 1e5, cl = 1)
+dat.pr <- preprocess(Sa, dim1 = new.ts, dim2 = new.lambdas, p = .001, 
+                     lambda = 1e5, cl = 1)
 ```
 
 ### Alignment
