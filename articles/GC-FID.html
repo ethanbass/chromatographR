@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,7 +38,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/FAQ.html">Frequently asked questions</a></li>
-    <li><a class="dropdown-item" href="../articles/GC-FID.html">Analysis of &lt;i&gt;Polistes&lt;/i&gt; cuticular hydrocarbons with GC-FID</a></li>
+    <li><a class="dropdown-item" href="../articles/GC-FID.html">Analysis of *Polistes* cuticular hydrocarbons with GC-FID</a></li>
     <li><a class="dropdown-item" href="../articles/uv_spectra.html">Programmatic analysis of UV spectra</a></li>
   </ul>
 </li>
@@ -57,7 +57,7 @@
 </nav><div class="container template-quarto">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1></h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Analysis of <em>Polistes</em> cuticular hydrocarbons with GC-FID</h1>
 
 
 
@@ -71,7 +71,7 @@
 
 
 
-    <header id="title-block-header" class="quarto-title-block"><h1 class="title">Analysis of <i>Polistes</i> cuticular hydrocarbons with GC-FID</h1></header><div class="cell">
+    <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ethanbass.github.io/chromatographR/">chromatographR</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/rdryad" class="external-link">rdryad</a></span><span class="op">)</span></span>
@@ -81,8 +81,8 @@
 <span><span class="co">#&gt; This is vegan 2.6-8</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
 </div>
-<section class="section level4"><h4 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
-</h4>
+<section class="level3"><h3 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+</h3>
 <p>While the basic workflow is similar for analyzing different types of chromatographic data with <code>chromatographR</code>, there are a few important differences when analyzing GC-FID data (or other 1-dimensional data). This vignette highlights some important considerations when using chromatographR to analyze GC-FID data (or other 2D chromatography data).</p>
 <p>To demonstrate the use of <code>chromatographR</code> for the analysis GC-FID data, we will analyze a dataset on cuticular hydrocarbons (CHCs) composition in four species of paper wasps (<em>Polistes spp.</em>) collected by Dr. Andrew Legan <span class="citation" data-cites="legan2022 legan2022a">(<a href="#ref-legan2022" role="doc-biblioref">Andrew W. Legan 2022</a>; <a href="#ref-legan2022a" role="doc-biblioref">A. Legan et al. 2022</a>)</span>. The dataset includes CHCs collected from <em>Polistes dominula</em> (european paper wasp), <em>Polistes exclamans</em> (common paper wasp), <em>P. fuscatus</em> (northern paper wasp), and <em>P. metricus</em> (metric paper wasp). As in other social insects, cuticular hydrocarbons serve as chemical cues mediating a number of social behaviors in paper wasps <span class="citation" data-cites="legan2021">(<a href="#ref-legan2021" role="doc-biblioref">Andrew W. Legan et al. 2021</a>)</span>, including nestmate recognition <span class="citation" data-cites="gamboa1986 gamboa1996 bruschini2011">(<a href="#ref-gamboa1986" role="doc-biblioref">G. J. Gamboa, Reeve, and Pfennig 1986</a>; <a href="#ref-gamboa1996" role="doc-biblioref">George J. Gamboa et al. 1996</a>; <a href="#ref-bruschini2011" role="doc-biblioref">Bruschini et al. 2011</a>)</span>, establishment of social hierarchies <span class="citation" data-cites="jandt2014">(<a href="#ref-jandt2014" role="doc-biblioref">Jandt, Tibbetts, and Toth 2014</a>)</span> and mate choice <span class="citation" data-cites="reed1990">(<a href="#ref-reed1990" role="doc-biblioref">Reed and Landolt 1990</a>)</span>.</p>
 <div id="fig-polistes" class="quarto-layout-panel">
@@ -200,8 +200,8 @@ Figure 1: <em>Polistes</em> species includes in this study.
 </div>
 </div>
 <p>Reassuringly, the peak areas and heights estimated by chromatographR are very similar to the results provided by LabSolutions.</p>
-</section><section class="section level4"><h4 id="alignment-of-chromatograms">Alignment of chromatograms<a class="anchor" aria-label="anchor" href="#alignment-of-chromatograms"></a>
-</h4>
+</section><section class="level3"><h3 id="alignment-of-chromatograms">Alignment of chromatograms<a class="anchor" aria-label="anchor" href="#alignment-of-chromatograms"></a>
+</h3>
 <p>We can align chromatograms by species using variable dynamic time warping.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
@@ -326,8 +326,8 @@ Figure 1: <em>Polistes</em> species includes in this study.
 </div>
 </div>
 <p>In general, the results are quite similar between multispecies and single species alignments.</p>
-</section><section class="section level4"><h4 id="integration-and-peaktable-assembly">Integration and peaktable assembly<a class="anchor" aria-label="anchor" href="#integration-and-peaktable-assembly"></a>
-</h4>
+</section><section class="level3"><h3 id="integration-and-peaktable-assembly">Integration and peaktable assembly<a class="anchor" aria-label="anchor" href="#integration-and-peaktable-assembly"></a>
+</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_peaks.html">get_peaks</a></span><span class="op">(</span><span class="va">warp_all</span><span class="op">)</span></span>
@@ -336,8 +336,8 @@ Figure 1: <em>Polistes</em> species includes in this study.
 <span><span class="co">#&gt; NAs introduced by coercion</span></span>
 <span><span class="va">pktab</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/attach_metadata.html">attach_metadata</a></span><span class="op">(</span><span class="va">pktab</span>, metadata <span class="op">=</span> <span class="va">meta</span>, column <span class="op">=</span> <span class="st">"SAMPLE_ID"</span><span class="op">)</span></span></code></pre></div>
 </div>
-</section><section class="section level4"><h4 id="analysis-of-peaktable">Analysis of peaktable<a class="anchor" aria-label="anchor" href="#analysis-of-peaktable"></a>
-</h4>
+</section><section class="level3"><h3 id="analysis-of-peaktable">Analysis of peaktable<a class="anchor" aria-label="anchor" href="#analysis-of-peaktable"></a>
+</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">vegan</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vegan/man/adonis.html" class="external-link">adonis2</a></span><span class="op">(</span><span class="va">pktab</span><span class="op">$</span><span class="va">tab</span> <span class="op">~</span> <span class="va">POLISTES_SPECIES</span> <span class="op">+</span> <span class="va">STATE</span> <span class="op">+</span> <span class="va">SEX</span> <span class="op">+</span> <span class="va">LAT</span> <span class="op">+</span> <span class="va">LON</span>,</span>
@@ -519,8 +519,8 @@ Figure 1: <em>Polistes</em> species includes in this study.
 </div>
 </div>
 </div>
-</section><section class="section level4"><h4 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
-</h4>
+</section><section class="level3"><h3 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h3>
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
 <div id="ref-bruschini2011" class="csl-entry" role="listitem">
 Bruschini, Claudia, Rita Cervo, Alessandro Cini, Giuseppe Pieraccini, Luigi Pontieri, Lisa Signorotti, and Stefano Turillazzi. 2011. <span>“Cuticular <span>Hydrocarbons Rather Than Peptides Are Responsible</span> for <span>Nestmate Recognition</span> in <span>Polistes</span> Dominulus.”</span> <em>Chemical Senses</em> 36 (8): 715–23. <a href="https://doi.org/10.1093/chemse/bjr042" class="external-link">https://doi.org/10.1093/chemse/bjr042</a>.
@@ -556,18 +556,18 @@ Legan, Andrew, Arthur Chen, Matthieu Fuchs, and Michael Sheehan. 2022. <span>“
 Reed, H. C., and P. J. Landolt. 1990. <span>“Sex Attraction in Paper Wasp,<span>Polistes</span> Exclamans Viereck (<span>Hymenoptera</span>: <span>Vespidae</span>), in a Wind Tunnel.”</span> <em>Journal of Chemical Ecology</em> 16 (4): 1277–87. <a href="https://doi.org/10.1007/BF01021026" class="external-link">https://doi.org/10.1007/BF01021026</a>.
 </div>
 </div>
-</section><section class="section level4"><h4 id="session-information">Session Information<a class="anchor" aria-label="anchor" href="#session-information"></a>
-</h4>
+</section><section class="level3"><h3 id="session-information">Session Information<a class="anchor" aria-label="anchor" href="#session-information"></a>
+</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.4.2 (2024-10-31)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
-<span><span class="co">#&gt; Running under: Ubuntu 22.04.5 LTS</span></span>
+<span><span class="co">#&gt; Running under: Ubuntu 24.04.1 LTS</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Matrix products: default</span></span>
 <span><span class="co">#&gt; BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 </span></span>
-<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0</span></span>
+<span><span class="co">#&gt; LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; locale:</span></span>
 <span><span class="co">#&gt;  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       </span></span>
@@ -583,33 +583,33 @@ Reed, H. C., and P. J. Landolt. 1990. <span>“Sex Attraction in Paper Wasp,<spa
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
 <span><span class="co">#&gt; [1] ggplot2_3.5.1        vegan_2.6-8          lattice_0.22-6      </span></span>
-<span><span class="co">#&gt; [4] permute_0.9-7        rdryad_1.0.0         chromatographR_0.7.2</span></span>
+<span><span class="co">#&gt; [4] permute_0.9-7        rdryad_1.0.0         chromatographR_0.7.3</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] gtable_0.3.6          xfun_0.49             caTools_1.18.3       </span></span>
+<span><span class="co">#&gt;  [1] gtable_0.3.6          xfun_0.50             caTools_1.18.3       </span></span>
 <span><span class="co">#&gt;  [4] vctrs_0.6.5           tools_4.4.2           bitops_1.0-9         </span></span>
-<span><span class="co">#&gt;  [7] generics_0.1.3        curl_6.0.1            parallel_4.4.2       </span></span>
-<span><span class="co">#&gt; [10] tibble_3.2.1          fansi_1.0.6           cluster_2.1.6        </span></span>
-<span><span class="co">#&gt; [13] pkgconfig_2.0.3       Matrix_1.7-1          readxl_1.4.3         </span></span>
-<span><span class="co">#&gt; [16] lifecycle_1.0.4       farver_2.1.2          compiler_4.4.2       </span></span>
-<span><span class="co">#&gt; [19] stringr_1.5.1         ptw_1.9-16            munsell_0.5.1        </span></span>
-<span><span class="co">#&gt; [22] RcppDE_0.1.7          minpack.lm_1.2-4      htmltools_0.5.8.1    </span></span>
-<span><span class="co">#&gt; [25] yaml_2.3.10           Formula_1.2-5         pillar_1.9.0         </span></span>
-<span><span class="co">#&gt; [28] tidyr_1.3.1           MASS_7.3-61           nlme_3.1-166         </span></span>
-<span><span class="co">#&gt; [31] mime_0.12             tidyselect_1.2.1      zip_2.3.1            </span></span>
-<span><span class="co">#&gt; [34] digest_0.6.37         stringi_1.8.4         dplyr_1.1.4          </span></span>
-<span><span class="co">#&gt; [37] purrr_1.0.2           labeling_0.4.3        VPdtw_2.2.1          </span></span>
-<span><span class="co">#&gt; [40] splines_4.4.2         fastmap_1.2.0         grid_4.4.2           </span></span>
-<span><span class="co">#&gt; [43] colorspace_2.1-1      cli_3.6.3             chromConverter_0.2.1 </span></span>
-<span><span class="co">#&gt; [46] magrittr_2.0.3        triebeard_0.4.1       crul_1.5.0           </span></span>
-<span><span class="co">#&gt; [49] dynamicTreeCut_1.63-1 utf8_1.2.4            withr_3.0.2          </span></span>
-<span><span class="co">#&gt; [52] ggordiplots_0.4.3     scales_1.3.0          rappdirs_0.3.3       </span></span>
-<span><span class="co">#&gt; [55] rmarkdown_2.29        reticulate_1.40.0     cellranger_1.1.0     </span></span>
-<span><span class="co">#&gt; [58] fastcluster_1.2.6     png_0.1-8             pbapply_1.7-2        </span></span>
-<span><span class="co">#&gt; [61] evaluate_1.0.1        knitr_1.49            hoardr_0.5.4         </span></span>
-<span><span class="co">#&gt; [64] mgcv_1.9-1            urltools_1.7.3        rlang_1.1.4          </span></span>
-<span><span class="co">#&gt; [67] Rcpp_1.0.13-1         glue_1.8.0            httpcode_0.3.0       </span></span>
-<span><span class="co">#&gt; [70] xml2_1.3.6            jsonlite_1.8.9        R6_2.5.1</span></span></code></pre></div>
+<span><span class="co">#&gt;  [7] generics_0.1.3        curl_6.1.0            parallel_4.4.2       </span></span>
+<span><span class="co">#&gt; [10] tibble_3.2.1          cluster_2.1.6         pkgconfig_2.0.3      </span></span>
+<span><span class="co">#&gt; [13] Matrix_1.7-1          readxl_1.4.3          lifecycle_1.0.4      </span></span>
+<span><span class="co">#&gt; [16] farver_2.1.2          compiler_4.4.2        stringr_1.5.1        </span></span>
+<span><span class="co">#&gt; [19] ptw_1.9-16            munsell_0.5.1         RcppDE_0.1.7         </span></span>
+<span><span class="co">#&gt; [22] minpack.lm_1.2-4      htmltools_0.5.8.1     yaml_2.3.10          </span></span>
+<span><span class="co">#&gt; [25] Formula_1.2-5         pillar_1.10.1         tidyr_1.3.1          </span></span>
+<span><span class="co">#&gt; [28] MASS_7.3-61           nlme_3.1-166          mime_0.12            </span></span>
+<span><span class="co">#&gt; [31] tidyselect_1.2.1      zip_2.3.1             digest_0.6.37        </span></span>
+<span><span class="co">#&gt; [34] stringi_1.8.4         dplyr_1.1.4           purrr_1.0.2          </span></span>
+<span><span class="co">#&gt; [37] labeling_0.4.3        VPdtw_2.2.1           splines_4.4.2        </span></span>
+<span><span class="co">#&gt; [40] fastmap_1.2.0         grid_4.4.2            colorspace_2.1-1     </span></span>
+<span><span class="co">#&gt; [43] cli_3.6.3             chromConverter_0.2.1  magrittr_2.0.3       </span></span>
+<span><span class="co">#&gt; [46] triebeard_0.4.1       crul_1.5.0            dynamicTreeCut_1.63-1</span></span>
+<span><span class="co">#&gt; [49] withr_3.0.2           ggordiplots_0.4.3     scales_1.3.0         </span></span>
+<span><span class="co">#&gt; [52] rappdirs_0.3.3        rmarkdown_2.29        reticulate_1.40.0    </span></span>
+<span><span class="co">#&gt; [55] cellranger_1.1.0      fastcluster_1.2.6     png_0.1-8            </span></span>
+<span><span class="co">#&gt; [58] pbapply_1.7-2         evaluate_1.0.1        knitr_1.49           </span></span>
+<span><span class="co">#&gt; [61] hoardr_0.5.4          mgcv_1.9-1            urltools_1.7.3       </span></span>
+<span><span class="co">#&gt; [64] rlang_1.1.4           Rcpp_1.0.13-1         glue_1.8.0           </span></span>
+<span><span class="co">#&gt; [67] httpcode_0.3.0        xml2_1.3.6            jsonlite_1.8.9       </span></span>
+<span><span class="co">#&gt; [70] R6_2.5.1</span></span></code></pre></div>
 </div>
 </section><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
