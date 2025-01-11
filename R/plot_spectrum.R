@@ -114,14 +114,14 @@ plot_spectrum <- function(loc = NULL, peak_table, chrom_list,
     if (!(loc %in% colnames(peak_table$tab))){
       stop(paste0("No match found for peak \'", loc, "\' in peak table."))}
   }
-  idx <- check_chr(idx, loc, peak_table, chrom_list)
+  chr_idx <- check_chr(idx, loc, peak_table, chrom_list)
   plt <- switch(engine,
                 "base" = plot_spectrum_base,
                 "plotly" = plot_spectrum_ggpl,
                 "ggplot2" = plot_spectrum_ggpl)
   
   plt(loc = loc, peak_table = peak_table, chrom_list = chrom_list,
-                       chr = idx, lambda = lambda,
+                       chr = chr_idx, lambda = lambda,
                        plot_spectrum = plot_spectrum, plot_trace = plot_trace,
                        spectrum_labels = spectrum_labels, scale_spectrum = scale_spectrum,
                        export_spectrum = export_spectrum, verbose = verbose, 
@@ -187,7 +187,8 @@ plot_spectrum_ggpl <- function(loc, peak_table, chrom_list,
   if (plot_spectrum){
     plot_fn <- switch(engine, plotly = plotly_spec,
                         ggplot2 = ggplot_spec)
-    spectrum <- plot_fn(x = y, spectrum_labels = spectrum_labels, ...)
+    spectrum <- plot_fn(x = y, chr = chr, RT = RT, 
+                        spectrum_labels = spectrum_labels, ...)
   }
   if (plot_spectrum & plot_trace){
     combine_plots <- switch(engine,
@@ -332,7 +333,6 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
 #' @export scan_chrom
 #' @md
 
-
 scan_chrom <- function(chrom_list, idx, lambda,
                         plot_spectrum = TRUE, peak_table=NULL,
                         scale_spectrum = FALSE, spectrum_labels = TRUE,
@@ -459,7 +459,8 @@ plot_all_spectra <- function(peak, peak_table, chrom_list, idx = "all",
     if (plot_spectrum){
       if (overlapping){
         matplot(new.lambdas, sp, type = 'l', 
-                xlab = 'wavelength', ylab = 'intensity', las = 2)
+                xlab = 'wavelength', ylab = 'intensity', las = 2,
+                main = peak)
       } else {
         apply(sp, 2, function(spp){
           plot(new.lambdas, spp, type = 'l', xlab = '', ylab = '', las = 2)
@@ -531,6 +532,7 @@ ggplot_spec <- function(x, chr, RT, spectrum_labels = TRUE, color="black",
   if ("sample" %in% colnames(df)){
     p <- p + ggplot2::aes(group = .data$sample, color = .data$sample)
   }
+  p <- p + ggplot2::theme_light()
   if (hide_legend)
     p <- p + ggplot2::theme(legend.position = "none")
   p
@@ -565,7 +567,11 @@ plotly_spec <- function(x, chr, RT, reshape = TRUE, color="black",
                           mode = 'lines', line = list(width = width, 
                                                       color = color))
   }
-  p <-  plotly::layout(p, xaxis = list(title = "Wavelength"),
+  p <-  plotly::layout(p,
+                       # title = list(text=sprintf("Chr %d;   RT: %g",
+                       #                           as.integer(chr), RT)
+                       # ),
+                       xaxis = list(title = "Wavelength"),
                        yaxis = list(title= "Absorbance (mAU)")
   )
   if (hide_legend)
@@ -592,9 +598,8 @@ plot_trace <- function(chrom_list, chr, lambda.idx, line.idx = NULL, what = ""){
   RT <- new.ts[line.idx]
   abline(v = RT, col = 'red', lty=3)
   title(bquote(paste("Chr ", .(chr),  " ;   RT: ", .(RT), " ;  ",
-                     lambda, ": ", .(lambda), " nm",
-                     #" abs: ", .(round(y_trace[idx], 2))
-  )))
+                     lambda, ": ", .(lambda), " nm")
+  ))
   line.idx
 }
 
@@ -621,7 +626,9 @@ plotly_trace <- function(chrom_list, chr, lambda.idx, line.idx = NULL,
                          line = list(dash = 3, color = "red"))
   }
   p <- plotly::layout(p,
-                      # title = list(text=plot_title),
+                      title = list(text=sprintf("Chr %d;   RT: %g;  lambda: %s nm",
+                                                as.integer(chr), RT, lambda)
+                      ),
                       xaxis=list(title = "Wavelength"),
                       yaxis=list(title = "Absorbance (mAU)")
   )
@@ -644,7 +651,10 @@ ggplot_trace <- function(chrom_list, chr, lambda.idx, line.idx = NULL){
     ggplot2::geom_line()
   if (!is.null(line.idx)){
     p <- p + ggplot2::geom_vline(xintercept = RT, color = "red", 
-                                 linetype = "dashed")
+                                 linetype = "dashed") +
+      ggplot2::ggtitle(sprintf("Chr %d;   RT: %g;  lambda: %s nm",
+                                                 as.integer(chr), RT, lambda)) +
+      ggplot2::theme_light()
   }
   p 
 }

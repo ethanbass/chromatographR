@@ -142,8 +142,12 @@ check_chr <- function(chr, loc = NULL, peak_table, chrom_list, allow_max = TRUE)
       stop("Chromatogram must be specified for scan function.")
     }
   }
-  if (is.character(chr) & !(chr %in% names(chrom_list))){
-    stop("Chromatogram not found. Please check `idx` argument and try again!")
+  if (is.character(chr)){
+    if (!(chr %in% names(chrom_list))){
+      stop("Chromatogram not found. Please check `idx` argument and try again!")
+    } else{
+        chr <- which(names(chrom_list) == chr)
+      }
   }
   chr
 }

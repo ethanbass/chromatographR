@@ -1,3 +1,5 @@
+# to run visual tests, set Sys.setenv("VISUAL_TESTS"="true")
+
 data("Sa")
 new.ts <- seq(10, 18.66, by = .01) # choose time-points
 new.lambdas <- seq(200, 318, by = 2) # choose wavelengths
