@@ -14,4 +14,11 @@ data(Sa_warp)
 A list of four pre-processed and warped goldenrod root chromatograms derived
 from the raw data stored in \code{Sa}.
 }
+\seealso{
+Other data objects: 
+\code{\link{Sa}},
+\code{\link{Sa_pr}},
+\code{\link{pk_tab}}
+}
+\concept{data objects}
 \keyword{data}

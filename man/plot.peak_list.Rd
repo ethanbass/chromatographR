@@ -73,8 +73,17 @@ provided \code{peak_list} drawn underneath the curve.
 
 \seealso{
 \code{\link{get_peaks}}
+
+Other visualization functions: 
+\code{\link{boxplot.peak_table}()},
+\code{\link{mirror_plot}()},
+\code{\link{plot.peak_table}()},
+\code{\link{plot_all_spectra}()},
+\code{\link{plot_chroms}()},
+\code{\link{plot_spectrum}()},
+\code{\link{scan_chrom}()}
 }
 \author{
 Ethan Bass
 }
-\concept{Visualization}
+\concept{visualization functions}

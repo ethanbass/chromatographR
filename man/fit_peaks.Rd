@@ -66,7 +66,8 @@ Fit peak parameters using exponential-gaussian hybrid or gaussian function.
 Peak parameters are calculated by fitting the data
 to a gaussian or exponential-gaussian hybrid curve using non-linear least
 squares estimation as implemented in \code{\link[minpack.lm:nlsLM]{nlsLM}}.
-Area under the fitted curve is then estimated using trapezoidal approximation.
+The area under the fitted curve is then estimated using trapezoidal
+approximation.
 }
 \note{
 The \code{\link{fit_peaks}} function is adapted from Dr. Robert

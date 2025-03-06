@@ -25,4 +25,14 @@ meta <- read.csv(path)
 pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
 boxplot(pk_tab, formula=V11 ~ trt)
 }
-\concept{Visualization}
+\seealso{
+Other visualization functions: 
+\code{\link{mirror_plot}()},
+\code{\link{plot.peak_list}()},
+\code{\link{plot.peak_table}()},
+\code{\link{plot_all_spectra}()},
+\code{\link{plot_chroms}()},
+\code{\link{plot_spectrum}()},
+\code{\link{scan_chrom}()}
+}
+\concept{visualization functions}

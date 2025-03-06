@@ -18,6 +18,22 @@
 #' squares (Lan, K. & Jorgenson, J. W. 2001. \doi{10.1016/S0021-9673(01)00594-5}). 
 #' More details on package usage and a suggested workflow can be found in the 
 #' vignette.
+#' 
+#' @section Data:
+#' \itemize{
+#'   \item \code{\link{preprocess}}: A list of four goldenrod root chromatograms.
+#'   \item \code{\link{Sa_pr}}: Preprocessed goldenrod root chromatograms.
+#'   \item \code{\link{Sa_warp}}: Preprocessed and aligned goldenrod root chromatograms.
+#'   \item \code{\link{pk_tab}}: Peak table from aligned goldenrod root chromatograms.
+#' }
+#' 
+#' @section Data:
+#' \itemize{
+#'   \item \code{\link{Sa}}: A list of four goldenrod root chromatograms.
+#'   \item \code{\link{Sa_pr}}: Preprocessed goldenrod root chromatograms.
+#'   \item \code{\link{Sa_warp}}: Preprocessed and aligned goldenrod root chromatograms.
+#'   \item \code{\link{pk_tab}}: Peak table from aligned goldenrod root chromatograms.
+#' }
 #' @author Ethan Bass
 "_PACKAGE"
 
@@ -32,6 +48,7 @@
 #' @keywords data
 #' @usage data(Sa)
 #' @format  A list of four matrices (1301 times x 60 wavelengths).
+#' @family data objects
 NULL
 
 #' Preprocessed goldenrod root chromatograms
@@ -46,6 +63,7 @@ NULL
 #' @docType data
 #' @usage data(Sa_pr)
 #' @format  A list of four pre-processed matrices (434 retention times x 60 wavelengths).
+#' @family data objects
 NULL
 
 #' Warped goldenrod root chromatograms.
@@ -58,6 +76,7 @@ NULL
 #' @keywords data
 #' @usage data(Sa_warp)
 #' @format  A list of four pre-processed and warped matrices (434 times x 60 wavelengths).
+#' @family data objects
 NULL
 
 #' Goldenrod peak table
@@ -69,4 +88,5 @@ NULL
 #' @keywords data
 #' @usage data(pk_tab)
 #' @format  A \code{peak_table} object.
+#' @family data objects
 NULL

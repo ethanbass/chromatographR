@@ -1,6 +1,6 @@
 #' Export peak table
 #' 
-#' Export peak table in \code{csv} or \code{xlsx} format according to the value
+#' Exports peak table in \code{csv} or \code{xlsx} format according to the value
 #' of \code{format}.
 #' 
 #' @param peak_table Peak table object from \code{\link{get_peaktable}}.

@@ -13,4 +13,11 @@ data(pk_tab)
 \description{
 Peak table generated from exemplary goldenrod root extracts.
 }
+\seealso{
+Other data objects: 
+\code{\link{Sa}},
+\code{\link{Sa_pr}},
+\code{\link{Sa_warp}}
+}
+\concept{data objects}
 \keyword{data}

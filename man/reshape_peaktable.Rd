@@ -25,6 +25,15 @@ A data.frame containing the information for the specified
 \description{
 Reshapes peak table from wide to long format
 }
+\seealso{
+Other utility functions: 
+\code{\link{combine_peaks}()},
+\code{\link{get_lambdas}()},
+\code{\link{get_times}()},
+\code{\link{merge_peaks}()},
+\code{\link{reshape_chroms}()}
+}
 \author{
 Ethan Bass
 }
+\concept{utility functions}

@@ -26,7 +26,7 @@
 #' @examples 
 #' data(Sa_pr)
 #' plot_chroms(Sa_pr, idx = c(1:2), lambdas = c(210))
-#' @concept Visualization
+#' @family visualization functions
 #' @export
 
 plot_chroms <- function(x, lambdas, idx, xlim, ylim, xlab = "", ylab = "Absorbance",

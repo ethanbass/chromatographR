@@ -115,7 +115,7 @@ function authored by Ron Wehrens (though the underlying algorithms for peak
 identification and peak-fitting are not the same).
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 data(Sa_pr)
 pks <- get_peaks(Sa_pr, lambdas = c('210'), sd.max=50, fit="egh")
 \dontshow{\}) # examplesIf}

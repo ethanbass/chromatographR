@@ -65,6 +65,7 @@
 #' par(mfrow = c(2, 1))
 #' plot_spectrum(loc = "V10", peak_table = pk_tab, what = "peak")
 #' par(oldpar)
+#' @family visualization functions
 #' @export plot_spectrum
 #' @md
 
@@ -331,6 +332,7 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
 #' data(Sa_pr)
 #' scan_chrom(Sa_pr, lambda = "210", idx = 2, export_spectrum = TRUE)
 #' @export scan_chrom
+#' @family visualization functions
 #' @md
 
 scan_chrom <- function(chrom_list, idx, lambda,
@@ -415,13 +417,13 @@ scan_chrom <- function(chrom_list, idx, lambda,
 #' (\code{idx}) of the given \code{peak}. The spectrum is a single row
 #' from the chromatographic matrix.
 #' @author Ethan Bass
-#' @seealso \code{\link{plot_spectrum}}
 #' @examplesIf interactive()
 #' data(Sa_warp)
 #' pks <- get_peaks(Sa_warp, lambda="220")
 #' pk_tab <- get_peaktable(pks)
-#' plot_all_spectra(peak="V13", peak_table = pk_tab, overlapping=TRUE)
-#' @export plot_all_spectra
+#' plot_all_spectra(peak="V13", peak_table = pk_tab, overlapping = TRUE)
+#' @family visualization functions
+#' @export
 
 plot_all_spectra <- function(peak, peak_table, chrom_list, idx = "all",
                              chrs = NULL, engine = c("base","ggplot2","plotly"),

@@ -101,7 +101,7 @@ from the chromatographic matrix.
 }
 
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 data(Sa)
 pks <- get_peaks(Sa, lambda = "220.00000")
 pk_tab <- get_peaktable(pks)
@@ -111,6 +111,17 @@ plot_spectrum(loc = "V10", peak_table = pk_tab, what = "peak")
 par(oldpar)
 \dontshow{\}) # examplesIf}
 }
+\seealso{
+Other visualization functions: 
+\code{\link{boxplot.peak_table}()},
+\code{\link{mirror_plot}()},
+\code{\link{plot.peak_list}()},
+\code{\link{plot.peak_table}()},
+\code{\link{plot_all_spectra}()},
+\code{\link{plot_chroms}()},
+\code{\link{scan_chrom}()}
+}
 \author{
 Ethan Bass
 }
+\concept{visualization functions}

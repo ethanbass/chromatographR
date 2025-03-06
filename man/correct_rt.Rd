@@ -97,7 +97,7 @@ Adapted from
 function in the alsace package by Ron Wehrens.
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 data(Sa_pr)
 warping.models <- correct_rt(Sa_pr, what = "models", lambdas=c(210))
 warp <- correct_rt(chrom_list = Sa_pr, models = warping.models)

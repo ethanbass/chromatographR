@@ -45,10 +45,10 @@ start, and end of each identified peak. Otherwise, returns a numeric vector
 of peak centers. All locations are expressed as indices.
 }
 \description{
-Find peaks in chromatographic profile.
+Detects peaks in chromatographic profile.
 }
 \details{
-Find peaks by looking for zero-crossings in the smoothed first derivative of
+Detects peaks by looking for zero-crossings in the smoothed first derivative of
 the signal (\code{y}) that exceed the specified slope threshold
 (\code{slope_thresh}). Additionally, peaks can be filtered by supplying a minimal
 amplitude threshold (\code{amp_thresh}), filtering out peaks below the

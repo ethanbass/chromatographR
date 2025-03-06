@@ -105,7 +105,17 @@ If \code{box_plot} is TRUE, produces a \code{\link[graphics]{boxplot}} from the
 specified peak with groups provided by \code{vars}.
 }
 
+\seealso{
+Other visualization functions: 
+\code{\link{boxplot.peak_table}()},
+\code{\link{mirror_plot}()},
+\code{\link{plot.peak_list}()},
+\code{\link{plot_all_spectra}()},
+\code{\link{plot_chroms}()},
+\code{\link{plot_spectrum}()},
+\code{\link{scan_chrom}()}
+}
 \author{
 Ethan Bass
 }
-\concept{Visualization}
+\concept{visualization functions}

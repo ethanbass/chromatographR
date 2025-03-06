@@ -16,4 +16,11 @@ stored in \code{Sa}. Retention times are stored in rows and wavelengths
 are stored in columns. The time axis is compressed to save space and 
 processing time so the data are a little choppy.
 }
+\seealso{
+Other data objects: 
+\code{\link{Sa}},
+\code{\link{Sa_warp}},
+\code{\link{pk_tab}}
+}
+\concept{data objects}
 \keyword{data}

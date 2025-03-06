@@ -25,6 +25,15 @@ A list of chromatographic matrices in long format.
 Reshape chromatograms
 Reshapes a list of chromatograms from wide to long format.
 }
+\seealso{
+Other utility functions: 
+\code{\link{combine_peaks}()},
+\code{\link{get_lambdas}()},
+\code{\link{get_times}()},
+\code{\link{merge_peaks}()},
+\code{\link{reshape_peaktable}()}
+}
 \author{
 Ethan Bass
 }
+\concept{utility functions}

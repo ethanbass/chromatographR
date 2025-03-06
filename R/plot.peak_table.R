@@ -61,7 +61,7 @@
 #' specified peak with groups provided by \code{vars}.
 #' @author Ethan Bass
 #' @rdname plot.peak_table
-#' @concept Visualization
+#' @family visualization functions
 #' @export
 
 plot.peak_table <- function(x, loc, chrom_list, what="peak",
@@ -135,7 +135,7 @@ plot.peak_table <- function(x, loc, chrom_list, what="peak",
 #' meta <- read.csv(path)
 #' pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
 #' boxplot(pk_tab, formula=V11 ~ trt)
-#' @concept Visualization
+#' @family visualization functions
 #' @export
 
 boxplot.peak_table <- function(x, formula, ...){
@@ -199,7 +199,7 @@ boxplot.peak_table <- function(x, formula, ...){
 #' pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
 #' mirror_plot(pk_tab,lambdas = c("210","260"), var = "trt", mirror = TRUE, 
 #'   col = c("green","blue"))
-#' @concept Visualization
+#' @family visualization functions
 #' @export
 
 mirror_plot <- function(x, chrom_list, lambdas = NULL, var, subset = NULL,

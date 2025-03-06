@@ -82,7 +82,17 @@ pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
 mirror_plot(pk_tab,lambdas = c("210","260"), var = "trt", mirror = TRUE, 
   col = c("green","blue"))
 }
+\seealso{
+Other visualization functions: 
+\code{\link{boxplot.peak_table}()},
+\code{\link{plot.peak_list}()},
+\code{\link{plot.peak_table}()},
+\code{\link{plot_all_spectra}()},
+\code{\link{plot_chroms}()},
+\code{\link{plot_spectrum}()},
+\code{\link{scan_chrom}()}
+}
 \author{
 Ethan Bass
 }
-\concept{Visualization}
+\concept{visualization functions}

@@ -264,7 +264,9 @@ row.names.peak_table <- function(x){
 }
 
 #' Subset peak table
-#' Return subset of \code{peak_table} object.
+#' 
+#' Returns subset of \code{peak_table} object.
+#' 
 #' @param x A \code{peak_table} object
 #' @param subset Logical expression indicating rows (samples) to keep from
 #' \code{peak_table}; missing values are taken as false.

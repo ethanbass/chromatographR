@@ -8,6 +8,7 @@
 #' @param rts Vector specifying retention times to include.
 #' @return A list of chromatographic matrices in long format.
 #' @author Ethan Bass
+#' @family utility functions
 #' @export
 
 reshape_chroms <- function(x, idx, sample_var = "sample",
@@ -75,6 +76,7 @@ reshape_chrom <- function(x, lambdas = NULL, rts = NULL){
 #' @return A data.frame containing the information for the specified 
 #' \code{peaks} in long format.
 #' @author Ethan Bass
+#' @family utility functions
 #' @export
 
 reshape_peaktable <- function(x, peaks, metadata, fixed_levels = TRUE){
@@ -99,8 +101,9 @@ reshape_peaktable <- function(x, peaks, metadata, fixed_levels = TRUE){
     times = colnames(df), timevar = "peak",
     idvar = "sample", ids = rownames(df))
   rownames(xx) <- NULL
-  xx <- merge(xx, data.frame(peak=colnames(x$pk_meta), t(x$pk_meta[c("lambda","rt"),])),
-        by="peak",all.x=TRUE)
+  xx <- merge(xx, data.frame(peak=colnames(x$pk_meta), 
+                             t(x$pk_meta[c("lambda", "rt"),])),
+        by = "peak", all.x = TRUE)
   xx <- xx[, c(1, 3, 4, 5, 2)]
   if (!is.null(dim(x$sample_meta))){
     xx <- merge(xx, data.frame(sample = row.names(df), x$sample_meta),

@@ -66,11 +66,22 @@ row from the chromatographic matrix.
 }
 
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 data(Sa_pr)
 scan_chrom(Sa_pr, lambda = "210", idx = 2, export_spectrum = TRUE)
 \dontshow{\}) # examplesIf}
 }
+\seealso{
+Other visualization functions: 
+\code{\link{boxplot.peak_table}()},
+\code{\link{mirror_plot}()},
+\code{\link{plot.peak_list}()},
+\code{\link{plot.peak_table}()},
+\code{\link{plot_all_spectra}()},
+\code{\link{plot_chroms}()},
+\code{\link{plot_spectrum}()}
+}
 \author{
 Ethan Bass
 }
+\concept{visualization functions}
