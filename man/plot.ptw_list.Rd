@@ -16,7 +16,7 @@
 \item{...}{Additional arguments to \code{\link[graphics]{matplot}}.}
 }
 \description{
-Plot PTW alignments
+Plots \code{\link{ptw}} alignments.
 }
 \author{
 Ethan Bass

@@ -44,7 +44,13 @@ combine_peaks(pk_tab, tol = .02, min.cor = .9)
 }
 \seealso{
 \code{\link{get_peaks}}
+
+Other utility functions: 
+\code{\link{get_lambdas}()},
+\code{\link{get_times}()},
+\code{\link{merge_peaks}()}
 }
 \author{
 Ethan Bass
 }
+\concept{utility functions}

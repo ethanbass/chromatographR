@@ -63,7 +63,15 @@ or plotly, according to the value of \code{engine}.
 data(Sa_pr)
 plot_chroms(Sa_pr, idx = c(1:2), lambdas = c(210))
 }
+\seealso{
+Other visualization functions: 
+\code{\link{plot.peak_list}()},
+\code{\link{plot.peak_table}()},
+\code{\link{plot_all_spectra}()},
+\code{\link{plot_spectrum}()},
+\code{\link{scan_chrom}()}
+}
 \author{
 Ethan Bass
 }
-\concept{Visualization}
+\concept{visualization functions}

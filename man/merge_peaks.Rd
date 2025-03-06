@@ -31,6 +31,13 @@ each column if \code{method} is \code{"max"}. If \code{method} is
 data(pk_tab)
 pk_tab <- merge_peaks(peak_table = pk_tab, peaks=c("V10","V11"))
 }
+\seealso{
+Other utility functions: 
+\code{\link{combine_peaks}()},
+\code{\link{get_lambdas}()},
+\code{\link{get_times}()}
+}
 \author{
 Ethan Bass
 }
+\concept{utility functions}

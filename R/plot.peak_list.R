@@ -31,7 +31,7 @@
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaks}}
 #' @rdname plot.peak_list
-#' @concept Visualization
+#' @family visualization functions
 #' @export
 
 plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,

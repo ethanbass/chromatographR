@@ -147,8 +147,8 @@ cluster_spectra <- function(peak_table, peak_no = NULL, alpha = 0.05,
         matplot(lambdas, spectra[, clusters[[i]]@peaks],
                 type = 'l', ylab = '', yaxt = 'n', xlab = expression(lambda),
                 main = paste0('cluster ', i, '; p = ',
-                              format.pval(clusters[[i]]@pval, .015, eps=.001, 
-                                          digits=2, nsmall=2))
+                              format.pval(clusters[[i]]@pval, .015, eps = .001, 
+                                          digits = 2, nsmall = 2))
         )
       })
     }

@@ -23,6 +23,7 @@
 #' data(Sa_warp)
 #' pk_tab <- attach_ref_spectra(pk_tab)
 #' combine_peaks(pk_tab, tol = .02, min.cor = .9)
+#' @family utility functions
 #' @export combine_peaks
 
 combine_peaks <- function(peak_table, tol = .01, min.cor = 0.9,
@@ -84,6 +85,7 @@ combine_peaks <- function(peak_table, tol = .01, min.cor = 0.9,
 #' @examples
 #' data(pk_tab)
 #' pk_tab <- merge_peaks(peak_table = pk_tab, peaks=c("V10","V11"))
+#' @family utility functions
 #' @export
 
 merge_peaks <- function(peak_table, peaks, method = c("max", "sum")){

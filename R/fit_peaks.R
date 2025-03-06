@@ -1,8 +1,8 @@
 #' Find peaks
 #' 
-#' Find peaks in chromatographic profile.
+#' Detects peaks in chromatographic profile.
 #' 
-#' Find peaks by looking for zero-crossings in the smoothed first derivative of
+#' Detects peaks by looking for zero-crossings in the smoothed first derivative of
 #' the signal (\code{y}) that exceed the specified slope threshold
 #' (\code{slope_thresh}). Additionally, peaks can be filtered by supplying a minimal
 #' amplitude threshold (\code{amp_thresh}), filtering out peaks below the
@@ -123,7 +123,8 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol",
 #' Peak parameters are calculated by fitting the data
 #' to a gaussian or exponential-gaussian hybrid curve using non-linear least
 #' squares estimation as implemented in \code{\link[minpack.lm:nlsLM]{nlsLM}}.
-#' Area under the fitted curve is then estimated using trapezoidal approximation.
+#' The area under the fitted curve is then estimated using trapezoidal
+#' approximation.
 #' 
 #' @param x A chromatogram in matrix format.
 #' @param lambda Wavelength to fit peaks at.
@@ -290,7 +291,7 @@ fit_gaussian <- function(x, y, start.center = NULL,
   return( out)
 }
 
-###########################################################################################
+###############################################################################
 
 #' Expontential-gaussian hybrid
 #' @noRd

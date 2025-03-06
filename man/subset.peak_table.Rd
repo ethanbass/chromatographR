@@ -2,8 +2,7 @@
 % Please edit documentation in R/get_peaktable.R
 \name{subset.peak_table}
 \alias{subset.peak_table}
-\title{Subset peak table
-Return subset of \code{peak_table} object.}
+\title{Subset peak table}
 \usage{
 \method{subset}{peak_table}(x, subset, select, drop = FALSE)
 }
@@ -23,8 +22,7 @@ A \code{peak_table} object with samples specified by \code{subset}
 and peaks specified by \code{select}.
 }
 \description{
-Subset peak table
-Return subset of \code{peak_table} object.
+Returns subset of \code{peak_table} object.
 }
 \author{
 Ethan Bass

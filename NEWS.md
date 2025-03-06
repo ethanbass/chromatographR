@@ -3,6 +3,7 @@
 * Updated `reshape_peaktable` function to include wavelength and retention time data.
 * Updated `pk_tab` data file to latest peak table format.
 * Fixed minor issues with roxygen formatting.
+* Added function "families".
 * Fixed bug in `get_peaks` causing occasional errors due to edge cases.
 * Added titles for ggplot2 and plotly `plot_spectrum` plots.
 * Fixed bug in console output when providing chromatogram index as string to `plot_spectrum`.

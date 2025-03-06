@@ -168,6 +168,7 @@ elementwise.all.equal <- Vectorize(function(x, y, ...){
 #' @param idx Index of chromatogram from which to extract times
 #' @return Numeric vector of retention times from the chromatogram specified by
 #' \code{idx}.
+#' @family utility functions
 #' @export
 get_times <- function(x, idx = 1){
   if (inherits(x, "peak_table")){
@@ -186,6 +187,7 @@ get_times <- function(x, idx = 1){
 #' 
 #' @param x List of chromatograms or \code{peak_table} object.
 #' @return Numeric vector of wavelengths.
+#' @family utility functions
 #' @export
 get_lambdas <- function(x){
   if (inherits(x, "peak_table")){

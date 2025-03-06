@@ -26,6 +26,24 @@ squares (Lan, K. & Jorgenson, J. W. 2001. \doi{10.1016/S0021-9673(01)00594-5}).
 More details on package usage and a suggested workflow can be found in the 
 vignette.
 }
+\section{Data}{
+
+\itemize{
+  \item \code{\link{preprocess}}: A list of four goldenrod root chromatograms.
+  \item \code{\link{Sa_pr}}: Preprocessed goldenrod root chromatograms.
+  \item \code{\link{Sa_warp}}: Preprocessed and aligned goldenrod root chromatograms.
+  \item \code{\link{pk_tab}}: Peak table from aligned goldenrod root chromatograms.
+}
+
+
+\itemize{
+  \item \code{\link{Sa}}: A list of four goldenrod root chromatograms.
+  \item \code{\link{Sa_pr}}: Preprocessed goldenrod root chromatograms.
+  \item \code{\link{Sa_warp}}: Preprocessed and aligned goldenrod root chromatograms.
+  \item \code{\link{pk_tab}}: Peak table from aligned goldenrod root chromatograms.
+}
+}
+
 \seealso{
 Useful links:
 \itemize{

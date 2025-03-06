@@ -76,16 +76,22 @@ from the chromatographic matrix.
 }
 
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 data(Sa_warp)
 pks <- get_peaks(Sa_warp, lambda="220")
 pk_tab <- get_peaktable(pks)
-plot_all_spectra(peak="V13", peak_table = pk_tab, overlapping=TRUE)
+plot_all_spectra(peak="V13", peak_table = pk_tab, overlapping = TRUE)
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-\code{\link{plot_spectrum}}
+Other visualization functions: 
+\code{\link{plot.peak_list}()},
+\code{\link{plot.peak_table}()},
+\code{\link{plot_chroms}()},
+\code{\link{plot_spectrum}()},
+\code{\link{scan_chrom}()}
 }
 \author{
 Ethan Bass
 }
+\concept{visualization functions}

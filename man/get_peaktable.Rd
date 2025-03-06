@@ -108,7 +108,7 @@ This function is adapted from
 function in the alsace package by Ron Wehrens.
 }
 \examples{
-\dontshow{if (interactive()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 data(Sa_pr)
 pks <- get_peaks(Sa_pr, lambdas = c('210'))
 get_peaktable(pks, response = "area")

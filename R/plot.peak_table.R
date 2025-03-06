@@ -61,7 +61,7 @@
 #' specified peak with groups provided by \code{vars}.
 #' @author Ethan Bass
 #' @rdname plot.peak_table
-#' @concept Visualization
+#' @family visualization functions
 #' @export
 
 plot.peak_table <- function(x, loc, chrom_list, what="peak",

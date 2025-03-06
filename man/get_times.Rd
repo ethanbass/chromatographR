@@ -18,3 +18,10 @@ Numeric vector of retention times from the chromatogram specified by
 \description{
 Get retention times from a list of chromatograms or a peak_table object.
 }
+\seealso{
+Other utility functions: 
+\code{\link{combine_peaks}()},
+\code{\link{get_lambdas}()},
+\code{\link{merge_peaks}()}
+}
+\concept{utility functions}
