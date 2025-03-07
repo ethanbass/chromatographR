@@ -1,12 +1,12 @@
 pandoc: 3.1.11
 pkgdown: 2.1.1.9000
-pkgdown_sha: 8b10575ae7835cd4cbccff12b675a192e6bb84a0
+pkgdown_sha: 7cf401f44a970ea13744fcdd883248552c68ff9d
 articles:
   chromatographR: chromatographR.html
   articles/FAQ: FAQ.html
   articles/GC-FID: GC-FID.html
   articles/uv_spectra: uv_spectra.html
-last_built: 2025-01-11T17:18Z
+last_built: 2025-03-07T21:50Z
 urls:
   reference: https://ethanbass.github.io/chromatographR/reference
   article: https://ethanbass.github.io/chromatographR/articles
