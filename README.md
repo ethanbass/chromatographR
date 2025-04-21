@@ -3,7 +3,7 @@
 <!-- badges: start -->
   [![R-CMD-check](https://github.com/ethanbass/chromatographR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ethanbass/chromatographR/actions/workflows/R-CMD-check.yaml)
   [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/chromatographR)](https://cran.r-project.org/package=chromatographR)
-  [![chromatographR status badge](https://ethanbass.r-universe.dev/badges/chromatographR)](https://ethanbass.r-universe.dev)
+  [![chromatographR status badge](https://ethanbass.r-universe.dev/badges/chromatographR)](https://ethanbass.r-universe.dev/chromatographR)
 
   [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7016988.svg)](https://doi.org/10.5281/zenodo.7016988)
   [![metacran downloads](https://cranlogs.r-pkg.org/badges/grand-total/chromatographR)](https://cran.r-project.org/package=chromatographR)
