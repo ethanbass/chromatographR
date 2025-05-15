@@ -11,7 +11,7 @@
    <!-- badges: end -->
 
 ## Overview
-`chromatographR` is a package for the reproducible analysis of HPLC-DAD chromatographic data in R. It can also be used to analyze other "simple" chromatographic data like GC-FID, HPLC-UV, or HPLC-FD.
+`chromatographR` is a package for the reproducible analysis of HPLC-DAD chromatographic data in R. It can also be used to analyze other "simple" chromatography data such as GC-FID, HPLC-UV, or HPLC-FD.
   
 ## Installation
 
