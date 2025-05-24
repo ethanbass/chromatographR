@@ -160,7 +160,7 @@ position_plotly_legend <- function(pos){
 #' @author Ethan Bass
 #' @examples 
 #' data(Sa_warp)
-#' plot_chroms_heatmap(Sa_warp, idx = c(1:2))
+#' plot_chroms_heatmap(Sa_warp, lambdas=210)
 #' @family visualization functions
 #' @export
 plot_chroms_heatmap <- function(chrom_list, idx = NULL, lambdas, 
@@ -212,9 +212,11 @@ plot_chroms_heatmap_base <- function(chrom_list, lambdas.idx = 1, idx = NULL,
   rect(xlim[1] - 1000, -1000,
        xlim[2] + 1000, ncol(x) + 1000, 
        col = bgcol)
-  times <- seq(xlim[1], xlim[2], by=get_time_resolution(chrom_list))
+  times <- seq(xlim[1], xlim[2], by = get_time_resolution(chrom_list))
   image(times, seq_len(ncol(x)), 
-        x[seq(1, length(times)),], col = viridis_base, add = TRUE)
+        x[seq(which.min(abs(get_times(chrom_list) - head(times,1))),
+              which.min(abs(get_times(chrom_list) - tail(times,1)))),], 
+        col = viridis_base, add = TRUE)
   box()
   if (show_legend){
     par(mar = c(5, 0, 4, 3))  # reset margins
@@ -239,7 +241,7 @@ plot_chroms_heatmap_base <- function(chrom_list, lambdas.idx = 1, idx = NULL,
     data_range <- range(x[xlim[1]:xlim[2],], na.rm = TRUE)
     tick_vals <- seq(y_start, y_end, length.out = 5)
     tick_labels <- round(seq(data_range[1], data_range[2], length.out = 5) / 100) * 100
-    axis(4, at = tick_vals, labels = tick_labels, las = 1, lwd=0, hadj = 0.2)
+    axis(4, at = tick_vals, labels = tick_labels, las = 1, lwd = 0, hadj = 0.2)
     mtext("Intensity", side = 3, line = 1, padj = 5.2, adj = .1)
     par(old_par)
   }
