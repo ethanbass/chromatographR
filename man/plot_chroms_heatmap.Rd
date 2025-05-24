@@ -47,7 +47,8 @@ Adapted from \code{\link[VPdtw]{plot.VPdtw}}.
 
 Plots the traces of the specified chromatograms \code{idx} at the specified
 wavelengths \code{lambdas} as a heatmap. Plots can be produced using base 
-graphics engine, ggplot2, or plotly, according to the value of \code{engine}.
+graphics engine, \code{ggplot2}, or \code{plotly}, according to the value of 
+\code{engine}.
 }
 
 \examples{

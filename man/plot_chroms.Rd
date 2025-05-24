@@ -62,7 +62,7 @@ or plotly, according to the value of \code{engine}.
 
 \examples{
 data(Sa_warp)
-plot_chroms(Sa_warp, idx = c(1:2), lambdas = 210)
+plot_chroms(Sa_warp, lambdas = 210)
 }
 \seealso{
 Other visualization functions: 

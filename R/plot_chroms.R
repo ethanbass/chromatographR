@@ -26,7 +26,7 @@
 #' @author Ethan Bass
 #' @examples 
 #' data(Sa_warp)
-#' plot_chroms(Sa_warp, idx = c(1:2), lambdas = 210)
+#' plot_chroms(Sa_warp, lambdas = 210)
 #' @family visualization functions
 #' @export
 
@@ -155,7 +155,8 @@ position_plotly_legend <- function(pos){
 #' @section Side effects:
 #' Plots the traces of the specified chromatograms \code{idx} at the specified
 #' wavelengths \code{lambdas} as a heatmap. Plots can be produced using base 
-#' graphics engine, ggplot2, or plotly, according to the value of \code{engine}.
+#' graphics engine, \code{ggplot2}, or \code{plotly}, according to the value of 
+#' \code{engine}.
 #' @author Ethan Bass
 #' @examples 
 #' data(Sa_warp)
@@ -170,7 +171,7 @@ plot_chroms_heatmap <- function(chrom_list, idx = NULL, lambdas,
   if (ncol(chrom_list[[1]]) == 1){
     lambdas.idx <- 1
   } else {
-    get_lambda_idx(lambdas, lambdas = get_lambdas(chrom_list))
+    lambdas.idx <- get_lambda_idx(lambdas, lambdas = get_lambdas(chrom_list))
   }
   fn <- switch(engine, base = plot_chroms_heatmap_base,
                ggplot = plot_chroms_heatmap_ggplot,
