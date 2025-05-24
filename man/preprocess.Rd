@@ -11,10 +11,8 @@ preprocess(
   remove.time.baseline = TRUE,
   spec.smooth = TRUE,
   maxI = NULL,
-  parallel = NULL,
   interpolate_rows = TRUE,
   interpolate_cols = TRUE,
-  mc.cores,
   cl = 2,
   show_progress = NULL,
   ...
@@ -42,17 +40,11 @@ the spectral direction, according to
 \item{maxI}{if given, the maximum intensity in the matrix is set to this
 value.}
 
-\item{parallel}{Logical, indicating whether to use parallel processing.
-Defaults to TRUE (unless you're on Windows).}
-
 \item{interpolate_rows}{Logical. Whether to interpolate along the time axis
 (\code{dim1}). Defaults to TRUE.}
 
 \item{interpolate_cols}{Logical. Whether to interpolate along the spectral
 axis (\code{dim2}). Defaults to TRUE.}
-
-\item{mc.cores}{How many cores to use for parallel processing. Defaults to 2.
-This argument has been deprecated and replaces with \code{cl}.}
 
 \item{cl}{Argument to \code{\link[pbapply]{pblapply}} or \code{\link[parallel]{mclapply}}.
 Either an integer specifying the number of clusters to use for parallel

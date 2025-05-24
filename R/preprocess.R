@@ -25,14 +25,10 @@
 #' \code{\link[stats:smooth.spline]{smooth.spline}}. Default is TRUE.
 #' @param maxI if given, the maximum intensity in the matrix is set to this
 #' value.
-#' @param parallel Logical, indicating whether to use parallel processing.
-#' Defaults to TRUE (unless you're on Windows).
 #' @param interpolate_rows Logical. Whether to interpolate along the time axis 
 #' (\code{dim1}). Defaults to TRUE.
 #' @param interpolate_cols Logical. Whether to interpolate along the spectral 
 #' axis (\code{dim2}). Defaults to TRUE.
-#' @param mc.cores How many cores to use for parallel processing. Defaults to 2.
-#' This argument has been deprecated and replaces with \code{cl}.
 #' @param cl Argument to \code{\link[pbapply]{pblapply}} or \code{\link[parallel]{mclapply}}.
 #' Either an integer specifying the number of clusters to use for parallel
 #' processing or a cluster object created by \code{\link[parallel]{makeCluster}}.
@@ -67,23 +63,11 @@
 preprocess <- function(X, dim1, ## time axis
                           dim2, ## spectral axis
                           remove.time.baseline = TRUE,
-                          spec.smooth = TRUE,
-                          maxI = NULL, parallel = NULL, 
+                          spec.smooth = TRUE, maxI = NULL,
                           interpolate_rows = TRUE,
                           interpolate_cols = TRUE,
-                          mc.cores, cl = 2, show_progress = NULL, ...){
-  if (!missing(mc.cores)){
-    warning("The `mc.cores` argument is deprecated. Please use the `cl` argument instead.",
-            immediate. = TRUE)
-    cl <- mc.cores
-  }
-  if (!is.null(parallel)){
-    warning("The `parallel` argument is deprecated. Just use the `cl` argument to enable
-            parallel processing.",
-            immediate. = TRUE)
-  }
-  laplee <- choose_apply_fnc(show_progress = show_progress, parallel = parallel,
-                             cl = cl)
+                          cl = 2, show_progress = NULL, ...){
+  laplee <- choose_apply_fnc(show_progress = show_progress, cl = cl)
   if (is.matrix(X)){
     X <- list(X)
     return_matrix <- TRUE
@@ -114,29 +98,6 @@ preprocess <- function(X, dim1, ## time axis
                           interpolate_rows = interpolate_rows,
                           interpolate_cols = interpolate_cols,
                           ...)
-    # if (parallel){
-    #   if (length(find.package('parallel', quiet=TRUE)) == 0){
-    #     stop("Parallel must be installed to enable parallel processing.")
-    # }
-    #   X <- parallel::mclapply(X, FUN=preprocess_matrix,
-    #            dim1=dim1,
-    #            dim2=dim2,
-    #            remove.time.baseline = remove.time.baseline,
-    #            spec.smooth = spec.smooth, maxI = maxI,
-    #            interpolate_rows = interpolate_rows,
-    #            interpolate_cols = interpolate_cols,
-    #            mc.cores=mc.cores,
-    #            ...)
-    # } else{
-    #   X <- lapply(X, FUN=preprocess_matrix,
-    #          dim1=dim1,
-    #          dim2=dim2,
-    #          remove.time.baseline = remove.time.baseline,
-    #          spec.smooth = spec.smooth, maxI = maxI,
-    #          interpolate_rows = interpolate_rows,
-    #          interpolate_cols = interpolate_cols,
-    #          ...)
-    # }
     if (return_matrix){
       X[[1]]
     } else X
