@@ -16,7 +16,7 @@ Numeric vector of retention times from the chromatogram specified by
 \code{idx}.
 }
 \description{
-Get retention times from a list of chromatograms or a peak_table object.
+Get retention times from a list of chromatograms or a \code{peak_table} object.
 }
 \seealso{
 Other utility functions: 

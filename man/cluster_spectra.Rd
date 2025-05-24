@@ -92,12 +92,11 @@ values can be used to select clusters that exceed a certain confidence
 threshold as defined by \code{alpha}.
 
 Clusters can be filtered by the minimum and maximum size of the cluster using
-the \code{min_size} and \code{max_size} arguments respectively. If
+the \code{min_size} and \code{max_size} arguments respectively. Users should
+be aware that the clustering algorithm will often return nested clusters.
+Thus, an individual peak could appear in more than one cluster. If
 \code{max_only} is TRUE, only the largest cluster in a nested tree of
 clusters meeting the specified confidence threshold will be returned.
-
-Users should be aware that the clustering algorithm will often return nested
-clusters. Thus, an individual peak could appear in more than one cluster.
 
 It is highly suggested to use more than 100 bootstraps if you run the
 clustering algorithm on real data even though we use \code{nboot = 100} in

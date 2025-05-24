@@ -13,7 +13,7 @@ get_lambdas(x)
 A numeric vector of wavelengths.
 }
 \description{
-Get wavelengths from a list of chromatograms or a peak_table object.
+Get wavelengths from a list of chromatograms or a \code{peak_table} object.
 }
 \seealso{
 Other utility functions: 

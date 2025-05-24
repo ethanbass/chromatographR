@@ -99,8 +99,7 @@ function in the alsace package by Ron Wehrens.
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 data(Sa_pr)
-warping.models <- correct_rt(Sa_pr, what = "models", lambdas=c(210))
-warp <- correct_rt(chrom_list = Sa_pr, models = warping.models)
+warp <- correct_rt(chrom_list = Sa_pr, lambdas=210)
 \dontshow{\}) # examplesIf}
 }
 \references{

@@ -29,7 +29,7 @@ correlation to the other spectra in the peak table (\code{"max.cor"}).
 }
 \examples{
 data(pk_tab)
-pk_tab <- attach_ref_spectra(pk_tab, ref="max.int")
+pk_tab <- attach_ref_spectra(pk_tab, ref = "max.int")
 pk_tab <- attach_ref_spectra(pk_tab, ref = "max.cor")
 }
 \seealso{

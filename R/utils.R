@@ -162,10 +162,10 @@ elementwise.all.equal <- Vectorize(function(x, y, ...){
 
 #' Get retention times
 #' 
-#' Get retention times from a list of chromatograms or a peak_table object.
+#' Get retention times from a list of chromatograms or a \code{peak_table} object.
 #' 
-#' @param x List of chromatograms or \code{peak_table} object.
-#' @param idx Index of chromatogram from which to extract times
+#' @param x A list of chromatograms or \code{peak_table} object.
+#' @param idx Index of chromatogram from which to extract times.
 #' @return Numeric vector of retention times from the chromatogram specified by
 #' \code{idx}.
 #' @family utility functions
@@ -183,10 +183,10 @@ get_times <- function(x, idx = 1){
 
 #' Get lambdas
 #' 
-#' Get wavelengths from a list of chromatograms or a peak_table object.
+#' Get wavelengths from a list of chromatograms or a \code{peak_table} object.
 #' 
-#' @param x List of chromatograms or \code{peak_table} object.
-#' @return Numeric vector of wavelengths.
+#' @param x A list of chromatograms or \code{peak_table} object.
+#' @return A numeric vector of wavelengths.
 #' @family utility functions
 #' @export
 
@@ -319,9 +319,8 @@ choose_apply_fnc <- function(show_progress, parallel = NULL, cl = 2){
 #' Get y bounds
 #' @noRd
 get_y_bounds <- function(x, idx, lambdas.idx, pad = 1.1){
-  mn <- get_minimum(x, idx = idx, lambdas.idx = lambdas.idx)
   mx <- get_maximum(x, idx, lambdas.idx = lambdas.idx)*pad
-  c(mn, mx)
+  c(0, mx)
 }
 
 #' Get maximum
