@@ -22,10 +22,10 @@ plot_all_spectra(
 }
 \arguments{
 \item{peak}{The name of a peak to plot (in character
-format)}
+format).}
 
 \item{peak_table}{The peak table (output from \code{\link{get_peaktable}}
-function)}
+function).}
 
 \item{chrom_list}{A list of chromatograms in matrix format (timepoints x 
 components). If no argument is provided here, the function will
@@ -78,9 +78,9 @@ from the chromatographic matrix.
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 data(Sa_warp)
-pks <- get_peaks(Sa_warp, lambda="220")
+pks <- get_peaks(Sa_warp, lambda = "220")
 pk_tab <- get_peaktable(pks)
-plot_all_spectra(peak="V13", peak_table = pk_tab, overlapping = TRUE)
+plot_all_spectra(peak = "V13", peak_table = pk_tab, overlapping = TRUE)
 \dontshow{\}) # examplesIf}
 }
 \seealso{
@@ -90,6 +90,7 @@ Other visualization functions:
 \code{\link{plot.peak_list}()},
 \code{\link{plot.peak_table}()},
 \code{\link{plot_chroms}()},
+\code{\link{plot_chroms_heatmap}()},
 \code{\link{plot_spectrum}()},
 \code{\link{scan_chrom}()}
 }

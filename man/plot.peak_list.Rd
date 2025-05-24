@@ -71,6 +71,11 @@ at the specified wavelength (\code{lambda}) with fitted peak shapes from the
 provided \code{peak_list} drawn underneath the curve.
 }
 
+\examples{
+data(Sa_warp)
+pks <- get_peaks(chrom_list = Sa_warp[1], lambdas = 210)
+plot(pks, points = TRUE, ticks = TRUE)
+}
 \seealso{
 \code{\link{get_peaks}}
 
@@ -80,6 +85,7 @@ Other visualization functions:
 \code{\link{plot.peak_table}()},
 \code{\link{plot_all_spectra}()},
 \code{\link{plot_chroms}()},
+\code{\link{plot_chroms_heatmap}()},
 \code{\link{plot_spectrum}()},
 \code{\link{scan_chrom}()}
 }

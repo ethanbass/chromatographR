@@ -123,6 +123,7 @@ Other visualization functions:
 \code{\link{plot.peak_table}()},
 \code{\link{plot_all_spectra}()},
 \code{\link{plot_chroms}()},
+\code{\link{plot_chroms_heatmap}()},
 \code{\link{scan_chrom}()}
 }
 \author{
