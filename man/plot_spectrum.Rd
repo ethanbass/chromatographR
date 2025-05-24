@@ -33,7 +33,8 @@ wavelengths). If no argument is provided here, the function will try to find
 the \code{chrom_list} object used to create the provided \code{peak_table}.}
 
 \item{idx}{Numerical index of chromatogram you wish to plot, or "max" to
-automatically plot the chromatogram with the largest signal.}
+automatically plot the chromatogram with the largest signal at the given peak
+or retention time.}
 
 \item{lambda}{The wavelength you wish to plot the trace at if plot_trace ==
 TRUE and/or the wavelength to be used for the determination of signal
@@ -79,13 +80,16 @@ object containing the specified plots. Otherwise, if \code{engine == "base"},
 there is no return value.
 }
 \description{
-Plots the trace and/or spectrum for a given peak in peak.table object, or
-plots the spectrum a particular retention time for a given chromatogram.
+Plots the trace and/or spectrum for a given peak or retention time in a
+\code{peak_table} object or a list of chromatograms.
 }
 \details{
 Can be used to confirm the identity of a peak or check that a particular
 column in the peak table represents a single compound. Retention times can
 also be selected by clicking on the plotted trace if \code{what == 'click'}.
+Plots can be produced using either base R graphics,
+\code{\link[ggplot2:ggplot2]{ggplot2}}, or \code{plotly}, according to the
+value of the \code{engine} argument.
 }
 \section{Side effects}{
 

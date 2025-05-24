@@ -1,11 +1,14 @@
 #' Plot spectrum from peak table
 #' 
-#' Plots the trace and/or spectrum for a given peak in peak.table object, or
-#' plots the spectrum a particular retention time for a given chromatogram.
+#' Plots the trace and/or spectrum for a given peak or retention time in a 
+#' \code{peak_table} object or a list of chromatograms.
 #' 
 #' Can be used to confirm the identity of a peak or check that a particular
 #' column in the peak table represents a single compound. Retention times can
 #' also be selected by clicking on the plotted trace if \code{what == 'click'}.
+#' Plots can be produced using either base R graphics, 
+#' \code{\link[ggplot2:ggplot2]{ggplot2}}, or \code{plotly}, according to the
+#' value of the \code{engine} argument.
 #' 
 #' @importFrom scales rescale
 #' @importFrom graphics identify title text
@@ -17,7 +20,8 @@
 #' wavelengths). If no argument is provided here, the function will try to find
 #' the \code{chrom_list} object used to create the provided \code{peak_table}.
 #' @param idx Numerical index of chromatogram you wish to plot, or "max" to
-#' automatically plot the chromatogram with the largest signal.
+#' automatically plot the chromatogram with the largest signal at the given peak
+#' or retention time.
 #' @param chr Deprecated. Please use \code{idx} instead.
 #' @param lambda The wavelength you wish to plot the trace at if plot_trace ==
 #' TRUE and/or the wavelength to be used for the determination of signal
@@ -183,12 +187,12 @@ plot_spectrum_ggpl <- function(loc, peak_table, chrom_list,
     stop("No data was found at the specified retention time.")
   }
   if (scale_spectrum){
-    y <- rescale(y)
+    y <- scales::rescale(y)
   }
   if (plot_spectrum){
     plot_fn <- switch(engine, plotly = plotly_spec,
                         ggplot2 = ggplot_spec)
-    spectrum <- plot_fn(x = y, chr = chr, RT = RT, 
+    spectrum <- plot_fn(y = y, chr = chr, RT = RT, 
                         spectrum_labels = spectrum_labels, ...)
   }
   if (plot_spectrum & plot_trace){
@@ -225,9 +229,8 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
                                plot_spectrum = TRUE, plot_trace = TRUE,
                                spectrum_labels = TRUE, scale_spectrum = FALSE,
                                export_spectrum = FALSE, verbose = TRUE, 
-                               what=c("peak", "rt", "idx", "click"), zoom = FALSE,
-                               engine="base",
-                               ...){
+                               what=c("peak", "rt", "idx", "click"),
+                               zoom = FALSE, engine="base", ...){
   new.ts <- get_times(chrom_list, idx = chr)
   new.lambdas <- get_lambdas(chrom_list)
   sig <- max(nchar(gsub(".*\\.","",rownames(chrom_list[[1]]))))
@@ -274,7 +277,7 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
     stop("No data was found at the specified retention time.")
   }
   if (scale_spectrum){
-    y <- rescale(y)
+    y <- scales::rescale(y)
   }
   if (plot_spectrum){
     plot_spec(y = y, spectrum_labels = spectrum_labels, main = loc, ...)
@@ -385,9 +388,9 @@ scan_chrom <- function(chrom_list, idx, lambda,
 #' \code{\link{plot_spectrum}}.
 #' 
 #' @param peak The name of a peak to plot (in character
-#' format)
+#' format).
 #' @param peak_table The peak table (output from \code{\link{get_peaktable}}
-#' function)
+#' function).
 #' @param chrom_list A list of chromatograms in matrix format (timepoints x 
 #' components). If no argument is provided here, the function will
 #' try to find the \code{chrom_list} object used to create the provided
@@ -419,9 +422,9 @@ scan_chrom <- function(chrom_list, idx, lambda,
 #' @author Ethan Bass
 #' @examplesIf interactive()
 #' data(Sa_warp)
-#' pks <- get_peaks(Sa_warp, lambda="220")
+#' pks <- get_peaks(Sa_warp, lambda = "220")
 #' pk_tab <- get_peaktable(pks)
-#' plot_all_spectra(peak="V13", peak_table = pk_tab, overlapping = TRUE)
+#' plot_all_spectra(peak = "V13", peak_table = pk_tab, overlapping = TRUE)
 #' @family visualization functions
 #' @export
 
@@ -497,16 +500,16 @@ plot_all_spectra <- function(peak, peak_table, chrom_list, idx = "all",
 #' @author Ethan Bass
 #' @noRd
 plot_spec <- function(y, spectrum_labels = TRUE, ...){
-  matplot(x = as.numeric(names(y)), y = as.numeric(y), type='l',
+  matplot(x = as.numeric(names(y)), y = as.numeric(y), type = 'l',
           ylab = 'Intensity', xlab = 'Wavelength (nm)',
-          ylim=c(0,max(y, na.rm = TRUE)*1.2), ...)
+          ylim = c(0, max(y, na.rm = TRUE)*1.2), ...)
   if (spectrum_labels){
     suppressWarnings(pks <- find_peaks(y, slope_thresh = .00001, bounds = FALSE, 
-                                       smooth_type = "none"))
+                                       smooth_type = "none", amp_thresh = .05*max(y)))
     if (length(pks) > 0){
       pks <- data.frame(round(as.numeric(names(y)[pks]), 0), y[pks],
                         stringsAsFactors = FALSE)
-      text(pks[,1], pks[,2], pks[,1], pos=3, offset=.3, cex = .8)
+      text(pks[,1], pks[,2], pks[,1], pos = 3, offset = .3, cex = .8)
     }
   }
 }
@@ -516,17 +519,17 @@ plot_spec <- function(y, spectrum_labels = TRUE, ...){
 #' @param spectrum_labels Logical. Whether to label peaks in spectrum.
 #' @author Ethan Bass
 #' @noRd
-ggplot_spec <- function(x, chr, RT, spectrum_labels = TRUE, color="black", 
-                        width=1.2, hide_legend = TRUE, group = TRUE, ...){
+ggplot_spec <- function(y, chr, RT, spectrum_labels = TRUE, color="black", 
+                        width = 1.2, hide_legend = TRUE, group = TRUE, ...){
   check_for_pkg("ggplot2")
   .data <- ggplot2::.data
-  if (inherits(x, "numeric")){
-    df <- data.frame(lambda = as.numeric(names(x)), absorbance = x)
+  if (inherits(y, "numeric")){
+    df <- data.frame(lambda = as.numeric(names(y)), absorbance = y)
     group <- FALSE
-  } else if (inherits(x, "list")){
-    df <- reshape_chroms(x = x, idx = chr, rts = RT)
-  } else if (inherits(x, "data.frame")){
-    df <- x
+  } else if (inherits(y, "list")){
+    df <- reshape_chroms(x = y, idx = chr, rts = RT)
+  } else if (inherits(y, "data.frame")){
+    df <- y
   }
   p <- ggplot2::ggplot(data = df, 
                        ggplot2::aes(x = .data$lambda, y = .data$absorbance)) +
@@ -534,7 +537,22 @@ ggplot_spec <- function(x, chr, RT, spectrum_labels = TRUE, color="black",
   if ("sample" %in% colnames(df)){
     p <- p + ggplot2::aes(group = .data$sample, color = .data$sample)
   }
-  p <- p + ggplot2::theme_light()
+  if (spectrum_labels && inherits(y, "numeric")) {
+    suppressWarnings(pks <- find_peaks(df$absorbance, slope_thresh = .00001, bounds = FALSE, 
+                                       smooth_type = "none", 
+                                       amp_thresh = .05*max(df$absorbance)))
+    if (length(pks) > 0) {
+      p <- p + ggplot2::geom_text(
+        data = df[pks,],
+        ggplot2::aes(x = .data$lambda, y = .data$absorbance, label = .data$lambda),
+        nudge_y = .06*max(y), nudge_x=.7,
+        size = 3
+      )
+    }
+  }
+  p <- p + ggplot2::theme_light() + 
+    ggplot2::xlab("Wavelength") + 
+    ggplot2::ylab("Absorbance")
   if (hide_legend)
     p <- p + ggplot2::theme(legend.position = "none")
   p
@@ -547,25 +565,25 @@ ggplot_spec <- function(x, chr, RT, spectrum_labels = TRUE, color="black",
 #' @author Ethan Bass
 #' @noRd
 
-plotly_spec <- function(x, chr, RT, reshape = TRUE, color="black",
-                        spectrum_labels = TRUE, width=1.2, 
+plotly_spec <- function(y, chr, RT, reshape = TRUE, color = "black",
+                        spectrum_labels = TRUE, width = 1.2, 
                          hide_legend = TRUE, ...){
   check_for_pkg("plotly")
-  if (inherits(x,"numeric")){
-    df <- data.frame(lambda = as.numeric(names(x)), absorbance = x)
+  if (inherits(y, "numeric")){
+    df <- data.frame(lambda = as.numeric(names(y)), absorbance = y)
     group <- FALSE
-  } else if (inherits(x, "list")){
-    df <- reshape_chroms(x = x, idx = chr, rts = RT)
-  } else if (inherits(x, "data.frame")){
-    df <- x
+  } else if (inherits(y, "list")){
+    df <- reshape_chroms(x = y, idx = chr, rts = RT)
+  } else if (inherits(y, "data.frame")){
+    df <- y
   }
   
   if ("sample" %in% colnames(df)){
     p <- plotly::plot_ly(data = df, x = ~lambda, y = ~absorbance, 
-                         color = ~sample, type='scatter',
+                         color = ~sample, type = 'scatter',
                          mode = 'lines', line = list(width = width))
   } else{
-    p <- plotly::plot_ly(data = df, x = ~lambda, y = ~absorbance, type='scatter', 
+    p <- plotly::plot_ly(data = df, x = ~lambda, y = ~absorbance, type = 'scatter', 
                           mode = 'lines', line = list(width = width, 
                                                       color = color))
   }
@@ -576,6 +594,45 @@ plotly_spec <- function(x, chr, RT, reshape = TRUE, color="black",
                        xaxis = list(title = "Wavelength"),
                        yaxis = list(title= "Absorbance (mAU)")
   )
+  if (spectrum_labels) {
+    if ("sample" %in% colnames(df)) {
+      warning("Peak labeling for multiple samples is not implemented yet.")
+    } else {
+      y <- df$absorbance
+      names(y) <- as.character(df$lambda)
+      
+      # Find peaks using the same function as in plot_spec
+      suppressWarnings(pks <- find_peaks(y, slope_thresh = .00001, bounds = FALSE, 
+                                         smooth_type = "none", amp_thresh = .05*max(y)))
+      
+      if (length(pks) > 0) {
+        # Create annotations for each peak
+        annotations <- list()
+        
+        for (i in seq_along(pks)) {
+          peak_x <- as.numeric(names(y)[pks[i]])
+          peak_y <- y[pks[i]]
+          peak_label <- round(peak_x, 0)
+          
+          # Create an annotation for this peak
+          ann <- list(
+            x = peak_x,
+            y = peak_y,
+            text = as.character(peak_label),
+            showarrow = FALSE,
+            arrowhead = 0,
+            ax = 0,
+            yshift = 20
+          )
+          
+          annotations[[i]] <- ann
+        }
+        
+        # Add all annotations to the plot
+        p <- plotly::layout(p, annotations = annotations)
+      }
+    }
+  }
   if (hide_legend)
     p <- plotly::hide_legend(p)
   p
@@ -631,8 +688,8 @@ plotly_trace <- function(chrom_list, chr, lambda.idx, line.idx = NULL,
                       title = list(text=sprintf("Chr %d;   RT: %g;  lambda: %s nm",
                                                 as.integer(chr), RT, lambda)
                       ),
-                      xaxis=list(title = "Wavelength"),
-                      yaxis=list(title = "Absorbance (mAU)")
+                      xaxis = list(title = "Wavelength"),
+                      yaxis = list(title = "Absorbance (mAU)")
   )
   if (hide_legend){
     p <- plotly::hide_legend(p)
@@ -640,7 +697,9 @@ plotly_trace <- function(chrom_list, chr, lambda.idx, line.idx = NULL,
   p
 }
 
-#'@noRd
+#' Plot trace with ggplot2
+#' @author Ethan Bass
+#' @noRd
 ggplot_trace <- function(chrom_list, chr, lambda.idx, line.idx = NULL){
   check_for_pkg("ggplot2")
   .data <- ggplot2::.data
