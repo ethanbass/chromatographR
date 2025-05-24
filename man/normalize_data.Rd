@@ -13,7 +13,7 @@ normalize_data(
 )
 }
 \arguments{
-\item{peak_table}{A `peak_table` object}
+\item{peak_table}{A \code{peak_table} object.}
 
 \item{column}{The name of the column containing the weights.}
 
@@ -33,7 +33,7 @@ of each sample.
 }
 \description{
 Normalizes peak table or list of chromatograms by specified column in sample
-metadata. Metadata must first be attached to \code{peak_table} using
+metadata. Metadata must first be attached to the \code{peak_table} using
 \code{\link{attach_metadata}}.
 }
 \examples{

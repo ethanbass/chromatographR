@@ -7,9 +7,9 @@
 get_times(x, idx = 1)
 }
 \arguments{
-\item{x}{List of chromatograms or \code{peak_table} object.}
+\item{x}{A list of chromatograms or \code{peak_table} object.}
 
-\item{idx}{Index of chromatogram from which to extract times}
+\item{idx}{Index of chromatogram from which to extract times.}
 }
 \value{
 Numeric vector of retention times from the chromatogram specified by

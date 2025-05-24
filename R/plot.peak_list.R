@@ -29,6 +29,10 @@
 #' at the specified wavelength (\code{lambda}) with fitted peak shapes from the
 #' provided \code{peak_list} drawn underneath the curve. 
 #' @author Ethan Bass
+#' @examples 
+#' data(Sa_warp)
+#' pks <- get_peaks(chrom_list = Sa_warp[1], lambdas = 210)
+#' plot(pks, points = TRUE, ticks = TRUE)
 #' @seealso \code{\link{get_peaks}}
 #' @rdname plot.peak_list
 #' @family visualization functions

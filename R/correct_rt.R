@@ -76,8 +76,7 @@
 #' 
 #' @examplesIf interactive()
 #' data(Sa_pr)
-#' warping.models <- correct_rt(Sa_pr, what = "models", lambdas=c(210))
-#' warp <- correct_rt(chrom_list = Sa_pr, models = warping.models)
+#' warp <- correct_rt(chrom_list = Sa_pr, lambdas=210)
 #' @md
 #' @export correct_rt
 correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
@@ -88,7 +87,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
                        verbose = getOption("verbose"), show_progress = NULL, 
                        cl = 2, ...){
   what <- match.arg(what, c("corrected.values", "models"))
-  alg <- match.arg(alg, c("ptw", "vpdtw"))
+  alg <- match.arg(tolower(alg), c("ptw", "vpdtw"))
   
   if (!is.null(models)){
     model_class <- switch(alg, ptw = "ptw_list", "vpdtw" = "VPdtw")

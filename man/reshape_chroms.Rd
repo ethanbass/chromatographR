@@ -10,7 +10,7 @@ reshape_chroms(x, idx, sample_var = "sample", lambdas = NULL, rts = NULL)
 \arguments{
 \item{x}{A list of chromatographic matrices in wide format.}
 
-\item{idx}{Indices of chromatograms to convert}
+\item{idx}{Indices of chromatograms to convert.}
 
 \item{sample_var}{String with name of new column containing sample IDs.}
 

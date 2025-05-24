@@ -124,9 +124,9 @@ plot.peak_table <- function(x, loc, chrom_list, what="peak",
 #' formula (separated by \code{+}). In this case, a separate boxplot will be
 #' produced for each response variable.
 #' 
-#' @param x A peak_table object
-#' @param formula A formula object
-#' @param ... Additional arguments to \code{\link[graphics]{boxplot}}
+#' @param x A \code{peak_table} object.
+#' @param formula A \code{\link[stats]{formula}} object.
+#' @param ... Additional arguments to \code{\link[graphics]{boxplot}}.
 #' @importFrom stats reformulate terms
 #' @importFrom graphics boxplot
 #' @examples

@@ -12,7 +12,7 @@ data(Sa_warp)
 }
 \description{
 A list of four pre-processed and warped goldenrod root chromatograms derived
-from the raw data stored in \code{Sa}.
+from the raw data stored in \code{\link{Sa}}.
 }
 \seealso{
 Other data objects: 

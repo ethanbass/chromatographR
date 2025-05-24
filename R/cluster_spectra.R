@@ -4,7 +4,7 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' 
 #' Cluster peaks by spectral similarity.
 #' 
-#' Function to cluster peaks by spectral similarity. Before using this function,
+#' Before using this function,
 #' reference spectra must be attached to the \code{peak_table} using the \code{
 #' attach_ref_spectra} function. These reference spectra are then used to
 #' construct a distance matrix based on spectral similarity (pearson correlation)
@@ -15,11 +15,17 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' threshold as defined by \code{alpha}. 
 #' 
 #' Clusters can be filtered by the minimum and maximum size of the cluster using
-#' the \code{min_size} and \code{max_size} arguments respectively. If 
+#' the \code{min_size} and \code{max_size} arguments respectively. Users should
+#' be aware that the clustering algorithm will often return nested clusters.
+#' Thus, an individual peak could appear in more than one cluster. If 
 #' \code{max_only} is TRUE, only the largest cluster in a nested tree of 
 #' clusters meeting the specified confidence threshold will be returned.
-#'
-#' @name cluster_spectra
+#' 
+#' It is highly suggested to use more than 100 bootstraps if you run the 
+#' clustering algorithm on real data even though we use \code{nboot = 100} in
+#' the example to reduce runtime. The authors of \code{pvclust} suggest \code{
+#' nboot = 10000}.
+#' 
 #' @importFrom stats cor
 #' @importFrom methods new
 #' @importFrom graphics matplot
@@ -62,13 +68,6 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' @references R. Suzuki & H. Shimodaira. 2006. Pvclust: an R package for assessing
 #' the uncertainty in hierarchical clustering. \emph{Bioinformatics},
 #' \bold{22(12)}:1540-1542. \doi{10.1093/bioinformatics/btl117}.
-#' @note
-#' * Users should be aware that the clustering algorithm will often return nested
-#' clusters. Thus, an individual peak could appear in more than one cluster.
-#' * It is highly suggested to use more than 100 bootstraps if you run the 
-#' clustering algorithm on real data even though we use \code{nboot = 100} in
-#' the example to reduce runtime. The authors of \code{pvclust} suggest \code{
-#' nboot = 10000}.
 #' @examples \donttest{
 #' data(pk_tab)
 #' data(Sa_warp)

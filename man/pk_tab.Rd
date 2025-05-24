@@ -11,7 +11,8 @@ A \code{peak_table} object.
 data(pk_tab)
 }
 \description{
-Peak table generated from exemplary goldenrod root extracts.
+A peak table generated from the exemplary goldenrod root extracts stored in
+\code{\link{Sa}}.
 }
 \seealso{
 Other data objects: 

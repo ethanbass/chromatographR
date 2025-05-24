@@ -1,12 +1,12 @@
 #' Attach experimental metadata
 #' 
-#' Attaches sample metadata to `peak_table` object. Metadata should be
+#' Attaches sample metadata to a \code{peak_table} object. Metadata should be
 #' provided as a data.frame object. One of the columns in
 #' the supplied metadata must match exactly the row names of the peak table.
 #' 
 #' @aliases attach_metadata
-#' @param peak_table A `peak_table` object.
-#' @param metadata A `data.frame` containing the sample metadata.
+#' @param peak_table A \code{peak_table} object.
+#' @param metadata A \code{data.frame} containing the sample metadata.
 #' @param column The name of the column in your \code{metadata} object containing the
 #' sample names. Sample names must match the row names of \code{peak_table$tab}.
 #' @return A \code{peak_table} object with attached metadata in the \code{
@@ -121,10 +121,10 @@ get_reference_spectra <- function(peak_table, chrom_list,
 
 #' Attach reference spectra
 #' 
-#' Gathers reference spectra and attaches them to peak_table object. Reference 
-#' spectra are defined either as the spectrum with the highest intensity (
-#' \code{max.int}) or as the spectrum with the highest average correlation
-#' to the other spectra in the peak_table (\code{max.cor}).
+#' Gathers reference spectra and attaches them to a \code{peak_table} object.
+#' Reference spectra are defined either as the spectrum with the highest 
+#' intensity (\code{"max.int"}) or as the spectrum with the highest average
+#' correlation to the other spectra in the peak table (\code{"max.cor"}).
 #' 
 #' @aliases attach_ref_spectra
 #' @param peak_table Peak table from \code{\link{get_peaktable}}.
@@ -132,22 +132,24 @@ get_reference_spectra <- function(peak_table, chrom_list,
 #' wavelengths). If no argument is provided here, the function will try to find
 #' the \code{chrom_list} object used to create the provided \code{peak_table}.
 #' @param ref What criterion to use to select reference spectra.
-#' Current options are maximum correlation (\code{max.cor}) or maximum signal
-#' intensity (\code{max.int}).
+#' Current options are maximum correlation (\code{"max.cor"}) or maximum signal
+#' intensity (\code{"max.int"}).
 #' @return A \code{peak_table} object with reference spectra attached in the
 #' \code{$ref_spectra} slot.
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaks}} \code{\link{get_peaktable}}
 #' @examples
 #' data(pk_tab)
-#' pk_tab <- attach_ref_spectra(pk_tab, ref="max.int")
+#' pk_tab <- attach_ref_spectra(pk_tab, ref = "max.int")
 #' pk_tab <- attach_ref_spectra(pk_tab, ref = "max.cor")
 #' @export attach_ref_spectra
 
-attach_ref_spectra <- function(peak_table, chrom_list, ref = c("max.cor","max.int")){
+attach_ref_spectra <- function(peak_table, chrom_list, 
+                               ref = c("max.cor", "max.int")){
   check_peaktable(peak_table)
   ref <- match.arg(ref, c("max.cor","max.int"))
-  peak_table$ref_spectra <- get_reference_spectra(peak_table, chrom_list, ref = ref)
+  peak_table$ref_spectra <- get_reference_spectra(peak_table, chrom_list,
+                                                  ref = ref)
   peak_table$args["reference_spectra"] <- ref
   return(peak_table)
 }
@@ -155,10 +157,10 @@ attach_ref_spectra <- function(peak_table, chrom_list, ref = c("max.cor","max.in
 #' Normalize peak table or chromatograms
 #' 
 #' Normalizes peak table or list of chromatograms by specified column in sample
-#' metadata. Metadata must first be attached to \code{peak_table} using
+#' metadata. Metadata must first be attached to the \code{peak_table} using
 #' \code{\link{attach_metadata}}.
 #' 
-#' @param peak_table A `peak_table` object
+#' @param peak_table A \code{peak_table} object.
 #' @param column The name of the column containing the weights.
 #' @param chrom_list List of chromatograms for normalization. The samples must
 #' be in same order as the peak_table. If no argument is provided here, the

@@ -12,7 +12,7 @@ data(Sa_pr)
 }
 \description{
 A list of four pre-processed HPLC-DAD chromatograms derived from the raw data
-stored in \code{Sa}. Retention times are stored in rows and wavelengths
+stored in \code{\link{Sa}}. Retention times are stored in rows and wavelengths
 are stored in columns. The time axis is compressed to save space and 
 processing time so the data are a little choppy.
 }

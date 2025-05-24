@@ -59,6 +59,7 @@
 #' Applications in scientific measurement. \url{https://terpconnect.umd.edu/~toh/spectrum/}
 #' (Accessed January, 2022).
 #' @export find_peaks
+
 find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol",
                                           "mva", "tmva", "none"),
                        smooth_window = .001, slope_thresh = 0, amp_thresh = 0,

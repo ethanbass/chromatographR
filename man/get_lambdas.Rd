@@ -7,10 +7,10 @@
 get_lambdas(x)
 }
 \arguments{
-\item{x}{List of chromatograms or \code{peak_table} object.}
+\item{x}{A list of chromatograms or \code{peak_table} object.}
 }
 \value{
-Numeric vector of wavelengths.
+A numeric vector of wavelengths.
 }
 \description{
 Get wavelengths from a list of chromatograms or a peak_table object.

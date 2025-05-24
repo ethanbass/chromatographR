@@ -3,7 +3,7 @@
 #' Estimates peak purity by assessing the dissimilarity of the spectra
 #' comprising the peak, using the method described in Stahl 2003.
 #' 
-#' @param x A chromatogram in matrix format
+#' @param x A chromatogram in matrix format.
 #' @param pos A vector containing the center, lower and upper bounds of a peak
 #' as numeric indices.
 #' @param weight Weight provided to \code{\link{get_agilent_threshold}}.
@@ -85,14 +85,14 @@ find_noise <- function(x, noise_threshold = 0.01, lambdas){
 }
 
 #' Calculate purity thresholds
-#' @param x A chromatogram in matrix format
-#' @param pos A vector containing peak information
+#' @param x A chromatogram in matrix format.
+#' @param pos A vector containing peak information.
 #' @param weight Scaling parameter affecting stringency of threshold. Defaults
 #' to \code{1}.
 #' @param noise_variance Variance of noise.
 #' @param noise_threshold Threshold to define noise. Highest proportion of 
 #' maximum absorbance. Defaults to \code{.005}.
-#' @param lambdas Wavelengths to include
+#' @param lambdas Wavelengths to include.
 #' @return Returns a vector of purity thresholds at each retention time index
 #' within the peak specified by \code{pos}.
 #' @references
@@ -172,8 +172,8 @@ get_purity_values <- function(x, pos, weight = 1, noise_variance = NULL,
 }
 
 #' Trim peak
-#' @param x A chromatogram in matrix format
-#' @param pos A vector containing peak information
+#' @param x A chromatogram in matrix format.
+#' @param pos A vector containing peak information.
 #' @param cutoff Proportion of maximum absorbance to use as cutoff. Defaults to
 #' \code{.05}.
 #' @return Returns indices within the peak specified by \code{pos} with a higher

@@ -81,7 +81,7 @@ the bootstrap p-value (au) for the given cluster.
 Cluster peaks by spectral similarity.
 }
 \details{
-Function to cluster peaks by spectral similarity. Before using this function,
+Before using this function,
 reference spectra must be attached to the \code{peak_table} using the \code{
 attach_ref_spectra} function. These reference spectra are then used to
 construct a distance matrix based on spectral similarity (pearson correlation)
@@ -95,16 +95,14 @@ Clusters can be filtered by the minimum and maximum size of the cluster using
 the \code{min_size} and \code{max_size} arguments respectively. If
 \code{max_only} is TRUE, only the largest cluster in a nested tree of
 clusters meeting the specified confidence threshold will be returned.
-}
-\note{
-\itemize{
-\item Users should be aware that the clustering algorithm will often return nested
+
+Users should be aware that the clustering algorithm will often return nested
 clusters. Thus, an individual peak could appear in more than one cluster.
-\item It is highly suggested to use more than 100 bootstraps if you run the
+
+It is highly suggested to use more than 100 bootstraps if you run the
 clustering algorithm on real data even though we use \code{nboot = 100} in
 the example to reduce runtime. The authors of \code{pvclust} suggest \code{
 nboot = 10000}.
-}
 }
 \examples{
 \donttest{

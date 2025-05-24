@@ -7,7 +7,7 @@
 \method{subset}{peak_table}(x, subset, select, drop = FALSE)
 }
 \arguments{
-\item{x}{A \code{peak_table} object}
+\item{x}{A \code{peak_table} object.}
 
 \item{subset}{Logical expression indicating rows (samples) to keep from
 \code{peak_table}; missing values are taken as false.}

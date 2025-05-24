@@ -2,7 +2,7 @@
 #' Reshapes a list of chromatograms from wide to long format.
 #' @name reshape_chroms
 #' @param x A list of chromatographic matrices in wide format.
-#' @param idx Indices of chromatograms to convert
+#' @param idx Indices of chromatograms to convert.
 #' @param sample_var String with name of new column containing sample IDs.
 #' @param lambdas Vector specifying wavelength(s) to include.
 #' @param rts Vector specifying retention times to include.

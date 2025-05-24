@@ -16,7 +16,7 @@ get_purity(
 )
 }
 \arguments{
-\item{x}{A chromatogram in matrix format}
+\item{x}{A chromatogram in matrix format.}
 
 \item{pos}{A vector containing the center, lower and upper bounds of a peak
 as numeric indices.}

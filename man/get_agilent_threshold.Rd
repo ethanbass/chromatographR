@@ -14,9 +14,9 @@ get_agilent_threshold(
 )
 }
 \arguments{
-\item{x}{A chromatogram in matrix format}
+\item{x}{A chromatogram in matrix format.}
 
-\item{pos}{A vector containing peak information}
+\item{pos}{A vector containing peak information.}
 
 \item{weight}{Scaling parameter affecting stringency of threshold. Defaults
 to \code{1}.}
@@ -26,7 +26,7 @@ to \code{1}.}
 \item{noise_threshold}{Threshold to define noise. Highest proportion of 
 maximum absorbance. Defaults to \code{.005}.}
 
-\item{lambdas}{Wavelengths to include}
+\item{lambdas}{Wavelengths to include.}
 }
 \value{
 Returns a vector of purity thresholds at each retention time index

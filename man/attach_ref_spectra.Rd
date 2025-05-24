@@ -14,18 +14,18 @@ wavelengths). If no argument is provided here, the function will try to find
 the \code{chrom_list} object used to create the provided \code{peak_table}.}
 
 \item{ref}{What criterion to use to select reference spectra.
-Current options are maximum correlation (\code{max.cor}) or maximum signal
-intensity (\code{max.int}).}
+Current options are maximum correlation (\code{"max.cor"}) or maximum signal
+intensity (\code{"max.int"}).}
 }
 \value{
 A \code{peak_table} object with reference spectra attached in the
 \code{$ref_spectra} slot.
 }
 \description{
-Gathers reference spectra and attaches them to peak_table object. Reference 
-spectra are defined either as the spectrum with the highest intensity (
-\code{max.int}) or as the spectrum with the highest average correlation
-to the other spectra in the peak_table (\code{max.cor}).
+Gathers reference spectra and attaches them to a \code{peak_table} object.
+Reference spectra are defined either as the spectrum with the highest 
+intensity (\code{"max.int"}) or as the spectrum with the highest average
+correlation to the other spectra in the peak table (\code{"max.cor"}).
 }
 \examples{
 data(pk_tab)

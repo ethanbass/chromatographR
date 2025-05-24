@@ -7,9 +7,9 @@
 trim_peak(x, pos, cutoff = 0.05)
 }
 \arguments{
-\item{x}{A chromatogram in matrix format}
+\item{x}{A chromatogram in matrix format.}
 
-\item{pos}{A vector containing peak information}
+\item{pos}{A vector containing peak information.}
 
 \item{cutoff}{Proportion of maximum absorbance to use as cutoff. Defaults to
 \code{.05}.}

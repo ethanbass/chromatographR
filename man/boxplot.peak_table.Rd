@@ -7,11 +7,11 @@
 \method{boxplot}{peak_table}(x, formula, ...)
 }
 \arguments{
-\item{x}{A peak_table object}
+\item{x}{A \code{peak_table} object.}
 
-\item{formula}{A formula object}
+\item{formula}{A \code{\link[stats]{formula}} object.}
 
-\item{...}{Additional arguments to \code{\link[graphics]{boxplot}}}
+\item{...}{Additional arguments to \code{\link[graphics]{boxplot}}.}
 }
 \description{
 The function can take multiple response variables on the left hand side of the

@@ -7,9 +7,9 @@
 attach_metadata(peak_table, metadata, column)
 }
 \arguments{
-\item{peak_table}{A `peak_table` object.}
+\item{peak_table}{A \code{peak_table} object.}
 
-\item{metadata}{A `data.frame` containing the sample metadata.}
+\item{metadata}{A \code{data.frame} containing the sample metadata.}
 
 \item{column}{The name of the column in your \code{metadata} object containing the
 sample names. Sample names must match the row names of \code{peak_table$tab}.}
@@ -19,7 +19,7 @@ A \code{peak_table} object with attached metadata in the \code{
 $sample_meta} slot.
 }
 \description{
-Attaches sample metadata to `peak_table` object. Metadata should be
+Attaches sample metadata to a \code{peak_table} object. Metadata should be
 provided as a data.frame object. One of the columns in
 the supplied metadata must match exactly the row names of the peak table.
 }
