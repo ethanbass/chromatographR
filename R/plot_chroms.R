@@ -135,8 +135,11 @@ position_plotly_legend <- function(pos){
 }
 
 #' Plot chromatograms as heatmap
+#' 
 #' Plots the specified traces from a list of chromatograms as a heatmap.
-#' Adapted from \code{\link{VPdtw:plot.VPdtw}}
+#' 
+#' Adapted from \code{\link[VPdtw]{plot.VPdtw}}.
+#' 
 #' @param chrom_list List of chromatograms to plot
 #' @param lambdas A character or numeric vector specifying the wavelengths to 
 #' plot.

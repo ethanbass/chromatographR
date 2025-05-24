@@ -2,9 +2,7 @@
 % Please edit documentation in R/plot_chroms.R
 \name{plot_chroms_heatmap}
 \alias{plot_chroms_heatmap}
-\title{Plot chromatograms as heatmap
-Plots the specified traces from a list of chromatograms as a heatmap.
-Adapted from \code{\link{VPdtw:plot.VPdtw}}}
+\title{Plot chromatograms as heatmap}
 \usage{
 plot_chroms_heatmap(
   chrom_list,
@@ -40,9 +38,10 @@ plot.}
 No return value, called for side effects.
 }
 \description{
-Plot chromatograms as heatmap
 Plots the specified traces from a list of chromatograms as a heatmap.
-Adapted from \code{\link{VPdtw:plot.VPdtw}}
+}
+\details{
+Adapted from \code{\link[VPdtw]{plot.VPdtw}}.
 }
 \section{Side effects}{
 
