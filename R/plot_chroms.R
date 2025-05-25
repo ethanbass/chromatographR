@@ -160,7 +160,7 @@ position_plotly_legend <- function(pos){
 #' @author Ethan Bass
 #' @examples 
 #' data(Sa_warp)
-#' plot_chroms_heatmap(Sa_warp, lambdas=210)
+#' plot_chroms_heatmap(Sa_warp, lambdas = 210)
 #' @family visualization functions
 #' @export
 plot_chroms_heatmap <- function(chrom_list, idx = NULL, lambdas, 
@@ -206,17 +206,19 @@ plot_chroms_heatmap_base <- function(chrom_list, lambdas.idx = 1, idx = NULL,
     layout(matrix(c(1, 2), ncol = 2), widths = c(8, 1))
     par(mar = c(5, 4, 4, 1))  # c(bottom, left, top, right)
   }
-  plot(xlim, c(1, ncol(x)), type = "n", 
+  plot(xlim, c(0.8, ncol(x) + 0.2), type = "n", 
        xlab = "", ylab = "Sample", main = title, 
-       xlim = xlim)
+       xlim = xlim, yaxt = "n")
+  axis(2, at = seq_len(ncol(x)), labels = colnames(x))
   rect(xlim[1] - 1000, -1000,
        xlim[2] + 1000, ncol(x) + 1000, 
        col = bgcol)
   times <- seq(xlim[1], xlim[2], by = get_time_resolution(chrom_list))
   image(times, seq_len(ncol(x)), 
-        x[seq(which.min(abs(get_times(chrom_list) - head(times,1))),
-              which.min(abs(get_times(chrom_list) - tail(times,1)))),], 
-        col = viridis_base, add = TRUE)
+        x[seq(which.min(abs(get_times(chrom_list) - head(times, 1))),
+              which.min(abs(get_times(chrom_list) - tail(times, 1)))),], 
+        col = viridis_base, add=TRUE)
+  axis(2, at = seq_len(ncol(x)), labels = colnames(x))
   box()
   if (show_legend){
     par(mar = c(5, 0, 4, 3))  # reset margins
@@ -234,7 +236,7 @@ plot_chroms_heatmap_base <- function(chrom_list, lambdas.idx = 1, idx = NULL,
     
     # Draw the rectangles
     for (i in 1:n_colors) {
-      rect(0, y_vals[i], 1, y_vals[i+1], col = viridis_base[i], border = NA)
+      rect(0, y_vals[i], 1, y_vals[i + 1], col = viridis_base[i], border = NA)
     }
     
     # Add axis labels that correspond to data values
