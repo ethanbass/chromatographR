@@ -33,7 +33,8 @@
 plot_chroms <- function(x, lambdas, idx, xlim = NULL, ylim = NULL, 
                         xlab = "", ylab = "Absorbance",
                         engine = c("base", "ggplot", "plotly"), linewidth = 1, 
-                        show_legend = TRUE, legend_position = "topright", ...){
+                        show_legend = TRUE, legend_position = "topright", 
+                        title = "", ...){
   engine <- match.arg(engine, c("base", "ggplot", "plotly"))
   if (!class(x) %in% c("list", "chrom_list")){
     stop("Please supply list of chromatograms.")
@@ -64,7 +65,7 @@ plot_chroms <- function(x, lambdas, idx, xlim = NULL, ylim = NULL,
   if (engine == "base"){
     plot.new()
     plot.window(xlim = xlim, ylim = ylim)
-    title(xlab = xlab, ylab = ylab)
+    title(main = title, xlab = xlab, ylab = ylab)
     axis(1)
     axis(2)
     box()
@@ -82,7 +83,10 @@ plot_chroms <- function(x, lambdas, idx, xlim = NULL, ylim = NULL,
       p <- ggplot2::ggplot(xx, ggplot2::aes(x = .data$rt, y = .data$absorbance,
                                         color = .data$sample)) +
         ggplot2::geom_line(linewidth = linewidth*0.5, ...) +
-        ggplot2::ylab(ylab) + ggplot2::xlab(xlab) + ggplot2::theme_light()
+        ggplot2::ylab(ylab) + 
+        ggplot2::xlab(xlab) + 
+        ggplot2::ggtitle(title) +
+        ggplot2::theme_light()
       if (!show_legend){
         p <- p + ggplot2::theme(legend.position = "none")
       } else if (legend_position != "topright"){
@@ -100,7 +104,8 @@ plot_chroms <- function(x, lambdas, idx, xlim = NULL, ylim = NULL,
                            type = 'scatter', mode = 'lines',
                            line = list(width = linewidth, ...))
       p <-  plotly::layout(p, xaxis = list(title = xlab),
-                           yaxis = list(title = ylab)
+                           yaxis = list(title = ylab),
+                           title = title
       )
       if (!show_legend){
         p <- plotly::hide_legend(p)
