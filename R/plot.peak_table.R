@@ -64,7 +64,7 @@
 #' @family visualization functions
 #' @export
 
-plot.peak_table <- function(x, loc, chrom_list, what="peak",
+plot.peak_table <- function(x, loc, chrom_list, what = "peak",
                             idx = 'max', lambda = 'max',
                             plot_spectrum = TRUE, plot_trace = TRUE,
                             box_plot = FALSE, vars = NULL,
@@ -106,11 +106,7 @@ plot.peak_table <- function(x, loc, chrom_list, what="peak",
       if (what != "peak"){
         stop("A peak name must be provided to `loc` to make a boxplot.")
       }
-      boxplot(as.formula(paste("x[['tab']][,loc]", vars, sep="~")),
-              data = x$sample_meta,
-              main = paste(loc, '\n', 'RT = ',
-                           round(as.numeric(x$pk_meta['rt', loc]), 2)),
-              ylab = "abs", xlab = "", ...)
+      boxplot(x, formula = reformulate(vars, response = loc), ...)
     }
     if (export_spectrum | engine %in% c("plotly", "ggplot")){
       return(out)
@@ -150,7 +146,7 @@ boxplot.peak_table <- function(x, formula, ...){
             data = x$sample_meta,
             main = paste(li, '\n',
                          'RT = ', round(as.numeric(x$pk_meta['rt', li]), 2)),
-            ylab = x$args[["response"]], xlab = "", ...)
+            ylab = simpleCap(x$args[["response"]]), xlab = "", ...)
   }
 }
 
