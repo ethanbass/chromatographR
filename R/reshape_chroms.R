@@ -38,8 +38,6 @@ reshape_chroms <- function(x, idx, sample_var = "sample",
 #' @noRd
 
 reshape_chrom <- function(x, lambdas = NULL, rts = NULL){
-  if (ncol(x) == 1)
-    stop("The provided data is already in long format!")
   times <- get_times(x = x)
   xx <- as.data.frame(x)
   if (!is.null(lambdas)){
