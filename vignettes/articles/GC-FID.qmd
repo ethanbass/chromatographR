@@ -28,13 +28,13 @@ To demonstrate the use of `chromatographR` for the analysis GC-FID data, we will
 
 ::: {#fig-polistes layout-ncol=2 layout-nrow=2}
 
-![*P. dominula* [@kranz2020]](images/pdom_pipe_c.jpg){height=300}
+![*P. dominula* [@kranz2020]](images/pdom_pipe_c.jpg){height=300, fig.alt="A photograph of Polistes dominula"}
 
-![*P. exclamans* (© Andrew Legan)](images/PEXC_multiple_adults_on_nest_c.png){height=300}
+![*P. exclamans* (© Andrew Legan)](images/PEXC_multiple_adults_on_nest_c.png){height=300, fig.alt="A photograph of Polistes exclamans"}
 
-![*P. fuscatus* [@cook2022]](images/fuscatus.jpeg){width=300}
+![*P. fuscatus* [@cook2022]](images/fuscatus.jpeg){width=300, fig.alt="A photograph of Polistes fuscatus"}
 
-![*P. metricus* [@drabik-hamshare2022]](images/p_metricus_c.jpeg){height=300}
+![*P. metricus* [@drabik-hamshare2022]](images/p_metricus_c.jpeg){height=300, fig.alt="A photograph of Polistes metricus"}
 
 *Polistes* species includes in this study.
 :::
@@ -52,10 +52,11 @@ path_to_metadata <- grep("METADATA", files, value = TRUE)
 meta <- read.csv(path_to_metadata, sep = "\t")
 ```
 
-In order to get a good alignment, it is helpful to remove the solvent peak. To accomplish this, we can use the `preprocess` function to remove the first four minutes of the chromatogram. We also reduce the time-axis resolution to .005 minutes since it drastically reduces computation time while seemingly having little effect on the accuracy of the integration results.
+In order to get a good alignment, it is helpful to remove the solvent peak. To accomplish this, we can use the `preprocess` function to remove the first four minutes of the chromatogram. We also reduce the time-axis resolution (from 40 ms to 300 ms) since it drastically reduces computation time while seemingly having little effect on the accuracy of the integration results.
 
 ```{r preprocess_data}
-dat.pr <- preprocess(dat, spec.smooth = FALSE, dim1 = seq(4, 59.9, .005), cl = 1)
+dat.pr <- preprocess(dat, spec.smooth = FALSE, dim1 = seq(from = 4, to = 59.9, by = .005), # .005 minutes = 300 ms
+                     cl = 1)
 ```
 
 We can then group the chromatograms by species for further analysis.
@@ -87,7 +88,7 @@ path_to_annotated_alkanes <- grep("ANNOTATED", files[[1]], value = TRUE)
 alkanes <- read.csv(path_to_annotated_alkanes, sep="\t")
 ```
 
-```{r}
+```{r compare_alkane_areas}
 # check equality of retention times
 # all.equal(alkanes$RT[-1],pks_f$ALKANE_LADDER$Intensity$rt)
 
@@ -149,66 +150,78 @@ warp_all <- suppressWarnings(correct_rt(dat.pr[-1], alg = "vpdtw",
 
 As a sanity check, we can compare the single species alignments for each species to the multi-species alignment of the corresponding chromatograms.
 
+```{r format_italics}
+#| code-fold: true
+#| code-summary: "Utility function to format text in base R plots with italics."
+
+format_italics <- function(str) {
+  spl <- strsplit(str, "\\*")[[1]]
+  non_empty <- spl[spl != ""]
+  bquote(paste(italic(.(non_empty[1])), .(non_empty[2])))
+}
+```
+
 ```{r plot_metricus_alignments}
 par(mfrow=c(3,1))
-plot_chroms(warp_all[grep("PMET",names(warp_all))],show_legend = FALSE)
-legend("topright", expression(paste(italic("P. metricus"), 
-                                    " (multi-species)")), bty = "n")
+plot_chroms_heatmap(dat.pr[species_idx$metricus], show_legend = FALSE, 
+                    title = format_italics("*P. metricus* (raw data)"), xlim=c(25, 50))
 
-plot_chroms(warp_metricus, show_legend = FALSE)
-legend("topright", expression(paste(italic("P. metricus"), 
-                                    " (single-species)")), bty = "n")
+plot_chroms_heatmap(warp_metricus, show_legend = FALSE, 
+                    title = format_italics("*P. metricus* (single-species alignment)"),
+                    xlim=c(25, 50))
 
-plot_chroms(dat.pr[species_idx$metricus], show_legend = FALSE)
-legend("topright", expression(paste(italic("P. metricus"), 
-                                    " (raw)")), bty = "n")
+plot_chroms_heatmap(warp_all[grep("PMET", names(warp_all))], show_legend = FALSE,
+                    title = format_italics("*P. metricus* (multi-species alignment)"),
+                    xlim=c(25, 50))
 ```
 
 
 ```{r plot_fuscatus_alignments}
 par(mfrow=c(3,1))
-plot_chroms(warp_all[grep("PFUS",names(warp_all))],show_legend = FALSE)
-legend("topright", expression(paste(italic("P. fuscatus"), " (multi-species)")),
-       bty = "n")
+plot_chroms_heatmap(dat.pr[species_idx$fuscatus], show_legend = FALSE, 
+                    title = format_italics("*P. fuscatus* (raw data)"),
+                    xlim=c(20,45))
 
-plot_chroms(warp_fuscatus, show_legend = FALSE)
-legend("topright", expression(paste(italic("P. fuscatus"), " (single-species)")),
-       bty = "n")
+plot_chroms_heatmap(warp_fuscatus, show_legend = FALSE, 
+                    title = format_italics("*P. fuscatus* (single-species alignment)"),
+                    xlim=c(20,45))
 
-plot_chroms(dat.pr[species_idx$fuscatus], show_legend = FALSE)
-legend("topright", expression(paste(italic("P. fuscatus"), 
-                                    " (raw)")), bty = "n")
+plot_chroms_heatmap(warp_all[grep("PFUS", names(warp_all))], show_legend = FALSE,
+                    title = format_italics("*P. fuscatus* (multi-species alignment)"),
+                    xlim=c(20,45))
 ```
 
 ```{r plot_dominula_alignments}
 par(mfrow=c(3,1))
-plot_chroms(warp_all[grep("PDOM", names(warp_all))],show_legend = FALSE)
-legend("topright", expression(paste(italic("P. dominula"), " (multi-species)")), bty="n")
+plot_chroms_heatmap(dat.pr[species_idx$dominula], show_legend = FALSE, 
+                    title = format_italics("*P. dominula* (raw data)"),
+                    xlim=c(25,45))
 
-plot_chroms(warp_dominula, show_legend = FALSE)
-legend("topright", expression(paste(italic("P. dominula"), " (single-species)")), bty="n")
+plot_chroms_heatmap(warp_dominula, show_legend = FALSE, 
+                    title = format_italics("*P. dominula* (single-species alignment)"),
+                    xlim=c(25,45))
 
-plot_chroms(dat.pr[species_idx$dominula], show_legend = FALSE)
-legend("topright", expression(paste(italic("P. dominula"), 
-                                    " (raw)")), bty="n")
+plot_chroms_heatmap(warp_all[grep("PDOM", names(warp_all))], show_legend = FALSE,
+                    title = format_italics("*P. dominula* (multi-species alignment)"),
+                    xlim=c(25,45))
 ```
 
 ```{r plot_exclamans_alignments}
 par(mfrow = c(3,1))
-plot_chroms(warp_all[grep("PEXC", names(warp_all))],show_legend = FALSE)
-legend("topright", expression(paste(italic("P. exclamans"), " (multi-species)")),
-       bty = "n")
+plot_chroms_heatmap(dat.pr[species_idx$exclamans], show_legend = FALSE, 
+                    title = format_italics("*P. exclamans* (raw data)"),
+                    xlim = c(30,40))
 
-plot_chroms(warp_exclamans, show_legend = FALSE)
-legend("topright", expression(paste(italic("P. exclamans"), " (single-species)")),
-       bty = "n")
+plot_chroms_heatmap(warp_exclamans, show_legend = FALSE, 
+                    title = format_italics("*P. exclamans* (single-species alignment)"),
+                    xlim = c(30,40))
 
-plot_chroms(dat.pr[species_idx$exclamans], show_legend = FALSE)
-legend("topright", expression(paste(italic("P. exclamans"), 
-                                    " (raw)")), bty = "n")
+plot_chroms_heatmap(warp_all[grep("PEXC", names(warp_all))], show_legend = FALSE,
+                    title = format_italics("*P. exclamans* (multi-species alignment)"),
+                    xlim = c(30,40))
 ```
 
-In general, the results are quite similar between multispecies and single species alignments.
+In general, the results are quite similar between multi-species and single species alignments, though the single-species alignments are noticeably better in some areas. Since we want to compare CHCs across species, we will proceed with the imperfect multi-species alignments.
 
 ### Integration and peaktable assembly
 
@@ -218,19 +231,22 @@ pktab <- get_peaktable(pks)
 pktab <- attach_metadata(pktab, metadata = meta, column = "SAMPLE_ID")
 ```
 
-### Analysis of peaktable
+### Analysis of cuticular hydrocarbon composition
 
-```{r}
+```{r permanova}
 m <- vegan::adonis2(pktab$tab ~ POLISTES_SPECIES + STATE + SEX + LAT + LON,
                data = pktab$sample_meta, method = "manhattan",
-               na.action = na.omit)
+               na.action = na.omit, by = "margin")
 m
 ```
 
-As one would expect, the permanova shows that species is the largest contributor to the variance in CHC profiles (R^2^ = `r round(m$R2[1], digits = 2)`), followed by state of origin (R^2^ = `r round(m$R2[2], digits = 2)`) and sex (R^2^ = `r round(m$R2[3], digits=2)`).
+As one would expect, the permanova results shows that species is the largest contributor to the variance in CHC profiles (R^2^<sub>marginal</sub> = `r round(m$R2[1], digits = 2)`), followed by state of origin (R^2^<sub>marginal</sub> = `r round(m$R2[2], digits = 2)`) and sex (R^2^<sub>marginal</sub> = `r round(m$R2[3], digits = 2)`).
 
 ```{r modified_ggordiplot}
+#| code-fold: true
+#| code-summary: "Modified `ggordiplot` function with added `shape` argument."
 # ggordiplot function (modified from https://github.com/jfq3/ggordiplots/blob/master/R/gg_ordiplot.R) with added shape argument
+
 gg_ordiplot <- function (ord, groups, shape = NULL, scaling = 1, choices = c(1, 2), 
                          kind = c("sd", "se", "ehull"), conf = NULL, 
                          show.groups = "all", ellipse = TRUE, 
@@ -299,34 +315,34 @@ gg_ordiplot <- function (ord, groups, shape = NULL, scaling = 1, choices = c(1, 
   ]
   xlab <- axis.labels[1]
   ylab <- axis.labels[2]
-  plt <- ggplot2::ggplot() + geom_point(data = df_ord, aes(x = x, 
+  plt <- ggplot2::ggplot() + ggplot2::geom_point(data = df_ord, ggplot2::aes(x = x, 
                                                            y = y, 
                                                            color = Group, 
                                                            shape = shape), 
                                         size = pt.size) + 
-    xlab(xlab) + 
-    ylab(ylab)
-  if (ellipse == TRUE) {
-    plt <- plt + geom_path(data = df_ellipse, aes(x = x, 
+    ggplot2::xlab(xlab) + 
+    ggplot2::ylab(ylab)
+  if (ellipse) {
+    plt <- plt + ggplot2::geom_path(data = df_ellipse, ggplot2::aes(x = x, 
                                                   y = y, color = Group),
                            show.legend = FALSE)
   }
-  if (label == TRUE) {
-    plt <- plt + geom_text(data = df_mean.ord, 
-                           aes(x = x, y = y, label = Group, color = Group),
+  if (label) {
+    plt <- plt + ggplot2::geom_text(data = df_mean.ord, 
+                           ggplot2::aes(x = x, y = y, label = Group, color = Group),
                            show.legend = FALSE)
   }
-  if (hull == TRUE) {
+  if (hull) {
     plt <- plt + geom_path(data = df_hull, 
-                           aes(x = x, y = y, color = Group), 
+                           ggplot2::aes(x = x, y = y, color = Group), 
                            show.legend = FALSE)
   }
-  if (spiders == TRUE) {
-    plt <- plt + geom_segment(data = df_spiders, 
-                              aes(x = cntr.x, xend = x, y = cntr.y, yend = y,
+  if (spiders) {
+    plt <- plt + ggplot2::geom_segment(data = df_spiders, 
+                              ggplot2::aes(x = cntr.x, xend = x, y = cntr.y, yend = y,
                                   color = Group), show.legend = FALSE)
   }
-  plt <- plt + coord_fixed(ratio = 1)
+  plt <- plt + ggplot2::coord_fixed(ratio = 1)
   if (plot) {
     print(plt)
   }
@@ -337,7 +353,7 @@ gg_ordiplot <- function (ord, groups, shape = NULL, scaling = 1, choices = c(1, 
 }
 ```
 
-```{r}
+```{r pca}
 ord <- vegan::rda(pktab$tab, scale = TRUE)
 pktab$sample_meta$SEX_SP <- interaction(pktab$sample_meta$SEX,
                                       pktab$sample_meta$POLISTES_SPECIES)
@@ -345,33 +361,37 @@ pktab$sample_meta$SEX_SP <- interaction(pktab$sample_meta$SEX,
 gg_ordiplot(ord, groups = pktab$sample_meta[,"POLISTES_SPECIES"],
             shape = pktab$sample_meta[,"SEX"], plot = FALSE)$plot +
   scale_shape_manual(values = c(19, 21), name = "Sex") +
-  labs(colour = "Species")
+  labs(colour = "Species") +
+  theme_classic()
 ```
 
 Principal componenets analysis shows decent separation between species, with *P. dominula*, *P. fuscatus* and *P. dominula* separating along PC2 and *P. exclamans* separating from the other species along PC1.
 
 We can get even better separation if we break down our data by sex, though there is considerable intraspecific variation.
 
-```{r}
+```{r pca_by_species}
 cond <- which(pktab$sample_meta$SEX == "M")
 ord_m <- vegan::rda(pktab$tab[cond,], scale = TRUE)
 
-gg_ordiplot(ord_m, groups = pktab$sample_meta[cond,"POLISTES_SPECIES"], 
+p_male <- gg_ordiplot(ord_m, groups = pktab$sample_meta[cond, "POLISTES_SPECIES"], 
             plot = FALSE)$plot + 
   ggtitle("Males") +
   theme_classic() +
-  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5)) +
+  theme(legend.position = "bottom", plot.title = element_text(hjust = 0.5)) +
   labs(colour = "Species")
 
 cond <- which(pktab$sample_meta$SEX == "F")
 ord_f <- vegan::rda(pktab$tab[cond,],scale=TRUE)
 
-gg_ordiplot(ord_f, groups = pktab$sample_meta[cond,"POLISTES_SPECIES"],
+p_female <- gg_ordiplot(ord_f, groups = pktab$sample_meta[cond,"POLISTES_SPECIES"],
                          plot = FALSE)$plot + 
   ggtitle("Females") + 
   theme_classic() +
-  theme(legend.position="bottom", plot.title = element_text(hjust = 0.5)) +
+  theme(legend.position = "bottom", plot.title = element_text(hjust = 0.5)) +
   labs(colour = "Species")
+
+p_male
+p_female
 ```
 
 ### References
