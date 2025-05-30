@@ -161,7 +161,6 @@ plot_spectrum_ggpl <- function(loc, peak_table, chrom_list,
     RT <- new.ts[idx]
   }
   idx <- get_retention_idx(RT, times = new.ts)
-  # chr <- check_chr(chr, loc, peak_table, chrom_list)
   y <- unlist(chrom_list[[chr]][idx, , drop = TRUE])
   lambda.idx <- get_lambda_idx(lambda, lambdas = new.lambdas, y = y)
   if (plot_trace){
