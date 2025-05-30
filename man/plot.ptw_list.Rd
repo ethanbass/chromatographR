@@ -4,19 +4,39 @@
 \alias{plot.ptw_list}
 \title{Plot PTW alignments}
 \usage{
-\method{plot}{ptw_list}(x, lambdas, legend = TRUE, ...)
+\method{plot}{ptw_list}(
+  x,
+  what = c("traces", "heatmap"),
+  engine = c("base", "ggplot", "plotly"),
+  lambdas,
+  show_legend = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{ptw_list} object created by \code{\link{correct_rt}}.}
 
+\item{what}{What type of plot to return. Either \code{traces} or 
+\code{heatmap}.}
+
+\item{engine}{What plotting engine to use. Either \code{base}, \code{ggplot}
+or \code{plotly}}
+
 \item{lambdas}{Which lambdas to plot.}
 
-\item{legend}{Logical. Whether to label the plots.}
+\item{show_legend}{Logical. Whether to include sample legend.}
 
-\item{...}{Additional arguments to \code{\link[graphics]{matplot}}.}
+\item{...}{Additional arguments (placeholder).}
 }
 \description{
 Plots \code{\link{ptw}} alignments.
+}
+\examples{
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
+data(Sa_pr)
+warp <- correct_rt(chrom_list = Sa_pr, what = "models", lambdas = 210)
+plot(warp)
+\dontshow{\}) # examplesIf}
 }
 \author{
 Ethan Bass

@@ -10,12 +10,13 @@ correct_peaks(peak_list, mod_list, chrom_list, match_names = TRUE)
 \item{peak_list}{A `peak_list` object created by \code{\link{get_peaks}},
 containing a nested list of peak tables where the first level is the sample,
 and the second level is the spectral wavelength. Every component is described
-by a matrix where every row is one peak, and the columns contain information on
-retention time, peak width (FWHM), peak width, height, and area.}
+by a matrix where each row corresponds to a feature, and the columns contain 
+information on that feature (e.g., retention time, peak width (FWHM), height,
+area, etc.)}
 
-\item{mod_list}{A list of ptw models.}
+\item{mod_list}{A list of \code{ptw} models.}
 
-\item{chrom_list}{List of chromatograms supplied to create ptw models.}
+\item{chrom_list}{List of chromatograms from which the ptw models are derived.}
 
 \item{match_names}{Logical. Whether to actively match the names of the 
 \code{peak_list} to the list of models (\code{mod_list}). Defaults to 
