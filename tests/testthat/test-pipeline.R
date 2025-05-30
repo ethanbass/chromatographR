@@ -1,3 +1,8 @@
+skip_on_cran()
+skip_if_not_installed("vdiffr")
+skip_if_not_installed("plotly")
+skip_if_not_installed("reticulate")
+skip_if_not_installed("rsvg")
 # to run visual tests, set Sys.setenv("VISUAL_TESTS"="true")
 
 data("Sa")
@@ -14,7 +19,7 @@ test_that("preprocess works on matrix", {
   expect_equal(rownames(out), as.character(new.ts))
   expect_equal(colnames(out), as.character(new.lambdas))
   expect_error(preprocess_matrix(Sa))
-  expect_error(preprocess_matrix(Sa[[1]], dim2 = seq(9,20,by=.01)))
+  expect_error(preprocess_matrix(Sa[[1]], dim2 = seq(9, 20, by = .01)))
 })
 
 test_that("Preprocess works without providing dimensions", {
@@ -101,14 +106,38 @@ test_that("PTW plot displays correctly", {
 
 
 test_that("plot_chroms works to plot alignments", {
+  skip_on_cran()
   skip_if_not_installed("vdiffr")
   alignment <- function(){
-    par(mfrow=c(2,1))
+    par(mfrow = c(2,1))
     plot_chroms(warp, lambdas = "210")
     plot_chroms(dat.pr, lambdas = "210")
   }
   vdiffr::expect_doppelganger("alignment", alignment)
   expect_error(plot_chroms(pktab))
+})
+
+test_that("plot_chroms can subset chromatograms correctly", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  data(Sa_pr)
+  numeric_indices <- function(){
+    plot_chroms(Sa_pr, idx=c(1, 3), lambdas = 210)
+  }
+  character_indices <- function(){
+    plot_chroms(Sa_pr, idx=c("119", "122"), lambdas = 210)
+  }
+  vdiffr::expect_doppelganger("plot_trace", numeric_indices)
+  vdiffr::expect_doppelganger("plot_trace", character_indices)
+
+  numeric_indices_rev <- function(){
+    plot_chroms(Sa_pr, idx=c(3, 1), lambdas = 210)
+  }
+  character_indices_rev <- function(){
+    plot_chroms(Sa_pr, idx=c("122", "119"), lambdas = 210)
+  }
+  vdiffr::expect_doppelganger("plot_trace_rev", numeric_indices_rev)
+  vdiffr::expect_doppelganger("plot_trace_rev", character_indices_rev)
 })
 
 
@@ -122,8 +151,8 @@ test_that("plot_chroms works to plot alignments with ggplot", {
   vdiffr::expect_doppelganger("alignment_ggp", alignment_ggp)
   
   alignment_ggp_zoom <- function(){
-    plot_chroms(warp, lambdas="210", engine="ggplot", show_legend = FALSE,
-                xlim=c(12.5, 15), ylim=c(0, 550))
+    plot_chroms(warp, lambdas = "210", engine = "ggplot", show_legend = FALSE,
+                xlim = c(12.5, 15), ylim = c(0, 550))
   }
   suppressWarnings(vdiffr::expect_doppelganger("alignment_ggp_zoom",
                                                alignment_ggp_zoom))
@@ -133,7 +162,7 @@ test_that("plot_chroms works to plot alignments with ggplot", {
 
 
 ### test get_peaks ###
-lam <- c("210","318")
+lam <- c("210", "318")
 pks_egh <- get_peaks(dat.pr, lambdas = lam, fit = "egh", smooth_type = "none",
                      show_progress = FALSE)
 pks_gaussian <- get_peaks(dat.pr, lambdas = lam, fit = "gaussian",
@@ -212,14 +241,15 @@ test_that("correct_peaks works", {
 
 test_that("strip plot works", {
   skip_on_cran()
-  # not sure why this is failing on github actions, but skipping for now
-  skip_on_ci()
   skip_on_os("windows")
   skip_if_not_installed("vdiffr")
   skip_on_ci()
-  vdiffr::expect_doppelganger("peak_table_plot", 
-                              pktab <- get_peaktable(pks_egh, plot_it = TRUE,
-                                            ask = FALSE))
+  plot_peak_table <- function(){
+    pktab <- get_peaktable(pks_egh, plot_it = TRUE,
+                           ask = FALSE)
+  }
+  
+  vdiffr::expect_doppelganger("peak_table_plot", plot_peak_table)
 })
 
 #### test metadata attachment ###
@@ -310,7 +340,7 @@ test_that("merge_peaks works with sum method", {
   pk_tab_m <- merge_peaks(pk_tab, peaks=c("V10","V11"), method = "sum")
   expect_equal(pk_tab_m$tab[["V11"]], (pk_tab$tab$V10 + pk_tab$tab$V11))
   expect_equal(ncol(pk_tab_m), ncol(pk_tab)-1)
-  expect_equal(ncol(pk_tab_m$pk_meta), ncol(pk_tab$pk_meta)-1)
+  expect_equal(ncol(pk_tab_m$pk_meta), ncol(pk_tab$pk_meta) - 1)
   expect_equal(rownames(pk_tab_m$tab), rownames(pk_tab$tab))
 })
 
@@ -341,6 +371,7 @@ test_that("cluster_spectra works", {
 ### test plotting functions
 
 test_that("plot.peak_list works", {
+  skip_on_cran()
   skip_if_not_installed("vdiffr")
   plot_peaks <- function(){
     plot(pks_egh, chrom_list = dat.pr, points = TRUE,
@@ -376,17 +407,44 @@ test_that("purity plot works", {
 
 
 test_that("plot.ptw_list works", {
+  skip_on_cran()
   skip_if_not_installed("vdiffr")
-  plot_ptw_list <- function(){
-    plot(warping.models)
+  plot_ptw_list_traces_base <- function(){
+    plot(warping.models, what = "traces", engine = "base")
   }
-  vdiffr::expect_doppelganger("plot.ptw_list", plot_ptw_list)
+  suppressWarnings(vdiffr::expect_doppelganger("plot_ptw_list_traces_base",
+                                               plot_ptw_list_traces_base))
+  
+  plot_ptw_list_heatmap_base <- function(){
+    plot(warping.models, what = "heatmap", engine = "base")
+  }
+  vdiffr::expect_doppelganger("plot_ptw_list_heatmap_base", plot_ptw_list_heatmap_base)
+  
+})
+
+test_that("plot.ptw_list works with ggplot", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  skip_if_not_installed("ggplot2")
+  plot_ptw_list_traces_ggplot <- function(){
+    suppressWarnings(plot(warping.models, what = "traces", engine = "ggplot"))
+  }
+  vdiffr::expect_doppelganger(title = "plot_ptw_list_traces_ggplot", 
+                              fig = plot_ptw_list_traces_ggplot)
+  
+  plot_ptw_list_heatmap_ggplot <- function(){
+    plot(warping.models, what = "heatmap", engine = "ggplot")
+  }
+  vdiffr::expect_doppelganger(title = "plot_ptw_list_heatmap_ggplot",
+                              fig = plot_ptw_list_heatmap_ggplot)
+
 })
 
 test_that("plot.peak_table works", {
+  skip_on_cran()
   skip_if_not_installed("vdiffr")
   plot_peak_table <- function(){
-    par(mfrow=c(3,1))
+    par(mfrow=c(3, 1))
     plot(pk_tab, loc = "V13", chrom_list = dat.pr, box_plot = TRUE,
          vars = "trt", verbose = FALSE, spectrum_labels = TRUE)
   }
@@ -399,6 +457,7 @@ test_that("plot.peak_table works", {
 })
 
 test_that("plot_all_spectra works", {
+  skip_on_cran()
   skip_if_not_installed("vdiffr")
   plot_spectra <- function(){
     plot_all_spectra("V13", peak_table = pk_tab, chrom_list = dat.pr, 
@@ -413,6 +472,7 @@ test_that("plot_all_spectra works", {
 })
 
 test_that("plot_all_spectra works with ggplot2", {
+  skip_on_cran()
   skip_if_not_installed("vdiffr")
   plot_spectra <- function(){
     plot_all_spectra("V13", peak_table = pk_tab, chrom_list = dat.pr, 
@@ -424,6 +484,7 @@ test_that("plot_all_spectra works with ggplot2", {
 })
 
 test_that("plot_spectrum works", {
+  skip_on_cran()
   skip_if_not_installed("vdiffr")
   plot_spec <- function(){
     par(mfrow=c(2,1))
@@ -431,21 +492,33 @@ test_that("plot_spectrum works", {
                   export=TRUE, what="rt", idx = 1, verbose = FALSE)
   }
   vdiffr::expect_doppelganger(title = "plot_spectrum", plot_spec)
-  x <- plot_spectrum("V13", peak_table = pk_tab, chrom_list = dat.pr, 
-                     export=TRUE, what="peak", idx = 1, verbose = FALSE)
+  
+  plot_spec_character_idx <- function(){
+    par(mfrow = c(2,1))
+    plot_spectrum(loc = "13.62", peak_table = pk_tab, chrom_list = dat.pr,
+                  what = "rt", idx = "119", verbose = FALSE)
+  }
+  vdiffr::expect_doppelganger(title = "plot_spectrum", 
+                              plot_spec_character_idx)
+
+  x <- plot_spectrum(loc = "V13", peak_table = pk_tab, chrom_list = dat.pr, 
+                     export_spectrum = TRUE, what = "peak", idx = 1, 
+                     verbose = FALSE)
   expect_equal(rownames(x), as.character(new.lambdas))
   expect_equal(class(x), "data.frame")
   expect_equal(ncol(x), 1)
 })
 
 test_that("plot_spectrum works", {
-  x <- plot_spectrum("V13", peak_table = pk_tab, chrom_list = dat.pr, 
-                     export = TRUE, what="peak", idx = 1, verbose = FALSE)
+  x <- plot_spectrum(loc = "V14", peak_table = pk_tab, chrom_list = dat.pr, 
+                     export_spectrum = TRUE, what = "peak", idx = 1, 
+                     verbose = FALSE)
   expect_equal(rownames(x), as.character(new.lambdas))
   expect_equal(class(x), "data.frame")
   expect_equal(ncol(x), 1)
+  
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, 
-                             what="click"))
+                             what = "click"))
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, 
                              what="click", idx = 1))
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, 
@@ -490,25 +563,26 @@ test_that("plot_spectrum works with ggplot2", {
   skip_if_not_installed("ggplot2")
   skip_if_not_installed("cowplot")
   
-  p1 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr,
+  p1 <- plot_spectrum(loc = "13.62", peak_table = pk_tab, chrom_list = dat.pr,
                       export_spectrum = FALSE, what="rt", idx = 1,
                       verbose = FALSE, engine="ggplot")
   vdiffr::expect_doppelganger(title = "plot_both_ggplot", fig = p1)
   
-  p2 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr,
+  p2 <- plot_spectrum(loc = "13.62", peak_table = pk_tab, chrom_list = dat.pr,
                       export_spectrum = FALSE, what="rt", idx = 1,
                       verbose = FALSE, engine="ggplot", plot_trace = FALSE)
-  vdiffr::expect_doppelganger(title = "plot_trace_ggplot", fig = p2)
+  vdiffr::expect_doppelganger(title = "plot_spectrum_ggplot", fig = p2)
   
-  p3 <- plot_spectrum("13.62", peak_table = pk_tab, chrom_list = dat.pr, 
+  p3 <- plot_spectrum(loc = "13.62", peak_table = pk_tab, chrom_list = dat.pr, 
                       export_spectrum = FALSE, what="rt", idx = 1,
                       verbose = FALSE, engine = "ggplot", plot_spectrum = FALSE)
-  vdiffr::expect_doppelganger(title = "plot_spectrum_ggplot", fig = p3)
+  vdiffr::expect_doppelganger(title = "plot_trace_ggplot", fig = p3)
 })
 
 
 
 test_that("mirror_plot works", {
+  skip_on_cran()
   skip_if_not_installed("vdiffr")
   mirror1 <- function(){
     mirror_plot(pk_tab, chrom_list = dat.pr, lambdas = c("210","260"),
@@ -526,6 +600,7 @@ test_that("mirror_plot works", {
 })
 
 test_that("boxplot works as expected", {
+  skip_on_cran()
   skip_if_not_installed("vdiffr")
   boxplot1 <- function(){
     boxplot(pk_tab, V11 ~ trt)
@@ -539,6 +614,7 @@ test_that("boxplot works as expected", {
 })
 
 test_that("plot_peak.list works", {
+  skip_on_cran()
   skip_if_not_installed("vdiffr")
   plot_peaklist <- function(){
     plot(pks_egh, chrom_list = dat.pr, idx = 2)
@@ -556,17 +632,17 @@ test_that("write_peaktable writes csvs correctly", {
                    path)))
   write_peaktable(peak_table = pk_tab, path = path, format = "csv",
                   what = c("tab", "pk_meta"))
-  path_table <- paste0(file.path(path,"peak_table-tab"), ext =".csv")
-  path_meta <- paste0(file.path(path,"peak_table-pk_meta"), ext =".csv")
+  path_table <- paste0(file.path(path,"peak_table-tab"), ext = ".csv")
+  path_meta <- paste0(file.path(path,"peak_table-pk_meta"), ext = ".csv")
   
   expect_true(file.exists(path_table))
   expect_true(file.exists(path_meta))
   
   expect_equal(pk_tab$tab, 
-               read.csv(file = path_table, row.names = 1), ignore_attr=TRUE)
+               read.csv(file = path_table, row.names = 1), ignore_attr = TRUE)
   expect_equal(pk_tab$pk_meta,
-               read.csv(file = path_meta, row.names = 1), ignore_attr=TRUE)
-  expect_error(write_peaktable(pk_tab, path="fake_path"))
+               read.csv(file = path_meta, row.names = 1), ignore_attr = TRUE)
+  expect_error(write_peaktable(pk_tab, path = "fake_path"))
 })
 
 test_that("write_peaktable writes xlsx correctly", {
@@ -585,6 +661,7 @@ test_that("write_peaktable writes xlsx correctly", {
                ignore_attr=TRUE)
 })
 
+# run the following line to activate plotly tests:
 # Sys.setenv("VISUAL_TESTS" = "true")
 
 test_that("plot_spectrum works with plotly engine", {
@@ -617,18 +694,104 @@ test_that("plot_chroms works with plotly", {
   skip_if_not_installed("reticulate")
   skip_if_not_installed("rsvg")
   
-  p <- plot_chroms(warp, lambdas="210", engine="plotly")
+  p <- plot_chroms(warp, lambdas = "210", engine = "plotly")
+  # warnings are suppressed because of annoying RColorBrewer warnings
+  # https://github.com/plotly/plotly.R/issues/2392
+  # should be fixed by https://github.com/plotly/plotly.R/pull/1999
   suppressWarnings(expect_doppelganger_plotly(name = "alignment_plotly", 
                                               p = p))
   
-  p2 <- plot_chroms(warp, lambdas="210", engine="plotly")
+  p2 <- plot_chroms(warp, lambdas="210", engine = "plotly", show_legend = FALSE)
   suppressWarnings(expect_doppelganger_plotly(name = "alignment_plotly_no_legend", 
                                               p = p2))
   
-  p3 <- plot_chroms(warp, lambdas="210", engine="plotly", 
+  p3 <- plot_chroms(warp, lambdas="210", engine = "plotly", 
                     legend_position = "topleft", 
                     xlim=c(15, 18), ylim=c(0,400))
   suppressWarnings(expect_doppelganger_plotly(name = "alignment_plotly_zoom",
                                               p = p3))
 })
 
+
+test_that("plot_chroms_heatmap works with plotly", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  skip_if_not_installed("plotly")
+  skip_if_not_installed("reticulate")
+  skip_if_not_installed("rsvg")
+  
+  p <- plot_chroms_heatmap(warp, lambdas = "210", engine = "plotly")
+  expect_doppelganger_plotly(name = "heatmap_plotly", 
+                                              p = p)
+  # plot retention times instead of indices
+  p2 <- plot_chroms_heatmap(warp, lambdas = "210", engine = "plotly", 
+                            show_legend = FALSE, xlim = c(10, 15))
+  expect_doppelganger_plotly(name = "heatmap_plotly_zoom",
+                                              p = p2)
+})
+
+test_that("plot.ptw_list works with plotly", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  skip_if_not_installed("plotly")
+  skip_if_not_installed("reticulate")
+  skip_if_not_installed("rsvg")
+  
+  plot_ptw_list_traces_plotly <- suppressWarnings(plot(warping.models, 
+                                                       what = "traces", 
+                                                       engine = "plotly")
+                                                                        )
+
+  expect_doppelganger_plotly(name = "plot_ptw_list_traces_plotly", 
+                             p = plot_ptw_list_traces_plotly)
+  
+  plot_ptw_list_heatmap_plotly <- plot(warping.models, what = "heatmap", 
+                                       engine = "plotly")
+
+  expect_doppelganger_plotly(name = "plot_ptw_list_heatmap_plotly", 
+                             p = plot_ptw_list_heatmap_plotly)
+})
+
+
+test_that("plot_chroms can subset chromatograms correctly", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  data(Sa_pr)
+  numeric_indices <- function(){
+    plot_chroms_heatmap(Sa_pr, idx=c(1, 3), lambdas = 210)
+  }
+  character_indices <- function(){
+    plot_chroms_heatmap(Sa_pr, idx=c("119", "122"), lambdas = 210)
+  }
+  vdiffr::expect_doppelganger("heatmap_plot_trace", numeric_indices)
+  vdiffr::expect_doppelganger("heatmap_plot_trace", character_indices)
+  
+  numeric_indices_rev <- function(){
+    plot_chroms_heatmap(Sa_pr, idx=c(3, 1), lambdas = 210)
+  }
+  character_indices_rev <- function(){
+    plot_chroms_heatmap(Sa_pr, idx=c("122", "119"), lambdas = 210)
+  }
+  vdiffr::expect_doppelganger("heatmap_plot_trace_rev", numeric_indices_rev)
+  vdiffr::expect_doppelganger("heatmap_plot_trace_rev", character_indices_rev)
+})
+
+
+test_that("plot_chroms works to plot alignments with ggplot", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  skip_if_not_installed("ggplot2")
+  alignment_ggplot_heatmap <- function(){
+    plot_chroms_heatmap(warp, lambdas=210, engine="ggplot")
+  }
+  vdiffr::expect_doppelganger("alignment_ggplot_heatmap",
+                              alignment_ggplot_heatmap)
+  
+  alignment_ggplot_heatmap_zoom <- function(){
+    plot_chroms_heatmap(warp, lambdas = 210, engine = "ggplot", 
+                        show_legend = TRUE, xlim = c(10, 15))
+  }
+  suppressWarnings(vdiffr::expect_doppelganger("alignment_ggplot_heatmap_zoom",
+                                               alignment_ggplot_heatmap_zoom))
+  expect_error(plot_chroms(pktab))
+})
