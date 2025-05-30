@@ -33,6 +33,8 @@ plot.}
 \item{xlim}{Range of x axis.}
 
 \item{legend_position}{Position of legend.}
+
+\item{title}{Title for plot.}
 }
 \value{
 No return value, called for side effects.
@@ -53,7 +55,7 @@ graphics engine, \code{ggplot2}, or \code{plotly}, according to the value of
 
 \examples{
 data(Sa_warp)
-plot_chroms_heatmap(Sa_warp, idx = c(1:2))
+plot_chroms_heatmap(Sa_warp, lambdas = 210)
 }
 \seealso{
 Other visualization functions: 

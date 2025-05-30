@@ -16,6 +16,7 @@ plot_chroms(
   linewidth = 1,
   show_legend = TRUE,
   legend_position = "topright",
+  title = "",
   ...
 )
 }
@@ -44,6 +45,8 @@ chromatograms to plot.}
 \item{show_legend}{Logical. Whether to display legend or not. Defaults to TRUE.}
 
 \item{legend_position}{Position of legend.}
+
+\item{title}{Title for plot.}
 
 \item{...}{Additional arguments to plotting function specified by \code{engine}.}
 }

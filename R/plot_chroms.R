@@ -17,6 +17,7 @@
 #' @param linewidth Line width.
 #' @param show_legend Logical. Whether to display legend or not. Defaults to TRUE.
 #' @param legend_position Position of legend.
+#' @param title Title for plot.
 #' @param ... Additional arguments to plotting function specified by \code{engine}.
 #' @return No return value, called for side effects.
 #' @section Side effects:
@@ -145,6 +146,8 @@ position_plotly_legend <- function(pos){
 #' 
 #' Adapted from \code{\link[VPdtw]{plot.VPdtw}}.
 #' 
+#' @importFrom grDevices grey hcl.colors
+#' @importFrom graphics image layout mtext rect
 #' @param chrom_list List of chromatograms to plot
 #' @param lambdas A character or numeric vector specifying the wavelengths to 
 #' plot.
@@ -156,6 +159,7 @@ position_plotly_legend <- function(pos){
 #' @param show_legend Logical. Whether to display legend or not. Defaults to
 #' \code{TRUE}.
 #' @param legend_position Position of legend.
+#' @param title Title for plot.
 #' @return No return value, called for side effects.
 #' @section Side effects:
 #' Plots the traces of the specified chromatograms \code{idx} at the specified
