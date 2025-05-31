@@ -2,7 +2,7 @@
 % Please edit documentation in R/reshape_chroms.R
 \name{reshape_peaktable}
 \alias{reshape_peaktable}
-\title{Reshapes peak table from wide to long format}
+\title{Reshape peaktable}
 \usage{
 reshape_peaktable(x, peaks, metadata, fixed_levels = TRUE)
 }

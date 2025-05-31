@@ -31,16 +31,17 @@ A peak table derived from the original, but with duplicate
 columns combined according to the specified criteria.
 }
 \description{
-Utility function to combine duplicate peaks in peak table, i.e. peaks that
-were integrated at more than one wavelength or component. Specify tolerance
-(\code{tol}) for retention time matching and minimum spectral correlation
-(\code{min.cor}) for a match.
+Utility function to combine duplicate peaks in peak table, (i.e., peaks that
+were integrated at more than one wavelength or component) based on retention
+time and/or spectral similiarity. Specify tolerance (\code{tol}) for 
+retention time matching and minimum spectral correlation (\code{min.cor}) for
+a match.
 }
 \examples{
 data(pk_tab)
 data(Sa_warp)
 pk_tab <- attach_ref_spectra(pk_tab)
-combine_peaks(pk_tab, tol = .02, min.cor = .9)
+combine_peaks(pk_tab, tol = 0.02, min.cor = 0.9)
 }
 \seealso{
 \code{\link{get_peaks}}

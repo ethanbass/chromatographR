@@ -30,7 +30,7 @@ filter_peaktable(
 are using HPLC-DAD/UV).}
 
 \item{what}{Whether to summarize intensities using \code{mean}, \code{median}, 
-or \code{max}.}
+or \code{max}. Defaults to \code{median}.}
 
 \item{tol}{Tolerance for matching of retention times to \code{rts}.}
 }
@@ -40,8 +40,8 @@ from the peak table that do not satisfy the specified criteria.
 }
 \description{
 Utility function to remove peaks from peak table, e.g., because their
-intensity is too low. Currently one can filter on mean or median peak intensity,
-or retention time.
+intensity is too low. Currently one can filter on \code{mean}, \code{median},
+or maximum (\code{"max"}) peak intensity or retention time.
 }
 \examples{
 data(pk_tab)

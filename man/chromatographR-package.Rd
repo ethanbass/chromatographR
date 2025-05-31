@@ -15,32 +15,75 @@ peak-finding and fitting, peak-table construction, data-visualization, etc.
 Preprocessing and peak-table construction follow the rough formula laid out
 in alsace (Wehrens, R., Bloemberg, T.G., and Eilers P.H.C., 2015.
 \doi{10.1093/bioinformatics/btv299}). Alignment of chromatograms is available
-using parametric time warping (ptw) (Wehrens, R., Bloemberg, T.G., and Eilers
+using parametric time warping (PTW) (Wehrens, R., Bloemberg, T.G., and Eilers
 P.H.C. 2015. \doi{10.1093/bioinformatics/btv299}) or variable penalty dynamic
 time warping (VPdtw) (Clifford, D., & Stone, G. 2012. \doi{10.18637/jss.v047.i08}).
 Peak-finding relies on the algorithm suggested by Tom O'Haver in his
 \href{https://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{
-Pragmatic Introduction to Signal Processing}. Peaks are then fitted to a 
-gaussian or exponential-gaussian hybrid peak shape using non-linear least 
-squares (Lan, K. & Jorgenson, J. W. 2001. \doi{10.1016/S0021-9673(01)00594-5}). 
-More details on package usage and a suggested workflow can be found in the 
+Pragmatic Introduction to Signal Processing}. Peaks are then fitted to a
+gaussian or exponential-gaussian hybrid peak shape using non-linear least
+squares (Lan, K. & Jorgenson, J. W. 2001. \doi{10.1016/S0021-9673(01)00594-5}).
+More details on package usage and a suggested workflow can be found in the
 vignette.
 }
-\section{Data}{
+\section{Analysis functions}{
 
 \itemize{
-  \item \code{\link{preprocess}}: A list of four goldenrod root chromatograms.
-  \item \code{\link{Sa_pr}}: Preprocessed goldenrod root chromatograms.
-  \item \code{\link{Sa_warp}}: Preprocessed and aligned goldenrod root chromatograms.
-  \item \code{\link{pk_tab}}: Peak table from aligned goldenrod root chromatograms.
+\itemize{
+\item \code{\link[=read_chroms]{read_chroms()}}: Import chromatograms from a variety of vendor formats.
+\item \code{\link[=preprocess]{preprocess()}}: Preprocess chromatographic matrices.
+\item \code{\link[=correct_rt]{correct_rt()}}: Align chromatograms.
+\item \code{\link[=get_peaks]{get_peaks()}}: Find and integrate peaks.
+\item \code{\link[=get_peaktable]{get_peaktable()}}: Assemble peak table.
+\item \code{\link[=attach_metadata]{attach_metadata()}}: Attach metadata to peak table.
+\item \code{\link[=attach_ref_spectra]{attach_ref_spectra()}}: Attach reference spectra to peak table.
+\item \code{\link[=normalize_data]{normalize_data()}}: Normalize \code{peaktable} or \code{chrom_list}.
+}
+}
 }
 
+\section{Visualization functions}{
 
 \itemize{
-  \item \code{\link{Sa}}: A list of four goldenrod root chromatograms.
-  \item \code{\link{Sa_pr}}: Preprocessed goldenrod root chromatograms.
-  \item \code{\link{Sa_warp}}: Preprocessed and aligned goldenrod root chromatograms.
-  \item \code{\link{pk_tab}}: Peak table from aligned goldenrod root chromatograms.
+\itemize{
+\item \code{\link[=boxplot.peak_table]{boxplot.peak_table()}}: Create boxplot from peaktable object.
+\item \code{\link[=plot_chroms]{plot_chroms()}}: Plot chromatograms as traces.
+\item \code{\link[=plot_chroms_heatmap]{plot_chroms_heatmap()}}: Plot chromatograms as heatmap.
+\item \code{\link[=plot_spectrum]{plot_spectrum()}}: Plot spectrum and/or trace of specified peak.
+\item \code{\link[=plot_all_spectra]{plot_all_spectra()}}: Plot all spectra for specified peak.
+\item \code{\link[=mirror_plot]{mirror_plot()}}: Plot chromatograms as mirror plot.
+\item \code{\link[=scan_chrom]{scan_chrom()}}: Plot spectrum at wavelength specified by clicking on a chromatogram.
+\item \code{\link[=plot.peak_list]{plot.peak_list()}}: Plot fitted peaks over chromatographic trace.
+\item \code{\link[=plot.peak_table]{plot.peak_table()}}: Plot the trace and/or spectrum of a specified peak from the peak table.
+\item \code{\link[=plot.ptw_list]{plot.ptw_list()}}: Plot PTW alignment object.
+}
+}
+}
+
+\section{Utility functions}{
+
+\itemize{
+\itemize{
+\item \code{\link[=combine_peaks]{combine_peaks()}}: Combine duplicate peaks in peak table based on retention time and spectral similarity.
+\item \code{\link[=merge_peaks]{merge_peaks()}}: Merge split peaks into a single column of a peak table.
+\item \code{\link[=get_times]{get_times()}}: Return retention times from a peak table or a list of chromatograms.
+\item \code{\link[=get_lambdas]{get_lambdas()}}: Return wavelengths from a peak table or a list of chromatograms.
+\item \code{\link[=reshape_chroms]{reshape_chroms()}}: Reshape a list of chromatograms to long format.
+\item \code{\link[=reshape_peaktable]{reshape_peaktable()}}: Reshape a \code{peak_table} object to long format.
+\item \code{\link[=write_peaktable]{write_peaktable()}}: Export peak table in \code{csv} or \code{xlsx} format.
+}
+}
+}
+
+\section{Example data}{
+
+\itemize{
+\itemize{
+\item \link{Sa}: A list of four goldenrod root chromatograms.
+\item \link{Sa_pr}: Preprocessed goldenrod root chromatograms.
+\item \link{Sa_warp}: Preprocessed and aligned goldenrod root chromatograms.
+\item \link{pk_tab}: Peak table from aligned goldenrod root chromatograms.
+}
 }
 }
 

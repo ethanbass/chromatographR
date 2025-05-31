@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_spectrum.R
 \name{scan_chrom}
 \alias{scan_chrom}
-\title{Plot spectra by clicking on the chromatogram}
+\title{Plot spectra by clicking on the chromatogram.}
 \usage{
 scan_chrom(
   chrom_list,
@@ -51,7 +51,7 @@ absorbance (or normalized absorbance, if \code{scale_spectrum} is TRUE)
 at each wavelength. Otherwise, there is no return value.
 }
 \description{
-Plot spectra by clicking on the chromatogram
+Plot spectra by clicking on the chromatogram.
 }
 \section{Side effects}{
 

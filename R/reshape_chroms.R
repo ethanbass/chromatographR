@@ -1,5 +1,7 @@
 #' Reshape chromatograms
+#' 
 #' Reshapes a list of chromatograms from wide to long format.
+#' 
 #' @name reshape_chroms
 #' @param x A list of chromatographic matrices in wide format.
 #' @param idx Indices of chromatograms to convert.
@@ -62,6 +64,8 @@ reshape_chrom <- function(x, lambdas = NULL, rts = NULL){
   transfer_metadata(data, x, transfer_class = TRUE)
 }
 
+#' Reshape peaktable
+#' 
 #' Reshapes peak table from wide to long format
 #' @name reshape_peaktable
 #' @param x A \code{peak_table} object.

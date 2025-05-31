@@ -295,7 +295,7 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
 }
 
 
-#' Plot spectra by clicking on the chromatogram
+#' Plot spectra by clicking on the chromatogram.
 #' 
 #' @importFrom scales rescale
 #' @importFrom graphics identify title text abline

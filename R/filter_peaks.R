@@ -74,8 +74,8 @@ filter_peaks <- function(peak_list, min_height, min_area,
 #' Filter peak table
 #' 
 #' Utility function to remove peaks from peak table, e.g., because their
-#' intensity is too low. Currently one can filter on mean or median peak intensity,
-#' or retention time.
+#' intensity is too low. Currently one can filter on \code{mean}, \code{median},
+#' or maximum (\code{"max"}) peak intensity or retention time.
 #' 
 #' @param peak_table A peak_table object from \code{\link{get_peaktable}}.
 #' @param rts Vector of retention times to include in the peak table.
@@ -83,7 +83,7 @@ filter_peaks <- function(peak_list, min_height, min_area,
 #' @param max_rt Maximum retention time to include in the peak table.
 #' @param min_value Minimal cutoff for summarized peak intensity.
 #' @param what Whether to summarize intensities using \code{mean}, \code{median}, 
-#' or \code{max}.
+#' or \code{max}. Defaults to \code{median}.
 #' @param lambda Component(s) to include in peak table (e.g. wavelengths if you
 #' are using HPLC-DAD/UV).
 #' @param tol Tolerance for matching of retention times to \code{rts}.
@@ -104,7 +104,7 @@ filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value, lambda,
     warning("Nothing to filter...")
     return(peak_table)
   }
-  peak_table$pk_meta["rt",] <-as.numeric(peak_table$pk_meta["rt",])
+  peak_table$pk_meta["rt",] <- as.numeric(peak_table$pk_meta["rt",])
   what <- match.arg(what, c("median", "mean", "max"))
   if (!missing(rts)){
     rts <- as.numeric(rts)

@@ -31,20 +31,20 @@ range of these should not exceed the range of the original wavelengths.}
 
 \item{remove.time.baseline}{Logical, indicating whether baseline correction
 should be done in the time direction, according to
-\code{\link[ptw:baseline.corr]{baseline.corr}}. Default is TRUE.}
+\code{\link[ptw:baseline.corr]{baseline.corr}}. Default is \code{TRUE}.}
 
 \item{spec.smooth}{Logical, indicating whether smoothing should be done in
 the spectral direction, according to
-\code{\link[stats:smooth.spline]{smooth.spline}}. Default is TRUE.}
+\code{\link[stats:smooth.spline]{smooth.spline}}. Default is \code{TRUE}.}
 
 \item{maxI}{if given, the maximum intensity in the matrix is set to this
 value.}
 
 \item{interpolate_rows}{Logical. Whether to interpolate along the time axis
-(\code{dim1}). Defaults to TRUE.}
+(\code{dim1}). Defaults to \code{TRUE}.}
 
 \item{interpolate_cols}{Logical. Whether to interpolate along the spectral
-axis (\code{dim2}). Defaults to TRUE.}
+axis (\code{dim2}). Defaults to \code{TRUE}.}
 
 \item{cl}{Argument to \code{\link[pbapply]{pblapply}} or \code{\link[parallel]{mclapply}}.
 Either an integer specifying the number of clusters to use for parallel
@@ -69,7 +69,7 @@ the size of the matrix can be reduced by interpolation. By default,
 the data are baseline-corrected in the time direction
 (\code{\link[ptw:baseline.corr]{baseline.corr}}) and smoothed in the
 spectral dimension using cubic smoothing splines
-(\code{\link[stats:smooth.spline]{smooth.spline}}.
+(\code{\link[stats:smooth.spline]{smooth.spline}}).
 }
 \note{
 Adapted from the
