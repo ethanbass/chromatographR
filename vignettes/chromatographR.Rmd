@@ -14,7 +14,7 @@ editor_options:
 
 ^1^ Department of Ecology and Evolutionary Biology, Cornell University, Ithaca NY
 
-```{r setup, include=FALSE}
+```{r setup, include = FALSE}
 library("knitr", quietly=TRUE)
 library(chromatographR)
 library(parallel)
@@ -59,7 +59,7 @@ Data from liquid chromatography often suffer from a variety of non-informative a
 
 To select a narrower range of times and/or wavelengths, arguments can be provided to the optional `dim1` and `dim2` arguments. The `baseline_cor` function from the *ptw* package [@bloemberg2010] takes arguments `p` (an asymmetry parameter) and `lambda` (a smoothing parameter). You can read more about these in the documentation for `ptw::asysm`. You may want to experiment with these parameters before choosing values to use on your whole dataset.
 
-```{r choose_parameters_for_fitting_baseline}
+```{r choose_parameters_for_fitting_baseline, fig.cap = "Comparison of baseline correction parameters: raw data (black), mild correction (green, p = 0.001), strong correction (red, p = 0.1)."}
 i <- 2 # chromatogram number in list of data
 tpoints <- as.numeric(rownames(Sa[[i]]))
 lambda <- '200.00000'
@@ -67,7 +67,10 @@ lambda <- '200.00000'
 matplot(x = tpoints, y = Sa[[i]][,lambda],
        type = 'l', ylab = 'Abs (mAU)', xlab = 'Time (min)')
 matplot(x = tpoints, y = ptw::baseline.corr(Sa[[i]][,lambda], p = .001, lambda = 1e5),
-       type = 'l', add = TRUE, col='blue', lty = 3)
+       type = 'l', add = TRUE, col='darkgreen', lty = 3)
+matplot(x = tpoints, y = ptw::baseline.corr(Sa[[i]][,lambda], p = .1, lambda = 1e5),
+       type = 'l', add = TRUE, col='firebrick2', lty = 3)
+
 ```
 
 After selecting parameters for baseline correction, you can proceed with the pre-processing step as shown below.
@@ -87,7 +90,7 @@ In many cases, liquid chromatography can suffer from retention time shifts (e.g.
 
 First, we check the alignment of our chromatograms using the `plot_chroms` function.
 
-```{r check alignment}
+```{r check alignment, fig.cap = "Chromatographic traces of four *S. altissima* root chromatograms at 210 nm."}
 plot_chroms(dat.pr, lambdas = 210)
 ```
 
@@ -98,8 +101,8 @@ Our chromatograms appear to be shifted, as shown by the poor overlap of the chro
 The `ptw` option can take a single wavelength or a list of wavelengths provided by the user using the `lambdas` argument. For each chromatogram, `ptw` then produces a "global" warping function across all the wavelengths supplied by the user. The code block below creates warping models for the samples in the provided list of data matrices. The same function is then used to warp each chromatogram according to the corresponding model, by setting the `models` parameter. Depending on the variety of your samples and the severity of the retention time shifts, it may take some experimentation with the warping parameters to get satisfactory results. Sometimes less can actually be more here -- for example, wavelengths with fewer peaks may sometimes yield better warping models. (Also see the documentation for [ptw](https://CRAN.R-project.org/package=ptw) for more guidance on warp function optimization).
 
 ```{r Create warp models}
-warping.models <- correct_rt(dat.pr, what = "models", lambdas = c(210), scale = TRUE)
-warp <- correct_rt(chrom_list = dat.pr, models = warping.models, what = "corrected.values")
+warping.models <- correct_rt(dat.pr, alg = "ptw", what = "models", lambdas = 210, scale = TRUE)
+warp_ptw <- correct_rt(chrom_list = dat.pr, models = warping.models, what = "corrected.values")
 ```
 
 We can then use the following code snippet to compare the alignment of warped (top panel) and unwarped (bottom panel) chromatograms.
@@ -108,16 +111,15 @@ We can then use the following code snippet to compare the alignment of warped (t
 oldpar <- par(no.readonly = TRUE) # save current par settings
 ```
 
-```{r alignment_plot, fig.height=6}
+```{r alignment_plot, fig.height = 6, fig.cap = "Comparison of parametric time warping (PTW) aligned chromatograms and raw data."}
 
 par(mfrow=c(2,1))
-# plot warped data
-plot_chroms(warp, lambdas = c(210))
-legend("topleft", legend = "ptw", bty = "n")
+plot_chroms(dat.pr, lambdas = 210, show_legend = FALSE)
+legend("topleft", legend = "Raw data", bty = "n")
 
-# plot unwarped data
-plot_chroms(dat.pr, lambdas = c(210))
-legend("topleft", legend = "raw", bty = "n")
+plot_chroms(warp_ptw, lambdas = 210, show_legend = FALSE)
+legend("topleft", legend = "PTW", bty = "n")
+
 ```
 
 ```{r, include = FALSE}
@@ -128,50 +130,63 @@ Clearly, the alignment is considerably improved after warping. You can also use 
 
 #### Variable penalty dynamic time warping
 
-Variable penalty dynamic time warping is another algorithm that can be very effective for correcting retention time shifts [@clifford2009; @clifford2012]. Instead of calculating an explicit warping function, dynamic time warping (DTW) works by repeatedly shifting, expanding or contracting the time axis in small steps until a satisfactory alignment is attained. This process can result in very close matching of peaks, but can also lead to severe peak distortion if the time axis is repeatedly expanded and/or contracted [@tomasi2004]. **Variable penalty dynamic time warping** is a derivative of DTW that constrains expansion and contraction of the time-axis by applying a penalty to these types of "risky" moves. This can often achieve a very good alignment with minimal peak distortion. VPdtw package is a suggested dependency since it requires a working C++ compiler. Unlike `ptw`, `VPdtw` can only take a single wavelength as input (but it returns a global warping on the whole chromatographic matrix). The code snippet below uses VPdtw to warp the example chromatograms using the first chromatogram as a reference. The `penalty` and `maxshift` parameters can be adjusted to control the degree of warping.
+Variable penalty dynamic time warping is another algorithm that can be very effective for correcting retention time shifts [@clifford2009; @clifford2012]. Instead of calculating an explicit warping function, dynamic time warping (DTW) works by repeatedly shifting, expanding or contracting the time axis in small steps until a satisfactory alignment is attained. This process can result in very close matching of peaks, but can also lead to severe peak distortion if the time axis is repeatedly expanded and/or contracted [@tomasi2004]. **Variable penalty dynamic time warping** is a derivative of DTW that constrains expansion and contraction of the time-axis by applying a penalty to these types of "risky" moves. This can often achieve a very good alignment with minimal peak distortion. VPdtw package is a suggested dependency since it requires a working C++ compiler. Unlike `PTW`, `VPdtw` can only take a single wavelength as input (but it returns a global warping on the whole chromatographic matrix). The code snippet below uses VPdtw to warp the example chromatograms using the first chromatogram as a reference. The `penalty` and `maxshift` parameters can be adjusted to control the degree of warping.
 
 ```{r vpdtw_alignmment, eval = TRUE}
-warp <- correct_rt(chrom_list = dat.pr, alg = "vpdtw", lambdas = 210, 
-                   what = "corrected.values", reference = 1)
+warp_vpdtw <- correct_rt(chrom_list = dat.pr, alg = "vpdtw", lambdas = 210, 
+                   what = "corrected.values")
 ```
 
-```{r, include=FALSE}
+```{r, include = FALSE}
 oldpar <- par(no.readonly = TRUE) # save current par settings
 ```
 
-```{r plot_chroms, fig.height=6}
+```{r plot_chroms, fig.height = 6, fig.cap = "Comparison of variable penalty dynamic time warping (VPdtw) aligned chromatograms (top) with raw data (bottom)."}
 par(mfrow=c(2,1))
-plot_chroms(warp, lambdas = c(210))
-legend("topleft", legend = "vpdtw", bty = "n")
+plot_chroms(dat.pr, lambdas = 210, show_legend = FALSE)
+legend("topleft", legend = "Raw data", bty = "n")
 
-plot_chroms(dat.pr, lambdas = c(210))
-legend("topleft", legend = "raw", bty = "n")
+plot_chroms(warp_vpdtw, lambdas = 210, show_legend = FALSE)
+legend("topleft", legend = "VPdtw", bty = "n")
 ```
 
 ```{r, include = FALSE}
 par(oldpar) # restore par settings
 ```
 
-In this case the alignments produced by the two algorithms are very similar, but in some cases one algorithm may dramatically outperform the other.
+Chromatograms can also be visualized as heatmaps with `plot_chroms_heatmap`, which can be a powerful way to check the alignment of chromatograms across samples.
+
+```{r plot_chroms_heatmap, fig.height = 6, fig.cap = "Comparison of variable penalty dynamic time warping (VPdtw) aligned chromatograms (top) with raw data (bottom) via heatmap plot."}
+par(mfrow=c(3,1))
+plot_chroms_heatmap(dat.pr, lambdas = 210, show_legend = FALSE, title="Raw data")
+plot_chroms_heatmap(warp_ptw, lambdas = 210, show_legend = FALSE, title="Parametric Time Warping (PTW)")
+plot_chroms_heatmap(warp_vpdtw, lambdas = 210, show_legend = FALSE, title="Variable Penalty Dynamic Time Warping (VPdtw)")
+```
+
+```{r, include = FALSE}
+par(oldpar) # restore par settings
+```
+
+In this case the alignments produced by the two algorithms are quite similar, but in other cases one algorithm may dramatically outperform the other. In my experience, alignments generated by VPdtw are less prone to overfitting. However, the PTW algorithm is more interpretable since it fits an explicit model to the data. Examination of the coefficients from these models can often be useful for the identification of problematic samples.
 
 ### Peak detection and integration
 
 The `get_peaks` function produced a nested list of peaks by looping through the supplied chromatograms at the specified wavelengths, finding peaks, and fitting them to the specified function using non-linear least squares. The area under the curve for each peak is then estimated using trapezoidal approximation. The `fit` argument can be used to specify a peak-fitting model. The current options are exponential-gaussian hybrid (`egh`) [@lan2001] (the default setting) or `gaussian`. Alternatively, peak areas can be integrated without applying a model (`fit = raw`). The function returns a nested list of data.frames containing parameters for the peaks identified in each chromatogram.
 
-```{r get_peaks, message=FALSE, warning=FALSE}
+```{r get_peaks, message = FALSE, warning = FALSE}
 # find and integrate peaks using gaussian peak fitting
-pks_gauss <- get_peaks(warp, lambdas = c(210), sd.max = 40, fit = "gaussian")
+pks_gauss <- get_peaks(warp_vpdtw, lambdas = c(210), sd.max = 40, fit = "gaussian")
 
 # find and integrate peaks using exponential-gaussian hybrid model
-pks_egh <- get_peaks(warp, lambdas = c(210), sd.max = 40, fit = "egh")
+pks_egh <- get_peaks(warp_vpdtw, lambdas = c(210), sd.max = 40, fit = "egh")
 
 # find and integrate peaks without modeling peak shape
-pks_raw <- get_peaks(warp, lambdas = c(210), sd.max = 100, fit = "raw")
+pks_raw <- get_peaks(warp_vpdtw, lambdas = c(210), sd.max = 100, fit = "raw")
 ```
 
 #### Filtering
 
-The peak-finding algorithm may often detect a lot of peaks that are little more than noise. Thus, it is recommended to filter out extraneous peaks at this stage (especially if you are processing a lot of samples) as it can greatly reduce the computational load of peak table construction. This can be accomplished directly by using the arguments `sd_max` (to filter by peak width) and/or `amp_thresh` (to filter by peak height). Alternatively, the `filter_peaks` function can be used to filter peaks after the `peak_list` has already been created.
+The peak-finding algorithm may often detect a lot of peaks that are little more than noise. Thus, it is recommended to filter out extraneous peaks at this stage (especially if you are processing a lot of samples) as it can greatly reduce the computational burden of peak table construction. This can be accomplished directly by using the arguments `sd_max` (to filter by peak width) and/or `amp_thresh` (to filter by peak height). Alternatively, the `filter_peaks` function can be used to filter peaks after the `peak_list` has already been created.
 
 #### Visualization
 
@@ -181,7 +196,7 @@ The `plot.peak_list` function allows you to visually assess the peak integration
 oldpar <- par(no.readonly = TRUE) # save current par settings
 ```
 
-```{r plot_peaks, warning=FALSE, fig.height=6}
+```{r plot_peaks, warning = FALSE, fig.height = 6, fig.cap = "Comparison of peak fitting algorithms: gaussian (top), exponential-gaussian hybrid (middle) and raw (bottom)."}
 par(mfrow=c(3,1))
 plot(pks_gauss, idx = 1, lambda = 210)
 legend("topright", "Gaussian", bty = "n")
@@ -193,7 +208,7 @@ plot(pks_raw, idx = 1, lambda = 210)
 legend("topright", "Raw", bty = "n")
 ```
 
-```{r, include=FALSE}
+```{r, include = FALSE}
 par(oldpar) # restore par settings
 ```
 
@@ -232,7 +247,7 @@ Optionally, you can attach scaled reference spectra to the peak_table using the 
 ```{r}
 pk_tab <- attach_ref_spectra(pk_tab, ref = "max.int")
 cor_matrix <- cor(pk_tab$ref_spectra)
-hx <- names(which(cor_matrix[,"V20"] > .99))
+hx <- names(which(cor_matrix[,"V20"] > .97))
 matplot(x = as.numeric(rownames(pk_tab$ref_spectra)),
                    y = pk_tab$ref_spectra[, hx], type = 'l',
                    ylab = "Abs (mAU)", 
@@ -257,10 +272,10 @@ The `plot_spectrum` function allows you to easily plot or record the spectra ass
 oldpar <- par(no.readonly = TRUE) # save current par settings
 ```
 
-```{r plot_spectra, fig.height=6}
+```{r plot_spectra, fig.height = 6, fig.alt = "Output of `plot_spectrum` function. Trace of chromatogram 4 at 318 nm (top) and spectrum of peak `V7` (bottom)."}
 par(mfrow = c(2,1))
 peak <- "V7"
-plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp, 
+plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp_vpdtw, 
               verbose = FALSE)
 ```
 
@@ -271,13 +286,13 @@ par(oldpar) # restore par settings
 The `plot_spectrum` function can also be used to generate interactive plots using [plotly](https://plotly.com/r/).
 
 ```{r plotly_plot, eval = FALSE}
-plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp, 
+plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp_vpdtw, 
               verbose = FALSE, engine = "plotly")
 ```
 
 The `plot_all_spectra` function can be used to visually compare the spectra for a specified peak across all samples.
 
-```{r plot_all_spectra}
+```{r plot_all_spectra, fig.alt="Output of `plot_all_spectra` function showing scaled spectra of peak `V3`."}
 peak <- "V13"
 plot_all_spectra(peak, peak_table = pk_tab, export = FALSE)
 ```
@@ -286,8 +301,13 @@ plot_all_spectra(peak, peak_table = pk_tab, export = FALSE)
 
 The `plot.peak_table` function provides a simplified interface to various options for plotting data from the `peak_table`. For example, it can be used as a quick interface to the `plot_spectrum` and `plot_all_spectra` functions shown above. It can also be used to quickly compare results across treatments by calling `boxplot`.
 
-```{r plot_peaktable}
+```{r plot_peaktable, fig.height = 6}
+par(mfrow = c(3,1))
 plot(pk_tab, loc = "V13", box_plot = TRUE, vars = "trt", verbose = FALSE)
+```
+
+```{r, include = FALSE}
+par(oldpar) # restore par settings
 ```
 
 ## References
