@@ -215,7 +215,8 @@ test_that("correct_peaks works", {
   
   warping.models <- correct_rt(chrom_list = Sa_pr, lambdas = 210, 
                                what = "models", show_progress = FALSE)
-  pks_cor <- correct_peaks(pks, warping.models)
+  
+  pks_cor <- correct_peaks(pks, mod_list = warping.models)
   pktab_cor <- get_peaktable(pks_cor, use.cor = TRUE)
 
   ptw_warp <- correct_rt(Sa_pr, models = warping.models)
@@ -349,14 +350,20 @@ test_that("normalize_data works", {
   expect_equal(rownames(pk_tab_norm$tab), rownames(pk_tab$tab))
   expect_equal(class(pk_tab_norm), class(pk_tab))
   expect_equal(colnames(pk_tab_norm$tab), colnames(pk_tab$tab))
-  chroms <- normalize_data(pk_tab, chrom_list = dat.pr, 
+  expect_equal(pk_tab_norm$tab[1,], pk_tab$tab[1,]/pk_tab$sample_meta$mass[1])
+  expect_equal(pk_tab_norm$tab[2,], pk_tab$tab[2,]/pk_tab$sample_meta$mass[2])
+  expect_equal(pk_tab_norm$args[["normalized"]], "TRUE")
+  expect_equal(pk_tab_norm$args[["normalization_by"]], "mass")
+  
+  chroms_norm <- normalize_data(pk_tab, chrom_list = dat.pr, 
                            column = "mass", what = "chrom_list")
-  expect_equal(dim(chroms), dim(dat.pr))
+  expect_equal(dim(chroms_norm), dim(dat.pr))
+  expect_equal(chroms_norm[[1]], dat.pr[[1]]/pk_tab$sample_meta$mass[1])
+  expect_equal(chroms_norm[[2]], dat.pr[[2]]/pk_tab$sample_meta$mass[2])
+  
   expect_error(normalize_data(pk_tab, chrom_list = dat.pr, column = "x"))
   expect_error(normalize_data(pk_tab, chrom_list = dat.pr, 
                               column = "mass", what="x"))
-  expect_equal(pk_tab_norm$args[["normalized"]], "TRUE")
-  expect_equal(pk_tab_norm$args[["normalization_by"]], "mass")
 })
 
 test_that("cluster_spectra works", {
