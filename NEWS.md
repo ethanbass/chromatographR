@@ -1,9 +1,35 @@
+# chromatographR 0.7.4
+
+* Added new heatmap plot in `plot_chroms`.
+* Added labeling of spectral peaks for `ggplot2` and `plotly` plots in `plot_spectrum`.
+* Added minimum amplitude for labeling of spectral peaks in `plot_spectrum`. Peaks are now labeled only if they exceed 5% of the maximum signal intensity.
+* Removed `parallel` and `mc.cores` argument from `preprocess` (deprecated in `v0.5.0`).
+* Added `title` argument in `plot_chroms`.
+* Added option for different plotting engines through `engine` argument in `plot.ptw_list`.
+* Added option for heatmap plots through `what` argument in `plot.ptw_list`.
+* Changed behavior of `reshape_chroms` such that it can be applied to 2D chromatograms without throwing an error.
+* Added index of functions to package documentation.
+* Made minor updates to documentation of functions.
+
+#### Changes to GC-FID vignette
+
+* Changed alignment plots to heatmaps rather than traces.
+* Hid `ggordiplot` function in "folded" code block
+* Added alt text to images.
+* Updated call to `adonis2` in accordance with new defaults in `vegan v2.7-0`.
+* Made other minor changes to text.
+
+#### Changes to chromatographR vignette
+
+* Added explanatory figure captions.
+* Added figure demonstrating comparison of alignments with new `plot_chroms_heatmap` function.
+
 # chromatographR 0.7.3
 
 * Updated `reshape_peaktable` function to include wavelength and retention time data.
 * Updated `pk_tab` data file to latest peak table format.
 * Fixed minor issues with roxygen formatting.
-* Added function "families".
+* Added functional "families".
 * Fixed bug in `get_peaks` causing occasional errors due to edge cases.
 * Added titles for ggplot2 and plotly `plot_spectrum` plots.
 * Fixed bug in console output when providing chromatogram index as string to `plot_spectrum`.
@@ -127,8 +153,7 @@ peaks or samples).
 * Updated `get_purity` function to improve speed.
 * Added additional argument to `reshape_chroms` function for subsetting data by 
 retention times (`rts`).
-* Added parallel processing through the `pbapply` package for the `correct_rt`,
-`get_peaks`, and `preprocess` functions by setting the `cl` argument.
+* Added parallel processing through the `pbapply` package for the `correct_rt`, `get_peaks`, and `preprocess` functions by setting the `cl` argument.
 
 #### Other changes
 
