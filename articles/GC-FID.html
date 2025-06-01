@@ -187,7 +187,18 @@
 <span>                                            alg <span class="op">=</span> <span class="st">"vpdtw"</span>, </span>
 <span>                                            what <span class="op">=</span> <span class="st">"corrected.values"</span>, </span>
 <span>                                            plot_it <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span>, </span>
-<span>                                            penalty <span class="op">=</span> <span class="fl">2</span>, maxshift <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>                                            penalty <span class="op">=</span> <span class="fl">2</span>, maxshift <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">warp_exclamans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="../reference/correct_rt.html">correct_rt</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">[</span><span class="va">species_idx</span><span class="op">$</span><span class="va">exclamans</span><span class="op">]</span>,</span>
+<span>                                             alg <span class="op">=</span> <span class="st">"vpdtw"</span>,</span>
+<span>                                             what <span class="op">=</span> <span class="st">"corrected.values"</span>, </span>
+<span>                                             plot_it <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>                                             penalty <span class="op">=</span> <span class="fl">2</span>, maxshift <span class="op">=</span> <span class="fl">200</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">warp_fuscatus</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="../reference/correct_rt.html">correct_rt</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">[</span><span class="va">species_idx</span><span class="op">$</span><span class="va">fuscatus</span><span class="op">]</span>,</span>
+<span>                            alg <span class="op">=</span> <span class="st">"vpdtw"</span>, what <span class="op">=</span> <span class="st">"corrected.values"</span>,</span>
+<span>                            plot_it <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>                            penalty <span class="op">=</span> <span class="fl">2</span>, maxshift <span class="op">=</span> <span class="fl">200</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
@@ -216,6 +227,76 @@
 </figure>
 </div>
 </div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot_chroms.html">plot_chroms</a></span><span class="op">(</span><span class="va">warp_all</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"PFUS"</span>,<span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">warp_all</span><span class="op">)</span><span class="op">)</span><span class="op">]</span>,show_legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu">italic</span><span class="op">(</span><span class="st">"P. fuscatus"</span><span class="op">)</span>, <span class="st">" (multi-species)"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>       bty <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/plot_chroms.html">plot_chroms</a></span><span class="op">(</span><span class="va">warp_fuscatus</span>, show_legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu">italic</span><span class="op">(</span><span class="st">"P. fuscatus"</span><span class="op">)</span>, <span class="st">" (single-species)"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>       bty <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/plot_chroms.html">plot_chroms</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">[</span><span class="va">species_idx</span><span class="op">$</span><span class="va">fuscatus</span><span class="op">]</span>, show_legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu">italic</span><span class="op">(</span><span class="st">"P. fuscatus"</span><span class="op">)</span>, </span>
+<span>                                    <span class="st">" (raw)"</span><span class="op">)</span><span class="op">)</span>, bty <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure><p><img src="GC-FID_files/figure-html/plot_fuscatus_alignments-1.png" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot_chroms.html">plot_chroms</a></span><span class="op">(</span><span class="va">warp_all</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"PDOM"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">warp_all</span><span class="op">)</span><span class="op">)</span><span class="op">]</span>,show_legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu">italic</span><span class="op">(</span><span class="st">"P. dominula"</span><span class="op">)</span>, <span class="st">" (multi-species)"</span><span class="op">)</span><span class="op">)</span>, bty<span class="op">=</span><span class="st">"n"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/plot_chroms.html">plot_chroms</a></span><span class="op">(</span><span class="va">warp_dominula</span>, show_legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu">italic</span><span class="op">(</span><span class="st">"P. dominula"</span><span class="op">)</span>, <span class="st">" (single-species)"</span><span class="op">)</span><span class="op">)</span>, bty<span class="op">=</span><span class="st">"n"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/plot_chroms.html">plot_chroms</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">[</span><span class="va">species_idx</span><span class="op">$</span><span class="va">dominula</span><span class="op">]</span>, show_legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu">italic</span><span class="op">(</span><span class="st">"P. dominula"</span><span class="op">)</span>, </span>
+<span>                                    <span class="st">" (raw)"</span><span class="op">)</span><span class="op">)</span>, bty<span class="op">=</span><span class="st">"n"</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure><p><img src="GC-FID_files/figure-html/plot_dominula_alignments-1.png" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot_chroms.html">plot_chroms</a></span><span class="op">(</span><span class="va">warp_all</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"PEXC"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">warp_all</span><span class="op">)</span><span class="op">)</span><span class="op">]</span>,show_legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu">italic</span><span class="op">(</span><span class="st">"P. exclamans"</span><span class="op">)</span>, <span class="st">" (multi-species)"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>       bty <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/plot_chroms.html">plot_chroms</a></span><span class="op">(</span><span class="va">warp_exclamans</span>, show_legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu">italic</span><span class="op">(</span><span class="st">"P. exclamans"</span><span class="op">)</span>, <span class="st">" (single-species)"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>       bty <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/plot_chroms.html">plot_chroms</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">[</span><span class="va">species_idx</span><span class="op">$</span><span class="va">exclamans</span><span class="op">]</span>, show_legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="fu">italic</span><span class="op">(</span><span class="st">"P. exclamans"</span><span class="op">)</span>, </span>
+<span>                                    <span class="st">" (raw)"</span><span class="op">)</span><span class="op">)</span>, bty <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span></span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure><p><img src="GC-FID_files/figure-html/plot_exclamans_alignments-1.png" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>In general, the results are quite similar between multispecies and single species alignments.</p>
+</section><section class="level3"><h3 id="integration-and-peaktable-assembly">Integration and peaktable assembly<a class="anchor" aria-label="anchor" href="#integration-and-peaktable-assembly"></a>
+</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_peaks.html">get_peaks</a></span><span class="op">(</span><span class="va">warp_dominula</span>, cl<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="co"># pktab &lt;- suppressWarnings(get_peaktable(pks))</span></span>
+<span><span class="co"># pktab &lt;- attach_metadata(pktab, metadata = meta, column = "SAMPLE_ID")</span></span></code></pre></div>
 </div>
 </section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
