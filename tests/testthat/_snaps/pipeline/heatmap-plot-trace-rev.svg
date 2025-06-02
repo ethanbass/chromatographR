@@ -39,13 +39,6 @@
 <g clip-path='url(#cpMC4wMHw2NDAuMDB8MC4wMHw1NzYuMDA=)'>
 <text transform='translate(11.52,280.80) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='40.69px' lengthAdjust='spacingAndGlyphs'>Sample</text>
 </g>
-<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
-<line x1='57.60' y1='428.42' x2='57.60' y2='133.18' style='stroke-width: 0.75;' />
-<line x1='57.60' y1='428.42' x2='50.40' y2='428.42' style='stroke-width: 0.75;' />
-<line x1='57.60' y1='133.18' x2='50.40' y2='133.18' style='stroke-width: 0.75;' />
-<text transform='translate(40.32,428.42) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>122</text>
-<text transform='translate(40.32,133.18) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>119</text>
-</g>
 <defs>
   <clipPath id='cpNTcuNjB8NjI1LjYwfDU3LjYwfDUwNC4wMA=='>
     <rect x='57.60' y='57.60' width='568.00' height='446.40' />
@@ -923,11 +916,6 @@
 <rect x='603.96' y='-14.44' width='1.21' height='295.24' style='stroke-width: 0.75; stroke: none; fill: #4B0057;' />
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
-<line x1='57.60' y1='428.42' x2='57.60' y2='133.18' style='stroke-width: 0.75;' />
-<line x1='57.60' y1='428.42' x2='50.40' y2='428.42' style='stroke-width: 0.75;' />
-<line x1='57.60' y1='133.18' x2='50.40' y2='133.18' style='stroke-width: 0.75;' />
-<text transform='translate(40.32,428.42) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>122</text>
-<text transform='translate(40.32,133.18) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>119</text>
 <polygon points='57.60,504.00 625.60,504.00 625.60,57.60 57.60,57.60 ' style='stroke-width: 0.75; fill: none;' />
 </g>
 <defs>

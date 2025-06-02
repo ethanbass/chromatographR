@@ -160,6 +160,7 @@ position_plotly_legend <- function(pos){
 #' \code{TRUE}.
 #' @param legend_position Position of legend.
 #' @param title Title for plot.
+#' @param show_ylabs Logical. Whether to show y labels. Defaults to \code{FALSE}.
 #' @return No return value, called for side effects.
 #' @section Side effects:
 #' Plots the traces of the specified chromatograms \code{idx} at the specified
@@ -175,7 +176,8 @@ position_plotly_legend <- function(pos){
 plot_chroms_heatmap <- function(chrom_list, idx = NULL, lambdas, 
                                 engine = c("base", "ggplot", "plotly"),
                                 show_legend = TRUE, xlim = NULL,
-                                legend_position = "topright", title = "") {
+                                legend_position = "topright", title = "", 
+                                show_ylabs = FALSE) {
   engine <- match.arg(engine, c("base", "ggplot", "plotly"))
   if (ncol(chrom_list[[1]]) == 1){
     lambdas.idx <- 1
@@ -187,7 +189,8 @@ plot_chroms_heatmap <- function(chrom_list, idx = NULL, lambdas,
                plotly = plot_chroms_heatmap_plotly)
   fn(chrom_list = chrom_list, lambdas.idx = lambdas.idx, idx = idx,
      show_legend = show_legend, xlim = xlim,
-     legend_position = legend_position, title = title)
+     legend_position = legend_position, title = title, 
+     show_ylabs = show_ylabs)
 }
 
 #' Plot chromatograms as heatmap using base graphics
@@ -196,7 +199,7 @@ plot_chroms_heatmap <- function(chrom_list, idx = NULL, lambdas,
 #' @noRd
 plot_chroms_heatmap_base <- function(chrom_list, lambdas.idx = 1, idx = NULL,
                                      title = "", xlim = NULL, show_legend = TRUE,
-                                     ...){
+                                     show_ylabs = FALSE, ...){
   viridis_base <- hcl.colors(100, "viridis")
   if (is.null(idx)) idx <- seq_along(chrom_list)
   if (inherits(chrom_list, "list")){
@@ -207,7 +210,6 @@ plot_chroms_heatmap_base <- function(chrom_list, lambdas.idx = 1, idx = NULL,
   
   bgcol <- grey(0.9)
   if (is.null(xlim)){
-    # xlim <- c(1, nrow(x))
     xlim <- c(head(get_times(chrom_list), 1), tail(get_times(chrom_list), 1))
   }
   if (show_legend){
@@ -218,7 +220,9 @@ plot_chroms_heatmap_base <- function(chrom_list, lambdas.idx = 1, idx = NULL,
   plot(xlim, c(0.8, ncol(x) + 0.2), type = "n", 
        xlab = "", ylab = "Sample", main = title, 
        xlim = xlim, yaxt = "n")
-  axis(2, at = seq_len(ncol(x)), labels = colnames(x))
+  # if (show_ylabs){
+  #   axis(2, at = seq_len(ncol(x)), labels = colnames(x))
+  # }
   rect(xlim[1] - 1000, -1000,
        xlim[2] + 1000, ncol(x) + 1000, 
        col = bgcol)
@@ -226,8 +230,10 @@ plot_chroms_heatmap_base <- function(chrom_list, lambdas.idx = 1, idx = NULL,
   image(times, seq_len(ncol(x)), 
         x[seq(which.min(abs(get_times(chrom_list) - head(times, 1))),
               which.min(abs(get_times(chrom_list) - tail(times, 1)))),], 
-        col = viridis_base, add=TRUE)
-  axis(2, at = seq_len(ncol(x)), labels = colnames(x))
+        col = viridis_base, add = TRUE)
+  if (show_ylabs){
+    axis(2, at = seq_len(ncol(x)), labels = colnames(x))
+  }
   box()
   if (show_legend){
     par(mar = c(5, 0, 4, 3))  # reset margins
@@ -263,7 +269,8 @@ plot_chroms_heatmap_base <- function(chrom_list, lambdas.idx = 1, idx = NULL,
 #' @noRd
 plot_chroms_heatmap_ggplot <- function(chrom_list, lambdas.idx = 1, idx = NULL,
                                        show_legend = TRUE, xlim = NULL,
-                                       legend_position = "topright", title = ""){
+                                       legend_position = "topright", title = "",
+                                       show_ylabs = FALSE){
   check_for_pkg("ggplot2")
   if (is.null(idx)) idx <- seq_along(chrom_list)
   if (inherits(chrom_list, "list")){
@@ -285,6 +292,9 @@ plot_chroms_heatmap_ggplot <- function(chrom_list, lambdas.idx = 1, idx = NULL,
     ggplot2::theme_minimal() +
     ggplot2::coord_cartesian(expand = FALSE) +
     ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+  if (!show_ylabs){
+    p <- p + ggplot2::theme(axis.text.y = ggplot2::element_blank())
+  }
   if (!show_legend){
     p <- p + ggplot2::theme(legend.position = "none")
   } else if (legend_position != "topright"){
@@ -301,7 +311,8 @@ plot_chroms_heatmap_ggplot <- function(chrom_list, lambdas.idx = 1, idx = NULL,
 #' @noRd
 plot_chroms_heatmap_plotly <- function(chrom_list, lambdas.idx = 1, idx = NULL,
                                        show_legend = TRUE, xlim = NULL,
-                                       legend_position = "topright", title = "") {
+                                       legend_position = "topright", title = "",
+                                       show_ylabs = FALSE) {
   check_for_pkg("plotly")
   if (is.null(idx)) idx <- seq_along(chrom_list)
   if (inherits(chrom_list, "list")){
@@ -331,6 +342,8 @@ plot_chroms_heatmap_plotly <- function(chrom_list, lambdas.idx = 1, idx = NULL,
         type = "category"
       )
     )
+  if (!show_ylabs)
+    p <- p |> plotly::layout(yaxis = list(showticklabels = FALSE, ticks=""))
   if (!show_legend){
     p <-  plotly::hide_colorbar(p)
   } else if (legend_position != "topright"){

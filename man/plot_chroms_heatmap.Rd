@@ -12,7 +12,8 @@ plot_chroms_heatmap(
   show_legend = TRUE,
   xlim = NULL,
   legend_position = "topright",
-  title = ""
+  title = "",
+  show_ylabs = FALSE
 )
 }
 \arguments{
@@ -35,6 +36,8 @@ plot.}
 \item{legend_position}{Position of legend.}
 
 \item{title}{Title for plot.}
+
+\item{show_ylabs}{Logical. Whether to show y labels. Defaults to \code{FALSE}.}
 }
 \value{
 No return value, called for side effects.

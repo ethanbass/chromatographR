@@ -41,11 +41,6 @@
 <polygon points='59.04,502.56 689.76,502.56 689.76,59.04 59.04,59.04 ' style='stroke-width: 0.75; fill: none;' />
 <text x='374.40' y='34.48' text-anchor='middle' style='font-size: 14.40px; font-weight: bold; font-family: sans;' textLength='98.44px' lengthAdjust='spacingAndGlyphs'>PTW alignment</text>
 <text transform='translate(12.96,280.80) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='40.69px' lengthAdjust='spacingAndGlyphs'>Sample</text>
-<line x1='59.04' y1='427.47' x2='59.04' y2='134.13' style='stroke-width: 0.75;' />
-<line x1='59.04' y1='427.47' x2='51.84' y2='427.47' style='stroke-width: 0.75;' />
-<line x1='59.04' y1='134.13' x2='51.84' y2='134.13' style='stroke-width: 0.75;' />
-<text transform='translate(41.76,427.47) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>119</text>
-<text transform='translate(41.76,134.13) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>121</text>
 </g>
 <g clip-path='url(#cpNTkuMDR8Njg5Ljc2fDU5LjA0fDUwMi41Ng==)'>
 <rect x='-67354.09' y='-293199.20' width='135456.98' height='587253.33' style='stroke-width: 0.75; fill: #E6E6E6;' />
@@ -1774,11 +1769,6 @@
 <rect x='666.06' y='280.80' width='0.67' height='293.33' style='stroke-width: 0.75; stroke: none; fill: #4B0055;' />
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
-<line x1='59.04' y1='427.47' x2='59.04' y2='134.13' style='stroke-width: 0.75;' />
-<line x1='59.04' y1='427.47' x2='51.84' y2='427.47' style='stroke-width: 0.75;' />
-<line x1='59.04' y1='134.13' x2='51.84' y2='134.13' style='stroke-width: 0.75;' />
-<text transform='translate(41.76,427.47) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>119</text>
-<text transform='translate(41.76,134.13) rotate(-90)' text-anchor='middle' style='font-size: 12.00px; font-family: sans;' textLength='20.02px' lengthAdjust='spacingAndGlyphs'>121</text>
 <polygon points='59.04,502.56 689.76,502.56 689.76,59.04 59.04,59.04 ' style='stroke-width: 0.75; fill: none;' />
 </g>
 </svg>
