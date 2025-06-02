@@ -41,13 +41,23 @@ To demonstrate the use of `chromatographR` for the analysis GC-FID data, we will
 
 
 ```{r download_data}
-# load chromatograms from Legan et al 2022
-files <- rdryad::dryad_download("10.5061/dryad.wpzgmsbr8")[[1]]
+is_github_actions <- Sys.getenv("GITHUB_ACTIONS") == "true"
+
+if (is_github_actions){
+  # Load files from GitHub (https://github.com/ethanbass/10_5061_dryad_wpzgmsbr8/releases/tag/v1.0)
+  tmp <- tempfile(fileext = ".zip")
+  curl::curl_download("https://github.com/ethanbass/10_5061_dryad_wpzgmsbr8/archive/refs/tags/v1.0.zip", destfile = tmp)
+  unzip(tmp, exdir = "./data/")
+  files <- list.files("./data/10_5061_dryad_wpzgmsbr8-1.0", full.names = TRUE)
+} else{
+  # Load files from Dryad
+  files <- rdryad::dryad_download("10.5061/dryad.wpzgmsbr8")[[1]]
+}
+
 chrom_paths <- grep("README|METADATA|ANNOTATED", files, invert = TRUE, 
                     value = TRUE)
 dat <- read_chroms(chrom_paths, format_in = "shimadzu_fid")
 
-# load metadata
 path_to_metadata <- grep("METADATA", files, value = TRUE)
 meta <- read.csv(path_to_metadata, sep = "\t")
 ```
@@ -57,6 +67,7 @@ In order to get a good alignment, it is helpful to remove the solvent peak. To a
 ```{r preprocess_data}
 dat.pr <- preprocess(dat, spec.smooth = FALSE, dim1 = seq(from = 4, to = 59.9, by = .005), # .005 minutes = 300 ms
                      cl = 1)
+names(dat.pr) <- gsub(".txt", "", names(dat.pr))
 ```
 
 We can then group the chromatograms by species for further analysis.
@@ -66,9 +77,8 @@ species <- c(dominula = "DOMINULA", exclamans.= "EXCLAMANS",
              fuscatus = "FUSCATUS", metricus = "METRICUS")
 
 species_idx <- lapply(species, function(sp){
-  which(names(dat.pr) %in% gsub(".txt", "",
-                                meta[which(meta$POLISTES_SPECIES == sp),
-                                     "SAMPLE_ID"]))
+  which(names(dat.pr) %in% meta[which(meta$POLISTES_SPECIES == sp),
+                                     "SAMPLE_ID"])
 })
 ```
 
