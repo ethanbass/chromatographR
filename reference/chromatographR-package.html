@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,7 +35,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>chromatographR</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/dev/R/chromatographR-package.R" class="external-link"><code>R/chromatographR-package.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/master/R/chromatographR-package.R" class="external-link"><code>R/chromatographR-package.R</code></a></small>
       <div class="d-none name"><code>chromatographR-package.Rd</code></div>
     </div>
 
@@ -53,7 +53,7 @@ Preprocessing and peak-table construction follow the rough formula laid out
 in alsace (Wehrens, R., Bloemberg, T.G., and Eilers P.H.C., 2015.
 <a href="https://doi.org/10.1093/bioinformatics/btv299" class="external-link">doi:10.1093/bioinformatics/btv299</a>
 ). Alignment of chromatograms is available
-using parametric time warping (ptw) (Wehrens, R., Bloemberg, T.G., and Eilers
+using parametric time warping (PTW) (Wehrens, R., Bloemberg, T.G., and Eilers
 P.H.C. 2015. <a href="https://doi.org/10.1093/bioinformatics/btv299" class="external-link">doi:10.1093/bioinformatics/btv299</a>
 ) or variable penalty dynamic
 time warping (VPdtw) (Clifford, D., &amp; Stone, G. 2012. <a href="https://doi.org/10.18637/jss.v047.i08" class="external-link">doi:10.18637/jss.v047.i08</a>
@@ -68,17 +68,57 @@ More details on package usage and a suggested workflow can be found in the
 vignette.</p>
     </div>
     <div class="section level2">
-    <h2 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a></h2>
+    <h2 id="analysis-functions">Analysis functions<a class="anchor" aria-label="anchor" href="#analysis-functions"></a></h2>
 
 
-<ul><li><p><code><a href="preprocess.html">preprocess</a></code>: A list of four goldenrod root chromatograms.</p></li>
-<li><p><code><a href="Sa_pr.html">Sa_pr</a></code>: Preprocessed goldenrod root chromatograms.</p></li>
-<li><p><code><a href="Sa_warp.html">Sa_warp</a></code>: Preprocessed and aligned goldenrod root chromatograms.</p></li>
-<li><p><code><a href="pk_tab.html">pk_tab</a></code>: Peak table from aligned goldenrod root chromatograms.</p></li>
-</ul><ul><li><p><code><a href="Sa.html">Sa</a></code>: A list of four goldenrod root chromatograms.</p></li>
-<li><p><code><a href="Sa_pr.html">Sa_pr</a></code>: Preprocessed goldenrod root chromatograms.</p></li>
-<li><p><code><a href="Sa_warp.html">Sa_warp</a></code>: Preprocessed and aligned goldenrod root chromatograms.</p></li>
-<li><p><code><a href="pk_tab.html">pk_tab</a></code>: Peak table from aligned goldenrod root chromatograms.</p></li>
+<ul><li><ul><li><p><code><a href="https://ethanbass.github.io/chromConverter/reference/read_chroms.html" class="external-link">read_chroms()</a></code>: Import chromatograms from a variety of vendor formats.</p></li>
+<li><p><code><a href="preprocess.html">preprocess()</a></code>: Preprocess chromatographic matrices.</p></li>
+<li><p><code><a href="correct_rt.html">correct_rt()</a></code>: Align chromatograms.</p></li>
+<li><p><code><a href="get_peaks.html">get_peaks()</a></code>: Find and integrate peaks.</p></li>
+<li><p><code><a href="get_peaktable.html">get_peaktable()</a></code>: Assemble peak table.</p></li>
+<li><p><code><a href="attach_metadata.html">attach_metadata()</a></code>: Attach metadata to peak table.</p></li>
+<li><p><code><a href="attach_ref_spectra.html">attach_ref_spectra()</a></code>: Attach reference spectra to peak table.</p></li>
+<li><p><code><a href="normalize_data.html">normalize_data()</a></code>: Normalize <code>peaktable</code> or <code>chrom_list</code>.</p></li>
+</ul></li>
+</ul></div>
+    <div class="section level2">
+    <h2 id="visualization-functions">Visualization functions<a class="anchor" aria-label="anchor" href="#visualization-functions"></a></h2>
+
+
+<ul><li><ul><li><p><code><a href="boxplot.peak_table.html">boxplot.peak_table()</a></code>: Create boxplot from peaktable object.</p></li>
+<li><p><code><a href="plot_chroms.html">plot_chroms()</a></code>: Plot chromatograms as traces.</p></li>
+<li><p><code><a href="plot_chroms_heatmap.html">plot_chroms_heatmap()</a></code>: Plot chromatograms as heatmap.</p></li>
+<li><p><code><a href="plot_spectrum.html">plot_spectrum()</a></code>: Plot spectrum and/or trace of specified peak.</p></li>
+<li><p><code><a href="plot_all_spectra.html">plot_all_spectra()</a></code>: Plot all spectra for specified peak.</p></li>
+<li><p><code><a href="mirror_plot.html">mirror_plot()</a></code>: Plot chromatograms as mirror plot.</p></li>
+<li><p><code><a href="scan_chrom.html">scan_chrom()</a></code>: Plot spectrum at wavelength specified by clicking on a chromatogram.</p></li>
+<li><p><code><a href="plot.peak_list.html">plot.peak_list()</a></code>: Plot fitted peaks over chromatographic trace.</p></li>
+<li><p><code><a href="plot.peak_table.html">plot.peak_table()</a></code>: Plot the trace and/or spectrum of a specified peak from the peak table.</p></li>
+<li><p><code><a href="plot.ptw_list.html">plot.ptw_list()</a></code>: Plot PTW alignment object.</p></li>
+</ul></li>
+</ul></div>
+    <div class="section level2">
+    <h2 id="utility-functions">Utility functions<a class="anchor" aria-label="anchor" href="#utility-functions"></a></h2>
+
+
+<ul><li><ul><li><p><code><a href="combine_peaks.html">combine_peaks()</a></code>: Combine duplicate peaks in peak table based on retention time and spectral similarity.</p></li>
+<li><p><code><a href="merge_peaks.html">merge_peaks()</a></code>: Merge split peaks into a single column of a peak table.</p></li>
+<li><p><code><a href="get_times.html">get_times()</a></code>: Return retention times from a peak table or a list of chromatograms.</p></li>
+<li><p><code><a href="get_lambdas.html">get_lambdas()</a></code>: Return wavelengths from a peak table or a list of chromatograms.</p></li>
+<li><p><code><a href="reshape_chroms.html">reshape_chroms()</a></code>: Reshape a list of chromatograms to long format.</p></li>
+<li><p><code><a href="reshape_peaktable.html">reshape_peaktable()</a></code>: Reshape a <code>peak_table</code> object to long format.</p></li>
+<li><p><code><a href="write_peaktable.html">write_peaktable()</a></code>: Export peak table in <code>csv</code> or <code>xlsx</code> format.</p></li>
+</ul></li>
+</ul></div>
+    <div class="section level2">
+    <h2 id="example-data">Example data<a class="anchor" aria-label="anchor" href="#example-data"></a></h2>
+
+
+<ul><li><ul><li><p><a href="Sa.html">Sa</a>: A list of four goldenrod root chromatograms.</p></li>
+<li><p><a href="Sa_pr.html">Sa_pr</a>: Preprocessed goldenrod root chromatograms.</p></li>
+<li><p><a href="Sa_warp.html">Sa_warp</a>: Preprocessed and aligned goldenrod root chromatograms.</p></li>
+<li><p><a href="pk_tab.html">pk_tab</a>: Peak table from aligned goldenrod root chromatograms.</p></li>
+</ul></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

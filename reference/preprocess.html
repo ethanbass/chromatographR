@@ -5,13 +5,13 @@ the size of the matrix can be reduced by interpolation. By default,
 the data are baseline-corrected in the time direction
 (baseline.corr) and smoothed in the
 spectral dimension using cubic smoothing splines
-(smooth.spline."><meta property="og:description" content="Standard pre-processing of response matrices, consisting of a time axis and
+(smooth.spline)."><meta property="og:description" content="Standard pre-processing of response matrices, consisting of a time axis and
 a spectral axis (e.g. HPLC-DAD/UV data). For smooth data, like UV-VIS data,
 the size of the matrix can be reduced by interpolation. By default,
 the data are baseline-corrected in the time direction
 (baseline.corr) and smoothed in the
 spectral dimension using cubic smoothing splines
-(smooth.spline."><meta property="og:image" content="https://ethanbass.github.io/chromatographR/logo.png"></head><body>
+(smooth.spline)."><meta property="og:image" content="https://ethanbass.github.io/chromatographR/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -19,7 +19,7 @@ spectral dimension using cubic smoothing splines
 
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,7 +47,7 @@ spectral dimension using cubic smoothing splines
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Preprocess time/wavelength data</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/dev/R/preprocess.R" class="external-link"><code>R/preprocess.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/master/R/preprocess.R" class="external-link"><code>R/preprocess.R</code></a></small>
       <div class="d-none name"><code>preprocess.Rd</code></div>
     </div>
 
@@ -58,7 +58,7 @@ the size of the matrix can be reduced by interpolation. By default,
 the data are baseline-corrected in the time direction
 (<code><a href="https://rdrr.io/pkg/ptw/man/baseline.corr.html" class="external-link">baseline.corr</a></code>) and smoothed in the
 spectral dimension using cubic smoothing splines
-(<code><a href="https://rdrr.io/r/stats/smooth.spline.html" class="external-link">smooth.spline</a></code>.</p>
+(<code><a href="https://rdrr.io/r/stats/smooth.spline.html" class="external-link">smooth.spline</a></code>).</p>
     </div>
 
     <div class="section level2">
@@ -70,10 +70,8 @@ spectral dimension using cubic smoothing splines
 <span>  remove.time.baseline <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  spec.smooth <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  maxI <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  parallel <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  interpolate_rows <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  interpolate_cols <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  <span class="va">mc.cores</span>,</span>
 <span>  cl <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  show_progress <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -103,13 +101,13 @@ range of these should not exceed the range of the original wavelengths.</p></dd>
 <dt id="arg-remove-time-baseline">remove.time.baseline<a class="anchor" aria-label="anchor" href="#arg-remove-time-baseline"></a></dt>
 <dd><p>Logical, indicating whether baseline correction
 should be done in the time direction, according to
-<code><a href="https://rdrr.io/pkg/ptw/man/baseline.corr.html" class="external-link">baseline.corr</a></code>. Default is TRUE.</p></dd>
+<code><a href="https://rdrr.io/pkg/ptw/man/baseline.corr.html" class="external-link">baseline.corr</a></code>. Default is <code>TRUE</code>.</p></dd>
 
 
 <dt id="arg-spec-smooth">spec.smooth<a class="anchor" aria-label="anchor" href="#arg-spec-smooth"></a></dt>
 <dd><p>Logical, indicating whether smoothing should be done in
 the spectral direction, according to
-<code><a href="https://rdrr.io/r/stats/smooth.spline.html" class="external-link">smooth.spline</a></code>. Default is TRUE.</p></dd>
+<code><a href="https://rdrr.io/r/stats/smooth.spline.html" class="external-link">smooth.spline</a></code>. Default is <code>TRUE</code>.</p></dd>
 
 
 <dt id="arg-maxi">maxI<a class="anchor" aria-label="anchor" href="#arg-maxi"></a></dt>
@@ -117,24 +115,14 @@ the spectral direction, according to
 value.</p></dd>
 
 
-<dt id="arg-parallel">parallel<a class="anchor" aria-label="anchor" href="#arg-parallel"></a></dt>
-<dd><p>Logical, indicating whether to use parallel processing.
-Defaults to TRUE (unless you're on Windows).</p></dd>
-
-
 <dt id="arg-interpolate-rows">interpolate_rows<a class="anchor" aria-label="anchor" href="#arg-interpolate-rows"></a></dt>
 <dd><p>Logical. Whether to interpolate along the time axis
-(<code>dim1</code>). Defaults to TRUE.</p></dd>
+(<code>dim1</code>). Defaults to <code>TRUE</code>.</p></dd>
 
 
 <dt id="arg-interpolate-cols">interpolate_cols<a class="anchor" aria-label="anchor" href="#arg-interpolate-cols"></a></dt>
 <dd><p>Logical. Whether to interpolate along the spectral
-axis (<code>dim2</code>). Defaults to TRUE.</p></dd>
-
-
-<dt id="arg-mc-cores">mc.cores<a class="anchor" aria-label="anchor" href="#arg-mc-cores"></a></dt>
-<dd><p>How many cores to use for parallel processing. Defaults to 2.
-This argument has been deprecated and replaces with <code>cl</code>.</p></dd>
+axis (<code>dim2</code>). Defaults to <code>TRUE</code>.</p></dd>
 
 
 <dt id="arg-cl">cl<a class="anchor" aria-label="anchor" href="#arg-cl"></a></dt>

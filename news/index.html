@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,15 +35,41 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/ethanbass/chromatographR/blob/dev/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/ethanbass/chromatographR/blob/master/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.7.4" id="chromatographr-074">chromatographR 0.7.4<a class="anchor" aria-label="anchor" href="#chromatographr-074"></a></h2>
+<ul><li>Added new heatmap plot in <code>plot_chroms</code>.</li>
+<li>Added labeling of spectral peaks for <code>ggplot2</code> and <code>plotly</code> plots in <code>plot_spectrum</code>.</li>
+<li>Added minimum amplitude for labeling of spectral peaks in <code>plot_spectrum</code>. Peaks are now labeled only if they exceed 5% of the maximum signal intensity.</li>
+<li>Removed <code>parallel</code> and <code>mc.cores</code> argument from <code>preprocess</code> (deprecated in <code>v0.5.0</code>).</li>
+<li>Added <code>title</code> argument in <code>plot_chroms</code>.</li>
+<li>Added option for different plotting engines through <code>engine</code> argument in <code>plot.ptw_list</code>.</li>
+<li>Added option for heatmap plots through <code>what</code> argument in <code>plot.ptw_list</code>.</li>
+<li>Changed behavior of <code>reshape_chroms</code> such that it can be applied to 2D chromatograms without throwing an error.</li>
+<li>Added index of functions to package documentation.</li>
+<li>Made minor updates to documentation of functions.</li>
+</ul><div class="section level5">
+<h5 id="changes-to-gc-fid-vignette-0-7-4">Changes to GC-FID vignette<a class="anchor" aria-label="anchor" href="#changes-to-gc-fid-vignette-0-7-4"></a></h5>
+<ul><li>Changed alignment plots to heatmaps rather than traces.</li>
+<li>Hid <code>ggordiplot</code> function in “folded” code block</li>
+<li>Added alt text to images.</li>
+<li>Updated call to <code>adonis2</code> in accordance with new defaults in <code>vegan v2.7-0</code>.</li>
+<li>Made other minor changes to text.</li>
+</ul></div>
+<div class="section level5">
+<h5 id="changes-to-chromatographr-vignette-0-7-4">Changes to chromatographR vignette<a class="anchor" aria-label="anchor" href="#changes-to-chromatographr-vignette-0-7-4"></a></h5>
+<ul><li>Added explanatory figure captions.</li>
+<li>Added figure demonstrating comparison of alignments with new <code>plot_chroms_heatmap</code> function.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.7.3" id="chromatographr-073">chromatographR 0.7.3<a class="anchor" aria-label="anchor" href="#chromatographr-073"></a></h2>
 <ul><li>Updated <code>reshape_peaktable</code> function to include wavelength and retention time data.</li>
 <li>Updated <code>pk_tab</code> data file to latest peak table format.</li>
 <li>Fixed minor issues with roxygen formatting.</li>
-<li>Added function “families”.</li>
+<li>Added functional “families”.</li>
 <li>Fixed bug in <code>get_peaks</code> causing occasional errors due to edge cases.</li>
 <li>Added titles for ggplot2 and plotly <code>plot_spectrum</code> plots.</li>
 <li>Fixed bug in console output when providing chromatogram index as string to <code>plot_spectrum</code>.</li>

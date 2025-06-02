@@ -19,7 +19,7 @@ warping."><meta property="og:image" content="https://ethanbass.github.io/chromat
 
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,7 +47,7 @@ warping."><meta property="og:image" content="https://ethanbass.github.io/chromat
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Correct retention time</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/dev/R/correct_rt.R" class="external-link"><code>R/correct_rt.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/master/R/correct_rt.R" class="external-link"><code>R/correct_rt.R</code></a></small>
       <div class="d-none name"><code>correct_rt.Rd</code></div>
     </div>
 
@@ -225,8 +225,7 @@ Metabolomics</em>, <b>11</b>:143-154. <a href="https://doi.org/10.1007/s11306-01
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># interactive()</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Sa_pr</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">warping.models</span> <span class="op">&lt;-</span> <span class="fu">correct_rt</span><span class="op">(</span><span class="va">Sa_pr</span>, what <span class="op">=</span> <span class="st">"models"</span>, lambdas<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">210</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">warp</span> <span class="op">&lt;-</span> <span class="fu">correct_rt</span><span class="op">(</span>chrom_list <span class="op">=</span> <span class="va">Sa_pr</span>, models <span class="op">=</span> <span class="va">warping.models</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">warp</span> <span class="op">&lt;-</span> <span class="fu">correct_rt</span><span class="op">(</span>chrom_list <span class="op">=</span> <span class="va">Sa_pr</span>, lambdas<span class="op">=</span><span class="fl">210</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>

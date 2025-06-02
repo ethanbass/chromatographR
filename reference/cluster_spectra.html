@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,7 +35,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Cluster spectra</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/dev/R/cluster_spectra.R" class="external-link"><code>R/cluster_spectra.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/master/R/cluster_spectra.R" class="external-link"><code>R/cluster_spectra.R</code></a></small>
       <div class="d-none name"><code>cluster_spectra.Rd</code></div>
     </div>
 
@@ -146,7 +146,7 @@ the bootstrap p-value (au) for the given cluster.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Function to cluster peaks by spectral similarity. Before using this function,
+    <p>Before using this function,
 reference spectra must be attached to the <code>peak_table</code> using the <code>
 attach_ref_spectra</code> function. These reference spectra are then used to
 construct a distance matrix based on spectral similarity (pearson correlation)
@@ -156,20 +156,16 @@ as implemented in <code><a href="https://rdrr.io/pkg/pvclust/man/pvclust.html" c
 values can be used to select clusters that exceed a certain confidence
 threshold as defined by <code>alpha</code>.</p>
 <p>Clusters can be filtered by the minimum and maximum size of the cluster using
-the <code>min_size</code> and <code>max_size</code> arguments respectively. If
+the <code>min_size</code> and <code>max_size</code> arguments respectively. Users should
+be aware that the clustering algorithm will often return nested clusters.
+Thus, an individual peak could appear in more than one cluster. If
 <code>max_only</code> is TRUE, only the largest cluster in a nested tree of
 clusters meeting the specified confidence threshold will be returned.</p>
-    </div>
-    <div class="section level2">
-    <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
-
-<ul><li><p>Users should be aware that the clustering algorithm will often return nested
-clusters. Thus, an individual peak could appear in more than one cluster.</p></li>
-<li><p>It is highly suggested to use more than 100 bootstraps if you run the
+<p>It is highly suggested to use more than 100 bootstraps if you run the
 clustering algorithm on real data even though we use <code>nboot = 100</code> in
 the example to reduce runtime. The authors of <code>pvclust</code> suggest <code>
-nboot = 10000</code>.</p></li>
-</ul></div>
+nboot = 10000</code>.</p>
+    </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>R. Suzuki &amp; H. Shimodaira. 2006. Pvclust: an R package for assessing
@@ -199,6 +195,7 @@ the uncertainty in hierarchical clustering. <em>Bioinformatics</em>,
 <span class="r-plt img"><img src="cluster_spectra-7.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="cluster_spectra-8.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="cluster_spectra-9.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="cluster_spectra-10.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

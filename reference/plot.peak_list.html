@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,7 +35,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Plot fitted peak shapes.</h1>
-      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/dev/R/plot.peak_list.R" class="external-link"><code>R/plot.peak_list.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/master/R/plot.peak_list.R" class="external-link"><code>R/plot.peak_list.R</code></a></small>
       <div class="d-none name"><code>plot.peak_list.Rd</code></div>
     </div>
 
@@ -157,6 +157,7 @@ provided <code>peak_list</code> drawn underneath the curve.</p>
 <code><a href="plot.peak_table.html">plot.peak_table</a>()</code>,
 <code><a href="plot_all_spectra.html">plot_all_spectra</a>()</code>,
 <code><a href="plot_chroms.html">plot_chroms</a>()</code>,
+<code><a href="plot_chroms_heatmap.html">plot_chroms_heatmap</a>()</code>,
 <code><a href="plot_spectrum.html">plot_spectrum</a>()</code>,
 <code><a href="scan_chrom.html">scan_chrom</a>()</code></p></div>
     </div>
@@ -165,6 +166,14 @@ provided <code>peak_list</code> drawn underneath the curve.</p>
     <p>Ethan Bass</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Sa_warp</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">pks</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_peaks.html">get_peaks</a></span><span class="op">(</span>chrom_list <span class="op">=</span> <span class="va">Sa_warp</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, lambdas <span class="op">=</span> <span class="fl">210</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pks</span>, points <span class="op">=</span> <span class="cn">TRUE</span>, ticks <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot.peak_list-1.png" alt="" width="700" height="433"></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
