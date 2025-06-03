@@ -737,8 +737,9 @@ test_that("plot_chroms_heatmap works with plotly", {
                                               p = p2)
 })
 
-test_that("plot.ptw_list works with plotly", {
+test_that("plot.ptw_list (base) works with plotly", {
   skip_on_cran()
+  skip_on_ci()
   skip_if_not_installed("vdiffr")
   skip_if_not_installed("plotly")
   skip_if_not_installed("reticulate")
@@ -751,10 +752,18 @@ test_that("plot.ptw_list works with plotly", {
 
   expect_doppelganger_plotly(name = "plot_ptw_list_traces_plotly", 
                              p = plot_ptw_list_traces_plotly)
+})
+
+test_that("plot.ptw_list (heatmap) works with plotly", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  skip_if_not_installed("plotly")
+  skip_if_not_installed("reticulate")
+  skip_if_not_installed("rsvg")
   
   plot_ptw_list_heatmap_plotly <- plot(warping.models, what = "heatmap", 
                                        engine = "plotly")
-
+  
   expect_doppelganger_plotly(name = "plot_ptw_list_heatmap_plotly", 
                              p = plot_ptw_list_heatmap_plotly)
 })
