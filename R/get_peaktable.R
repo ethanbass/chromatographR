@@ -168,7 +168,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
     pkcenters.cl <- order(order(cl.centers[, rt]))[pkcenters.cl]
     cl.centers <- cl.centers[order(cl.centers[, rt]),]
     metaInfo <- cbind(lambda = rep(suppressWarnings(
-      as.numeric(names(peak_list[[1]])[comp]), ncl)),
+      as.numeric(names(peak_list[[1]])[comp])), ncl),
                       peak = 1:ncl, 
                       round(cl.centers, 2)
                       )
