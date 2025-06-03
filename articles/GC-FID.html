@@ -6,6 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Analysis of Polistes cuticular hydrocarbons with GC-FID • chromatographR</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -277,7 +282,7 @@ Figure 1: <em>Polistes</em> species includes in this study.
 <span>                    xlim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
-<figure><p><img src="GC-FID_files/figure-html/plot_metricus_alignments-1.png" width="672"></p>
+<figure><p><img src="GC-FID_files/figure-html/plot_metricus_alignments-1.png" width="896"></p>
 </figure>
 </div>
 </div>
@@ -298,7 +303,7 @@ Figure 1: <em>Polistes</em> species includes in this study.
 <span>                    xlim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>,<span class="fl">45</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
-<figure><p><img src="GC-FID_files/figure-html/plot_fuscatus_alignments-1.png" width="672"></p>
+<figure><p><img src="GC-FID_files/figure-html/plot_fuscatus_alignments-1.png" width="896"></p>
 </figure>
 </div>
 </div>
@@ -319,7 +324,7 @@ Figure 1: <em>Polistes</em> species includes in this study.
 <span>                    xlim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>,<span class="fl">45</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
-<figure><p><img src="GC-FID_files/figure-html/plot_dominula_alignments-1.png" width="672"></p>
+<figure><p><img src="GC-FID_files/figure-html/plot_dominula_alignments-1.png" width="896"></p>
 </figure>
 </div>
 </div>
@@ -352,8 +357,6 @@ Figure 1: <em>Polistes</em> species includes in this study.
 <div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_peaks.html">get_peaks</a></span><span class="op">(</span><span class="va">warp_all</span><span class="op">)</span></span>
 <span><span class="va">pktab</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_peaktable.html">get_peaktable</a></span><span class="op">(</span><span class="va">pks</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in cbind(lambda = rep(as.numeric(names(peak_list[[1]])[comp]), ncl), :</span></span>
-<span><span class="co">#&gt; NAs introduced by coercion</span></span>
 <span><span class="va">pktab</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/attach_metadata.html">attach_metadata</a></span><span class="op">(</span><span class="va">pktab</span>, metadata <span class="op">=</span> <span class="va">meta</span>, column <span class="op">=</span> <span class="st">"SAMPLE_ID"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </section><section class="level3"><h3 id="analysis-of-cuticular-hydrocarbon-composition">Analysis of cuticular hydrocarbon composition<a class="anchor" aria-label="anchor" href="#analysis-of-cuticular-hydrocarbon-composition"></a>
@@ -374,8 +377,8 @@ Figure 1: <em>Polistes</em> species includes in this study.
 <span><span class="co">#&gt; POLISTES_SPECIES   3 1.3830e+11 0.12124 8.7638  0.001 ***</span></span>
 <span><span class="co">#&gt; STATE              7 1.3067e+11 0.11455 3.5489  0.001 ***</span></span>
 <span><span class="co">#&gt; SEX                1 4.2418e+10 0.03719 8.0641  0.001 ***</span></span>
-<span><span class="co">#&gt; LAT                1 9.3279e+09 0.00818 1.7733  0.075 .  </span></span>
-<span><span class="co">#&gt; LON                1 1.5117e+10 0.01325 2.8740  0.017 *  </span></span>
+<span><span class="co">#&gt; LAT                1 9.3279e+09 0.00818 1.7733  0.085 .  </span></span>
+<span><span class="co">#&gt; LON                1 1.5117e+10 0.01325 2.8740  0.012 *  </span></span>
 <span><span class="co">#&gt; Residual         105 5.5231e+11 0.48418                  </span></span>
 <span><span class="co">#&gt; Total            118 1.1407e+12 1.00000                  </span></span>
 <span><span class="co">#&gt; ---</span></span>
