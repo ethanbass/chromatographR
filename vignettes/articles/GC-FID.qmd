@@ -172,6 +172,7 @@ format_italics <- function(str) {
 ```
 
 ```{r plot_metricus_alignments}
+#| dpi: 128
 par(mfrow=c(3,1))
 plot_chroms_heatmap(dat.pr[species_idx$metricus], show_legend = FALSE, 
                     title = format_italics("*P. metricus* (raw data)"), xlim=c(25, 50))
@@ -187,6 +188,7 @@ plot_chroms_heatmap(warp_all[grep("PMET", names(warp_all))], show_legend = FALSE
 
 
 ```{r plot_fuscatus_alignments}
+#| dpi: 128
 par(mfrow=c(3,1))
 plot_chroms_heatmap(dat.pr[species_idx$fuscatus], show_legend = FALSE, 
                     title = format_italics("*P. fuscatus* (raw data)"),
@@ -202,6 +204,7 @@ plot_chroms_heatmap(warp_all[grep("PFUS", names(warp_all))], show_legend = FALSE
 ```
 
 ```{r plot_dominula_alignments}
+#| dpi: 128
 par(mfrow=c(3,1))
 plot_chroms_heatmap(dat.pr[species_idx$dominula], show_legend = FALSE, 
                     title = format_italics("*P. dominula* (raw data)"),
