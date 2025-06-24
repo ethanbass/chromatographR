@@ -81,7 +81,7 @@ preprocess <- function(X, dim1, ## time axis
     message("...Times not provided. Extrapolating from matrix dimensions for interpolation.")
     limits <- sapply(X,function(x){
       ts <- rownames(x)
-      c(head(ts,1), tail(ts,1))})
+      c(head(ts, 1), tail(ts, 1))})
     start <- ceiling(max(as.numeric(limits[1,]))*100)/100
     end <- floor((min(as.numeric(limits[2,])))*100)/100
     dim1 <- seq(start, end, by = .01)
