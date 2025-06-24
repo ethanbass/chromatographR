@@ -1,15 +1,15 @@
 # chromatographR 0.7.4
 
-* Added new heatmap plot in `plot_chroms`.
+* Added new heatmap plot in `plot_chroms` for plotting a list of chromatograms as a heatmap.
 * Added labeling of spectral peaks for `ggplot2` and `plotly` plots in `plot_spectrum`.
-* Added minimum amplitude for labeling of spectral peaks in `plot_spectrum`. Peaks are now labeled only if they exceed 5% of the maximum signal intensity.
+* Added minimum amplitude for labeling of spectral peaks in `plot_spectrum`, such that peaks are given a text label only if they exceed 5% of the maximum signal intensity.
 * Removed `parallel` and `mc.cores` argument from `preprocess` (deprecated in `v0.5.0`).
 * Added `title` argument in `plot_chroms`.
 * Added option for different plotting engines through `engine` argument in `plot.ptw_list`.
 * Added option for heatmap plots through `what` argument in `plot.ptw_list`.
 * Changed behavior of `reshape_chroms` such that it can be applied to 2D chromatograms without throwing an error.
-* Added index of functions to package documentation.
-* Made minor updates to documentation of functions.
+* Added index of functions to the package landing page.
+* Made minor updates to function documentation.
 
 #### Changes to GC-FID vignette
 
@@ -21,8 +21,8 @@
 
 #### Changes to chromatographR vignette
 
-* Added explanatory figure captions.
 * Added figure demonstrating comparison of alignments with new `plot_chroms_heatmap` function.
+* Added explanatory figure captions.
 
 # chromatographR 0.7.3
 
