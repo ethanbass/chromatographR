@@ -71,7 +71,7 @@
 #' statistically questionable, since the models are fit using non-linear least
 #' squares. Nevertheless, it can still be useful as a rough metric for 
 #' "goodness-of-fit").
-#' * \code{purity} The peak purity.
+#' * \code{purity} The peak purity as estimated by \code{\link{get_purity}}.
 #' @author Ethan Bass
 #' @note The bones of this function are adapted from the
 #' \href{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks}

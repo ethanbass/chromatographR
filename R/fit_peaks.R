@@ -50,6 +50,7 @@
 #' Prof. Tom O'Haver's
 #' \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{
 #' Pragmatic Introduction to Signal Processing}.
+#' @keywords internal
 #' @author Ethan Bass
 #' @examples
 #' data(Sa_pr)
@@ -176,7 +177,9 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol",
 #' good model for chromatographic peaks in isocratic HPLC? \emph{Chromatographia},
 #' \bold{26}: 285-296. \doi{10.1007/BF02268168}.
 #' @export fit_peaks
+#' @keywords internal
 #' @md
+
 fit_peaks <- function (x, lambda, pos = NULL, sd.max = 50,
                        fit = c("egh", "gaussian", "raw"),  max.iter = 1000, 
                        estimate_purity = TRUE, noise_threshold = .001, ...){

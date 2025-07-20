@@ -15,8 +15,8 @@
 #' @param choose If \code{max} will retain peak with highest intensity. Otherwise,
 #' the first column in the data.frame will be retained.
 #' @param verbose Logical. Whether to print status to the console.
-#' @return A peak table derived from the original, but with duplicate
-#' columns combined according to the specified criteria.
+#' @return A peak table derived from the original, but with columns corresponding
+#' to duplicate peaks combined according to the specified criteria.
 #' @author Ethan Bass
 #' @seealso \code{\link{get_peaks}}
 #' @examples

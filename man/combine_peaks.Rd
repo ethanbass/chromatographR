@@ -27,8 +27,8 @@ the first column in the data.frame will be retained.}
 \item{verbose}{Logical. Whether to print status to the console.}
 }
 \value{
-A peak table derived from the original, but with duplicate
-columns combined according to the specified criteria.
+A peak table derived from the original, but with columns corresponding
+to duplicate peaks combined according to the specified criteria.
 }
 \description{
 Utility function to combine duplicate peaks in peak table, (i.e., peaks that

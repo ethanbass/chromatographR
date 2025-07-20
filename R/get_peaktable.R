@@ -1,9 +1,4 @@
-#' Convert peak list into an ordered peak table.
-#' 
-#' Returns a \code{peak_table} object. The first slot contains a matrix of
-#' intensities, where rows correspond to samples and columns correspond to
-#' aligned features. The rest of the slots contain various meta-data about peaks,
-#' samples, and experimental settings. 
+#' Converts peak list into an ordered peak table.
 #' 
 #' The function performs a complete linkage clustering of retention times across
 #' all samples, and cuts at a height given by the user (which can be understood

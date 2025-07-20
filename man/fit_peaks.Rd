@@ -96,3 +96,4 @@ good model for chromatographic peaks in isocratic HPLC? \emph{Chromatographia},
 \author{
 Ethan Bass
 }
+\keyword{internal}
