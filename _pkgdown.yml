@@ -3,3 +3,44 @@ template:
   bootstrap: 5
 development:
   mode: auto
+reference:
+  - title: "Package overview"
+    contents:
+    - chromatographR-package
+  - title: "Analysis functions"
+    contents: 
+    - read_chroms
+    - preprocess
+    - correct_rt
+    - correct_peaks
+    - get_peaks
+    - get_peaktable
+    - attach_metadata
+    - attach_ref_spectra
+    - normalize_data
+    - cluster_spectra
+  - title: "Visualization functions"
+    contents:
+    - starts_with("plot_")
+    - boxplot.peak_table
+    - mirror_plot
+    - scan_chrom
+    - starts_with("plot.")
+  - title: "Utility functions"
+    contents:
+    - combine_peaks
+    - filter_peaks
+    - filter_peaktable
+    - merge_peaks
+    - get_times
+    - get_lambdas
+    - reshape_chroms
+    - reshape_peaktable
+    - subset.peak_table
+    - write_peaktable
+  - title: "Data objects"
+    contents:
+    - Sa
+    - Sa_pr
+    - Sa_warp
+    - pk_tab
