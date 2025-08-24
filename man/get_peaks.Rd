@@ -83,7 +83,7 @@ linear model of the fitted peak values to the raw data. This approach is
 statistically questionable, since the models are fit using non-linear least
 squares. Nevertheless, it can still be useful as a rough metric for
 "goodness-of-fit").
-\item \code{purity} The peak purity.
+\item \code{purity} The peak purity as estimated by \code{\link{get_purity}}.
 }
 }
 \description{

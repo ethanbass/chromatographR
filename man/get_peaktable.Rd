@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_peaktable.R
 \name{get_peaktable}
 \alias{get_peaktable}
-\title{Convert peak list into an ordered peak table.}
+\title{Converts peak list into an ordered peak table.}
 \usage{
 get_peaktable(
   peak_list,
