@@ -33,7 +33,7 @@ to duplicate peaks combined according to the specified criteria.
 \description{
 Utility function to combine duplicate peaks in peak table, (i.e., peaks that
 were integrated at more than one wavelength or component) based on retention
-time and/or spectral similiarity. Specify tolerance (\code{tol}) for 
+time and/or spectral similarity. Specify tolerance (\code{tol}) for 
 retention time matching and minimum spectral correlation (\code{min.cor}) for
 a match.
 }
