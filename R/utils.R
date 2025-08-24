@@ -135,7 +135,7 @@ get_lambda_idx <- function(lambda, lambdas, y, allow_max = TRUE){
 #' Check chromatogram
 #' @noRd
 check_chr <- function(chr, loc = NULL, peak_table, chrom_list, allow_max = TRUE){
-  if (chr == 'max'){
+  if (chr[[1]] == 'max'){
     if (allow_max){
       chr <- which.max(peak_table$tab[, loc])
     } else{
