@@ -100,22 +100,22 @@ alkanes <- read.csv(path_to_annotated_alkanes, sep="\t")
 
 ```{r compare_alkane_areas}
 # check equality of retention times
-# all.equal(alkanes$RT[-1],pks_f$ALKANE_LADDER$Intensity$rt)
+# all.equal(alkanes$RT[-1], pks_f$ALKANE_LADDER[[1]]$rt)
 
 par(mfrow=c(1,2))
 
-plot(pks_f$ALKANE_LADDER$Intensity$area ~ alkanes$Area[-1], pch = 20,
+plot(pks_f$ALKANE_LADDER[[1]]$area ~ alkanes$Area[-1], pch = 20,
      xlab = "Area (LabSolutions)", ylab = "Area (chromatographR)", 
      main = "Area")
-m <- lm(pks_f$ALKANE_LADDER$Intensity$area ~ alkanes$Area[-1])
+m <- lm(pks_f$ALKANE_LADDER[[1]]$area ~ alkanes$Area[-1])
 abline(m)
 legend("bottomright", bty = "n", 
        legend = bquote(R^2 == .(format(summary(m)$adj.r.squared, digits = 4))))
 
-plot(pks_f$ALKANE_LADDER$Intensity$height ~ alkanes$Height[-1], pch = 20,
+plot(pks_f$ALKANE_LADDER[[1]]$height ~ alkanes$Height[-1], pch = 20,
      xlab = "Area (LabSolutions)", ylab = "Area (chromatographR)", 
      main = "Height")
-m <- lm(pks_f$ALKANE_LADDER$Intensity$height ~ alkanes$Height[-1])
+m <- lm(pks_f$ALKANE_LADDER[[1]]$height ~ alkanes$Height[-1])
 abline(m)
 legend("bottomright", bty = "n", 
        legend = bquote(R^2 == .(format(summary(m)$adj.r.squared, digits = 4))))
@@ -253,7 +253,7 @@ m <- vegan::adonis2(pktab$tab ~ POLISTES_SPECIES + STATE + SEX + LAT + LON,
 m
 ```
 
-As one would expect, the permanova results shows that species is the largest contributor to the variance in CHC profiles (R^2^<sub>marginal</sub> = `r round(m$R2[1], digits = 2)`), followed by state of origin (R^2^<sub>marginal</sub> = `r round(m$R2[2], digits = 2)`) and sex (R^2^<sub>marginal</sub> = `r round(m$R2[3], digits = 2)`).
+As one might expect, the permanova results shows that species is the largest contributor to the variance in CHC profiles (R^2^<sub>marginal</sub> = `r round(m$R2[1], digits = 2)`), followed by state of origin (R^2^<sub>marginal</sub> = `r round(m$R2[2], digits = 2)`) and sex (R^2^<sub>marginal</sub> = `r round(m$R2[3], digits = 2)`).
 
 ```{r modified_ggordiplot}
 #| code-fold: true
@@ -277,7 +277,7 @@ gg_ordiplot <- function (ord, groups, shape = NULL, scaling = 1, choices = c(1, 
   if (!is.null(shape)){
     df_ord <- data.frame(df_ord, shape = shape)
   }
-  df_mean.ord <- aggregate(df_ord[, 1:2], by = list(df_ord$Group), 
+  df_mean.ord <- aggregate(df_ord[, c(1:2)], by = list(df_ord$Group), 
                            mean)
   colnames(df_mean.ord) <- c("Group", "x", "y")
   df_mean.ord <- df_mean.ord[df_mean.ord$Group %in% show.groups, 

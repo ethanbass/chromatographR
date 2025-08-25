@@ -1,3 +1,7 @@
+# chromatographR 0.7.5
+
+* Fixed bug in `check_chr` when multiple chromatograms are provided.
+
 # chromatographR 0.7.4
 
 * Added new heatmap plot in `plot_chroms` for plotting a list of chromatograms as a heatmap.
@@ -11,7 +15,7 @@
 * Added index of functions to the package landing page.
 * Made minor updates to function documentation.
 
-#### Changes to GC-FID vignette
+#### Updates to GC-FID vignette
 
 * Changed alignment plots to heatmaps rather than traces.
 * Hid `ggordiplot` function in "folded" code block
@@ -19,7 +23,7 @@
 * Updated call to `adonis2` in accordance with new defaults in `vegan v2.7-0`.
 * Made other minor changes to text.
 
-#### Changes to chromatographR vignette
+#### Updates to chromatographR vignette
 
 * Added figure demonstrating comparison of alignments with new `plot_chroms_heatmap` function.
 * Added explanatory figure captions.
