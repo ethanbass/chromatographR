@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,7 +38,237 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="package-overview">Package overview<a class="anchor" aria-label="anchor" href="#package-overview"></a></h2>
+
+
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="chromatographR-package.html">chromatographR</a></code> <code><a href="chromatographR-package.html">chromatographR-package</a></code>
+
+        </dt>
+        <dd>chromatographR</dd>
+      </dl></div><div class="section level2">
+      <h2 id="analysis-functions">Analysis functions<a class="anchor" aria-label="anchor" href="#analysis-functions"></a></h2>
+
+
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="reexports.html">reexports</a></code> <code><a href="reexports.html">read_chroms</a></code>
+
+        </dt>
+        <dd>Read chromatograms.</dd>
+      </dl><dl><dt>
+
+          <code><a href="preprocess.html">preprocess()</a></code>
+
+        </dt>
+        <dd>Preprocess time/wavelength data</dd>
+      </dl><dl><dt>
+
+          <code><a href="correct_rt.html">correct_rt()</a></code>
+
+        </dt>
+        <dd>Correct retention time</dd>
+      </dl><dl><dt>
+
+          <code><a href="correct_peaks.html">correct_peaks()</a></code>
+
+        </dt>
+        <dd>Correct peak positions according to a PTW warping model</dd>
+      </dl><dl><dt>
+
+          <code><a href="get_peaks.html">get_peaks()</a></code>
+
+        </dt>
+        <dd>Get peak list.</dd>
+      </dl><dl><dt>
+
+          <code><a href="get_peaktable.html">get_peaktable()</a></code>
+
+        </dt>
+        <dd>Converts peak list into an ordered peak table.</dd>
+      </dl><dl><dt>
+
+          <code><a href="attach_metadata.html">attach_metadata()</a></code>
+
+        </dt>
+        <dd>Attach experimental metadata</dd>
+      </dl><dl><dt>
+
+          <code><a href="attach_ref_spectra.html">attach_ref_spectra()</a></code>
+
+        </dt>
+        <dd>Attach reference spectra</dd>
+      </dl><dl><dt>
+
+          <code><a href="normalize_data.html">normalize_data()</a></code>
+
+        </dt>
+        <dd>Normalize peak table or chromatograms</dd>
+      </dl><dl><dt>
+
+          <code><a href="cluster_spectra.html">cluster_spectra()</a></code>
+
+        </dt>
+        <dd>Cluster spectra</dd>
+      </dl></div><div class="section level2">
+      <h2 id="visualization-functions">Visualization functions<a class="anchor" aria-label="anchor" href="#visualization-functions"></a></h2>
+
+
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="plot_all_spectra.html">plot_all_spectra()</a></code>
+
+        </dt>
+        <dd>Plot all spectra for chosen peak.</dd>
+      </dl><dl><dt>
+
+          <code><a href="plot_chroms.html">plot_chroms()</a></code>
+
+        </dt>
+        <dd>Plot traces from list of chromatograms.</dd>
+      </dl><dl><dt>
+
+          <code><a href="plot_chroms_heatmap.html">plot_chroms_heatmap()</a></code>
+
+        </dt>
+        <dd>Plot chromatograms as heatmap</dd>
+      </dl><dl><dt>
+
+          <code><a href="plot_spectrum.html">plot_spectrum()</a></code>
+
+        </dt>
+        <dd>Plot spectrum from peak table</dd>
+      </dl><dl><dt>
+
+          <code><a href="boxplot.peak_table.html">boxplot(<i>&lt;peak_table&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Make boxplot from peak table.</dd>
+      </dl><dl><dt>
+
+          <code><a href="mirror_plot.html">mirror_plot()</a></code>
+
+        </dt>
+        <dd>Make mirror plot from peak table.</dd>
+      </dl><dl><dt>
+
+          <code><a href="scan_chrom.html">scan_chrom()</a></code>
+
+        </dt>
+        <dd>Plot spectra by clicking on the chromatogram.</dd>
+      </dl><dl><dt>
+
+          <code><a href="plot.peak_list.html">plot(<i>&lt;peak_list&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot fitted peak shapes.</dd>
+      </dl><dl><dt>
+
+          <code><a href="plot.peak_table.html">plot(<i>&lt;peak_table&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot spectrum from peak table</dd>
+      </dl><dl><dt>
+
+          <code><a href="plot.ptw_list.html">plot(<i>&lt;ptw_list&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Plot PTW alignments</dd>
+      </dl></div><div class="section level2">
+      <h2 id="utility-functions">Utility functions<a class="anchor" aria-label="anchor" href="#utility-functions"></a></h2>
+
+
+
+
+    </div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="combine_peaks.html">combine_peaks()</a></code>
+
+        </dt>
+        <dd>Combine peaks</dd>
+      </dl><dl><dt>
+
+          <code><a href="filter_peaks.html">filter_peaks()</a></code>
+
+        </dt>
+        <dd>Filter peak lists</dd>
+      </dl><dl><dt>
+
+          <code><a href="filter_peaktable.html">filter_peaktable()</a></code>
+
+        </dt>
+        <dd>Filter peak table</dd>
+      </dl><dl><dt>
+
+          <code><a href="merge_peaks.html">merge_peaks()</a></code>
+
+        </dt>
+        <dd>Merge split peaks</dd>
+      </dl><dl><dt>
+
+          <code><a href="get_times.html">get_times()</a></code>
+
+        </dt>
+        <dd>Get retention times</dd>
+      </dl><dl><dt>
+
+          <code><a href="get_lambdas.html">get_lambdas()</a></code>
+
+        </dt>
+        <dd>Get lambdas</dd>
+      </dl><dl><dt>
+
+          <code><a href="reshape_chroms.html">reshape_chroms()</a></code>
+
+        </dt>
+        <dd>Reshape chromatograms</dd>
+      </dl><dl><dt>
+
+          <code><a href="reshape_peaktable.html">reshape_peaktable()</a></code>
+
+        </dt>
+        <dd>Reshape peaktable</dd>
+      </dl><dl><dt>
+
+          <code><a href="subset.peak_table.html">subset(<i>&lt;peak_table&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Subset peak table</dd>
+      </dl><dl><dt>
+
+          <code><a href="write_peaktable.html">write_peaktable()</a></code>
+
+        </dt>
+        <dd>Export peak table</dd>
+      </dl></div><div class="section level2">
+      <h2 id="data-objects">Data objects<a class="anchor" aria-label="anchor" href="#data-objects"></a></h2>
 
 
 
@@ -68,204 +298,13 @@
         <dd>Warped goldenrod root chromatograms.</dd>
       </dl><dl><dt>
 
-          <code><a href="attach_metadata.html">attach_metadata()</a></code>
-
-        </dt>
-        <dd>Attach experimental metadata</dd>
-      </dl><dl><dt>
-
-          <code><a href="attach_ref_spectra.html">attach_ref_spectra()</a></code>
-
-        </dt>
-        <dd>Attach reference spectra</dd>
-      </dl><dl><dt>
-
-          <code><a href="boxplot.peak_table.html">boxplot(<i>&lt;peak_table&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Make boxplot from peak table.</dd>
-      </dl><dl><dt>
-
-          <code><a href="chromatographR-package.html">chromatographR</a></code> <code><a href="chromatographR-package.html">chromatographR-package</a></code>
-
-        </dt>
-        <dd>chromatographR</dd>
-      </dl><dl><dt>
-
-          <code><a href="cluster_spectra.html">cluster_spectra()</a></code>
-
-        </dt>
-        <dd>Cluster spectra</dd>
-      </dl><dl><dt>
-
-          <code><a href="combine_peaks.html">combine_peaks()</a></code>
-
-        </dt>
-        <dd>Combine peaks</dd>
-      </dl><dl><dt>
-
-          <code><a href="correct_peaks.html">correct_peaks()</a></code>
-
-        </dt>
-        <dd>Correct peak positions according to a PTW warping model</dd>
-      </dl><dl><dt>
-
-          <code><a href="correct_rt.html">correct_rt()</a></code>
-
-        </dt>
-        <dd>Correct retention time</dd>
-      </dl><dl><dt>
-
-          <code><a href="filter_peaks.html">filter_peaks()</a></code>
-
-        </dt>
-        <dd>Filter peak lists</dd>
-      </dl><dl><dt>
-
-          <code><a href="filter_peaktable.html">filter_peaktable()</a></code>
-
-        </dt>
-        <dd>Filter peak table</dd>
-      </dl><dl><dt>
-
-          <code><a href="find_peaks.html">find_peaks()</a></code>
-
-        </dt>
-        <dd>Find peaks</dd>
-      </dl><dl><dt>
-
-          <code><a href="fit_peaks.html">fit_peaks()</a></code>
-
-        </dt>
-        <dd>Fit chromatographic peaks to an exponential-gaussian hybrid or gaussian profile</dd>
-      </dl><dl><dt>
-
-          <code><a href="get_lambdas.html">get_lambdas()</a></code>
-
-        </dt>
-        <dd>Get lambdas</dd>
-      </dl><dl><dt>
-
-          <code><a href="get_peaks.html">get_peaks()</a></code>
-
-        </dt>
-        <dd>Get peak list.</dd>
-      </dl><dl><dt>
-
-          <code><a href="get_peaktable.html">get_peaktable()</a></code>
-
-        </dt>
-        <dd>Convert peak list into an ordered peak table.</dd>
-      </dl><dl><dt>
-
-          <code><a href="get_times.html">get_times()</a></code>
-
-        </dt>
-        <dd>Get retention times</dd>
-      </dl><dl><dt>
-
-          <code><a href="merge_peaks.html">merge_peaks()</a></code>
-
-        </dt>
-        <dd>Merge split peaks</dd>
-      </dl><dl><dt>
-
-          <code><a href="mirror_plot.html">mirror_plot()</a></code>
-
-        </dt>
-        <dd>Make mirror plot from peak table.</dd>
-      </dl><dl><dt>
-
-          <code><a href="normalize_data.html">normalize_data()</a></code>
-
-        </dt>
-        <dd>Normalize peak table or chromatograms</dd>
-      </dl><dl><dt>
-
           <code><a href="pk_tab.html">pk_tab</a></code>
 
         </dt>
         <dd>Goldenrod peak table</dd>
-      </dl><dl><dt>
-
-          <code><a href="plot.peak_list.html">plot(<i>&lt;peak_list&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Plot fitted peak shapes.</dd>
-      </dl><dl><dt>
-
-          <code><a href="plot.peak_table.html">plot(<i>&lt;peak_table&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Plot spectrum from peak table</dd>
-      </dl><dl><dt>
-
-          <code><a href="plot.ptw_list.html">plot(<i>&lt;ptw_list&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Plot PTW alignments</dd>
-      </dl><dl><dt>
-
-          <code><a href="plot_all_spectra.html">plot_all_spectra()</a></code>
-
-        </dt>
-        <dd>Plot all spectra for chosen peak.</dd>
-      </dl><dl><dt>
-
-          <code><a href="plot_chroms.html">plot_chroms()</a></code>
-
-        </dt>
-        <dd>Plot traces from list of chromatograms.</dd>
-      </dl><dl><dt>
-
-          <code><a href="plot_chroms_heatmap.html">plot_chroms_heatmap()</a></code>
-
-        </dt>
-        <dd>Plot chromatograms as heatmap</dd>
-      </dl><dl><dt>
-
-          <code><a href="plot_spectrum.html">plot_spectrum()</a></code>
-
-        </dt>
-        <dd>Plot spectrum from peak table</dd>
-      </dl><dl><dt>
-
-          <code><a href="preprocess.html">preprocess()</a></code>
-
-        </dt>
-        <dd>Preprocess time/wavelength data</dd>
-      </dl><dl><dt>
-
-          <code><a href="reshape_chroms.html">reshape_chroms()</a></code>
-
-        </dt>
-        <dd>Reshape chromatograms</dd>
-      </dl><dl><dt>
-
-          <code><a href="reshape_peaktable.html">reshape_peaktable()</a></code>
-
-        </dt>
-        <dd>Reshape peaktable</dd>
-      </dl><dl><dt>
-
-          <code><a href="scan_chrom.html">scan_chrom()</a></code>
-
-        </dt>
-        <dd>Plot spectra by clicking on the chromatogram.</dd>
-      </dl><dl><dt>
-
-          <code><a href="subset.peak_table.html">subset(<i>&lt;peak_table&gt;</i>)</a></code>
-
-        </dt>
-        <dd>Subset peak table</dd>
-      </dl><dl><dt>
-
-          <code><a href="write_peaktable.html">write_peaktable()</a></code>
-
-        </dt>
-        <dd>Export peak table</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
