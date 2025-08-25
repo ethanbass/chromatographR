@@ -1,9 +1,4 @@
-skip_on_cran()
-skip_if_not_installed("vdiffr")
-skip_if_not_installed("plotly")
-skip_if_not_installed("reticulate")
-skip_if_not_installed("rsvg")
-# to run visual tests, set Sys.setenv("VISUAL_TESTS"="true")
+# to run visual tests for plotly graphics, set Sys.setenv("VISUAL_TESTS"="true")
 
 data("Sa")
 new.ts <- seq(10, 18.66, by = .01) # choose time-points
@@ -76,9 +71,8 @@ test_that("correct_rt works", {
                           models = "warping.models", alg = "vpdtw"))
 })
 
-test_that("correct_rt works with vpdtw", {
-  skip_if_not_installed("VPdtw")
-  warp <- correct_rt(dat.pr, lambdas = "210", alg="vpdtw")
+test_that("correct_rt works with VPdtw", {
+  warp <- correct_rt(dat.pr, lambdas = "210", alg = "vpdtw")
   expect_equal(names(warp), names(dat.pr[1:2]))
   expect_equal(colnames(warp[[1]]), colnames(dat.pr[[1]]), ignore_attr = TRUE)
   expect_error(correct_rt(dat.pr, lambdas = c("210", "260"),
@@ -165,8 +159,10 @@ test_that("plot_chroms works to plot alignments with ggplot", {
 lam <- c("210", "318")
 pks_egh <- get_peaks(dat.pr, lambdas = lam, fit = "egh", smooth_type = "none",
                      show_progress = FALSE)
+
 pks_gaussian <- get_peaks(dat.pr, lambdas = lam, fit = "gaussian",
                           smooth_type = "none", show_progress = FALSE)
+
 pks_raw <- get_peaks(dat.pr, lambdas = lam, fit = "raw", smooth_type = "savgol",
                      show_progress = FALSE, sd.max = 100, smooth_window=3)
 
