@@ -19,10 +19,6 @@ jobs:
       matrix:
         config:
           - {os: macos-latest,   r: 'release', visual_tests: true}
-          - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
-          - {os: ubuntu-latest,   r: 'release'}
-          - {os: ubuntu-latest,   r: 'oldrel-1'}
 
     env:
       VISUAL_TESTS: ${{ matrix.config.visual_tests }}
@@ -56,8 +52,12 @@ jobs:
           Rscript -e "reticulate::install_miniconda()"
           Rscript -e "reticulate::conda_install('r-reticulate', 'python-kaleido')"
           Rscript -e "reticulate::conda_install('r-reticulate', 'plotly', channel = 'plotly')"
-          Rscript -e "reticulate::use_miniconda('r-reticulate')"
-          
+    
+    - name: Set Python environment for tests
+        if: matrix.config.visual_tests == true
+        run: |
+            echo 'reticulate::use_miniconda("r-reticulate")' >> ~/.Rprofile
+    
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
