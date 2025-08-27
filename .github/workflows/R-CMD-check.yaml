@@ -19,6 +19,10 @@ jobs:
       matrix:
         config:
           - {os: macos-latest,   r: 'release', visual_tests: true}
+          - {os: windows-latest, r: 'release'}
+          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest,   r: 'release'}
+          - {os: ubuntu-latest,   r: 'oldrel-1'}
 
     env:
       VISUAL_TESTS: ${{ matrix.config.visual_tests }}
