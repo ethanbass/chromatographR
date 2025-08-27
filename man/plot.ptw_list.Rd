@@ -29,7 +29,7 @@ or \code{plotly}}
 \item{...}{Additional arguments (placeholder).}
 }
 \description{
-Plots \code{\link{ptw}} alignments.
+Plots \code{\link[ptw]{ptw}} alignments.
 }
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}

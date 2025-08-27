@@ -72,7 +72,7 @@ correct_peaks <- function(peak_list, mod_list, chrom_list, match_names = TRUE){
 
 #' Plot PTW alignments
 #' 
-#' Plots \code{\link{ptw}} alignments.
+#' Plots \code{\link[ptw]{ptw}} alignments.
 #' 
 #' @importFrom graphics matplot
 #' @param x A \code{ptw_list} object created by \code{\link{correct_rt}}.
