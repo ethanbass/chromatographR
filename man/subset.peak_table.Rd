@@ -4,7 +4,7 @@
 \alias{subset.peak_table}
 \title{Subset peak table}
 \usage{
-\method{subset}{peak_table}(x, subset, select, drop = FALSE)
+\method{subset}{peak_table}(x, subset, select, drop = FALSE, ...)
 }
 \arguments{
 \item{x}{A \code{peak_table} object.}
@@ -16,6 +16,8 @@
 \code{peak_table}.}
 
 \item{drop}{Logical. Passed to indexing operator.}
+
+\item{...}{Additional arguments (placeholder).}
 }
 \value{
 A \code{peak_table} object with samples specified by \code{subset}
