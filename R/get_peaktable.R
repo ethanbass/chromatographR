@@ -272,6 +272,9 @@ row.names.peak_table <- function(x){
 #' @return A \code{peak_table} object with samples specified by \code{subset}
 #' and peaks specified by \code{select}.
 #' @author Ethan Bass
+#' @method subset peak_table
+#' @export
+
 subset.peak_table <- function(x, subset, select, drop = FALSE){
   x$tab <- subset(x$tab, subset = subset, 
                   select = select, drop = drop)
