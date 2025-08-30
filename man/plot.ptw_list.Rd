@@ -28,9 +28,20 @@ or \code{plotly}}
 
 \item{...}{Additional arguments (placeholder).}
 }
+\value{
+No return value, called for side effects.
+}
 \description{
 Plots \code{\link[ptw]{ptw}} alignments.
 }
+\section{Side effects}{
+
+Plots PTW alignments at the specified wavelength (\code{lambda}) either as
+individual traces or as a heatmap, according to the value of \code{what}. The
+plot can be produced using either base R graphics, \code{ggplot2}, or 
+\code{plotly}, according to the value of \code{engine}.
+}
+
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 data(Sa_pr)

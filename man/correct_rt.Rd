@@ -80,7 +80,7 @@ equal to \code{"global"}.}
 }
 \value{
 A list of warping models or a list of warped absorbance profiles,
-depending on the value of the \code{what} argument.
+according to the value of the \code{what} argument.
 }
 \description{
 Aligns chromatograms using one of two algorithms, according to the value of

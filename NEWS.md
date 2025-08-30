@@ -1,6 +1,9 @@
 # chromatographR 0.7.5
 
 * Fixed bug in `check_chr` when multiple chromatograms are provided.
+* Added additional arguments as placeholder for `subset.peak_table`.
+* Formalized requirement for R 4.1.0.
+* Minor improvements to documentation.
 
 # chromatographR 0.7.4
 

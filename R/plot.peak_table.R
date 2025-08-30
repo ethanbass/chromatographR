@@ -125,6 +125,11 @@ plot.peak_table <- function(x, loc, chrom_list, what = "peak",
 #' @param ... Additional arguments to \code{\link[graphics]{boxplot}}.
 #' @importFrom stats reformulate terms
 #' @importFrom graphics boxplot
+#' @return No return value, called for side effects.
+#' @section Side effects:
+#' Creates a boxplot according to the provided formula, using data from the
+#' supplied \code{peak_table} object.
+#' @author Ethan Bass
 #' @examples
 #' data(pk_tab)
 #' path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")

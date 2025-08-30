@@ -13,11 +13,20 @@
 
 \item{...}{Additional arguments to \code{\link[graphics]{boxplot}}.}
 }
+\value{
+No return value, called for side effects.
+}
 \description{
 The function can take multiple response variables on the left hand side of the
 formula (separated by \code{+}). In this case, a separate boxplot will be
 produced for each response variable.
 }
+\section{Side effects}{
+
+Creates a boxplot according to the provided formula, using data from the
+supplied \code{peak_table} object.
+}
+
 \examples{
 data(pk_tab)
 path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
@@ -35,5 +44,8 @@ Other visualization functions:
 \code{\link{plot_chroms_heatmap}()},
 \code{\link{plot_spectrum}()},
 \code{\link{scan_chrom}()}
+}
+\author{
+Ethan Bass
 }
 \concept{visualization functions}

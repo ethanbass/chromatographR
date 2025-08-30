@@ -47,7 +47,7 @@
 #' The only argument that cannot be changed is \code{warp.type}: this is always
 #' equal to \code{"global"}.
 #' @return A list of warping models or a list of warped absorbance profiles,
-#' depending on the value of the \code{what} argument.
+#' according to the value of the \code{what} argument.
 #' @author Ethan Bass
 #' @note Adapted from
 #' \href{https://github.com/rwehrens/alsace/blob/master/R/correctRT.R}{correctRT}

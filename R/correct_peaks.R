@@ -83,6 +83,12 @@ correct_peaks <- function(peak_list, mod_list, chrom_list, match_names = TRUE){
 #' @param lambdas Which lambdas to plot.
 #' @param show_legend Logical. Whether to include sample legend.
 #' @param ... Additional arguments (placeholder).
+#' @return No return value, called for side effects.
+#' @section Side effects:
+#' Plots PTW alignments at the specified wavelength (\code{lambda}) either as
+#' individual traces or as a heatmap, according to the value of \code{what}. The
+#' plot can be produced using either base R graphics, \code{ggplot2}, or 
+#' \code{plotly}, according to the value of \code{engine}. 
 #' @author Ethan Bass
 #' @examplesIf interactive()
 #' data(Sa_pr)
