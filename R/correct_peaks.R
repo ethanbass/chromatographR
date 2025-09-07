@@ -1,7 +1,7 @@
 #' Correct peak positions according to a PTW warping model
 #' 
-#' Corrects retention time differences using parametric time warping as 
-#' implemented in the \code{\link[ptw]{ptw}} package.
+#' Corrects retention time differences in \code{peak_list} using parametric time
+#' warping as implemented in the \code{\link[ptw]{ptw}} package.
 #' 
 #' Once an appropriate warping model has been established, corrected retention
 #' times can be predicted for each peak. These are stored in a separate column
@@ -10,20 +10,21 @@
 #' @importFrom stats predict
 #' @param peak_list A `peak_list` object created by \code{\link{get_peaks}},
 #' containing a nested list of peak tables where the first level is the sample,
-#' and the second level is the spectral wavelength. Every component is described
+#' and the second level is the spectral wavelength. Every wavelength is described
 #' by a matrix where each row corresponds to a feature, and the columns contain 
 #' information on that feature (e.g., retention time, peak width (FWHM), height,
 #' area, etc.)
 #' @param mod_list A list of \code{ptw} models.
-#' @param chrom_list List of chromatograms from which the ptw models are derived.
+#' @param chrom_list List of chromatograms from which the \code{ptw} models are
+#' derived.
 #' @param match_names Logical. Whether to actively match the names of the 
 #' \code{peak_list} to the list of models (\code{mod_list}). Defaults to 
 #' \code{TRUE}.
 #' @return The input list of peak tables is returned with extra columns
-#' containing the corrected retention time.
+#' containing the corrected retention times.
 #' @author Ron Wehrens, Ethan Bass
 #' @note This function is adapted from
-#' \href{https://github.com/rwehrens/alsace/blob/master/R/correctPeaks.R}{getPeakTable}
+#' \href{https://github.com/rwehrens/alsace/blob/master/R/correctPeaks.R}{correctPeaks}
 #' function in the alsace package by Ron Wehrens.
 #' @seealso \code{\link{correct_rt}}
 #' @export correct_peaks
