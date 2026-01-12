@@ -24,7 +24,7 @@ plot_chroms(
 \item{x}{A list of chromatograms in matrix format (timepoints x wavelengths).}
 
 \item{lambdas}{A character or numeric vector specifying the wavelengths to 
-plot.}
+plot. For one-dimensional chromatograms, this argument can be ignored.}
 
 \item{idx}{A vector representing the names or numerical indices of the 
 chromatograms to plot.}

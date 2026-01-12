@@ -24,7 +24,8 @@
 #' @importFrom stats median
 #' @param chrom_list A list of profile matrices, each of the same dimensions
 #' (timepoints × wavelengths).
-#' @param lambdas Character vector of wavelengths to find peaks at.
+#' @param lambdas A character or numeric vector specifying the wavelengths to 
+#' find peaks at. For one-dimensional chromatograms, this argument can be ignored.
 #' @param fit What type of fit to use. Current options are exponential-gaussian
 #' hybrid (\code{egh}), gaussian or raw. The \code{raw} setting performs
 #' trapezoidal integration directly on the raw data without fitting a peak shape.

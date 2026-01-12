@@ -13,7 +13,9 @@
 #' @importFrom scales rescale
 #' @importFrom stats approx
 #' @param chrom_list List of chromatograms in matrix format.
-#' @param lambdas Select wavelengths to use by name.
+#' @param lambdas A character or numeric vector specifying the wavelengths to 
+#' use for alignment. Only one wavelength should be specified for VPdtw. For
+#' one-dimensional chromatograms, this argument can be ignored.
 #' @param models List of models to warp by. The models provided here (if any)
 #' must match the algorithm selected in \code{alg}.
 #' @param reference Index of the sample that is to be considered the reference

@@ -28,7 +28,9 @@ correct_rt(
 \arguments{
 \item{chrom_list}{List of chromatograms in matrix format.}
 
-\item{lambdas}{Select wavelengths to use by name.}
+\item{lambdas}{A character or numeric vector specifying the wavelengths to
+use for alignment. Only one wavelength should be specified for VPdtw. For
+one-dimensional chromatograms, this argument can be ignored.}
 
 \item{models}{List of models to warp by. The models provided here (if any)
 must match the algorithm selected in \code{alg}.}

@@ -23,7 +23,8 @@ get_peaks(
 \item{chrom_list}{A list of profile matrices, each of the same dimensions
 (timepoints × wavelengths).}
 
-\item{lambdas}{Character vector of wavelengths to find peaks at.}
+\item{lambdas}{A character or numeric vector specifying the wavelengths to
+find peaks at. For one-dimensional chromatograms, this argument can be ignored.}
 
 \item{fit}{What type of fit to use. Current options are exponential-gaussian
 hybrid (\code{egh}), gaussian or raw. The \code{raw} setting performs
