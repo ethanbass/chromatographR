@@ -4,7 +4,7 @@
   [![Last commit](https://img.shields.io/github/last-commit/ethanbass/chromatographR)]()
   [![R-CMD-check](https://github.com/ethanbass/chromatographR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ethanbass/chromatographR/actions/workflows/R-CMD-check.yaml)
   <br>
-  [![chromatographR status badge](https://ethanbass.r-universe.dev/badges/chromatographR)](https://ethanbass.r-universe.dev)
+  [![chromatographR status badge](https://ethanbass.r-universe.dev/badges/chromatographR)](https://ethanbass.r-universe.dev/chromatographR)
   [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/chromatographR)](https://cran.r-project.org/package=chromatographR)
   <br>
   [![metacran downloads](https://cranlogs.r-pkg.org/badges/grand-total/chromatographR)](https://cran.r-project.org/package=chromatographR)
@@ -34,7 +34,7 @@ remotes::install_github("https://github.com/ethanbass/chromatographR/")
 or from R Universe:
 
 ```
-install.packages("chromatographR", repos="https://ethanbass.r-universe.dev/", type="source")
+install.packages("chromatographR", repos="https://ethanbass.r-universe.dev/")
 ```
 
 ## Usage
