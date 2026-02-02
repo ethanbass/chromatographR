@@ -5,16 +5,22 @@
 #' @name reshape_chroms
 #' @param x A list of chromatographic matrices in wide format.
 #' @param idx Indices of chromatograms to convert.
+#' @param time_resolution Time resolution for plot. This argument can be used
+#' to thin the time axis while reshaping. By default the time resoution is not
+#' altered.
 #' @param sample_var String with name of new column containing sample IDs.
 #' @param lambdas Vector specifying wavelength(s) to include.
 #' @param rts Vector specifying retention times to include.
+#' @param transfer_metadata Logical. Whether to transfer metadata attributes or
+#' not. Defaults to \code{FALSE}.
 #' @return A list of chromatographic matrices in long format.
 #' @author Ethan Bass
 #' @family utility functions
 #' @export
 
-reshape_chroms <- function(x, idx, sample_var = "sample",
-                            lambdas = NULL, rts = NULL){
+reshape_chroms <- function(x, idx, time_resolution = NULL,  
+                           sample_var = "sample", lambdas = NULL, rts = NULL, 
+                           transfer_metadata = FALSE){
   if (missing(idx)){
     idx <- seq_along(x)
   }
@@ -22,7 +28,9 @@ reshape_chroms <- function(x, idx, sample_var = "sample",
     lambdas <- colnames(x[[1]])
   }
   dat <- lapply(idx, function(i){
-    xx <- reshape_chrom(x = x[[i]], lambdas = lambdas, rts = rts)
+    xx <- reshape_chrom(x = x[[i]], time_resolution = time_resolution,
+                        lambdas = lambdas, rts = rts,
+                        transfer_metadata)
     xx[, sample_var] <- names(x)[[i]]
     xx
   })
@@ -31,21 +39,20 @@ reshape_chroms <- function(x, idx, sample_var = "sample",
 
 #' Reshapes a single chromatogram from wide to long format
 #' @name reshape_chrom
-#' @importFrom stats reshape
 #' @param x A chromatographic matrix in wide format.
 #' @param lambdas Vector specifying wavelength(s) to include.
 #' @param rts Vector specifying retention times to include.
 #' @return A chromatographic matrix in long format.
 #' @author Ethan Bass
 #' @noRd
-
-reshape_chrom <- function(x, lambdas = NULL, rts = NULL){
-  times <- get_times(x = x)
+reshape_chrom <- function(x, time_resolution = NULL, lambdas = NULL, rts = NULL, 
+                          transfer_metadata = FALSE){
   xx <- as.data.frame(x)
   if (!is.null(lambdas)){
     xx <- xx[, lambdas, drop = FALSE]
   }
   if (!is.null(rts)){
+    times <- get_times(x = x)
     if (is.character(rts)){
       rts <- as.numeric(rts)
     }
@@ -53,66 +60,21 @@ reshape_chrom <- function(x, lambdas = NULL, rts = NULL){
       get_retention_idx(RT = rt, times = times)})
     xx <- xx[rts.idx, , drop = FALSE]
   }
-  data <- reshape(as.data.frame(rt = rownames(xx), xx), direction = "long",
-                  varying = list(seq_len(ncol(xx))), v.names = "absorbance",
-                  times = colnames(xx), timevar = "lambda",
-                  idvar = "rt", ids = rownames(xx))
-  rownames(data) <- NULL
-  data$rt <- as.numeric(data$rt)
-  data$lambda <- as.numeric(data$lambda)
-  data <- data[,c(3,2,1)]
-  transfer_metadata(data, x, transfer_class = TRUE)
-}
-
-#' Reshape peaktable
-#' 
-#' Reshapes peak table from wide to long format
-#' @name reshape_peaktable
-#' @param x A \code{peak_table} object.
-#' @param peaks A character vector specifying the peaks to include. If the
-#' character vector is named, the names of the vector elements will be used in
-#' place of the original peak names.
-#' @param metadata A character vector specifying the metadata fields to include.
-#' @param fixed_levels Logical. Whether to fix factor levels of features in the
-#' order provided. Defaults to \code{TRUE}.
-#' @return A data.frame containing the information for the specified 
-#' \code{peaks} in long format.
-#' @author Ethan Bass
-#' @family utility functions
-#' @export
-
-reshape_peaktable <- function(x, peaks, metadata, fixed_levels = TRUE){
-  if (!missing(peaks)){
-    if (is.numeric(peaks)){
-      peaks <- colnames(x$tab)[peaks]
-    }
-    df <- x$tab[, match(peaks, colnames(x$tab)), drop = FALSE]
-    if (!is.null(names(peaks))){
-      colnames(df) <- names(peaks)
-      peaks <- colnames(df)
-    }
-  } else {
-    df <- x$tab
+  if (!is.null(time_resolution)){
+    times <- get_times(xx)
+    time_diff <- mean(diff(times[1:10]))
+    thin_factor <- round(time_resolution / time_diff)
+    keep_idx <- seq(1, length(times), by = thin_factor)
+    xx <- xx[keep_idx, , drop = FALSE]
   }
-  if (!missing(metadata)){
-    meta_idx <- which(colnames(x$sample_meta) %in% metadata)
-    x$sample_meta <- x$sample_meta[, meta_idx, drop = FALSE]
+  data <- data.frame(
+    rt = as.numeric(rep(rownames(xx), ncol(xx))),
+    lambda = as.numeric(rep(colnames(xx), each = nrow(xx))),
+    absorbance = as.vector(as.matrix(xx)),
+    row.names = NULL
+  )
+  if (transfer_metadata){
+    data <- transfer_metadata(data, x, transfer_class = TRUE)
   }
-  xx <- reshape(as.data.frame(chr = rownames(df), df), direction = "long",
-    varying = list(seq_len(ncol(df))), v.names = x$args[["response"]],
-    times = colnames(df), timevar = "peak",
-    idvar = "sample", ids = rownames(df))
-  rownames(xx) <- NULL
-  xx <- merge(xx, data.frame(peak=colnames(x$pk_meta), 
-                             t(x$pk_meta[c("lambda", "rt"),])),
-        by = "peak", all.x = TRUE)
-  xx <- xx[, c(1, 3, 4, 5, 2)]
-  if (!is.null(dim(x$sample_meta))){
-    xx <- merge(xx, data.frame(sample = row.names(df), x$sample_meta),
-                by = "sample", all.x = TRUE)
-  }
-  if (fixed_levels){
-    xx$peak <- factor(xx$peak, levels = peaks)
-  }
-  xx
+ data
 }

@@ -4,18 +4,33 @@
 \alias{reshape_chroms}
 \title{Reshape chromatograms}
 \usage{
-reshape_chroms(x, idx, sample_var = "sample", lambdas = NULL, rts = NULL)
+reshape_chroms(
+  x,
+  idx,
+  time_resolution = NULL,
+  sample_var = "sample",
+  lambdas = NULL,
+  rts = NULL,
+  transfer_metadata = FALSE
+)
 }
 \arguments{
 \item{x}{A list of chromatographic matrices in wide format.}
 
 \item{idx}{Indices of chromatograms to convert.}
 
+\item{time_resolution}{Time resolution for plot. This argument can be used
+to thin the time axis while reshaping. By default the time resoution is not
+altered.}
+
 \item{sample_var}{String with name of new column containing sample IDs.}
 
 \item{lambdas}{Vector specifying wavelength(s) to include.}
 
 \item{rts}{Vector specifying retention times to include.}
+
+\item{transfer_metadata}{Logical. Whether to transfer metadata attributes or
+not. Defaults to \code{FALSE}.}
 }
 \value{
 A list of chromatographic matrices in long format.

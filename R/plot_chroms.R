@@ -8,6 +8,13 @@
 #' plot. For one-dimensional chromatograms, this argument can be ignored.
 #' @param idx A vector representing the names or numerical indices of the 
 #' chromatograms to plot.
+#' @param time_resolution Time resolution for plot in minutes. Defaults to 
+#' \code{0.01}. Thinning the time axis dramatically improved speed when plotting
+#' many chromatograms.
+#' @param time_unit Time units of the provided chromatograms. Units will be
+#' detected automatically if possible from chromatogram metadata. If 
+#' \code{time_unit} attribute is not present, the time units will default to to 
+#' \code{min}.
 #' @param xlim Range of x axis.
 #' @param ylim Range of y axis.
 #' @param ylab Y label. Defaults to "Absorbance".
@@ -15,7 +22,8 @@
 #' @param engine Plotting engine. Either \code{base} (\code{\link[graphics]{matplot}}), 
 #' \code{\link[plotly]{plotly}}, or \link[ggplot2:ggplot2-package]{ggplot}.
 #' @param linewidth Line width.
-#' @param show_legend Logical. Whether to display legend or not. Defaults to TRUE.
+#' @param show_legend Logical. Whether to display legend or not. Defaults to 
+#' \code{FALSE}.
 #' @param legend_position Position of legend.
 #' @param title Title for plot.
 #' @param ... Additional arguments to plotting function specified by \code{engine}.
@@ -31,12 +39,20 @@
 #' @family visualization functions
 #' @export
 
-plot_chroms <- function(x, lambdas, idx, xlim = NULL, ylim = NULL, 
+plot_chroms <- function(x, lambdas, idx, time_resolution = 0.01,
+                        time_unit = NULL,
+                        xlim = NULL, ylim = NULL, 
                         xlab = "", ylab = "Absorbance",
                         engine = c("base", "ggplot", "plotly"), linewidth = 1, 
-                        show_legend = TRUE, legend_position = "topright", 
+                        show_legend = FALSE, legend_position = "topright", 
                         title = "", ...){
   engine <- match.arg(engine, c("base", "ggplot", "plotly"))
+  if (is.null(time_unit)){
+    time_unit <- get_time_unit(x, na_value = "min")
+  }
+  time_unit <- match.arg(time_unit, c("min", "s", "ms"))
+  tfac <- switch(time_unit, "min" = 1, "s" = 60, "ms" = 60*1000)
+  time_resolution <- tfac*time_resolution
   if (!class(x) %in% c("list", "chrom_list")){
     stop("Please supply list of chromatograms.")
   }
@@ -71,13 +87,19 @@ plot_chroms <- function(x, lambdas, idx, xlim = NULL, ylim = NULL,
     axis(2)
     box()
     for (i in seq_along(idx)){
-        matplot(get_times(x, idx = idx[i]), x[[idx[i]]][,lambdas.idx], type = 'l',
-                add = TRUE, col = i, lwd = linewidth, ...)
+      times <- get_times(x, idx = idx[i])
+      time_diff <- mean(diff(times[1:10]))
+      thin_factor <- round(time_resolution/time_diff)
+      keep_idx <- seq(1, length(times), by = thin_factor)
+      matplot(times[keep_idx], x[[idx[i]]][keep_idx, lambdas.idx], type = 'l',
+              add = TRUE, col = i, lwd = linewidth, ...)
     }
     if (show_legend)
-      legend(x = legend_position, legend = names(x)[idx], fill = seq_along(x[idx]))
+      legend(x = legend_position, legend = names(x)[idx], 
+             fill = seq_along(x[idx]))
   } else {
-    xx <- reshape_chroms(x, idx = idx, lambdas = lambdas.idx)
+    xx <- reshape_chroms(x, idx = idx, lambdas = lambdas.idx, 
+                         time_resolution = time_resolution)
     if (engine == "ggplot"){
       check_for_pkg("ggplot2")
       .data <- ggplot2::.data
