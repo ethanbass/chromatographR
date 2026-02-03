@@ -379,3 +379,15 @@ simpleCap <- function(x) {
   paste(toupper(substring(s, 1, 1)), substring(s, 2),
         sep = "", collapse = " ")
 }
+
+#' Deprecated function warning
+#' @noRd
+resolve_deprecated <- function(arg, new_arg){
+  if (!is.null(arg)){
+    warning(sprintf("The '%s' function is deprecated. Please use '%s' instead.", 
+                    deparse(substitute(arg)), deparse(substitute(new_arg))))
+    arg
+  } else{
+    new_arg
+  }
+}
