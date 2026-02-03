@@ -211,6 +211,36 @@ get_time_resolution <- function(chrom_list, idx = 1){
   signif(median(diff(ts)))
 }
 
+#' Get time unit
+#' 
+#' Get time units from a list of chromatograms or a \code{peak_table} object.
+#' 
+#' @param x A list of chromatograms or \code{peak_table} object.
+#' @param idx Index of chromatogram from which to extract times.
+#' @param na_value What to return if \code{time_unit} attribute is not present.
+#' @return A string specifying the time units for the provided chromatograms.c
+#' @family utility functions
+#' @noRd
+get_time_unit <- function(x, idx = 1, na_value=NA){
+  if (inherits(x, "peak_table")){
+    x <- get_chrom_list(x)
+  }
+  if (inherits(x, "chrom_list") | inherits(x, "list")){
+    chrom <- x[[1]]
+  } else if (inherits(x, "matrix")){
+    chrom <- x
+  }
+  time_unit <- attr(chrom, "time_unit")
+  if (is.null(time_unit)){
+    return(na_value)
+  } else{
+    switch(time_unit, "Minutes" = "min", 
+           "Seconds" = "s", 
+           "Milliseconds" = "ms",
+           time_unit)
+  }
+}
+
 #' Check for suggested package
 #' 
 #' This function checks for a suggested package and returns an error if the 
