@@ -159,12 +159,14 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
     ptable
   })
   names(result) <- names(chrom_list)
+  
   structure(result,
             chrom_list = chrom_list_string,
-            lambdas = lambdas, fit = fit, sd.max = sd.max,
-            max.iter = max.iter,
-            time.units = time.units,
-            class = "peak_list")
+            lambdas = lambdas, fit = fit, sd_max = sd_max,
+            max_iter = max_iter,
+            time_unit = time_unit,
+            intensity_unit = get_metadata_attribute(chrom_list[[1]], "detector_y_unit"),
+            class = c("peak_list", "list"))
 }
 
 #' Remove bad peaks
