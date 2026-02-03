@@ -111,9 +111,9 @@ filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value, lambda,
     if (!inherits(rts, c("numeric"))){
       stop("`rts` should be a vector of retention times.")
     }
-    idx.rt <- as.numeric(sapply(rts, function(x){
-      which(elementwise.all.equal(x, peak_table$pk_meta["rt",],
-                                  tolerance = tol, scale = 1))
+    idx.rt <- as.numeric(sapply(rts, function(rt){
+      diffs <- abs(rt - peak_table$pk_meta["rt", ])
+      ifelse(min(diffs) <= tol, which.min(diffs), NA)
     }))
     nas <- is.na(idx.rt)
     if (any(nas)){
