@@ -9,31 +9,31 @@ fit_peaks(
   x,
   lambda,
   pos = NULL,
-  sd.max = 50,
+  sd_max = 50,
   fit = c("egh", "gaussian", "raw"),
-  max.iter = 1000,
+  max_iter = 1000,
   estimate_purity = TRUE,
   noise_threshold = 0.001,
   ...
 )
 }
 \arguments{
-\item{x}{A chromatogram in matrix format.}
+\item{x}{A single chromatogram in matrix format.}
 
 \item{lambda}{Wavelength to fit peaks at.}
 
-\item{pos}{Locations of peaks in vector y. If NULL, \code{find_peaks} will
+\item{pos}{Locations of peaks in vector \code{y}. If NULL, \code{find_peaks} will
 run automatically to find peak positions.}
 
-\item{sd.max}{Maximum width (standard deviation) for peaks. Defaults to 50.}
+\item{sd_max}{Maximum width (standard deviation) for peaks. Defaults to 50.}
 
-\item{fit}{Function for peak fitting. (Currently exponential-gaussian hybrid
-\code{egh}, \code{gaussian} and \code{raw} settings are supported). If \code{
+\item{fit}{Function for peak fitting. Currently, exponential-gaussian hybrid
+\code{egh}, \code{gaussian} and \code{raw} settings are supported. If \code{
 raw} is selected, trapezoidal integration will be performed on raw data
 without fitting a peak shape. Defaults to \code{egh}.)}
 
-\item{max.iter}{Maximum number of iterations to use in nonlinear least
-squares peak-fitting. (Defaults to 1000).}
+\item{max_iter}{Maximum number of iterations to use in nonlinear least
+squares peak-fitting. Defaults to 1000.}
 
 \item{estimate_purity}{Logical. Whether to estimate purity or not. Defaults
 to TRUE.}
@@ -53,7 +53,7 @@ the following information about each peak:
 \item{FWHM}{The full width at half maximum.}
 \item{height}{Peak height.}
 \item{area}{Peak area.}
-\item{r.squared}{The R-squared value for linear fit of the model to the data.}
+\item{r.squared}{The R\if{html}{\out{<sup>}}2\if{html}{\out{</sup>}} value for linear fit of the model to the data.}
 \item{purity}{The spectral purity of peak as assessed by \code{\link{get_purity}}.}
 Again, the first five elements (rt, start, end, sd and FWHM) are expressed
 as indices, so not in terms of the real retention times. The transformation

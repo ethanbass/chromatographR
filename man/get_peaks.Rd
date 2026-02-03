@@ -8,14 +8,17 @@ get_peaks(
   chrom_list,
   lambdas,
   fit = c("egh", "gaussian", "raw"),
-  sd.max = 50,
-  max.iter = 100,
-  time.units = c("min", "s", "ms"),
+  sd_max = 50,
+  max_iter = 100,
+  time_unit = c("min", "s", "ms"),
   estimate_purity = FALSE,
   noise_threshold = 0.001,
   show_progress = NULL,
   cl = 2,
   collapse = FALSE,
+  time.units = NULL,
+  sd.max = NULL,
+  max.iter = NULL,
   ...
 )
 }
@@ -30,12 +33,12 @@ find peaks at. For one-dimensional chromatograms, this argument can be ignored.}
 hybrid (\code{egh}), gaussian or raw. The \code{raw} setting performs
 trapezoidal integration directly on the raw data without fitting a peak shape.}
 
-\item{sd.max}{Maximum width (standard deviation) for peaks. Defaults to 50.}
+\item{sd_max}{Maximum width (standard deviation) for peaks. Defaults to 50.}
 
-\item{max.iter}{Maximum number of iterations for non-linear least squares
+\item{max_iter}{Maximum number of iterations for non-linear least squares
 in \code{\link{fit_peaks}}.}
 
-\item{time.units}{Units of \code{sd}, \code{FWHM}, \code{area}, and \code{tau}
+\item{time_unit}{Units of \code{sd}, \code{FWHM}, \code{area}, and \code{tau}
 (if applicable). Options are minutes (\code{"min"}), seconds (\code{"s"}), or
 milliseconds (\code{"ms"}).}
 
@@ -54,6 +57,15 @@ Defaults to 2. On Windows integer values will be ignored.}
 
 \item{collapse}{Logical. Whether to collapse multiple peak lists per sample
 into a single list when multiple wavelengths (\code{lambdas}) are provided.}
+
+\item{time.units}{The \code{time.units} argument is deprecated. Please use
+\code{time_unit} instead.}
+
+\item{sd.max}{The \code{sd.max} argument is deprecated. Please use
+\code{sd_max} instead.}
+
+\item{max.iter}{The \code{max.iter} argument is deprecated. Please use
+\code{max_iter} instead.}
 
 \item{\dots}{Additional arguments to \code{\link{find_peaks}}. Arguments
 provided to \code{\link{find_peaks}} can be used to fine-tune the peak-finding
@@ -106,8 +118,9 @@ aggressive smoothing may cause small peaks to be overlooked.
 
 The standard deviation (\code{sd}), full-width at half maximum (\code{FWHM}),
 tau \code{tau}, and \code{area} are returned in units determined by
-\code{time.units}. By default, the units are in minutes. To compare directly
-with 'ChemStation' integration results, the time units should be in seconds.
+\code{time_unit}. By default, the units are in minutes. To compare directly
+with 'ChemStation' integration results, the time units should be changed to
+seconds.
 }
 \note{
 The bones of this function are adapted from the
@@ -118,7 +131,7 @@ identification and peak-fitting are not the same).
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 data(Sa_pr)
-pks <- get_peaks(Sa_pr, lambdas = c('210'), sd.max=50, fit="egh")
+pks <- get_peaks(Sa_pr, lambdas = c('210'), sd_max = 50, fit = "egh")
 \dontshow{\}) # examplesIf}
 }
 \references{

@@ -17,8 +17,9 @@
 #' 
 #' The standard deviation (\code{sd}), full-width at half maximum (\code{FWHM}),
 #' tau \code{tau}, and \code{area} are returned in units determined by 
-#' \code{time.units}. By default, the units are in minutes. To compare directly
-#' with 'ChemStation' integration results, the time units should be in seconds.
+#' \code{time_unit}. By default, the units are in minutes. To compare directly
+#' with 'ChemStation' integration results, the time units should be changed to
+#' seconds.
 #' 
 #' @aliases get_peaks
 #' @importFrom stats median
@@ -29,12 +30,18 @@
 #' @param fit What type of fit to use. Current options are exponential-gaussian
 #' hybrid (\code{egh}), gaussian or raw. The \code{raw} setting performs
 #' trapezoidal integration directly on the raw data without fitting a peak shape.
-#' @param sd.max Maximum width (standard deviation) for peaks. Defaults to 50.
-#' @param max.iter Maximum number of iterations for non-linear least squares
+#' @param sd_max Maximum width (standard deviation) for peaks. Defaults to 50.
+#' @param sd.max The \code{sd.max} argument is deprecated. Please use 
+#' \code{sd_max} instead.
+#' @param max_iter Maximum number of iterations for non-linear least squares
 #' in \code{\link{fit_peaks}}.
-#' @param time.units Units of \code{sd}, \code{FWHM}, \code{area}, and \code{tau}
+#' @param max.iter The \code{max.iter} argument is deprecated. Please use 
+#' \code{max_iter} instead.
+#' @param time_unit Units of \code{sd}, \code{FWHM}, \code{area}, and \code{tau}
 #' (if applicable). Options are minutes (\code{"min"}), seconds (\code{"s"}), or 
 #' milliseconds (\code{"ms"}).
+#' @param time.units The \code{time.units} argument is deprecated. Please use 
+#' \code{time_unit} instead.
 #' @param estimate_purity Logical. Whether to estimate purity or not. Defaults
 #' to \code{FALSE}. (If \code{TRUE}, this will slow down the function significantly).
 #' @param noise_threshold Noise threshold. Argument to \code{get_purity}.
@@ -97,18 +104,22 @@
 #' 
 #' @examplesIf interactive()
 #' data(Sa_pr)
-#' pks <- get_peaks(Sa_pr, lambdas = c('210'), sd.max=50, fit="egh")
+#' pks <- get_peaks(Sa_pr, lambdas = c('210'), sd_max = 50, fit = "egh")
 #' @seealso \code{\link{find_peaks}}, \code{\link{fit_peaks}}
 #' @export get_peaks
 #' @md
 
 get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
-                      sd.max = 50, max.iter = 100,
-                      time.units = c("min", "s", "ms"),
+                      sd_max = 50, max_iter = 100,
+                      time_unit = c("min", "s", "ms"),
                       estimate_purity = FALSE,  noise_threshold = .001,
-                      show_progress = NULL, cl = 2, collapse = FALSE, ...){
-  time.units <- match.arg(time.units, c("min", "s", "ms"))
-  tfac <- switch(time.units, "min" = 1, "s" = 60, "ms" = 60*1000)
+                      show_progress = NULL, cl = 2, collapse = FALSE, 
+                      time.units = NULL, sd.max = NULL, max.iter = NULL, ...){
+  max_iter <- resolve_deprecated(max.iter, max_iter)
+  sd_max <- resolve_deprecated(sd.max, sd_max)
+  time_unit <- resolve_deprecated(time.units, time_unit)
+  time_unit <- match.arg(time_unit, c("min", "s", "ms"))
+  tfac <- switch(time_unit, "min" = 1, "s" = 60, "ms" = 60*1000)
   fit <- match.arg(fit, c("egh", "gaussian", "raw"))
   chrom_list_string <- deparse(substitute(chrom_list))
   if (class(chrom_list)[1] == "matrix")
@@ -132,7 +143,7 @@ get_peaks <- function(chrom_list, lambdas, fit = c("egh", "gaussian", "raw"),
   result <- laplee(seq_along(chrom_list), function(sample){
     suppressWarnings(ptable <- lapply(lambdas, function(lambda){
       pks <- fit_peaks(chrom_list[[sample]], lambda = lambda, fit = fit,
-                       max.iter = max.iter, sd.max = sd.max,
+                       max_iter = max_iter, sd_max = sd_max,
                        estimate_purity = estimate_purity,
                        noise_threshold = noise_threshold, ...)
       pks <- cbind(sample = names(chrom_list)[sample], lambda, pks)

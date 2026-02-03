@@ -61,8 +61,8 @@
 #' (Accessed January, 2022).
 #' @export find_peaks
 
-find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol",
-                                          "mva", "tmva", "none"),
+find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva", 
+                                          "tmva", "none"),
                        smooth_window = .001, slope_thresh = 0, amp_thresh = 0,
                        bounds = TRUE){
   if (!is.vector(y)){
@@ -128,17 +128,17 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol",
 #' The area under the fitted curve is then estimated using trapezoidal
 #' approximation.
 #' 
-#' @param x A chromatogram in matrix format.
+#' @param x A single chromatogram in matrix format.
 #' @param lambda Wavelength to fit peaks at.
-#' @param pos Locations of peaks in vector y. If NULL, \code{find_peaks} will
+#' @param pos Locations of peaks in vector \code{y}. If NULL, \code{find_peaks} will
 #' run automatically to find peak positions.
-#' @param sd.max Maximum width (standard deviation) for peaks. Defaults to 50.
-#' @param fit Function for peak fitting. (Currently exponential-gaussian hybrid
-#' \code{egh}, \code{gaussian} and \code{raw} settings are supported). If \code{
+#' @param sd_max Maximum width (standard deviation) for peaks. Defaults to 50.
+#' @param fit Function for peak fitting. Currently, exponential-gaussian hybrid
+#' \code{egh}, \code{gaussian} and \code{raw} settings are supported. If \code{
 #' raw} is selected, trapezoidal integration will be performed on raw data
 #' without fitting a peak shape. Defaults to \code{egh}.)
-#' @param max.iter Maximum number of iterations to use in nonlinear least
-#' squares peak-fitting. (Defaults to 1000).
+#' @param max_iter Maximum number of iterations to use in nonlinear least
+#' squares peak-fitting. Defaults to 1000.
 #' @param estimate_purity Logical. Whether to estimate purity or not. Defaults
 #' to TRUE.
 #' @param noise_threshold Noise threshold. Input to \code{get_purity}.
@@ -153,7 +153,7 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol",
 #' \item{FWHM}{The full width at half maximum.}
 #' \item{height}{Peak height.}
 #' \item{area}{Peak area.}
-#' \item{r.squared}{The R-squared value for linear fit of the model to the data.}
+#' \item{r.squared}{The R<sup>2</sup> value for linear fit of the model to the data.}
 #' \item{purity}{The spectral purity of peak as assessed by \code{\link{get_purity}}.}
 #' Again, the first five elements (rt, start, end, sd and FWHM) are expressed
 #' as indices, so not in terms of the real retention times. The transformation
@@ -180,14 +180,14 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol",
 #' @keywords internal
 #' @md
 
-fit_peaks <- function (x, lambda, pos = NULL, sd.max = 50,
-                       fit = c("egh", "gaussian", "raw"),  max.iter = 1000, 
+fit_peaks <- function (x, lambda, pos = NULL, sd_max = 50,
+                       fit = c("egh", "gaussian", "raw"),  max_iter = 1000, 
                        estimate_purity = TRUE, noise_threshold = .001, ...){
-  lambda.idx <- get_lambda_idx(lambda, as.numeric(colnames(x)))
+  lambda.idx <- get_lambda_idx(lambda, get_lambdas(x))
   y <- x[,lambda.idx]
   fit <- match.arg(fit, c("egh", "gaussian", "raw"))
   if (is.null(pos)){
-    pos <- find_peaks(y, ...)
+    pos <- find_peaks(y = y, ...)
   }
   if (ncol(x) == 1){
     estimate_purity <- FALSE
@@ -216,13 +216,13 @@ fit_peaks <- function (x, lambda, pos = NULL, sd.max = 50,
                   "raw" = fitpk_raw)
   
   huhn <- data.frame(t(apply(pos, 1, fitpk, x = x,
-                             lambda = lambda.idx, max.iter = max.iter,
+                             lambda = lambda.idx, max_iter = max_iter,
                              estimate_purity = estimate_purity,
                              noise_threshold = noise_threshold)))
   colnames(huhn) <- tabnames
   huhn <- data.frame(sapply(huhn, as.numeric, simplify = FALSE))
-  if (!is.null(sd.max)) {
-    huhn <- huhn[huhn$sd < sd.max, ]
+  if (!is.null(sd_max)) {
+    huhn <- huhn[huhn$sd < sd_max, ]
   }
   x <- try(huhn[huhn$rt > 0,], silent = TRUE)
   if(inherits(x, "try-error")) NA else x
@@ -253,7 +253,7 @@ gaussian <- function(x, center = 0, width = 1, height = NULL, floor = 0){
 fit_gaussian <- function(x, y, start.center = NULL,
                          start.width = NULL, start.height = NULL,
                          start.floor = NULL, fit.floor = FALSE,
-                         max.iter = 1000){
+                         max_iter = 1000){
   # estimate starting values
   who.max <- which.max(y)
   if (is.null(start.center)) start.center <- x[who.max]
@@ -261,7 +261,7 @@ fit_gaussian <- function(x, y, start.center = NULL,
   if (is.null(start.width)) start.width <- sum( y > (start.height/2)) / 2
   
   # call the Nonlinear Least Squares, either fitting the floor too or not
-  controlList <- nls.control(maxiter = max.iter, minFactor = 1/512,
+  controlList <- nls.control(maxiter = max_iter, minFactor = 1/512,
                               warnOnly = TRUE)
   starts <- list("center" = start.center, "width" = start.width,
                   "height" = start.height)
@@ -274,9 +274,7 @@ fit_gaussian <- function(x, y, start.center = NULL,
     nlsAns <- try(nlsLM( y ~ gaussian(x, center, width, height, floor),
                          start = starts, control = controlList), silent = TRUE)
   }
-  
   # package up the results to pass back
-  
     if (inherits(nlsAns, "try-error")){
       yAns <- gaussian(x, start.center, start.width, start.height, start.floor)
       out <- list("center" = start.center, "width" = start.width,
@@ -312,7 +310,7 @@ egh <- function(x, center, width,  height, tau, floor = 0){
 #' @noRd
 fit_egh <- function(x1, y1, start.center = NULL, start.width = NULL,
                     start.tau = NULL, start.height = NULL, start.floor = NULL,
-                    fit.floor = FALSE, max.iter = 1000) {
+                    fit.floor = FALSE, max_iter = 1000) {
   
   # try to find the best egh to fit the given data
   
@@ -331,7 +329,7 @@ fit_egh <- function(x1, y1, start.center = NULL, start.width = NULL,
     start.tau <- 0
   }
   # call the Nonlinear Least Squares, either fitting the floor too or not
-  controlList <- nls.control(maxiter = max.iter, minFactor = 1/512,
+  controlList <- nls.control(maxiter = max_iter, minFactor = 1/512,
                              warnOnly = TRUE)
   starts <- list("center" = start.center, "width" = start.width, 
                  "height" = start.height, "tau" = start.tau)
@@ -369,7 +367,7 @@ fit_egh <- function(x1, y1, start.center = NULL, start.width = NULL,
 
 #' Fit peak (gaussian)
 #' @noRd
-fitpk_gaussian <- function(x, pos, lambda, max.iter,
+fitpk_gaussian <- function(x, pos, lambda, max_iter,
                            estimate_purity = TRUE, noise_threshold = .001, ...){
   
   y <- x[,lambda]
@@ -378,9 +376,9 @@ fitpk_gaussian <- function(x, pos, lambda, max.iter,
   suppressWarnings(m <- fit_gaussian(peak.loc, y[peak.loc],
                                      start.center = xloc,
                                      start.height = y[xloc],
-                                     max.iter = max.iter)
+                                     max_iter = max_iter)
   )
-  area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1)))) # trapezoidal integration
+  area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1))))
   r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE)
   purity <- get_purity(x = x, pos = pos, try = estimate_purity,
                        noise_threshold = noise_threshold)
@@ -391,13 +389,13 @@ fitpk_gaussian <- function(x, pos, lambda, max.iter,
 
 #' Fit peak (exponential-gaussian hybrid)
 #' @noRd
-fitpk_egh <- function(x, pos, lambda, max.iter,
+fitpk_egh <- function(x, pos, lambda, max_iter,
                       estimate_purity = TRUE, noise_threshold = .001){
   y <- x[,lambda]
   xloc <- pos[1]
   peak.loc <- seq.int(pos[2], pos[3])
   suppressWarnings(m <- fit_egh(peak.loc, y[peak.loc], start.center = xloc,
-                                start.height = y[xloc], max.iter = max.iter)
+                                start.height = y[xloc], max_iter = max_iter)
   )
   r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE)
   purity <- get_purity(x = x, pos = pos, try = estimate_purity,
@@ -411,7 +409,7 @@ fitpk_egh <- function(x, pos, lambda, max.iter,
 
 #' Fit peak (raw)
 #' @noRd
-fitpk_raw <- function(x, pos, lambda, max.iter,
+fitpk_raw <- function(x, pos, lambda, max_iter,
                       estimate_purity = TRUE, noise_threshold = .001){
   y <- x[,lambda]
   xloc <- pos[1]
@@ -456,7 +454,7 @@ savgol <- function(T, fl, forder = 4, dorder = 0) {
   return( Tsg )
 }
 
-#' 'pinv' port from pracma
+#' 'pinv' function from pracma
 #' @author Hans W. Borchers
 #' @note This function is ported from \href{https://cran.r-project.org/web/packages/pracma/index.html}{pracma},
 #' where it is licensed under GPL (>= 3).
