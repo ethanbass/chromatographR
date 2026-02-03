@@ -220,9 +220,11 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
                         reference_spectra = NA,
                         metadata_path = NA,
                         normalized = FALSE,
-                        normalization_by = NA
+                        normalization_by = NA,
+                        time_unit = attr(peak_list, "time_unit"),
+                        intensity_unit = attr(peak_list, "intensity_unit")
                         ))
-  class(result) <- "peak_table"
+  class(result) <- c("peak_table", "list")
   attr(result, "pk_args") <- attr(peak_list,"meta")
   result
 }
