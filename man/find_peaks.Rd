@@ -14,30 +14,30 @@ find_peaks(
 )
 }
 \arguments{
-\item{y}{Signal (as a numerical vector).}
+\item{y}{A chromatographic signal (as a numeric vector).}
 
 \item{smooth_type}{Type of smoothing. Either gaussian kernel (\code{"gaussian"}),
-box kernel (\code{"box"}), savitzky-golay smoothing (\code{"savgol"}),
+box kernel (\code{"box"}), Savitzky-Golay smoothing (\code{"savgol"}),
 moving average (\code{"mva"}), triangular moving average (\code{"tmva"}), or 
 no smoothing (\code{"none"}).}
 
 \item{smooth_window}{Smoothing window. Larger values of this parameter will 
 exclude sharp, narrow features. If the supplied value is between 0 and
-1, window will be interpreted as a proportion of points to include. Otherwise,
-the window will be the absolute number of points to include in the window.
-(Defaults to \code{.001}).}
+1, the window will be interpreted as a proportion of points to include. 
+Otherwise, the window will be interpreted as the absolute number of points to
+include in the window. Defaults to \code{0.001}.}
 
 \item{slope_thresh}{Minimum threshold for slope of the smoothed first
-derivative. This parameter filters on the basis of peak width, such that
-larger values will exclude broad peaks from the peak list. (Defaults to
-\code{0}).}
+derivative. This parameter filters peaks on the basis of their width, such
+that larger values will exclude broad peaks from the peak list. Defaults to
+\code{0}.}
 
 \item{amp_thresh}{Minimum threshold for peak amplitude. This parameter
 filters on the basis of peak height, such that larger values will
-exclude small peaks from the peak list. (Defaults to \code{0}).}
+exclude small peaks from the peak list. Defaults to \code{0}.}
 
 \item{bounds}{Logical. If TRUE, includes peak boundaries in data.frame.
-(Defaults to \code{TRUE}).}
+Defaults to \code{TRUE}.}
 }
 \value{
 If \code{bounds == TRUE}, returns a data.frame containing the center,
