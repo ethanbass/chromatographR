@@ -52,21 +52,21 @@
 #' \code{\link[dynamicTreeCut]{cutreeDynamic}} for additional information.
 #' @param verbose Logical. Whether to print warning when combining peaks into 
 #' single time window. Defaults to \code{FALSE}.
-#' @param out Specify `data.frame` or `matrix` as output. Defaults to
-#' `data.frame`.
+#' @param out Specify \code{data.frame} or \code{matrix} as output. Defaults to
+#' \code{data.frame}.
 #' @md
-#' @return The function returns an S3 \code{peak_table} object, containing the
-#' following elements:
-#' * `tab`: the peak table itself -- a data-frame of intensities in a
+#' @return The function returns an S3 \code{\link{peak_table}} object, 
+#' containing the following elements:
+#' * `tab`: The peak table itself -- a \code{data.frame} of intensities in a
 #' sample x peak configuration.
-#' * `pk_meta`: A data.frame containing peak meta-data (e.g., the spectral component,
-#' peak number, and average retention time).
-#' * `sample_meta`: A data.frame of sample meta-data. Must be added using
+#' * `pk_meta`: A \code{data.frame} containing peak meta-data (e.g., the 
+#' spectral component, peak number, and average retention time).
+#' * `sample_meta`: A \code{data.frame} of sample meta-data. Must be added using
 #' \code{\link{attach_metadata}}.
-#' * `ref_spectra`: A data.frame of reference spectra (in a wavelength x peak
-#' configuration). Must be added using \code{\link{attach_ref_spectra}}.
-#' * `args`: A vector of arguments given to \code{\link{get_peaktable}} to generate
-#' the peak table.
+#' * `ref_spectra`: A \code{data.frame} of reference spectra (in a wavelength × 
+#' peak configuration). Must be added using \code{\link{attach_ref_spectra}}.
+#' * `args`: A vector of arguments given to \code{\link{get_peaktable}} to 
+#' generate the peak table.
 #' @author Ethan Bass
 #' @note This function is adapted from
 #' \href{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}{getPeakTable}
@@ -75,8 +75,8 @@
 #' @references
 #' * Broeckling, C. D., Afsar F.A., Neumann S., Ben-Hur A., and Prenni J.E. 2014.
 #' RAMClust: A Novel Feature Clustering Method Enables Spectral-Matching-Based
-#' Annotation for Metabolomics Data. \emph{Anal. Chem.}
-#' \bold{86}:6812-6817. \doi{10.1021/ac501530d}.
+#' Annotation for Metabolomics Data. \emph{Anal. Chem.} \bold{86}:6812-6817. 
+#' \doi{10.1021/ac501530d}.
 #' * Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
 #' LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
 #' Metabolomics} \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}.
@@ -88,8 +88,9 @@
 #' @export get_peaktable
 
 get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
-                          use.cor = NULL, hmax = 0.2, plot_it = FALSE,
-                          ask = plot_it, clust = c("rt", "sp.rt"),
+                          use.cor = NULL, hmax = 0.2,
+                          plot_it = FALSE, ask = plot_it, 
+                          clust = c("rt", "sp.rt"), 
                           sigma.t = NULL, sigma.r = 0.5,
                           deepSplit = FALSE, verbose = FALSE,
                           out = c('data.frame', 'matrix')){
@@ -147,19 +148,20 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
       D <- 1 - S
       linkage <- "average"
       pkcenters.hcl <- fastcluster::hclust(as.dist(D), method = linkage)
-      pkcenters.cl <- dynamicTreeCut::cutreeDynamicTree(pkcenters.hcl, maxTreeHeight = hmax, 
-                                      deepSplit = deepSplit, minModuleSize = 2)
+      pkcenters.cl <- dynamicTreeCut::cutreeDynamicTree(pkcenters.hcl, 
+                                                        maxTreeHeight = hmax, 
+                                                        deepSplit = deepSplit, 
+                                                        minModuleSize = 2)
       sing <- which(pkcenters.cl == 0)
       pkcenters.cl[sing] <- max(pkcenters.cl) + seq_along(sing)
     }
     vars <- c(rt, start, end, "sd", "width", "tau", "FWHM", "r.squared", "purity")
     vars <- vars[vars %in% colnames(xx)]
     vars.idx <- match(vars, colnames(xx))
-    cl.centers <- aggregate(xx[, vars.idx], by = list(pkcenters.cl), FUN = "mean",
+    cl.centers <- aggregate(xx[, vars.idx], by = list(pkcenters.cl),
+                            FUN = "mean",
                             na.action = "na.pass")[, -1, drop = FALSE]
     ncl <- length(cl.centers[, rt])
-    
-    ## re-order clusters from small to large rt
     pkcenters.cl <- order(order(cl.centers[, rt]))[pkcenters.cl]
     cl.centers <- cl.centers[order(cl.centers[, rt]),]
     metaInfo <- cbind(lambda = rep(suppressWarnings(
