@@ -2,6 +2,7 @@
 #' 
 #' This function validates that the provided object is of the \code{peak_table}
 #' class.
+#' 
 #' @author Ethan Bass
 #' @noRd
 check_peaktable <- function(peak_table){
@@ -170,13 +171,14 @@ elementwise.all.equal <- Vectorize(function(x, y, ...){
 #' \code{idx}.
 #' @family utility functions
 #' @export
+
 get_times <- function(x, idx = 1){
   if (inherits(x, "peak_table")){
     x <- get_chrom_list(x)
   }
   if (inherits(x, "chrom_list") | inherits(x, "list")){
     as.numeric(rownames(x[[idx]]))
-  } else if (inherits(x, "matrix")){
+  } else if (inherits(x, c("matrix","data.frame"))){
     as.numeric(rownames(x))
   }
 }
