@@ -98,7 +98,7 @@ plot_chroms <- function(x, lambdas, idx, time_resolution = 0.01,
       legend(x = legend_position, legend = names(x)[idx], 
              fill = seq_along(x[idx]))
   } else {
-    xx <- reshape_chroms(x, idx = idx, lambdas = lambdas.idx, 
+    xx <- reshape_chroms(x, idx = idx, lambdas = lambdas, 
                          time_resolution = time_resolution)
     if (engine == "ggplot"){
       check_for_pkg("ggplot2")

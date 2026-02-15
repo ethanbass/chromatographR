@@ -26,10 +26,15 @@ reshape_chroms <- function(x, idx, time_resolution = NULL,
   }
   if (missing(lambdas)){
     lambdas <- colnames(x[[1]])
+  } else{
+    lambdas.idx <- sapply(lambdas, function(lambda){
+      get_lambda_idx(lambda, lambdas = get_lambdas(x),
+                     allow_max = FALSE)
+    }) 
   }
   dat <- lapply(idx, function(i){
     xx <- reshape_chrom(x = x[[i]], time_resolution = time_resolution,
-                        lambdas = lambdas, rts = rts,
+                        lambdas = lambdas.idx, rts = rts,
                         transfer_metadata)
     xx[, sample_var] <- names(x)[[i]]
     xx

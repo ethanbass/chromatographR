@@ -8,13 +8,15 @@ plot_chroms(
   x,
   lambdas,
   idx,
+  time_resolution = 0.01,
+  time_unit = NULL,
   xlim = NULL,
   ylim = NULL,
   xlab = "",
   ylab = "Absorbance",
   engine = c("base", "ggplot", "plotly"),
   linewidth = 1,
-  show_legend = TRUE,
+  show_legend = FALSE,
   legend_position = "topright",
   title = "",
   ...
@@ -29,6 +31,15 @@ plot. For one-dimensional chromatograms, this argument can be ignored.}
 \item{idx}{A vector representing the names or numerical indices of the 
 chromatograms to plot.}
 
+\item{time_resolution}{Time resolution for plot in minutes. Defaults to 
+\code{0.01}. Thinning the time axis dramatically improved speed when plotting
+many chromatograms.}
+
+\item{time_unit}{Time units of the provided chromatograms. Units will be
+detected automatically if possible from chromatogram metadata. If 
+\code{time_unit} attribute is not present, the time units will default to to 
+\code{min}.}
+
 \item{xlim}{Range of x axis.}
 
 \item{ylim}{Range of y axis.}
@@ -42,7 +53,8 @@ chromatograms to plot.}
 
 \item{linewidth}{Line width.}
 
-\item{show_legend}{Logical. Whether to display legend or not. Defaults to TRUE.}
+\item{show_legend}{Logical. Whether to display legend or not. Defaults to 
+\code{FALSE}.}
 
 \item{legend_position}{Position of legend.}
 
