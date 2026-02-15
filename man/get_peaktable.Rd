@@ -67,19 +67,19 @@ single time window. Defaults to \code{FALSE}.}
 \code{data.frame}.}
 }
 \value{
-The function returns an S3 \code{peak_table} object, containing the
-following elements:
+The function returns an S3 \code{\link{peak_table}} object,
+containing the following elements:
 \itemize{
-\item \code{tab}: the peak table itself -- a data-frame of intensities in a
+\item \code{tab}: The peak table itself -- a \code{data.frame} of intensities in a
 sample x peak configuration.
-\item \code{pk_meta}: A data.frame containing peak meta-data (e.g., the spectral component,
-peak number, and average retention time).
-\item \code{sample_meta}: A data.frame of sample meta-data. Must be added using
+\item \code{pk_meta}: A \code{data.frame} containing peak meta-data (e.g., the
+spectral component, peak number, and average retention time).
+\item \code{sample_meta}: A \code{data.frame} of sample meta-data. Must be added using
 \code{\link{attach_metadata}}.
-\item \code{ref_spectra}: A data.frame of reference spectra (in a wavelength x peak
-configuration). Must be added using \code{\link{attach_ref_spectra}}.
-\item \code{args}: A vector of arguments given to \code{\link{get_peaktable}} to generate
-the peak table.
+\item \code{ref_spectra}: A \code{data.frame} of reference spectra (in a wavelength ×
+peak configuration). Must be added using \code{\link{attach_ref_spectra}}.
+\item \code{args}: A vector of arguments given to \code{\link{get_peaktable}} to
+generate the peak table.
 }
 }
 \description{
@@ -112,8 +112,8 @@ get_peaktable(pks, response = "area")
 \itemize{
 \item Broeckling, C. D., Afsar F.A., Neumann S., Ben-Hur A., and Prenni J.E. 2014.
 RAMClust: A Novel Feature Clustering Method Enables Spectral-Matching-Based
-Annotation for Metabolomics Data. \emph{Anal. Chem.}
-\bold{86}:6812-6817. \doi{10.1021/ac501530d}.
+Annotation for Metabolomics Data. \emph{Anal. Chem.} \bold{86}:6812-6817.
+\doi{10.1021/ac501530d}.
 \item Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
 LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
 Metabolomics} \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}.

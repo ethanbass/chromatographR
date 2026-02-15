@@ -221,76 +221,63 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
                         metadata_path = NA,
                         normalized = FALSE,
                         normalization_by = NA,
-                        time_unit = attr(peak_list, "time_unit"),
-                        intensity_unit = attr(peak_list, "intensity_unit")
+                        time_unit = get_metadata_attribute(peak_list, "time_unit"),
+                        intensity_unit = get_metadata_attribute(peak_list, "intensity_unit")
                         ))
   class(result) <- c("peak_table", "list")
   attr(result, "pk_args") <- attr(peak_list,"meta")
   result
 }
 
-
-#' @importFrom utils head
-#' @noRd
-#' @rdname head.peak_table
-#' @export
-head.peak_table <- function(x,...){
-  head(x$tab)
-}
-
-#' @importFrom utils tail
-#' @noRd
-#' @export
-tail.peak_table <- function(x,...){
-  tail(x$tab)
-}
-
-#' @noRd
-#' @export
-print.peak_table <- function(x, ...){
-  print(x$tab)
-}
-
-#' @noRd
-#' @export
-dim.peak_table <- function(x){
-  dim(x$tab)
-}
-
-#' @noRd
-#' @export
-row.names.peak_table <- function(x){
-  row.names(x$tab)
-}
-
-#' Subset peak table
+#' Reshape peaktable
 #' 
-#' Returns subset of \code{peak_table} object.
-#' 
+#' Reshapes peak table from wide to long format
+#' @name reshape_peaktable
+#' @importFrom stats reshape
 #' @param x A \code{peak_table} object.
-#' @param subset Logical expression indicating rows (samples) to keep from
-#' \code{peak_table}; missing values are taken as false.
-#' @param select Logical expression indicating columns (peaks) to select from
-#' \code{peak_table}.
-#' @param drop Logical. Passed to indexing operator.
-#' @param ... Additional arguments (placeholder).
-#' @return A \code{peak_table} object with samples specified by \code{subset}
-#' and peaks specified by \code{select}.
+#' @param peaks A character vector specifying the peaks to include. If the
+#' character vector is named, the names of the vector elements will be used in
+#' place of the original peak names.
+#' @param metadata A character vector specifying the metadata fields to include.
+#' @param fixed_levels Logical. Whether to fix factor levels of features in the
+#' order provided. Defaults to \code{TRUE}.
+#' @return A data.frame containing the information for the specified 
+#' \code{peaks} in long format.
 #' @author Ethan Bass
-#' @method subset peak_table
+#' @family utility functions
 #' @export
-
-subset.peak_table <- function(x, subset, select, drop = FALSE, ...){
-  x$tab <- subset(x$tab, subset = subset, 
-                  select = select, drop = drop)
-  if (!is.null(dim(x$ref_spectra))){
-    x$sample_meta <- subset(x$sample_meta, subset = subset, drop = drop)
-  }
-  if (!missing(select)){
-    x$pk_meta <- subset(x$pk_meta, select = select, drop = drop)
-    if (!is.null(dim(x$ref_spectra))){
-      x$ref_spectra <- subset(x$ref_spectra, select = select, drop = drop)
+reshape_peaktable <- function(x, peaks, metadata, fixed_levels = TRUE){
+  if (!missing(peaks)){
+    if (is.numeric(peaks)){
+      peaks <- colnames(x$tab)[peaks]
     }
+    df <- x$tab[, match(peaks, colnames(x$tab)), drop = FALSE]
+    if (!is.null(names(peaks))){
+      colnames(df) <- names(peaks)
+      peaks <- colnames(df)
+    }
+  } else {
+    df <- x$tab
   }
-  x
+  if (!missing(metadata)){
+    meta_idx <- which(colnames(x$sample_meta) %in% metadata)
+    x$sample_meta <- x$sample_meta[, meta_idx, drop = FALSE]
+  }
+  xx <- reshape(as.data.frame(chr = rownames(df), df), direction = "long",
+                varying = list(seq_len(ncol(df))), v.names = x$args[["response"]],
+                times = colnames(df), timevar = "peak",
+                idvar = "sample", ids = rownames(df))
+  rownames(xx) <- NULL
+  xx <- merge(xx, data.frame(peak=colnames(x$pk_meta), 
+                             t(x$pk_meta[c("lambda", "rt"),])),
+              by = "peak", all.x = TRUE)
+  xx <- xx[, c(1, 3, 4, 5, 2)]
+  if (!is.null(dim(x$sample_meta))){
+    xx <- merge(xx, data.frame(sample = row.names(df), x$sample_meta),
+                by = "sample", all.x = TRUE)
+  }
+  if (fixed_levels){
+    xx$peak <- factor(xx$peak, levels = peaks)
+  }
+  xx
 }

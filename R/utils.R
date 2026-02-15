@@ -129,7 +129,7 @@ get_lambda_idx <- function(lambda, lambdas, y, allow_max = TRUE){
     )
   }
   if (is.na(lambda.idx) | length(lambda.idx) == 0)
-    stop("The specified wavelength (`lambda`) could not be found!")
+    stop(sprintf("The specified wavelength (`%s`) could not be found!", lambda))
   lambda.idx
 }
 
@@ -145,7 +145,7 @@ check_chr <- function(chr, loc = NULL, peak_table, chrom_list, allow_max = TRUE)
   }
   if (is.character(chr)){
     if (!(chr %in% names(chrom_list))){
-      stop("Chromatogram not found. Please check `idx` argument and try again!")
+      stop(sprintf("Chromatogram `%s` could not be found. Please check `idx` argument and try again!", chr))
     } else{
         chr <- which(names(chrom_list) == chr)
       }
@@ -237,9 +237,22 @@ get_time_unit <- function(x, idx = 1, na_value=NA){
     switch(time_unit, "Minutes" = "min", 
            "Seconds" = "s", 
            "Milliseconds" = "ms",
-           time_unit)
+            time_unit)
   }
 }
+
+#' Convert time units
+#' @noRd
+convert_time_units <- function(chrom_list, time_unit = c("min", "s", "ms")){
+  time_unit <- match.arg(time_unit, c("min", "s", "ms"))
+  tfac <- switch(time_unit, "min" = 1, "s" = 60, "ms" = 60*1000)
+  lapply(chrom_list, function(x){
+    rownames(x) <- as.numeric(rownames(x))*tfac
+    attr(x, "time_unit") <- time_unit
+    x
+  })
+}
+
 
 #' Check for suggested package
 #' 
@@ -390,4 +403,14 @@ resolve_deprecated <- function(arg, new_arg){
   } else{
     new_arg
   }
+}
+
+#' Get metadata attribute
+#' @noRd
+get_metadata_attribute <- function(x, which, ...){
+  result <- attr(x, which = which, ...)
+  if (is.null(result)){
+    result <- NA
+  }
+  result
 }
