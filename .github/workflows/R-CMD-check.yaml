@@ -45,18 +45,15 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
       
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v3
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: 3.11
       
       - name: Install kaleido
         if: matrix.config.visual_tests == true
         run: |
-          Rscript -e "reticulate::install_miniconda()"
-          Rscript -e "reticulate::conda_install('r-reticulate', 'python-kaleido')"
-          Rscript -e "reticulate::conda_install('r-reticulate', 'plotly', channel = 'plotly')"
-          Rscript -e "reticulate::use_miniconda('r-reticulate')"
+          Rscript -e 'library(reticulate); use_python(Sys.which("python")); py_install(c("kaleido==0.2.1", "plotly"))'
           
       - uses: r-lib/actions/check-r-package@v2
         with:

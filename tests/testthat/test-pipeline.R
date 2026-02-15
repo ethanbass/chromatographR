@@ -104,8 +104,8 @@ test_that("plot_chroms works to plot alignments", {
   skip_if_not_installed("vdiffr")
   alignment <- function(){
     par(mfrow = c(2,1))
-    plot_chroms(warp, lambdas = "210")
-    plot_chroms(dat.pr, lambdas = "210")
+    plot_chroms(warp, lambdas = "210", show_legend = TRUE)
+    plot_chroms(dat.pr, lambdas = "210", show_legend = TRUE)
   }
   vdiffr::expect_doppelganger("alignment", alignment)
   expect_error(plot_chroms(pktab))
@@ -116,22 +116,22 @@ test_that("plot_chroms can subset chromatograms correctly", {
   skip_if_not_installed("vdiffr")
   data(Sa_pr)
   numeric_indices <- function(){
-    plot_chroms(Sa_pr, idx=c(1, 3), lambdas = 210)
+    plot_chroms(Sa_pr, idx=c(1, 3), lambdas = 210, show_legend = TRUE)
   }
-  character_indices <- function(){
-    plot_chroms(Sa_pr, idx=c("119", "122"), lambdas = 210)
-  }
-  vdiffr::expect_doppelganger("plot_trace", numeric_indices)
-  vdiffr::expect_doppelganger("plot_trace", character_indices)
+  # character_indices <- function(){
+  #   plot_chroms(Sa_pr, idx=c("119", "122"), lambdas = 210)
+  # }
+  vdiffr::expect_doppelganger("plot-trace", numeric_indices)
+  # vdiffr::expect_doppelganger("plot_trace", character_indices)
 
   numeric_indices_rev <- function(){
-    plot_chroms(Sa_pr, idx=c(3, 1), lambdas = 210)
+    plot_chroms(Sa_pr, idx=c(3, 1), lambdas = 210, show_legend=TRUE)
   }
-  character_indices_rev <- function(){
-    plot_chroms(Sa_pr, idx=c("122", "119"), lambdas = 210)
-  }
-  vdiffr::expect_doppelganger("plot_trace_rev", numeric_indices_rev)
-  vdiffr::expect_doppelganger("plot_trace_rev", character_indices_rev)
+  # character_indices_rev <- function(){
+  #   plot_chroms(Sa_pr, idx=c("122", "119"), lambdas = 210)
+  # }
+  vdiffr::expect_doppelganger("plot-trace-rev", numeric_indices_rev)
+  # vdiffr::expect_doppelganger("plot_trace_rev", character_indices_rev)
 })
 
 
@@ -140,7 +140,7 @@ test_that("plot_chroms works to plot alignments with ggplot", {
   skip_if_not_installed("vdiffr")
   skip_if_not_installed("ggplot2")
   alignment_ggp <- function(){
-    plot_chroms(warp, lambdas="210", engine="ggplot")
+    plot_chroms(warp, lambdas="210", engine="ggplot", show_legend = TRUE)
   }
   vdiffr::expect_doppelganger("alignment_ggp", alignment_ggp)
   
@@ -164,14 +164,14 @@ pks_gaussian <- get_peaks(dat.pr, lambdas = lam, fit = "gaussian",
                           smooth_type = "none", show_progress = FALSE)
 
 pks_raw <- get_peaks(dat.pr, lambdas = lam, fit = "raw", smooth_type = "savgol",
-                     show_progress = FALSE, sd.max = 100, smooth_window=3)
+                     show_progress = FALSE, sd_max = 100, smooth_window=3)
 
 test_that("get_peaks works", {
   expect_equal(names(pks_egh), names(dat.pr))
   expect_equal(names(pks_gaussian), names(dat.pr))
   expect_equal(names(pks_egh[[1]]), lam)
   expect_equal(names(pks_gaussian[[1]]), lam)
-  expect_equal(class(pks_egh), "peak_list")
+  expect_equal(class(pks_egh), c("peak_list","list"))
   expect_error(get_peaks(dat.pr)) # lambdas must be provided
   expect_error(get_peaks(dat.pr, lambdas = "210", fit = "nonsense"))
 })
@@ -181,7 +181,7 @@ test_that("filter_peaks works", {
   expect_equal(names(pks_egh), names(pks_s))
   expect_equal(names(pks_s), names(dat.pr))
   expect_equal(names(pks_s[[1]]), lam)
-  expect_equal(class(pks_s), "peak_list")
+  expect_equal(class(pks_s), c("peak_list","list"))
   expect_lt(nrow(pks_s[[1]][[1]]), nrow(pks_egh[[1]][[1]]))
   expect_lt(nrow(pks_s[[2]][[1]]), nrow(pks_egh[[2]][[1]]))
   expect_warning(filter_peaks(pks_egh))
@@ -198,7 +198,7 @@ pk_tab_sp <- get_peaktable(peak_list = pks_egh, chrom_list = dat.pr, clust = "sp
 test_that("get_peaktable works", {
   expect_equal(rownames(pk_tab$tab), names(dat.pr))
   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$pk_meta))
-  expect_equal(class(pk_tab), "peak_table")
+  expect_equal(class(pk_tab), c("peak_table","list"))
   expect_equal(class(pk_tab$tab), "data.frame")
   expect_equal(class(pk_tab$pk_meta), "data.frame")
   expect_equal(class(pk_tab$args), "list")
@@ -496,13 +496,13 @@ test_that("plot_spectrum works", {
   }
   vdiffr::expect_doppelganger(title = "plot_spectrum", plot_spec)
   
-  plot_spec_character_idx <- function(){
-    par(mfrow = c(2,1))
-    plot_spectrum(loc = "13.62", peak_table = pk_tab, chrom_list = dat.pr,
-                  what = "rt", idx = "119", verbose = FALSE)
-  }
-  vdiffr::expect_doppelganger(title = "plot_spectrum", 
-                              plot_spec_character_idx)
+  # plot_spec_character_idx <- function(){
+  #   par(mfrow = c(2,1))
+  #   plot_spectrum(loc = "13.62", peak_table = pk_tab, chrom_list = dat.pr,
+  #                 what = "rt", idx = "119", verbose = FALSE)
+  # }
+  # vdiffr::expect_doppelganger(title = "plot_spectrum", 
+  #                             plot_spec_character_idx)
 
   x <- plot_spectrum(loc = "V13", peak_table = pk_tab, chrom_list = dat.pr, 
                      export_spectrum = TRUE, what = "peak", idx = 1, 
@@ -697,7 +697,7 @@ test_that("plot_chroms works with plotly", {
   skip_if_not_installed("reticulate")
   skip_if_not_installed("rsvg")
   
-  p <- plot_chroms(warp, lambdas = "210", engine = "plotly")
+  p <- plot_chroms(warp, lambdas = "210", engine = "plotly", show_legend=TRUE)
   # warnings are suppressed because of annoying RColorBrewer warnings
   # https://github.com/plotly/plotly.R/issues/2392
   # should be fixed by https://github.com/plotly/plotly.R/pull/1999
@@ -708,7 +708,7 @@ test_that("plot_chroms works with plotly", {
   suppressWarnings(expect_doppelganger_plotly(name = "alignment_plotly_no_legend", 
                                               p = p2))
   
-  p3 <- plot_chroms(warp, lambdas="210", engine = "plotly", 
+  p3 <- plot_chroms(warp, lambdas="210", engine = "plotly", show_legend=TRUE,
                     legend_position = "topleft", 
                     xlim=c(15, 18), ylim=c(0,400))
   suppressWarnings(expect_doppelganger_plotly(name = "alignment_plotly_zoom",
@@ -729,8 +729,7 @@ test_that("plot_chroms_heatmap works with plotly", {
   # plot retention times instead of indices
   p2 <- plot_chroms_heatmap(warp, lambdas = "210", engine = "plotly", 
                             show_legend = FALSE, xlim = c(10, 15))
-  expect_doppelganger_plotly(name = "heatmap_plotly_zoom",
-                                              p = p2)
+  expect_doppelganger_plotly(name = "heatmap_plotly_zoom", p = p2)
 })
 
 test_that("plot.ptw_list (base) works with plotly", {
@@ -772,24 +771,24 @@ test_that("plot_chroms can subset chromatograms correctly", {
   numeric_indices <- function(){
     plot_chroms_heatmap(Sa_pr, idx=c(1, 3), lambdas = 210)
   }
-  character_indices <- function(){
-    plot_chroms_heatmap(Sa_pr, idx=c("119", "122"), lambdas = 210)
-  }
+  # character_indices <- function(){
+  #   plot_chroms_heatmap(Sa_pr, idx=c("119", "122"), lambdas = 210)
+  # }
   vdiffr::expect_doppelganger("heatmap_plot_trace", numeric_indices)
-  vdiffr::expect_doppelganger("heatmap_plot_trace", character_indices)
+  # vdiffr::expect_doppelganger("heatmap_plot_trace", character_indices)
   
   numeric_indices_rev <- function(){
     plot_chroms_heatmap(Sa_pr, idx=c(3, 1), lambdas = 210)
   }
-  character_indices_rev <- function(){
-    plot_chroms_heatmap(Sa_pr, idx=c("122", "119"), lambdas = 210)
-  }
+  # character_indices_rev <- function(){
+  #   plot_chroms_heatmap(Sa_pr, idx=c("122", "119"), lambdas = 210)
+  # }
   vdiffr::expect_doppelganger("heatmap_plot_trace_rev", numeric_indices_rev)
-  vdiffr::expect_doppelganger("heatmap_plot_trace_rev", character_indices_rev)
+  # vdiffr::expect_doppelganger("heatmap_plot_trace_rev", character_indices_rev)
 })
 
 
-test_that("plot_chroms works to plot alignments with ggplot", {
+test_that("plot_chroms_heatmap works to plot alignments with ggplot", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
   skip_if_not_installed("ggplot2")

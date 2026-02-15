@@ -30,7 +30,7 @@ visual_testing <- grepl("true", Sys.getenv("VISUAL_TESTS"), fixed = TRUE)
 imageServer <- if (visual_testing) {
   # https://github.com/plotly/plotly.R/issues/2179
   if (!reticulate::py_module_available("kaleido")){
-    reticulate::py_require("kaleido")
+    reticulate::py_require("kaleido==0.2.1")
   }
   if (!reticulate::py_module_available("plotly")){
     reticulate::py_require("plotly")
