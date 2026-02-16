@@ -344,7 +344,7 @@ scan_chrom <- function(chrom_list, idx, lambda,
   # check chrom_list
   if (missing(chrom_list))
     stop("List of chromatograms must be provided for scan function.")
-  if (!(inherits(chrom_list, "list") | inherits(chrom_list, "chrom_list")))
+  if (!inherits(chrom_list, c("list", "chrom_list")) | inherits(chrom_list, "peak_table"))
     stop("`chrom_list` argument should be a list of chromatograms in matrix format")
   if (!is.null(chr)){
     message("The `chr` argument is deprecated. Please use `idx` instead.")

@@ -53,8 +53,8 @@ plot_chroms <- function(x, lambdas, idx, time_resolution = 0.01,
   time_unit <- match.arg(time_unit, c("min", "s", "ms"))
   tfac <- switch(time_unit, "min" = 1, "s" = 60, "ms" = 60*1000)
   time_resolution <- tfac*time_resolution
-  if (!class(x) %in% c("list", "chrom_list")){
-    stop("Please supply list of chromatograms.")
+  if (!inherits(x, c("list", "chrom_list")) | inherits(x, "peak_table")){
+    stop("Please supply a list of chromatograms.")
   }
   if (missing(idx)){
     idx <- seq_along(x)
@@ -200,6 +200,10 @@ plot_chroms_heatmap <- function(chrom_list, idx = NULL, lambdas,
                                 show_legend = TRUE, xlim = NULL,
                                 legend_position = "topright", title = "", 
                                 show_ylabs = FALSE) {
+  if (!inherits(chrom_list, c("list", "chrom_list")) | 
+      inherits(chrom_list, "peak_table")){
+    stop("Please supply a list of chromatograms.")
+  }
   engine <- match.arg(engine, c("base", "ggplot", "plotly"))
   if (ncol(chrom_list[[1]]) == 1){
     lambdas.idx <- 1

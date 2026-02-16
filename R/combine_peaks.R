@@ -106,7 +106,7 @@ merge_peaks <- function(peak_table, peaks, method = c("max", "sum")){
   }
   peak_table$tab <- peak_table$tab[, -pks.idx[-sel]]
   peak_table$pk_meta <- peak_table$pk_meta[, -pks.idx[-sel]]
-  if (inherits(peak_table$ref_spectra,"matrix")){
+  if (inherits(peak_table$ref_spectra, "matrix")){
     peak_table$ref_spectra <- peak_table$ref_spectra[, -pks.idx[-sel]]
   }
   return(peak_table)
