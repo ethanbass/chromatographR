@@ -1,9 +1,27 @@
+# chromatographR 0.7.5.9000
+
+### New features
+
+* Fixed `preprocess` function incorrectly truncating chromatograms when outliers are present and `dim1` is not specified.
+* Added more informative warnings and errors to `preprocess` function.
+* Added automatic thinning of chromatograms in `plot_chroms` to speed up plotting of raw data. The time resolution can be adjusted with the new `time_resolution` argument.
+* Changed default behavior of `plot_chroms` so legend is no longer displayed by default because legends often overrun the plot boundaries.
+* Carry time units and intensity units through to `peak_table` object.
+* Added `summary.peak_table` function.
+* Allow numeric wavelength (`lambda` argument) to `reshape_chroms`.
+* In `plot_chroms`, `show_legend` now defaults to `FALSE` to avoid overloading the plot.
+
+### Bug fixes and other minor changes
+
+* Fixed bug in `filter_peaktable` when filtering peaks based on specific retention times with the `rts` argument.
+* Fixed issue with visual tests due to new version of Kaleido.
+* Added additional arguments as placeholder for `subset.peak_table`.
+* Minor improvements to documentation.
+* Formalized requirement for R version 4.1.0.
+
 # chromatographR 0.7.5
 
 * Fixed bug in `check_chr` when multiple chromatograms are provided.
-* Added additional arguments as placeholder for `subset.peak_table`.
-* Formalized requirement for R 4.1.0.
-* Minor improvements to documentation.
 
 # chromatographR 0.7.4
 
@@ -142,8 +160,6 @@ peaks or samples).
 * Added option for renaming peaks via `reshape_peaktable` by providing a named character vector.
 
 # chromatographR 0.5.1
-
-* In `plot_chroms`, `show_legend` now defaults to FALSE to prevent overloading of the plot.
 
 #### Bug fixes
 
