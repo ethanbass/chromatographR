@@ -76,7 +76,10 @@ test_that("choose_apply_fnc works as expected with NULL value", {
 test_that("check_peaktable works as expected", {
   data(pk_tab)
   expect_null(check_peaktable(pk_tab))
-  expect_error(check_peaktable(pks_egh))
+  expect_error(check_peaktable("xxx"), 
+               regexp = "must be of the `peak_table` class")
+  expect_error(check_peaktable("Sa_pr"), 
+               regexp = "must be of the `peak_table` class")
 })
 
 test_that("summary.peak_table works as expected", {
@@ -91,8 +94,10 @@ test_that("summary.peak_table works as expected", {
 test_that("get_retention_idx works as expected", {
   idx <- get_retention_idx(RT = 18.49, times = get_times(Sa_pr))
   expect_equal(idx, 425)
-  expect_error(get_retention_idx(RT = 9, times = get_times(Sa_pr)))
-  expect_error(get_retention_idx(RT = 20, times = get_times(Sa_pr)))
+  expect_error(get_retention_idx(RT = 9, times = get_times(Sa_pr)), 
+               regexp = "falls outside the bounds of the chromatogram")
+  expect_error(get_retention_idx(RT = 20, times = get_times(Sa_pr)), 
+               regexp = "falls outside the bounds of the chromatogram")
 })
 
 test_that("check_idx works as expected", {
@@ -102,17 +107,18 @@ test_that("check_idx works as expected", {
 test_that("get_lambda_idx works as expected", {
   lam <- get_lambda_idx(lambda = 200, lambdas = get_lambdas(x = Sa_pr))
   expect_equal(lam, 1)
-  expect_error(get_lambda_idx(lambda=190, lambdas = get_lambdas(x = Sa_pr)))
-  expect_error(get_lambda_idx(lambda=400, lambdas = get_lambdas(x = Sa_pr)))
+  expect_error(get_lambda_idx(lambda=190, lambdas = get_lambdas(x = Sa_pr)), 
+               regexp = "could not be found")
+  expect_error(get_lambda_idx(lambda=400, lambdas = get_lambdas(x = Sa_pr)), 
+               regexp = "could not be found")
   expect_error(get_lambda_idx(lambda="max", lambdas = get_lambdas(x = Sa_pr),
-                              allow_max = FALSE))
-  # lam <- get_lambda_idx(lambda="max", lambdas = get_lambdas(chrom_list = dat.pr),
-  #                       y = unlist(dat.pr[[1]][500, , drop = TRUE]),
-  #                       allow_max = TRUE)
+                              allow_max = FALSE), 
+               regexp = "must be specified for interactive scanning")
 })
 
 test_that("check_for_pkg functions as expected",{
-  expect_error(check_for_pkg(pkg = "nonsense-package-that-doesn't-exist"))
+  expect_error(check_for_pkg(pkg = "nonsense-package-that-doesn't-exist"),
+               regexp = "must be installed to perform this action")
 })
 
 test_that("reshape_peaktable works as expected",{
@@ -163,7 +169,8 @@ test_that("head.peak_table works as expected", {
 test_that("resolve_deprecated works as expected", {
   max_iter <- 100
   max.iter <- 50
-  expect_warning(resolve_deprecated(max.iter, max_iter))
+  expect_warning(resolve_deprecated(max.iter, max_iter), 
+                 regexp = "The 'max.iter' function is deprecated")
   expect_equal(suppressWarnings(resolve_deprecated(max.iter, max_iter)),50)
   
   max_iter <- 100

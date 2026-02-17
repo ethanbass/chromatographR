@@ -13,8 +13,9 @@ test_that("preprocess works on matrix", {
   expect_equal(class(out)[1],"matrix")
   expect_equal(rownames(out), as.character(new.ts))
   expect_equal(colnames(out), as.character(new.lambdas))
-  expect_error(preprocess_matrix(Sa))
-  expect_error(preprocess_matrix(Sa[[1]], dim2 = seq(9, 20, by = .01)))
+  expect_error(preprocess_matrix(Sa), regexp = "X should be a matrix")
+  expect_error(preprocess_matrix(Sa[[1]], dim2 = seq(9, 20, by = .01)), 
+               regexp = 'argument "dim1" is missing')
 })
 
 test_that("Preprocess works without providing dimensions", {
@@ -26,8 +27,19 @@ test_that("Preprocess works without providing dimensions", {
 })
 
 
-test_that("preprocess returns correct errors", {
-  expect_error(preprocess(X = as.data.frame(Sa[[1]]), show_progress = FALSE))
+test_that("preprocess returns correct errors and warnings", {
+  expect_error(preprocess(X = as.data.frame(Sa[[1]]), show_progress = FALSE), 
+               regexp = "X should be a matrix")
+  expect_error(preprocess(Sa, dim1 = seq(8,15, by=.01)), 
+               regexp = "incompatible with actual data")
+  expect_error(preprocess(Sa, dim1 = seq(10,20, by=.01)), 
+               regexp = "incompatible with actual data")
+  expect_warning(xx <- preprocess(Sa, dim1 = seq(16,18.664, by=.001)), 
+                 regexp = "No extrapolation allowed")
+  expect_length(xx,2)
+  expect_warning(xx <- preprocess(Sa, dim1 = seq(9.997,13, by=.01)), 
+                 regexp = "No extrapolation allowed")
+  expect_length(xx,2)
 })
 
 
@@ -63,12 +75,13 @@ test_that("correct_rt works", {
   expect_equal(colnames(warp[[1]]), colnames(dat.pr[[1]]), ignore_attr=TRUE)
   expect_equal(t(warping.models[[1]]$warped.sample)[,1], 
                as.numeric(warp[[1]][,"210"]))
-  expect_error(correct_rt(dat.pr))
-  expect_error(correct_rt(dat.pr, what="x"))
-  expect_error(correct_rt(dat.pr, lambdas = "x"))
-  expect_error(correct_rt(dat.pr, lambdas = "210", alg="x"))
+  expect_error(correct_rt(dat.pr), regexp = "Must specify wavelengths")
+  expect_error(correct_rt(dat.pr, what="x"), regexp = "'arg' should be one of")
+  expect_error(correct_rt(dat.pr, lambdas = "x"), regexp = "Lambdas not found")
+  expect_error(correct_rt(dat.pr, lambdas = "210", alg="x"), regexp = "'arg' should be one of")
   expect_error(correct_rt(dat.pr, lambdas = "210", 
-                          models = "warping.models", alg = "vpdtw"))
+                          models = "warping.models", alg = "vpdtw"), 
+               regexp = "The supplied models do not match")
 })
 
 test_that("correct_rt works with VPdtw", {
@@ -76,8 +89,10 @@ test_that("correct_rt works with VPdtw", {
   expect_equal(names(warp), names(dat.pr[1:2]))
   expect_equal(colnames(warp[[1]]), colnames(dat.pr[[1]]), ignore_attr = TRUE)
   expect_error(correct_rt(dat.pr, lambdas = c("210", "260"),
-                          alg="vpdtw",  show_progress = FALSE))
-  expect_error(correct_rt(dat.pr, lambdas = c("x"), alg = "vpdtw"))
+                          alg="vpdtw",  show_progress = FALSE), 
+               regexp = "only supports warping by a single wavelength")
+  expect_error(correct_rt(dat.pr, lambdas = c("x"), alg = "vpdtw"), 
+               regexp = "Lambdas not found")
 })
 
 test_that("VPdtw plot displays correctly", {
@@ -150,8 +165,9 @@ test_that("plot_chroms works to plot alignments with ggplot", {
   }
   suppressWarnings(vdiffr::expect_doppelganger("alignment_ggp_zoom",
                                                alignment_ggp_zoom))
-  
-  expect_error(plot_chroms(pktab))
+  data(pk_tab)
+  expect_error(plot_chroms(pk_tab), 
+               regexp = "Please supply a list of chromatograms")
 })
 
 
@@ -172,8 +188,10 @@ test_that("get_peaks works", {
   expect_equal(names(pks_egh[[1]]), lam)
   expect_equal(names(pks_gaussian[[1]]), lam)
   expect_equal(class(pks_egh), c("peak_list","list"))
-  expect_error(get_peaks(dat.pr)) # lambdas must be provided
-  expect_error(get_peaks(dat.pr, lambdas = "210", fit = "nonsense"))
+  expect_error(get_peaks(dat.pr), 
+               regexp = "must be provided.")
+  expect_error(get_peaks(dat.pr, lambdas = "210", fit = "nonsense"), 
+               regexp = "'arg' should be one of")
 })
 
 test_that("filter_peaks works", {
@@ -184,10 +202,13 @@ test_that("filter_peaks works", {
   expect_equal(class(pks_s), c("peak_list","list"))
   expect_lt(nrow(pks_s[[1]][[1]]), nrow(pks_egh[[1]][[1]]))
   expect_lt(nrow(pks_s[[2]][[1]]), nrow(pks_egh[[2]][[1]]))
-  expect_warning(filter_peaks(pks_egh))
-  expect_warning(filter_peaks(pks_egh, min_height=0))
-  expect_warning(filter_peaks(pks_egh, min_area=0))
-  expect_warning(filter_peaks(pks_egh, max_sd=Inf))
+  expect_warning(filter_peaks(pks_egh), regexp = "Nothing to filter")
+  expect_warning(filter_peaks(pks_egh, min_height=0),
+                 regexp = "'min_height' is less than minimum peak height.")
+  expect_warning(filter_peaks(pks_egh, min_area=0), 
+                 regexp = "'min_area' is less than minimum peak area")
+  expect_warning(filter_peaks(pks_egh, max_sd=Inf), 
+                 regexp = "'max_sd' is greater than maximum")
 })
 
 ### test get_peaktable ###
@@ -261,17 +282,22 @@ test_that("attach_metadata works", {
   expect_equal(colnames(pk_tab$sample_meta), colnames(meta))
   
   ### check errors & warnings ###
-  expect_error(attach_metadata())
-  expect_error(attach_metadata(warp))
-  expect_error(attach_metadata(pk_tab, metadata = warp))
-  expect_error(attach_metadata(pk_tab, metadata = meta, column = "x"))
-  expect_error(attach_metadata(pk_tab$tab, metadata = meta, column = "vial"))
+  expect_error(attach_metadata(), regexp = 'argument "peak_table" is missing')
+  expect_error(attach_metadata(warp), regexp = "must be of the `peak_table` class")
+  expect_error(attach_metadata(pk_tab, metadata = warp), regexp = "Please provide metadata")
+  expect_error(attach_metadata(pk_tab, metadata = meta, column = "x"), 
+               regexp = "could not be found")
+  expect_error(attach_metadata(pk_tab$tab, metadata = meta, column = "vial"),
+               regexp = "must be of the `peak_table` class")
   expect_error(attach_metadata(pk_tab, metadata = rbind(meta,meta), 
-                               column = "vial"))
-  expect_warning(attach_metadata(pk_tab, metadata = meta[-1,], column = "vial"))
+                               column = "vial"), 
+               regexp = "Sample names must be unique")
+  expect_warning(attach_metadata(pk_tab, metadata = meta[-1,], column = "vial"),
+                 regexp = "The supplied metadata does not include all samples")
 })
 
 pk_tab <- attach_ref_spectra(pk_tab, chrom_list = dat.pr, ref = "max.cor")
+
 test_that("attach_ref_spectra works", {
   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$ref_spectra))
   expect_equal(pk_tab$args[["reference_spectra"]], "max.cor")
@@ -281,8 +307,10 @@ test_that("attach_ref_spectra works", {
   expect_equal(colnames(pk_tab$tab), colnames(pk_tab$ref_spectra))
   
   # test errors
-  expect_error(attach_ref_spectra(peak_table = warp))
-  expect_error(attach_ref_spectra(pk_tab, chrom_list = dat.pr, ref = "x"))
+  expect_error(attach_ref_spectra(peak_table = warp), 
+               regexp = "must be of the `peak_table` class")
+  expect_error(attach_ref_spectra(pk_tab, chrom_list = dat.pr, ref = "x"), 
+               regexp = "'arg' should be one of")
 })
 
 test_that("subset.peaktable works", {
@@ -314,7 +342,7 @@ test_that("filter_peaktable works", {
   expect_equal(colnames(pktab_s$tab), colnames(pktab_s$ref_spectra))
 
   # warning if no arguments are provided
-  expect_warning(filter_peaktable(pk_tab))
+  expect_warning(filter_peaktable(pk_tab), regexp = "Nothing to filter")
 })
 
 test_that("combine_peaks works", {
@@ -357,9 +385,11 @@ test_that("normalize_data works", {
   expect_equal(chroms_norm[[1]], dat.pr[[1]]/pk_tab$sample_meta$mass[1])
   expect_equal(chroms_norm[[2]], dat.pr[[2]]/pk_tab$sample_meta$mass[2])
   
-  expect_error(normalize_data(pk_tab, chrom_list = dat.pr, column = "x"))
+  expect_error(normalize_data(pk_tab, chrom_list = dat.pr, column = "x"), 
+               regexp = "could not be found")
   expect_error(normalize_data(pk_tab, chrom_list = dat.pr, 
-                              column = "mass", what="x"))
+                              column = "mass", what="x"), 
+               regexp = "'arg' should be one of")
 })
 
 test_that("cluster_spectra works", {
@@ -393,7 +423,8 @@ test_that("plot.peak_list works", {
   # }
   # vdiffr::expect_doppelganger("plot.peak_list_raw", plot_peaks_raw)
   
-  expect_error(plot(pks_egh, chrom_list = dat.pr, lambda = 190))
+  expect_error(plot(pks_egh, chrom_list = dat.pr, lambda = 190),
+               regexp = "must match one of the wavelengths in your peak list")
 })
 
 test_that("purity plot works", {
@@ -440,7 +471,6 @@ test_that("plot.ptw_list works with ggplot", {
   }
   vdiffr::expect_doppelganger(title = "plot_ptw_list_heatmap_ggplot",
                               fig = plot_ptw_list_heatmap_ggplot)
-
 })
 
 test_that("plot.peak_table works", {
@@ -453,10 +483,12 @@ test_that("plot.peak_table works", {
   }
   vdiffr::expect_doppelganger("plot.peak_table", plot_peak_table)
   expect_error(plot(pk_tab, chrom_list = dat.pr, loc = "V13", idx = 1,
-                    lambda = "210",  box_plot = TRUE, verbose = FALSE))
+                    lambda = "210",  box_plot = TRUE, verbose = FALSE),
+               regexp="Must provide independent variable")
   expect_error(plot(pk_tab, chrom_list = dat.pr, loc = "15", what = "rt",
                     idx = 1, lambda = "210",  
-                    box_plot = TRUE, var = "trt", verbose = FALSE))
+                    box_plot = TRUE, var = "trt", verbose = FALSE),
+               regexp = "A peak name must be provided")
 })
 
 test_that("plot_all_spectra works", {
@@ -521,42 +553,53 @@ test_that("plot_spectrum works", {
   expect_equal(ncol(x), 1)
   
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, 
-                             what = "click"))
+                             what = "click"), 
+               regexp = "Chromatogram must be specified")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, 
-                             what="click", idx = 1))
+                             what="click", idx = 1), 
+               regexp = "must be specified")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, 
-                             what="click",lambda="210"))
+                             what="rt", lambda="210"),
+               regexp = "Please supply argument")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, 
-                             what="rt", lambda="210"))
-  expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr, 
-                             what="rt", idx = 1))
+                             what="rt", idx = 1), regexp = "Please supply argument")
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr, 
-                             what="rt"))
+                             what="rt"), regexp = "Chromatogram must be specified")
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr, 
-                             what="rt"))
+                             what="rt"), regexp = "Chromatogram must be specified")
   expect_error(plot_spectrum(loc=12, chrom_list = pk_tab, what="rt", idx = 1))
-  expect_error(plot_spectrum(loc=12, what="rt", idx = 1))
-  expect_error(plot_spectrum(loc=12, chrom_list = dat.pr, what="peak", idx = 1))
+  expect_error(plot_spectrum(loc=12, what="rt", idx = 1), 
+               regexp = "Must provide either a peak_table or a chrom_list")
+  expect_error(plot_spectrum(loc=12, chrom_list = dat.pr, what="peak", idx = 1),
+               regexp = "Peak table must be provided")
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr, 
-                             what="peak", idx = 1))
+                             what="peak", idx = 1), regexp = "No match found for peak")
   
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr,
-                             what="click", engine="plotly"))
+                             what="click", engine="plotly"),
+               regexp = "Chromatogram must be specified")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr,
-                             what="click", idx = 1, engine="plotly"))
+                             what="click", idx = 1, engine="plotly"),
+               regexp = "does not currently support clicking")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr,
                              what = "click", idx = 1, lambda="210",
-                             engine = "plotly"))
+                             engine = "plotly"),
+               regexp = "does not currently support clicking")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr,
-                             what="click",lambda="210", engine="plotly"))
+                             what="click",lambda="210", engine="plotly"),
+               regexp = "Chromatogram must be specified")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr,
-                             what="rt", lambda="210", engine="plotly"))
+                             what="rt", lambda="210", engine="plotly"),
+               regexp = "Please supply argument")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr,
-                             what="rt", idx = 1, engine="plotly"))
+                             what="rt", idx = 1, engine="plotly"),
+               regexp = "Please supply argument")
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr,
-                             what="rt", engine="plotly"))
+                             what="rt", engine="plotly"), 
+               regexp = "Chromatogram must be specified")
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr,
-                             what="rt", engine="plotly"))
+                             what="rt", engine="plotly"), 
+               regexp = "Chromatogram must be specified")
 })
 
 
@@ -598,8 +641,9 @@ test_that("mirror_plot works", {
                 var = "trt", legend_size=2, mirror = FALSE)
   }
   vdiffr::expect_doppelganger("mirror2", mirror2)
-  expect_error(mirror_plot(pk_tab, chrom_list = dat.pr))
-  expect_error(mirror_plot(pk_tab, chrom_list = dat.pr, var = "invalid_variable"))
+  expect_error(mirror_plot(pk_tab, chrom_list = dat.pr), regexp = 'argument "var" is missing')
+  expect_error(mirror_plot(pk_tab, chrom_list = dat.pr, var = "invalid_variable"), 
+               regexp = "could not be found")
 })
 
 test_that("boxplot works as expected", {
@@ -645,7 +689,8 @@ test_that("write_peaktable writes csvs correctly", {
                read.csv(file = path_table, row.names = 1), ignore_attr = TRUE)
   expect_equal(pk_tab$pk_meta,
                read.csv(file = path_meta, row.names = 1), ignore_attr = TRUE)
-  expect_error(write_peaktable(pk_tab, path = "fake_path"))
+  expect_error(write_peaktable(pk_tab, path = "fake_path"),
+               regexp = "specified directory does not exist")
 })
 
 test_that("write_peaktable writes xlsx correctly", {
@@ -661,7 +706,7 @@ test_that("write_peaktable writes xlsx correctly", {
   expect_equal(pk_tab$tab, xx, ignore_attr=TRUE)
   expect_equal(pk_tab$pk_meta, 
                openxlsx::read.xlsx(file, sheet = 2, rowNames = TRUE), 
-               ignore_attr=TRUE)
+               ignore_attr = TRUE)
 })
 
 # run the following line to activate plotly tests:
@@ -804,5 +849,8 @@ test_that("plot_chroms_heatmap works to plot alignments with ggplot", {
   }
   suppressWarnings(vdiffr::expect_doppelganger("alignment_ggplot_heatmap_zoom",
                                                alignment_ggplot_heatmap_zoom))
-  expect_error(plot_chroms(pktab))
+  expect_error(plot_chroms_heatmap(Sa_pr), 
+               regexp = 'argument "lambdas" is missing')
+  expect_error(plot_chroms_heatmap(pk_tab, lambdas = 210), 
+               regexp = "Please supply a list of chromatograms.")
 })

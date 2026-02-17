@@ -29,12 +29,12 @@ attach_metadata <- function(peak_table, metadata, column){
     stop("Please provide metadata as a `data.frame`")
   }
   if (!(column %in% colnames(metadata)))
-    stop(paste0("Column, ", column, ", is not found."))
+    stop(sprintf("Column %s could not be found.", sQuote(column)))
   if (sum((duplicated(metadata[,column], incomparables = NA))) > 0)
     stop(paste("Sample names must be unique. Please check column", sQuote(column),
     "for duplicates."))
   if (!inherits(peak_table,"peak_table"))
-    stop(paste("Provided peak table object must be of class 'peak_table'."))
+    stop(paste("Provided peak table object must be of the 'peak_table' class."))
   meta <- data.frame(rownames(peak_table$tab))
   names(meta) <- column
   metadata[, column] <- as.character(metadata[, column])
