@@ -38,6 +38,9 @@ reference:
     - reshape_peaktable
     - subset.peak_table
     - write_peaktable
+  - title: "Data structures"
+    contents:
+    - peak_table-class
   - title: "Data objects"
     contents:
     - Sa
