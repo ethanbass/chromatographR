@@ -66,7 +66,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Programmatic analysis of UV spectra</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/master/vignettes/articles/uv_spectra.Rmd" class="external-link"><code>vignettes/articles/uv_spectra.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/v0.7.5/vignettes/articles/uv_spectra.Rmd" class="external-link"><code>vignettes/articles/uv_spectra.Rmd</code></a></small>
       <div class="d-none name"><code>uv_spectra.Rmd</code></div>
     </div>
 
@@ -108,7 +108,7 @@ threshold (<code>t</code>) to a reference peak (in this case ‘V21’).</p>
 <span><span class="va">idx_99</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">cor_mat</span><span class="op">[</span>,<span class="st">"V21"</span><span class="op">]</span> <span class="op">&gt;</span> <span class="fl">.99</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/matplot.html" class="external-link">matplot</a></span><span class="op">(</span><span class="va">pktab</span><span class="op">$</span><span class="va">ref_spectra</span><span class="op">[</span>,<span class="va">idx_99</span><span class="op">]</span>,type<span class="op">=</span><span class="st">'l'</span>, ylab<span class="op">=</span><span class="st">"Abs"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"top"</span>, <span class="st">"t = 0.99"</span>, bty <span class="op">=</span> <span class="st">"n"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="uv_spectra_files/figure-html/plot_spectra-1.png" width="700"></p>
+<p><img src="uv_spectra_files/figure-html/plot_spectra-1.png" class="r-plt" alt="" width="700"></p>
 <p>We can also extract retention times for spectra above the desired
 spectral similarity threshold with the reference spectra.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -126,7 +126,7 @@ level are marked with dotted gray lines.</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v <span class="op">=</span> <span class="va">rts_99</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v <span class="op">=</span> <span class="va">pktab</span><span class="op">$</span><span class="va">pk_meta</span><span class="op">[</span><span class="st">"rt"</span>, <span class="va">idx_97</span><span class="op">]</span>, lty<span class="op">=</span><span class="fl">2</span>, col <span class="op">=</span> <span class="st">"darkgray"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="uv_spectra_files/figure-html/plot_chroms-1.png" width="700"></p>
+<p><img src="uv_spectra_files/figure-html/plot_chroms-1.png" class="r-plt" alt="" width="700"></p>
 <p>If we are interested in the combined area of these peaks, we could
 also use these indices to sum them together.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -146,7 +146,7 @@ only the largest clusters.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cluster_spectra.html">cluster_spectra</a></span><span class="op">(</span><span class="va">pktab</span>, alpha <span class="op">=</span> <span class="fl">0.01</span>, iseed <span class="op">=</span> <span class="fl">1</span>, max.only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="uv_spectra_files/figure-html/hierarchical_clustering-1.png" width="700"></p>
+<p><img src="uv_spectra_files/figure-html/hierarchical_clustering-1.png" class="r-plt" alt="" width="700"></p>
 <p>The output is a dendrogram of peaks annotated with bootstrap values
 showing the support for each node and spectra of the clusters with
 p-values below the significance level specified by <code>alpha</code>.
@@ -177,7 +177,7 @@ threshold.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.9000.</p>
 </div>
 
     </footer>

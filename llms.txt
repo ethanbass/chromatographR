@@ -1,0 +1,179 @@
+# chromatographR
+
+## Overview
+
+`chromatographR` is a package for the reproducible analysis of HPLC-DAD
+chromatographic data in R. It can also be used to analyze other “simple”
+chromatographic data like GC-FID, HPLC-UV, or HPLC-FD.
+
+## Installation
+
+chromatographR can now be installed from CRAN:
+
+    install.packages("chromatographR")
+
+However, it’s recommended to install the latest development version of
+chromatographR from GitHub using the devtools package:
+
+    install.packages("remotes")
+    remotes::install_github("https://github.com/ethanbass/chromatographR/")
+
+or from R Universe:
+
+    install.packages("chromatographR", repos="https://ethanbass.r-universe.dev/", type="source")
+
+## Usage
+
+#### Importing data
+
+chromatographR can import a variety of vendor formats, including
+‘Agilent ChemStation’ and ‘MassHunter’ files. This is accomplished using
+parsers from my chromConverter package. See the [chromConverter
+page](https://ethanbass.github.io/chromConverter/) for a detailed list
+of supported formats. Alternatively, chromatographR can also be used
+with regular `csv` files.
+
+#### Analysis
+
+Please see the
+[vignette](https://ethanbass.github.io/chromatographR/articles/chromatographR.html)
+included with the package for details on the application of
+chromatographR for the analysis of HPLC data. Additional articles are
+available on the pkgdown website: 1) a suggested [workflow for the
+analysis of GC-FID
+data](https://ethanbass.github.io/chromatographR/articles/GC-FID.html)
+(*Polistes* cuticular hydrocarbons) and 2) an introductory guide to the
+[programmatic analysis of UV
+spectra](https://ethanbass.github.io/chromatographR/articles/uv_spectra.html).
+
+## Contributing
+
+Contributions are always welcome. Please get in touch (preferable by
+opening a GitHub
+[issue](https://github.com/ethanbass/chromatographR/issues)) to discuss
+any suggestions or to file a bug report. Some good reasons to file an
+issue:
+
+- You’ve found an actual bug.  
+- You’re getting a cryptic error message that you don’t understand.  
+- You have a file format you’d like to read that isn’t currently
+  supported by chromatographR. (If you do this, please make sure to
+  include a link to an example file!)  
+- You have a new feature you’d like to see implemented.
+
+Also see the
+[contributing.md](https://github.com/ethanbass/chromatographR/blob/master/.github/contributing.md)
+page for more details.
+
+(**Note:** Please post questions about file conversions to the
+[chromConverter](https://github.com/ethanbass/chromConverter/issues)
+page).
+
+## Citation:
+
+If you use chromatographR in published work, please cite it as follows:
+
+Bass, E. (2023). chromatographR: Chromatographic Data Analysis Toolset
+(version 0.7.3). <http://doi.org/10.5281/zenodo.6944334>
+
+# Package index
+
+## Package overview
+
+- [`chromatographR`](https://ethanbass.github.io/chromatographR/reference/chromatographR-package.md)
+  [`chromatographR-package`](https://ethanbass.github.io/chromatographR/reference/chromatographR-package.md)
+  : chromatographR
+
+## Analysis functions
+
+- [`reexports`](https://ethanbass.github.io/chromatographR/reference/reexports.md)
+  [`read_chroms`](https://ethanbass.github.io/chromatographR/reference/reexports.md)
+  : Read chromatograms.
+- [`preprocess()`](https://ethanbass.github.io/chromatographR/reference/preprocess.md)
+  : Preprocess time/wavelength data
+- [`correct_rt()`](https://ethanbass.github.io/chromatographR/reference/correct_rt.md)
+  : Correct retention time
+- [`correct_peaks()`](https://ethanbass.github.io/chromatographR/reference/correct_peaks.md)
+  : Correct peak positions according to a PTW warping model
+- [`get_peaks()`](https://ethanbass.github.io/chromatographR/reference/get_peaks.md)
+  : Get peak list.
+- [`get_peaktable()`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md)
+  : Converts peak list into an ordered peak table.
+- [`attach_metadata()`](https://ethanbass.github.io/chromatographR/reference/attach_metadata.md)
+  : Attach experimental metadata
+- [`attach_ref_spectra()`](https://ethanbass.github.io/chromatographR/reference/attach_ref_spectra.md)
+  : Attach reference spectra
+- [`normalize_data()`](https://ethanbass.github.io/chromatographR/reference/normalize_data.md)
+  : Normalize peak table or chromatograms
+- [`cluster_spectra()`](https://ethanbass.github.io/chromatographR/reference/cluster_spectra.md)
+  : Cluster spectra
+
+## Visualization functions
+
+- [`plot_all_spectra()`](https://ethanbass.github.io/chromatographR/reference/plot_all_spectra.md)
+  : Plot all spectra for chosen peak.
+- [`plot_chroms()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms.md)
+  : Plot traces from list of chromatograms.
+- [`plot_chroms_heatmap()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms_heatmap.md)
+  : Plot chromatograms as heatmap
+- [`plot_spectrum()`](https://ethanbass.github.io/chromatographR/reference/plot_spectrum.md)
+  : Plot spectrum from peak table
+- [`boxplot(`*`<peak_table>`*`)`](https://ethanbass.github.io/chromatographR/reference/boxplot.peak_table.md)
+  : Make boxplot from peak table.
+- [`mirror_plot()`](https://ethanbass.github.io/chromatographR/reference/mirror_plot.md)
+  : Make mirror plot from peak table.
+- [`scan_chrom()`](https://ethanbass.github.io/chromatographR/reference/scan_chrom.md)
+  : Plot spectra by clicking on the chromatogram.
+- [`plot(`*`<peak_list>`*`)`](https://ethanbass.github.io/chromatographR/reference/plot.peak_list.md)
+  : Plot fitted peak shapes.
+- [`plot(`*`<peak_table>`*`)`](https://ethanbass.github.io/chromatographR/reference/plot.peak_table.md)
+  : Plot spectrum from peak table
+- [`plot(`*`<ptw_list>`*`)`](https://ethanbass.github.io/chromatographR/reference/plot.ptw_list.md)
+  : Plot PTW alignments
+
+## Utility functions
+
+- [`combine_peaks()`](https://ethanbass.github.io/chromatographR/reference/combine_peaks.md)
+  : Combine peaks
+- [`filter_peaks()`](https://ethanbass.github.io/chromatographR/reference/filter_peaks.md)
+  : Filter peak lists
+- [`filter_peaktable()`](https://ethanbass.github.io/chromatographR/reference/filter_peaktable.md)
+  : Filter peak table
+- [`merge_peaks()`](https://ethanbass.github.io/chromatographR/reference/merge_peaks.md)
+  : Merge split peaks
+- [`get_times()`](https://ethanbass.github.io/chromatographR/reference/get_times.md)
+  : Get retention times
+- [`get_lambdas()`](https://ethanbass.github.io/chromatographR/reference/get_lambdas.md)
+  : Get lambdas
+- [`reshape_chroms()`](https://ethanbass.github.io/chromatographR/reference/reshape_chroms.md)
+  : Reshape chromatograms
+- [`reshape_peaktable()`](https://ethanbass.github.io/chromatographR/reference/reshape_peaktable.md)
+  : Reshape peaktable
+- [`subset(`*`<peak_table>`*`)`](https://ethanbass.github.io/chromatographR/reference/subset.peak_table.md)
+  : Subset peak table
+- [`write_peaktable()`](https://ethanbass.github.io/chromatographR/reference/write_peaktable.md)
+  : Export peak table
+
+## Data objects
+
+- [`Sa`](https://ethanbass.github.io/chromatographR/reference/Sa.md) :
+  Raw goldenrod root chromatograms
+- [`Sa_pr`](https://ethanbass.github.io/chromatographR/reference/Sa_pr.md)
+  : Preprocessed goldenrod root chromatograms
+- [`Sa_warp`](https://ethanbass.github.io/chromatographR/reference/Sa_warp.md)
+  : Warped goldenrod root chromatograms.
+- [`pk_tab`](https://ethanbass.github.io/chromatographR/reference/pk_tab.md)
+  : Goldenrod peak table
+
+# Articles
+
+### All vignettes
+
+- [chromatographR: An introduction to HPLC-DAD
+  analysis](https://ethanbass.github.io/chromatographR/articles/chromatographR.md):
+- [Frequently asked
+  questions](https://ethanbass.github.io/chromatographR/articles/FAQ.md):
+- [Analysis of \*Polistes\* cuticular hydrocarbons with
+  GC-FID](https://ethanbass.github.io/chromatographR/articles/GC-FID.md):
+- [Programmatic analysis of UV
+  spectra](https://ethanbass.github.io/chromatographR/articles/uv_spectra.md):
