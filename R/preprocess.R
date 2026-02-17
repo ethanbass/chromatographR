@@ -35,6 +35,10 @@
 #' Defaults to 2. On Windows integer values will be ignored.
 #' @param show_progress Logical. Whether to show progress bar. Defaults to 
 #' \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.
+#' @param outlier_cutoff Threshold for excluding chromatograms that end 
+#' prematurely. Chromatograms ending more than this value (in seconds) before 
+#' the median end time are excluded. Default is 5 seconds. Only applies when 
+#' \code{dim1} is not specified.
 #' @param \dots Further optional arguments to
 #' \code{\link[ptw:baseline.corr]{baseline.corr}}.
 #' @return The function returns the preprocessed data matrix (or list of 
@@ -48,7 +52,6 @@
 #' * Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast
 #' parametric time warping of peak lists. \emph{Bioinformatics}
 #' \bold{31}:3063-3065. \doi{10.1093/bioinformatics/btv299}.
-#' 
 #' * Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
 #' LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
 #' Metabolomics} \bold{11:1}:143-154. \doi{10.1007/s11306-014-0683-5}.
@@ -60,14 +63,16 @@
 #' @md
 #' @export preprocess
 
-preprocess <- function(X, dim1, ## time axis
-                          dim2, ## spectral axis
-                          remove.time.baseline = TRUE,
-                          spec.smooth = TRUE, maxI = NULL,
-                          interpolate_rows = TRUE,
-                          interpolate_cols = TRUE,
-                          cl = 2, show_progress = NULL, ...){
+preprocess <- function(X, dim1, dim2,
+                       remove.time.baseline = TRUE,
+                       spec.smooth = TRUE, maxI = NULL,
+                       interpolate_rows = TRUE,
+                       interpolate_cols = TRUE,
+                       cl = 2, show_progress = NULL,
+                       outlier_cutoff = 5/60, ...){
   laplee <- choose_apply_fnc(show_progress = show_progress, cl = cl)
+  time_unit <- get_time_unit(X, na_value = "min")
+  tfac <- switch(time_unit, "min" = 1, "s" = 60, "ms" = 60*1000)
   if (is.matrix(X)){
     X <- list(X)
     return_matrix <- TRUE
@@ -77,14 +82,61 @@ preprocess <- function(X, dim1, ## time axis
   if (ncol(X[[1]]) == 1){
     interpolate_cols <- FALSE
   }
-  if (interpolate_rows && missing(dim1)){
-    message("...Times not provided. Extrapolating from matrix dimensions for interpolation.")
-    limits <- sapply(X,function(x){
-      ts <- rownames(x)
-      c(head(ts, 1), tail(ts, 1))})
-    start <- ceiling(max(as.numeric(limits[1,]))*100)/100
-    end <- floor((min(as.numeric(limits[2,])))*100)/100
-    dim1 <- seq(start, end, by = .01)
+  if (interpolate_rows){
+    limits <- sapply(X, function(x){
+      ts <- as.numeric(rownames(x))
+      c(head(ts, 1), tail(ts, 1))
+    })
+    if (missing(dim1)){
+      message("...Times not provided. Extrapolating from matrix dimensions for interpolation.")
+      start <- ceiling(max(limits[1,])*100)/100
+      outliers <- which(limits[2,] < median(limits[2,]) - outlier_cutoff*tfac)
+      if (length(outliers) > 0){
+        limits <- limits[,-outliers]
+        warning(sprintf("Excluding short chromatograms: %s.", 
+                        paste(sQuote(names(outliers)), collapse = ", ")),
+                immediate. = TRUE)
+        X <- X[-outliers]
+      }
+      end <- floor((min(limits[2,]))*100)/100
+      dim1 <- seq(start, end, by = .01)
+    } else{
+      too_early <- which(limits[1,] > head(dim1, 1))
+      too_late <- which(limits[2,] < tail(dim1, 1))
+      outliers <- union(too_early, too_late)
+      
+      if (length(outliers) == length(X)) {
+        stop(sprintf(
+          "No extrapolation allowed. New time axis (dim1) range [%.2f, %.2f] is incompatible with actual data.",
+          head(dim1, 1), tail(dim1, 1)
+        ))
+      }
+      
+      if (length(too_early) > 0) {
+        labeled <- paste0(too_early, " (", sQuote(names(too_early)), ")", collapse = ", ")
+        plural <- ifelse(length(too_early) > 1, "s", "")
+        warning(sprintf(paste(
+          "No extrapolation allowed. New time axis (dim1) begins at %.2f, before actual data begins.",
+          "\n\tExcluding chromatogram%s: %s."),
+          head(dim1, 1), plural, labeled
+        ), immediate. = TRUE)
+      }
+      
+      if (length(too_late) > 0) {
+        labeled <- paste0(too_late, " (", sQuote(names(too_late)), ")", collapse = ", ")
+        plural <- ifelse(length(too_late) > 1, "s", "")
+        warning(sprintf(paste(
+          "No extrapolation allowed. New time axis (dim1) ends at %.2f, after actual data ends.",
+          "\n\tExcluding chromatogram%s: %s."),
+          tail(dim1, 1), plural, labeled
+        ), immediate. = TRUE)
+      }
+      
+      # Remove all outliers
+      if (length(outliers) > 0) {
+        X <- X[-outliers]
+      }
+    }
   }
   if (interpolate_cols && missing(dim2)){
     message("...Wavelengths not provided. Extrapolating from matrix dimensions for interpolation.")
@@ -117,21 +169,17 @@ preprocess_matrix <- function(X,
     stop("X should be a matrix!")
   metadata <- attributes(X)
   metadata[c("dimnames", "names", "row.names", "dim", "class", "levels")] <- NULL
-  
-  ## possibly resize matrix to a lower dimension - faster, noise averaging
   if (interpolate_rows){
     if (length(tpoints <- as.numeric(rownames(X))) == 0)
       tpoints <- seq_len(nrow(X))
-    if (min(dim1) < min(tpoints) |
-        max(dim1) > max(tpoints))
+    if (min(dim1) < min(tpoints) | max(dim1) > max(tpoints))
       stop("No extrapolation allowed - check dim1 argument")
     X <- apply(X, 2, function(xx) approx(tpoints, xx, dim1)$y)
   } else dim1 <- rownames(X)
   if (interpolate_cols){
     if (length(lambdas <- as.numeric(colnames(X))) == 0)
       lambdas <- seq_len(ncol(X))
-    if (min(dim2) < min(lambdas) |
-        max(dim2) > max(lambdas))
+    if (min(dim2) < min(lambdas) | max(dim2) > max(lambdas))
       stop("No extrapolation allowed - check dim2 argument")
     X <- t(apply(X, 1, function(xx) approx(lambdas, xx, dim2)$y)) 
   } else dim2 <- colnames(X)
@@ -142,7 +190,7 @@ preprocess_matrix <- function(X,
     X <- t(apply(X, 1, function(xxx) smooth.spline(xxx)$y))
   }
   if (remove.time.baseline){
-    X <- apply(X, 2, baseline.corr, ...)
+    X <- apply(X, 2, ptw::baseline.corr, ...)
   }
   if (min(X, na.rm = TRUE) < 0){
     X[X < 0] <- 0

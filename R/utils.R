@@ -229,6 +229,8 @@ get_time_unit <- function(x, idx = 1, na_value=NA){
     chrom <- x[[1]]
   } else if (inherits(x, "matrix")){
     chrom <- x
+  } else{
+    chrom <- NA
   }
   time_unit <- attr(chrom, "time_unit")
   if (is.null(time_unit)){

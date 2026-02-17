@@ -15,6 +15,7 @@ preprocess(
   interpolate_cols = TRUE,
   cl = 2,
   show_progress = NULL,
+  outlier_cutoff = 5/60,
   ...
 )
 }
@@ -53,6 +54,11 @@ Defaults to 2. On Windows integer values will be ignored.}
 
 \item{show_progress}{Logical. Whether to show progress bar. Defaults to
 \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.}
+
+\item{outlier_cutoff}{Threshold for excluding chromatograms that end
+prematurely. Chromatograms ending more than this value (in seconds) before
+the median end time are excluded. Default is 5 seconds. Only applies when
+\code{dim1} is not specified.}
 
 \item{\dots}{Further optional arguments to
 \code{\link[ptw:baseline.corr]{baseline.corr}}.}
