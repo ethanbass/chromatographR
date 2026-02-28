@@ -8,7 +8,7 @@
 #' plot. For one-dimensional chromatograms, this argument can be ignored.
 #' @param idx A vector representing the names or numerical indices of the 
 #' chromatograms to plot.
-#' @param time_resolution Time resolution for plot in minutes. Defaults to 
+#' @param time_resolution Time resolution for plot (in minutes). Defaults to 
 #' \code{0.01}. Thinning the time axis dramatically improved speed when plotting
 #' many chromatograms.
 #' @param time_unit Time units of the provided chromatograms. Units will be

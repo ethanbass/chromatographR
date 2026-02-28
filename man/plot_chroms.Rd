@@ -31,7 +31,7 @@ plot. For one-dimensional chromatograms, this argument can be ignored.}
 \item{idx}{A vector representing the names or numerical indices of the 
 chromatograms to plot.}
 
-\item{time_resolution}{Time resolution for plot in minutes. Defaults to 
+\item{time_resolution}{Time resolution for plot (in minutes). Defaults to 
 \code{0.01}. Thinning the time axis dramatically improved speed when plotting
 many chromatograms.}
 
