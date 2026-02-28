@@ -384,7 +384,7 @@ fitpk_gaussian <- function(x, pos, lambda, max_iter,
                        noise_threshold = noise_threshold)
   c("rt" = m$center, "start" = pos[2], "end" = pos[3], 
     "sd" = m$width, "FWHM" = 2.35 * m$width,
-    "height" = y[xloc], "area" = area, "r.squared" = r.squared, purity = purity)
+    "height" = m$height, "area" = area, "r.squared" = r.squared, purity = purity)
 }
 
 #' Fit peak (exponential-gaussian hybrid)
@@ -404,7 +404,8 @@ fitpk_egh <- function(x, pos, lambda, max_iter,
   area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y, -1))))
   c("rt" = m$center, "start" = pos[2], "end" = pos[3], 
     "sd" = m$width, "tau" = m$tau, "FWHM" = 2.35 * m$width,
-    "height" = y[xloc], "area" = area, "r.squared" = r.squared, purity = purity)
+    "height" = m$height, "area" = area, "r.squared" = r.squared, 
+    purity = purity)
 }
 
 #' Fit peak (raw)
