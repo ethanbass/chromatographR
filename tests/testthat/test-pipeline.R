@@ -173,14 +173,18 @@ test_that("plot_chroms works to plot alignments with ggplot", {
 
 ### test get_peaks ###
 lam <- c("210", "318")
+
 pks_egh <- get_peaks(dat.pr, lambdas = lam, fit = "egh", smooth_type = "none",
+                     show_progress = FALSE)
+
+pks_bemg <- get_peaks(dat.pr, lambdas = lam, fit = "bemg", smooth_type = "none",
                      show_progress = FALSE)
 
 pks_gaussian <- get_peaks(dat.pr, lambdas = lam, fit = "gaussian",
                           smooth_type = "none", show_progress = FALSE)
 
 pks_raw <- get_peaks(dat.pr, lambdas = lam, fit = "raw", smooth_type = "savgol",
-                     show_progress = FALSE, sd_max = 100, smooth_window=3)
+                     show_progress = FALSE, sd_max = 100, smooth_window = 3)
 
 test_that("get_peaks works", {
   expect_equal(names(pks_egh), names(dat.pr))
@@ -246,7 +250,7 @@ test_that("correct_peaks works", {
   # expect_equal(pks_cor[[2]][[1]]$rt.cor, pks_warp[[2]][[1]]$rt[-6], 
   #              tolerance = .001)
   
-  pks_reg <- get_peaks(Sa_pr, lambdas = 210, show_progress = FALSE)
+  pks_reg <- get_peaks(Sa_pr, lambdas = 210, fit = "egh", show_progress = FALSE)
   pktab_reg <- get_peaktable(pks_reg)
 
   expect_equal(row.names(pktab_cor), names(Sa_pr))
@@ -417,6 +421,11 @@ test_that("plot.peak_list works", {
   }
   vdiffr::expect_doppelganger("plot.peak_list_gaussian", plot_peaks_gaussian)
   
+  plot_peaks_bemg <- function(){
+    plot(pks_bemg, chrom_list = dat.pr)
+  }
+  vdiffr::expect_doppelganger("plot.peak_list_bemg", plot_peaks_bemg)
+  
   # something raw with this test on GitHub actions
   # plot_peaks_raw <- function(){
   #   plot(pks_raw, chrom_list = dat.pr)
@@ -425,6 +434,8 @@ test_that("plot.peak_list works", {
   
   expect_error(plot(pks_egh, chrom_list = dat.pr, lambda = 190),
                regexp = "must match one of the wavelengths in your peak list")
+  
+  
 })
 
 test_that("purity plot works", {

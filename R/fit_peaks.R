@@ -62,8 +62,8 @@
 #' @export find_peaks
 
 find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva", 
-                                          "tmva", "none"),
-                       smooth_window = .001, slope_thresh = 0, amp_thresh = 0,
+                                          "tmva", "none"), smooth_window = .001,
+                       slope_thresh = 0, amp_thresh = 0,
                        bounds = TRUE){
   if (!is.vector(y)){
     stop("Please provide a vector to argument `y` to proceed.")
@@ -130,17 +130,18 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' 
 #' @param x A single chromatogram in matrix format.
 #' @param lambda Wavelength to fit peaks at.
-#' @param pos Locations of peaks in vector \code{y}. If NULL, \code{find_peaks} will
-#' run automatically to find peak positions.
+#' @param pos Locations of peaks in vector \code{y}. If \code{NULL}, 
+#' \code{find_peaks} will run automatically to find peak positions.
 #' @param sd_max Maximum width (standard deviation) for peaks. Defaults to 50.
-#' @param fit Function for peak fitting. Currently, exponential-gaussian hybrid
-#' \code{egh}, \code{gaussian} and \code{raw} settings are supported. If \code{
-#' raw} is selected, trapezoidal integration will be performed on raw data
-#' without fitting a peak shape. Defaults to \code{egh}.)
+#' @param fit Function for peak fitting. Currently, bidirectional exponentially 
+#' modified Gaussian (\code{bemg}), exponential-gaussian hybrid (\code{egh}),
+#' \code{gaussian} and \code{raw} settings are supported. If \code{raw} is
+#' selected, trapezoidal integration will be performed on raw data
+#' without fitting a model to the peak. Defaults to \code{bemg}.)
 #' @param max_iter Maximum number of iterations to use in nonlinear least
-#' squares peak-fitting. Defaults to 1000.
+#' squares peak-fitting. Defaults to \code{1000}.
 #' @param estimate_purity Logical. Whether to estimate purity or not. Defaults
-#' to TRUE.
+#' to \code{TRUE}.
 #' @param noise_threshold Noise threshold. Input to \code{get_purity}.
 #' @param ... Additional arguments to \code{find_peaks}.
 #' @return The \code{fit_peaks} function returns a matrix, whose columns contain
@@ -149,7 +150,12 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' \item{start}{Start of peak (only included in table if \code{bounds = TRUE}).}
 #' \item{end}{End of peak (only included in table if \code{bounds = TRUE}).}
 #' \item{sd}{The standard deviation of the peak.}
-#' \item{tau}{\eqn{\tau} parameter (only included in table if \code{fit = "egh"}).}
+#' \item{tau}{Exponential decay constant (only included in table if 
+#' \code{fit = "egh"}).}
+#' \item{tau_right}{Exponential decay constant for right side of peak (when 
+#' \code{bemg} is selected).}
+#' \item{tau_left}{Exponential decay constant for left side of peak (when 
+#' \code{bemg} is selected).}
 #' \item{FWHM}{The full width at half maximum.}
 #' \item{height}{Peak height.}
 #' \item{area}{Peak area.}
@@ -181,11 +187,12 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' @md
 
 fit_peaks <- function (x, lambda, pos = NULL, sd_max = 50,
-                       fit = c("egh", "gaussian", "raw"),  max_iter = 1000, 
-                       estimate_purity = TRUE, noise_threshold = .001, ...){
+                       fit = c("bemg", "egh", "gaussian", "raw"), 
+                       max_iter = 1000, estimate_purity = TRUE, 
+                       noise_threshold = .001, ...){
   lambda.idx <- get_lambda_idx(lambda, get_lambdas(x))
   y <- x[,lambda.idx]
-  fit <- match.arg(fit, c("egh", "gaussian", "raw"))
+  fit <- match.arg(fit, c("bemg", "egh", "gaussian", "raw"))
   if (is.null(pos)){
     pos <- find_peaks(y = y, ...)
   }
@@ -197,6 +204,9 @@ fit_peaks <- function (x, lambda, pos = NULL, sd_max = 50,
                                     "height", "area", "r-squared", "purity"),
                      "egh" = c("rt", "start", "end", "sd", "tau", "FWHM", 
                                "height", "area", "r.squared", "purity"),
+                     "bemg" = c("rt", "start", "end", "sd", "tau_right", 
+                                "tau_left", "FWHM", "height", "area", 
+                                "r.squared", "purity"),
                      "raw" = c("rt", "start", "end", "sd", "FWHM", "height",
                                                       "area", "purity")
   )
@@ -209,12 +219,11 @@ fit_peaks <- function (x, lambda, pos = NULL, sd_max = 50,
     
     if (nrow(pos) == 0) 
       return(noPeaksMat)
-
   fitpk <- switch(fit,
                   "gaussian" = fitpk_gaussian,
                   "egh" = fitpk_egh,
-                  "raw" = fitpk_raw)
-  
+                  "raw" = fitpk_raw,
+                  "bemg" = fitpk_bemg)
   huhn <- data.frame(t(apply(pos, 1, fitpk, x = x,
                              lambda = lambda.idx, max_iter = max_iter,
                              estimate_purity = estimate_purity,
@@ -224,8 +233,8 @@ fit_peaks <- function (x, lambda, pos = NULL, sd_max = 50,
   if (!is.null(sd_max)) {
     huhn <- huhn[huhn$sd < sd_max, ]
   }
-  x <- try(huhn[huhn$rt > 0,], silent = TRUE)
-  if(inherits(x, "try-error")) NA else x
+  df <- try(huhn[huhn$rt > 0,], silent = TRUE)
+  if(inherits(df, "try-error")) NA else df
 }
 
 #' Gaussian function
@@ -249,7 +258,6 @@ gaussian <- function(x, center = 0, width = 1, height = NULL, floor = 0){
 #' Fit gaussian peak
 #' @importFrom stats coef fitted lm nls.control quantile residuals
 #' @noRd
-
 fit_gaussian <- function(x, y, start.center = NULL,
                          start.width = NULL, start.height = NULL,
                          start.floor = NULL, fit.floor = FALSE,
@@ -365,6 +373,26 @@ fit_egh <- function(x1, y1, start.center = NULL, start.width = NULL,
   return(out)
 }
 
+fitpk_bemg <- function(x, pos, lambda, max_iter,
+                       estimate_purity = TRUE, noise_threshold = .001){
+  y <- x[,lambda]
+  xloc <- pos[[1]]
+  peak.loc <- seq.int(pos[2], pos[3])
+  suppressWarnings(m <- fit_bemg(peak.loc, y[peak.loc], start.center = xloc,
+                                 start.height = y[[xloc]], max_iter = max_iter)
+  )
+  r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE)
+  purity <- get_purity(x = x, pos = pos, try = estimate_purity,
+                       noise_threshold = noise_threshold)
+  # trapezoidal integration
+  area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y, -1))))
+  c("rt" = unname(round(m$center)), "start" = pos[[2]], "end" = pos[[3]], 
+    "sd" = unname(m$width), "tau_right" = unname(m$a), "tau_left" = unname(m$b), 
+    "FWHM" = 2.35 * unname(m$width),
+    "height" = unname(m$height), "area" = area, "r.squared" = unname(r.squared), 
+    purity = purity)
+}
+
 #' Fit peak (gaussian)
 #' @noRd
 fitpk_gaussian <- function(x, pos, lambda, max_iter,
@@ -478,3 +506,70 @@ pinv <- function (A, tol = .Machine$double.eps^(2/3)) {
   
   return(mp)
 }
+
+#' Bi-Exponentially Modified Gaussian
+#' @noRd
+bemg <- function(x, center, width, height, a, b, floor = 0) {
+  tm <- x - center
+  as2 <- a * width^2
+  bs2 <- b * width^2
+  sq2s2 <- sqrt(2 * width^2)
+  
+  tau_right <- exp(a * as2 / 2 + a * tm) * erfc((as2 + tm) / sq2s2)
+  tau_left <- exp(b * bs2 / 2 - b * tm) * erfc((bs2 - tm) / sq2s2)
+  
+  return(floor + height * 0.5 * (tau_right + tau_left))
+}
+
+#' Fit Bi-Exponentially Modified Gaussian peak
+#' @importFrom stats coef fitted nls.control quantile residuals
+#' @noRd
+fit_bemg <- function(x1, y1, start.center = NULL, start.width = NULL,
+                     start.a = NULL, start.b = NULL, start.height = NULL,
+                     start.floor = NULL, fit.floor = FALSE, max_iter = 1000) {
+  
+  who.max <- which.max(y1)
+  if (is.null(start.center)) start.center <- x1[who.max]
+  if (is.null(start.height)) start.height <- y1[who.max]
+  if (is.null(start.width))  start.width  <- sum(y1 > (start.height / 2)) / 2
+  if (is.null(start.a))      start.a      <- 1.0
+  if (is.null(start.b))      start.b      <- 1.0
+  
+  controlList <- nls.control(maxiter = max_iter, minFactor = 1/512,
+                             warnOnly = TRUE)
+  starts <- list(center = start.center, width = start.width,
+                 height = start.height, a = start.a, b = start.b)
+  
+  if (!fit.floor) {
+    nlsAns <- try(minpack.lm::nlsLM(
+      y1 ~ bemg(x1, center, width, height, a, b),
+      start = starts, control = controlList), silent = TRUE)
+  } else {
+    if (is.null(start.floor)) start.floor <- quantile(y1, seq(0, 1, 0.1))[2]
+    starts <- c(starts, floor = start.floor)
+    nlsAns <- try(minpack.lm::nlsLM(
+      y1 ~ bemg(x1, center, width, height, a, b, floor),
+      start = starts, control = controlList), silent = TRUE)
+  }
+  
+  if (inherits(nlsAns, "try-error")) {
+    yAns <- bemg(x1, start.center, start.width, start.height,
+                 start.a, start.b, if (fit.floor) start.floor else 0)
+    out <- list(center = start.center, width = start.width,
+                height = start.height, a = start.a, b = start.b,
+                y = yAns, residual = y1 - yAns)
+    floorAns <- if (fit.floor) start.floor else 0
+  } else {
+    coefs <- coef(nlsAns)
+    out <- list(center = coefs["center"], width = coefs["width"],
+                height = coefs["height"], a = coefs["a"], b = coefs["b"],
+                y = fitted(nlsAns), residual = residuals(nlsAns))
+    floorAns <- if (fit.floor) coefs["floor"] else 0
+  }
+  
+  if (fit.floor) out <- c(out, floor = floorAns)
+  return(out)
+}
+
+#' @noRd
+erfc <- function(x) 2 * stats::pnorm(-x * sqrt(2))

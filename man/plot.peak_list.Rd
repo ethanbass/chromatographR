@@ -12,7 +12,7 @@
   lambda = NULL,
   points = FALSE,
   ticks = FALSE,
-  a = 0.5,
+  alpha = 0.5,
   color = NULL,
   cex.points = 0.5,
   numbers = FALSE,
@@ -33,28 +33,30 @@ matrices)}
 
 \item{idx}{Index or name of chromatogram to be plotted.}
 
-\item{lambda}{Wavelength for plotting.}
+\item{lambda}{Wavelength to use for plotting.}
 
-\item{points}{Logical. If TRUE, plot peak maxima. Defaults to FALSE.}
+\item{points}{Logical. If \code{TRUE}, plot peak maxima. Defaults to 
+\code{FALSE}.}
 
-\item{ticks}{Logical. If TRUE, mark beginning and end of each peak. Defaults
-to FALSE.}
+\item{ticks}{Logical. If \code{TRUE}, mark beginning and end of each peak. 
+Defaults to \code{FALSE}.}
 
-\item{a}{Alpha parameter controlling the transparency of fitted shapes.}
+\item{alpha}{Parameter controlling the transparency of fitted shapes.
+Defaults to \code{0.5}.}
 
 \item{color}{The color of the fitted shapes.}
 
-\item{cex.points}{Size of points. Defaults to 0.5}
+\item{cex.points}{Size of points. Defaults to \code{0.5}.}
 
-\item{numbers}{Whether to number peaks. Defaults to FALSE.}
+\item{numbers}{Whether to number peaks. Defaults to \code{FALSE}.}
 
-\item{cex.font}{Font size if peaks are numbered. Defaults to 0.5.}
+\item{cex.font}{Font size if peaks are numbered. Defaults to \code{0.5}.}
 
-\item{y.offset}{Y offset for peak numbers. Defaults to 25.}
+\item{y.offset}{Y offset for peak numbers. Defaults to \code{25}.}
 
 \item{plot_purity}{Whether to add visualization of peak purity.}
 
-\item{res}{time resolution for peak fitting}
+\item{res}{Time resolution for peak fitting}
 
 \item{index}{This argument is deprecated. Please use \code{idx} instead.}
 }

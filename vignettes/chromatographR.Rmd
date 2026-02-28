@@ -172,14 +172,14 @@ In this case the alignments produced by the two algorithms are quite similar, bu
 The `get_peaks` function produced a nested list of peaks by looping through the supplied chromatograms at the specified wavelengths, finding peaks, and fitting them to the specified function using non-linear least squares. The area under the curve for each peak is then estimated using trapezoidal approximation. The `fit` argument can be used to specify a peak-fitting model. The current options are exponential-gaussian hybrid (`egh`) [@lan2001] (the default setting) or `gaussian`. Alternatively, peak areas can be integrated without applying a model (`fit = raw`). The function returns a nested list of data.frames containing parameters for the peaks identified in each chromatogram.
 
 ```{r get-peaks, message = FALSE, warning = FALSE}
+# find and integrate peaks using exponential-gaussian hybrid model
+pks_bemg <- get_peaks(warp_vpdtw, lambdas = c(210), sd_max = 40, fit = "bemg")
+
 # find and integrate peaks using gaussian peak fitting
-pks_gauss <- get_peaks(warp_vpdtw, lambdas = c(210), sd.max = 40, fit = "gaussian")
+pks_gauss <- get_peaks(warp_vpdtw, lambdas = c(210), sd_max = 40, fit = "gaussian")
 
 # find and integrate peaks using exponential-gaussian hybrid model
-pks_egh <- get_peaks(warp_vpdtw, lambdas = c(210), sd.max = 40, fit = "egh")
-
-# find and integrate peaks without modeling peak shape
-pks_raw <- get_peaks(warp_vpdtw, lambdas = c(210), sd.max = 100, fit = "raw")
+pks_egh <- get_peaks(warp_vpdtw, lambdas = c(210), sd_max = 40, fit = "egh")
 ```
 
 #### Filtering
@@ -202,8 +202,8 @@ legend("topright", "Gaussian", bty = "n")
 plot(pks_egh, idx = 1, lambda = 210)
 legend("topright", "Exponential-gaussian hybrid", bty = "n")
 
-plot(pks_raw, idx = 1, lambda = 210)
-legend("topright", "Raw", bty = "n")
+plot(pks_bemg, idx = 1, lambda = 210)
+legend("topright", "Bidirectional exponentially modified gaussian", bty = "n")
 ```
 
 ```{r, include = FALSE}

@@ -7,7 +7,7 @@
 get_peaks(
   chrom_list,
   lambdas,
-  fit = c("egh", "gaussian", "raw"),
+  fit = c("bemg", "egh", "gaussian", "raw"),
   sd_max = 50,
   max_iter = 100,
   time_unit = c("min", "s", "ms"),
@@ -29,11 +29,14 @@ get_peaks(
 \item{lambdas}{A character or numeric vector specifying the wavelengths to
 find peaks at. For one-dimensional chromatograms, this argument can be ignored.}
 
-\item{fit}{What type of fit to use. Current options are exponential-gaussian
-hybrid (\code{egh}), gaussian or raw. The \code{raw} setting performs
-trapezoidal integration directly on the raw data without fitting a peak shape.}
+\item{fit}{What type of fit to use. Current options are bidirectional
+exponentially modified gaussian (\code{bemg}), exponential-gaussian
+hybrid (\code{egh}), \code{gaussian}, or \code{raw}. The \code{raw} setting
+performs trapezoidal integration directly on the raw data without fitting a
+model to the data. Defaults to \code{bemg}.}
 
-\item{sd_max}{Maximum width (standard deviation) for peaks. Defaults to 50.}
+\item{sd_max}{Maximum width (standard deviation) for peaks. Defaults to
+\code{50}.}
 
 \item{max_iter}{Maximum number of iterations for non-linear least squares
 in \code{\link{fit_peaks}}.}
@@ -83,11 +86,16 @@ information about various peak parameters:
 \item \code{rt}: The retention time of the peak maximum.
 \item \code{start}: The retention time where the peak is estimated to begin.
 \item \code{end}: The retention time where the peak is estimated to end.
-\item \code{sd}: The standard deviation of the fitted peak shape.
-\item \code{tau} The value of parameter \eqn{\tau}. This parameter determines
-peak asymmetry for peaks fit with an exponential-gaussian hybrid function.
-(This column will only appear if \code{fit = egh}.
-\item \code{FWHM}: The full-width at half maximum.
+\item \code{sd}: The standard deviation (\eqn{\sigma}) of the fitted peak shape.
+\item \code{tau} Empirical skewness parameter (in units of time) determining peak
+asymmetry when \code{fit = "egh"}.
+\item \code{tau_right} Exponential rate constant controlling right-sided tailing
+when \code{fit = "bemg"}. Note that unlike \code{tau} in the EGH model,
+this parameter has units of 1/time.
+\item \code{tau_left} Exponential rate constant controlling left-sided tailing
+when \code{fit = "bemg"}. Note that unlike \code{tau} in the EGH model,
+this parameter has units of 1/time.
+\item \code{FWHM}: The full-width at half maximum calculated as \eqn{2.355 \sigma}.
 \item \code{height}: The height of the peak.
 \item \code{area}: The area of the peak as determined by trapezoidal approximation.
 \item \code{r.squared} The coefficient of determination (\eqn{R^2}) of the fitted
@@ -106,9 +114,11 @@ at the specified wavelengths.
 \details{
 Peaks are located by finding zero-crossings in the smoothed first derivative
 of the specified chromatographic traces (function \code{\link{find_peaks}}).
-At the given positions, an exponential-gaussian hybrid (or regular gaussian)
-function is fit to the signal using \code{\link{fit_peaks}} according to the
-value of \code{fit}. Finally, the area is calculated using trapezoidal
+At the given positions, a peak model is fit to the signal using
+\code{\link{fit_peaks}} according to the value of the \code{fit} argument.
+Available models include the bidirectional exponentially modified gaussian
+(\code{bemg}),exponential-gaussian hybrid (\code{egh} or regular
+\code{gaussian}.  Finally, the area is calculated using a trapezoidal
 approximation.
 
 Additional arguments can be provided to \code{\link{find_peaks}} to fine-tune
@@ -117,7 +127,8 @@ increased to prevent peaks from being split into multiple features. Overly
 aggressive smoothing may cause small peaks to be overlooked.
 
 The standard deviation (\code{sd}), full-width at half maximum (\code{FWHM}),
-tau \code{tau}, and \code{area} are returned in units determined by
+\eqn{\tau} (\code{tau}), \eqn{\tau_{R}} (\code{tau_right}),
+\eqn{\tau_{L}} (\code{tau_left}), and \code{area} are returned in units determined by
 \code{time_unit}. By default, the units are in minutes. To compare directly
 with 'ChemStation' integration results, the time units should be changed to
 seconds.
@@ -139,9 +150,14 @@ pks <- get_peaks(Sa_pr, lambdas = c('210'), sd_max = 50, fit = "egh")
 \item Lan, K. & Jorgenson, J. W. 2001. A hybrid of exponential and gaussian
 functions as a simple model of asymmetric chromatographic peaks. \emph{Journal of
 Chromatography A} \strong{915}:1-13. \doi{10.1016/S0021-9673(01)00594-5}.
-\item Naish, P. J. & Hartwell, S. 1988. Exponentially Modified Gaussian functions - A
-good model for chromatographic peaks in isocratic HPLC? \emph{Chromatographia},
+\item Naish, P. J. & Hartwell, S. 1988. Exponentially Modified Gaussian functions
+— A good model for chromatographic peaks in isocratic HPLC? \emph{Chromatographia},
 \strong{26}: 285-296. \doi{10.1007/BF02268168}.
+\item Arase, Shuntaro, Kanta Horie, Takashi Kato, et al. 2016. Intelligent Peak
+Deconvolution through In-Depth Study of the Data Matrix from Liquid
+Chromatography Coupled with a Photo-Diode Array Detector Applied to
+Pharmaceutical Analysis. \emph{Journal of Chromatography. A}, \strong{1469}: 35–47.
+\doi{doi.org/10.1016/j.chroma.2016.09.037}.
 \item O'Haver, Tom. Pragmatic Introduction to Signal Processing:
 Applications in scientific measurement.
 \url{https://terpconnect.umd.edu/~toh/spectrum/} (Accessed January, 2022).

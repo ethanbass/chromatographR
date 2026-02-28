@@ -2,21 +2,25 @@
 
 ### New features
 
+* Added support for bidirectional exponentially modified gaussian (BEMG) peak shape, now used as the new default for peak fitting.
 * Fixed `preprocess` function incorrectly truncating chromatograms when outliers are present and `dim1` is not specified.
 * Added more informative warnings and errors to `preprocess` function.
 * Added automatic thinning of chromatograms in `plot_chroms` to speed up plotting of raw data. The time resolution can be adjusted with the new `time_resolution` argument.
 * Changed default behavior of `plot_chroms` so legend is no longer displayed by default because legends often overrun the plot boundaries.
-* Carry time units and intensity units through to `peak_table` object.
+* Added support for propagating time and intensity units through to `peak_table` object.
 * Added `summary.peak_table` function.
-* Allow numeric wavelength (`lambda` argument) to `reshape_chroms`.
+* Added `print.peak_table` function to return just the peak data.
+* Added support for numeric input to lambda argument in `reshape_chroms`.
 * In `plot_chroms`, `show_legend` now defaults to `FALSE` to avoid overloading the plot.
 
 ### Bug fixes and other minor changes
 
 * Fixed bug in `filter_peaktable` when filtering peaks based on specific retention times with the `rts` argument.
+* Fixed bug causing `get_peaks` to return raw peak heights instead of model-fitted peak heights.
+* Extended name of `a` parameter in `plot.peak_list` to `alpha`.
 * Fixed issue with visual tests due to new version of Kaleido.
 * Added additional arguments as placeholder for `subset.peak_table`.
-* Minor improvements to documentation.
+* Added minor improvements to documentation.
 * Formalized requirement for R version 4.1.0.
 
 # chromatographR 0.7.5

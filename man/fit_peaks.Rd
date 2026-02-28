@@ -10,7 +10,7 @@ fit_peaks(
   lambda,
   pos = NULL,
   sd_max = 50,
-  fit = c("egh", "gaussian", "raw"),
+  fit = c("bemg", "egh", "gaussian", "raw"),
   max_iter = 1000,
   estimate_purity = TRUE,
   noise_threshold = 0.001,
@@ -22,21 +22,22 @@ fit_peaks(
 
 \item{lambda}{Wavelength to fit peaks at.}
 
-\item{pos}{Locations of peaks in vector \code{y}. If NULL, \code{find_peaks} will
-run automatically to find peak positions.}
+\item{pos}{Locations of peaks in vector \code{y}. If \code{NULL},
+\code{find_peaks} will run automatically to find peak positions.}
 
 \item{sd_max}{Maximum width (standard deviation) for peaks. Defaults to 50.}
 
-\item{fit}{Function for peak fitting. Currently, exponential-gaussian hybrid
-\code{egh}, \code{gaussian} and \code{raw} settings are supported. If \code{
-raw} is selected, trapezoidal integration will be performed on raw data
-without fitting a peak shape. Defaults to \code{egh}.)}
+\item{fit}{Function for peak fitting. Currently, bidirectional exponentially
+modified Gaussian (\code{bemg}), exponential-gaussian hybrid (\code{egh}),
+\code{gaussian} and \code{raw} settings are supported. If \code{raw} is
+selected, trapezoidal integration will be performed on raw data
+without fitting a model to the peak. Defaults to \code{bemg}.)}
 
 \item{max_iter}{Maximum number of iterations to use in nonlinear least
-squares peak-fitting. Defaults to 1000.}
+squares peak-fitting. Defaults to \code{1000}.}
 
 \item{estimate_purity}{Logical. Whether to estimate purity or not. Defaults
-to TRUE.}
+to \code{TRUE}.}
 
 \item{noise_threshold}{Noise threshold. Input to \code{get_purity}.}
 
@@ -49,7 +50,12 @@ the following information about each peak:
 \item{start}{Start of peak (only included in table if \code{bounds = TRUE}).}
 \item{end}{End of peak (only included in table if \code{bounds = TRUE}).}
 \item{sd}{The standard deviation of the peak.}
-\item{tau}{\eqn{\tau} parameter (only included in table if \code{fit = "egh"}).}
+\item{tau}{Exponential decay constant (only included in table if
+\code{fit = "egh"}).}
+\item{tau_right}{Exponential decay constant for right side of peak (when
+\code{bemg} is selected).}
+\item{tau_left}{Exponential decay constant for left side of peak (when
+\code{bemg} is selected).}
 \item{FWHM}{The full width at half maximum.}
 \item{height}{Peak height.}
 \item{area}{Peak area.}
