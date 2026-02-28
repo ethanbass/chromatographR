@@ -22,6 +22,7 @@
 #'
 #' @section Methods:
 #' The following methods are available:
+#' - [print.peak_table()]
 #' - [dim.peak_table()]
 #' - [head.peak_table()]  
 #' - [tail.peak_table()]

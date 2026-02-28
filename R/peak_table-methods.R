@@ -166,3 +166,14 @@ print.summary.peak_table <- function(x, ...) {
   
   invisible(x)
 }
+
+#' Print peak table
+#' @param x A \code{\link{peak_table}} object.
+#' @param ... Additional arguments to \code{\link{print}}.
+#' @return Prints and invisible returns the \code{tab} element from the supplied 
+#' \code{peak_table}.
+#' @keywords internal
+#' @export
+print.peak_table <- function(x, ...){
+  print(x$tab, ...)
+}

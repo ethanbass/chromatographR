@@ -29,6 +29,7 @@ the peak table.
 
 The following methods are available:
 \itemize{
+\item \code{\link[=print.peak_table]{print.peak_table()}}
 \item \code{\link[=dim.peak_table]{dim.peak_table()}}
 \item \code{\link[=head.peak_table]{head.peak_table()}}
 \item \code{\link[=tail.peak_table]{tail.peak_table()}}
