@@ -14,40 +14,42 @@
 #' @importFrom stats approx
 #' @param chrom_list List of chromatograms in matrix format.
 #' @param lambdas A character or numeric vector specifying the wavelengths to 
-#' use for alignment. Only one wavelength should be specified for VPdtw. For
-#' one-dimensional chromatograms, this argument can be ignored.
+#' use for alignment. Only one wavelength should be specified for VPdtw warping.
+#' For one-dimensional chromatograms, this argument can be ignored.
 #' @param models List of models to warp by. The models provided here (if any)
 #' must match the algorithm selected in \code{alg}.
 #' @param reference Index of the sample that is to be considered the reference
 #' sample.
-#' @param alg algorithm to use: parametric time warping (\code{ptw}) or variable
-#' penalty dynamic time warping (\code{vpdtw}).
-#' @param what What to return: either the 'corrected.values' (useful for visual
-#' inspection) or the warping 'models' (for further programmatic use).
+#' @param alg algorithm to use: parametric time warping (\code{"ptw"}) or 
+#' variable penalty dynamic time warping (\code{"vpdtw"}).
+#' @param what What to return: either the \code{"corrected.values"} (useful for 
+#' visual inspection and downstream analysis) or the warping \code{"models"}
+#' (for further programmatic use).
 #' @param init.coef Starting values for the optimization.
 #' @param n.traces Number of traces to use.
 #' @param n.zeros Number of zeros to add.
-#' @param scale Logical. If true, scale chromatograms before warping.
+#' @param scale Logical. If \code{TRUE}, scale chromatograms before warping.
 #' @param trwdth width of the triangle in the WCC criterion.
 #' @param plot_it Logical. Whether to plot alignment.
 #' @param penalty The divisor used to calculate the penalty for
 #' \code{\link[VPdtw]{VPdtw}}. The warping penalty is calculated by dividing the
 #' \code{\link[VPdtw]{dilation}} by this number. Thus, a higher number will
 #' produce a lower penalty and be more permissive, while a lower number will 
-#' produce a higher penalty and allow less warping. Defaults to 5.
+#' produce a higher penalty and allow less warping. Defaults to \code{5}.
 #' @param maxshift Integer. Maximum allowable shift for \code{\link[VPdtw]{VPdtw}}.
-#' Defaults to 50.
-#' @param verbose Whether to print verbose output.
+#' Defaults to \code{50}.
+#' @param verbose Logical. Whether to print verbose output.
 #' @param show_progress Logical. Whether to show progress bar. Defaults to 
 #' \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed. Currently works 
 #' only for \code{ptw} alignments.
-#' @param cl Argument to \code{\link[pbapply]{pblapply}} or \code{\link[parallel]{mclapply}}.
-#' Either an integer specifying the number of clusters to use for parallel
-#' processing or a cluster object created by \code{\link[parallel]{makeCluster}}.
-#' Defaults to 2. On Windows integer values will be ignored.
+#' @param cl Argument to \code{\link[pbapply]{pblapply}} or 
+#' \code{\link[parallel]{mclapply}}. Either an integer specifying the number of 
+#' clusters to use for parallel processing or a cluster object created by 
+#' \code{\link[parallel]{makeCluster}}. Defaults to \code{2}. On Windows systems,
+#' integer values will be ignored.
 #' @param \dots Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
-#' The only argument that cannot be changed is \code{warp.type}: this is always
-#' equal to \code{"global"}.
+#' The only argument that cannot be changed is \code{warp.type}: this is
+#' hard-coded to \code{"global"} to permit warping on multiple wavelengths.
 #' @return A list of warping models or a list of warped absorbance profiles,
 #' according to the value of the \code{what} argument.
 #' @author Ethan Bass
@@ -109,7 +111,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
     stop("Lambdas not found!")
   }
   if (scale){
-    chrom_list <- lapply(chrom_list, rescale)
+    chrom_list <- lapply(chrom_list, scales::rescale)
   }
   chrom_list_og <- chrom_list
   if (n.zeros > 0){

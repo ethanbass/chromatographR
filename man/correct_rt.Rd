@@ -29,8 +29,8 @@ correct_rt(
 \item{chrom_list}{List of chromatograms in matrix format.}
 
 \item{lambdas}{A character or numeric vector specifying the wavelengths to
-use for alignment. Only one wavelength should be specified for VPdtw. For
-one-dimensional chromatograms, this argument can be ignored.}
+use for alignment. Only one wavelength should be specified for VPdtw warping.
+For one-dimensional chromatograms, this argument can be ignored.}
 
 \item{models}{List of models to warp by. The models provided here (if any)
 must match the algorithm selected in \code{alg}.}
@@ -38,11 +38,12 @@ must match the algorithm selected in \code{alg}.}
 \item{reference}{Index of the sample that is to be considered the reference
 sample.}
 
-\item{alg}{algorithm to use: parametric time warping (\code{ptw}) or variable
-penalty dynamic time warping (\code{vpdtw}).}
+\item{alg}{algorithm to use: parametric time warping (\code{"ptw"}) or
+variable penalty dynamic time warping (\code{"vpdtw"}).}
 
-\item{what}{What to return: either the 'corrected.values' (useful for visual
-inspection) or the warping 'models' (for further programmatic use).}
+\item{what}{What to return: either the \code{"corrected.values"} (useful for
+visual inspection and downstream analysis) or the warping \code{"models"}
+(for further programmatic use).}
 
 \item{init.coef}{Starting values for the optimization.}
 
@@ -50,7 +51,7 @@ inspection) or the warping 'models' (for further programmatic use).}
 
 \item{n.zeros}{Number of zeros to add.}
 
-\item{scale}{Logical. If true, scale chromatograms before warping.}
+\item{scale}{Logical. If \code{TRUE}, scale chromatograms before warping.}
 
 \item{trwdth}{width of the triangle in the WCC criterion.}
 
@@ -60,25 +61,26 @@ inspection) or the warping 'models' (for further programmatic use).}
 \code{\link[VPdtw]{VPdtw}}. The warping penalty is calculated by dividing the
 \code{\link[VPdtw]{dilation}} by this number. Thus, a higher number will
 produce a lower penalty and be more permissive, while a lower number will
-produce a higher penalty and allow less warping. Defaults to 5.}
+produce a higher penalty and allow less warping. Defaults to \code{5}.}
 
 \item{maxshift}{Integer. Maximum allowable shift for \code{\link[VPdtw]{VPdtw}}.
-Defaults to 50.}
+Defaults to \code{50}.}
 
-\item{verbose}{Whether to print verbose output.}
+\item{verbose}{Logical. Whether to print verbose output.}
 
 \item{show_progress}{Logical. Whether to show progress bar. Defaults to
 \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed. Currently works
 only for \code{ptw} alignments.}
 
-\item{cl}{Argument to \code{\link[pbapply]{pblapply}} or \code{\link[parallel]{mclapply}}.
-Either an integer specifying the number of clusters to use for parallel
-processing or a cluster object created by \code{\link[parallel]{makeCluster}}.
-Defaults to 2. On Windows integer values will be ignored.}
+\item{cl}{Argument to \code{\link[pbapply]{pblapply}} or
+\code{\link[parallel]{mclapply}}. Either an integer specifying the number of
+clusters to use for parallel processing or a cluster object created by
+\code{\link[parallel]{makeCluster}}. Defaults to \code{2}. On Windows systems,
+integer values will be ignored.}
 
 \item{\dots}{Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
-The only argument that cannot be changed is \code{warp.type}: this is always
-equal to \code{"global"}.}
+The only argument that cannot be changed is \code{warp.type}: this is
+hard-coded to \code{"global"} to permit warping on multiple wavelengths.}
 }
 \value{
 A list of warping models or a list of warped absorbance profiles,
