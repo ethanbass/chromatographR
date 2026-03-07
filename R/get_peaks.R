@@ -122,7 +122,8 @@
 #' @examplesIf interactive()
 #' data(Sa_pr)
 #' pks <- get_peaks(Sa_pr, lambdas = c('210'), sd_max = 50, fit = "egh")
-#' @seealso \code{\link{find_peaks}}, \code{\link{fit_peaks}}
+#' @seealso \code{\link{find_peaks}}, \code{\link{fit_peaks}}, 
+#' \code{\link{print.peak_list}}, \code{\link{[.peak_list}}
 #' @export get_peaks
 #' @md
 
@@ -217,4 +218,55 @@ convert_indices_to_times <- function(x, chrom_list, idx, tfac){
     x[, c('tau_right', 'tau_left')] <- x[, c('tau_right', 'tau_left')] / (tdiff * tfac)
   } 
   x
+}
+
+#' Subset peak list
+#'
+#' Subsets a \code{peak_list} while preserving metadata attributes.
+#'
+#' @param x A \code{peak_list} object.
+#' @param i Indices specifying elements to extract.
+#' @param j Not used.
+#' @param ... Additional arguments (ignored).
+#' @param drop Not used.
+#' @return A \code{peak_list} object.
+#' @author Ethan Bass
+#' @method [ peak_list
+#' @export
+`[.peak_list` <- function(x, i, j, ..., drop = FALSE) {
+  meta <- attributes(x)
+  result <- .subset(x, i)
+  exclude = c('names','row.names','dim','dimnames')
+  meta[exclude] <- NULL
+  attributes(result) <- c(attributes(result), meta)
+  result
+}
+
+#' Print peak list
+#'
+#' Prints a summary of a \code{peak_list} object, including the number of
+#' samples, wavelengths, fit method, and total number of peaks.
+#'
+#' @param x A \code{peak_list} object.
+#' @param ... Additional arguments (ignored).
+#' @return Invisibly returns \code{x}.
+#' @author Ethan Bass
+#' @method print peak_list
+#' @export
+print.peak_list <- function(x, ...) {
+  meta <- attributes(x)
+  n_samples <- length(x)
+  lambdas <- paste(meta$lambdas, collapse = ", ")
+  n_peaks <- sum(sapply(x, function(s) sum(sapply(s, nrow))))
+  mean_peaks <- round(n_peaks / n_samples)
+  
+  cat(sprintf("A peak_list with %d samples and %d wavelength(s) (%s nm)\n",
+              n_samples, length(meta$lambdas), lambdas))
+  cat(sprintf("Fit method: %s | Time unit: %s | sd_max: %s\n",
+              meta$fit, meta$time_unit, meta$sd_max))
+  cat(sprintf("Total peaks: %d (mean %s per sample)\n",
+              n_peaks, mean_peaks))
+  if (!is.na(meta$chrom_list))
+    cat(sprintf("Source: %s\n", meta$chrom_list))
+  invisible(x)
 }

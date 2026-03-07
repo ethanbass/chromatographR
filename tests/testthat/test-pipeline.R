@@ -198,6 +198,14 @@ test_that("get_peaks works", {
                regexp = "'arg' should be one of")
 })
 
+test_that("[.peak_list works", {
+  sub_peaks <- pks_egh[2]
+  expect_equal(sub_peaks[[1]], pks_egh[[2]])
+  attr_original <- attributes(pks_egh)
+  attr_new <- attributes(sub_peaks)
+  expect_equal(attr_new[-1], attr_original[-1])
+})
+
 test_that("filter_peaks works", {
   pks_s <- filter_peaks(pks_egh, min_height = 10, min_area = 10, min_sd = .07)
   expect_equal(names(pks_egh), names(pks_s))
@@ -317,7 +325,7 @@ test_that("attach_ref_spectra works", {
                regexp = "'arg' should be one of")
 })
 
-test_that("subset.peaktable works", {
+test_that("subset.peak_table works", {
   sub <- subset(pk_tab, subset = pk_tab$sample_meta$trt == "+")
   
   expect_equal(sub$tab, pk_tab$tab[1,])
