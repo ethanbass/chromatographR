@@ -177,3 +177,45 @@ print.summary.peak_table <- function(x, ...) {
 print.peak_table <- function(x, ...){
   print(x$tab, ...)
 }
+
+#' Subset peak table
+#'
+#' Subsets a \code{peak_table} while preserving and subsetting all associated
+#' slots (\code{tab}, \code{pk_meta}, \code{sample_meta}, \code{ref_spectra}).
+#'
+#' @note Subsetting a \code{peak_table} does not modify the associated
+#' \code{chrom_list}. Methods that rely on the \code{chrom_list} (e.g.,
+#' \code{\link{plot_spectrum}}) may not work as expected on a subsetted
+#' \code{peak_table} unless the \code{chrom_list} is subsetted in parallel.
+#'
+#' @param x A \code{peak_table} object.
+#' @param i Row indices (samples) to subset.
+#' @param j Column indices (peaks) to subset.
+#' @param ... Additional arguments (ignored).
+#' @param drop Passed to the \code{[} method for \code{data.frame}.
+#' @return A \code{peak_table} object.
+#' @author Ethan Bass
+#' @method [ peak_table
+#' @export
+
+`[.peak_table` <- function(x, i, j, ..., drop = FALSE) {
+  if (missing(i)) i <- seq_len(nrow(x$tab))
+  if (missing(j)) j <- seq_len(ncol(x$tab))
+  
+  x$tab <- x$tab[i, j, drop = drop]
+  
+  if (is_attached(x$pk_meta))
+    x$pk_meta <- x$pk_meta[, j, drop = drop]
+  
+  if (is_attached(x$sample_meta))
+    x$sample_meta <- x$sample_meta[i, , drop = drop]
+  
+  if (is_attached(x$ref_spectra))
+    x$ref_spectra <- x$ref_spectra[, j, drop = drop]
+  
+  x
+}
+
+#' Is slot full
+#' @noRd
+is_attached <- function(x) !identical(x, NA)

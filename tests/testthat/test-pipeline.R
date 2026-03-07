@@ -325,6 +325,29 @@ test_that("attach_ref_spectra works", {
                regexp = "'arg' should be one of")
 })
 
+test_that("[.peak_table works", {
+  i <- 1
+  sub_rows <- pk_tab[i,]
+  expect_equal(sub_rows$tab, pk_tab$tab[i,])
+  expect_equal(sub_rows$pk_meta, pk_tab$pk_meta)
+  expect_equal(sub_rows$sample_meta, pk_tab$sample_meta[i,])
+  expect_equal(sub_rows$ref_spectra, pk_tab$ref_spectra)
+  expect_equal(sub_rows$args, pk_tab$args)
+  j <- c(3:5)
+  sub_cols <- pk_tab[,j]
+  expect_equal(sub_cols$tab, pk_tab$tab[,j])
+  expect_equal(sub_cols$pk_meta, pk_tab$pk_meta[,j])
+  expect_equal(sub_cols$sample_meta, pk_tab$sample_meta)
+  expect_equal(sub_cols$ref_spectra, pk_tab$ref_spectra[,j])
+  expect_equal(sub_rows$args, pk_tab$args)
+  sub_ij <- pk_tab[i,j]
+  expect_equal(sub_ij$tab, pk_tab$tab[i,j])
+  expect_equal(sub_ij$pk_meta, pk_tab$pk_meta[,j])
+  expect_equal(sub_ij$sample_meta, pk_tab$sample_meta[i,])
+  expect_equal(sub_ij$ref_spectra, pk_tab$ref_spectra[,j])
+  expect_equal(sub_ij$args, pk_tab$args)
+})
+
 test_that("subset.peak_table works", {
   sub <- subset(pk_tab, subset = pk_tab$sample_meta$trt == "+")
   

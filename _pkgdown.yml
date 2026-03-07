@@ -36,11 +36,22 @@ reference:
     - get_lambdas
     - reshape_chroms
     - reshape_peaktable
-    - subset.peak_table
     - write_peaktable
   - title: "Data structures"
     contents:
     - peak_table-class
+  - title: "Methods"
+    contents:
+    - print.peak_table
+    - print.peak_list
+    - summary.peak_table
+    - "[.peak_table"
+    - "[.peak_list"
+    - dim.peak_table
+    - head.peak_table
+    - tail.peak_table
+    - row.names.peak_table
+    - subset.peak_table
   - title: "Data objects"
     contents:
     - Sa

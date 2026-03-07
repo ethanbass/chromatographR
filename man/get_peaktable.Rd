@@ -120,7 +120,8 @@ Metabolomics} \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}.
 }
 }
 \seealso{
-\code{\link{attach_ref_spectra}} \code{\link{attach_metadata}}
+\code{\link{peak_table-class}}, \code{\link{attach_ref_spectra}},
+\code{\link{attach_metadata}}
 }
 \author{
 Ethan Bass

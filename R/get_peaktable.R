@@ -84,7 +84,8 @@
 #' data(Sa_pr)
 #' pks <- get_peaks(Sa_pr, lambdas = c('210'))
 #' get_peaktable(pks, response = "area")
-#' @seealso \code{\link{attach_ref_spectra}} \code{\link{attach_metadata}}
+#' @seealso \code{\link{peak_table-class}}, \code{\link{attach_ref_spectra}}, 
+#' \code{\link{attach_metadata}}
 #' @export get_peaktable
 
 get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),

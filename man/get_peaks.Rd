@@ -167,7 +167,8 @@ Metabolomics} \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}.
 }
 }
 \seealso{
-\code{\link{find_peaks}}, \code{\link{fit_peaks}}
+\code{\link{find_peaks}}, \code{\link{fit_peaks}},
+\code{\link{print.peak_list}}, \code{\link{[.peak_list}}
 }
 \author{
 Ethan Bass

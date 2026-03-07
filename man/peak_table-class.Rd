@@ -36,6 +36,7 @@ The following methods are available:
 \item \code{\link[=row.names.peak_table]{row.names.peak_table()}}
 \item \code{\link[=subset.peak_table]{subset.peak_table()}}
 \item \code{\link[=summary.peak_table]{summary.peak_table()}}
+\item \code{\link{[.peak_table}}
 }
 }
 

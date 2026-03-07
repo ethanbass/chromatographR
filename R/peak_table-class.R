@@ -29,6 +29,7 @@
 #' - [row.names.peak_table()]
 #' - [subset.peak_table()]
 #' - [summary.peak_table()]
+#' - \code{\link{[.peak_table}}
 #'
 #' @seealso [get_peaktable()] for creating peak_table objects
 #'
