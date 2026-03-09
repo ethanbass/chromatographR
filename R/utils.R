@@ -416,3 +416,13 @@ get_metadata_attribute <- function(x, which, ...){
   }
   result
 }
+
+#' @noRd
+seq_nrow <- function(x){
+  seq_len(nrow(x))
+}
+
+#' @noRd
+seq_ncol <- function(x){
+  seq_len(ncol(x))
+}
