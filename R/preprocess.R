@@ -171,14 +171,14 @@ preprocess_matrix <- function(X,
   metadata[c("dimnames", "names", "row.names", "dim", "class", "levels")] <- NULL
   if (interpolate_rows){
     if (length(tpoints <- as.numeric(rownames(X))) == 0)
-      tpoints <- seq_len(nrow(X))
+      tpoints <- seq_nrow(X)
     if (min(dim1) < min(tpoints) | max(dim1) > max(tpoints))
       stop("No extrapolation allowed - check dim1 argument")
     X <- apply(X, 2, function(xx) approx(tpoints, xx, dim1)$y)
   } else dim1 <- rownames(X)
   if (interpolate_cols){
     if (length(lambdas <- as.numeric(colnames(X))) == 0)
-      lambdas <- seq_len(ncol(X))
+      lambdas <- seq_ncol(X)
     if (min(dim2) < min(lambdas) | max(dim2) > max(lambdas))
       stop("No extrapolation allowed - check dim2 argument")
     X <- t(apply(X, 1, function(xx) approx(lambdas, xx, dim2)$y)) 
