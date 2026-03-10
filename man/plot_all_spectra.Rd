@@ -58,11 +58,11 @@ information for a certain peak, \code{rt} to scan by retention time, or
 \item{\dots}{Additional arguments to plot_spectrum.}
 }
 \value{
-If \code{export_spectrum} is TRUE, returns the spectra as a \code{
-data.frame} with wavelengths as rows and one column for each sample in the
-\code{chrom_list} encoding the absorbance (or normalized absorbance, if
-\code{scale_spectrum} is TRUE) at each wavelength. Otherwise, there is no
-return value.
+If \code{export_spectrum} is \code{TRUE}, invisibly returns the 
+spectra as a \code{data.frame} with wavelengths as rows and one column for 
+each sample in the \code{chrom_list} encoding the absorbance (or normalized 
+absorbance, if \code{scale_spectrum} is \code{TRUE}) at each wavelength. 
+Otherwise, there is no return value.
 }
 \description{
 Plot multiple for a given peak in peak table. Wrapper for
@@ -70,9 +70,9 @@ Plot multiple for a given peak in peak table. Wrapper for
 }
 \section{Side effects}{
 
-If \code{plot_spectrum} is TRUE, plots the spectra for the specified chromatogram
-(\code{idx}) of the given \code{peak}. The spectrum is a single row
-from the chromatographic matrix.
+If \code{plot_spectrum} is \code{TRUE}, plots the spectra for the specified 
+chromatogram (\code{idx}) of the given \code{peak}. Each spectrum is a single 
+row from the chromatographic matrix.
 }
 
 \examples{

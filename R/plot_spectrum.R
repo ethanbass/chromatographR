@@ -409,15 +409,15 @@ scan_chrom <- function(chrom_list, idx, lambda,
 #' information for a certain peak, \code{rt} to scan by retention time, or 
 #' \code{idx} to scan by numeric index. Defaults to "peak" mode.
 #' @param \dots Additional arguments to plot_spectrum.
-#' @return If \code{export_spectrum} is TRUE, returns the spectra as a \code{
-#' data.frame} with wavelengths as rows and one column for each sample in the
-#' \code{chrom_list} encoding the absorbance (or normalized absorbance, if
-#' \code{scale_spectrum} is TRUE) at each wavelength. Otherwise, there is no
-#' return value.
+#' @return If \code{export_spectrum} is \code{TRUE}, invisibly returns the 
+#' spectra as a \code{data.frame} with wavelengths as rows and one column for 
+#' each sample in the \code{chrom_list} encoding the absorbance (or normalized 
+#' absorbance, if \code{scale_spectrum} is \code{TRUE}) at each wavelength. 
+#' Otherwise, there is no return value.
 #' @section Side effects:
-#' If \code{plot_spectrum} is TRUE, plots the spectra for the specified chromatogram
-#' (\code{idx}) of the given \code{peak}. The spectrum is a single row
-#' from the chromatographic matrix.
+#' If \code{plot_spectrum} is \code{TRUE}, plots the spectra for the specified 
+#' chromatogram (\code{idx}) of the given \code{peak}. Each spectrum is a single 
+#' row from the chromatographic matrix.
 #' @author Ethan Bass
 #' @examplesIf interactive()
 #' data(Sa_warp)
@@ -472,7 +472,7 @@ plot_all_spectra <- function(peak, peak_table, chrom_list, idx = "all",
       }
     }
     if (export_spectrum)
-      return(sp)
+      return(invisible(sp))
   } else {
     sp <- lapply(seq_along(sp), function(i){
       data.frame(lambda = get_lambdas(chrom_list), absorbance = sp[[i]], 

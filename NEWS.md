@@ -22,6 +22,7 @@
 * Added additional arguments as placeholder for `subset.peak_table`.
 * Added minor improvements to documentation.
 * Formalized requirement for R version 4.1.0.
+* The `plot_all_spectra` function now invisibly returns spectra to avoid cluttering up the console.
 
 # chromatographR 0.7.5
 
