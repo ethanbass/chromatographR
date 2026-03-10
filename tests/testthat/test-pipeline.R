@@ -785,21 +785,15 @@ test_that("plot_chroms works with plotly", {
   skip_if_not_installed("rsvg")
   
   p <- plot_chroms(warp, lambdas = "210", engine = "plotly", show_legend=TRUE)
-  # warnings are suppressed because of annoying RColorBrewer warnings
-  # https://github.com/plotly/plotly.R/issues/2392
-  # should be fixed by https://github.com/plotly/plotly.R/pull/1999
-  suppressWarnings(expect_doppelganger_plotly(name = "alignment_plotly", 
-                                              p = p))
+  expect_doppelganger_plotly(name = "alignment_plotly", p = p)
   
   p2 <- plot_chroms(warp, lambdas="210", engine = "plotly", show_legend = FALSE)
-  suppressWarnings(expect_doppelganger_plotly(name = "alignment_plotly_no_legend", 
-                                              p = p2))
+  expect_doppelganger_plotly(name = "alignment_plotly_no_legend", p = p2)
   
   p3 <- plot_chroms(warp, lambdas="210", engine = "plotly", show_legend=TRUE,
                     legend_position = "topleft", 
                     xlim=c(15, 18), ylim=c(0,400))
-  suppressWarnings(expect_doppelganger_plotly(name = "alignment_plotly_zoom",
-                                              p = p3))
+  expect_doppelganger_plotly(name = "alignment_plotly_zoom", p = p3)
 })
 
 
