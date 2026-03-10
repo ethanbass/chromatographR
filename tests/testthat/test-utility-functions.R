@@ -177,3 +177,50 @@ test_that("resolve_deprecated works as expected", {
   max.iter <- NULL
   expect_equal(resolve_deprecated(max.iter, max_iter),100)
 })
+
+test_that("check_norm_values behaves correctly for all on_invalid options", {
+  samples <- c("s1", "s2", "s3")
+  valid   <- c(1.5, 2.0, 3.0)
+  
+  # valid values returned unchanged
+  expect_identical(check_norm_values(valid, samples, "error"), valid)
+  expect_identical(check_norm_values(valid, samples, "warn"),  valid)
+  expect_identical(check_norm_values(valid, samples, "silent"), valid)
+  
+  # error throws and returns nothing
+  expect_error(check_norm_values(c(NA,  2, 3), samples, "error"), "NA")
+  expect_error(check_norm_values(c(0,   2, 3), samples, "error"), "0")
+  expect_error(check_norm_values(c(-1,  2, 3), samples, "error"), "negative")
+  
+  # warn emits message and replaces invalid with NA
+  expect_warning(w <- check_norm_values(c(NA,  2, 3), samples, "warn"), "NA")
+  expect_identical(w, c(NA_real_, 2, 3))
+  
+  expect_warning(w <- check_norm_values(c(0,   2, 3), samples, "warn"), "0")
+  expect_identical(w, c(NA_real_, 2, 3))
+  
+  expect_warning(w <- check_norm_values(c(-1,  2, 3), samples, "warn"), "negative")
+  expect_identical(w, c(NA_real_, 2, 3))
+  
+  # silent replaces invalid with NA, no condition
+  expect_silent(w <- check_norm_values(c(NA, 2, 3), samples, "silent"))
+  expect_identical(w, c(NA_real_, 2, 3))
+  
+  expect_silent(w <- check_norm_values(c(0,  2, 3), samples, "silent"))
+  expect_identical(w, c(NA_real_, 2, 3))
+  
+  expect_silent(w <- check_norm_values(c(-1, 2, 3), samples, "silent"))
+  expect_identical(w, c(NA_real_, 2, 3))
+  
+  # sample names appear in messages
+  expect_error(check_norm_values(c(NA, 2, 3), samples, "error"), "s1")
+  
+  # multiple invalid values - all reasons appear in message
+  w <- testthat::capture_warnings(
+    v <- check_norm_values(c(NA, 0, -1), samples, "warn")
+  )
+  expect_match(w, "NA",       all = FALSE)
+  expect_match(w, "0",     all = FALSE)
+  expect_match(w, "negative", all = FALSE)
+  expect_identical(v, rep(NA_real_, 3))
+})

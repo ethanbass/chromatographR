@@ -31,8 +31,8 @@ attach_metadata <- function(peak_table, metadata, column){
   if (!(column %in% colnames(metadata)))
     stop(sprintf("Column %s could not be found.", sQuote(column)))
   if (sum((duplicated(metadata[,column], incomparables = NA))) > 0)
-    stop(paste("Sample names must be unique. Please check column", sQuote(column),
-    "for duplicates."))
+    stop(sprintf("Sample names must be unique. Please check column %s for duplicates.",
+                 sQuote(column)))
   if (!inherits(peak_table,"peak_table"))
     stop(paste("Provided peak table object must be of the 'peak_table' class."))
   meta <- data.frame(rownames(peak_table$tab))
@@ -52,14 +52,13 @@ attach_metadata <- function(peak_table, metadata, column){
 #' @noRd
 keep_order <- function(data, fn, ...) { 
   col <- ".sortColumn"
-  data[,col] <- seq_len(nrow(data))
+  data[,col] <- seq_nrow(data)
   out <- fn(data, ...) 
   if (!col %in% colnames(out)) stop("Ordering column not preserved by function") 
   out <- out[order(out[,col]),] 
   out[,col] <- NULL 
   out 
 } 
-
 
 #' Get reference spectra.
 #' 
@@ -152,63 +151,4 @@ attach_ref_spectra <- function(peak_table, chrom_list,
                                                   ref = ref)
   peak_table$args["reference_spectra"] <- ref
   return(peak_table)
-}
-
-#' Normalize peak table or chromatograms
-#' 
-#' Normalizes peak table or list of chromatograms by specified column in sample
-#' metadata. Metadata must first be attached to the \code{peak_table} using
-#' \code{\link{attach_metadata}}.
-#' 
-#' @param peak_table A \code{peak_table} object.
-#' @param column The name of the column containing the weights.
-#' @param chrom_list List of chromatograms for normalization. The samples must
-#' be in same order as the peak_table. If no argument is provided here, the
-#' function will try to find the \code{chrom_list} object used to create the
-#' provided \code{peak_table}.
-#' @param what `peak_table` or list of chromatograms (`chrom_list`).
-#' @param by Whether to normalize by a column in sample metadata (\code{meta}) or
-#' by a column in the peak table itself (\code{peak}).
-#' @return A \code{peak_table} object where the peaks are normalized by the mass
-#' of each sample.
-#' @author Ethan Bass
-#' @seealso \code{\link{get_peaktable}} \code{\link{attach_metadata}}
-#' @examples
-#' data(pk_tab)
-#' path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
-#' meta <- read.csv(path)
-#' pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
-#' norm <- normalize_data(pk_tab, "mass", what = "peak_table")
-#' @export normalize_data
-
-normalize_data <- function(peak_table, column, chrom_list,
-                           what = c('peak_table', 'chrom_list'),
-                           by = c("meta", "peak")){
-  check_peaktable(peak_table)
-  if (!is.data.frame(peak_table$sample_meta))
-    stop("Metadata must be attached to peak_table prior to normalization.")
-  if (!(column %in% colnames(peak_table$sample_meta)))
-    stop(paste0("The specified column (", sQuote(column), ") could not be found."))
-  what <- match.arg(what, c("peak_table", "chrom_list"))
-  by <- match.arg(by, c("meta", "peak"))
-  df <- switch(by, meta = peak_table$sample_meta, peak = peak_table$tab)
-  if (what == "peak_table"){
-    pktab <- as.data.frame(t(sapply(seq_len(nrow(peak_table$tab)), function(samp){
-      as.numeric(as.vector(peak_table$tab[samp,]))/df[samp, column]
-    })))
-    rownames(pktab) <- rownames(peak_table$tab)
-    peak_table$tab <- pktab
-    peak_table$args[c("normalized", "normalization_by")] <- c(TRUE, column)
-    return(peak_table)
-  } else if (what == "chrom_list"){
-    if (missing(chrom_list)){
-      chrom_list <- get_chrom_list(peak_table)
-    } else get_chrom_list(peak_table, chrom_list)
-    if (mean(elementwise.all.equal(names(chrom_list), rownames(peak_table$tab))) < 1)
-      stop("Names of chromatograms do not match the peak table.")
-    chrom_list <- lapply(seq_len(nrow(peak_table$tab)), function(samp){
-      chrom_list[[samp]]/df[samp, column]
-    })
-    return(chrom_list)
-  }
 }

@@ -23,6 +23,8 @@
 * Added minor improvements to documentation.
 * Formalized requirement for R version 4.1.0.
 * The `plot_all_spectra` function now invisibly returns spectra to avoid cluttering up the console.
+* Refactored `normalize_data` for improved performance and added `on_invalid` argument to specify behavior for dealing with invalid normalization values (zero, negative or `NA`).
+* Fixed bug in `normalize_data` causing loss of sample names when normalizing chromatograms.
 
 # chromatographR 0.7.5
 

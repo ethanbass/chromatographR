@@ -411,20 +411,45 @@ test_that("normalize_data works", {
   expect_equal(colnames(pk_tab_norm$tab), colnames(pk_tab$tab))
   expect_equal(pk_tab_norm$tab[1,], pk_tab$tab[1,]/pk_tab$sample_meta$mass[1])
   expect_equal(pk_tab_norm$tab[2,], pk_tab$tab[2,]/pk_tab$sample_meta$mass[2])
-  expect_equal(pk_tab_norm$args[["normalized"]], "TRUE")
-  expect_equal(pk_tab_norm$args[["normalization_by"]], "mass")
+  expect_equal(pk_tab_norm$args[["normalized"]], TRUE)
+  expect_equal(pk_tab_norm$args[["normalization_column"]], "mass")
+  expect_equal(pk_tab_norm$args[["normalization_by"]], "meta")
   
   chroms_norm <- normalize_data(pk_tab, chrom_list = dat.pr, 
                            column = "mass", what = "chrom_list")
   expect_equal(dim(chroms_norm), dim(dat.pr))
-  expect_equal(chroms_norm[[1]], dat.pr[[1]]/pk_tab$sample_meta$mass[1])
-  expect_equal(chroms_norm[[2]], dat.pr[[2]]/pk_tab$sample_meta$mass[2])
-  
+  expect_equal(chroms_norm[[1]], dat.pr[[1]]/pk_tab$sample_meta$mass[1], 
+               ignore_attr = TRUE)
+  expect_equal(chroms_norm[[2]], dat.pr[[2]]/pk_tab$sample_meta$mass[2], 
+               ignore_attr = TRUE)
+  expect_equal(attr(chroms_norm[[1]],"normalized"),TRUE)
+  expect_equal(attr(chroms_norm[[1]],"normalized_by"),"meta")
+  expect_equal(attr(chroms_norm[[1]],"normalization_column"),"mass")
+  expect_equal(names(chroms_norm), names(dat.pr))
+
   expect_error(normalize_data(pk_tab, chrom_list = dat.pr, column = "x"), 
                regexp = "could not be found")
   expect_error(normalize_data(pk_tab, chrom_list = dat.pr, 
                               column = "mass", what="x"), 
                regexp = "'arg' should be one of")
+  
+  pk_tab_pnorm <- normalize_data(pk_tab, chrom_list = dat.pr, 
+                                column = "V22", by = "peak")
+  expect_equal(rownames(pk_tab_pnorm$tab), rownames(pk_tab$tab))
+  expect_equal(class(pk_tab_pnorm), class(pk_tab))
+  expect_equal(colnames(pk_tab_pnorm$tab), colnames(pk_tab$tab))
+  expect_equal(pk_tab_pnorm$tab[1,], pk_tab$tab[1,]/pk_tab$tab$V22[1])
+  expect_equal(pk_tab_pnorm$tab[2,], pk_tab$tab[2,]/pk_tab$tab$V22[2])
+  expect_equal(pk_tab_pnorm$args[["normalized"]], TRUE)
+  expect_equal(pk_tab_pnorm$args[["normalization_column"]], "V22")
+  expect_equal(pk_tab_pnorm$args[["normalization_by"]], "peak")
+  
+  expect_warning(pk_tab_pnorm_w <- normalize_data(pk_tab, chrom_list = dat.pr, 
+                                                   column = "V5", by = "peak"),
+                 regexp = "Invalid normalization values")
+  expect_error(pk_tab_pnorm_w <- normalize_data(pk_tab, chrom_list = dat.pr, 
+                                                  column = "V5", by = "peak", 
+                                                on_invalid = "error"))
 })
 
 test_that("cluster_spectra works", {
