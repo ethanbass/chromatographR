@@ -205,7 +205,7 @@ fit_peaks <- function (x, lambda, pos = NULL, sd_max = 50,
                      "egh" = c("rt", "start", "end", "sd", "tau", "FWHM", 
                                "height", "area", "r.squared", "purity"),
                      "bemg" = c("rt", "start", "end", "sd", "tau_right", 
-                                "tau_left", "FWHM", "height", "area", 
+                                "tau_left", "h", "FWHM", "height", "area", 
                                 "r.squared", "purity"),
                      "raw" = c("rt", "start", "end", "sd", "FWHM", "height",
                                                       "area", "purity")
@@ -388,8 +388,8 @@ fitpk_bemg <- function(x, pos, lambda, max_iter,
   area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y, -1))))
   c("rt" = unname(round(m$center)), "start" = pos[[2]], "end" = pos[[3]], 
     "sd" = unname(m$width), "tau_right" = unname(m$a), "tau_left" = unname(m$b), 
-    "FWHM" = 2.35 * unname(m$width),
-    "height" = unname(m$height), "area" = area, "r.squared" = unname(r.squared), 
+    "h" = unname(m$height), "FWHM" = 2.35 * unname(m$width),
+    "height" = unname(max(m$y)), "area" = area, "r.squared" = unname(r.squared), 
     purity = purity)
 }
 

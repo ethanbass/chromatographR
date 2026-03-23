@@ -69,7 +69,7 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
   fit <- attr(x,"fit")
   plot(new.ts, y, type = 'l', xlab = '', ylab = '', xaxt = 'n', yaxt = 'n', ...)
   if (points){
-    points(pks$rt, pks$height, pch = 20, cex=cex.points, col = 'red')
+    points(pks$rt, pks$height, pch = 20, cex = cex.points, col = 'red')
   }
   if (ticks){
     arrows(pks$start, y[which(new.ts %in% pks$start)] - 5,
@@ -100,7 +100,7 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
         if (is.null(color)) color <- "purple"
       } else if (fit == "bemg"){
         yvals <- bemg(x = peak.loc, center = pks$rt[i], width = pks$sd[i]*tfac,
-                      height = pks$height[i], a = pks$tau_right[i]*tfac, 
+                      height = pks$h[i], a = pks$tau_right[i]*tfac, 
                       b = pks$tau_left[i]*tfac)
         if (is.null(color)) color <- "darkgreen"
       }
