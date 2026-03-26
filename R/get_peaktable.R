@@ -36,6 +36,10 @@
 #' exists in the provided \code{peak_list}.
 #' @param hmax Height at which the complete linkage dendrogram will be cut. Can
 #' be interpreted as the maximal intercluster retention time difference.
+#' @param summarize_by How to select the representative peak from each cluster.
+#' Options are \code{"mean"} and \code{"median"} (which aggregate metadata across
+#' all peaks in the cluster) or \code{"max"} (which selects the most intense peak
+#' in the cluster and uses its metadata directly).
 #' @param plot_it Logical. If \code{TRUE}, for every component a strip plot will be
 #' shown indicating the clustering.
 #' @param ask Logical. Ask before showing new plot? Defaults to \code{TRUE}.
@@ -89,7 +93,8 @@
 #' @export get_peaktable
 
 get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
-                          use.cor = NULL, hmax = 0.2,
+                          use.cor = NULL, hmax = 0.2, 
+                          summarize_by = c("median", "mean", "max"),
                           plot_it = FALSE, ask = plot_it, 
                           clust = c("rt", "sp.rt"), 
                           sigma.t = NULL, sigma.r = 0.5,
@@ -98,6 +103,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
   response <- match.arg(response, c("area", "height"))
   clust <- match.arg(clust, c("rt", "sp.rt"))
   out <- match.arg(out, c('data.frame', 'matrix'))
+  summarize_by <- match.arg(summarize_by, c('median', 'mean',"max"))
   if (is.null(use.cor)){
     use.cor <- "rt.cor" %in% colnames(peak_list[[1]][[1]])
   }
@@ -159,9 +165,17 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
     vars <- c(rt, start, end, "sd", "width", "tau", "FWHM", "r.squared", "purity")
     vars <- vars[vars %in% colnames(xx)]
     vars.idx <- match(vars, colnames(xx))
-    cl.centers <- aggregate(xx[, vars.idx], by = list(pkcenters.cl),
-                            FUN = "mean",
-                            na.action = "na.pass")[, -1, drop = FALSE]
+    if (summarize_by == "max"){
+      cl.centers <- do.call(rbind, 
+                            tapply(seq_along(pkcenters), 
+                                   pkcenters.cl, function(i){
+        xx[i[which.max(xx[i, response])], vars.idx]
+      }))
+    } else{
+      cl.centers <- aggregate(xx[, vars.idx], by = list(pkcenters.cl),
+                              FUN = summarize_by,
+                              na.action = "na.pass")[, -1, drop = FALSE]
+    }
     ncl <- length(cl.centers[, rt])
     pkcenters.cl <- order(order(cl.centers[, rt]))[pkcenters.cl]
     cl.centers <- cl.centers[order(cl.centers[, rt]),]
@@ -193,7 +207,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
     }
     allIs <- unlist(lapply(pkLst, function(samp) samp[[comp]][, response]))
     Iinfo <- matrix(0, ncl, length(pkLst), dimnames = list(NULL, names(pkLst)))
-    for (i in seq(along = allIs)){
+    for (i in seq_along(allIs)){
       Iinfo[pkcenters.cl[i],  file.idx[i]] <- 
       max(allIs[i], Iinfo[pkcenters.cl[i], file.idx[i]])
     }

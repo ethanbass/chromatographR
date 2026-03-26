@@ -10,6 +10,7 @@ get_peaktable(
   response = c("area", "height"),
   use.cor = NULL,
   hmax = 0.2,
+  summarize_by = c("median", "mean", "max"),
   plot_it = FALSE,
   ask = plot_it,
   clust = c("rt", "sp.rt"),
@@ -39,6 +40,11 @@ exists in the provided \code{peak_list}.}
 
 \item{hmax}{Height at which the complete linkage dendrogram will be cut. Can
 be interpreted as the maximal intercluster retention time difference.}
+
+\item{summarize_by}{How to select the representative peak from each cluster.
+Options are \code{"mean"} and \code{"median"} (which aggregate metadata across
+all peaks in the cluster) or \code{"max"} (which selects the most intense peak
+in the cluster and uses its metadata directly).}
 
 \item{plot_it}{Logical. If \code{TRUE}, for every component a strip plot will be
 shown indicating the clustering.}
