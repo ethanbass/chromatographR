@@ -62,4 +62,8 @@ Also see the [contributing.md](https://github.com/ethanbass/chromatographR/blob/
 
 If you use chromatographR in published work, please cite it as follows:
 
-Bass, E. (2023). chromatographR: Chromatographic Data Analysis Toolset (version 0.7.5). http://doi.org/10.5281/zenodo.6944334
+Bass, E. (2026). chromatographR: Chromatographic Data Analysis Toolset (version 0.8.0). http://doi.org/10.5281/zenodo.6944334
+
+If your workflow includes data import with chromConverter, please also cite:
+
+Bass, E. (2026). chromConverter: Chromatographic File Converter. http://doi.org/10.5281/zenodo.6792521.
