@@ -224,3 +224,9 @@ test_that("check_norm_values behaves correctly for all on_invalid options", {
   expect_match(w, "negative", all = FALSE)
   expect_identical(v, rep(NA_real_, 3))
 })
+
+test_that("check_duplicated_names works as expected", {
+  expect_error(check_duplicated_names(c("X","X")))
+  expect_no_error(check_duplicated_names(c("X","Y")))
+  expect_warning(check_duplicated_names(c("X","X"), warn = TRUE))
+})

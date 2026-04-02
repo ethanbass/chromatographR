@@ -426,3 +426,18 @@ seq_nrow <- function(x){
 seq_ncol <- function(x){
   seq_len(ncol(x))
 }
+
+#' Check for duplicated names
+#' @noRd
+check_duplicated_names <- function(sample_names, warn = FALSE){
+  if (anyDuplicated(sample_names)) {
+    fn <- ifelse(warn, warning, stop)
+    dups <- paste(sample_names[duplicated(sample_names)], collapse = ", ")
+    limit <- getOption("warning.length") - 60
+    if (nchar(dups) > limit) {
+      last_comma <- max(gregexpr(",", substr(dups, 1, limit))[[1]])
+      dups <- paste0(substr(dups, 1, last_comma - 1), ", etc.")
+    }
+    fn("Duplicate sample names found in peak_list: ", dups)
+  }
+}

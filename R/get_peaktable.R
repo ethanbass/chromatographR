@@ -112,6 +112,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
   end <- ifelse(use.cor, "end.cor", "end")
   if (!inherits(peak_list, "peak_list"))
     stop("Peak list must be of the associated class.")
+  check_duplicated_names(names(peak_list))
   if (clust == "sp.rt"){
     if (missing(chrom_list)){
       chrom_list <- get_chrom_list(peak_list)

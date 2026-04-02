@@ -134,6 +134,7 @@ get_peaks <- function(chrom_list, lambdas,
                       estimate_purity = FALSE,  noise_threshold = .001,
                       show_progress = NULL, cl = 2, collapse = FALSE, 
                       time.units = NULL, sd.max = NULL, max.iter = NULL, ...){
+  check_duplicated_names(names(chrom_list))
   max_iter <- resolve_deprecated(max.iter, max_iter)
   sd_max <- resolve_deprecated(sd.max, sd_max)
   time_unit <- resolve_deprecated(time.units, time_unit)
