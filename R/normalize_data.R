@@ -12,7 +12,8 @@
 #' find it automatically using information stored in the \code{peak_table}.
 #' @param what A \code{peak_table} or list of chromatograms (\code{chrom_list}).
 #' @param by Whether to normalize by a column in sample metadata (\code{meta}) 
-#' or by a column in the peak table (\code{peak}).
+#' or by a column in the peak table (\code{peak}). Defaults to \code{NULL}. In
+#' this case, this parameter is inferred based on the \code{column} name.
 #' @param on_invalid How to handle invalid normalization values (i.e. zero,
 #' negative, or \code{NA} values). One of \code{"warn"} (the default),
 #' \code{"silent"}, or \code{"error"}. The former two options will replace
@@ -38,10 +39,22 @@
 
 normalize_data <- function(peak_table, column, chrom_list=NULL,
                            what = c('peak_table', 'chrom_list'),
-                           by = c("meta", "peak"), 
+                           by = NULL, 
                            on_invalid = c("warn", "error", "silent")){
   on_invalid <- match.arg(on_invalid)
   check_peaktable(peak_table)
+  if (is.null(by)){
+    found_meta <- any(grepl(column, colnames(peak_table$meta)))
+    found_tab <- any(grepl(column, colnames(peak_table$tab)))
+    if (found_meta & found_tab){
+      stop("Column could not be disambiguated. Please specify `by` argument.")
+    }
+    else if (found_meta){
+      by <- "meta"
+    } else if (found_tab){
+      by <- "peak"
+    }
+  }
   by <- match.arg(by, c("meta", "peak"))
   if (by == "meta"){
     if (!is.data.frame(peak_table$sample_meta))

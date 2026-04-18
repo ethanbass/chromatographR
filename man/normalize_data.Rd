@@ -9,7 +9,7 @@ normalize_data(
   column,
   chrom_list = NULL,
   what = c("peak_table", "chrom_list"),
-  by = c("meta", "peak"),
+  by = NULL,
   on_invalid = c("warn", "error", "silent")
 )
 }
@@ -25,7 +25,8 @@ find it automatically using information stored in the \code{peak_table}.}
 \item{what}{A \code{peak_table} or list of chromatograms (\code{chrom_list}).}
 
 \item{by}{Whether to normalize by a column in sample metadata (\code{meta}) 
-or by a column in the peak table (\code{peak}).}
+or by a column in the peak table (\code{peak}). Defaults to \code{NULL}. In
+this case, this parameter is inferred based on the \code{column} name.}
 
 \item{on_invalid}{How to handle invalid normalization values (i.e. zero,
 negative, or \code{NA} values). One of \code{"warn"} (the default),
