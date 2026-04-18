@@ -643,29 +643,29 @@ test_that("plot_spectrum works", {
                              what="peak", idx = 1), regexp = "No match found for peak")
   
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr,
-                             what="click", engine="plotly"),
+                             what="click", engine = "plotly"),
                regexp = "Chromatogram must be specified")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr,
-                             what="click", idx = 1, engine="plotly"),
+                             what="click", idx = 1, engine = "plotly"),
                regexp = "does not currently support clicking")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr,
-                             what = "click", idx = 1, lambda="210",
+                             what = "click", idx = 1, lambda = "210",
                              engine = "plotly"),
                regexp = "does not currently support clicking")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr,
-                             what="click",lambda="210", engine="plotly"),
+                             what = "click",lambda = "210", engine = "plotly"),
                regexp = "Chromatogram must be specified")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr,
                              what="rt", lambda="210", engine="plotly"),
                regexp = "Please supply argument")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr,
-                             what="rt", idx = 1, engine="plotly"),
+                             what="rt", idx = 1, engine = "plotly"),
                regexp = "Please supply argument")
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr,
-                             what="rt", engine="plotly"), 
+                             what="rt", engine = "plotly"), 
                regexp = "Chromatogram must be specified")
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr,
-                             what="rt", engine="plotly"), 
+                             what="rt", engine = "plotly"), 
                regexp = "Chromatogram must be specified")
 })
 
