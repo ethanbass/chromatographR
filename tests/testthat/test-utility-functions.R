@@ -1,12 +1,11 @@
-#### test utilities #### 
-data(Sa_pr)
-
 test_that("get_times works as expected", {
+  data(Sa_pr)
   ts <- get_times(Sa_pr)
   expect_equal(ts, as.numeric(rownames(Sa_pr[[1]])))
 })
 
 test_that("get_lambdas works as expected", {
+  data(Sa_pr)
   lambdas <- get_lambdas(Sa_pr)
   expect_equal(lambdas, as.numeric(colnames(Sa_pr[[1]])))
 })
@@ -74,6 +73,7 @@ test_that("choose_apply_fnc works as expected with NULL value", {
 })
 
 test_that("check_peaktable works as expected", {
+  data(Sa_pr)
   data(pk_tab)
   expect_null(check_peaktable(pk_tab))
   expect_error(check_peaktable("xxx"), 
@@ -92,6 +92,7 @@ test_that("summary.peak_table works as expected", {
 # })
 
 test_that("get_retention_idx works as expected", {
+  data(Sa_pr)
   idx <- get_retention_idx(RT = 18.49, times = get_times(Sa_pr))
   expect_equal(idx, 425)
   expect_error(get_retention_idx(RT = 9, times = get_times(Sa_pr)), 
@@ -101,10 +102,12 @@ test_that("get_retention_idx works as expected", {
 })
 
 test_that("check_idx works as expected", {
+  data(Sa_pr)
   expect_error(check_idx(idx = 1000, chrom_list = Sa_pr))
 })
 
 test_that("get_lambda_idx works as expected", {
+  data(Sa_pr)
   lam <- get_lambda_idx(lambda = 200, lambdas = get_lambdas(x = Sa_pr))
   expect_equal(lam, 1)
   expect_error(get_lambda_idx(lambda=190, lambdas = get_lambdas(x = Sa_pr)), 
@@ -137,6 +140,7 @@ test_that("reshape_peaktable works as expected",{
 })
 
 test_that("reshape_chroms works as expected", {
+  data(Sa_pr)
   chrom_list_long <- reshape_chroms(Sa_pr, lambdas = "210")
   expect_equal(ncol(chrom_list_long), 4)
   expect_equal(nrow(chrom_list_long), length(Sa_pr)*nrow(Sa_pr[[1]]))
