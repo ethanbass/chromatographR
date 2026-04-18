@@ -27,7 +27,10 @@
 #' (for further programmatic use).
 #' @param init.coef Starting values for the optimization.
 #' @param n.traces Number of traces to use.
-#' @param n.zeros Number of zeros to add.
+#' @param fill_zeros Logical. If \code{TRUE}, out-of-bounds regions produced by 
+#' warping are filled with zeros. If \code{FALSE}, these regions are returned 
+#' as \code{NA}. Defaults to \code{FALSE}.
+#' @param n.zeros Number of zeros to add for padding chromatograms at the edges.
 #' @param scale Logical. If \code{TRUE}, scale chromatograms before warping.
 #' @param trwdth width of the triangle in the WCC criterion.
 #' @param plot_it Logical. Whether to plot alignment.
@@ -171,19 +174,16 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
         plot(models)
       }
     }
-    if (what == "corrected.values"){
-      allmats <- sapply(chrom_list_og, identity, simplify = "array")
-      warp.coef <- lapply(models, FUN = function(x){
-        x$warp.coef[1,]
-      })
-      models <- lapply(seq_len(dim(allmats)[3]), function(ii){
-        ptw::ptw(t(allmats[,, 1]), t(allmats[,, ii]), init.coef = warp.coef[[ii]],
-            try = TRUE, alg = models[[1]]$alg, warp.type = "global", ...)})
-      result <- lapply(seq_along(models), function(i){
-        x <- t(models[[i]]$warped.sample)
-        rownames(x) <- rownames(chrom_list[[i]])
-        colnames(x) <- colnames(chrom_list[[i]])
-        x <- transfer_metadata(x, chrom_list_og[[i]])
+  if (what == "corrected.values"){
+    if (verbose) message("Applying PTW warping models to chromatograms.")
+      result <- laplee(seq_along(models), function(ii){
+        coef <- models[[ii]]$warp.coef[1, ]
+        x <- warp_sample_ptw(chrom_list_og[[ii]], coef, 
+                             fill_zeros = fill_zeros,
+                             mode = models[[ii]]$mode)
+        rownames(x) <- rownames(chrom_list_og[[ii]])
+        colnames(x) <- colnames(chrom_list_og[[ii]])
+        transfer_metadata(x, chrom_list_og[[ii]])
       })
       result <- structure(result, warped = TRUE, warping_args = args)
       names(result) <- names(chrom_list)
@@ -247,6 +247,29 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
       result
     } else {
       models
+#' Warp sample PTW
+#' @noRd
+warp_sample_ptw <- function(mat, coef, fill_zeros = FALSE,
+                            mode = c("forward", "backward")){
+  mode <- match.arg(mode)
+  tp <- seq_len(nrow(mat))
+  w <- ptw::warp.time(tp, coef)
+  if (mode == "forward"){
+    lo <- findInterval(tp, w)
+    hi <- lo + 1
+    oob <- lo < 1 | hi > length(w)
+    lo_c <- pmax(1, lo)
+    hi_c <- pmin(length(w), hi)
+    frac <- (tp - w[lo_c]) / (w[hi_c] - w[lo_c])
+  } else {
+    stop("Backward mode is not yet supported.")
+  }
+  frac[oob] <- 0
+  frac_mat <- matrix(frac, nrow = length(tp), ncol = ncol(mat))
+  x <- mat[lo_c, ] + frac_mat * (mat[hi_c, ] - mat[lo_c, ])
+  x[which(tp < min(w) | tp > max(w)), ] <- ifelse(fill_zeros, 0, NA)
+  x
+}
     }
   }
 }

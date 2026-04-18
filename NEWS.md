@@ -1,30 +1,40 @@
-# chromatographR 0.7.5.9000
+# chromatographR 0.8.0
 
-### New features
+#### Breaking changes
 
 * Added support for bidirectional exponentially modified gaussian (BEMG) peak shape, now used as the new default for peak fitting.
+* Added `summarize_by` argument to `get_peaktable` controlling how peak metadata (e.g., retention time, etc.) are summarized. The default ("median") selects the median value across all peaks in each cluster, which is more robust to outliers than the previous behaviour of taking the mean. Use summarize_by = "max" to instead use the most intense peak in each cluster as the representative, which is more robust when noise peaks outnumber real peaks. To reproduce old behaviour, set summarize_by = "mean".
+* Added automatic thinning of chromatograms in `plot_chroms` to speed up plotting of raw data. The time resolution can be adjusted with the new `time_resolution` argument.
+* Changed default behavior of `plot_chroms` so legend is no longer displayed by default to avoid overloading plots with many chromatograms.
+* The `plot_all_spectra` function now invisibly returns spectra to avoid cluttering up the console.
+* Fixed bug causing `get_peaks` to return raw peak heights instead of model-fitted peak heights.
+* Changed the name of the `a` parameter in `plot.peak_list` to `alpha`.
+* Added `fill_zeros` argument to `correct_rt` to control whether out-of-bounds regions produced by warping are filled with zeros or returned as `NA`. Defaults to `FALSE` which changes the behavior for VPdtw warping which used to automatically fill zeros.
+
+### Other New features
+
 * Fixed `preprocess` function incorrectly truncating chromatograms when outliers are present and `dim1` is not specified.
 * Added more informative warnings and errors to `preprocess` function.
-* Added automatic thinning of chromatograms in `plot_chroms` to speed up plotting of raw data. The time resolution can be adjusted with the new `time_resolution` argument.
-* Changed default behavior of `plot_chroms` so legend is no longer displayed by default because legends often overrun the plot boundaries.
 * Added support for propagating time and intensity units through to `peak_table` object.
-* Added `summary.peak_table` function.
-* Added `print.peak_table` function to return just the peak data.
 * Added support for numeric input to lambda argument in `reshape_chroms`.
-* In `plot_chroms`, `show_legend` now defaults to `FALSE` to avoid overloading the plot.
+* Refactored `ptw` warping in `correct_rt` using whole-matrix interpolation resulting in substantial speedup.
+
+#### New generic functions
+
+* Added `summary` method for `peak_table` objects, reporting dimensions, retention time range, intensity statistics, and metadata availability.
+* Added `print.peak_table` function to return just the peak data.
+* Added `[` method for `peak_table` objects for simultaneous subsetting of `tab`, `pk_meta`, `sample_meta`, and `ref_spectra` elements.
+* Added `[` method for `peak_list` objects to preserve metadata attributes when subsetting.
+* Added `print` method for `peak_list` objects, summarizing samples, wavelengths, fit method, and peak counts.
 
 ### Bug fixes and other minor changes
 
 * Fixed bug in `filter_peaktable` when filtering peaks based on specific retention times with the `rts` argument.
-* Fixed bug causing `get_peaks` to return raw peak heights instead of model-fitted peak heights.
-* Extended name of `a` parameter in `plot.peak_list` to `alpha`.
+* Added error when duplicated sample names are provided to `get_peaktable` or `get_peaks` since this will cause downstream issues.
 * Fixed issue with visual tests due to new version of Kaleido.
 * Added additional arguments as placeholder for `subset.peak_table`.
-* Added minor improvements to documentation.
-* Formalized requirement for R version 4.1.0.
-* The `plot_all_spectra` function now invisibly returns spectra to avoid cluttering up the console.
-* Refactored `normalize_data` for improved performance and added `on_invalid` argument to specify behavior for dealing with invalid normalization values (zero, negative or `NA`).
 * Fixed bug in `normalize_data` causing loss of sample names when normalizing chromatograms.
+* Formalized requirement for R version 4.1.0.
 
 # chromatographR 0.7.5
 

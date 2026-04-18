@@ -13,6 +13,7 @@ correct_rt(
   what = c("corrected.values", "models"),
   init.coef = c(0, 1, 0),
   n.traces = NULL,
+  fill_zeros = FALSE,
   n.zeros = 0,
   scale = FALSE,
   trwdth = 200,
@@ -49,7 +50,11 @@ visual inspection and downstream analysis) or the warping \code{"models"}
 
 \item{n.traces}{Number of traces to use.}
 
-\item{n.zeros}{Number of zeros to add.}
+\item{fill_zeros}{Logical. If \code{TRUE}, out-of-bounds regions produced by
+warping are filled with zeros. If \code{FALSE}, these regions are returned
+as \code{NA}. Defaults to \code{FALSE}.}
+
+\item{n.zeros}{Number of zeros to add for padding chromatograms at the edges.}
 
 \item{scale}{Logical. If \code{TRUE}, scale chromatograms before warping.}
 
