@@ -207,6 +207,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
                 "Keeping only the most intense one.", "", sep = "\n"))
     }
     allIs <- unlist(lapply(pkLst, function(samp) samp[[comp]][, response]))
+    allIs[!is.finite(allIs) | allIs < 0] <- 0
     Iinfo <- matrix(0, ncl, length(pkLst), dimnames = list(NULL, names(pkLst)))
     for (i in seq_along(allIs)){
       Iinfo[pkcenters.cl[i],  file.idx[i]] <- 
