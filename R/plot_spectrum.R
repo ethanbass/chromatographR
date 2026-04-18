@@ -90,7 +90,7 @@ plot_spectrum <- function(loc = NULL, peak_table, chrom_list,
   } else{
     if (!missing(peak_table)) get_chrom_list(peak_table, chrom_list)
   }
-  if (!(class(chrom_list) %in% c("list", "chrom_list", "matrix")))
+  if (!(inherits(chrom_list, c("chrom_list", "list", "matrix"))))
     stop("The provided `chrom_list` does not appear to be valid. 
                             ......Please check `chrom_list` argument")
   if (!is.null(chr)){

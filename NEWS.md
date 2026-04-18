@@ -20,6 +20,7 @@
 * Refactored `normalize_data` for improved performance and added `on_invalid` argument to specify behavior for dealing with invalid normalization values (zero, negative or `NA`).
 * Refactored `normalize_data` for automatic detection of column names so that user no longer has to specify whether they wish to normalize by a metadata column or a column in the peak table.
 * Refactored `ptw` warping in `correct_rt` using whole-matrix interpolation resulting in substantial speedup.
+* Added support for new `chrom_list` class introduced in chromConverter v0.9.0.
 
 #### New generic functions
 

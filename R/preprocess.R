@@ -73,11 +73,12 @@ preprocess <- function(X, dim1, dim2,
   laplee <- choose_apply_fnc(show_progress = show_progress, cl = cl)
   time_unit <- get_time_unit(X, na_value = "min")
   tfac <- switch(time_unit, "min" = 1, "s" = 60, "ms" = 60*1000)
+  X_class <- class(X)
   if (is.matrix(X)){
     X <- list(X)
     return_matrix <- TRUE
   } else return_matrix <- FALSE
-  if (!is.list(X) | !all(sapply(X, is.matrix)))
+  if (!inherits(X, c("list", "matrix")) && !all(sapply(X, is.matrix)))
     stop("X should be a matrix or a list of matrices")
   if (ncol(X[[1]]) == 1){
     interpolate_cols <- FALSE
@@ -152,7 +153,10 @@ preprocess <- function(X, dim1, dim2,
                           ...)
     if (return_matrix){
       X[[1]]
-    } else X
+    } else{
+      class(X) <- X_class
+      X
+    }
 }
 
 #' @noRd

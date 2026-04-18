@@ -20,12 +20,11 @@ test_that("preprocess works on matrix", {
 
 test_that("Preprocess works without providing dimensions", {
   out <- suppressMessages(preprocess(X = (Sa[1]), show_progress = FALSE))
-  expect_equal(class(out), "list")
-  expect_equal(class(out[[1]])[1],"matrix")
+  testthat::expect_true(inherits(out, "list"))
+  expect_equal(class(out[[1]])[1], "matrix")
   expect_equal(rownames(out[[1]]), as.character(new.ts))
   expect_equal(colnames(out[[1]]), as.character(new.lambdas))
 })
-
 
 test_that("preprocess returns correct errors and warnings", {
   expect_error(preprocess(X = as.data.frame(Sa[[1]]), show_progress = FALSE), 
@@ -36,7 +35,7 @@ test_that("preprocess returns correct errors and warnings", {
                regexp = "incompatible with actual data")
   expect_warning(xx <- preprocess(Sa, dim1 = seq(16,18.664, by=.001)), 
                  regexp = "No extrapolation allowed")
-  expect_length(xx,2)
+  expect_length(xx, 2)
   expect_warning(xx <- preprocess(Sa, dim1 = seq(9.997,13, by=.01)), 
                  regexp = "No extrapolation allowed")
   expect_length(xx,2)

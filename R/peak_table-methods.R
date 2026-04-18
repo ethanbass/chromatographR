@@ -216,6 +216,6 @@ print.peak_table <- function(x, ...){
   x
 }
 
-#' Is slot full
+#' Check if slot is full
 #' @noRd
 is_attached <- function(x) !identical(x, NA)
