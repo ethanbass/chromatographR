@@ -215,35 +215,34 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
                                          seq_len(jmax))$y)
         })
       })
-        # fix times
-        old_ts <- c(rep(NA, short), get_times(chrom_list_og, idx = reference))
-        times <- suppressWarnings(stats::approx(x = jset[, reference],
-                                                y = old_ts, seq_len(jmax))$y)
-        idx_start <- which.min(times)
-        if (idx_start > 1){
-          beg <- sort(seq(from = times[idx_start] - res, by = -res,
-                          length.out = idx_start - 1), decreasing = FALSE)
-        } else beg <- NULL
-        idx_end <- which.max(times)
-        if (idx_end < length(times)){
-          end <- seq(from = times[idx_end] + res,
-                     length.out = length(times) - idx_end, by = res)
-        } else end <- NULL
-        new.times <- c(beg, times[!is.na(times)], end)
-        result <- mapply(function(x,idx){
-          rownames(x) <- new.times
-          x <- transfer_metadata(x, chrom_list_og[[idx]])
-          x
-        }, result, seq_along(result), SIMPLIFY = FALSE)
+      # fix times
+      old_ts <- c(rep(NA, short), get_times(chrom_list_og, idx = reference))
+      times <- suppressWarnings(stats::approx(x = jset[, reference],
+                                              y = old_ts, seq_len(jmax))$y)
+      idx_start <- which.min(times)
+      if (idx_start > 1){
+        beg <- sort(seq(from = times[idx_start] - res, by = -res,
+                        length.out = idx_start - 1), decreasing = FALSE)
+      } else beg <- NULL
+      idx_end <- which.max(times)
+      if (idx_end < length(times)){
+        end <- seq(from = times[idx_end] + res,
+                   length.out = length(times) - idx_end, by = res)
+      } else end <- NULL
+      new.times <- c(beg, times[!is.na(times)], end)
+      result <- mapply(function(x,idx){
+        rownames(x) <- new.times
+        x <- transfer_metadata(x, chrom_list_og[[idx]])
+        x
+      }, result, seq_along(result), SIMPLIFY = FALSE)
       names(result) <- names(chrom_list)
-      # replace NAs with 0s and add additional metadata
       result <- lapply(result, function(xx){
-          if(any(is.na(xx))){
-            xx[which(is.na(xx))] <- 0
-          }
-          xx <- structure(xx, warped = TRUE, warping_args = args)
-          xx
-        })
+        if (fill_zeros && any(is.na(xx))){
+          xx[which(is.na(xx))] <- 0
+        }
+        xx <- structure(xx, warped = TRUE, warping_args = args)
+        xx
+      })
       result
     } else {
       models
