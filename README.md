@@ -34,8 +34,8 @@ install.packages("chromatographR")
 However, it's recommended to install the latest development version of chromatographR from GitHub using the devtools package:
 
 ```
-install.packages("remotes")
-remotes::install_github("https://github.com/ethanbass/chromatographR/")
+if (!require("pak", quietly=TRUE)) install.packages("pak")
+pak::pak("ethanbass/chromatographR")
 ```
 
 or from R Universe:
