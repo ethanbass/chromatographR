@@ -34,6 +34,7 @@
 ### Bug fixes and other minor changes
 
 * Fixed bug in `filter_peaktable` when filtering peaks based on specific retention times with the `rts` argument.
+* Fixed `filter_peaktable` and `filter_peaks` to make filtering criteria inclusive (e.g., `min_rt = 5` now retains peaks with `rt == 5`).
 * Added error when duplicated sample names are provided to `get_peaktable` or `get_peaks` since this will cause downstream issues.
 * Fixed issue with visual tests due to new version of Kaleido.
 * Added additional arguments as placeholder for `subset.peak_table`.

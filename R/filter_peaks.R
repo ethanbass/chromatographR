@@ -32,16 +32,16 @@ filter_peaks <- function(peak_list, min_height, min_area,
   x <- do.call(rbind, do.call(rbind, peak_list))
   if (!missing(min_height)){
     if (min_height < min(x$height))
-      warning("'min_height' is less than minimum peak height.")}
+      warning("The 'min_height' is less than minimum peak height.")}
   if (!missing(min_area)){
     if (min_area < min(x$area))
-      warning("'min_area' is less than minimum peak area.")}
+      warning("The 'min_area' is less than minimum peak area.")}
   if (!missing(min_sd)){
     if (min_sd < min(x$sd))
-      warning("'min_sd' is less than minimum peak standard deviation.")}
+      warning("The 'min_sd' is less than minimum peak standard deviation.")}
   if (!missing(max_sd)){
     if (max_sd > max(x$sd))
-      warning("'max_sd' is greater than maximum peak standard deviation,")}
+      warning("The 'max_sd' is greater than maximum peak standard deviation,")}
   if (missing(max_sd)) ## find max value in peak_list and add 1 to be sure...
     max_sd <- 1 + max(unlist(sapply(peak_list,
                                     function(samp)
@@ -61,12 +61,12 @@ filter_peaks <- function(peak_list, min_height, min_area,
          function(smpl)
            lapply(smpl,
                   function(comp)
-                    comp[which(comp[,"sd"] < max_sd &
-                           comp[, "sd"] > min_sd &
-                           comp[, "height"] > min_height &
-                           comp[, "area"] > min_area &
-                           comp[, "rt"] > as.numeric(min_rt) &
-                           comp[, "rt"] < as.numeric(max_rt)), , drop = FALSE]))
+                    comp[which(comp[,"sd"] <= max_sd &
+                           comp[, "sd"] >= min_sd &
+                           comp[, "height"] >= min_height &
+                           comp[, "area"] >= min_area &
+                           comp[, "rt"] >= as.numeric(min_rt) &
+                           comp[, "rt"] <= as.numeric(max_rt)), , drop = FALSE]))
   att <- attributes(peak_list)
   transfer_metadata(result, peak_list, transfer_class = TRUE)
 }
@@ -131,8 +131,8 @@ filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value,
       min_rt <- 0
     if (missing(max_rt))
       max_rt <- peak_table$pk_meta["rt",] + 1
-    idx.rt <- which(peak_table$pk_meta["rt",] > min_rt &
-                      peak_table$pk_meta["rt",] < max_rt)
+    idx.rt <- which(peak_table$pk_meta["rt",] >= min_rt &
+                      peak_table$pk_meta["rt",] <= max_rt)
   } else{idx.rt <- seq_along(peak_table$pk_meta)}
   if (!missing(min_value)){
     val <- apply(peak_table$tab, 2, eval(what))
