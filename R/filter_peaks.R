@@ -82,6 +82,7 @@ filter_peaks <- function(peak_list, min_height, min_area,
 #' @param min_rt Minimum retention time to include in the peak table.
 #' @param max_rt Maximum retention time to include in the peak table.
 #' @param min_value Minimal cutoff for summarized peak intensity.
+#' @param max_zeros Maximum proportion of zero values to allow.
 #' @param what Whether to summarize intensities using \code{mean}, \code{median}, 
 #' or \code{max}. Defaults to \code{median}.
 #' @param lambda Component(s) to include in peak table (e.g. wavelengths if you
@@ -96,11 +97,13 @@ filter_peaks <- function(peak_list, min_height, min_area,
 #' pk_tab <- filter_peaktable(pk_tab, min_rt = 10, max_rt = 16)
 #' @export filter_peaktable
 
-filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value, lambda,
+filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value, 
+                             max_zeros, lambda,
                               what = c("median", "mean", "max"), tol = 0){
   check_peaktable(peak_table)
   if (missing(rts) & missing(min_rt) &
-      missing(max_rt) & missing(min_value) & missing(lambda)) {
+      missing(max_rt) & missing(min_value) & 
+      missing(lambda) & missing(max_zeros)) {
     warning("Nothing to filter...")
     return(peak_table)
   }
@@ -135,10 +138,16 @@ filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value, lambda,
     val <- apply(peak_table$tab, 2, eval(what))
     idx.val <- which(val >= min_value)
   } else (idx.val <- seq_along(peak_table$tab))
+  if (!missing(max_zeros)){
+    if (!is.numeric(max_zeros) || max_zeros < 0 || max_zeros > 1)
+      stop("`max_zeros` must be a numeric value between 0 and 1.")
+    prop_zero <- colMeans(peak_table$tab == 0, na.rm = TRUE)
+    idx.zeros <- which(prop_zero <= max_zeros)
+  } else (idx.zeros <- seq_along(peak_table$tab))
   if (!missing(lambda)){
     idx.lambda <- which(peak_table$pk_meta["lambda",] %in% lambda)
   } else (idx.lambda <- seq_along(peak_table$tab))
-  idx <- Reduce(intersect, list(idx.rt, idx.val, idx.lambda))
+  idx <- Reduce(intersect, list(idx.rt, idx.val, idx.lambda, idx.zeros))
   peak_table$tab <- peak_table$tab[,idx, drop = FALSE]
   peak_table$pk_meta <- peak_table$pk_meta[, idx, drop = FALSE]
   if (inherits(peak_table$ref_spectra, c("data.frame", "matrix"))){

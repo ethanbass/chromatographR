@@ -365,18 +365,23 @@ test_that("subset.peak_table works", {
 })
 
 
-# test filter_peaktable
+### test filter_peaktable
 
 test_that("filter_peaktable works", {
-  pktab_s <- filter_peaktable(pk_tab, min_rt = 6, max_rt = 15)
+  pktab_s <- filter_peaktable(pk_tab, min_rt = 12, max_rt = 15)
   # check that dimensions are unaltered
   expect_equal(rownames(pk_tab$tab), rownames(pktab_s$tab))
   expect_equal(colnames(pktab_s$tab), colnames(pktab_s$pk_meta))
   expect_equal(nrow(pktab_s$tab), nrow(pktab_s$sample_meta))
   expect_equal(colnames(pktab_s$tab), colnames(pktab_s$ref_spectra))
-
+  expect_true(all(!(pktab_s$pk_meta["rt",] <= 12)))
+  expect_true(all(pktab_s$pk_meta["rt",] <= 15))
+  
   # warning if no arguments are provided
   expect_warning(filter_peaktable(pk_tab), regexp = "Nothing to filter")
+  
+  pktab_s2 <- filter_peaktable(pk_tab, max_zeros = 0)
+  expect_true(all(pktab_s2$tab != 0))
 })
 
 test_that("combine_peaks works", {
@@ -633,19 +638,19 @@ test_that("plot_spectrum works", {
                              what="rt"), regexp = "Chromatogram must be specified")
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr, 
                              what="rt"), regexp = "Chromatogram must be specified")
-  expect_error(plot_spectrum(loc=12, chrom_list = pk_tab, what="rt", idx = 1))
-  expect_error(plot_spectrum(loc=12, what="rt", idx = 1), 
+  expect_error(plot_spectrum(loc = 12, chrom_list = pk_tab, what = "rt", idx = 1))
+  expect_error(plot_spectrum(loc = 12, what="rt", idx = 1), 
                regexp = "Must provide either a peak_table or a chrom_list")
-  expect_error(plot_spectrum(loc=12, chrom_list = dat.pr, what="peak", idx = 1),
+  expect_error(plot_spectrum(loc = 12, chrom_list = dat.pr, what="peak", idx = 1),
                regexp = "Peak table must be provided")
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr, 
                              what="peak", idx = 1), regexp = "No match found for peak")
   
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr,
-                             what="click", engine = "plotly"),
+                             what = "click", engine = "plotly"),
                regexp = "Chromatogram must be specified")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr,
-                             what="click", idx = 1, engine = "plotly"),
+                             what = "click", idx = 1, engine = "plotly"),
                regexp = "does not currently support clicking")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr,
                              what = "click", idx = 1, lambda = "210",
@@ -655,16 +660,16 @@ test_that("plot_spectrum works", {
                              what = "click",lambda = "210", engine = "plotly"),
                regexp = "Chromatogram must be specified")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr,
-                             what="rt", lambda="210", engine="plotly"),
+                             what = "rt", lambda="210", engine="plotly"),
                regexp = "Please supply argument")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = dat.pr,
-                             what="rt", idx = 1, engine = "plotly"),
+                             what = "rt", idx = 1, engine = "plotly"),
                regexp = "Please supply argument")
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr,
-                             what="rt", engine = "plotly"), 
+                             what = "rt", engine = "plotly"), 
                regexp = "Chromatogram must be specified")
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = dat.pr,
-                             what="rt", engine = "plotly"), 
+                             what = "rt", engine = "plotly"), 
                regexp = "Chromatogram must be specified")
 })
 

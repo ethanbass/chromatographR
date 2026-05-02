@@ -10,6 +10,7 @@ filter_peaktable(
   min_rt,
   max_rt,
   min_value,
+  max_zeros,
   lambda,
   what = c("median", "mean", "max"),
   tol = 0
@@ -25,6 +26,8 @@ filter_peaktable(
 \item{max_rt}{Maximum retention time to include in the peak table.}
 
 \item{min_value}{Minimal cutoff for summarized peak intensity.}
+
+\item{max_zeros}{Maximum proportion of zero values to allow.}
 
 \item{lambda}{Component(s) to include in peak table (e.g. wavelengths if you
 are using HPLC-DAD/UV).}
