@@ -14,8 +14,8 @@ check_peaktable <- function(peak_table){
 #' @param peak_table Peak table object
 #' @author Ethan Bass
 #' @noRd
-get_chrom_list <- function(x, chrom_list, verbose = FALSE){
-  if (missing(chrom_list)){
+get_chrom_list <- function(x, chrom_list = NULL, verbose = FALSE){
+  if (is.null(chrom_list)){
     if (inherits(x, "peak_table")){
       string <- x$args[["chrom_list"]]
     } else if (inherits(x, "peak_list") | inherits(x, "ptw_list")){
@@ -117,7 +117,7 @@ check_idx <- function(idx, chrom_list){
 #' @author Ethan Bass
 #' @noRd
 get_lambda_idx <- function(lambda, lambdas, y, allow_max = TRUE){
-  if (lambda == 'max'){
+  if (identical(lambda, "max")){
     if (allow_max){
       lambda.idx <- which.max(y)
     } else{
@@ -136,9 +136,14 @@ get_lambda_idx <- function(lambda, lambdas, y, allow_max = TRUE){
 #' Check chromatogram
 #' @noRd
 check_chr <- function(chr, loc = NULL, peak_table, chrom_list, allow_max = TRUE){
-  if (chr[[1]] == 'max'){
+  if (identical(chr, "max")){
     if (allow_max){
-      chr <- which.max(peak_table$tab[, loc])
+      if (length(loc) > 1) {
+        chr <- which.max(rowSums(apply(peak_table$tab[, loc, drop = FALSE], 2, 
+                                       function(x) x / max(x, na.rm = TRUE))))
+      } else{
+        chr <- which.max(peak_table$tab[, loc])
+      }
     } else{
       stop("Chromatogram must be specified for scan function.")
     }
@@ -440,4 +445,55 @@ check_duplicated_names <- function(sample_names, warn = FALSE){
     }
     fn("Duplicate sample names found in peak_list: ", dups)
   }
+}
+
+#' Resolve idx and lambda
+#' @noRd
+resolve_idx_lambda <- function(idx, lambda, loc, peak_table, chrom_list) {
+  # resolve idx_max for spectral slice (always scalar)
+  idx_max <- which.max(rowSums(apply(peak_table$tab[, loc, drop = FALSE], 2,
+                                     function(x) x / max(x, na.rm = TRUE))))
+  
+  # resolve idx (may be vector)
+  idx <- check_chr(idx, loc, peak_table, chrom_list)
+  
+  # resolve lambda using idx_max
+  lambdas <- get_lambdas(chrom_list)
+  times   <- get_times(chrom_list)
+  lambda_idx <- if (lambda == "max") {
+    spectra <- vapply(loc, function(l) {
+      rt     <- peak_table$pk_meta["rt", l]
+      rt_idx <- get_retention_idx(rt, times)
+      y      <- chrom_list[[idx_max]][rt_idx, ]
+      y / max(y, na.rm = TRUE)
+    }, numeric(length(lambdas)))
+    get_lambda_idx("max", lambdas, y = rowSums(spectra))
+  } else {
+    get_lambda_idx(lambda, lambdas, y = NULL)
+  }
+  
+  list(idx = idx, lambda_idx = lambda_idx, lambda = lambdas[lambda_idx])
+}
+
+#' Get peak coordinates
+#' @noRd
+get_peak_coordinates <- function(peak_table, chrom_list=NULL, loc, idx, lambda){
+  chrom_list <- get_chrom_list(peak_table, chrom_list = chrom_list)
+  idx_max <- which.max(peak_table$tab[[loc]])
+  if (identical(idx, "max")){
+    idx <- idx_max
+  }
+  rt <- peak_table$pk_meta["rt", loc]
+  rt_idx <- get_retention_idx(rt, get_times(chrom_list))
+  
+  lambda_indices <- sapply(lambda, function(l) {
+    get_lambda_idx(l, get_lambdas(chrom_list), 
+                   y = chrom_list[[idx_max]][rt_idx, ])
+  })
+  lambda_idx <- lambda_indices[which.max(chrom_list[[idx_max]][rt_idx, lambda_indices])]
+  
+  int <- max(vapply(chrom_list[idx], function(chr) chr[rt_idx, lambda_idx], 
+                    numeric(1)))
+  list(coordinates = c(rt, int), lambda_idx = lambda_idx, 
+       lambda = get_lambdas(chrom_list)[lambda_idx])
 }

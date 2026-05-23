@@ -667,13 +667,223 @@ ggplot_trace <- function(chrom_list, chr, lambda.idx, line.idx = NULL){
   p <- ggplot2::ggplot(reshape_chroms(x = chrom_list, idx = chr, 
                                       lambdas = lambda),
                        ggplot2::aes(x = .data$rt, y = .data$absorbance)) +
-    ggplot2::geom_line()
+    ggplot2::geom_line(na.rm = TRUE)
   if (!is.null(line.idx)){
     p <- p + ggplot2::geom_vline(xintercept = RT, color = "red", 
                                  linetype = "dashed") +
-      ggplot2::ggtitle(sprintf("Chr %d;   RT: %g;  lambda: %s nm",
+      ggplot2::ggtitle(sprintf("Chr %d;   RT: %g;  \u03bb: %s nm",
                                                  as.integer(chr), RT, lambda)) +
-      ggplot2::theme_light()
+      ggplot2::theme_light() + 
+      ggplot2::xlab(add_unit("Retention time", chrom_list, unit = "time_unit", 
+                             idx = chr)) +
+      ggplot2::ylab(add_unit("Absorbance", chrom_list, unit = "detector_y_unit", 
+                             idx = chr))
   }
   p 
+}
+
+#' Plot a chromatogram or chromatograms with an inset UV spectrum
+#'
+#' Plots a chromatogram (either a single trace or multiple traces) with an
+#' inset UV spectrum for a specified peak. Dotted lines connect the peak apex
+#' to the corners of the inset box.
+#'
+#' @inheritParams plot_spectrum
+#' @param loc Peak name or vector of names in the peak table (e.g. `"V10"`).
+#' @param idx Index of chromatogram(s) to plot. If `"max"` (default) or a
+#'   scalar, plots a single trace using [plot_spectrum()]. If a vector,
+#'   plots multiple traces using [plot_chroms()].
+#' @param lambda Wavelength to use for the chromatographic trace and for
+#'   locating the peak apex. Either a numeric value or `"max"` (default)
+#'   to use the wavelength of maximum absorbance.
+#' @param position Position of the inset. One of `"topright"` (default),
+#'   `"topleft"`, `"top"`, `"left"`, or `"right"`. Alternatively, a numeric
+#'   vector of length 2 giving the proportional coordinates of the bottom-left
+#'   corner, e.g., `c(0.6, 0.6)`, used together with `inset_width` and
+#'   `inset_height`.
+#' @param inset_width Width of the inset as a proportion of the plot width.
+#'   Defaults to `0.35`.
+#' @param inset_height Height of the inset as a proportion of the plot height.
+#'   Defaults to `0.35`.
+#' @param ylim Y axis limits for the main plot. Passed to [plot_chroms()] or
+#'   [plot_spectrum()].
+#' @param xlim X axis limits for the main plot. Passed to [plot_chroms()] or
+#'   [plot_spectrum()].
+#' @param engine Plotting engine. Currently only `"ggplot"` is supported.
+#' @param inset_text_size Base size for text elements in inset. Defaults to `8`. 
+#' @param ... Additional arguments passed to [plot_chroms()] or [plot_spectrum()].
+#'
+#' @return A `ggplot` object.
+#'
+#' @seealso [plot_spectrum()], [plot_chroms()]
+#'
+#' @examples
+#' \dontrun{
+#' # single trace with inset spectrum
+#' plot_spectrum_inset("V10", peak_table = pktab)
+#'
+#' # multiple traces, inset on the left
+#' plot_spectrum_inset("V15", peak_table = pk_tab)
+#'
+#' # manual inset placement using bottom-left corner
+#' plot_spectrum_inset("V15", peak_table = pk_tab, 
+#'                    position=c(0.6,0.3),
+#'                    inset_width = 0.35, inset_height = 0.25)
+#' }
+#' @export
+plot_spectrum_inset <- function(loc, peak_table, chrom_list=NULL,
+                                idx = "max", lambda = "max",
+                                position = "topright",
+                                inset_width = 0.35, inset_height = 0.35,
+                                ylim = NULL, xlim = NULL,
+                                engine = "ggplot", scale_spectrum = TRUE,
+                                verbose = getOption("verbose"),
+                                inset_text_size = 8,
+                                ...) {
+  check_for_pkg("ggplot2")
+  chrom_list <- get_chrom_list(peak_table, chrom_list)
+  peak_data <- resolve_idx_lambda(idx=idx, lambda = lambda, loc = loc, 
+                                  peak_table=peak_table, chrom_list = chrom_list)
+  idx <- peak_data$idx
+  lambda <- peak_data$lambda
+  named <- !is.null(names(loc))
+  if (length(loc) > 1 && length(position) != length(loc))
+    stop("When annotating multiple peaks, `position` must have the same length as `loc`.")
+  
+  p1 <- plot_chroms(chrom_list, idx = idx, lambdas = lambda,
+                    ylim = ylim, xlim = xlim, engine = "ggplot", ...) + 
+    ggplot2::theme(panel.grid = ggplot2::element_blank())
+  
+  # build inset
+  for (i in seq_along(loc)) {
+    if (length(idx) == 1){
+      p2 <- plot_spectrum(loc = loc[i], peak_table = peak_table,
+                          chrom_list = chrom_list, idx = idx,
+                          lambda = lambda, plot_spectrum = TRUE,
+                          plot_trace = FALSE, engine = engine, verbose = verbose)
+    } else {
+      p2 <- plot_all_spectra(loc = loc[i], peak_table = peak_table, 
+                             idx = idx, engine = engine, 
+                             scale_spectrum = scale_spectrum,
+                             export_spectrum = FALSE, verbose = verbose)
+    }
+    if (named){
+      p2 <- p2 + ggplot2::ggtitle(names(loc)[i]) + 
+        ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+    }
+    p2 <- p2 +
+      ggplot2::theme(
+        plot.background  = ggplot2::element_rect(fill = "transparent", 
+                                                 colour = "black"),
+        panel.background = ggplot2::element_rect(fill = "transparent"),
+        axis.text.y      = ggplot2::element_blank(),
+        axis.ticks.y     = ggplot2::element_blank(),
+        panel.grid = ggplot2::element_blank(),
+        text = ggplot2::element_text(size = inset_text_size),
+        axis.text = ggplot2::element_text(size = inset_text_size - 2),
+        axis.title = ggplot2::element_text(size = inset_text_size),
+        plot.title = ggplot2::element_text(size = inset_text_size + 2, 
+                                           hjust = 0.5)
+      )
+    
+    # get peak coordinates
+    peak_data <- get_peak_coordinates(peak_table, chrom_list = chrom_list, 
+                                      loc = loc[i], idx = idx, lambda = lambda)
+    coords <- peak_data$coordinates
+    
+    # get axis ranges
+    built   <- ggplot2::ggplot_build(p1)
+    x_range <- built$layout$panel_params[[1]]$x.range
+    y_range <- built$layout$panel_params[[1]]$y.range
+    
+    peak_x <- coords[1]
+    peak_y <- min(coords[2], y_range[2])
+    
+    # get inset position
+    pos <- get_inset_position(position[[i]], inset_width, inset_height)
+    
+    # convert proportional to data coordinates
+    xmin <- x_range[1] + pos$inset_left   * diff(x_range)
+    xmax <- x_range[1] + pos$inset_right  * diff(x_range)
+    ymin <- y_range[1] + pos$inset_bottom * diff(y_range)
+    ymax <- y_range[1] + pos$inset_top    * diff(y_range)
+    
+    closest <- get_connector_corners(peak_x, peak_y, xmin, xmax, ymin, ymax, 
+                                     x_range, y_range)
+    
+    p1 <- p1 +
+      ggplot2::annotation_custom(
+        grob = ggplot2::ggplotGrob(p2),
+        xmin = xmin, xmax = xmax,
+        ymin = ymin, ymax = ymax
+      ) +
+      ggplot2::annotate("segment",
+                        x = peak_x, y = peak_y, xend = closest[[1]][1], 
+                        yend = closest[[1]][2],
+                        linetype = "dotted") +
+      ggplot2::annotate("segment",
+                        x = peak_x, y = peak_y, xend = closest[[2]][1], 
+                        yend = closest[[2]][2],
+                        linetype = "dotted")
+  }
+  suppressWarnings(p1)
+}
+
+#' Get inset position
+#' @noRd
+get_inset_position <- function(position, inset_width, inset_height) {
+  if (is.numeric(position)) {
+    if (length(position) == 2) {
+      return(list(inset_left   = position[1],
+                  inset_right  = position[1] + inset_width,
+                  inset_bottom = position[2],
+                  inset_top    = position[2] + inset_height))
+    } else {
+      stop("`position` must be a string or a numeric vector of length 2 c(left, bottom).")
+    }
+  }
+  position <- match.arg(position, c("topright", "topleft", "top", "left", "right"))
+  left <- switch(position,
+                 topright = ,
+                 right    = 1 - inset_width - 0.05,
+                 topleft  = ,
+                 left     = 0.05,
+                 top      = 0.5 - inset_width / 2)
+  bottom <- switch(position,
+                   topright = ,
+                   topleft  = ,
+                   top      = 1 - inset_height - 0.05,
+                   left     = ,
+                   right    = 0.5 - inset_height / 2)
+  list(inset_left   = left,
+       inset_right  = left   + inset_width,
+       inset_bottom = bottom,
+       inset_top    = bottom + inset_height)
+}
+
+#' Get connector corners
+#' Helper function for `plot_spectrum_inset`.
+#' @noRd
+get_connector_corners <- function(peak_x, peak_y, xmin, xmax, ymin, ymax, 
+                                  x_range, y_range) {
+  xmid <- mean(c(xmin, xmax))
+  ymid <- mean(c(ymin, ymax))
+  
+  ndist <- function(x1, y1, x2, y2) {
+    sqrt(((x1 - x2) / diff(x_range))^2 + ((y1 - y2) / diff(y_range))^2)
+  }
+  
+  edge_dists <- c(
+    left   = ndist(peak_x, peak_y, xmin, ymid),
+    right  = ndist(peak_x, peak_y, xmax, ymid),
+    bottom = ndist(peak_x, peak_y, xmid, ymin),
+    top    = ndist(peak_x, peak_y, xmid, ymax)
+  )
+  
+  switch(names(which.min(edge_dists)),
+         left   = list(c(xmin, ymin), c(xmin, ymax)),
+         right  = list(c(xmax, ymin), c(xmax, ymax)),
+         bottom = list(c(xmin, ymin), c(xmax, ymin)),
+         top    = list(c(xmin, ymax), c(xmax, ymax))
+  )
 }

@@ -147,6 +147,8 @@ plot_chroms <- function(x, lambdas, idx, time_resolution = 0.01,
         p <- plotly::layout(p, yaxis = list(range = ylim))
       }
     }
+    attr(p, "lambdas") <- lambdas
+    attr(p, "idx") <- idx
     suppressWarnings(p)
   }
 }
@@ -378,3 +380,67 @@ plot_chroms_heatmap_plotly <- function(chrom_list, lambdas.idx = 1, idx = NULL,
   }
   return(p)
 }
+
+#' Annotate peaks on a chromatogram
+#'
+#' Adds text labels to peaks on a chromatogram plot produced by
+#' [plot_chroms()]. Peak retention times and intensities are looked up
+#' automatically from the peak table.
+#'
+#' @param p A `ggplot` object produced by [plot_chroms()].
+#' @param loc A character vector of peak names (e.g. `c("V8", "V15")`).
+#'   If named, the names are used as labels (e.g.
+#'   `c(Sinigrin = "V8", `1ME` = "V15")`).
+#' @param peak_table A `peak_table` object created by [`get_peaktable`].
+#' @param chrom_list A list of chromatograms in matrix format (timepoints x
+#' wavelengths). If no argument is provided here, the function will try to find
+#' the `chrom_list` object using the pointer in the `peak_table`.
+#' @param label Labels to display at each peak. Can be a character vector of
+#'   labels (one per peak), `"rt"` to use retention times from the peak table.
+#'   If labels are not specified here, the names of `loc` will be applied, or
+#'   if the `loc` vector is not named, the peak names will be used directly.
+#' @param lambda Wavelength(s) to use for locating the peak apex. Inherited
+#'   from `p` if `NULL` (default). If multiple wavelengths are provided, the
+#'   one with the highest absorbance is used.
+#' @param idx Index of chromatogram(s) to use for locating the peak apex.
+#'   Inherited from `p` if `NULL` (default).
+#' @param vjust Vertical justification of the label relative to the peak apex.
+#'   Defaults to `-0.5`.
+#' @param ... Additional arguments passed to [ggplot2::annotate()].
+#'
+#' @return A `ggplot` object.
+#'
+#' @seealso [plot_chroms()], [plot_spectrum_inset()]
+#'
+#' @examples
+#' \dontrun{
+#' plot_chroms(dat, idx = 1:5, lambda = 228, engine = "ggplot") |>
+#'   annotate_peaks(c(Sinigrin = "V8", `1ME` = "V15"), peak_table = pktab)
+#' }
+#' @export
+annotate_peaks <- function(p, loc, peak_table, chrom_list=NULL, label = NULL, 
+                           lambda = NULL, idx = NULL, vjust = -0.5, ...) {
+  if (!inherits(p, "ggplot")){
+    stop("Please supply a ggplot object to `p`.")
+  }
+  lambda <- if (is.null(lambda)) attr(p, "lambdas") else lambda
+  idx    <- if (is.null(idx))    attr(p, "idx")    else idx
+
+  if (is.null(label) && !is.null(names(loc))) {
+    label <- names(loc)
+  } else if (identical(label, "rt")){
+    label <- peak_table$pk_meta["rt", loc]
+  } else if (is.null(label)) {
+    label <- loc
+  }
+  
+  for (i in seq_along(loc)) {
+    peak_data <- get_peak_coordinates(peak_table, chrom_list = chrom_list, 
+                                      loc[i], lambda = lambda, idx = idx)
+    coords <- peak_data$coordinates
+    p <- p + ggplot2::annotate("text", x = coords[1], y = coords[2], 
+                               label = label[i], vjust = vjust, ...)
+  }
+  p
+}
+  
