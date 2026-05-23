@@ -84,7 +84,7 @@ apply(pktab$tab[,idx_99], 1, sum)
 
 ```{r hierarchical_clustering}
 par(mfrow=c(2,2))
-cl <- cluster_spectra(pktab, alpha = 0.01, iseed = 1, max.only = TRUE)
+cl <- cluster_spectra(pktab, alpha = 0.05, iseed = 1, max.only = TRUE)
 ```
 
 The output is a dendrogram of peaks annotated with bootstrap values showing the support for each node and spectra of the clusters with p-values below the significance level specified by `alpha`. In this case, we recovered two clusters, representing two different classes of compounds distinguished by their chromophores. The second cluster closely matches the spectrum represented by peak `'V21'`. We can access the peaks in cluster two as follows:
@@ -94,8 +94,8 @@ cl2 <- cl$clusters$c2@peaks
 cl2
 ```
 
-In this case, the peaks in cluster two happen to overlap completely with the peaks recovered through pearson correlation at the 90% threshold.
+In this case, the peaks in cluster two happen to overlap completely with the peaks recovered through pearson correlation at the 95% threshold.
 
 ```{r show_overlap}
-all.equal(cl2, names(idx_90))
+all.equal(cl2, names(idx_95))
 ```
