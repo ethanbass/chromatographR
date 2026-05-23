@@ -283,7 +283,7 @@ par(oldpar) # restore par settings
 
 The `plot_spectrum` function can also be used to generate interactive plots using [plotly](https://plotly.com/r/).
 
-```{r plotly-plot, eval = FALSE}
+```{r plotly-plot, eval=FALSE}
 plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp_vpdtw, 
               verbose = FALSE, engine = "plotly")
 ```
@@ -300,6 +300,27 @@ Inconsistencies in the spectra (as can be seen with "V13") can be indicative of 
 
 ```{r, include = FALSE}
 par(oldpar) # restore par settings
+```
+
+The new `plot_spectrum_inset` function can also be used to plot spectra onto the chromatogram.
+
+```{r inset-plot, eval=requireNamespace("ggplot2", quietly=TRUE), fig.width=8, fig.height=6}
+plot_spectrum_inset("V13", peak_table = pk_tab, 
+              verbose = FALSE, xlab="Retention time (min)",
+              position="top", inset_width = 0.25)
+```
+
+This function can also be used to produce multiple insets. The spectra can also be given titles using the `title` argument. Additional peaks can be labeled with arbitrary labels using the `annotate_peaks` function.
+
+```{r double-inset-plot, eval=requireNamespace("ggplot2", quietly=TRUE), fig.width=8, fig.height=6}
+plot_spectrum_inset(c("Unknown 1" = "V7",
+                      "Unknown 2" = "V15"), idx=c(1:4), 
+                    peak_table = pk_tab, 
+              verbose = FALSE, xlab="Retention time (min)",
+              position=list(c(0.0,0.6),c(0.55,0.4)), inset_width = 0.25,
+              scale_spectrum = FALSE) |>
+   annotate_peaks(loc = c(A = "V5", B = "V7", C="V17",
+                          D = "V21", E = "V22"), peak_table = pk_tab)
 ```
 
 ##### Plot peak table function
