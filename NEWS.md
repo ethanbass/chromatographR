@@ -48,7 +48,11 @@
 * Added additional arguments as placeholder for `subset.peak_table`.
 * Fixed bug in `normalize_data` causing loss of sample names when normalizing chromatograms.
 * Formalized requirement for R version 4.1.0.
+* Fixed `plot_spectrum` plots with plotly engine so they always maintain their axis labels.
+* Standardized axis labels across `plot_spectrum` plots.
+* Standardized titles of trace plots across engines so they always use unicode lambda character.
 * Fixed `reshape_chroms` so it returns a factor for the `sample` column.
+* Fixed `plot_chroms` so chromatograms are black when plotting a single chromatogram with plotly or ggplot.
 
 # chromatographR 0.7.5
 

@@ -110,7 +110,7 @@ plot_chroms <- function(x, lambdas, idx, time_resolution = 0.01,
       .data <- ggplot2::.data
       p <- ggplot2::ggplot(xx, ggplot2::aes(x = .data$rt, y = .data$absorbance,
                                         color = .data$sample)) +
-        ggplot2::geom_line(linewidth = linewidth*0.5, ...) +
+        ggplot2::geom_line(linewidth = linewidth*0.5, na.rm = TRUE, ...) +
         ggplot2::ylab(ylab) + 
         ggplot2::xlab(xlab) + 
         ggplot2::ggtitle(title) +
@@ -126,10 +126,15 @@ plot_chroms <- function(x, lambdas, idx, time_resolution = 0.01,
       if (zoom_y){
         p <- p + ggplot2::ylim(ylim)
       }
+      if (nlevels(xx$sample) == 1){
+        p <- p + ggplot2::scale_color_manual(values = "black")
+      }
     } else if (engine == "plotly"){
       check_for_pkg("plotly")
+      plotly_colors <- if (nlevels(xx$sample) == 1) "black" else NULL
       p <- plotly::plot_ly(data = xx, x = ~rt, y = ~absorbance, color = ~sample,
-                           type = 'scatter', mode = 'lines',
+                           type = 'scatter', mode = 'lines', 
+                           colors = plotly_colors,
                            line = list(width = linewidth, ...))
       p <-  plotly::layout(p, xaxis = list(title = xlab),
                            yaxis = list(title = ylab),

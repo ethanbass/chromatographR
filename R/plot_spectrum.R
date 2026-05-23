@@ -189,7 +189,9 @@ plot_spectrum_ggpl <- function(loc, peak_table, chrom_list,
   }
   if (plot_spectrum & plot_trace){
     combine_plots <- switch(engine,
-                            plotly = purrr::partial(plotly::subplot, nrows = 2),
+                            plotly = purrr::partial(plotly::subplot, nrows = 2,
+                                                    margin = 0.1, titleY = TRUE,
+                                                    titleX = TRUE),
                             ggplot2 = purrr::partial(cowplot::plot_grid, 
                                                      nrow = 2))
     sub <- combine_plots(trace, spectrum)
@@ -422,8 +424,11 @@ plot_all_spectra <- function(loc, peak_table, chrom_list, idx = "all",
     if (plot_spectrum){
       if (overlapping){
         matplot(new.lambdas, sp, type = 'l', 
-                xlab = 'wavelength', ylab = 'intensity', las = 2,
-                main = peak)
+                xlab = add_unit('Wavelength', chrom_list, 
+                                unit = "detector_x_unit", idx = idx), 
+                ylab = add_unit('Absorbance', chrom_list, 
+                                unit = "detector_y_unit", idx = idx),
+                las = 2, main = loc)
       } else {
         apply(sp, 2, function(spp){
           plot(new.lambdas, spp, type = 'l', xlab = '', ylab = '', las = 2)
@@ -459,7 +464,7 @@ plot_all_spectra <- function(loc, peak_table, chrom_list, idx = "all",
 #' @noRd
 plot_spec <- function(y, spectrum_labels = TRUE, ...){
   matplot(x = as.numeric(names(y)), y = as.numeric(y), type = 'l',
-          ylab = 'Intensity', xlab = 'Wavelength (nm)',
+          ylab = 'Absorbance', xlab = 'Wavelength (nm)',
           ylim = c(0, max(y, na.rm = TRUE)*1.2), ...)
   if (spectrum_labels){
     suppressWarnings(pks <- find_peaks(y, slope_thresh = .00001, bounds = FALSE, 
@@ -491,7 +496,7 @@ ggplot_spec <- function(y, chr, RT, spectrum_labels = TRUE, color="black",
   }
   p <- ggplot2::ggplot(data = df, 
                        ggplot2::aes(x = .data$lambda, y = .data$absorbance)) +
-    ggplot2::geom_line()
+    ggplot2::geom_line(na.rm = TRUE)
   if ("sample" %in% colnames(df)){
     p <- p + ggplot2::aes(group = .data$sample, color = .data$sample)
   }
@@ -617,6 +622,7 @@ plot_trace <- function(chrom_list, chr, lambda.idx, line.idx = NULL, what = ""){
   title(bquote(paste("Chr ", .(chr),  " ;   RT: ", .(RT), " ;  ",
                      lambda, ": ", .(lambda), " nm")
   ))
+  title(xlab = "Retention time", ylab = "Absorbance")
   line.idx
 }
 
@@ -643,16 +649,38 @@ plotly_trace <- function(chrom_list, chr, lambda.idx, line.idx = NULL,
                          line = list(dash = 3, color = "red"))
   }
   p <- plotly::layout(p,
-                      title = list(text=sprintf("Chr %d;   RT: %g;  lambda: %s nm",
+                      title = list(text=sprintf("Chr %d;   RT: %g;  \u03bb: %s nm",
                                                 as.integer(chr), RT, lambda)
                       ),
-                      xaxis = list(title = "Wavelength"),
-                      yaxis = list(title = "Absorbance (mAU)")
+                      xaxis = list(title = add_unit("Retention time", chrom_list, 
+                                                    unit = "time_unit", 
+                                                    idx = chr)),
+                      yaxis = list(title = add_unit("Absorbance", chrom_list, 
+                                                    unit = "detector_y_unit", 
+                                                    idx = chr))
   )
   if (hide_legend){
     p <- plotly::hide_legend(p)
   }
   p
+}
+
+#' Add unit
+#' @noRd
+add_unit <- function(string, chrom_list, unit, idx){
+  if (length(idx) > 1){
+    idx <- idx[1]
+  }
+  unit <- extract_chrom_metadata(chrom_list, "time_unit", idx = idx)
+  addition <- ifelse(unit != "", sprintf(" (%s)", unit), "")
+  paste0(string, addition)
+}
+
+# Extract chromatogram metadata
+#' @noRd
+extract_chrom_metadata <- function(chrom_list, what = "time_unit", idx = 1){
+  meta <- attr(chrom_list[[idx]], what)
+  ifelse(is.null(meta), "", meta)
 }
 
 #' Plot trace with ggplot2
