@@ -145,11 +145,11 @@ test_that("reshape_chroms works as expected", {
   expect_equal(ncol(chrom_list_long), 4)
   expect_equal(nrow(chrom_list_long), length(Sa_pr)*nrow(Sa_pr[[1]]))
   expect_equal(unique(chrom_list_long$lambda), 210)
-  expect_equal(unique(chrom_list_long$sample), names(Sa_pr))
+  expect_equal(levels(chrom_list_long$sample), names(Sa_pr))
   chrom_list_long_subset <- reshape_chroms(Sa_pr, lambdas = 210, idx = c(1:2))
   expect_equal(ncol(chrom_list_long_subset), 4)
   expect_equal(nrow(chrom_list_long_subset), 2*nrow(Sa_pr[[1]]))
-  expect_equal(unique(chrom_list_long_subset$sample), names(Sa_pr)[1:2])
+  expect_equal(levels(chrom_list_long_subset$sample), names(Sa_pr)[1:2])
 })
 
 test_that("get_purity works as intended", {
