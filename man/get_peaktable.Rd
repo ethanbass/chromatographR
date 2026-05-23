@@ -100,7 +100,7 @@ By default, clustering is performed on retention times only (when
 \code{clust == "rt"}). Clustering can also incorporate information about
 spectral similarity (when \code{clust == "sp.rt"}) using a distance function
 adapted from Broeckling et al., 2014:
-\deqn{e^{-\frac{(1-c_{ij})^2}{2\sigma_r^2}} \cdot e^{-\frac{(1-(t_i-t_j)^2)}{2\sigma_t^2}}}
+\deqn{e^{-\frac{(1-c_{ij})^2}{2\sigma_r^2}} \cdot e^{-\frac{(t_i-t_j)^2}{2\sigma_t^2}}}
 where \eqn{c_{ij}} is the spectral correlation coefficient between spectra
 \eqn{i} and \eqn{j}, and \eqn{\sigma_t} and \eqn{\sigma_r} control the
 relative contributions of retention time and spectral similarity,

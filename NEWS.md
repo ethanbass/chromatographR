@@ -53,6 +53,7 @@
 * Standardized titles of trace plots across engines so they always use unicode lambda character.
 * Fixed `reshape_chroms` so it returns a factor for the `sample` column.
 * Fixed `plot_chroms` so chromatograms are black when plotting a single chromatogram with plotly or ggplot.
+* Fixed error in equation describing spectral clustering in documentation for `get_peaktable`.
 
 # chromatographR 0.7.5
 
