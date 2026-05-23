@@ -17,6 +17,7 @@
 
 ### Other New features
 
+* Added `correct_rt_group` function for group-wise warping function estimation using within-group averages. This improves alignment accuracy when samples share batch-level retention time shifts or contain group-specific peaks, and is generally faster than per-sample alignment.
 * Fixed `preprocess` function incorrectly truncating chromatograms when outliers are present and `dim1` is not specified.
 * Added more informative warnings and errors to `preprocess` function.
 * Added support for propagating time and intensity units through to `peak_table` object.

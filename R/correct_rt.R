@@ -346,6 +346,177 @@ warp_sample_ptw <- function(mat, coef, fill_zeros = FALSE,
   x[which(tp < min(w) | tp > max(w)), ] <- ifelse(fill_zeros, 0, NA)
   x
 }
+
+
+#' Correct retention time with group-based warping
+#'
+#' Aligns chromatograms using parametric time warping (`"ptw"`), as
+#' implemented in [`ptw`][ptw::ptw], with warping functions estimated
+#' from within-group averages. This is useful when samples fall into batches
+#' with shared retention time shifts, or when individual samples contain peaks
+#' absent in other groups that would otherwise confound alignment. In addition
+#' to potentially being more accurate, this should also be faster than computing
+#' warping functions individually on each sample.
+#'
+#' @aliases correct_rt_group
+#' @import ptw
+#' @param chrom_list A list of chromatograms in matrix format.
+#' @param lambdas A character or numeric vector specifying the wavelengths to
+#' use for alignment.
+#' @param groups A vector of group assignments for each chromatogram, or a
+#' single string naming a metadata attribute from which to extract the group
+#' assignments (e.g. `"batch"`). If a vector is provided, it must be the same 
+#' length as `chrom_list` and may be named (matching `names(chrom_list)`) or
+#' positional. All samples must have a group assignment; `NA` values will
+#' trigger an error.
+#' @param reference Index or name of the group average to use as the alignment
+#' reference. Defaults to `"best"`, which selects the reference
+#' automatically using [`bestref`][ptw::bestref] applied to the group averages.
+#' @param reference_group Name of the group to use as the reference group. If
+#' supplied, overrides `reference`. Defaults to `NULL`.
+#' @inheritParams correct_rt
+#' @return A list of warped chromatogram matrices in the same order as
+#' `chrom_list`, with each sample warped using the warp coefficients
+#' estimated from its group average.
+#' @author Ethan Bass
+#' @seealso [`correct_rt`], [`ptw`][ptw::ptw]
+#' @examplesIf interactive()
+#' \dontrun{
+#' data(Sa_pr)
+#' groups <- c("a", "a", "b", "b")
+#' warp <- correct_rt_group(chrom_list = Sa_pr, lambdas = 210, groups = groups)
+#' }
+#' @md
+#' @export
+
+correct_rt_group <- function(chrom_list, lambdas, groups, reference = 'best',
+                             reference_group = NULL,
+                             init.coef = c(0, 1, 0), n.traces = NULL,
+                             fill_zeros = FALSE, n.zeros = 0, scale = FALSE, 
+                             trwdth = 200, plot_it = FALSE, penalty = 5, 
+                             maxshift = 50, verbose = getOption("verbose"),
+                             show_progress = NULL, cl = 2,
+                             ...) {
+  
+  if (length(groups) == 1 && is.character(groups)) {
+    groups_vec <- sapply(chrom_list, function(x) attr(x, groups))
+    if (any(is.na(groups_vec))) {
+      stop(sprintf("Metadata attribute '%s' not found on all chromatograms.", 
+                   groups))
+    }
+  } else {
+    groups_vec <- groups
+    groups_vec <- as.factor(groups_vec)
+    if (is.null(names(groups_vec))) {
+      if (length(groups_vec) != length(chrom_list)){
+        stop("Length of `groups` must match the number of samples in `chrom_list`.")
+      }
+      names(groups_vec) <- names(chrom_list)
+    } else {
+      groups_vec <- groups_vec[names(chrom_list)] 
     }
   }
+  if (any(is.na(groups_vec))) {
+    na_idx <- which(is.na(groups_vec))
+    na_samples <- names(groups_vec)[na_idx]
+    stop(sprintf("All samples must have a group assignment. NA%s found for:\n%s",
+                 ifelse(length(na_idx)>1, "s", ""),
+                 paste(
+                   sprintf("         %d (%s)", na_idx, sQuote(na_samples)),
+                   collapse = ", \n")))
+  }
+  
+  group_levels <- levels(groups_vec)
+  
+  if (verbose) message("Computing within-group averages.")
+  group_avg_list <- lapply(setNames(group_levels, group_levels), function(g) {
+    members <- names(groups_vec)[which(groups_vec == g)]
+    mats <- lapply(chrom_list[members], as.matrix)
+    avg <- Reduce("+", mats) / length(mats)
+    dimnames(avg) <- dimnames(mats[[1]])
+    avg
+  })
+  
+  if (is.null(reference_group)) {
+    if (reference == 'best') {
+      reference_group <- NULL  # passed through, correct_rt will resolve
+    } else {
+      ref_name <- if (is.numeric(reference)) names(chrom_list)[reference] else reference
+      reference_group <- groups_vec[ref_name]
+      reference <- which(names(group_avg_list) == reference_group)
+    }
+  } else {
+    reference <- which(names(group_avg_list) == reference_group)
+  }
+  
+  if (verbose) message("Fitting PTW warp models on group averages.")
+  group_models <- correct_rt(
+    chrom_list  = group_avg_list,
+    lambdas     = lambdas,
+    reference   = reference,
+    alg         = "ptw",
+    what        = "models",
+    init.coef   = init.coef,
+    n.traces    = n.traces,
+    n.zeros     = n.zeros,
+    scale       = scale,
+    trwdth      = trwdth,
+    plot_it     = plot_it,
+    penalty     = penalty,
+    maxshift    = maxshift,
+    verbose     = verbose,
+    show_progress = show_progress,
+    cl          = cl,
+    ...
+  )
+  laplee <- choose_apply_fnc(show_progress, cl = cl)
+  if (verbose) message("Applying group warp models to individual chromatograms.")
+  result <- laplee(group_levels, function(g) {
+    members <- names(groups_vec)[which(groups_vec == g)]
+    member_list <- chrom_list[members]
+    correct_rt(
+      chrom_list  = member_list,
+      lambdas     = lambdas,
+      models      = structure(rep(group_models[g], 
+                                  length(member_list)), class="ptw_list"), 
+      alg         = "ptw",
+      what        = "corrected.values",
+      init.coef   = init.coef,
+      n.zeros     = n.zeros,
+      fill_zeros = fill_zeros,
+      scale       = scale,
+      trwdth      = trwdth,
+      verbose     = verbose,
+      show_progress = FALSE,
+      cl          = 1,
+      ...
+    )
+  })
+  
+  result_flat <- do.call(c, result)
+  result_flat[names(chrom_list)]
+}
+
+#' Pad zeros
+#' Helper for [`correct_rt`].
+#' @noRd
+pad_zeros <- function(x, n_zeros, side = "both") {
+  if (is.vector(x)) x <- as.matrix(x)
+  zeros <- matrix(0, nrow = n_zeros, ncol = ncol(x))
+  switch(side,
+         both = rbind(zeros, x, zeros),
+         left = rbind(zeros, x),
+         right = rbind(x, zeros)
+  )
+}
+
+#' Strip zeros
+#' @noRd
+strip_zeros <- function(x, n_zeros, side = "both") {
+  n <- nrow(x)
+  switch(side,
+         both = x[(n_zeros + 1):(n - n_zeros), ],
+         left = x[(n_zeros + 1):n, ],
+         right = x[1:(n - n_zeros), ]
+  )
 }

@@ -26,21 +26,21 @@ correct_rt_group(
 )
 }
 \arguments{
-\item{chrom_list}{List of chromatograms in matrix format.}
+\item{chrom_list}{A list of chromatograms in matrix format.}
 
 \item{lambdas}{A character or numeric vector specifying the wavelengths to
 use for alignment.}
 
 \item{groups}{A vector of group assignments for each chromatogram, or a
-single string naming a metadata attribute to extract group assignments from
-(e.g. \code{"batch"}). If a vector, it must be the same length as
-\code{chrom_list} and may be named (matching \code{names(chrom_list)}) or
+single string naming a metadata attribute from which to extract the group
+assignments (e.g. \code{"batch"}). If a vector is provided, it must be the same
+length as \code{chrom_list} and may be named (matching \code{names(chrom_list)}) or
 positional. All samples must have a group assignment; \code{NA} values will
 trigger an error.}
 
 \item{reference}{Index or name of the group average to use as the alignment
 reference. Defaults to \code{"best"}, which selects the reference
-automatically using \code{\link[ptw]{bestref}} applied to the group averages.}
+automatically using \code{\link[ptw:bestref]{bestref}} applied to the group averages.}
 
 \item{reference_group}{Name of the group to use as the reference group. If
 supplied, overrides \code{reference}. Defaults to \code{NULL}.}
@@ -50,42 +50,41 @@ supplied, overrides \code{reference}. Defaults to \code{NULL}.}
 \item{n.traces}{Number of traces to use.}
 
 \item{fill_zeros}{Logical. If \code{TRUE}, out-of-bounds regions produced by
-warping are filled with zeros. If \code{FALSE}, these regions are returned
-as \code{NA}. Defaults to \code{FALSE}.}
+warping are filled with zeros. If \code{FALSE} (default), these regions are
+returned as \code{NA}.}
 
 \item{n.zeros}{Number of zeros to add for padding chromatograms at the edges.}
 
 \item{scale}{Logical. If \code{TRUE}, scale chromatograms before warping.}
 
-\item{trwdth}{Argument to \code{\link[ptw]{ptw}}. Width of the triangle in
+\item{trwdth}{Argument to \code{\link[ptw:ptw]{ptw}}. Width of the triangle in
 the WCC criterion. Defaults to \code{200}.}
 
-\item{plot_it}{Logical. Whether to plot alignment.}
+\item{plot_it}{Logical. Whether to plot alignment. Defaults to \code{FALSE}.}
 
 \item{penalty}{The divisor used to calculate the penalty for
-\code{\link[VPdtw]{VPdtw}}. The warping penalty is calculated by dividing the
-\code{\link[VPdtw]{dilation}} by this number. Thus, a higher number will
+\code{\link[VPdtw:VPdtw]{VPdtw}}. The warping penalty is calculated by dividing the
+\code{\link[VPdtw:dilation]{dilation}} by this number. Thus, a higher number will
 produce a lower penalty and be more permissive, while a lower number will
 produce a higher penalty and allow less warping. Defaults to \code{5}.}
 
-\item{maxshift}{Integer. Maximum allowable shift for \code{\link[VPdtw]{VPdtw}}.
+\item{maxshift}{Integer. Maximum allowable shift for \code{VPdtw} warping.
 Defaults to \code{50}.}
 
 \item{verbose}{Logical. Whether to print verbose output.}
 
 \item{show_progress}{Logical. Whether to show progress bar. Defaults to
-\code{TRUE} if \code{\link[pbapply]{pbapply}} is installed. Currently works
+\code{TRUE} if \code{\link[pbapply:pbapply]{pbapply}} is installed. Currently works
 only for \code{ptw} alignments.}
 
-\item{cl}{Argument to \code{\link[pbapply]{pblapply}} or
-\code{\link[parallel]{mclapply}}. Either an integer specifying the number of
-clusters to use for parallel processing or a cluster object created by
-\code{\link[parallel]{makeCluster}}. Defaults to \code{2}. On Windows systems,
-integer values will be ignored.}
+\item{cl}{Argument to \code{pbapply} or \code{\link[parallel:mclapply]{mclapply}}. Either
+an integer specifying the number of clusters to use for parallel processing
+or a cluster object created by \code{\link[parallel:makeCluster]{makeCluster}}.
+Defaults to \code{2}. On Windows systems, integer values will be ignored.}
 
-\item{...}{Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
-The only argument that cannot be changed is \code{warp.type}: this is
-hard-coded to \code{"global"} to permit warping on multiple wavelengths.}
+\item{...}{Optional additional arguments to \code{ptw}. The only argument that
+cannot be changed is \code{warp.type} which is hard-coded to \code{"global"} to permit
+warping on multiple wavelengths.}
 }
 \value{
 A list of warped chromatogram matrices in the same order as
@@ -94,7 +93,7 @@ estimated from its group average.
 }
 \description{
 Aligns chromatograms using parametric time warping (\code{"ptw"}), as
-implemented in \code{\link[ptw]{ptw}}, with warping functions estimated
+implemented in \code{\link[ptw:ptw]{ptw}}, with warping functions estimated
 from within-group averages. This is useful when samples fall into batches
 with shared retention time shifts, or when individual samples contain peaks
 absent in other groups that would otherwise confound alignment. In addition
