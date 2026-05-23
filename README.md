@@ -1,7 +1,7 @@
 # chromatographR <a href='https://ethanbass.github.io/chromatographR/'><img src='man/figures/logo.png' align="right" height="160" /></a>
 
 <!-- badges: start -->
-  [![Last commit](https://img.shields.io/github/last-commit/ethanbass/chromatographR)]()
+  [![Last commit](https://img.shields.io/github/last-commit/ethanbass/chromatographR)](https://github.com/ethanbass/chromatographR/)
   [![R-CMD-check](https://github.com/ethanbass/chromatographR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ethanbass/chromatographR/actions/workflows/R-CMD-check.yaml)
   <br>
   [![chromatographR status badge](https://ethanbass.r-universe.dev/badges/chromatographR)](https://ethanbass.r-universe.dev/chromatographR)
@@ -14,7 +14,7 @@
    <!-- badges: end -->
 
 ## Overview
-`chromatographR` is a package for the reproducible analysis of HPLC-DAD chromatographic data in R. It can also be used to analyze other "simple" chromatographic data like GC-FID, HPLC-UV, or HPLC-FD.
+`chromatographR` is a package for the reproducible analysis of HPLC-DAD and other "simple" chromatographic data (e.g., GC-FID, HPLC-UV, or HPLC-FD) in R.
   
 ## Installation
 
