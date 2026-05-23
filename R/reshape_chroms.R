@@ -39,7 +39,9 @@ reshape_chroms <- function(x, idx, time_resolution = NULL,
     xx[, sample_var] <- names(x)[[i]]
     xx
   })
-  do.call(rbind, dat)
+  df <- do.call(rbind, dat)
+  df$sample <- as.factor(df$sample)
+  df
 }
 
 #' Reshapes a single chromatogram from wide to long format

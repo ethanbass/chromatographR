@@ -46,6 +46,7 @@
 * Added additional arguments as placeholder for `subset.peak_table`.
 * Fixed bug in `normalize_data` causing loss of sample names when normalizing chromatograms.
 * Formalized requirement for R version 4.1.0.
+* Fixed `reshape_chroms` so it returns a factor for the `sample` column.
 
 # chromatographR 0.7.5
 
