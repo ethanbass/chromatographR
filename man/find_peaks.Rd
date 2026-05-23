@@ -18,12 +18,12 @@ find_peaks(
 
 \item{smooth_type}{Type of smoothing. Either gaussian kernel (\code{"gaussian"}),
 box kernel (\code{"box"}), Savitzky-Golay smoothing (\code{"savgol"}),
-moving average (\code{"mva"}), triangular moving average (\code{"tmva"}), or 
+moving average (\code{"mva"}), triangular moving average (\code{"tmva"}), or
 no smoothing (\code{"none"}).}
 
-\item{smooth_window}{Smoothing window. Larger values of this parameter will 
+\item{smooth_window}{Smoothing window. Larger values of this parameter will
 exclude sharp, narrow features. If the supplied value is between 0 and
-1, the window will be interpreted as a proportion of points to include. 
+1, the window will be interpreted as a proportion of points to include.
 Otherwise, the window will be interpreted as the absolute number of points to
 include in the window. Defaults to \code{0.001}.}
 
@@ -33,14 +33,14 @@ that larger values will exclude broad peaks from the peak list. Defaults to
 \code{0}.}
 
 \item{amp_thresh}{Minimum threshold for peak amplitude. This parameter
-filters on the basis of peak height, such that larger values will
-exclude small peaks from the peak list. Defaults to \code{0}.}
+filters on the basis of peak height, such that larger values will exclude
+small peaks from the peak list. Defaults to \code{0}.}
 
-\item{bounds}{Logical. If TRUE, includes peak boundaries in data.frame.
-Defaults to \code{TRUE}.}
+\item{bounds}{Logical. If \code{TRUE} (default), includes peak boundaries in
+data.frame.}
 }
 \value{
-If \code{bounds == TRUE}, returns a data.frame containing the center,
+If \code{bounds == TRUE}, returns a \code{data.frame} containing the center,
 start, and end of each identified peak. Otherwise, returns a numeric vector
 of peak centers. All locations are expressed as indices.
 }
@@ -49,18 +49,18 @@ Detects peaks in chromatographic profile.
 }
 \details{
 Detects peaks by looking for zero-crossings in the smoothed first derivative of
-the signal (\code{y}) that exceed the specified slope threshold
-(\code{slope_thresh}). Additionally, peaks can be filtered by supplying a minimal
+the signal (\code{y}) that exceed the specified slope threshold (\code{slope_thresh}).
+Additionally, peaks can be filtered by supplying a minimal
 amplitude threshold (\code{amp_thresh}), filtering out peaks below the
 specified height. Smoothing is intended to prevent the algorithm from
 getting caught up on local minima and maxima that do not represent true
 features. Several smoothing options are available, including \code{"gaussian"},
 box kernel (\code{"box"}), savitzky-golay smoothing (\code{"savgol"}),
-moving average (\code{"mva"}), triangular moving average (\code{"tmva"}), or 
+moving average (\code{"mva"}), triangular moving average (\code{"tmva"}), or
 no smoothing (\code{"none"}).
 
 It is recommended to do pre-processing using the \code{\link{preprocess}}
-function before peak detection. Overly high chromatographic resolution can 
+function before peak detection. Overly high chromatographic resolution can
 sometimes cause peaks to be split into multiple segments. In this case,
 it is recommended to increase the \code{smooth_window} or reduce the
 resolution along the time axis by adjusting the \code{dim1} argument during
@@ -68,9 +68,7 @@ preprocessing.
 }
 \note{
 The \code{find_peaks} function is adapted from MATLAB code included in
-Prof. Tom O'Haver's
-\href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{
-Pragmatic Introduction to Signal Processing}.
+Prof. Tom O'Haver's \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{Pragmatic Introduction to Signal Processing}.
 }
 \examples{
 data(Sa_pr)

@@ -14,8 +14,8 @@ A \code{peak_table} object contains the following elements:
 \itemize{
 \item \code{tab}: The peak table itself -- a \code{data.frame} of intensities in a
 sample x peak configuration.
-\item \code{pk_meta}: A \code{data.frame} containing peak meta-data (e.g., the spectral component,
-peak number, and average retention time).
+\item \code{pk_meta}: A \code{data.frame} containing peak meta-data (e.g., the spectral
+component, peak number, and average retention time).
 \item \code{sample_meta}: A \code{data.frame} of sample meta-data. Must be added using
 \code{\link{attach_metadata}}.
 \item \code{ref_spectra}: A \code{data.frame} of reference spectra (in a wavelength x peak

@@ -16,11 +16,11 @@ A numeric vector of wavelengths.
 Get wavelengths from a list of chromatograms or a \code{peak_table} object.
 }
 \seealso{
-Other utility functions: 
-\code{\link{combine_peaks}()},
-\code{\link{get_times}()},
-\code{\link{merge_peaks}()},
-\code{\link{reshape_chroms}()},
-\code{\link{reshape_peaktable}()}
+Other utility functions:
+\code{\link[=combine_peaks]{combine_peaks()}},
+\code{\link[=get_times]{get_times()}},
+\code{\link[=merge_peaks]{merge_peaks()}},
+\code{\link[=reshape_chroms]{reshape_chroms()}},
+\code{\link[=reshape_peaktable]{reshape_peaktable()}}
 }
 \concept{utility functions}

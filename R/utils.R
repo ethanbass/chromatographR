@@ -1,6 +1,6 @@
 #' Check that peak_table is of proper class
 #' 
-#' This function validates that the provided object is of the \code{peak_table}
+#' This function validates that the provided object is of the `peak_table`
 #' class.
 #' 
 #' @author Ethan Bass
@@ -113,7 +113,7 @@ check_idx <- function(idx, chrom_list){
 #' @param lambdas lambdas to be matched
 #' @param y Signal as numeric vector.
 #' @param allow_max Logical. Whether to return lambda at maximum signal intensity
-#' of vector \code{y}. Defaults to TRUE.
+#' of vector `y`. Defaults to `TRUE.`
 #' @author Ethan Bass
 #' @noRd
 get_lambda_idx <- function(lambda, lambdas, y, allow_max = TRUE){
@@ -163,12 +163,12 @@ elementwise.all.equal <- Vectorize(function(x, y, ...){
 
 #' Get retention times
 #' 
-#' Get retention times from a list of chromatograms or a \code{peak_table} object.
+#' Get retention times from a list of chromatograms or a `peak_table` object.
 #' 
-#' @param x A list of chromatograms or \code{peak_table} object.
+#' @param x A list of chromatograms or `peak_table` object.
 #' @param idx Index of chromatogram from which to extract times.
 #' @return Numeric vector of retention times from the chromatogram specified by
-#' \code{idx}.
+#' `idx`.
 #' @family utility functions
 #' @export
 
@@ -185,9 +185,9 @@ get_times <- function(x, idx = 1){
 
 #' Get lambdas
 #' 
-#' Get wavelengths from a list of chromatograms or a \code{peak_table} object.
+#' Get wavelengths from a list of chromatograms or a `peak_table` object.
 #' 
-#' @param x A list of chromatograms or \code{peak_table} object.
+#' @param x A list of chromatograms or `peak_table` object.
 #' @return A numeric vector of wavelengths.
 #' @family utility functions
 #' @export
@@ -213,15 +213,15 @@ get_time_resolution <- function(chrom_list, idx = 1){
 
 #' Get time unit
 #' 
-#' Get time units from a list of chromatograms or a \code{peak_table} object.
+#' Get time units from a list of chromatograms or a `peak_table` object.
 #' 
-#' @param x A list of chromatograms or \code{peak_table} object.
+#' @param x A list of chromatograms or `peak_table` object.
 #' @param idx Index of chromatogram from which to extract times.
-#' @param na_value What to return if \code{time_unit} attribute is not present.
+#' @param na_value What to return if `time_unit` attribute is not present.
 #' @return A string specifying the time units for the provided chromatograms.c
 #' @family utility functions
 #' @noRd
-get_time_unit <- function(x, idx = 1, na_value=NA){
+get_time_unit <- function(x, idx = 1, na_value = NA){
   if (inherits(x, "peak_table")){
     x <- get_chrom_list(x)
   }
@@ -259,7 +259,7 @@ convert_time_units <- function(chrom_list, time_unit = c("min", "s", "ms")){
 #' Check for suggested package
 #' 
 #' This function checks for a suggested package and returns an error if the 
-#' package is not installed (if \code{return_boolean} is FALSE. Otherwise, it 
+#' package is not installed (if `return_boolean` is `FALSE.` Otherwise, it 
 #' returns a boolean value.
 #' 
 #' @noRd
@@ -277,7 +277,7 @@ check_for_pkg <- function(pkg, return_boolean = FALSE){
 }
 
 #' Extract variables from the left-hand-side of a formula.
-#' @param formula A \code{\link{formula}} object.
+#' @param formula A [`formula`] object.
 #' @importFrom Formula Formula
 #' @noRd
 #' @note Adapted from https://github.com/adibender/pammtools/blob/master/R/formula-utils.R
@@ -321,10 +321,10 @@ transfer_metadata <- function(new_object, old_object, transfer_class = TRUE,
 
 #' Choose apply function
 #' This function chooses an apply function based on arguments provided by the
-#' user. The options are \code{lapply}, \code{pblapply} and \code{mclapply}.
+#' user. The options are `lapply`, `pblapply` and `mclapply`.
 #' @importFrom parallel mclapply
-#' @return Returns \code{\link[pbapply]{pblapply}} if \code{progress_bar == TRUE},
-#' otherwise returns \code{\link{lapply}}.
+#' @return Returns [`pbapply`][pbapply::pbapply] if `progress_bar == TRUE`,
+#' otherwise returns [`lapply`].
 #' @noRd
 choose_apply_fnc <- function(show_progress, parallel = NULL, cl = 2){
   pbapply_installed <- check_for_pkg("pbapply", return_boolean = TRUE)
@@ -387,7 +387,7 @@ get_minimum <- function(x, idx, lambdas.idx){
 }
 
 #' Simple cap
-#' Copied from \code{toupper} examples.
+#' Copied from `toupper` examples.
 #' @noRd
 simpleCap <- function(x) {
   s <- strsplit(x, " ")[[1]]

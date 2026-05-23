@@ -1,12 +1,12 @@
-#' Return first or last parts of a \code{peak_table}.
+#' Return first or last parts of a `peak_table`.
 #'
-#' Returns the first or last parts of the \code{\link{peak_table}}.
+#' Returns the first or last parts of the `peak_table` object.
 #'
 #' @importFrom utils head
-#' @param x A \code{\link{peak_table}} object.
-#' @param ... Additional arguments to \code{\link{head}}.
+#' @param x A [`peak_table`] object.
+#' @param ... Additional arguments to [`head`].
 #' @method head peak_table
-#' @return The first or last \code{n} rows of \code{peak_table$tab}.
+#' @return The first or last `n` rows of `peak_table$tab`.
 #' @rdname head.peak_table
 #' @keywords internal
 #' @export
@@ -15,8 +15,8 @@ head.peak_table <- function(x,...){
 }
 
 #' @importFrom utils tail
-#' @param x A \code{\link{peak_table}} object.
-#' @param ... Additional arguments to \code{\link{tail}}.
+#' @param x A [`peak_table`] object.
+#' @param ... Additional arguments to [`tail`].
 #' @rdname head.peak_table
 #' @method tail peak_table
 #' @keywords internal
@@ -25,30 +25,29 @@ tail.peak_table <- function(x,...){
   tail(x$tab, ...)
 }
 
-
-#' Return dimensions of a \code{peak_table} object.
+#' Return dimensions of a `peak_table` object.
 #'
-#' Returns the dimensions of a \code{peak_table}, where the first dimension is
+#' Returns the dimensions of a `peak_table`, where the first dimension is
 #' the number of samples and the second dimension is the number of peaks.
 #' 
-#' @param x A \code{\link{peak_table}} object.
+#' @param x A [`peak_table`] object.
 #' @method dim peak_table
 #' @keywords internal
-#' @return Returns the number of rows and columns in \code{peak_table$tab}.
+#' @return Returns the number of rows and columns in `peak_table$tab`.
 #' @export
 dim.peak_table <- function(x){
   dim(x$tab)
 }
 
-#' Return row names from a \code{peak_table} object.
+#' Return row names from a `peak_table` object.
 #'
 #' These will be the names of the samples.
 #'
-#' @param x A \code{\link{peak_table}} object.
-#' @param ... Additional arguments to \code{\link{row.names}}.
+#' @param x A [`peak_table`] object.
+#' @param ... Additional arguments to [`row.names`].
 #' @method row.names peak_table
 #' @keywords internal
-#' @return Returns the row names of \code{peak_table$tab}.
+#' @return Returns the row names of `peak_table$tab`.
 #' @export
 row.names.peak_table <- function(x, ...){
   row.names(x$tab, ...)
@@ -56,17 +55,17 @@ row.names.peak_table <- function(x, ...){
 
 #' Subset peak table
 #' 
-#' Returns subset of \code{peak_table} object.
+#' Returns subset of `peak_table` object.
 #' 
-#' @param x A \code{peak_table} object.
+#' @param x A [`peak_table`] object.
 #' @param subset Logical expression indicating rows (samples) to keep from
-#' \code{peak_table}; missing values are taken as false.
+#' `peak_table`; missing values are taken as false.
 #' @param select Logical expression indicating columns (peaks) to select from
-#' \code{peak_table}.
+#' `peak_table`.
 #' @param drop Logical. Passed to indexing operator.
 #' @param ... Additional arguments (placeholder).
-#' @return A \code{peak_table} object with samples specified by \code{subset}
-#' and peaks specified by \code{select}.
+#' @return A `peak_table` object with samples specified by `subset`
+#' and peaks specified by `select`.
 #' @author Ethan Bass
 #' @method subset peak_table
 #' @keywords internal
@@ -88,17 +87,17 @@ subset.peak_table <- function(x, subset, select, drop = FALSE, ...){
 
 #' Summarize Peak Table
 #' 
-#' Prints basic statistics about \code{peak_table} to the console (e.g., the 
+#' Prints basic statistics about `peak_table` to the console (e.g., the 
 #' number of peaks, wavelengths, range of intensities, etc).
 #' 
-#' @param object A \code{\link{peak_table}} object.
+#' @param object A [`peak_table`] object.
 #' @param ... Additional arguments (currently unused).
 #' @author Ethan Bass
 #' @method summary peak_table
 #' @keywords internal
 #' @export
 #' @return A list containing basic information about the supplied 
-#' \code{peak_table} object.
+#' `peak_table` object.
 summary.peak_table <- function(object, ...) {
   
   # Calculate summary statistics
@@ -132,7 +131,8 @@ summary.peak_table <- function(object, ...) {
   return(summary_list)
 }
 
-#' Peak table summary
+#' Print peak table summary
+#' @exportS3Method
 #' @noRd
 print.summary.peak_table <- function(x, ...) {
   cat("Peak Table Summary\n")
@@ -163,15 +163,14 @@ print.summary.peak_table <- function(x, ...) {
   cat("  Normalization:", ifelse(x$normalized, 
                                  paste("Normalized by", x$normalization_method), 
                                  "N/A"), "\n")
-  
   invisible(x)
 }
 
 #' Print peak table
-#' @param x A \code{\link{peak_table}} object.
-#' @param ... Additional arguments to \code{\link{print}}.
-#' @return Prints and invisible returns the \code{tab} element from the supplied 
-#' \code{peak_table}.
+#' @param x A [`peak_table`] object.
+#' @param ... Additional arguments to [`print`].
+#' @return Prints and invisible returns the `tab` element from the supplied 
+#' `peak_table`.
 #' @keywords internal
 #' @export
 print.peak_table <- function(x, ...){
@@ -180,20 +179,20 @@ print.peak_table <- function(x, ...){
 
 #' Subset peak table
 #'
-#' Subsets a \code{peak_table} while preserving and subsetting all associated
-#' slots (\code{tab}, \code{pk_meta}, \code{sample_meta}, \code{ref_spectra}).
+#' Subsets a `peak_table` while preserving and subsetting all associated
+#' slots (`tab`, `pk_meta`, `sample_meta`, `ref_spectra`).
 #'
-#' @note Subsetting a \code{peak_table} does not modify the associated
-#' \code{chrom_list}. Methods that rely on the \code{chrom_list} (e.g.,
-#' \code{\link{plot_spectrum}}) may not work as expected on a subsetted
-#' \code{peak_table} unless the \code{chrom_list} is subsetted in parallel.
+#' @note Subsetting a `peak_table` does not modify the associated `chrom_list`.
+#' Methods that rely on the `chrom_list` (e.g., [`plot_spectrum`]) may not work
+#' as expected on a subsetted `peak_table` unless the `chrom_list` is subsetted
+#' separately.
 #'
-#' @param x A \code{peak_table} object.
+#' @param x A [`peak_table`] object.
 #' @param i Row indices (samples) to subset.
 #' @param j Column indices (peaks) to subset.
 #' @param ... Additional arguments (ignored).
-#' @param drop Passed to the \code{[} method for \code{data.frame}.
-#' @return A \code{peak_table} object.
+#' @param drop Passed to the `[ `indexing operator.
+#' @return A `peak_table` object.
 #' @author Ethan Bass
 #' @method [ peak_table
 #' @export

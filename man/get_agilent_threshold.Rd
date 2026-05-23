@@ -23,8 +23,8 @@ to \code{1}.}
 
 \item{noise_variance}{Variance of noise.}
 
-\item{noise_threshold}{Threshold to define noise. Highest proportion of 
-maximum absorbance. Defaults to \code{.005}.}
+\item{noise_threshold}{Threshold to define noise. Highest proportion of
+maximum absorbance. Defaults to \code{0.005}.}
 
 \item{lambdas}{Wavelengths to include.}
 }
@@ -38,7 +38,7 @@ Calculate purity thresholds
 \references{
 Stahl, Mark. “Peak Purity Analysis in HPLC and CE Using Diode-Array Technology.”
 Agilent Technologies, April 1, 2003, 16.
-\url{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
+\href{https://web.archive.org/web/20220615145615/https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}{5988-8647EN.pdf}
 }
 \author{
 Ethan Bass

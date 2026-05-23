@@ -10,7 +10,7 @@ get_peaktable(
   response = c("area", "height"),
   use.cor = NULL,
   hmax = 0.2,
-  summarize_by = c("median", "mean", "max"),
+  summarize_by = c("weighted.mean", "median", "mean", "max"),
   plot_it = FALSE,
   ask = plot_it,
   clust = c("rt", "sp.rt"),
@@ -22,19 +22,19 @@ get_peaktable(
 )
 }
 \arguments{
-\item{peak_list}{A \code{peak_list} object created by \code{\link{get_peaks}},
-containing a nested list of peak tables: the first level is the
-sample, and the second level is the spectral wavelength. Every component is
-described by a \code{data.frame} with a row for each peak and columns
-containing information on various peak parameters.}
+\item{peak_list}{A \code{peak_list} object created by \code{\link{get_peaks}}, containing a
+nested list of features, where the first level is the sample, and the second
+level is the spectral wavelength. Every sample x wavelength component is
+described by a  \code{data.frame} with a row for each peak and columns containing
+information on various peak parameters.}
 
 \item{chrom_list}{A list of chromatographic matrices.}
 
-\item{response}{Indicates whether peak area or peak height is to be used
+\item{response}{Indicates whether peak \code{area} or peak \code{height} is to be used
 as intensity measure. Defaults to \code{area} setting.}
 
 \item{use.cor}{Logical. Indicates whether to use corrected retention times
-(\code{rt.cor} column) or raw retention times (\code{rt} column). Unless
+(\code{rt.cor} column) or raw retention times \code{rt} column). Unless
 otherwise specified, the \code{rt.cor} column will be used by default if it
 exists in the provided \code{peak_list}.}
 
@@ -42,9 +42,10 @@ exists in the provided \code{peak_list}.}
 be interpreted as the maximal intercluster retention time difference.}
 
 \item{summarize_by}{How to select the representative peak from each cluster.
-Options are \code{"mean"} and \code{"median"} (which aggregate metadata across
-all peaks in the cluster) or \code{"max"} (which selects the most intense peak
-in the cluster and uses its metadata directly).}
+Options are \code{"weighted.mean"} (default, weights peaks by their intensity as
+given by \code{response}), \code{"mean"}, \code{"median"} (which aggregate metadata across
+all peaks in the cluster) or \code{"max"} (which selects the most intense peak in
+the cluster and uses its metadata directly).}
 
 \item{plot_it}{Logical. If \code{TRUE}, for every component a strip plot will be
 shown indicating the clustering.}
@@ -53,8 +54,7 @@ shown indicating the clustering.}
 
 \item{clust}{Specify whether to perform hierarchical clustering based on
 spectral similarity and retention time (\code{sp.rt}) or retention time alone
-(\code{rt}). Defaults to \code{rt}. The \code{sp.rt} option is experimental
-and should be used with caution.}
+(\code{rt}). Defaults to \code{rt}.}
 
 \item{sigma.t}{Width of gaussian in retention time distance function.
 Controls weight given to retention time if \code{sp.rt} is selected.}
@@ -64,22 +64,22 @@ weight given to spectral correlation if \code{sp.rt} is selected.}
 
 \item{deepSplit}{Logical. Controls sensitivity to cluster splitting. If
 \code{TRUE}, function will return more smaller clusters. See documentation for
-\code{\link[dynamicTreeCut]{cutreeDynamic}} for additional information.}
+\code{\link[dynamicTreeCut:cutreeDynamic]{cutreeDynamic}} for additional information.}
 
 \item{verbose}{Logical. Whether to print warning when combining peaks into
 single time window. Defaults to \code{FALSE}.}
 
-\item{out}{Specify \code{data.frame} or \code{matrix} as output. Defaults to
-\code{data.frame}.}
+\item{out}{Specify \code{data.frame} (default) or \code{matrix} as output.}
 }
 \value{
-The function returns an S3 \code{\link{peak_table}} object,
-containing the following elements:
+The function returns an S3 \code{\link{peak_table}} object, containing the
+following elements:
 \itemize{
 \item \code{tab}: The peak table itself -- a \code{data.frame} of intensities in a
 sample x peak configuration.
-\item \code{pk_meta}: A \code{data.frame} containing peak meta-data (e.g., the
-spectral component, peak number, and average retention time).
+\item \code{pk_meta}: A \code{data.frame} containing peak meta-data (e.g., the spectral
+component, peak number, and average retention time), summarized across all
+peaks in each cluster according to \code{summarize_by}.
 \item \code{sample_meta}: A \code{data.frame} of sample meta-data. Must be added using
 \code{\link{attach_metadata}}.
 \item \code{ref_spectra}: A \code{data.frame} of reference spectra (in a wavelength ×
@@ -92,20 +92,37 @@ generate the peak table.
 The function performs a complete linkage clustering of retention times across
 all samples, and cuts at a height given by the user (which can be understood
 as the maximal inter-cluster retention time difference) in the simple case
-based on retention times. Clustering can also incorporate information about
-spectral similarity using a distance function adapted from Broeckling et al.,
-2014:
+based on retention times. Optionally, clustering can also incorporate
+information about spectral similarity.
+}
+\details{
+By default, clustering is performed on retention times only (when
+\code{clust == "rt"}). Clustering can also incorporate information about
+spectral similarity (when \code{clust == "sp.rt"}) using a distance function
+adapted from Broeckling et al., 2014:
 \deqn{e^{-\frac{(1-c_{ij})^2}{2\sigma_r^2}} \cdot e^{-\frac{(1-(t_i-t_j)^2)}{2\sigma_t^2}}}
+where \eqn{c_{ij}} is the spectral correlation coefficient between spectra
+\eqn{i} and \eqn{j}, and \eqn{\sigma_t} and \eqn{\sigma_r} control the
+relative contributions of retention time and spectral similarity,
+respectively (see \code{sigma.t} and \code{sigma.r}).
+
 If two peaks from the same sample are assigned to the same cluster, a warning
 message is printed to the console. These warnings can usually be ignored, but
 one could also consider reducing the \code{hmax} variable. However, this may
 lead to splitting of peaks across multiple clusters. Another option is to
 filter the peaks by intensity to remove small features.
+
+Once clusters are formed, peak metadata is summarized across all peaks within
+each cluster according to \code{summarize_by}. By default, the peak metadata are
+summarized as the mean within each cluster weighted by the relative size of
+each peak. This downweights the importance of small peaks that are more
+likely to represent noise, resulting in a more robust estimate of the cluster
+center. Alternatively, if the \code{"max"} option is selected, the metadata
+associated with the most intense peak in each cluster will be returned here.
 }
 \note{
-This function is adapted from
-\href{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}{getPeakTable}
-function in the alsace package by Ron Wehrens.
+This function is adapted from the \code{getPeakTable} function in the alsace
+package by Ron Wehrens: \url{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}.
 }
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
@@ -118,16 +135,15 @@ get_peaktable(pks, response = "area")
 \itemize{
 \item Broeckling, C. D., Afsar F.A., Neumann S., Ben-Hur A., and Prenni J.E. 2014.
 RAMClust: A Novel Feature Clustering Method Enables Spectral-Matching-Based
-Annotation for Metabolomics Data. \emph{Anal. Chem.} \bold{86}:6812-6817.
+Annotation for Metabolomics Data. \emph{Anal. Chem.} 86:6812-6817.
 \doi{10.1021/ac501530d}.
 \item Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
-LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
-Metabolomics} \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}.
+LC–DAD using multivariate curve resolution: the alsace package for R.
+\emph{Metabolomics} 11:143-154. \doi{10.1007/s11306-014-0683-5}.
 }
 }
 \seealso{
-\code{\link{peak_table-class}}, \code{\link{attach_ref_spectra}},
-\code{\link{attach_metadata}}
+\code{\link[=peak_table-class]{peak_table}}, \code{\link{attach_ref_spectra}}, \code{\link{attach_metadata}}
 }
 \author{
 Ethan Bass

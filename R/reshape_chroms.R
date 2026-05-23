@@ -6,13 +6,13 @@
 #' @param x A list of chromatographic matrices in wide format.
 #' @param idx Indices of chromatograms to convert.
 #' @param time_resolution Time resolution for plot. This argument can be used
-#' to thin the time axis while reshaping. By default the time resoution is not
+#' to thin the time axis while reshaping. By default the time resolution is not
 #' altered.
 #' @param sample_var String with name of new column containing sample IDs.
 #' @param lambdas Vector specifying wavelength(s) to include.
 #' @param rts Vector specifying retention times to include.
 #' @param transfer_metadata Logical. Whether to transfer metadata attributes or
-#' not. Defaults to \code{FALSE}.
+#' not. Defaults to `FALSE`.
 #' @return A list of chromatographic matrices in long format.
 #' @author Ethan Bass
 #' @family utility functions

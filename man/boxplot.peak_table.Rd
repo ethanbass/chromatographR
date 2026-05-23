@@ -9,9 +9,9 @@
 \arguments{
 \item{x}{A \code{peak_table} object.}
 
-\item{formula}{A \code{\link[stats]{formula}} object.}
+\item{formula}{A \link{formula} object.}
 
-\item{...}{Additional arguments to \code{\link[graphics]{boxplot}}.}
+\item{...}{Additional arguments to \code{\link{boxplot}}.}
 }
 \value{
 No return value, called for side effects.
@@ -35,15 +35,15 @@ pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
 boxplot(pk_tab, formula=V11 ~ trt)
 }
 \seealso{
-Other visualization functions: 
-\code{\link{mirror_plot}()},
-\code{\link{plot.peak_list}()},
-\code{\link{plot.peak_table}()},
-\code{\link{plot_all_spectra}()},
-\code{\link{plot_chroms}()},
-\code{\link{plot_chroms_heatmap}()},
-\code{\link{plot_spectrum}()},
-\code{\link{scan_chrom}()}
+Other visualization functions:
+\code{\link[=mirror_plot]{mirror_plot()}},
+\code{\link[=plot.peak_list]{plot.peak_list()}},
+\code{\link[=plot.peak_table]{plot.peak_table()}},
+\code{\link[=plot_all_spectra]{plot_all_spectra()}},
+\code{\link[=plot_chroms]{plot_chroms()}},
+\code{\link[=plot_chroms_heatmap]{plot_chroms_heatmap()}},
+\code{\link[=plot_spectrum]{plot_spectrum()}},
+\code{\link[=scan_chrom]{scan_chrom()}}
 }
 \author{
 Ethan Bass

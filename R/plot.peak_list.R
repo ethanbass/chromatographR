@@ -5,37 +5,36 @@
 #' @importFrom stats median
 #' @importFrom graphics polygon arrows
 #' @importFrom scales alpha
-#' @param x A \code{peak_list} object. Output from the \code{get_peaks} function.
+#' @param x A `peak_list` object. Output from the `get_peaks` function.
 #' @param ... Additional arguments to main plot function.
 #' @param chrom_list List of chromatograms (retention time x wavelength
 #' matrices)
 #' @param idx Index or name of chromatogram to be plotted.
-#' @param index This argument is deprecated. Please use \code{idx} instead.
 #' @param lambda Wavelength to use for plotting.
-#' @param points Logical. If \code{TRUE}, plot peak maxima. Defaults to 
-#' \code{FALSE}.
-#' @param ticks Logical. If \code{TRUE}, mark beginning and end of each peak. 
-#' Defaults to \code{FALSE}.
+#' @param points Logical. If `TRUE`, plot peak maxima. Defaults to `FALSE`.
+#' @param ticks Logical. If `TRUE`, mark beginning and end of each peak. 
+#' Defaults to `FALSE`.
 #' @param alpha Parameter controlling the transparency of fitted shapes.
-#' Defaults to \code{0.5}.
+#' Defaults to `0.5`.
 #' @param color The color of the fitted shapes.
-#' @param cex.points Size of points. Defaults to \code{0.5}.
-#' @param numbers Whether to number peaks. Defaults to \code{FALSE}.
-#' @param cex.font Font size if peaks are numbered. Defaults to \code{0.5}.
-#' @param y.offset Y offset for peak numbers. Defaults to \code{25}.
-#' @param plot_purity Whether to add visualization of peak purity.
-#' @param res Time resolution for peak fitting
+#' @param cex.points Size of points. Defaults to `0.5`.
+#' @param numbers Whether to number peaks. Defaults to `FALSE`.
+#' @param cex.font Font size if peaks are numbered. Defaults to `0.5`.
+#' @param y.offset Y offset for peak numbers. Defaults to `25`.
+#' @param plot_purity Logical. Whether to add visualization of peak purity. 
+#' Defaults to `FALSE`.
+#' @param res Time resolution for peak fitting.
 #' @return No return value, called for side effects.
 #' @section Side effects:
-#' Plots a chromatographic trace from the specified chromatogram (\code{chr})
-#' at the specified wavelength (\code{lambda}) with fitted peak shapes from the
-#' provided \code{peak_list} drawn underneath the curve. 
+#' Plots a chromatographic trace from the specified chromatogram (`chr`)
+#' at the specified wavelength (`lambda`) with fitted peak shapes from the
+#' provided `peak_list` drawn underneath the curve. 
 #' @author Ethan Bass
 #' @examples 
 #' data(Sa_warp)
 #' pks <- get_peaks(chrom_list = Sa_warp[1], lambdas = 210)
 #' plot(pks, points = TRUE, ticks = TRUE)
-#' @seealso \code{\link{get_peaks}}
+#' @seealso [`get_peaks`]
 #' @rdname plot.peak_list
 #' @family visualization functions
 #' @export
@@ -43,11 +42,7 @@
 plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
                            points = FALSE, ticks = FALSE, alpha = 0.5, color = NULL,
                            cex.points = 0.5, numbers = FALSE, cex.font = 0.5, 
-                           y.offset = 25, plot_purity = FALSE, res, index = NULL){
-  if (!is.null(index)){
-    idx <- index
-    message("The `index` argument is deprecated. Please use `idx` instead")
-  }
+                           y.offset = 25, plot_purity = FALSE, res){
   time.units <- attributes(x)$time.units
   time.units <- ifelse(is.null(time.units), "", time.units)
   tfac <- switch(time.units, "min" = 1, "s" = 1/60, "ms" = 1/60000, 1)

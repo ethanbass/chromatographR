@@ -1,63 +1,61 @@
 #' Plot spectrum from peak table
 #' 
 #' Plots the trace and/or spectrum for a given peak or retention time in a 
-#' \code{peak_table} object or a list of chromatograms.
+#' `peak_table` object or a list of chromatograms.
 #' 
 #' Can be used to confirm the identity of a peak or check that a particular
 #' column in the peak table represents a single compound. Retention times can
-#' also be selected by clicking on the plotted trace if \code{what == 'click'}.
+#' also be selected by clicking on the plotted trace if `what == 'click'`.
 #' Plots can be produced using either base R graphics, 
-#' \code{\link[ggplot2:ggplot2]{ggplot2}}, or \code{plotly}, according to the
-#' value of the \code{engine} argument.
+#' [`ggplot2`][ggplot2::ggplot2], or `plotly`, according to the value
+#' of the `engine` argument.
 #' 
 #' @importFrom scales rescale
 #' @importFrom graphics identify title text
 #' @importFrom utils head tail
-#' @param loc The name of the peak or retention time for which you wish to
+#' @param loc The peak, retention time, or index for which you wish to
 #' extract spectral data.
-#' @param peak_table The peak table (output from \code{\link{get_peaktable}}).
+#' @param peak_table A `peak_table` object created by [`get_peaktable`].
 #' @param chrom_list A list of chromatograms in matrix format (timepoints x
 #' wavelengths). If no argument is provided here, the function will try to find
-#' the \code{chrom_list} object used to create the provided \code{peak_table}.
+#' the `chrom_list` object using the pointer in the `peak_table`.
 #' @param idx Numerical index of chromatogram you wish to plot, or "max" to
 #' automatically plot the chromatogram with the largest signal at the given peak
 #' or retention time.
-#' @param chr Deprecated. Please use \code{idx} instead.
-#' @param lambda The wavelength you wish to plot the trace at if plot_trace ==
-#' TRUE and/or the wavelength to be used for the determination of signal
+#' @param lambda The wavelength you wish to plot the trace at if `plot_trace` is
+#' `TRUE` and/or the wavelength to be used for the determination of signal
 #' abundance.
-#' @param plot_spectrum Logical. If \code{TRUE}, plots the spectrum of the chosen
-#' peak. Defaults to \code{TRUE}.
-#' @param plot_trace Logical. If \code{TRUE}, plots the trace of the chosen peak at
-#' lambda. Defaults to \code{TRUE}.
-#' @param spectrum_labels Logical. If \code{TRUE}, plots labels on maxima in spectral
-#' plot. Defaults to \code{TRUE}.
-#' @param scale_spectrum Logical. If \code{TRUE}, scales spectrum to unit height.
-#' Defaults to \code{FALSE}.
-#' @param export_spectrum Logical. If \code{TRUE}, exports spectrum to console.
-#' Defaults to \code{FALSE}.
-#' @param verbose Logical. If \code{TRUE}, prints verbose output to console.
-#' Defaults to \code{TRUE}.
-#' @param what What to look for. Either \code{peak} to extract spectral 
-#' information for a certain peak, \code{rt} to scan by retention time, 
-#' \code{idx} to scan by numeric index, or \code{click} to manually select 
-#' retention time by clicking on the chromatogram. Defaults to "peak" mode.
-#' @param engine Which plotting engine to use: \code{base}, \code{ggplot2}, or
-#' \code{plotly}.
+#' @param plot_spectrum Logical. If `TRUE`, plots the spectrum of the chosen
+#' peak. Defaults to `TRUE`.
+#' @param plot_trace Logical. If `TRUE`, plots the trace of the chosen peak at
+#' lambda. Defaults to `TRUE`.
+#' @param spectrum_labels Logical. If `TRUE`, plots labels on maxima in spectral
+#' plot. Defaults to `TRUE`.
+#' @param scale_spectrum Logical. If `TRUE`, scales spectrum to unit height.
+#' Defaults to `FALSE`.
+#' @param export_spectrum Logical. If `TRUE`, exports spectrum to console.
+#' Defaults to `FALSE`.
+#' @param verbose Logical. If `TRUE` (default), prints verbose output to console.
+#' @param what What to look for. Either `peak` to extract spectral 
+#' information for a certain peak, `rt` to scan by retention time, 
+#' `idx` to scan by numeric index, or `click` to manually select 
+#' retention time by clicking on the chromatogram. Defaults to `"peak"` mode.
+#' @param engine Which plotting engine to use: `base`, `ggplot2`, or
+#' `plotly`.
 #' @param ... Additional arguments.
-#' @return If \code{export_spectrum} is TRUE, returns the spectrum as a \code{
-#' data.frame} with wavelengths as rows and a single column encoding the
-#' absorbance (or normalized absorbance, if \code{scale_spectrum} is TRUE)
-#' at each wavelength. If \code{export_spectrum} is FALSE, the output depends on
-#' the plotting \code{engine}. If \code{engine == "plotly"}, returns a \code{plotly}
-#' object containing the specified plots. Otherwise, if \code{engine == "base"},
-#' there is no return value.
+#' @return If `export_spectrum` is `TRUE`, returns the spectrum as a 
+#' `data.frame` with wavelengths as rows and a single column encoding the
+#' absorbance (or normalized absorbance, if `scale_spectrum` is `TRUE`)
+#' at each wavelength. If `export_spectrum` is `FALSE`, the output depends on
+#' the plotting `engine`. If `engine == "plotly"`, returns a `plotly` object 
+#' containing the specified plots. Otherwise, if `engine == "base"`, there is no
+#' return value.
 #' @section Side effects:
-#' * If \code{plot_trace} is \code{TRUE}, plots the chromatographic trace of the
-#' specified chromatogram (\code{idx}), at the specified wavelength 
-#' (\code{lambda}) with a dotted red line to indicate the retention time given 
-#' by \code{loc}. The trace is a single column from the chromatographic matrix.
-#' * If \code{plot_spectrum} is \code{TRUE}, plots the spectrum for the specified
+#' * If `plot_trace` is `TRUE`, plots the chromatographic trace of the
+#' specified chromatogram (`idx`), at the specified wavelength (`lambda`) with a
+#' dotted red line to indicate the retention time given by `loc`. The trace is a
+#' single column from the chromatographic matrix.
+#' * If `plot_spectrum` is `TRUE`, plots the spectrum for the specified
 #' chromatogram at the specified retention time. The spectrum is a single row
 #' from the chromatographic matrix.
 #' @author Ethan Bass
@@ -79,8 +77,7 @@ plot_spectrum <- function(loc = NULL, peak_table, chrom_list,
                           spectrum_labels = TRUE, scale_spectrum = FALSE, 
                           export_spectrum = FALSE, verbose = TRUE, 
                           what = c("peak", "rt", "idx", "click"),
-                          engine = c('base', "plotly", "ggplot2"),
-                          chr = NULL, ...){
+                          engine = c('base', "plotly", "ggplot2"), ...){
   if (missing(chrom_list) & missing(peak_table))
     stop("Must provide either a peak_table or a chrom_list.")
   if (!missing(peak_table))
@@ -93,10 +90,6 @@ plot_spectrum <- function(loc = NULL, peak_table, chrom_list,
   if (!(inherits(chrom_list, c("chrom_list", "list", "matrix"))))
     stop("The provided `chrom_list` does not appear to be valid. 
                             ......Please check `chrom_list` argument")
-  if (!is.null(chr)){
-    message("The `chr` argument is deprecated. Please us `idx` instead.")
-    idx <- chr
-  }
   if (is.matrix(chrom_list)){
     chrom_list <- list(chrom_list)
     idx <- 1
@@ -133,7 +126,7 @@ plot_spectrum <- function(loc = NULL, peak_table, chrom_list,
                        what = what, engine = engine, ...)
 }
 
-#' Plot trace and/or spectrum with plotly
+#' Plot trace and/or spectrum with ggplot2 or plotly
 #' @author Ethan Bass
 #' @noRd
 plot_spectrum_ggpl <- function(loc, peak_table, chrom_list,
@@ -285,7 +278,8 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
     y <- data.frame(y)
     colnames(y) <- names(chrom_list)[chr]
     a <- attributes(chrom_list[[chr]])
-    a$sample_name <- ifelse(is.null(a$sample_name), names(chrom_list)[chr], a$sample_name)
+    a$sample_name <- ifelse(is.null(a$sample_name), names(chrom_list)[chr], 
+                            a$sample_name)
     a <- c(a, rt = RT, loc = loc)
     attr(y, "meta") <- a[-which(names(a) %in% c(
       "time_range", "time_interval", "dimnames", "row.names",
@@ -299,33 +293,16 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
 #' 
 #' @importFrom scales rescale
 #' @importFrom graphics identify title text abline
-#' @param peak_table The peak table (output from \code{\link{get_peaktable}}
-#' function).
-#' @param chrom_list A list of chromatograms in matrix format (timepoints x
-#' wavelengths). If no argument is provided here, the function will try to find
-#' the \code{chrom_list} object used to create the provided \code{peak_table}.
-#' @param idx Numerical index of chromatogram you wish to plot.
-#' @param chr Deprecated. Please use \code{idx} instead.
-#' @param lambda The wavelength to plot the trace at.
-#' @param plot_spectrum Logical. Whether to plot the spectrum or not.
-#' @param spectrum_labels Logical. If TRUE, plots labels on maxima in spectral
-#' plot. Defaults to TRUE.
-#' @param scale_spectrum Logical. If TRUE, scales spectrum to unit height.
-#' Defaults to FALSE.
-#' @param export_spectrum Logical. If TRUE, exports spectrum to console.
-#' Defaults to FALSE.
-#' @param ... Additional arguments.
-#' @return If \code{export_spectrum} is TRUE, returns the spectrum as a \code{
-#' data.frame} with wavelengths as rows and a single column encoding the
-#' absorbance (or normalized absorbance, if \code{scale_spectrum} is TRUE)
-#' at each wavelength. Otherwise, there is no return value.
+#' @inheritParams plot_spectrum
+#' @param ... Additional arguments to `plot_spectrum`.
+#' @inherit plot_spectrum return
 #' @section Side effects:
-#' Plots a chromatographic trace from the specified chromatogram (\code{idx}),
-#' at the specified wavelength (\code{lambda}) with a dotted red line to indicate
+#' Plots a chromatographic trace from the specified chromatogram (`idx`),
+#' at the specified wavelength (`lambda`) with a dotted red line to indicate
 #' the user-selected retention time. The trace is a single column from the
 #' chromatographic matrix.
 #' 
-#' If \code{plot_spectrum} is TRUE, plots the spectrum for the specified
+#' If `plot_spectrum` is `TRUE`, plots the spectrum for the specified
 #' chromatogram at the user-specified retention time. The spectrum is a single
 #' row from the chromatographic matrix.
 #' 
@@ -340,17 +317,12 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
 scan_chrom <- function(chrom_list, idx, lambda,
                         plot_spectrum = TRUE, peak_table=NULL,
                         scale_spectrum = FALSE, spectrum_labels = TRUE,
-                        export_spectrum = FALSE, chr = NULL, ...){
+                        export_spectrum = FALSE, ...){
   # check chrom_list
   if (missing(chrom_list))
     stop("List of chromatograms must be provided for scan function.")
   if (!inherits(chrom_list, c("list", "chrom_list")) | inherits(chrom_list, "peak_table"))
     stop("`chrom_list` argument should be a list of chromatograms in matrix format")
-  if (!is.null(chr)){
-    message("The `chr` argument is deprecated. Please use `idx` instead.")
-    idx <- chr
-  }
-
   if (missing(idx)){
     idx <- as.numeric(readline(
       prompt = "Which chromatogram do you wish to plot? \n"))
@@ -383,40 +355,26 @@ scan_chrom <- function(chrom_list, idx, lambda,
 
 #' Plot all spectra for chosen peak.
 #' 
-#' Plot multiple for a given peak in peak table. Wrapper for
-#' \code{\link{plot_spectrum}}.
+#' Plot multiple for a given peak in peak table. Wrapper for [`plot_spectrum`].
 #' 
-#' @param peak The name of a peak to plot (in character
-#' format).
-#' @param peak_table The peak table (output from \code{\link{get_peaktable}}
-#' function).
-#' @param chrom_list A list of chromatograms in matrix format (timepoints x 
-#' components). If no argument is provided here, the function will
-#' try to find the \code{chrom_list} object used to create the provided
-#' \code{peak_table}.
+#' @inheritParams plot_spectrum
+#' @param peak The name of a peak to plot (in character format).
 #' @param idx Vector of chromatograms to plot.
-#' @param chrs Deprecated. Please use \code{idx} instead.
-#' @param engine Which plotting engine to use: \code{base}, \code{ggplot2},
-#' or \code{plotly}.
-#' @param plot_spectrum Logical. If TRUE, plots the spectrum of the chosen
-#' peak.
-#' @param export_spectrum Logical. If TRUE, exports spectrum to console.
-#' Defaults to FALSE.
-#' @param scale_spectrum Logical. If TRUE, scales spectrum to unit height.
-#' @param overlapping Logical. If TRUE, plot spectra in single plot.
-#' @param verbose Logical. If TRUE, prints verbose output to console.
-#' @param what What to look for. Either \code{peak} to extract spectral 
-#' information for a certain peak, \code{rt} to scan by retention time, or 
-#' \code{idx} to scan by numeric index. Defaults to "peak" mode.
-#' @param \dots Additional arguments to plot_spectrum.
-#' @return If \code{export_spectrum} is \code{TRUE}, invisibly returns the 
-#' spectra as a \code{data.frame} with wavelengths as rows and one column for 
-#' each sample in the \code{chrom_list} encoding the absorbance (or normalized 
-#' absorbance, if \code{scale_spectrum} is \code{TRUE}) at each wavelength. 
+#' @param overlapping Logical. If `TRUE`, plot spectra in single plot.
+#' @param verbose Logical. If `TRUE`, prints verbose output to console. Defaults
+#' to `FALSE`.
+#' @param what What to look for. Either `"peak"` to extract spectral 
+#' information for a certain peak, `"rt"` to scan by retention time, or 
+#' `"idx"` to scan by numeric index. Defaults to "peak" mode.
+#' @param ... Additional arguments to `plot_spectrum.`
+#' @return If `export_spectrum` is `TRUE`, invisibly returns the 
+#' spectra as a `data.frame` with wavelengths as rows and one column for 
+#' each sample in the `chrom_list` encoding the absorbance (or normalized 
+#' absorbance if `scale_spectrum` is `TRUE`) at each wavelength. 
 #' Otherwise, there is no return value.
 #' @section Side effects:
-#' If \code{plot_spectrum} is \code{TRUE}, plots the spectra for the specified 
-#' chromatogram (\code{idx}) of the given \code{peak}. Each spectrum is a single 
+#' If `plot_spectrum` is `TRUE`, plots the spectra for the specified 
+#' chromatogram (`idx`) of the given peak. Each spectrum represents a single 
 #' row from the chromatographic matrix.
 #' @author Ethan Bass
 #' @examplesIf interactive()
@@ -427,33 +385,34 @@ scan_chrom <- function(chrom_list, idx, lambda,
 #' @family visualization functions
 #' @export
 
-plot_all_spectra <- function(peak, peak_table, chrom_list, idx = "all",
-                             chrs = NULL, engine = c("base","ggplot2","plotly"),
+plot_all_spectra <- function(loc, peak_table, chrom_list, idx = "all",
+                             engine = c("base", "ggplot2", "plotly"),
                              plot_spectrum = TRUE, export_spectrum = TRUE,
                              scale_spectrum = TRUE, overlapping = TRUE,
-                             verbose = FALSE, 
-                             what = c("peak", "rt", "idx"), ...){
+                             verbose = FALSE, what = c("peak", "rt", "idx"), 
+                             peak = NULL, ...){
   engine <- match.arg(engine, c("base","ggplot2","plotly"))
   what <- match.arg(what, c("peak", "rt", "idx"))
   check_peaktable(peak_table)
+  if (!is.null(peak)){
+    message("The `peak` argument is deprecated. Please us `loc` instead.")
+    loc <- peak
+  }
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(peak_table)
   } else get_chrom_list(peak_table, chrom_list)
   if (!(inherits(chrom_list, "list") | inherits(chrom_list, "chrom_list")))
     stop("chrom_list is not a list")
-  if (!is.null(chrs)){
-    message("The `chrs` argument is deprecated. Please use `idx` instead.")
-    idx <- chrs
-  }
   new.lambdas <- as.numeric(colnames(chrom_list[[1]]))
   if ("all" %in% idx)
     idx <- seq_along(chrom_list)
   sp <- sapply(idx, function(chr){
-    tryCatch(plot_spectrum(loc = peak, peak_table = peak_table, chrom_list = chrom_list,
+    tryCatch({
+      plot_spectrum(loc = loc, peak_table = peak_table, chrom_list = chrom_list,
                   idx = chr, plot_spectrum = FALSE, plot_trace = FALSE, 
                   export_spectrum = TRUE, scale_spectrum = scale_spectrum,
-                  verbose = verbose, what = what, engine = "base"), 
-             error = function(e) NA
+                  verbose = verbose, what = what, engine = "base")
+      }, error = function(e) NA
     )
   })
   if (engine == "base"){

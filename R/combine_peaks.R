@@ -2,23 +2,23 @@
 #' 
 #' Utility function to combine duplicate peaks in peak table, (i.e., peaks that
 #' were integrated at more than one wavelength or component) based on retention
-#' time and/or spectral similarity. Specify tolerance (\code{tol}) for 
-#' retention time matching and minimum spectral correlation (\code{min.cor}) for
+#' time and/or spectral similarity. Specify tolerance (`tol`) for 
+#' retention time matching and minimum spectral correlation (`min.cor`) for
 #' a match.
 #' 
 #' @name combine_peaks
-#' @param peak_table Peak table from \code{\link{get_peaktable}}.
+#' @param peak_table Peak table from [`get_peaktable`].
 #' @param tol Tolerance for matching retention times (maximum retention time
-#' difference). Defaults to \code{.01}.
+#' difference). Defaults to `0.01`.
 #' @param min.cor Minimum spectral correlation to confirm a match. Defaults to 
-#' \code{0.9}.
-#' @param choose If \code{max} will retain peak with highest intensity. Otherwise,
-#' the first column in the data.frame will be retained.
+#' `0.9`.
+#' @param choose If `max`, the peak with highest intensity will be retained.
+#' Otherwise, the first column in the data.frame will be retained.
 #' @param verbose Logical. Whether to print status to the console.
 #' @return A peak table derived from the original, but with columns corresponding
 #' to duplicate peaks combined according to the specified criteria.
 #' @author Ethan Bass
-#' @seealso \code{\link{get_peaks}}
+#' @seealso [`get_peaks`]
 #' @examples
 #' data(pk_tab)
 #' data(Sa_warp)
@@ -72,20 +72,20 @@ combine_peaks <- function(peak_table, tol = .01, min.cor = 0.9,
 #' table.
 #' 
 #' Merges the specified peaks in peak table, by selecting the largest value from 
-#' each column if \code{method} is \code{"max"}. If \code{method} is
-#' \code{"sum"}, merges peak by summing their values.
+#' each column if `method` is `"max"`. If `method` is `"sum"`, peaks will be 
+#' merged by summing their values.
 #'
 #' @name merge_peaks
-#' @param peak_table Peak table from \code{\link{get_peaktable}}.
+#' @param peak_table A `peak_table` object from [`get_peaktable`].
 #' @param peaks A vector specifying the names or indices of peaks to be merged.
-#' @param method Method to merge peaks. Either \code{max} to select the largest
-#' peak from each sample or \code{sum} to sum the peaks together.
+#' @param method Method to merge peaks. Either `max` to select the largest
+#' peak from each sample or `sum` to add the peaks together.
 #' @return A peak table similar to the input peak table, but where the specified
 #' columns are combined. 
 #' @author Ethan Bass
 #' @examples
 #' data(pk_tab)
-#' pk_tab <- merge_peaks(peak_table = pk_tab, peaks=c("V10","V11"))
+#' pk_tab <- merge_peaks(peak_table = pk_tab, peaks = c("V10","V11"))
 #' @family utility functions
 #' @export
 

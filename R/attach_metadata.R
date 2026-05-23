@@ -1,18 +1,19 @@
 #' Attach experimental metadata
 #' 
-#' Attaches sample metadata to a \code{peak_table} object. Metadata should be
-#' provided as a data.frame object. One of the columns in
-#' the supplied metadata must match exactly the row names of the peak table.
+#' Attaches sample metadata to a `peak_table` object. Metadata should be
+#' provided as a `data.frame`. One of the columns in the supplied metadata must 
+#' match exactly the row names of the peak table.
 #' 
 #' @aliases attach_metadata
-#' @param peak_table A \code{peak_table} object.
-#' @param metadata A \code{data.frame} containing the sample metadata.
-#' @param column The name of the column in your \code{metadata} object containing the
-#' sample names. Sample names must match the row names of \code{peak_table$tab}.
-#' @return A \code{peak_table} object with attached metadata in the \code{
-#' $sample_meta} slot.
+#' @param peak_table A `peak_table` object created by [get_peaktable].
+#' @param metadata A `data.frame` containing the sample metadata.
+#' @param column The name of the column in the provided `metadata` object
+#' containing the sample names. Sample names must match the row names of 
+#' `peak_table$tab`.
+#' @return A `peak_table` object with metadata attached in the `sample_meta` 
+#' slot.
 #' @author Ethan Bass
-#' @seealso \code{\link{get_peaktable}} \code{\link{normalize_data}}
+#' @seealso [`get_peaktable`], [`normalize_data`]
 #' @examples
 #' data(pk_tab)
 #' path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
@@ -47,6 +48,41 @@ attach_metadata <- function(peak_table, metadata, column){
   return(peak_table)
 }
 
+#' Attach reference spectra
+#' 
+#' Gathers reference spectra and attaches them to a `peak_table` object.
+#' Reference spectra are defined either as the spectrum with the highest 
+#' intensity (`"max.int"`) or as the spectrum with the highest average
+#' correlation to the other spectra in the peak table (`"max.cor"`).
+#' 
+#' @aliases attach_ref_spectra
+#' @param peak_table Peak table from [`get_peaktable`].
+#' @param chrom_list A list of chromatograms in matrix format (timepoints x
+#' wavelengths). If no argument is provided here, the function will try to find
+#' the `chrom_list` object used to create the provided `peak_table`.
+#' @param ref What criterion to use to select reference spectra. The current 
+#' options are maximum correlation (`"max.cor"`) or maximum signal intensity 
+#' (`"max.int"`).
+#' @return A `peak_table` object with reference spectra attached in the
+#' `$ref_spectra` slot.
+#' @author Ethan Bass
+#' @seealso [`get_peaks`], [`get_peaktable`]
+#' @examples
+#' data(pk_tab)
+#' pk_tab <- attach_ref_spectra(pk_tab, ref = "max.int")
+#' pk_tab <- attach_ref_spectra(pk_tab, ref = "max.cor")
+#' @export attach_ref_spectra
+
+attach_ref_spectra <- function(peak_table, chrom_list, 
+                               ref = c("max.cor", "max.int")){
+  check_peaktable(peak_table)
+  ref <- match.arg(ref, c("max.cor", "max.int"))
+  peak_table$ref_spectra <- get_reference_spectra(peak_table, chrom_list,
+                                                  ref = ref)
+  peak_table$args["reference_spectra"] <- ref
+  return(peak_table)
+}
+
 #' note: convenience function from stackoverflow:
 #' https://stackoverflow.com/questions/17878048/merge-two-data-frames-while-keeping-the-original-row-order
 #' @noRd
@@ -63,22 +99,22 @@ keep_order <- function(data, fn, ...) {
 #' Get reference spectra.
 #' 
 #' Defines reference spectra. Reference spectra are defined either as the 
-#' spectrum with the highest intensity (\code{max.int}) or as the spectrum 
+#' spectrum with the highest intensity (`"max.int"`) or as the spectrum 
 #' with the highest average correlation to the rest of the spectra in the
-#' \code{peak_table} (\code{max.cor}).
+#' `peak_table` (`"max.cor"`).
 #' 
 #' @importFrom stats cor sd
-#' @param peak_table Peak table from \code{\link{get_peaktable}}.
+#' @param peak_table Peak table from [`get_peaktable`].
 #' @param chrom_list A list of chromatograms in matrix format (timepoints x
 #' wavelengths). If no argument is provided here, the function will try to find
-#' the \code{chrom_list} object used to create the provided \code{peak_table}.
+#' the `chrom_list` object used to create the provided `peak_table`.
 #' @param ref What criterion to use to select reference spectra.
-#' Current options are maximum correlation (\code{max.cor}) or maximum signal
-#' intensity (\code{max.int}).
+#' Current options are maximum correlation (`"max.cor"`) or maximum signal
+#' intensity (`"max.int"`).
 #' @return A matrix consisting of reference spectra for each peak in the
 #' provided peak table.
 #' @author Ethan Bass
-#' @seealso \code{\link{get_peaks}}
+#' @seealso [`get_peaks`]
 #' @noRd
 
 get_reference_spectra <- function(peak_table, chrom_list,
@@ -93,7 +129,7 @@ get_reference_spectra <- function(peak_table, chrom_list,
   X <- colnames(peak_table$tab)
   if (ref == "max.cor"){
     sp.l <- lapply(X,function(pk){
-      x <- plot_all_spectra(peak = pk, peak_table, chrom_list,
+      x <- plot_all_spectra(loc = pk, peak_table, chrom_list,
                        plot_spectrum = FALSE, export_spectrum = TRUE,
                        scale_spectrum = TRUE)
       apply(x, 2, as.numeric)
@@ -116,39 +152,4 @@ get_reference_spectra <- function(peak_table, chrom_list,
   colnames(sp.ref) <- colnames(peak_table$tab)
   rownames(sp.ref) <- colnames(chrom_list[[1]])
   return(sp.ref)
-}
-
-#' Attach reference spectra
-#' 
-#' Gathers reference spectra and attaches them to a \code{peak_table} object.
-#' Reference spectra are defined either as the spectrum with the highest 
-#' intensity (\code{"max.int"}) or as the spectrum with the highest average
-#' correlation to the other spectra in the peak table (\code{"max.cor"}).
-#' 
-#' @aliases attach_ref_spectra
-#' @param peak_table Peak table from \code{\link{get_peaktable}}.
-#' @param chrom_list A list of chromatograms in matrix format (timepoints x
-#' wavelengths). If no argument is provided here, the function will try to find
-#' the \code{chrom_list} object used to create the provided \code{peak_table}.
-#' @param ref What criterion to use to select reference spectra.
-#' Current options are maximum correlation (\code{"max.cor"}) or maximum signal
-#' intensity (\code{"max.int"}).
-#' @return A \code{peak_table} object with reference spectra attached in the
-#' \code{$ref_spectra} slot.
-#' @author Ethan Bass
-#' @seealso \code{\link{get_peaks}} \code{\link{get_peaktable}}
-#' @examples
-#' data(pk_tab)
-#' pk_tab <- attach_ref_spectra(pk_tab, ref = "max.int")
-#' pk_tab <- attach_ref_spectra(pk_tab, ref = "max.cor")
-#' @export attach_ref_spectra
-
-attach_ref_spectra <- function(peak_table, chrom_list, 
-                               ref = c("max.cor", "max.int")){
-  check_peaktable(peak_table)
-  ref <- match.arg(ref, c("max.cor","max.int"))
-  peak_table$ref_spectra <- get_reference_spectra(peak_table, chrom_list,
-                                                  ref = ref)
-  peak_table$args["reference_spectra"] <- ref
-  return(peak_table)
 }

@@ -3,15 +3,32 @@
 #' The function performs a complete linkage clustering of retention times across
 #' all samples, and cuts at a height given by the user (which can be understood
 #' as the maximal inter-cluster retention time difference) in the simple case
-#' based on retention times. Clustering can also incorporate information about
-#' spectral similarity using a distance function adapted from Broeckling et al.,
-#' 2014:
+#' based on retention times. Optionally, clustering can also incorporate 
+#' information about spectral similarity.
+#' 
+#' By default, clustering is performed on retention times only (when 
+#' `clust == "rt"`). Clustering can also incorporate information about
+#' spectral similarity (when `clust == "sp.rt"`) using a distance function 
+#' adapted from Broeckling et al., 2014:
 #' \deqn{e^{-\frac{(1-c_{ij})^2}{2\sigma_r^2}} \cdot e^{-\frac{(1-(t_i-t_j)^2)}{2\sigma_t^2}}}
+#' where \eqn{c_{ij}} is the spectral correlation coefficient between spectra
+#' \eqn{i} and \eqn{j}, and \eqn{\sigma_t} and \eqn{\sigma_r} control the
+#' relative contributions of retention time and spectral similarity,
+#' respectively (see `sigma.t` and `sigma.r`).
+#' 
 #' If two peaks from the same sample are assigned to the same cluster, a warning
 #' message is printed to the console. These warnings can usually be ignored, but
-#' one could also consider reducing the \code{hmax} variable. However, this may 
+#' one could also consider reducing the `hmax` variable. However, this may 
 #' lead to splitting of peaks across multiple clusters. Another option is to
 #' filter the peaks by intensity to remove small features.
+#' 
+#' Once clusters are formed, peak metadata is summarized across all peaks within
+#' each cluster according to `summarize_by`. By default, the peak metadata are 
+#' summarized as the mean within each cluster weighted by the relative size of
+#' each peak. This downweights the importance of small peaks that are more 
+#' likely to represent noise, resulting in a more robust estimate of the cluster
+#' center. Alternatively, if the `"max"` option is selected, the metadata
+#' associated with the most intense peak in each cluster will be returned here.
 #' 
 #' @name get_peaktable
 #' @aliases get_peaktable
@@ -22,79 +39,77 @@
 #' @importFrom grDevices colorRampPalette 
 #' @importFrom scales rescale
 #' @importFrom graphics par
-#' @param peak_list A `peak_list` object created by \code{\link{get_peaks}},
-#' containing a nested list of peak tables: the first level is the
-#' sample, and the second level is the spectral wavelength. Every component is
-#' described by a \code{data.frame} with a row for each peak and columns
-#' containing information on various peak parameters.
+#' @param peak_list A `peak_list` object created by [`get_peaks`], containing a
+#' nested list of features, where the first level is the sample, and the second 
+#' level is the spectral wavelength. Every sample x wavelength component is 
+#' described by a  `data.frame` with a row for each peak and columns containing 
+#' information on various peak parameters.
 #' @param chrom_list A list of chromatographic matrices.
-#' @param response Indicates whether peak area or peak height is to be used
+#' @param response Indicates whether peak `area` or peak `height` is to be used
 #' as intensity measure. Defaults to `area` setting.
 #' @param use.cor Logical. Indicates whether to use corrected retention times
-#' (\code{rt.cor} column) or raw retention times (\code{rt} column). Unless
-#' otherwise specified, the \code{rt.cor} column will be used by default if it 
-#' exists in the provided \code{peak_list}.
+#' (`rt.cor` column) or raw retention times `rt` column). Unless
+#' otherwise specified, the `rt.cor` column will be used by default if it 
+#' exists in the provided `peak_list`.
 #' @param hmax Height at which the complete linkage dendrogram will be cut. Can
 #' be interpreted as the maximal intercluster retention time difference.
 #' @param summarize_by How to select the representative peak from each cluster.
-#' Options are \code{"mean"} and \code{"median"} (which aggregate metadata across
-#' all peaks in the cluster) or \code{"max"} (which selects the most intense peak
-#' in the cluster and uses its metadata directly).
-#' @param plot_it Logical. If \code{TRUE}, for every component a strip plot will be
+#' Options are `"weighted.mean"` (default, weights peaks by their intensity as
+#' given by `response`), `"mean"`, `"median"` (which aggregate metadata across 
+#' all peaks in the cluster) or `"max"` (which selects the most intense peak in 
+#' the cluster and uses its metadata directly).
+#' @param plot_it Logical. If `TRUE`, for every component a strip plot will be
 #' shown indicating the clustering.
-#' @param ask Logical. Ask before showing new plot? Defaults to \code{TRUE}.
+#' @param ask Logical. Ask before showing new plot? Defaults to `TRUE`.
 #' @param clust Specify whether to perform hierarchical clustering based on
-#' spectral similarity and retention time (\code{sp.rt}) or retention time alone
-#' (\code{rt}). Defaults to \code{rt}. The \code{sp.rt} option is experimental
-#' and should be used with caution.
+#' spectral similarity and retention time (`sp.rt`) or retention time alone
+#' (`rt`). Defaults to `rt`.
 #' @param sigma.t Width of gaussian in retention time distance function.
-#' Controls weight given to retention time if \code{sp.rt} is selected.
+#' Controls weight given to retention time if `sp.rt` is selected.
 #' @param sigma.r Width of gaussian in spectral similarity function. Controls
-#' weight given to spectral correlation if \code{sp.rt} is selected.
+#' weight given to spectral correlation if `sp.rt` is selected.
 #' @param deepSplit Logical. Controls sensitivity to cluster splitting. If
-#' \code{TRUE}, function will return more smaller clusters. See documentation for
-#' \code{\link[dynamicTreeCut]{cutreeDynamic}} for additional information.
+#' `TRUE`, function will return more smaller clusters. See documentation for
+#' [`cutreeDynamic`][dynamicTreeCut::cutreeDynamic] for additional information.
 #' @param verbose Logical. Whether to print warning when combining peaks into 
-#' single time window. Defaults to \code{FALSE}.
-#' @param out Specify \code{data.frame} or \code{matrix} as output. Defaults to
-#' \code{data.frame}.
+#' single time window. Defaults to `FALSE`.
+#' @param out Specify `data.frame` (default) or `matrix` as output.
 #' @md
-#' @return The function returns an S3 \code{\link{peak_table}} object, 
-#' containing the following elements:
-#' * `tab`: The peak table itself -- a \code{data.frame} of intensities in a
+#' @return The function returns an S3 [`peak_table`] object, containing the
+#' following elements:
+#' * `tab`: The peak table itself -- a `data.frame` of intensities in a
 #' sample x peak configuration.
-#' * `pk_meta`: A \code{data.frame} containing peak meta-data (e.g., the 
-#' spectral component, peak number, and average retention time).
-#' * `sample_meta`: A \code{data.frame} of sample meta-data. Must be added using
-#' \code{\link{attach_metadata}}.
-#' * `ref_spectra`: A \code{data.frame} of reference spectra (in a wavelength × 
-#' peak configuration). Must be added using \code{\link{attach_ref_spectra}}.
-#' * `args`: A vector of arguments given to \code{\link{get_peaktable}} to 
+#' * `pk_meta`: A `data.frame` containing peak meta-data (e.g., the spectral
+#' component, peak number, and average retention time), summarized across all
+#' peaks in each cluster according to `summarize_by`.
+#' * `sample_meta`: A `data.frame` of sample meta-data. Must be added using
+#' [`attach_metadata`].
+#' * `ref_spectra`: A `data.frame` of reference spectra (in a wavelength × 
+#' peak configuration). Must be added using [`attach_ref_spectra`].
+#' * `args`: A vector of arguments given to [`get_peaktable`] to 
 #' generate the peak table.
 #' @author Ethan Bass
-#' @note This function is adapted from
-#' \href{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}{getPeakTable}
-#' function in the alsace package by Ron Wehrens.
+#' @note This function is adapted from the `getPeakTable` function in the alsace
+#' package by Ron Wehrens: <https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R>.
 #' @md
 #' @references
 #' * Broeckling, C. D., Afsar F.A., Neumann S., Ben-Hur A., and Prenni J.E. 2014.
 #' RAMClust: A Novel Feature Clustering Method Enables Spectral-Matching-Based
-#' Annotation for Metabolomics Data. \emph{Anal. Chem.} \bold{86}:6812-6817. 
+#' Annotation for Metabolomics Data. *Anal. Chem.* 86:6812-6817. 
 #' \doi{10.1021/ac501530d}.
 #' * Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
-#' LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
-#' Metabolomics} \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}.
+#' LC–DAD using multivariate curve resolution: the alsace package for R. 
+#' *Metabolomics* 11:143-154. \doi{10.1007/s11306-014-0683-5}.
 #' @examplesIf interactive()
 #' data(Sa_pr)
 #' pks <- get_peaks(Sa_pr, lambdas = c('210'))
 #' get_peaktable(pks, response = "area")
-#' @seealso \code{\link{peak_table-class}}, \code{\link{attach_ref_spectra}}, 
-#' \code{\link{attach_metadata}}
+#' @seealso [`peak_table-class`], [`attach_ref_spectra`], [`attach_metadata`]
 #' @export get_peaktable
 
 get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
                           use.cor = NULL, hmax = 0.2, 
-                          summarize_by = c("median", "mean", "max"),
+                          summarize_by = c("weighted.mean", "median", "mean", "max"),
                           plot_it = FALSE, ask = plot_it, 
                           clust = c("rt", "sp.rt"), 
                           sigma.t = NULL, sigma.r = 0.5,
@@ -103,7 +118,8 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
   response <- match.arg(response, c("area", "height"))
   clust <- match.arg(clust, c("rt", "sp.rt"))
   out <- match.arg(out, c('data.frame', 'matrix'))
-  summarize_by <- match.arg(summarize_by, c('median', 'mean',"max"))
+  summarize_by <- match.arg(summarize_by, choices = c("weighted.mean", 
+                                                      "median", "mean", "max"))
   if (is.null(use.cor)){
     use.cor <- "rt.cor" %in% colnames(peak_list[[1]][[1]])
   }
@@ -166,7 +182,17 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
     vars <- c(rt, start, end, "sd", "width", "tau", "FWHM", "r.squared", "purity")
     vars <- vars[vars %in% colnames(xx)]
     vars.idx <- match(vars, colnames(xx))
-    if (summarize_by == "max"){
+    if (summarize_by == "weighted.mean"){
+      weights <- xx[, response]
+      cl.centers <- do.call(rbind,
+                            tapply(seq_along(pkcenters),
+                                   pkcenters.cl, function(i){
+                                     vapply(vars.idx, function(v){
+                                       stats::weighted.mean(xx[i, v], w = weights[i])
+                                     }, numeric(1)) |>
+                                       setNames(colnames(xx[, vars.idx]))
+                                   }))
+    } else if (summarize_by == "max"){
       cl.centers <- do.call(rbind, 
                             tapply(seq_along(pkcenters), 
                                    pkcenters.cl, function(i){
@@ -238,6 +264,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
                         metadata_path = NA,
                         normalized = FALSE,
                         normalization_by = NA,
+                        summarized_by = summarize_by,
                         time_unit = get_metadata_attribute(peak_list, "time_unit"),
                         intensity_unit = get_metadata_attribute(peak_list, "intensity_unit")
                         ))
@@ -251,15 +278,15 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
 #' Reshapes peak table from wide to long format
 #' @name reshape_peaktable
 #' @importFrom stats reshape
-#' @param x A \code{peak_table} object.
+#' @param x A `peak_table` object.
 #' @param peaks A character vector specifying the peaks to include. If the
 #' character vector is named, the names of the vector elements will be used in
 #' place of the original peak names.
 #' @param metadata A character vector specifying the metadata fields to include.
 #' @param fixed_levels Logical. Whether to fix factor levels of features in the
-#' order provided. Defaults to \code{TRUE}.
-#' @return A data.frame containing the information for the specified 
-#' \code{peaks} in long format.
+#' order provided. Defaults to `TRUE`.
+#' @return A data.frame containing the information for the specified peaks in 
+#' long format.
 #' @author Ethan Bass
 #' @family utility functions
 #' @export
@@ -285,7 +312,7 @@ reshape_peaktable <- function(x, peaks, metadata, fixed_levels = TRUE){
                 times = colnames(df), timevar = "peak",
                 idvar = "sample", ids = rownames(df))
   rownames(xx) <- NULL
-  xx <- merge(xx, data.frame(peak=colnames(x$pk_meta), 
+  xx <- merge(xx, data.frame(peak = colnames(x$pk_meta), 
                              t(x$pk_meta[c("lambda", "rt"),])),
               by = "peak", all.x = TRUE)
   xx <- xx[, c(1, 3, 4, 5, 2)]

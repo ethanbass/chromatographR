@@ -12,11 +12,11 @@
 \item{...}{Additional arguments (currently unused).}
 }
 \value{
-A list containing basic information about the supplied 
+A list containing basic information about the supplied
 \code{peak_table} object.
 }
 \description{
-Prints basic statistics about \code{peak_table} to the console (e.g., the 
+Prints basic statistics about \code{peak_table} to the console (e.g., the
 number of peaks, wavelengths, range of intensities, etc).
 }
 \author{

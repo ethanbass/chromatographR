@@ -7,7 +7,7 @@
 \method{[}{peak_table}(x, i, j, ..., drop = FALSE)
 }
 \arguments{
-\item{x}{A \code{peak_table} object.}
+\item{x}{A \code{\link{peak_table}} object.}
 
 \item{i}{Row indices (samples) to subset.}
 
@@ -15,7 +15,7 @@
 
 \item{...}{Additional arguments (ignored).}
 
-\item{drop}{Passed to the \code{[} method for \code{data.frame}.}
+\item{drop}{Passed to the \verb{[ }indexing operator.}
 }
 \value{
 A \code{peak_table} object.
@@ -25,10 +25,10 @@ Subsets a \code{peak_table} while preserving and subsetting all associated
 slots (\code{tab}, \code{pk_meta}, \code{sample_meta}, \code{ref_spectra}).
 }
 \note{
-Subsetting a \code{peak_table} does not modify the associated
-\code{chrom_list}. Methods that rely on the \code{chrom_list} (e.g.,
-\code{\link{plot_spectrum}}) may not work as expected on a subsetted
-\code{peak_table} unless the \code{chrom_list} is subsetted in parallel.
+Subsetting a \code{peak_table} does not modify the associated \code{chrom_list}.
+Methods that rely on the \code{chrom_list} (e.g., \code{\link{plot_spectrum}}) may not work
+as expected on a subsetted \code{peak_table} unless the \code{chrom_list} is subsetted
+separately.
 }
 \author{
 Ethan Bass

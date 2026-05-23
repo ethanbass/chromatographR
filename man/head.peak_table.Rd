@@ -18,6 +18,6 @@
 The first or last \code{n} rows of \code{peak_table$tab}.
 }
 \description{
-Returns the first or last parts of the \code{\link{peak_table}}.
+Returns the first or last parts of the \code{peak_table} object.
 }
 \keyword{internal}

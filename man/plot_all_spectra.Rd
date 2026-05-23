@@ -5,11 +5,10 @@
 \title{Plot all spectra for chosen peak.}
 \usage{
 plot_all_spectra(
-  peak,
+  loc,
   peak_table,
   chrom_list,
   idx = "all",
-  chrs = NULL,
   engine = c("base", "ggplot2", "plotly"),
   plot_spectrum = TRUE,
   export_spectrum = TRUE,
@@ -17,61 +16,61 @@ plot_all_spectra(
   overlapping = TRUE,
   verbose = FALSE,
   what = c("peak", "rt", "idx"),
+  peak = NULL,
   ...
 )
 }
 \arguments{
-\item{peak}{The name of a peak to plot (in character
-format).}
+\item{loc}{The peak, retention time, or index for which you wish to
+extract spectral data.}
 
-\item{peak_table}{The peak table (output from \code{\link{get_peaktable}}
-function).}
+\item{peak_table}{A \code{peak_table} object created by \code{\link{get_peaktable}}.}
 
-\item{chrom_list}{A list of chromatograms in matrix format (timepoints x 
-components). If no argument is provided here, the function will
-try to find the \code{chrom_list} object used to create the provided
-\code{peak_table}.}
+\item{chrom_list}{A list of chromatograms in matrix format (timepoints x
+wavelengths). If no argument is provided here, the function will try to find
+the \code{chrom_list} object using the pointer in the \code{peak_table}.}
 
 \item{idx}{Vector of chromatograms to plot.}
 
-\item{chrs}{Deprecated. Please use \code{idx} instead.}
+\item{engine}{Which plotting engine to use: \code{base}, \code{ggplot2}, or
+\code{plotly}.}
 
-\item{engine}{Which plotting engine to use: \code{base}, \code{ggplot2},
-or \code{plotly}.}
+\item{plot_spectrum}{Logical. If \code{TRUE}, plots the spectrum of the chosen
+peak. Defaults to \code{TRUE}.}
 
-\item{plot_spectrum}{Logical. If TRUE, plots the spectrum of the chosen
-peak.}
+\item{export_spectrum}{Logical. If \code{TRUE}, exports spectrum to console.
+Defaults to \code{FALSE}.}
 
-\item{export_spectrum}{Logical. If TRUE, exports spectrum to console.
-Defaults to FALSE.}
+\item{scale_spectrum}{Logical. If \code{TRUE}, scales spectrum to unit height.
+Defaults to \code{FALSE}.}
 
-\item{scale_spectrum}{Logical. If TRUE, scales spectrum to unit height.}
+\item{overlapping}{Logical. If \code{TRUE}, plot spectra in single plot.}
 
-\item{overlapping}{Logical. If TRUE, plot spectra in single plot.}
+\item{verbose}{Logical. If \code{TRUE}, prints verbose output to console. Defaults
+to \code{FALSE}.}
 
-\item{verbose}{Logical. If TRUE, prints verbose output to console.}
+\item{what}{What to look for. Either \code{"peak"} to extract spectral
+information for a certain peak, \code{"rt"} to scan by retention time, or
+\code{"idx"} to scan by numeric index. Defaults to "peak" mode.}
 
-\item{what}{What to look for. Either \code{peak} to extract spectral 
-information for a certain peak, \code{rt} to scan by retention time, or 
-\code{idx} to scan by numeric index. Defaults to "peak" mode.}
+\item{peak}{The name of a peak to plot (in character format).}
 
-\item{\dots}{Additional arguments to plot_spectrum.}
+\item{...}{Additional arguments to \code{plot_spectrum.}}
 }
 \value{
-If \code{export_spectrum} is \code{TRUE}, invisibly returns the 
-spectra as a \code{data.frame} with wavelengths as rows and one column for 
-each sample in the \code{chrom_list} encoding the absorbance (or normalized 
-absorbance, if \code{scale_spectrum} is \code{TRUE}) at each wavelength. 
+If \code{export_spectrum} is \code{TRUE}, invisibly returns the
+spectra as a \code{data.frame} with wavelengths as rows and one column for
+each sample in the \code{chrom_list} encoding the absorbance (or normalized
+absorbance if \code{scale_spectrum} is \code{TRUE}) at each wavelength.
 Otherwise, there is no return value.
 }
 \description{
-Plot multiple for a given peak in peak table. Wrapper for
-\code{\link{plot_spectrum}}.
+Plot multiple for a given peak in peak table. Wrapper for \code{\link{plot_spectrum}}.
 }
 \section{Side effects}{
 
-If \code{plot_spectrum} is \code{TRUE}, plots the spectra for the specified 
-chromatogram (\code{idx}) of the given \code{peak}. Each spectrum is a single 
+If \code{plot_spectrum} is \code{TRUE}, plots the spectra for the specified
+chromatogram (\code{idx}) of the given peak. Each spectrum represents a single
 row from the chromatographic matrix.
 }
 
@@ -84,15 +83,15 @@ plot_all_spectra(peak = "V13", peak_table = pk_tab, overlapping = TRUE)
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-Other visualization functions: 
-\code{\link{boxplot.peak_table}()},
-\code{\link{mirror_plot}()},
-\code{\link{plot.peak_list}()},
-\code{\link{plot.peak_table}()},
-\code{\link{plot_chroms}()},
-\code{\link{plot_chroms_heatmap}()},
-\code{\link{plot_spectrum}()},
-\code{\link{scan_chrom}()}
+Other visualization functions:
+\code{\link[=boxplot.peak_table]{boxplot.peak_table()}},
+\code{\link[=mirror_plot]{mirror_plot()}},
+\code{\link[=plot.peak_list]{plot.peak_list()}},
+\code{\link[=plot.peak_table]{plot.peak_table()}},
+\code{\link[=plot_chroms]{plot_chroms()}},
+\code{\link[=plot_chroms_heatmap]{plot_chroms_heatmap()}},
+\code{\link[=plot_spectrum]{plot_spectrum()}},
+\code{\link[=scan_chrom]{scan_chrom()}}
 }
 \author{
 Ethan Bass

@@ -9,15 +9,15 @@
 #'
 #' @section Components:
 #' A `peak_table` object contains the following elements:
-#' * `tab`: The peak table itself -- a \code{data.frame} of intensities in a
+#' * `tab`: The peak table itself -- a `data.frame` of intensities in a
 #' sample x peak configuration.
-#' * `pk_meta`: A \code{data.frame} containing peak meta-data (e.g., the spectral component,
-#' peak number, and average retention time).
-#' * `sample_meta`: A \code{data.frame} of sample meta-data. Must be added using
-#' \code{\link{attach_metadata}}.
-#' * `ref_spectra`: A \code{data.frame} of reference spectra (in a wavelength x peak
-#' configuration). Must be added using \code{\link{attach_ref_spectra}}.
-#' * `args`: A vector of arguments given to \code{\link{get_peaktable}} to generate
+#' * `pk_meta`: A `data.frame` containing peak meta-data (e.g., the spectral
+#' component, peak number, and average retention time).
+#' * `sample_meta`: A `data.frame` of sample meta-data. Must be added using
+#' [`attach_metadata`].
+#' * `ref_spectra`: A `data.frame` of reference spectra (in a wavelength x peak
+#' configuration). Must be added using [`attach_ref_spectra`].
+#' * `args`: A vector of arguments given to [`get_peaktable`] to generate
 #' the peak table.
 #'
 #' @section Methods:

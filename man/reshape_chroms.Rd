@@ -20,7 +20,7 @@ reshape_chroms(
 \item{idx}{Indices of chromatograms to convert.}
 
 \item{time_resolution}{Time resolution for plot. This argument can be used
-to thin the time axis while reshaping. By default the time resoution is not
+to thin the time axis while reshaping. By default the time resolution is not
 altered.}
 
 \item{sample_var}{String with name of new column containing sample IDs.}
@@ -39,12 +39,12 @@ A list of chromatographic matrices in long format.
 Reshapes a list of chromatograms from wide to long format.
 }
 \seealso{
-Other utility functions: 
-\code{\link{combine_peaks}()},
-\code{\link{get_lambdas}()},
-\code{\link{get_times}()},
-\code{\link{merge_peaks}()},
-\code{\link{reshape_peaktable}()}
+Other utility functions:
+\code{\link[=combine_peaks]{combine_peaks()}},
+\code{\link[=get_lambdas]{get_lambdas()}},
+\code{\link[=get_times]{get_times()}},
+\code{\link[=merge_peaks]{merge_peaks()}},
+\code{\link[=reshape_peaktable]{reshape_peaktable()}}
 }
 \author{
 Ethan Bass

@@ -5,7 +5,7 @@
 \title{Plot chromatograms as heatmap}
 \usage{
 plot_chroms_heatmap(
-  chrom_list,
+  x,
   idx = NULL,
   lambdas,
   engine = c("base", "ggplot", "plotly"),
@@ -17,23 +17,25 @@ plot_chroms_heatmap(
 )
 }
 \arguments{
-\item{chrom_list}{List of chromatograms to plot}
+\item{x}{A list of chromatograms in matrix format (timepoints x wavelengths)
+or a \code{peak_table} containing a pointer toward the chromatograms, if present
+in the environment.}
 
-\item{idx}{A vector representing the names or numerical indices of the 
+\item{idx}{A vector representing the names or numerical indices of the
 chromatograms to plot.}
 
-\item{lambdas}{A character or numeric vector specifying the wavelengths to 
-plot.}
+\item{lambdas}{A character or numeric vector specifying the wavelengths to
+plot. For one-dimensional chromatograms, this argument can be ignored.}
 
-\item{engine}{Plotting engine. Either \code{base} (\code{\link[graphics]{matplot}}), 
-\code{\link[plotly]{plotly}}, or \link[ggplot2:ggplot2-package]{ggplot}.}
+\item{engine}{Plotting engine. Either \code{\link[graphics:matplot]{"base"}},
+\code{\link[plotly:plotly]{"plotly"}}, or \code{\link[ggplot2:ggplot2-package]{"ggplot"}}.}
 
 \item{show_legend}{Logical. Whether to display legend or not. Defaults to
 \code{TRUE}.}
 
-\item{xlim}{Range of x axis.}
+\item{xlim}{Range of x axis (numeric vector).}
 
-\item{legend_position}{Position of legend.}
+\item{legend_position}{Position of legend. Defaults to \code{"topright"}}
 
 \item{title}{Title for plot.}
 
@@ -46,14 +48,14 @@ No return value, called for side effects.
 Plots the specified traces from a list of chromatograms as a heatmap.
 }
 \details{
-Adapted from \code{\link[VPdtw]{plot.VPdtw}}.
+Adapted from \code{\link[VPdtw:plot.VPdtw]{VPdtw::plot.VPdtw}}.
 }
 \section{Side effects}{
 
-Plots the traces of the specified chromatograms \code{idx} at the specified
-wavelengths \code{lambdas} as a heatmap. Plots can be produced using base 
-graphics engine, \code{ggplot2}, or \code{plotly}, according to the value of 
-\code{engine}.
+Plots the traces of the chromatograms specified by \code{idx} at the specified
+wavelengths (\code{lambdas}) as a heatmap. Plots can be produced using base
+graphics engine, \code{ggplot2}, or \code{plotly}, according to the value of the
+\code{engine} argument.
 }
 
 \examples{
@@ -61,15 +63,15 @@ data(Sa_warp)
 plot_chroms_heatmap(Sa_warp, lambdas = 210)
 }
 \seealso{
-Other visualization functions: 
-\code{\link{boxplot.peak_table}()},
-\code{\link{mirror_plot}()},
-\code{\link{plot.peak_list}()},
-\code{\link{plot.peak_table}()},
-\code{\link{plot_all_spectra}()},
-\code{\link{plot_chroms}()},
-\code{\link{plot_spectrum}()},
-\code{\link{scan_chrom}()}
+Other visualization functions:
+\code{\link[=boxplot.peak_table]{boxplot.peak_table()}},
+\code{\link[=mirror_plot]{mirror_plot()}},
+\code{\link[=plot.peak_list]{plot.peak_list()}},
+\code{\link[=plot.peak_table]{plot.peak_table()}},
+\code{\link[=plot_all_spectra]{plot_all_spectra()}},
+\code{\link[=plot_chroms]{plot_chroms()}},
+\code{\link[=plot_spectrum]{plot_spectrum()}},
+\code{\link[=scan_chrom]{scan_chrom()}}
 }
 \author{
 Ethan Bass

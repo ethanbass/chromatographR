@@ -30,19 +30,18 @@ get_peaks(
 find peaks at. For one-dimensional chromatograms, this argument can be ignored.}
 
 \item{fit}{What type of fit to use. Current options are bidirectional
-exponentially modified gaussian (\code{bemg}), exponential-gaussian
-hybrid (\code{egh}), \code{gaussian}, or \code{raw}. The \code{raw} setting
+exponentially modified gaussian (\code{"bemg"}), exponential-gaussian
+hybrid (\code{"egh"}), \code{"gaussian"}, or \code{"raw"}. The \code{raw} setting
 performs trapezoidal integration directly on the raw data without fitting a
 model to the data. Defaults to \code{bemg}.}
 
-\item{sd_max}{Maximum width (standard deviation) for peaks. Defaults to
-\code{50}.}
+\item{sd_max}{Maximum width (standard deviation) for peaks. Defaults to \code{50}.}
 
 \item{max_iter}{Maximum number of iterations for non-linear least squares
 in \code{\link{fit_peaks}}.}
 
-\item{time_unit}{Units of \code{sd}, \code{FWHM}, \code{area}, and \code{tau}
-(if applicable). Options are minutes (\code{"min"}), seconds (\code{"s"}), or
+\item{time_unit}{Specifies the units for \code{sd}, \code{FWHM}, \code{area}, and \code{tau} (if
+applicable). Options are minutes (\code{"min"}), seconds (\code{"s"}), or
 milliseconds (\code{"ms"}).}
 
 \item{estimate_purity}{Logical. Whether to estimate purity or not. Defaults
@@ -51,12 +50,12 @@ to \code{FALSE}. (If \code{TRUE}, this will slow down the function significantly
 \item{noise_threshold}{Noise threshold. Argument to \code{get_purity}.}
 
 \item{show_progress}{Logical. Whether to show progress bar. Defaults to
-\code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.}
+\code{TRUE} if \code{\link[pbapply:pbapply]{pbapply}} is installed.}
 
-\item{cl}{Argument to \code{\link[pbapply]{pblapply}} or \code{\link[parallel]{mclapply}}.
-Either an integer specifying the number of clusters to use for parallel
-processing or a cluster object created by \code{\link[parallel]{makeCluster}}.
-Defaults to 2. On Windows integer values will be ignored.}
+\item{cl}{Either an integer specifying the number of clusters to use for
+parallel processing or a cluster object created by
+\code{\link[parallel:makeCluster]{makeCluster}}. Defaults to \code{2}. On Windows integer
+values will be ignored.}
 
 \item{collapse}{Logical. Whether to collapse multiple peak lists per sample
 into a single list when multiple wavelengths (\code{lambdas}) are provided.}
@@ -64,22 +63,21 @@ into a single list when multiple wavelengths (\code{lambdas}) are provided.}
 \item{time.units}{The \code{time.units} argument is deprecated. Please use
 \code{time_unit} instead.}
 
-\item{sd.max}{The \code{sd.max} argument is deprecated. Please use
-\code{sd_max} instead.}
+\item{sd.max}{The \code{sd.max} argument is deprecated. Please use \code{sd_max} instead.}
 
-\item{max.iter}{The \code{max.iter} argument is deprecated. Please use
-\code{max_iter} instead.}
+\item{max.iter}{The \code{max.iter} argument is deprecated. Please use \code{max_iter}
+instead.}
 
-\item{\dots}{Additional arguments to \code{\link{find_peaks}}. Arguments
-provided to \code{\link{find_peaks}} can be used to fine-tune the peak-finding
-algorithm. Most importantly, the \code{smooth_window} should be increased if
-features are being split into multiple bins. Other arguments that can be used
+\item{\dots}{Additional arguments to \code{\link{find_peaks}}. Arguments provided to
+\code{find_peaks} can be used to fine-tune the peak-finding algorithm. Most
+importantly, the \code{smooth_window} should be increased if features are being
+split into multiple bins. Other arguments that can be used
 here include \code{smooth_type}, \code{slope_thresh}, and \code{amp_thresh}.}
 }
 \value{
 The result is an S3 object of class \code{peak_list}, containing a
 nested list of data.frames containing information about the peaks fitted for
-each chromatogram at each of wavelengths specified by the \code{lamdas}
+each chromatogram at each of wavelengths specified by the \code{lambdas}
 argument. Each row in these data.frames is a peak and the columns contain
 information about various peak parameters:
 \itemize{
@@ -88,23 +86,23 @@ information about various peak parameters:
 \item \code{end}: The retention time where the peak is estimated to end.
 \item \code{sd}: The standard deviation (\eqn{\sigma}) of the fitted peak shape.
 \item \code{tau} Empirical skewness parameter (in units of time) determining peak
-asymmetry when \code{fit = "egh"}.
-\item \code{tau_right} Exponential rate constant controlling right-sided tailing
+asymmetry when \code{fit == "egh"}.
+\item \code{tau_right}: Exponential rate constant controlling right-sided tailing
 when \code{fit = "bemg"}. Note that unlike \code{tau} in the EGH model,
 this parameter has units of 1/time.
-\item \code{tau_left} Exponential rate constant controlling left-sided tailing
+\item \code{tau_left}: Exponential rate constant controlling left-sided tailing
 when \code{fit = "bemg"}. Note that unlike \code{tau} in the EGH model,
 this parameter has units of 1/time.
 \item \code{FWHM}: The full-width at half maximum calculated as \eqn{2.355 \sigma}.
 \item \code{height}: The height of the peak.
 \item \code{area}: The area of the peak as determined by trapezoidal approximation.
-\item \code{r.squared} The coefficient of determination (\eqn{R^2}) of the fitted
+\item \code{r.squared}: The coefficient of determination (\eqn{R^2}) of the fitted
 model to the raw data. (\strong{Note}: this value is calculated by fitting a
 linear model of the fitted peak values to the raw data. This approach is
-statistically questionable, since the models are fit using non-linear least
+statistically dubious, since the models are fit using non-linear least
 squares. Nevertheless, it can still be useful as a rough metric for
 "goodness-of-fit").
-\item \code{purity} The peak purity as estimated by \code{\link{get_purity}}.
+\item \code{purity}: The peak purity as estimated by \code{\link{get_purity}}.
 }
 }
 \description{
@@ -113,15 +111,15 @@ at the specified wavelengths.
 }
 \details{
 Peaks are located by finding zero-crossings in the smoothed first derivative
-of the specified chromatographic traces (function \code{\link{find_peaks}}).
-At the given positions, a peak model is fit to the signal using
+of the specified chromatographic traces (using the \code{\link{find_peaks}} function).
+At the given positions, a peak model is then fit to the signal using
 \code{\link{fit_peaks}} according to the value of the \code{fit} argument.
 Available models include the bidirectional exponentially modified gaussian
-(\code{bemg}),exponential-gaussian hybrid (\code{egh} or regular
-\code{gaussian}.  Finally, the area is calculated using a trapezoidal
+(\code{"bemg"}),exponential-gaussian hybrid (\code{"egh"}) or regular
+\code{"gaussian"}.  Finally, the area is calculated using a trapezoidal
 approximation.
 
-Additional arguments can be provided to \code{\link{find_peaks}} to fine-tune
+Additional arguments can be provided to \code{find_peaks} to fine-tune
 the peak-finding algorithm. For example, the \code{smooth_window} can be
 increased to prevent peaks from being split into multiple features. Overly
 aggressive smoothing may cause small peaks to be overlooked.
@@ -129,15 +127,15 @@ aggressive smoothing may cause small peaks to be overlooked.
 The standard deviation (\code{sd}), full-width at half maximum (\code{FWHM}),
 \eqn{\tau} (\code{tau}), \eqn{\tau_{R}} (\code{tau_right}),
 \eqn{\tau_{L}} (\code{tau_left}), and \code{area} are returned in units determined by
-\code{time_unit}. By default, the units are in minutes. To compare directly
-with 'ChemStation' integration results, the time units should be changed to
-seconds.
+the \code{time_unit} argument. By default, the units are in minutes. To compare
+directly with 'ChemStation' integration results, the time units should be
+changed to seconds.
 }
 \note{
 The bones of this function are adapted from the
-\href{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}{getAllPeaks}
-function authored by Ron Wehrens (though the underlying algorithms for peak
-identification and peak-fitting are not the same).
+\code{getAllPeaks} function (\url{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R})
+by Ron Wehrens (though the underlying algorithms for finding and integrating
+peaks are not the same.
 }
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
@@ -149,26 +147,26 @@ pks <- get_peaks(Sa_pr, lambdas = c('210'), sd_max = 50, fit = "egh")
 \itemize{
 \item Lan, K. & Jorgenson, J. W. 2001. A hybrid of exponential and gaussian
 functions as a simple model of asymmetric chromatographic peaks. \emph{Journal of
-Chromatography A} \strong{915}:1-13. \doi{10.1016/S0021-9673(01)00594-5}.
+Chromatography A} 915:1-13. \doi{10.1016/S0021-9673(01)00594-5}.
 \item Naish, P. J. & Hartwell, S. 1988. Exponentially Modified Gaussian functions
 — A good model for chromatographic peaks in isocratic HPLC? \emph{Chromatographia},
-\strong{26}: 285-296. \doi{10.1007/BF02268168}.
+26: 285-296. \doi{10.1007/BF02268168}.
 \item Arase, Shuntaro, Kanta Horie, Takashi Kato, et al. 2016. Intelligent Peak
 Deconvolution through In-Depth Study of the Data Matrix from Liquid
 Chromatography Coupled with a Photo-Diode Array Detector Applied to
-Pharmaceutical Analysis. \emph{Journal of Chromatography. A}, \strong{1469}: 35–47.
+Pharmaceutical Analysis. \emph{Journal of Chromatography. A}, 1469: 35–47.
 \doi{doi.org/10.1016/j.chroma.2016.09.037}.
 \item O'Haver, Tom. Pragmatic Introduction to Signal Processing:
 Applications in scientific measurement.
 \url{https://terpconnect.umd.edu/~toh/spectrum/} (Accessed January, 2022).
 \item Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
-LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
-Metabolomics} \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}.
+LC–DAD using multivariate curve resolution: the alsace package for R.
+\emph{Metabolomics} 11:143-154. \doi{10.1007/s11306-014-0683-5}.
 }
 }
 \seealso{
-\code{\link{find_peaks}}, \code{\link{fit_peaks}},
-\code{\link{print.peak_list}}, \code{\link{[.peak_list}}
+\code{\link{find_peaks}}, \code{\link{fit_peaks}}, \code{\link{print.peak_list}},
+\code{\link{[.peak_list}}
 }
 \author{
 Ethan Bass

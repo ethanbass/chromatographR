@@ -3,21 +3,21 @@
 #' Detects peaks in chromatographic profile.
 #' 
 #' Detects peaks by looking for zero-crossings in the smoothed first derivative of
-#' the signal (\code{y}) that exceed the specified slope threshold
-#' (\code{slope_thresh}). Additionally, peaks can be filtered by supplying a minimal
-#' amplitude threshold (\code{amp_thresh}), filtering out peaks below the
+#' the signal (`y`) that exceed the specified slope threshold (`slope_thresh`).
+#' Additionally, peaks can be filtered by supplying a minimal
+#' amplitude threshold (`amp_thresh`), filtering out peaks below the
 #' specified height. Smoothing is intended to prevent the algorithm from
 #' getting caught up on local minima and maxima that do not represent true
-#' features. Several smoothing options are available, including \code{"gaussian"},
-#' box kernel (\code{"box"}), savitzky-golay smoothing (\code{"savgol"}),
-#' moving average (\code{"mva"}), triangular moving average (\code{"tmva"}), or 
-#' no smoothing (\code{"none"}).
+#' features. Several smoothing options are available, including `"gaussian"`,
+#' box kernel (`"box"`), savitzky-golay smoothing (`"savgol"`),
+#' moving average (`"mva"`), triangular moving average (`"tmva"`), or 
+#' no smoothing (`"none"`).
 #' 
-#' It is recommended to do pre-processing using the \code{\link{preprocess}}
+#' It is recommended to do pre-processing using the [`preprocess`]
 #' function before peak detection. Overly high chromatographic resolution can 
 #' sometimes cause peaks to be split into multiple segments. In this case,
-#' it is recommended to increase the \code{smooth_window} or reduce the
-#' resolution along the time axis by adjusting the \code{dim1} argument during
+#' it is recommended to increase the `smooth_window` or reduce the
+#' resolution along the time axis by adjusting the `dim1` argument during
 #' preprocessing.
 #' 
 #' @importFrom caTools runmean
@@ -25,39 +25,38 @@
 #' @importFrom stats deriv lm ksmooth
 #' @importFrom utils tail
 #' @param y A chromatographic signal (as a numeric vector).
-#' @param smooth_type Type of smoothing. Either gaussian kernel (\code{"gaussian"}),
-#' box kernel (\code{"box"}), Savitzky-Golay smoothing (\code{"savgol"}),
-#' moving average (\code{"mva"}), triangular moving average (\code{"tmva"}), or 
-#' no smoothing (\code{"none"}).
+#' @param smooth_type Type of smoothing. Either gaussian kernel (`"gaussian"`),
+#' box kernel (`"box"`), Savitzky-Golay smoothing (`"savgol"`),
+#' moving average (`"mva"`), triangular moving average (`"tmva"`), or 
+#' no smoothing (`"none"`).
 #' @param smooth_window Smoothing window. Larger values of this parameter will 
 #' exclude sharp, narrow features. If the supplied value is between 0 and
 #' 1, the window will be interpreted as a proportion of points to include. 
 #' Otherwise, the window will be interpreted as the absolute number of points to
-#' include in the window. Defaults to \code{0.001}.
+#' include in the window. Defaults to `0.001`.
 #' @param slope_thresh Minimum threshold for slope of the smoothed first
 #' derivative. This parameter filters peaks on the basis of their width, such
 #' that larger values will exclude broad peaks from the peak list. Defaults to
-#' \code{0}.
+#' `0`.
 #' @param amp_thresh Minimum threshold for peak amplitude. This parameter
-#' filters on the basis of peak height, such that larger values will
-#' exclude small peaks from the peak list. Defaults to \code{0}.
-#' @param bounds Logical. If TRUE, includes peak boundaries in data.frame.
-#' Defaults to \code{TRUE}.
-#' @return If \code{bounds == TRUE}, returns a data.frame containing the center,
+#' filters on the basis of peak height, such that larger values will exclude 
+#' small peaks from the peak list. Defaults to `0`.
+#' @param bounds Logical. If `TRUE` (default), includes peak boundaries in 
+#' data.frame.
+#' @return If `bounds == TRUE`, returns a `data.frame` containing the center,
 #' start, and end of each identified peak. Otherwise, returns a numeric vector
 #' of peak centers. All locations are expressed as indices.
-#' @note The \code{find_peaks} function is adapted from MATLAB code included in
-#' Prof. Tom O'Haver's
-#' \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{
-#' Pragmatic Introduction to Signal Processing}.
+#' @note The `find_peaks` function is adapted from MATLAB code included in
+#' Prof. Tom O'Haver's [Pragmatic Introduction to Signal Processing](
+#' http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm).
 #' @keywords internal
 #' @author Ethan Bass
 #' @examples
 #' data(Sa_pr)
 #' find_peaks(Sa_pr[[1]][,"220"])
-#' @seealso \code{\link{fit_peaks}}, \code{\link{get_peaks}}
+#' @seealso [`fit_peaks`], [`get_peaks`]
 #' @references O'Haver, Tom. Pragmatic Introduction to Signal Processing:
-#' Applications in scientific measurement. \url{https://terpconnect.umd.edu/~toh/spectrum/}
+#' Applications in scientific measurement. <https://terpconnect.umd.edu/~toh/spectrum/>
 #' (Accessed January, 2022).
 #' @export find_peaks
 
@@ -117,71 +116,69 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
   p
 }
 
-#' Fit chromatographic peaks to an exponential-gaussian hybrid or gaussian
-#' profile
+#' Fit chromatographic peaks
 #' 
-#' Fit peak parameters using exponential-gaussian hybrid or gaussian function.
+#' Fit peak parameters using the specified peak model
 #' 
-#' Peak parameters are calculated by fitting the data
-#' to a gaussian or exponential-gaussian hybrid curve using non-linear least
-#' squares estimation as implemented in \code{\link[minpack.lm:nlsLM]{nlsLM}}.
-#' The area under the fitted curve is then estimated using trapezoidal
-#' approximation.
+#' Peak parameters are calculated by fitting the data to a gaussian, 
+#' bidirectional exponentially modified gaussian, or exponential-gaussian hybrid
+#' curve using non-linear least squares estimation as implemented in 
+#' [`nlsLM`][minpack.lm::nlsLM]. The area under the fitted curve is then 
+#' estimated using trapezoidal approximation.
 #' 
 #' @param x A single chromatogram in matrix format.
 #' @param lambda Wavelength to fit peaks at.
-#' @param pos Locations of peaks in vector \code{y}. If \code{NULL}, 
-#' \code{find_peaks} will run automatically to find peak positions.
-#' @param sd_max Maximum width (standard deviation) for peaks. Defaults to 50.
+#' @param pos Locations of peaks in vector `y`. If `NULL`, `find_peaks` will run
+#' automatically to find peak positions.
+#' @param sd_max Maximum width (standard deviation) for peaks. Defaults to `50`.
 #' @param fit Function for peak fitting. Currently, bidirectional exponentially 
-#' modified Gaussian (\code{bemg}), exponential-gaussian hybrid (\code{egh}),
-#' \code{gaussian} and \code{raw} settings are supported. If \code{raw} is
+#' modified Gaussian (`"bemg"`), exponential-gaussian hybrid (`"egh"`),
+#' `"gaussian"` and `"raw"` settings are supported. If `raw` mode is
 #' selected, trapezoidal integration will be performed on raw data
-#' without fitting a model to the peak. Defaults to \code{bemg}.)
+#' without fitting a model to the peak. Defaults to `"bemg"`.)
 #' @param max_iter Maximum number of iterations to use in nonlinear least
-#' squares peak-fitting. Defaults to \code{1000}.
+#' squares peak-fitting. Defaults to `1000`.
 #' @param estimate_purity Logical. Whether to estimate purity or not. Defaults
-#' to \code{TRUE}.
-#' @param noise_threshold Noise threshold. Input to \code{get_purity}.
-#' @param ... Additional arguments to \code{find_peaks}.
-#' @return The \code{fit_peaks} function returns a matrix, whose columns contain
-#' the following information about each peak:
-#' \item{rt}{Location of the peak maximum.}
-#' \item{start}{Start of peak (only included in table if \code{bounds = TRUE}).}
-#' \item{end}{End of peak (only included in table if \code{bounds = TRUE}).}
-#' \item{sd}{The standard deviation of the peak.}
-#' \item{tau}{Exponential decay constant (only included in table if 
-#' \code{fit = "egh"}).}
-#' \item{tau_right}{Exponential decay constant for right side of peak (when 
-#' \code{bemg} is selected).}
-#' \item{tau_left}{Exponential decay constant for left side of peak (when 
-#' \code{bemg} is selected).}
-#' \item{FWHM}{The full width at half maximum.}
-#' \item{height}{Peak height.}
-#' \item{area}{Peak area.}
-#' \item{r.squared}{The R<sup>2</sup> value for linear fit of the model to the data.}
-#' \item{purity}{The spectral purity of peak as assessed by \code{\link{get_purity}}.}
+#' to `TRUE`.
+#' @param noise_threshold Noise threshold. Input to `get_purity`.
+#' @param ... Additional arguments to `find_peaks`.
+#' @return Returns a matrix with columns containing the following information 
+#' about each peak:
+#' * `rt`: Location of the peak maximum.
+#' * `start`: Start of peak (only included in table if `bounds = TRUE`).
+#' * `end`: End of peak (only included in table if `bounds = TRUE`).
+#' * `sd`: The standard deviation of the peak.
+#' * `tau`: Exponential decay constant (only included in table if 
+#' `fit = "egh"`).
+#' * `tau_right`: Exponential decay constant for right side of peak (when 
+#' `bemg` is selected).
+#' * `tau_left`: Exponential decay constant for left side of peak (when 
+#' `bemg` is selected).
+#' * `FWHM`: The full width at half maximum.
+#' * `height`: Peak height.
+#' * `area`: Peak area.
+#' * `r.squared`: The R<sup>2</sup> value for linear fit of the model to the data.
+#' * `purity`: The spectral purity of peak as assessed by [`get_purity`].
 #' Again, the first five elements (rt, start, end, sd and FWHM) are expressed
 #' as indices, so not in terms of the real retention times. The transformation
-#' to "real" time is done in function \code{get_peaks}.
-#' @note The \code{\link{fit_peaks}} function is adapted from Dr. Robert
-#' Morrison's
-#' \href{https://github.com/robertdouglasmorrison/DuffyTools}{DuffyTools package}
-#' as well as code published in Ron Wehrens'
-#' \href{https://github.com/rwehrens/alsace}{alsace} package.
+#' to "real" time is done in function the `get_peaks` function.
+#' @note The `fit_peaks` function is adapted from Dr. Robert Morrison's
+#' [DuffyTools](https://github.com/robertdouglasmorrison/DuffyTools) package
+#' as well as code published in Ron Wehrens' [alsace](
+#' https://github.com/rwehrens/alsace) package.
 #' @author Ethan Bass
 #' @examples
 #' data(Sa_pr)
 #' fit_peaks(Sa_pr[[1]], lambda = 220)
-#' @seealso \code{\link{find_peaks}}, \code{\link{get_peaks}}
+#' @seealso [`find_peaks`], [`get_peaks`]
 #' @references
 #' * Lan, K. & Jorgenson, J. W. 2001. A hybrid of exponential and gaussian
-#' functions as a simple model of asymmetric chromatographic peaks. \emph{Journal of
-#' Chromatography A} \bold{915}:1-13. \doi{10.1016/S0021-9673(01)00594-5}.
+#' functions as a simple model of asymmetric chromatographic peaks. *Journal of
+#' Chromatography A* 915:1-13. \doi{10.1016/S0021-9673(01)00594-5}.
 #'
 #' * Naish, P. J. & Hartwell, S. 1988. Exponentially Modified Gaussian functions - A
-#' good model for chromatographic peaks in isocratic HPLC? \emph{Chromatographia},
-#' \bold{26}: 285-296. \doi{10.1007/BF02268168}.
+#' good model for chromatographic peaks in isocratic HPLC? *Chromatographia*,
+#' 26: 285-296. \doi{10.1007/BF02268168}.
 #' @export fit_peaks
 #' @keywords internal
 #' @md
@@ -238,7 +235,7 @@ fit_peaks <- function (x, lambda, pos = NULL, sd_max = 50,
 }
 
 #' Gaussian function
-#' @note: Adapted from \href{https://github.com/robertdouglasmorrison/DuffyTools/blob/master/R/gaussian.R}
+#' @note: Adapted from <https://github.com/robertdouglasmorrison/DuffyTools/blob/master/R/gaussian.R>
 #' @noRd
 gaussian <- function(x, center = 0, width = 1, height = NULL, floor = 0){
   
@@ -460,8 +457,9 @@ fitpk_raw <- function(x, pos, lambda, max_iter,
 #' @param fl Filter length (for instance fl = 51..151), has to be odd.
 #' @param forder filter order Filter order (2 = quadratic filter, 4 = quartic).
 #' @param dorder Derivative order (0 = smoothing, 1 = first derivative, etc.).
-#' @note This function is bundled from \href{https://cran.r-project.org/web/packages/pracma/index.html}{pracma},
-#' where it is licensed under GPL (>= 3).
+#' @note This function is bundled from [pracma](
+#' https://cran.r-project.org/web/packages/pracma/index.html), where it is 
+#' licensed under GPL (>= 3).
 #' @importFrom stats convolve
 #' @noRd
 savgol <- function(T, fl, forder = 4, dorder = 0) {
@@ -485,8 +483,9 @@ savgol <- function(T, fl, forder = 4, dorder = 0) {
 
 #' 'pinv' function from pracma
 #' @author Hans W. Borchers
-#' @note This function is ported from \href{https://cran.r-project.org/web/packages/pracma/index.html}{pracma},
-#' where it is licensed under GPL (>= 3).
+#' @note This function is ported from [pracma](
+#' https://cran.r-project.org/web/packages/pracma/index.html), where it is 
+#' licensed under GPL (>= 3).
 #' @noRd
 pinv <- function (A, tol = .Machine$double.eps^(2/3)) {
   stopifnot(is.numeric(A) || is.complex(A), is.matrix(A))

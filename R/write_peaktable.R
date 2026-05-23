@@ -1,18 +1,17 @@
 #' Export peak table
 #' 
-#' Exports peak table in \code{csv} or \code{xlsx} format according to the value
-#' of \code{format}.
+#' Exports peak table in `csv` or `xlsx` format.
 #' 
-#' @param peak_table Peak table object from \code{\link{get_peaktable}}.
+#' @param peak_table Peak table object from [`get_peaktable`].
 #' @param path Path to write file.
-#' @param filename File name. Defaults to "peak_table".
-#' @param format File format to export. Either \code{csv} or \code{xlsx}.
-#' @param what Which elements of the \code{peak_table} to export.
+#' @param filename File name. Defaults to `"peak_table"`.
+#' @param format File format to export. Either `csv` or `xlsx`.
+#' @param what Which elements of the `peak_table` to export.
 #' @importFrom utils write.csv
 #' @return No return value. The function is called for its side effects.
 #' @section Side effects:
-#' Exports peak_table object as \code{.csv} or \code{.xlsx} file according to the value
-#' of \code{format}.
+#' Exports peak_table object as `.csv` or `.xlsx` file according to the value
+#' of the `format` argument.
 #' @examples \donttest{
 #' data(pk_tab)
 #' path_out = tempdir()

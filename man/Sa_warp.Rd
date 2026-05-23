@@ -5,7 +5,8 @@
 \alias{Sa_warp}
 \title{Warped goldenrod root chromatograms.}
 \format{
-A list of four pre-processed and warped matrices (434 times x 60 wavelengths).
+A list of four pre-processed and warped matrices (434 times x
+60 wavelengths).
 }
 \usage{
 data(Sa_warp)
@@ -15,7 +16,7 @@ A list of four pre-processed and warped goldenrod root chromatograms derived
 from the raw data stored in \code{\link{Sa}}.
 }
 \seealso{
-Other data objects: 
+Other data objects:
 \code{\link{Sa}},
 \code{\link{Sa_pr}},
 \code{\link{pk_tab}}

@@ -3,10 +3,9 @@
 #' Standard pre-processing of response matrices, consisting of a time axis and
 #' a spectral axis (e.g. HPLC-DAD/UV data). For smooth data, like UV-VIS data,
 #' the size of the matrix can be reduced by interpolation. By default,
-#' the data are baseline-corrected in the time direction
-#' (\code{\link[ptw:baseline.corr]{baseline.corr}}) and smoothed in the 
-#' spectral dimension using cubic smoothing splines
-#' (\code{\link[stats:smooth.spline]{smooth.spline}}).
+#' the data are baseline-corrected in the time direction 
+#' ([`baseline.corr`][ptw::baseline.corr]) and smoothed in the spectral dimension
+#' using cubic smoothing splines ([`smooth.spline`]).
 #' 
 #' @import ptw
 #' @importFrom stats approx smooth.spline
@@ -19,42 +18,40 @@
 #' range of these should not exceed the range of the original wavelengths.
 #' @param remove.time.baseline Logical, indicating whether baseline correction
 #' should be done in the time direction, according to
-#' \code{\link[ptw:baseline.corr]{baseline.corr}}. Default is \code{TRUE}.
+#' [`baseline.corr`][ptw::baseline.corr]. Default is `TRUE`.
 #' @param spec.smooth Logical, indicating whether smoothing should be done in
 #' the spectral direction, according to
-#' \code{\link[stats:smooth.spline]{smooth.spline}}. Default is \code{TRUE}.
+#' [`smooth.spline`][stats::smooth.spline]. Default is `TRUE`.
 #' @param maxI if given, the maximum intensity in the matrix is set to this
 #' value.
 #' @param interpolate_rows Logical. Whether to interpolate along the time axis 
-#' (\code{dim1}). Defaults to \code{TRUE}.
+#' (`dim1`). Defaults to `TRUE`.
 #' @param interpolate_cols Logical. Whether to interpolate along the spectral 
-#' axis (\code{dim2}). Defaults to \code{TRUE}.
-#' @param cl Argument to \code{\link[pbapply]{pblapply}} or \code{\link[parallel]{mclapply}}.
-#' Either an integer specifying the number of clusters to use for parallel
-#' processing or a cluster object created by \code{\link[parallel]{makeCluster}}.
-#' Defaults to 2. On Windows integer values will be ignored.
+#' axis (`dim2`). Defaults to `TRUE`.
+#' @param cl Either an integer specifying the number of clusters to use for 
+#' parallel processing or a cluster object created by 
+#' [`makeCluster`][parallel::makeCluster]. Defaults to `2`. On Windows integer 
+#' values will be ignored.
 #' @param show_progress Logical. Whether to show progress bar. Defaults to 
-#' \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.
+#' `TRUE` if [`pbapply`][pbapply::pbapply] is installed.
 #' @param outlier_cutoff Threshold for excluding chromatograms that end 
 #' prematurely. Chromatograms ending more than this value (in seconds) before 
 #' the median end time are excluded. Default is 5 seconds. Only applies when 
-#' \code{dim1} is not specified.
-#' @param \dots Further optional arguments to
-#' \code{\link[ptw:baseline.corr]{baseline.corr}}.
+#' `dim1` is not specified.
+#' @param ... Additional arguments to [`baseline.corr`][ptw::baseline.corr].
 #' @return The function returns the preprocessed data matrix (or list of 
 #' matrices), with row names and column names indicating the time points and 
 #' wavelengths, respectively.
 #' @author Ethan Bass
-#' @note Adapted from the
-#' \href{https://github.com/rwehrens/alsace/blob/master/R/preprocess.R}{preprocess}
-#' function in the alsace package by Ron Wehrens.
+#' @note Adapted from the `preprocess` function in the alsace package by 
+#' Ron Wehrens: <https://github.com/rwehrens/alsace/blob/master/R/preprocess.R>.
 #' @references 
 #' * Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast
-#' parametric time warping of peak lists. \emph{Bioinformatics}
-#' \bold{31}:3063-3065. \doi{10.1093/bioinformatics/btv299}.
+#' parametric time warping of peak lists. *Bioinformatics*
+#' 31:3063-3065. \doi{10.1093/bioinformatics/btv299}.
 #' * Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
-#' LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
-#' Metabolomics} \bold{11:1}:143-154. \doi{10.1007/s11306-014-0683-5}.
+#' LC–DAD using multivariate curve resolution: the alsace package for R. 
+#' *Metabolomics* 11:1:143-154. \doi{10.1007/s11306-014-0683-5}.
 #' @examplesIf interactive()
 #' data(Sa)
 #' new.ts <- seq(10,18.66,by=.01) # choose time-points

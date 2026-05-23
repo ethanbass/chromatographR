@@ -2,28 +2,25 @@
 #' 
 #' Normalizes peak table or list of chromatograms by specified column in sample
 #' metadata or in the peak table. For normalization by sample metadata, the 
-#' metadata must first be attached to the \code{peak_table} using
-#' \code{\link{attach_metadata}}.
+#' metadata must first be attached to the `peak_table` using [`attach_metadata`].
 #' 
-#' @param peak_table A \code{peak_table} object.
+#' @param peak_table A `peak_table` object.
 #' @param column A string specifying the column containing the weights.
 #' @param chrom_list List of chromatograms for normalization. The samples must
 #' be in same order as the peak_table. If omitted, the function will attempt to
-#' find it automatically using information stored in the \code{peak_table}.
-#' @param what A \code{peak_table} or list of chromatograms (\code{chrom_list}).
-#' @param by Whether to normalize by a column in sample metadata (\code{meta}) 
-#' or by a column in the peak table (\code{peak}). Defaults to \code{NULL}. In
-#' this case, this parameter is inferred based on the \code{column} name.
+#' find it automatically using information stored in the `peak_table`.
+#' @param what A `peak_table` or list of chromatograms (`chrom_list`).
+#' @param by Whether to normalize by a column in sample metadata (`meta`) or by
+#' a column in the peak table (`peak`). By default, this parameter is inferred 
+#' based on the `column` name.
 #' @param on_invalid How to handle invalid normalization values (i.e. zero,
-#' negative, or \code{NA} values). One of \code{"warn"} (the default),
-#' \code{"silent"}, or \code{"error"}. The former two options will replace
-#' invalid values with \code{NA}. 
+#' negative, or `NA` values). One of `"warn"` (the default), `"silent"`, or `
+#' "error"`. The former two options will replace invalid values with `NA`. 
 #' @importFrom stats setNames
-#' @return A \code{peak_table} object where values are normalized as specified
-#' by the specified \code{column}.
-#' of each sample.
+#' @return A `peak_table` object where values are normalized by the values in
+#' the specified `column`.
 #' @author Ethan Bass
-#' @seealso \code{\link{get_peaktable}} \code{\link{attach_metadata}}
+#' @seealso [`get_peaktable`] [`attach_metadata`]
 #' @examples
 #' data(pk_tab)
 #' path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
@@ -37,7 +34,7 @@
 #' norm <- normalize_data(pk_tab, column = "V16", by = "peak")
 #' @export normalize_data
 
-normalize_data <- function(peak_table, column, chrom_list=NULL,
+normalize_data <- function(peak_table, column, chrom_list = NULL,
                            what = c('peak_table', 'chrom_list'),
                            by = NULL, 
                            on_invalid = c("warn", "error", "silent")){

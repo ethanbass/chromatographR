@@ -3,35 +3,37 @@
 #' Plots the specified traces from a list of chromatograms.
 #' 
 #' @importFrom graphics matplot axis box
-#' @param x A list of chromatograms in matrix format (timepoints x wavelengths).
+#' @param x A list of chromatograms in matrix format (timepoints x wavelengths)
+#' or a `peak_table` containing a pointer toward the chromatograms, if present
+#' in the environment.
 #' @param lambdas A character or numeric vector specifying the wavelengths to 
 #' plot. For one-dimensional chromatograms, this argument can be ignored.
 #' @param idx A vector representing the names or numerical indices of the 
 #' chromatograms to plot.
 #' @param time_resolution Time resolution for plot (in minutes). Defaults to 
-#' \code{0.01}. Thinning the time axis dramatically improved speed when plotting
+#' `0.01`. Thinning the time axis dramatically improved speed when plotting
 #' many chromatograms.
-#' @param time_unit Time units of the provided chromatograms. Units will be
-#' detected automatically if possible from chromatogram metadata. If 
-#' \code{time_unit} attribute is not present, the time units will default to to 
-#' \code{min}.
-#' @param xlim Range of x axis.
-#' @param ylim Range of y axis.
-#' @param ylab Y label. Defaults to "Absorbance".
+#' @param time_unit Time units of the provided chromatograms: either `min`, `s`,
+#' or `ms`. If possible, units will be detected automatically if possible from 
+#' chromatogram metadata. If `time_unit` attribute is not present and no
+#' argument is provided, the time units will default to minutes.
+#' @param xlim Range of x axis (numeric vector).
+#' @param ylim Range of y axis (numeric vector).
+#' @param ylab Y label. Defaults to `"Absorbance"`.
 #' @param xlab X label.
-#' @param engine Plotting engine. Either \code{base} (\code{\link[graphics]{matplot}}), 
-#' \code{\link[plotly]{plotly}}, or \link[ggplot2:ggplot2-package]{ggplot}.
-#' @param linewidth Line width.
+#' @param engine Plotting engine. Either [`"base"`][graphics::matplot], 
+#' [`"plotly"`][plotly::plotly], or [`"ggplot"`][ggplot2::ggplot2-package].
+#' @param linewidth Line width. Defaults to `1`.
 #' @param show_legend Logical. Whether to display legend or not. Defaults to 
-#' \code{FALSE}.
-#' @param legend_position Position of legend.
+#' `FALSE`.
+#' @param legend_position Position of legend. Defaults to `"topright"`
 #' @param title Title for plot.
-#' @param ... Additional arguments to plotting function specified by \code{engine}.
+#' @param ... Additional arguments to plotting function specified by `engine`.
 #' @return No return value, called for side effects.
 #' @section Side effects:
-#' Plots the traces of the specified chromatograms \code{idx} at the specified
-#' wavelengths \code{lambdas}. Plots can be produced using base graphics, ggplot2,
-#' or plotly, according to the value of \code{engine}.
+#' Plots the traces of the specified chromatograms `idx` at the specified
+#' wavelengths (`lambdas`). Plots can be produced using base graphics, ggplot2,
+#' or plotly, according to the value of the `engine` argument.
 #' @author Ethan Bass
 #' @examples 
 #' data(Sa_warp)
@@ -46,6 +48,12 @@ plot_chroms <- function(x, lambdas, idx, time_resolution = 0.01,
                         engine = c("base", "ggplot", "plotly"), linewidth = 1, 
                         show_legend = FALSE, legend_position = "topright", 
                         title = "", ...){
+  if (inherits(x, "peak_table")){
+    x <- get_chrom_list(x)
+  }
+  if (!inherits(x, c("list", "chrom_list"))){
+    stop("Please supply a list of chromatograms.")
+  }
   engine <- match.arg(engine, c("base", "ggplot", "plotly"))
   if (is.null(time_unit)){
     time_unit <- get_time_unit(x, na_value = "min")
@@ -53,9 +61,6 @@ plot_chroms <- function(x, lambdas, idx, time_resolution = 0.01,
   time_unit <- match.arg(time_unit, c("min", "s", "ms"))
   tfac <- switch(time_unit, "min" = 1, "s" = 60, "ms" = 60*1000)
   time_resolution <- tfac*time_resolution
-  if (!inherits(x, c("list", "chrom_list")) | inherits(x, "peak_table")){
-    stop("Please supply a list of chromatograms.")
-  }
   if (missing(idx)){
     idx <- seq_along(x)
   }
@@ -166,61 +171,54 @@ position_plotly_legend <- function(pos){
 #' 
 #' Plots the specified traces from a list of chromatograms as a heatmap.
 #' 
-#' Adapted from \code{\link[VPdtw]{plot.VPdtw}}.
+#' Adapted from [`VPdtw::plot.VPdtw`].
 #' 
 #' @importFrom grDevices grey hcl.colors
 #' @importFrom graphics image layout mtext rect
-#' @param chrom_list List of chromatograms to plot
-#' @param lambdas A character or numeric vector specifying the wavelengths to 
-#' plot.
-#' @param idx A vector representing the names or numerical indices of the 
-#' chromatograms to plot.
-#' @param xlim Range of x axis.
-#' @param engine Plotting engine. Either \code{base} (\code{\link[graphics]{matplot}}), 
-#' \code{\link[plotly]{plotly}}, or \link[ggplot2:ggplot2-package]{ggplot}.
+#' @inheritParams plot_chroms
 #' @param show_legend Logical. Whether to display legend or not. Defaults to
-#' \code{TRUE}.
-#' @param legend_position Position of legend.
-#' @param title Title for plot.
-#' @param show_ylabs Logical. Whether to show y labels. Defaults to \code{FALSE}.
+#' `TRUE`.
+#' @param show_ylabs Logical. Whether to show y labels. Defaults to `FALSE`.
 #' @return No return value, called for side effects.
 #' @section Side effects:
-#' Plots the traces of the specified chromatograms \code{idx} at the specified
-#' wavelengths \code{lambdas} as a heatmap. Plots can be produced using base 
-#' graphics engine, \code{ggplot2}, or \code{plotly}, according to the value of 
-#' \code{engine}.
+#' Plots the traces of the chromatograms specified by `idx` at the specified
+#' wavelengths (`lambdas`) as a heatmap. Plots can be produced using base 
+#' graphics engine, `ggplot2`, or `plotly`, according to the value of the 
+#' `engine` argument.
 #' @author Ethan Bass
 #' @examples 
 #' data(Sa_warp)
 #' plot_chroms_heatmap(Sa_warp, lambdas = 210)
 #' @family visualization functions
 #' @export
-plot_chroms_heatmap <- function(chrom_list, idx = NULL, lambdas, 
+plot_chroms_heatmap <- function(x, idx = NULL, lambdas, 
                                 engine = c("base", "ggplot", "plotly"),
                                 show_legend = TRUE, xlim = NULL,
                                 legend_position = "topright", title = "", 
                                 show_ylabs = FALSE) {
-  if (!inherits(chrom_list, c("list", "chrom_list")) | 
-      inherits(chrom_list, "peak_table")){
+  if (inherits(x, "peak_table")){
+    x <- get_chrom_list(x)
+  }
+  if (!inherits(x, c("list", "chrom_list"))){
     stop("Please supply a list of chromatograms.")
   }
   engine <- match.arg(engine, c("base", "ggplot", "plotly"))
-  if (ncol(chrom_list[[1]]) == 1){
+  if (ncol(x[[1]]) == 1){
     lambdas.idx <- 1
   } else {
-    lambdas.idx <- get_lambda_idx(lambdas, lambdas = get_lambdas(chrom_list))
+    lambdas.idx <- get_lambda_idx(lambdas, lambdas = get_lambdas(x))
   }
   fn <- switch(engine, base = plot_chroms_heatmap_base,
                ggplot = plot_chroms_heatmap_ggplot,
                plotly = plot_chroms_heatmap_plotly)
-  fn(chrom_list = chrom_list, lambdas.idx = lambdas.idx, idx = idx,
+  fn(chrom_list = x, lambdas.idx = lambdas.idx, idx = idx,
      show_legend = show_legend, xlim = xlim,
      legend_position = legend_position, title = title, 
      show_ylabs = show_ylabs)
 }
 
 #' Plot chromatograms as heatmap using base graphics
-#' Adapted from \code{VPdtw::plot.VPdtw}
+#' Adapted from `VPdtw::plot.VPdtw`
 #' @param ... Additional arguments (currently unused).
 #' @noRd
 plot_chroms_heatmap_base <- function(chrom_list, lambdas.idx = 1, idx = NULL,

@@ -19,8 +19,7 @@
   cex.font = 0.5,
   y.offset = 25,
   plot_purity = FALSE,
-  res,
-  index = NULL
+  res
 )
 }
 \arguments{
@@ -35,10 +34,9 @@ matrices)}
 
 \item{lambda}{Wavelength to use for plotting.}
 
-\item{points}{Logical. If \code{TRUE}, plot peak maxima. Defaults to 
-\code{FALSE}.}
+\item{points}{Logical. If \code{TRUE}, plot peak maxima. Defaults to \code{FALSE}.}
 
-\item{ticks}{Logical. If \code{TRUE}, mark beginning and end of each peak. 
+\item{ticks}{Logical. If \code{TRUE}, mark beginning and end of each peak.
 Defaults to \code{FALSE}.}
 
 \item{alpha}{Parameter controlling the transparency of fitted shapes.
@@ -54,11 +52,10 @@ Defaults to \code{0.5}.}
 
 \item{y.offset}{Y offset for peak numbers. Defaults to \code{25}.}
 
-\item{plot_purity}{Whether to add visualization of peak purity.}
+\item{plot_purity}{Logical. Whether to add visualization of peak purity.
+Defaults to \code{FALSE}.}
 
-\item{res}{Time resolution for peak fitting}
-
-\item{index}{This argument is deprecated. Please use \code{idx} instead.}
+\item{res}{Time resolution for peak fitting.}
 }
 \value{
 No return value, called for side effects.
@@ -81,15 +78,15 @@ plot(pks, points = TRUE, ticks = TRUE)
 \seealso{
 \code{\link{get_peaks}}
 
-Other visualization functions: 
-\code{\link{boxplot.peak_table}()},
-\code{\link{mirror_plot}()},
-\code{\link{plot.peak_table}()},
-\code{\link{plot_all_spectra}()},
-\code{\link{plot_chroms}()},
-\code{\link{plot_chroms_heatmap}()},
-\code{\link{plot_spectrum}()},
-\code{\link{scan_chrom}()}
+Other visualization functions:
+\code{\link[=boxplot.peak_table]{boxplot.peak_table()}},
+\code{\link[=mirror_plot]{mirror_plot()}},
+\code{\link[=plot.peak_table]{plot.peak_table()}},
+\code{\link[=plot_all_spectra]{plot_all_spectra()}},
+\code{\link[=plot_chroms]{plot_chroms()}},
+\code{\link[=plot_chroms_heatmap]{plot_chroms_heatmap()}},
+\code{\link[=plot_spectrum]{plot_spectrum()}},
+\code{\link[=scan_chrom]{scan_chrom()}}
 }
 \author{
 Ethan Bass

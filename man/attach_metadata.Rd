@@ -7,21 +7,22 @@
 attach_metadata(peak_table, metadata, column)
 }
 \arguments{
-\item{peak_table}{A \code{peak_table} object.}
+\item{peak_table}{A \code{peak_table} object created by \link{get_peaktable}.}
 
 \item{metadata}{A \code{data.frame} containing the sample metadata.}
 
-\item{column}{The name of the column in your \code{metadata} object containing the
-sample names. Sample names must match the row names of \code{peak_table$tab}.}
+\item{column}{The name of the column in the provided \code{metadata} object
+containing the sample names. Sample names must match the row names of
+\code{peak_table$tab}.}
 }
 \value{
-A \code{peak_table} object with attached metadata in the \code{
-$sample_meta} slot.
+A \code{peak_table} object with metadata attached in the \code{sample_meta}
+slot.
 }
 \description{
 Attaches sample metadata to a \code{peak_table} object. Metadata should be
-provided as a data.frame object. One of the columns in
-the supplied metadata must match exactly the row names of the peak table.
+provided as a \code{data.frame}. One of the columns in the supplied metadata must
+match exactly the row names of the peak table.
 }
 \examples{
 data(pk_tab)
@@ -30,7 +31,7 @@ meta <- read.csv(path)
 pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
 }
 \seealso{
-\code{\link{get_peaktable}} \code{\link{normalize_data}}
+\code{\link{get_peaktable}}, \code{\link{normalize_data}}
 }
 \author{
 Ethan Bass

@@ -13,17 +13,17 @@ attach_ref_spectra(peak_table, chrom_list, ref = c("max.cor", "max.int"))
 wavelengths). If no argument is provided here, the function will try to find
 the \code{chrom_list} object used to create the provided \code{peak_table}.}
 
-\item{ref}{What criterion to use to select reference spectra.
-Current options are maximum correlation (\code{"max.cor"}) or maximum signal
-intensity (\code{"max.int"}).}
+\item{ref}{What criterion to use to select reference spectra. The current
+options are maximum correlation (\code{"max.cor"}) or maximum signal intensity
+(\code{"max.int"}).}
 }
 \value{
 A \code{peak_table} object with reference spectra attached in the
-\code{$ref_spectra} slot.
+\verb{$ref_spectra} slot.
 }
 \description{
 Gathers reference spectra and attaches them to a \code{peak_table} object.
-Reference spectra are defined either as the spectrum with the highest 
+Reference spectra are defined either as the spectrum with the highest
 intensity (\code{"max.int"}) or as the spectrum with the highest average
 correlation to the other spectra in the peak table (\code{"max.cor"}).
 }
@@ -33,7 +33,7 @@ pk_tab <- attach_ref_spectra(pk_tab, ref = "max.int")
 pk_tab <- attach_ref_spectra(pk_tab, ref = "max.cor")
 }
 \seealso{
-\code{\link{get_peaks}} \code{\link{get_peaktable}}
+\code{\link{get_peaks}}, \code{\link{get_peaktable}}
 }
 \author{
 Ethan Bass

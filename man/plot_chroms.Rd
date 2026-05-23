@@ -23,40 +23,42 @@ plot_chroms(
 )
 }
 \arguments{
-\item{x}{A list of chromatograms in matrix format (timepoints x wavelengths).}
+\item{x}{A list of chromatograms in matrix format (timepoints x wavelengths)
+or a \code{peak_table} containing a pointer toward the chromatograms, if present
+in the environment.}
 
-\item{lambdas}{A character or numeric vector specifying the wavelengths to 
+\item{lambdas}{A character or numeric vector specifying the wavelengths to
 plot. For one-dimensional chromatograms, this argument can be ignored.}
 
-\item{idx}{A vector representing the names or numerical indices of the 
+\item{idx}{A vector representing the names or numerical indices of the
 chromatograms to plot.}
 
-\item{time_resolution}{Time resolution for plot (in minutes). Defaults to 
+\item{time_resolution}{Time resolution for plot (in minutes). Defaults to
 \code{0.01}. Thinning the time axis dramatically improved speed when plotting
 many chromatograms.}
 
-\item{time_unit}{Time units of the provided chromatograms. Units will be
-detected automatically if possible from chromatogram metadata. If 
-\code{time_unit} attribute is not present, the time units will default to to 
-\code{min}.}
+\item{time_unit}{Time units of the provided chromatograms: either \code{min}, \code{s},
+or \code{ms}. If possible, units will be detected automatically if possible from
+chromatogram metadata. If \code{time_unit} attribute is not present and no
+argument is provided, the time units will default to minutes.}
 
-\item{xlim}{Range of x axis.}
+\item{xlim}{Range of x axis (numeric vector).}
 
-\item{ylim}{Range of y axis.}
+\item{ylim}{Range of y axis (numeric vector).}
 
 \item{xlab}{X label.}
 
-\item{ylab}{Y label. Defaults to "Absorbance".}
+\item{ylab}{Y label. Defaults to \code{"Absorbance"}.}
 
-\item{engine}{Plotting engine. Either \code{base} (\code{\link[graphics]{matplot}}), 
-\code{\link[plotly]{plotly}}, or \link[ggplot2:ggplot2-package]{ggplot}.}
+\item{engine}{Plotting engine. Either \code{\link[graphics:matplot]{"base"}},
+\code{\link[plotly:plotly]{"plotly"}}, or \code{\link[ggplot2:ggplot2-package]{"ggplot"}}.}
 
-\item{linewidth}{Line width.}
+\item{linewidth}{Line width. Defaults to \code{1}.}
 
-\item{show_legend}{Logical. Whether to display legend or not. Defaults to 
+\item{show_legend}{Logical. Whether to display legend or not. Defaults to
 \code{FALSE}.}
 
-\item{legend_position}{Position of legend.}
+\item{legend_position}{Position of legend. Defaults to \code{"topright"}}
 
 \item{title}{Title for plot.}
 
@@ -71,8 +73,8 @@ Plots the specified traces from a list of chromatograms.
 \section{Side effects}{
 
 Plots the traces of the specified chromatograms \code{idx} at the specified
-wavelengths \code{lambdas}. Plots can be produced using base graphics, ggplot2,
-or plotly, according to the value of \code{engine}.
+wavelengths (\code{lambdas}). Plots can be produced using base graphics, ggplot2,
+or plotly, according to the value of the \code{engine} argument.
 }
 
 \examples{
@@ -80,15 +82,15 @@ data(Sa_warp)
 plot_chroms(Sa_warp, lambdas = 210)
 }
 \seealso{
-Other visualization functions: 
-\code{\link{boxplot.peak_table}()},
-\code{\link{mirror_plot}()},
-\code{\link{plot.peak_list}()},
-\code{\link{plot.peak_table}()},
-\code{\link{plot_all_spectra}()},
-\code{\link{plot_chroms_heatmap}()},
-\code{\link{plot_spectrum}()},
-\code{\link{scan_chrom}()}
+Other visualization functions:
+\code{\link[=boxplot.peak_table]{boxplot.peak_table()}},
+\code{\link[=mirror_plot]{mirror_plot()}},
+\code{\link[=plot.peak_list]{plot.peak_list()}},
+\code{\link[=plot.peak_table]{plot.peak_table()}},
+\code{\link[=plot_all_spectra]{plot_all_spectra()}},
+\code{\link[=plot_chroms_heatmap]{plot_chroms_heatmap()}},
+\code{\link[=plot_spectrum]{plot_spectrum()}},
+\code{\link[=scan_chrom]{scan_chrom()}}
 }
 \author{
 Ethan Bass

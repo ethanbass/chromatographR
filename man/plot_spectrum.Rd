@@ -18,26 +18,25 @@ plot_spectrum(
   verbose = TRUE,
   what = c("peak", "rt", "idx", "click"),
   engine = c("base", "plotly", "ggplot2"),
-  chr = NULL,
   ...
 )
 }
 \arguments{
-\item{loc}{The name of the peak or retention time for which you wish to
+\item{loc}{The peak, retention time, or index for which you wish to
 extract spectral data.}
 
-\item{peak_table}{The peak table (output from \code{\link{get_peaktable}}).}
+\item{peak_table}{A \code{peak_table} object created by \code{\link{get_peaktable}}.}
 
 \item{chrom_list}{A list of chromatograms in matrix format (timepoints x
 wavelengths). If no argument is provided here, the function will try to find
-the \code{chrom_list} object used to create the provided \code{peak_table}.}
+the \code{chrom_list} object using the pointer in the \code{peak_table}.}
 
 \item{idx}{Numerical index of chromatogram you wish to plot, or "max" to
 automatically plot the chromatogram with the largest signal at the given peak
 or retention time.}
 
-\item{lambda}{The wavelength you wish to plot the trace at if plot_trace ==
-TRUE and/or the wavelength to be used for the determination of signal
+\item{lambda}{The wavelength you wish to plot the trace at if \code{plot_trace} is
+\code{TRUE} and/or the wavelength to be used for the determination of signal
 abundance.}
 
 \item{plot_spectrum}{Logical. If \code{TRUE}, plots the spectrum of the chosen
@@ -55,29 +54,26 @@ Defaults to \code{FALSE}.}
 \item{export_spectrum}{Logical. If \code{TRUE}, exports spectrum to console.
 Defaults to \code{FALSE}.}
 
-\item{verbose}{Logical. If \code{TRUE}, prints verbose output to console.
-Defaults to \code{TRUE}.}
+\item{verbose}{Logical. If \code{TRUE} (default), prints verbose output to console.}
 
 \item{what}{What to look for. Either \code{peak} to extract spectral
 information for a certain peak, \code{rt} to scan by retention time,
 \code{idx} to scan by numeric index, or \code{click} to manually select
-retention time by clicking on the chromatogram. Defaults to "peak" mode.}
+retention time by clicking on the chromatogram. Defaults to \code{"peak"} mode.}
 
 \item{engine}{Which plotting engine to use: \code{base}, \code{ggplot2}, or
 \code{plotly}.}
 
-\item{chr}{Deprecated. Please use \code{idx} instead.}
-
 \item{...}{Additional arguments.}
 }
 \value{
-If \code{export_spectrum} is TRUE, returns the spectrum as a \code{
-data.frame} with wavelengths as rows and a single column encoding the
-absorbance (or normalized absorbance, if \code{scale_spectrum} is TRUE)
-at each wavelength. If \code{export_spectrum} is FALSE, the output depends on
-the plotting \code{engine}. If \code{engine == "plotly"}, returns a \code{plotly}
-object containing the specified plots. Otherwise, if \code{engine == "base"},
-there is no return value.
+If \code{export_spectrum} is \code{TRUE}, returns the spectrum as a
+\code{data.frame} with wavelengths as rows and a single column encoding the
+absorbance (or normalized absorbance, if \code{scale_spectrum} is \code{TRUE})
+at each wavelength. If \code{export_spectrum} is \code{FALSE}, the output depends on
+the plotting \code{engine}. If \code{engine == "plotly"}, returns a \code{plotly} object
+containing the specified plots. Otherwise, if \code{engine == "base"}, there is no
+return value.
 }
 \description{
 Plots the trace and/or spectrum for a given peak or retention time in a
@@ -88,16 +84,16 @@ Can be used to confirm the identity of a peak or check that a particular
 column in the peak table represents a single compound. Retention times can
 also be selected by clicking on the plotted trace if \code{what == 'click'}.
 Plots can be produced using either base R graphics,
-\code{\link[ggplot2:ggplot2]{ggplot2}}, or \code{plotly}, according to the
-value of the \code{engine} argument.
+\code{\link[ggplot2:ggplot2]{ggplot2}}, or \code{plotly}, according to the value
+of the \code{engine} argument.
 }
 \section{Side effects}{
 
 \itemize{
 \item If \code{plot_trace} is \code{TRUE}, plots the chromatographic trace of the
-specified chromatogram (\code{idx}), at the specified wavelength
-(\code{lambda}) with a dotted red line to indicate the retention time given
-by \code{loc}. The trace is a single column from the chromatographic matrix.
+specified chromatogram (\code{idx}), at the specified wavelength (\code{lambda}) with a
+dotted red line to indicate the retention time given by \code{loc}. The trace is a
+single column from the chromatographic matrix.
 \item If \code{plot_spectrum} is \code{TRUE}, plots the spectrum for the specified
 chromatogram at the specified retention time. The spectrum is a single row
 from the chromatographic matrix.
@@ -116,15 +112,15 @@ par(oldpar)
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-Other visualization functions: 
-\code{\link{boxplot.peak_table}()},
-\code{\link{mirror_plot}()},
-\code{\link{plot.peak_list}()},
-\code{\link{plot.peak_table}()},
-\code{\link{plot_all_spectra}()},
-\code{\link{plot_chroms}()},
-\code{\link{plot_chroms_heatmap}()},
-\code{\link{scan_chrom}()}
+Other visualization functions:
+\code{\link[=boxplot.peak_table]{boxplot.peak_table()}},
+\code{\link[=mirror_plot]{mirror_plot()}},
+\code{\link[=plot.peak_list]{plot.peak_list()}},
+\code{\link[=plot.peak_table]{plot.peak_table()}},
+\code{\link[=plot_all_spectra]{plot_all_spectra()}},
+\code{\link[=plot_chroms]{plot_chroms()}},
+\code{\link[=plot_chroms_heatmap]{plot_chroms_heatmap()}},
+\code{\link[=scan_chrom]{scan_chrom()}}
 }
 \author{
 Ethan Bass

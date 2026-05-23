@@ -13,42 +13,46 @@ scan_chrom(
   scale_spectrum = FALSE,
   spectrum_labels = TRUE,
   export_spectrum = FALSE,
-  chr = NULL,
   ...
 )
 }
 \arguments{
 \item{chrom_list}{A list of chromatograms in matrix format (timepoints x
 wavelengths). If no argument is provided here, the function will try to find
-the \code{chrom_list} object used to create the provided \code{peak_table}.}
+the \code{chrom_list} object using the pointer in the \code{peak_table}.}
 
-\item{idx}{Numerical index of chromatogram you wish to plot.}
+\item{idx}{Numerical index of chromatogram you wish to plot, or "max" to
+automatically plot the chromatogram with the largest signal at the given peak
+or retention time.}
 
-\item{lambda}{The wavelength to plot the trace at.}
+\item{lambda}{The wavelength you wish to plot the trace at if \code{plot_trace} is
+\code{TRUE} and/or the wavelength to be used for the determination of signal
+abundance.}
 
-\item{plot_spectrum}{Logical. Whether to plot the spectrum or not.}
+\item{plot_spectrum}{Logical. If \code{TRUE}, plots the spectrum of the chosen
+peak. Defaults to \code{TRUE}.}
 
-\item{peak_table}{The peak table (output from \code{\link{get_peaktable}}
-function).}
+\item{peak_table}{A \code{peak_table} object created by \code{\link{get_peaktable}}.}
 
-\item{scale_spectrum}{Logical. If TRUE, scales spectrum to unit height.
-Defaults to FALSE.}
+\item{scale_spectrum}{Logical. If \code{TRUE}, scales spectrum to unit height.
+Defaults to \code{FALSE}.}
 
-\item{spectrum_labels}{Logical. If TRUE, plots labels on maxima in spectral
-plot. Defaults to TRUE.}
+\item{spectrum_labels}{Logical. If \code{TRUE}, plots labels on maxima in spectral
+plot. Defaults to \code{TRUE}.}
 
-\item{export_spectrum}{Logical. If TRUE, exports spectrum to console.
-Defaults to FALSE.}
+\item{export_spectrum}{Logical. If \code{TRUE}, exports spectrum to console.
+Defaults to \code{FALSE}.}
 
-\item{chr}{Deprecated. Please use \code{idx} instead.}
-
-\item{...}{Additional arguments.}
+\item{...}{Additional arguments to \code{plot_spectrum}.}
 }
 \value{
-If \code{export_spectrum} is TRUE, returns the spectrum as a \code{
-data.frame} with wavelengths as rows and a single column encoding the
-absorbance (or normalized absorbance, if \code{scale_spectrum} is TRUE)
-at each wavelength. Otherwise, there is no return value.
+If \code{export_spectrum} is \code{TRUE}, returns the spectrum as a
+\code{data.frame} with wavelengths as rows and a single column encoding the
+absorbance (or normalized absorbance, if \code{scale_spectrum} is \code{TRUE})
+at each wavelength. If \code{export_spectrum} is \code{FALSE}, the output depends on
+the plotting \code{engine}. If \code{engine == "plotly"}, returns a \code{plotly} object
+containing the specified plots. Otherwise, if \code{engine == "base"}, there is no
+return value.
 }
 \description{
 Plot spectra by clicking on the chromatogram.
@@ -60,7 +64,7 @@ at the specified wavelength (\code{lambda}) with a dotted red line to indicate
 the user-selected retention time. The trace is a single column from the
 chromatographic matrix.
 
-If \code{plot_spectrum} is TRUE, plots the spectrum for the specified
+If \code{plot_spectrum} is \code{TRUE}, plots the spectrum for the specified
 chromatogram at the user-specified retention time. The spectrum is a single
 row from the chromatographic matrix.
 }
@@ -72,15 +76,15 @@ scan_chrom(Sa_pr, lambda = "210", idx = 2, export_spectrum = TRUE)
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-Other visualization functions: 
-\code{\link{boxplot.peak_table}()},
-\code{\link{mirror_plot}()},
-\code{\link{plot.peak_list}()},
-\code{\link{plot.peak_table}()},
-\code{\link{plot_all_spectra}()},
-\code{\link{plot_chroms}()},
-\code{\link{plot_chroms_heatmap}()},
-\code{\link{plot_spectrum}()}
+Other visualization functions:
+\code{\link[=boxplot.peak_table]{boxplot.peak_table()}},
+\code{\link[=mirror_plot]{mirror_plot()}},
+\code{\link[=plot.peak_list]{plot.peak_list()}},
+\code{\link[=plot.peak_table]{plot.peak_table()}},
+\code{\link[=plot_all_spectra]{plot_all_spectra()}},
+\code{\link[=plot_chroms]{plot_chroms()}},
+\code{\link[=plot_chroms_heatmap]{plot_chroms_heatmap()}},
+\code{\link[=plot_spectrum]{plot_spectrum()}}
 }
 \author{
 Ethan Bass

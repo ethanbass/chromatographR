@@ -47,21 +47,20 @@ value.}
 \item{interpolate_cols}{Logical. Whether to interpolate along the spectral
 axis (\code{dim2}). Defaults to \code{TRUE}.}
 
-\item{cl}{Argument to \code{\link[pbapply]{pblapply}} or \code{\link[parallel]{mclapply}}.
-Either an integer specifying the number of clusters to use for parallel
-processing or a cluster object created by \code{\link[parallel]{makeCluster}}.
-Defaults to 2. On Windows integer values will be ignored.}
+\item{cl}{Either an integer specifying the number of clusters to use for
+parallel processing or a cluster object created by
+\code{\link[parallel:makeCluster]{makeCluster}}. Defaults to \code{2}. On Windows integer
+values will be ignored.}
 
 \item{show_progress}{Logical. Whether to show progress bar. Defaults to
-\code{TRUE} if \code{\link[pbapply]{pbapply}} is installed.}
+\code{TRUE} if \code{\link[pbapply:pbapply]{pbapply}} is installed.}
 
 \item{outlier_cutoff}{Threshold for excluding chromatograms that end
 prematurely. Chromatograms ending more than this value (in seconds) before
 the median end time are excluded. Default is 5 seconds. Only applies when
 \code{dim1} is not specified.}
 
-\item{\dots}{Further optional arguments to
-\code{\link[ptw:baseline.corr]{baseline.corr}}.}
+\item{...}{Additional arguments to \code{\link[ptw:baseline.corr]{baseline.corr}}.}
 }
 \value{
 The function returns the preprocessed data matrix (or list of
@@ -73,14 +72,12 @@ Standard pre-processing of response matrices, consisting of a time axis and
 a spectral axis (e.g. HPLC-DAD/UV data). For smooth data, like UV-VIS data,
 the size of the matrix can be reduced by interpolation. By default,
 the data are baseline-corrected in the time direction
-(\code{\link[ptw:baseline.corr]{baseline.corr}}) and smoothed in the
-spectral dimension using cubic smoothing splines
-(\code{\link[stats:smooth.spline]{smooth.spline}}).
+(\code{\link[ptw:baseline.corr]{baseline.corr}}) and smoothed in the spectral dimension
+using cubic smoothing splines (\code{\link{smooth.spline}}).
 }
 \note{
-Adapted from the
-\href{https://github.com/rwehrens/alsace/blob/master/R/preprocess.R}{preprocess}
-function in the alsace package by Ron Wehrens.
+Adapted from the \code{preprocess} function in the alsace package by
+Ron Wehrens: \url{https://github.com/rwehrens/alsace/blob/master/R/preprocess.R}.
 }
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
@@ -94,10 +91,10 @@ Sa_pr <- preprocess(Sa[[1]], dim1 = new.ts, dim2 = new.lambdas)
 \itemize{
 \item Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast
 parametric time warping of peak lists. \emph{Bioinformatics}
-\bold{31}:3063-3065. \doi{10.1093/bioinformatics/btv299}.
+31:3063-3065. \doi{10.1093/bioinformatics/btv299}.
 \item Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
-LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
-Metabolomics} \bold{11:1}:143-154. \doi{10.1007/s11306-014-0683-5}.
+LC–DAD using multivariate curve resolution: the alsace package for R.
+\emph{Metabolomics} 11:1:143-154. \doi{10.1007/s11306-014-0683-5}.
 }
 }
 \author{

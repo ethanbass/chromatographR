@@ -32,18 +32,18 @@ filter_peaktable(
 \item{lambda}{Component(s) to include in peak table (e.g. wavelengths if you
 are using HPLC-DAD/UV).}
 
-\item{what}{Whether to summarize intensities using \code{mean}, \code{median}, 
-or \code{max}. Defaults to \code{median}.}
+\item{what}{Whether to summarize intensities using \code{mean}, \code{median} (default),
+or \code{max}.}
 
 \item{tol}{Tolerance for matching of retention times to \code{rts}.}
 }
 \value{
-A peak table similar to the input, with all columns removed
-from the peak table that do not satisfy the specified criteria.
+A peak table similar to the input, with all columns removed from the
+peak table that do not satisfy the specified criteria.
 }
 \description{
 Utility function to remove peaks from peak table, e.g., because their
-intensity is too low. Currently one can filter on \code{mean}, \code{median},
+intensity is too low. Currently one can filter on \code{"mean"}, \code{"median"},
 or maximum (\code{"max"}) peak intensity or retention time.
 }
 \examples{

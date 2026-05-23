@@ -19,19 +19,19 @@ place of the original peak names.}
 order provided. Defaults to \code{TRUE}.}
 }
 \value{
-A data.frame containing the information for the specified 
-\code{peaks} in long format.
+A data.frame containing the information for the specified peaks in
+long format.
 }
 \description{
 Reshapes peak table from wide to long format
 }
 \seealso{
-Other utility functions: 
-\code{\link{combine_peaks}()},
-\code{\link{get_lambdas}()},
-\code{\link{get_times}()},
-\code{\link{merge_peaks}()},
-\code{\link{reshape_chroms}()}
+Other utility functions:
+\code{\link[=combine_peaks]{combine_peaks()}},
+\code{\link[=get_lambdas]{get_lambdas()}},
+\code{\link[=get_times]{get_times()}},
+\code{\link[=merge_peaks]{merge_peaks()}},
+\code{\link[=reshape_chroms]{reshape_chroms()}}
 }
 \author{
 Ethan Bass

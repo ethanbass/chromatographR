@@ -11,6 +11,6 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{chromConverter}{\code{\link[chromConverter]{read_chroms}}}
+  \item{chromConverter}{\code{\link[chromConverter:read_chroms]{read_chroms()}}}
 }}
 

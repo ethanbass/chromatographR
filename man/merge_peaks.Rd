@@ -7,37 +7,37 @@
 merge_peaks(peak_table, peaks, method = c("max", "sum"))
 }
 \arguments{
-\item{peak_table}{Peak table from \code{\link{get_peaktable}}.}
+\item{peak_table}{A \code{peak_table} object from \code{\link{get_peaktable}}.}
 
 \item{peaks}{A vector specifying the names or indices of peaks to be merged.}
 
 \item{method}{Method to merge peaks. Either \code{max} to select the largest
-peak from each sample or \code{sum} to sum the peaks together.}
+peak from each sample or \code{sum} to add the peaks together.}
 }
 \value{
 A peak table similar to the input peak table, but where the specified
 columns are combined.
 }
 \description{
-Utility function to combine split peaks into a single column of the peak 
+Utility function to combine split peaks into a single column of the peak
 table.
 }
 \details{
-Merges the specified peaks in peak table, by selecting the largest value from 
-each column if \code{method} is \code{"max"}. If \code{method} is
-\code{"sum"}, merges peak by summing their values.
+Merges the specified peaks in peak table, by selecting the largest value from
+each column if \code{method} is \code{"max"}. If \code{method} is \code{"sum"}, peaks will be
+merged by summing their values.
 }
 \examples{
 data(pk_tab)
-pk_tab <- merge_peaks(peak_table = pk_tab, peaks=c("V10","V11"))
+pk_tab <- merge_peaks(peak_table = pk_tab, peaks = c("V10","V11"))
 }
 \seealso{
-Other utility functions: 
-\code{\link{combine_peaks}()},
-\code{\link{get_lambdas}()},
-\code{\link{get_times}()},
-\code{\link{reshape_chroms}()},
-\code{\link{reshape_peaktable}()}
+Other utility functions:
+\code{\link[=combine_peaks]{combine_peaks()}},
+\code{\link[=get_lambdas]{get_lambdas()}},
+\code{\link[=get_times]{get_times()}},
+\code{\link[=reshape_chroms]{reshape_chroms()}},
+\code{\link[=reshape_peaktable]{reshape_peaktable()}}
 }
 \author{
 Ethan Bass

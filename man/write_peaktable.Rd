@@ -17,7 +17,7 @@ write_peaktable(
 
 \item{path}{Path to write file.}
 
-\item{filename}{File name. Defaults to "peak_table".}
+\item{filename}{File name. Defaults to \code{"peak_table"}.}
 
 \item{format}{File format to export. Either \code{csv} or \code{xlsx}.}
 
@@ -27,13 +27,12 @@ write_peaktable(
 No return value. The function is called for its side effects.
 }
 \description{
-Exports peak table in \code{csv} or \code{xlsx} format according to the value
-of \code{format}.
+Exports peak table in \code{csv} or \code{xlsx} format.
 }
 \section{Side effects}{
 
 Exports peak_table object as \code{.csv} or \code{.xlsx} file according to the value
-of \code{format}.
+of the \code{format} argument.
 }
 
 \examples{

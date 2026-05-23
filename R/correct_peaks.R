@@ -1,32 +1,30 @@
 #' Correct peak positions according to a PTW warping model
 #' 
-#' Corrects retention time differences in \code{peak_list} using parametric time
-#' warping as implemented in the \code{\link[ptw]{ptw}} package.
+#' Corrects retention time differences in `peak_list` using parametric time
+#' warping as implemented in the [`ptw`][ptw::ptw] package.
 #' 
 #' Once an appropriate warping model has been established, corrected retention
 #' times can be predicted for each peak. These are stored in a separate column
 #' in the list of peak tables.
 #' 
 #' @importFrom stats predict
-#' @param peak_list A `peak_list` object created by \code{\link{get_peaks}},
-#' containing a nested list of peak tables where the first level is the sample,
+#' @param peak_list A `peak_list` object created by [`get_peaks`], containing a 
+#' nested list of peak tables where the first level is the sample,
 #' and the second level is the spectral wavelength. Every wavelength is described
 #' by a matrix where each row corresponds to a feature, and the columns contain 
 #' information on that feature (e.g., retention time, peak width (FWHM), height,
 #' area, etc.)
-#' @param mod_list A list of \code{ptw} models.
-#' @param chrom_list List of chromatograms from which the \code{ptw} models are
+#' @param mod_list A list of `ptw` models.
+#' @param chrom_list List of chromatograms from which the `ptw` models are
 #' derived.
 #' @param match_names Logical. Whether to actively match the names of the 
-#' \code{peak_list} to the list of models (\code{mod_list}). Defaults to 
-#' \code{TRUE}.
+#' `peak_list` to the list of models (`mod_list`). Defaults to `TRUE`.
 #' @return The input list of peak tables is returned with extra columns
 #' containing the corrected retention times.
 #' @author Ron Wehrens, Ethan Bass
-#' @note This function is adapted from
-#' \href{https://github.com/rwehrens/alsace/blob/master/R/correctPeaks.R}{correctPeaks}
-#' function in the alsace package by Ron Wehrens.
-#' @seealso \code{\link{correct_rt}}
+#' @note This function is adapted from the `correctPeaks` function in the alsace
+#' package by Ron Wehrens: <https://github.com/rwehrens/alsace/blob/master/R/correctPeaks.R>.
+#' @seealso [`correct_rt`]
 #' @export correct_peaks
 
 correct_peaks <- function(peak_list, mod_list, chrom_list, match_names = TRUE){
@@ -72,9 +70,23 @@ correct_peaks <- function(peak_list, mod_list, chrom_list, match_names = TRUE){
 }
 
 #' Predict PTW
-#' @note This is the function from the ptw package, reproduced here because it
-#' isn't exported from ptw.
-#' @noRd
+#' 
+#' Predict method for objects of class `ptw`. Reproduced from the [`ptw`]
+#' package as the original is not exported.
+#'
+#' @param object an object of class `ptw`.
+#' @param newdata an optional matrix of new data to predict. If missing,
+#'   returns the warped sample.
+#' @param what character string specifying whether to return the warped
+#'   `"response"` or corrected `"time"`. Defaults to `"response"`.
+#' @param RTref optional numeric vector of reference retention times.
+#' @param ... additional arguments (currently ignored).
+#'
+#' @return a matrix of warped responses or corrected retention times.
+#'
+#' @author Ron Wehrens
+#' @keywords internal
+#' @exportS3Method
 predict.ptw <- function (object, newdata, what = c("response", "time"), 
                          RTref = NULL, 
                          ...){

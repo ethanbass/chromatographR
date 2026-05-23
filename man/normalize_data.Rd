@@ -24,25 +24,21 @@ find it automatically using information stored in the \code{peak_table}.}
 
 \item{what}{A \code{peak_table} or list of chromatograms (\code{chrom_list}).}
 
-\item{by}{Whether to normalize by a column in sample metadata (\code{meta}) 
-or by a column in the peak table (\code{peak}). Defaults to \code{NULL}. In
-this case, this parameter is inferred based on the \code{column} name.}
+\item{by}{Whether to normalize by a column in sample metadata (\code{meta}) or by
+a column in the peak table (\code{peak}). By default, this parameter is inferred
+based on the \code{column} name.}
 
 \item{on_invalid}{How to handle invalid normalization values (i.e. zero,
-negative, or \code{NA} values). One of \code{"warn"} (the default),
-\code{"silent"}, or \code{"error"}. The former two options will replace
-invalid values with \code{NA}.}
+negative, or \code{NA} values). One of \code{"warn"} (the default), \code{"silent"}, or \code{ "error"}. The former two options will replace invalid values with \code{NA}.}
 }
 \value{
-A \code{peak_table} object where values are normalized as specified
-by the specified \code{column}.
-of each sample.
+A \code{peak_table} object where values are normalized by the values in
+the specified \code{column}.
 }
 \description{
 Normalizes peak table or list of chromatograms by specified column in sample
-metadata or in the peak table. For normalization by sample metadata, the 
-metadata must first be attached to the \code{peak_table} using
-\code{\link{attach_metadata}}.
+metadata or in the peak table. For normalization by sample metadata, the
+metadata must first be attached to the \code{peak_table} using \code{\link{attach_metadata}}.
 }
 \examples{
 data(pk_tab)

@@ -10,55 +10,37 @@
 #' @importFrom scales rescale
 #' @importFrom graphics identify title text boxplot
 #' @importFrom stats as.formula
-#' @param x The peak table (output from \code{\link{get_peaktable}}
-#' function).
-#' @param loc A vector specifying the peak(s) or retention time(s) that you wish to plot.
-#' @param chrom_list A list of chromatograms in matrix format (timepoints x
-#' wavelengths). If no argument is provided here, the function will try to find the
-#' \code{chrom_list} object used to create the \code{peak_table}.
-#' @param what What to look for. Either \code{peak} to extract spectral information
-#' for a certain peak, \code{rt} to scan by retention time, or \code{click} to manually
-#' select retention time by clicking on the chromatogram. Defaults to \code{peak}.
+#' @inheritParams plot_spectrum
+#' @param x The peak table (output from [`get_peaktable`]).
+#' @param loc A vector specifying the peak(s) or retention time(s) to plot.
 #' @param idx Numerical index of chromatogram you wish to plot; "max" to
 #' plot the chromatogram with the largest signal; or "all" to plot spectra
 #' for all chromatograms.
-#' @param lambda The wavelength you wish to plot the trace at (if
-#' \code{plot_chrom} is TRUE and/or the wavelength to be used for the determination
+#' @param lambda The wavelength you wish to plot the trace at (if `plot_chrom` 
+#' is `TRUE`. Otherwise, the wavelength to be used for the determination
 #' of signal abundance.
-#' @param plot_spectrum Logical. If TRUE, plots the spectrum of the chosen
-#' peak. Defaults to TRUE.
-#' @param plot_trace Logical. If TRUE, plots the trace of the chosen peak at
-#' lambda. Defaults to TRUE.
-#' @param box_plot Logical. If TRUE, plots box plot using categories
-#' defined by \code{vars}.
+#' @param box_plot Logical. If `TRUE`, plots box plot using categories
+#' defined by `vars`.
 #' @param vars Independent variables for boxplot. Righthand side of formula.
-#' @param spectrum_labels Logical. If TRUE, plots labels on maxima in spectral
-#' plot. Defaults to TRUE.
-#' @param scale_spectrum Logical. If TRUE, scales spectrum to unit height.
-#' Defaults to FALSE.
-#' @param export_spectrum Logical. If TRUE, exports spectrum to console.
-#' Defaults to FALSE.
-#' @param verbose Logical. If TRUE, prints verbose output to console. Defaults
-#' to TRUE.
-#' @param engine Which plotting engine to use: either \code{base} or \code{plotly}.
-#' @param chr Deprecated. Please use \code{idx} instead.
-#' @param ... Additional arguments to \code{\link[graphics]{boxplot}}.
-#' @return If \code{export_spectrum} is TRUE, returns the spectrum as a \code{
-#' data.frame} with wavelengths as rows and columns encoding the
-#' absorbance (or normalized absorbance, if \code{scale_spectrum} is TRUE) for 
+#' @param verbose Logical. If `TRUE` (default), prints verbose output to the
+#' console.
+#' @param ... Additional arguments to [boxplot].
+#' @return If `export_spectrum` is `TRUE`, returns the spectrum as a 
+#' `data.frame` with wavelengths as rows and columns encoding the
+#' absorbance (or normalized absorbance, if `scale_spectrum` is `TRUE`) for 
 #' the specified sample(s). Otherwise, there is no return value.
 #' @section Side effects:
-#' If \code{plot_trace} is \code{TRUE}, plots the chromatographic trace of the 
-#' specified chromatogram (\code{idx}), at the specified wavelength 
-#' (\code{lambda}) with a dotted red line to indicate the retention time given 
-#' by \code{loc}. The trace is a single column from the chromatographic matrix.
+#' * If `plot_trace` is `TRUE`, plots the chromatographic trace of the 
+#' specified chromatogram (`idx`), at the specified wavelength 
+#' (`lambda`) with a dotted red line to indicate the retention time given 
+#' by `loc`. The trace is a single column from the chromatographic matrix.
 #'
-#' If \code{plot_spectrum} is TRUE, plots the spectrum for the specified chromatogram
-#' at the specified retention time. The spectrum is a single row from the chromatographic
-#' matrix.
+#' * If `plot_spectrum` is `TRUE`, plots the spectrum for the specified 
+#' chromatogram at the specified retention time. The spectrum represents a single 
+#' row from the chromatographic matrix.
 #' 
-#' If \code{box_plot} is TRUE, produces a \code{\link[graphics]{boxplot}} from the
-#' specified peak with groups provided by \code{vars}.
+#' * If `box_plot` is `TRUE`, produces a [`boxplot`] from the specified peak 
+#' with groups defined by the `vars` argument.
 #' @author Ethan Bass
 #' @rdname plot.peak_table
 #' @family visualization functions
@@ -70,8 +52,7 @@ plot.peak_table <- function(x, loc, chrom_list, what = "peak",
                             box_plot = FALSE, vars = NULL,
                             spectrum_labels = TRUE, scale_spectrum = FALSE,
                             export_spectrum = FALSE, verbose = TRUE,
-                            engine = c("base", "plotly", "ggplot"), 
-                            chr = NULL, ...){
+                            engine = c("base", "plotly", "ggplot"), ...){
   engine <- match.arg(engine, c("base", "plotly", "ggplot"))
   if (what == "peak" & missing(loc)){
     loc <- readline(prompt="Which peak would you like to plot? \n")
@@ -117,18 +98,18 @@ plot.peak_table <- function(x, loc, chrom_list, what = "peak",
 #' Make boxplot from peak table.
 #' 
 #' The function can take multiple response variables on the left hand side of the
-#' formula (separated by \code{+}). In this case, a separate boxplot will be
+#' formula (separated by `+`). In this case, a separate boxplot will be
 #' produced for each response variable.
 #' 
-#' @param x A \code{peak_table} object.
-#' @param formula A \code{\link[stats]{formula}} object.
-#' @param ... Additional arguments to \code{\link[graphics]{boxplot}}.
+#' @param x A `peak_table` object.
+#' @param formula A [formula] object.
+#' @param ... Additional arguments to [`boxplot`].
 #' @importFrom stats reformulate terms
 #' @importFrom graphics boxplot
 #' @return No return value, called for side effects.
 #' @section Side effects:
 #' Creates a boxplot according to the provided formula, using data from the
-#' supplied \code{peak_table} object.
+#' supplied `peak_table` object.
 #' @author Ethan Bass
 #' @examples
 #' data(pk_tab)
@@ -166,30 +147,29 @@ boxplot.peak_table <- function(x, formula, ...){
 #' 
 #' @importFrom graphics matplot legend plot.new plot.window par
 #' @importFrom utils head tail
-#' @param x The peak table (output from \code{\link{get_peaktable}}
-#' function).
+#' @param x The peak table (output from [`get_peaktable`].
 #' @param chrom_list A list of chromatograms in matrix format (timepoints x
 #' wavelengths). If no argument is provided here, the function will try to find the
-#' \code{chrom_list} object used to create the \code{peak_table}.
+#' `chrom_list` object used to create the `peak_table`.
 #' @param lambdas The wavelength you wish to plot the traces at.
 #' @param var Variable to index chromatograms.
-#' @param subset Character vector specifying levels to use (if more than 2 levels
-#' are present in \code{var}).
-#' @param print_legend Logical. Whether to print legend. Defaults to \code{TRUE}.
+#' @param subset Character vector specifying levels to use (if more than two
+#' levels are present in `var`).
+#' @param print_legend Logical. Whether to print legend. Defaults to `TRUE`.
 #' @param legend_txt Character vector containing labels for legend.
 #' @param legend_pos Legend position.
-#' @param legend_size Legend size (\code{cex} argument). Default is 1.
+#' @param legend_size Legend size (`cex` argument). Default is `1`.
 #' @param mirror Logical. Whether to plot as mirror or stacked plots.
-#' Defaults to \code{TRUE}.
+#' Defaults to `TRUE`.
 #' @param xlim Numerical vector specifying limits for x axis.
 #' @param ylim Numerical vector specifying limits for y axis.
-#' @param ... Additional arguments to \code{\link{matplot}} function.
+#' @param ... Additional arguments to `matplot` function.
 #' @return No return value, called for side effects.
 #' @section Side effects:
-#' If \code{mirror_plot} is TRUE, plots a mirror plot comparing two treatments
-#' defined by \code{var} and \code{subset} (if more than two factors are present
-#' in \code{var}).
-#' Otherwise, if \code{mirror_plot} is FALSE, the treatments are plotted in two
+#' If `mirror_plot` is `TRUE`, plots a mirror plot comparing two treatments
+#' defined by `var` and `subset` (if more than two factors are present
+#' in `var`).
+#' Otherwise, if `mirror_plot` is `FALSE`, the treatments are plotted in two
 #' separate panes.
 #' @author Ethan Bass
 #' @examples
@@ -241,7 +221,7 @@ mirror_plot <- function(x, chrom_list, lambdas = NULL, var, subset = NULL,
     }
   }
   if (is.null(subset)){
-    if (nlevels(fac)>2){
+    if (nlevels(fac) > 2){
       warning(paste0("Selecting first two levels of ", sQuote(var)),
       ". To choose different levels, use the `subset` argument 
         to specify the desired levels.")
@@ -300,6 +280,6 @@ mirror_plot <- function(x, chrom_list, lambdas = NULL, var, subset = NULL,
     }
     if (print_legend)
       legend(legend_pos, legend = legend_txt[[2]], cex = legend_size, bty = "n")
-    par(oldpar) # reset par
+    par(oldpar)
   }
 }

@@ -12,11 +12,11 @@ data(Sa)
 }
 \description{
 A list of four HPLC-DAD data matrices of \emph{Solidago altissima} roots
-extracted in 90\% methanol. Retention times are stored in rows and 
+extracted in 90\\% methanol. Retention times are stored in rows and
 wavelengths are stored in columns. Data were collected on a Agilent 1100 HPLC.
 }
 \seealso{
-Other data objects: 
+Other data objects:
 \code{\link{Sa_pr}},
 \code{\link{Sa_warp}},
 \code{\link{pk_tab}}

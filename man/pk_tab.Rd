@@ -15,7 +15,7 @@ A peak table generated from the exemplary goldenrod root extracts stored in
 \code{\link{Sa}}.
 }
 \seealso{
-Other data objects: 
+Other data objects:
 \code{\link{Sa}},
 \code{\link{Sa_pr}},
 \code{\link{Sa_warp}}

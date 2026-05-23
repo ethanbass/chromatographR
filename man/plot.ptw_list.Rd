@@ -16,11 +16,10 @@
 \arguments{
 \item{x}{A \code{ptw_list} object created by \code{\link{correct_rt}}.}
 
-\item{what}{What type of plot to return. Either \code{traces} or 
-\code{heatmap}.}
+\item{what}{What type of plot to return. Either \code{traces} or \code{heatmap}.}
 
-\item{engine}{What plotting engine to use. Either \code{base}, \code{ggplot}
-or \code{plotly}}
+\item{engine}{What plotting engine to use. Either \code{base}, \code{ggplot}, or
+\code{plotly}.}
 
 \item{lambdas}{Which lambdas to plot.}
 
@@ -32,14 +31,14 @@ or \code{plotly}}
 No return value, called for side effects.
 }
 \description{
-Plots \code{\link[ptw]{ptw}} alignments.
+Plots \code{\link[ptw:ptw]{ptw}} alignments.
 }
 \section{Side effects}{
 
 Plots PTW alignments at the specified wavelength (\code{lambda}) either as
 individual traces or as a heatmap, according to the value of \code{what}. The
-plot can be produced using either base R graphics, \code{ggplot2}, or 
-\code{plotly}, according to the value of \code{engine}.
+plot can be produced using either base R graphics, \code{ggplot2}, or \code{plotly},
+according to the value of the \code{engine} argument.
 }
 
 \examples{

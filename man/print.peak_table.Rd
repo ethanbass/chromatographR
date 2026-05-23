@@ -12,7 +12,7 @@
 \item{...}{Additional arguments to \code{\link{print}}.}
 }
 \value{
-Prints and invisible returns the \code{tab} element from the supplied 
+Prints and invisible returns the \code{tab} element from the supplied
 \code{peak_table}.
 }
 \description{

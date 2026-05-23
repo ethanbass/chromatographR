@@ -24,17 +24,17 @@ as numeric indices.}
 \item{weight}{Weight provided to \code{\link{get_agilent_threshold}}.}
 
 \item{cutoff}{Proportion of maximum absorbance to use as cutoff.
-Argument to \code{\link{trim_peak}}. Defaults to \code{.05}.}
+Argument to \code{\link{trim_peak}}. Defaults to \code{0.05}.}
 
-\item{noise_variance}{Variance of noise. Argument to 
-\code{\link{get_agilent_threshold}}.}
+\item{noise_variance}{Variance of noise. Argument to
+\code{get_agilent_threshold}.}
 
-\item{noise_threshold}{Threshold to define noise. Highest proportion of 
-maximum absorbance. Defaults to \code{.01}.}
+\item{noise_threshold}{Threshold to define noise. Highest proportion of
+maximum absorbance. Defaults to \code{0.01}.}
 
 \item{lambdas}{Wavelengths to include in calculations.}
 
-\item{try}{Logical. Whether to estimate the purity or not. Defaults to TRUE.}
+\item{try}{Logical. Whether to estimate the purity or not. Defaults to \code{TRUE}.}
 }
 \value{
 Returns the mean purity of the peak specified by \code{pos}, defined
@@ -47,7 +47,7 @@ comprising the peak, using the method described in Stahl 2003.
 \references{
 Stahl, Mark. “Peak Purity Analysis in HPLC and CE Using Diode-Array Technology.”
 Agilent Technologies, April 1, 2003, 16.
-\url{https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}
+\href{https://web.archive.org/web/20220615145615/https://www.agilent.com/cs/library/applications/5988-8647EN.pdf}{5988-8647EN.pdf}
 }
 \author{
 Ethan Bass

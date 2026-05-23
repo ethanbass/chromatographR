@@ -16,13 +16,13 @@ combine_peaks(
 \item{peak_table}{Peak table from \code{\link{get_peaktable}}.}
 
 \item{tol}{Tolerance for matching retention times (maximum retention time
-difference). Defaults to \code{.01}.}
+difference). Defaults to \code{0.01}.}
 
-\item{min.cor}{Minimum spectral correlation to confirm a match. Defaults to 
+\item{min.cor}{Minimum spectral correlation to confirm a match. Defaults to
 \code{0.9}.}
 
-\item{choose}{If \code{max} will retain peak with highest intensity. Otherwise,
-the first column in the data.frame will be retained.}
+\item{choose}{If \code{max}, the peak with highest intensity will be retained.
+Otherwise, the first column in the data.frame will be retained.}
 
 \item{verbose}{Logical. Whether to print status to the console.}
 }
@@ -33,7 +33,7 @@ to duplicate peaks combined according to the specified criteria.
 \description{
 Utility function to combine duplicate peaks in peak table, (i.e., peaks that
 were integrated at more than one wavelength or component) based on retention
-time and/or spectral similarity. Specify tolerance (\code{tol}) for 
+time and/or spectral similarity. Specify tolerance (\code{tol}) for
 retention time matching and minimum spectral correlation (\code{min.cor}) for
 a match.
 }
@@ -46,12 +46,12 @@ combine_peaks(pk_tab, tol = 0.02, min.cor = 0.9)
 \seealso{
 \code{\link{get_peaks}}
 
-Other utility functions: 
-\code{\link{get_lambdas}()},
-\code{\link{get_times}()},
-\code{\link{merge_peaks}()},
-\code{\link{reshape_chroms}()},
-\code{\link{reshape_peaktable}()}
+Other utility functions:
+\code{\link[=get_lambdas]{get_lambdas()}},
+\code{\link[=get_times]{get_times()}},
+\code{\link[=merge_peaks]{merge_peaks()}},
+\code{\link[=reshape_chroms]{reshape_chroms()}},
+\code{\link[=reshape_peaktable]{reshape_peaktable()}}
 }
 \author{
 Ethan Bass

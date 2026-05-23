@@ -36,11 +36,13 @@ For one-dimensional chromatograms, this argument can be ignored.}
 \item{models}{List of models to warp by. The models provided here (if any)
 must match the algorithm selected in \code{alg}.}
 
-\item{reference}{Index of the sample that is to be considered the reference
-sample.}
+\item{reference}{Index of the sample to be used as the reference. If no
+reference is specified, the reference will be chosen algorithmically from a
+similarity matrix of the supplied chromatograms using the
+\code{\link[ptw:bestref]{bestref}} function from \code{ptw}.}
 
-\item{alg}{algorithm to use: parametric time warping (\code{"ptw"}) or
-variable penalty dynamic time warping (\code{"vpdtw"}).}
+\item{alg}{Alignment algorithm to use: parametric time warping (\code{"ptw"}),
+or variable penalty dynamic time warping (\code{"vpdtw"}).}
 
 \item{what}{What to return: either the \code{"corrected.values"} (useful for
 visual inspection and downstream analysis) or the warping \code{"models"}
@@ -51,41 +53,41 @@ visual inspection and downstream analysis) or the warping \code{"models"}
 \item{n.traces}{Number of traces to use.}
 
 \item{fill_zeros}{Logical. If \code{TRUE}, out-of-bounds regions produced by
-warping are filled with zeros. If \code{FALSE}, these regions are returned
-as \code{NA}. Defaults to \code{FALSE}.}
+warping are filled with zeros. If \code{FALSE} (default), these regions are
+returned as \code{NA}.}
 
 \item{n.zeros}{Number of zeros to add for padding chromatograms at the edges.}
 
 \item{scale}{Logical. If \code{TRUE}, scale chromatograms before warping.}
 
-\item{trwdth}{width of the triangle in the WCC criterion.}
+\item{trwdth}{Argument to \code{\link[ptw:ptw]{ptw}}. Width of the triangle in
+the WCC criterion. Defaults to \code{200}.}
 
-\item{plot_it}{Logical. Whether to plot alignment.}
+\item{plot_it}{Logical. Whether to plot alignment. Defaults to \code{FALSE}.}
 
 \item{penalty}{The divisor used to calculate the penalty for
-\code{\link[VPdtw]{VPdtw}}. The warping penalty is calculated by dividing the
-\code{\link[VPdtw]{dilation}} by this number. Thus, a higher number will
+\code{\link[VPdtw:VPdtw]{VPdtw}}. The warping penalty is calculated by dividing the
+\code{\link[VPdtw:dilation]{dilation}} by this number. Thus, a higher number will
 produce a lower penalty and be more permissive, while a lower number will
 produce a higher penalty and allow less warping. Defaults to \code{5}.}
 
-\item{maxshift}{Integer. Maximum allowable shift for \code{\link[VPdtw]{VPdtw}}.
+\item{maxshift}{Integer. Maximum allowable shift for \code{VPdtw} warping.
 Defaults to \code{50}.}
 
 \item{verbose}{Logical. Whether to print verbose output.}
 
 \item{show_progress}{Logical. Whether to show progress bar. Defaults to
-\code{TRUE} if \code{\link[pbapply]{pbapply}} is installed. Currently works
+\code{TRUE} if \code{\link[pbapply:pbapply]{pbapply}} is installed. Currently works
 only for \code{ptw} alignments.}
 
-\item{cl}{Argument to \code{\link[pbapply]{pblapply}} or
-\code{\link[parallel]{mclapply}}. Either an integer specifying the number of
-clusters to use for parallel processing or a cluster object created by
-\code{\link[parallel]{makeCluster}}. Defaults to \code{2}. On Windows systems,
-integer values will be ignored.}
+\item{cl}{Argument to \code{pbapply} or \code{\link[parallel:mclapply]{mclapply}}. Either
+an integer specifying the number of clusters to use for parallel processing
+or a cluster object created by \code{\link[parallel:makeCluster]{makeCluster}}.
+Defaults to \code{2}. On Windows systems, integer values will be ignored.}
 
-\item{\dots}{Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
-The only argument that cannot be changed is \code{warp.type}: this is
-hard-coded to \code{"global"} to permit warping on multiple wavelengths.}
+\item{...}{Optional additional arguments to \code{ptw}. The only argument that
+cannot be changed is \code{warp.type} which is hard-coded to \code{"global"} to permit
+warping on multiple wavelengths.}
 }
 \value{
 A list of warping models or a list of warped absorbance profiles,
@@ -93,17 +95,18 @@ according to the value of the \code{what} argument.
 }
 \description{
 Aligns chromatograms using one of two algorithms, according to the value of
-\code{alg}: either parametric time warping, as implemented in
-\code{\link[ptw]{ptw}}, or variable penalty dynamic time warping, as
-implemented in \code{\link[VPdtw]{VPdtw}}. The \code{init.coef} and
-\code{n.traces} arguments apply only to \code{ptw} warping, while
-\code{penalty} and \code{maxshift} apply only to \code{vpdtw}
-warping.
+\code{alg}: parametric time warping (\code{"ptw"}), as implemented in \code{\link[ptw:ptw]{ptw}};
+variable penalty dynamic time warping (\code{"vpdtw"}), as implemented in
+\code{\link[VPdtw:VPdtw]{VPdtw}}.
+}
+\details{
+Some arguments are specific to particular warping functions. For example
+the \code{init.coef} and \code{n.traces} arguments apply only to \code{"ptw"} warping, while
+\code{penalty} and \code{maxshift} apply only to  \code{"vpdtw"} warping.
 }
 \note{
-Adapted from
-\href{https://github.com/rwehrens/alsace/blob/master/R/correctRT.R}{correctRT}
-function in the alsace package by Ron Wehrens.
+Adapted from the \code{correctRT} function in the alsace package by Ron
+Wehrens (\url{https://github.com/rwehrens/alsace/blob/master/R/correctRT.R}).
 }
 \examples{
 \dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
@@ -115,23 +118,23 @@ warp <- correct_rt(chrom_list = Sa_pr, lambdas=210)
 \itemize{
 \item Clifford, D., Stone, G., Montoliu, I., Rezzi, S., Martin, F. P., Guy, P.,
 Bruce, S., & Kochhar, S. 2009. Alignment using variable penalty dynamic time
-warping. \emph{Analytical chemistry}, \bold{81(3)}:1000-1007. \doi{10.1021/ac802041e}.
+warping. \emph{Analytical chemistry}, 81(3):1000-1007. \doi{10.1021/ac802041e}.
 \item Clifford, D., & Stone, G. 2012. Variable Penalty Dynamic Time Warping Code
 for Aligning Mass Spectrometry Chromatograms in R. \emph{Journal of
-Statistical Software}, \bold{47(8)}:1-17. \doi{10.18637/jss.v047.i08}.
+Statistical Software}, 47(8):1-17. \doi{10.18637/jss.v047.i08}.
 \item Eilers, P.H.C. 2004. Parametric Time Warping.
-\emph{Anal. Chem.}, \bold{76}:404-411. \doi{10.1021/ac034800e}.
+\emph{Anal. Chem.}, 76:404-411. \doi{10.1021/ac034800e}.
 \item Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast
 parametric time warping of peak lists. \emph{Bioinformatics},
-\bold{31}:3063-3065. \doi{10.1093/bioinformatics/btv299}.
+31:3063-3065. \doi{10.1093/bioinformatics/btv299}.
 \item Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
-LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
-Metabolomics}, \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}.
+LC–DAD using multivariate curve resolution: the alsace package for R.
+\emph{Metabolomics}, 11:143-154. \doi{10.1007/s11306-014-0683-5}.
 }
 }
 \seealso{
-\code{\link[ptw:ptw]{ptw}}, \code{\link{correct_peaks}},
-\code{\link[VPdtw]{VPdtw}}
+\code{\link{correct_rt_group}}, \code{\link{correct_peaks}}, \code{\link[ptw:ptw]{ptw}},
+\code{\link[VPdtw:VPdtw]{VPdtw}}
 }
 \author{
 Ethan Bass

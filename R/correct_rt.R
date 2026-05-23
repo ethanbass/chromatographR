@@ -1,12 +1,13 @@
 #' Correct retention time
 #' 
-#' Aligns chromatograms using one of two algorithms, according to the value of 
-#' \code{alg}: either parametric time warping, as implemented in 
-#' \code{\link[ptw]{ptw}}, or variable penalty dynamic time warping, as 
-#' implemented in \code{\link[VPdtw]{VPdtw}}. The \code{init.coef} and 
-#' \code{n.traces} arguments apply only to \code{ptw} warping, while 
-#' \code{penalty} and \code{maxshift} apply only to \code{vpdtw}
-#' warping.
+#' Aligns chromatograms using one of two algorithms, according to the value of
+#' `alg`: parametric time warping (`"ptw"`), as implemented in [`ptw`][ptw::ptw]; 
+#' variable penalty dynamic time warping (`"vpdtw"`), as implemented in 
+#' [`VPdtw`][VPdtw::VPdtw].
+#' 
+#' Some arguments are specific to particular warping functions. For example 
+#' the `init.coef` and `n.traces` arguments apply only to `"ptw"` warping, while 
+#' `penalty` and `maxshift` apply only to  `"vpdtw"` warping.
 #' 
 #' @aliases correct_rt
 #' @import ptw
@@ -17,69 +18,70 @@
 #' use for alignment. Only one wavelength should be specified for VPdtw warping.
 #' For one-dimensional chromatograms, this argument can be ignored.
 #' @param models List of models to warp by. The models provided here (if any)
-#' must match the algorithm selected in \code{alg}.
-#' @param reference Index of the sample that is to be considered the reference
-#' sample.
-#' @param alg algorithm to use: parametric time warping (\code{"ptw"}) or 
-#' variable penalty dynamic time warping (\code{"vpdtw"}).
-#' @param what What to return: either the \code{"corrected.values"} (useful for 
-#' visual inspection and downstream analysis) or the warping \code{"models"}
+#' must match the algorithm selected in `alg`.
+#' @param reference Index of the sample to be used as the reference. If no 
+#' reference is specified, the reference will be chosen algorithmically from a
+#' similarity matrix of the supplied chromatograms using the 
+#' [`bestref`][ptw::bestref] function from `ptw`.
+#' @param alg Alignment algorithm to use: parametric time warping (`"ptw"`), 
+#' or variable penalty dynamic time warping (`"vpdtw"`).
+#' @param what What to return: either the `"corrected.values"` (useful for 
+#' visual inspection and downstream analysis) or the warping `"models"`
 #' (for further programmatic use).
 #' @param init.coef Starting values for the optimization.
 #' @param n.traces Number of traces to use.
-#' @param fill_zeros Logical. If \code{TRUE}, out-of-bounds regions produced by 
-#' warping are filled with zeros. If \code{FALSE}, these regions are returned 
-#' as \code{NA}. Defaults to \code{FALSE}.
+#' @param fill_zeros Logical. If `TRUE`, out-of-bounds regions produced by 
+#' warping are filled with zeros. If `FALSE` (default), these regions are 
+#' returned as `NA`.
 #' @param n.zeros Number of zeros to add for padding chromatograms at the edges.
-#' @param scale Logical. If \code{TRUE}, scale chromatograms before warping.
-#' @param trwdth width of the triangle in the WCC criterion.
-#' @param plot_it Logical. Whether to plot alignment.
+#' @param scale Logical. If `TRUE`, scale chromatograms before warping.
+#' @param trwdth Argument to [`ptw`][ptw::ptw]. Width of the triangle in 
+#' the WCC criterion. Defaults to `200`.
+#' @param plot_it Logical. Whether to plot alignment. Defaults to `FALSE`.
 #' @param penalty The divisor used to calculate the penalty for
-#' \code{\link[VPdtw]{VPdtw}}. The warping penalty is calculated by dividing the
-#' \code{\link[VPdtw]{dilation}} by this number. Thus, a higher number will
+#' [`VPdtw`][VPdtw::VPdtw]. The warping penalty is calculated by dividing the
+#' [`dilation`][VPdtw::dilation] by this number. Thus, a higher number will
 #' produce a lower penalty and be more permissive, while a lower number will 
-#' produce a higher penalty and allow less warping. Defaults to \code{5}.
-#' @param maxshift Integer. Maximum allowable shift for \code{\link[VPdtw]{VPdtw}}.
-#' Defaults to \code{50}.
+#' produce a higher penalty and allow less warping. Defaults to `5`.
+#' @param maxshift Integer. Maximum allowable shift for `VPdtw` warping.
+#' Defaults to `50`.
 #' @param verbose Logical. Whether to print verbose output.
 #' @param show_progress Logical. Whether to show progress bar. Defaults to 
-#' \code{TRUE} if \code{\link[pbapply]{pbapply}} is installed. Currently works 
-#' only for \code{ptw} alignments.
-#' @param cl Argument to \code{\link[pbapply]{pblapply}} or 
-#' \code{\link[parallel]{mclapply}}. Either an integer specifying the number of 
-#' clusters to use for parallel processing or a cluster object created by 
-#' \code{\link[parallel]{makeCluster}}. Defaults to \code{2}. On Windows systems,
-#' integer values will be ignored.
-#' @param \dots Optional arguments for the \code{\link[ptw:ptw]{ptw}} function.
-#' The only argument that cannot be changed is \code{warp.type}: this is
-#' hard-coded to \code{"global"} to permit warping on multiple wavelengths.
+#' `TRUE` if [`pbapply`][pbapply::pbapply] is installed. Currently works 
+#' only for `ptw` alignments.
+#' @param cl Argument to `pbapply` or [`mclapply`][parallel::mclapply]. Either 
+#' an integer specifying the number of clusters to use for parallel processing 
+#' or a cluster object created by [`makeCluster`][parallel::makeCluster]. 
+#' Defaults to `2`. On Windows systems, integer values will be ignored.
+#' @param ... Optional additional arguments to `ptw`. The only argument that 
+#' cannot be changed is `warp.type` which is hard-coded to `"global"` to permit
+#' warping on multiple wavelengths.
 #' @return A list of warping models or a list of warped absorbance profiles,
-#' according to the value of the \code{what} argument.
+#' according to the value of the `what` argument.
 #' @author Ethan Bass
-#' @note Adapted from
-#' \href{https://github.com/rwehrens/alsace/blob/master/R/correctRT.R}{correctRT}
-#' function in the alsace package by Ron Wehrens.
-#' @seealso \code{\link[ptw:ptw]{ptw}}, \code{\link{correct_peaks}},
-#' \code{\link[VPdtw]{VPdtw}}
+#' @note Adapted from the `correctRT` function in the alsace package by Ron 
+#' Wehrens (<https://github.com/rwehrens/alsace/blob/master/R/correctRT.R>).
+#' @seealso [`correct_rt_group`], [`correct_peaks`], [`ptw`][ptw::ptw], 
+#' [`VPdtw`][VPdtw::VPdtw]
 #' @references 
 #' * Clifford, D., Stone, G., Montoliu, I., Rezzi, S., Martin, F. P., Guy, P.,
 #' Bruce, S., & Kochhar, S. 2009. Alignment using variable penalty dynamic time
-#' warping. \emph{Analytical chemistry}, \bold{81(3)}:1000-1007. \doi{10.1021/ac802041e}.
+#' warping. *Analytical chemistry*, 81(3):1000-1007. \doi{10.1021/ac802041e}.
 #'
 #' * Clifford, D., & Stone, G. 2012. Variable Penalty Dynamic Time Warping Code
-#' for Aligning Mass Spectrometry Chromatograms in R. \emph{Journal of
-#' Statistical Software}, \bold{47(8)}:1-17. \doi{10.18637/jss.v047.i08}.
+#' for Aligning Mass Spectrometry Chromatograms in R. *Journal of
+#' Statistical Software*, 47(8):1-17. \doi{10.18637/jss.v047.i08}.
 #' 
 #' * Eilers, P.H.C. 2004. Parametric Time Warping.
-#' \emph{Anal. Chem.}, \bold{76}:404-411. \doi{10.1021/ac034800e}.
+#' *Anal. Chem.*, 76:404-411. \doi{10.1021/ac034800e}.
 #' 
 #' * Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast
-#' parametric time warping of peak lists. \emph{Bioinformatics},
-#' \bold{31}:3063-3065. \doi{10.1093/bioinformatics/btv299}.
+#' parametric time warping of peak lists. *Bioinformatics*,
+#' 31:3063-3065. \doi{10.1093/bioinformatics/btv299}.
 #' 
 #' * Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
-#' LC–DAD using multivariate curve resolution: the alsace package for R. \emph{
-#' Metabolomics}, \bold{11}:143-154. \doi{10.1007/s11306-014-0683-5}.
+#' LC–DAD using multivariate curve resolution: the alsace package for R.
+#' *Metabolomics*, 11:143-154. \doi{10.1007/s11306-014-0683-5}.
 #' 
 #' @examplesIf interactive()
 #' data(Sa_pr)
@@ -87,8 +89,10 @@
 #' @md
 #' @export correct_rt
 correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
-                       alg = c("ptw", "vpdtw"), what = c("corrected.values", "models"), 
-                       init.coef = c(0, 1, 0), n.traces = NULL, n.zeros = 0, 
+                       alg = c("ptw", "vpdtw"),
+                       what = c("corrected.values", "models"), 
+                       init.coef = c(0, 1, 0), n.traces = NULL, 
+                       fill_zeros = FALSE, n.zeros = 0, 
                        scale = FALSE, trwdth = 200, plot_it = FALSE,
                        penalty = 5, maxshift = 50,
                        verbose = getOption("verbose"), show_progress = NULL, 
@@ -119,11 +123,10 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
   chrom_list_og <- chrom_list
   if (n.zeros > 0){
     chrom_list <- lapply(chrom_list, function(x){
-      apply(x, 2, padzeros, nzeros = n.zeros, side = 'both')
+      x_p <- pad_zeros(x, n_zeros = n.zeros, side = "both")
+      transfer_metadata(x_p, x)
     })
   }
-  allmats <- sapply(chrom_list, function(x){
-    x[, lambdas, drop = FALSE]}, simplify = "array")
   allmats.t <- sapply(chrom_list, function(x){
     t(x[, lambdas, drop = FALSE])}, simplify = "array")
   if (is.null(n.traces)){
@@ -132,7 +135,6 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
     traces <- select.traces(X = allmats.t, criterion = 'coda')
     traces <- traces$trace.nrs[seq_len(n.traces)]
   }
-  # choose reference chromatogram
   if (reference == 'best'){
     best <- ptw::bestref(allmats.t)
     reference <- as.numeric(names(sort(table(best$best.ref), 
@@ -148,9 +150,10 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
                           n.zeros = n.zeros, scale = scale, trwdth = trwdth,
                           penalty = penalty, maxshift = maxshift))
   if (alg == "ptw"){
+    laplee <- choose_apply_fnc(show_progress, cl = cl)
     if (is.null(models)){
-      laplee <- choose_apply_fnc(show_progress, cl = cl)
-      models <- laplee(seq_len(dim(allmats)[3]), function(ii){
+      if (verbose) message("Fitting PTW warping models.")
+      models <- laplee(seq_len(dim(allmats.t)[3]), function(ii){
         pw <- ptw::ptw(allmats.t[,, reference],
             allmats.t[,, ii], selected.traces = traces, init.coef = init.coef,
             warp.type = "global", ...)
@@ -163,7 +166,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
           rownames(pw$warped.sample) <- lambdas
         }
         pw
-        })
+      })
       names(models) <- names(chrom_list)
       models <- structure(models, chrom_list = deparse(substitute(chrom_list)), 
                           reference = reference, init.coef = init.coef,
@@ -174,8 +177,8 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
         plot(models)
       }
     }
-  if (what == "corrected.values"){
-    if (verbose) message("Applying PTW warping models to chromatograms.")
+    if (what == "corrected.values"){
+      if (verbose) message("Applying PTW warping models to chromatograms.")
       result <- laplee(seq_along(models), function(ii){
         coef <- models[[ii]]$warp.coef[1, ]
         x <- warp_sample_ptw(chrom_list_og[[ii]], coef, 
@@ -188,27 +191,32 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
       result <- structure(result, warped = TRUE, warping_args = args)
       names(result) <- names(chrom_list)
       result
-    } else {models}
+    } else {
+      return(models)
+    }
   } else if (alg == "vpdtw"){
     if (length(lambdas) > 1)
       stop("VPdtw only supports warping by a single wavelength")
-    allmats <- sapply(chrom_list_og, function(x) x[, lambdas, drop = FALSE])
     if (is.null(models)){
+      if (verbose) message("Fitting VPdtw warping models.")
+      allmats <- sapply(chrom_list_og, function(x) x[, lambdas, drop = FALSE])
       penalty <- VPdtw::dilation(allmats[,reference], 350) / penalty
       models <- VPdtw::VPdtw(query = allmats, reference = allmats[, reference],
                              penalty = penalty, maxshift = maxshift)
+      attr(models, "parameters") <- list(reference = reference,
+                                         maxshift = maxshift)
     }
     if (plot_it){
       VPdtw::plot.VPdtw(models)
     }
     if (what == "corrected.values"){
+      if (verbose) message("Applying VPdtw warping models to chromatograms.")
       jset <- models$xVals + models$shift
       iset <- models$query
       jmax <- nrow(jset)
       short <- jmax - nrow(iset)
       res <- get_time_resolution(chrom_list_og, idx = reference)
-      result <- lapply(seq_len(ncol(allmats)), function(samp){
-        # warp retention times
+      result <- lapply(seq_along(chrom_list), function(samp){
         x <- apply(chrom_list_og[[samp]], 2, function(j){
           iset <- c(rep(NA, short), j)
           suppressWarnings(stats::approx(x = jset[,samp], y = iset, 
@@ -245,7 +253,76 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
       })
       result
     } else {
-      models
+      return(models)
+    }
+  }
+}
+
+#' Apply VPdtw
+#' @noRd
+apply_vpdtw <- function(chrom_list, models, reference, args = NULL, 
+                        fill_zeros = FALSE) {
+  jset <- models$xVals + models$shift
+  iset <- models$query
+  jmax <- nrow(jset)
+  short <- jmax - nrow(iset)
+  res <- get_time_resolution(chrom_list, idx = reference)
+  
+  result <- lapply(seq_along(chrom_list), function(ii) {
+    warp_sample_vpdtw(chrom_list[[ii]], jset[, ii], short, 
+                      fill_zeros = fill_zeros)
+  })
+  
+  old_ts <- c(rep(NA, short), get_times(chrom_list, idx = reference))
+  times <- suppressWarnings(stats::approx(x = jset[, reference],
+                                          y = old_ts, seq_len(jmax))$y)
+  idx_start <- which.min(times)
+  beg <- if (idx_start > 1) {
+    sort(seq(from = times[idx_start] - res, by = -res,
+             length.out = idx_start - 1), decreasing = FALSE)
+  } else NULL
+  idx_end <- which.max(times)
+  end <- if (idx_end < length(times)) {
+    seq(from = times[idx_end] + res,
+        length.out = length(times) - idx_end, by = res)
+  } else NULL
+  new.times <- c(beg, times[!is.na(times)], end)
+  
+  # assign times and metadata
+  result <- mapply(function(x, idx) {
+    rownames(x) <- new.times
+    transfer_metadata(x, chrom_list[[idx]])
+  }, result, seq_along(result), SIMPLIFY = FALSE)
+  names(result) <- names(chrom_list)
+  
+  # replace NAs with 0s and attach metadata
+  lapply(result, function(xx) {
+    if (fill_zeros && any(is.na(xx))) xx[which(is.na(xx))] <- 0
+    structure(xx, warped = TRUE, warping_args = args)
+  })
+}
+
+#' Warp sample VPdtw
+#' @noRd
+warp_sample_vpdtw <- function(mat, jset_col, short, fill_zeros = FALSE) {
+  padded <- rbind(matrix(NA, nrow = short, ncol = ncol(mat)), mat)
+  tp <- seq_len(nrow(padded))
+  valid_range <- range(jset_col, na.rm = TRUE)
+  jset_col[is.na(jset_col) & seq_along(jset_col) > valid_range[2]] <- Inf
+  jset_col[is.na(jset_col)] <- -Inf
+  lo <- findInterval(tp, jset_col)
+  hi <- lo + 1
+  lo_c <- pmax(1, lo)
+  hi_c <- pmin(length(jset_col), hi)
+  frac <- (tp - jset_col[lo_c]) / (jset_col[hi_c] - jset_col[lo_c])
+  frac[is.na(frac)] <- 0
+  frac_mat <- matrix(frac, nrow = length(tp), ncol = ncol(padded))
+  x <- padded[lo_c, ] + frac_mat * (padded[hi_c, ] - padded[lo_c, ])
+  x[which(tp < valid_range[1] | 
+            tp > valid_range[2]), ] <- ifelse(fill_zeros, 0, NA)
+  x
+}
+
 #' Warp sample PTW
 #' @noRd
 warp_sample_ptw <- function(mat, coef, fill_zeros = FALSE,

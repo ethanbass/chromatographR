@@ -1,23 +1,21 @@
-
 #' Plot PTW alignments
 #' 
-#' Plots \code{\link[ptw]{ptw}} alignments.
+#' Plots [`ptw`][ptw::ptw] alignments.
 #' 
 #' @importFrom graphics matplot
-#' @param x A \code{ptw_list} object created by \code{\link{correct_rt}}.
-#' @param what What type of plot to return. Either \code{traces} or 
-#' \code{heatmap}.
-#' @param engine What plotting engine to use. Either \code{base}, \code{ggplot}
-#' or \code{plotly}
+#' @param x A `ptw_list` object created by [`correct_rt`].
+#' @param what What type of plot to return. Either `traces` or `heatmap`.
+#' @param engine What plotting engine to use. Either `base`, `ggplot`, or
+#' `plotly`.
 #' @param lambdas Which lambdas to plot.
 #' @param show_legend Logical. Whether to include sample legend.
 #' @param ... Additional arguments (placeholder).
 #' @return No return value, called for side effects.
 #' @section Side effects:
-#' Plots PTW alignments at the specified wavelength (\code{lambda}) either as
-#' individual traces or as a heatmap, according to the value of \code{what}. The
-#' plot can be produced using either base R graphics, \code{ggplot2}, or 
-#' \code{plotly}, according to the value of \code{engine}. 
+#' Plots PTW alignments at the specified wavelength (`lambda`) either as
+#' individual traces or as a heatmap, according to the value of `what`. The
+#' plot can be produced using either base R graphics, `ggplot2`, or `plotly`,
+#' according to the value of the `engine` argument. 
 #' @author Ethan Bass
 #' @examplesIf interactive()
 #' data(Sa_pr)
@@ -61,7 +59,8 @@ plot.ptw_list <- function(x, what = c("traces", "heatmap"),
       p2 <- plot_chroms(warped_chroms, lambdas = lambdas, title = "PTW alignment",
                         engine = engine, show_legend = show_legend)
       if (engine == "plotly"){
-        p2 <- p2 |> plotly::style(showlegend = FALSE) |> plotly::layout(title="")
+        p2 <- p2 |> plotly::style(showlegend = FALSE) |> 
+          plotly::layout(title = "")
       }
       combine_plots <- switch(engine,
                               plotly = purrr::partial(plotly::subplot, nrows = 2),
@@ -71,9 +70,9 @@ plot.ptw_list <- function(x, what = c("traces", "heatmap"),
       if (engine == "plotly"){
         p_c <- p_c |> plotly::layout(
           annotations = list(
-            list(x = 0.5, y = 1, text = "Raw data", showarrow = F, 
+            list(x = 0.5, y = 1, text = "Raw data", showarrow = FALSE, 
                  xref = 'paper', yref = 'paper', font = list(size = 16)),
-            list(x = 0.5, y = 0.45, text = "PTW alignments", showarrow = F, 
+            list(x = 0.5, y = 0.45, text = "PTW alignments", showarrow = FALSE, 
                  xref = 'paper', yref = 'paper', font = list(size = 16))
           )
         )
@@ -99,8 +98,9 @@ plot.ptw_list <- function(x, what = c("traces", "heatmap"),
                                 p_w + ggplot2::theme(legend.position = "none"), 
                                 nrow = 2)
         if (show_legend){
-          legend <- suppressWarnings(cowplot::get_legend(p_o + 
-                                                           ggplot2::theme(legend.box.margin = ggplot2::margin(0, 6, 0, 0))))
+          legend <- suppressWarnings(cowplot::get_legend(
+            p_o + ggplot2::theme(legend.box.margin = ggplot2::margin(0, 6, 0, 0))
+          ))
           p <- cowplot::plot_grid(p, legend, ncol = 2, rel_widths  = c(1, 0.2))
         }
       } else if (engine == "plotly"){
@@ -134,7 +134,9 @@ plot.ptw_list <- function(x, what = c("traces", "heatmap"),
   }
 }
 
-#' @noRd
+#' @method [ ptw_list
+#' @export
+#' @keywords internal
 `[.ptw_list` <- function(x, i) {
   structure(NextMethod(), class = "ptw_list")
 }  

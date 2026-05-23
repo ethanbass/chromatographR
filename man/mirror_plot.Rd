@@ -21,8 +21,7 @@ mirror_plot(
 )
 }
 \arguments{
-\item{x}{The peak table (output from \code{\link{get_peaktable}}
-function).}
+\item{x}{The peak table (output from \code{\link{get_peaktable}}.}
 
 \item{chrom_list}{A list of chromatograms in matrix format (timepoints x
 wavelengths). If no argument is provided here, the function will try to find the
@@ -32,8 +31,8 @@ wavelengths). If no argument is provided here, the function will try to find the
 
 \item{var}{Variable to index chromatograms.}
 
-\item{subset}{Character vector specifying levels to use (if more than 2 levels
-are present in \code{var}).}
+\item{subset}{Character vector specifying levels to use (if more than two
+levels are present in \code{var}).}
 
 \item{print_legend}{Logical. Whether to print legend. Defaults to \code{TRUE}.}
 
@@ -41,7 +40,7 @@ are present in \code{var}).}
 
 \item{legend_pos}{Legend position.}
 
-\item{legend_size}{Legend size (\code{cex} argument). Default is 1.}
+\item{legend_size}{Legend size (\code{cex} argument). Default is \code{1}.}
 
 \item{mirror}{Logical. Whether to plot as mirror or stacked plots.
 Defaults to \code{TRUE}.}
@@ -50,7 +49,7 @@ Defaults to \code{TRUE}.}
 
 \item{ylim}{Numerical vector specifying limits for y axis.}
 
-\item{...}{Additional arguments to \code{\link{matplot}} function.}
+\item{...}{Additional arguments to \code{matplot} function.}
 }
 \value{
 No return value, called for side effects.
@@ -66,10 +65,10 @@ to variables defined in sample metadata.
 }
 \section{Side effects}{
 
-If \code{mirror_plot} is TRUE, plots a mirror plot comparing two treatments
+If \code{mirror_plot} is \code{TRUE}, plots a mirror plot comparing two treatments
 defined by \code{var} and \code{subset} (if more than two factors are present
 in \code{var}).
-Otherwise, if \code{mirror_plot} is FALSE, the treatments are plotted in two
+Otherwise, if \code{mirror_plot} is \code{FALSE}, the treatments are plotted in two
 separate panes.
 }
 
@@ -83,15 +82,15 @@ mirror_plot(pk_tab,lambdas = c("210","260"), var = "trt", mirror = TRUE,
   col = c("green","blue"))
 }
 \seealso{
-Other visualization functions: 
-\code{\link{boxplot.peak_table}()},
-\code{\link{plot.peak_list}()},
-\code{\link{plot.peak_table}()},
-\code{\link{plot_all_spectra}()},
-\code{\link{plot_chroms}()},
-\code{\link{plot_chroms_heatmap}()},
-\code{\link{plot_spectrum}()},
-\code{\link{scan_chrom}()}
+Other visualization functions:
+\code{\link[=boxplot.peak_table]{boxplot.peak_table()}},
+\code{\link[=plot.peak_list]{plot.peak_list()}},
+\code{\link[=plot.peak_table]{plot.peak_table()}},
+\code{\link[=plot_all_spectra]{plot_all_spectra()}},
+\code{\link[=plot_chroms]{plot_chroms()}},
+\code{\link[=plot_chroms_heatmap]{plot_chroms_heatmap()}},
+\code{\link[=plot_spectrum]{plot_spectrum()}},
+\code{\link[=scan_chrom]{scan_chrom()}}
 }
 \author{
 Ethan Bass
