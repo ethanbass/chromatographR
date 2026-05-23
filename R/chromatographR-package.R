@@ -35,8 +35,10 @@
 #' \itemize{
 #'   * [boxplot.peak_table()]: Create boxplot from peaktable object.
 #'   * [plot_chroms()]: Plot chromatograms as traces.
+#'   * [annotate_peaks()]: Modify chromatogram plot with peak labels.
 #'   * [plot_chroms_heatmap()]: Plot chromatograms as heatmap.
 #'   * [plot_spectrum()]: Plot spectrum and/or trace of specified peak.
+#'   * [plot_spectrum_inset()]: Plot spectrum over chromatogram.
 #'   * [plot_all_spectra()]: Plot all spectra for specified peak.
 #'   * [mirror_plot()]: Plot chromatograms as mirror plot.
 #'   * [scan_chrom()]: Plot spectrum at wavelength specified by clicking on a chromatogram.

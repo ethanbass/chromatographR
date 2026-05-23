@@ -47,8 +47,10 @@ suggested workflow can be found in the vignette.
 \itemize{
 \item \code{\link[=boxplot.peak_table]{boxplot.peak_table()}}: Create boxplot from peaktable object.
 \item \code{\link[=plot_chroms]{plot_chroms()}}: Plot chromatograms as traces.
+\item \code{\link[=annotate_peaks]{annotate_peaks()}}: Modify chromatogram plot with peak labels.
 \item \code{\link[=plot_chroms_heatmap]{plot_chroms_heatmap()}}: Plot chromatograms as heatmap.
 \item \code{\link[=plot_spectrum]{plot_spectrum()}}: Plot spectrum and/or trace of specified peak.
+\item \code{\link[=plot_spectrum_inset]{plot_spectrum_inset()}}: Plot spectrum over chromatogram.
 \item \code{\link[=plot_all_spectra]{plot_all_spectra()}}: Plot all spectra for specified peak.
 \item \code{\link[=mirror_plot]{mirror_plot()}}: Plot chromatograms as mirror plot.
 \item \code{\link[=scan_chrom]{scan_chrom()}}: Plot spectrum at wavelength specified by clicking on a chromatogram.
