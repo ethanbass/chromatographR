@@ -4,7 +4,7 @@ bibentry(
   bibtype    = "manual",
   title    = "chromatographR: Chromatographic Data Analysis Toolset",
   author   = "Ethan Bass",
-  year     = "2023",
+  year     = "2026",
   note     = "version 0.7.5",
   url      = "https://ethanbass.github.io/chromatographR/",
   doi      = "10.5281/zenodo.6944334",
