@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="chromatographR: An introduction to HPLC-DAD analysis">
 <meta name="robots" content="noindex">
@@ -67,7 +67,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>chromatographR: An introduction to HPLC-DAD analysis</h1>
                         <h4 data-toc-skip class="author">Ethan Bass</h4>
             
-            <h4 data-toc-skip class="date">2026-04-28</h4>
+            <h4 data-toc-skip class="date">2026-05-31</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/master/vignettes/chromatographR.Rmd" class="external-link"><code>vignettes/chromatographR.Rmd</code></a></small>
       <div class="d-none name"><code>chromatographR.Rmd</code></div>
@@ -92,12 +92,12 @@ repeated. Reproducibility is much higher in command line workflows, like
 <em>chromatographR</em>, where the entire analysis can be stored and
 easily repeated by anyone using publicly available software.</p>
 <p>The <em>chromatographR</em> package began as a fork from the
-previously published <em>alsace</em> package <span class="citation">(Wehrens, Carvalho, and Fraser 2015)</span>, but has
-been reworked with improved functions for peak-finding, integration and
-peak table generation as well as a number of new tools for data
-visualization and downstream analysis. Unlike <em>alsace</em>, which
-emphasized multivariate curve resolution through alternating least
-squares (MCR-ALS), <em>chromatographR</em> is developed around a more
+previously published <em>alsace</em> package <span class="citation">(Wehrens et al. 2015)</span>, but has been reworked
+with improved functions for peak-finding, integration and peak table
+generation as well as a number of new tools for data visualization and
+downstream analysis. Unlike <em>alsace</em>, which emphasized
+multivariate curve resolution through alternating least squares
+(MCR-ALS), <em>chromatographR</em> is developed around a more
 conventional workflow that should seem more familiar to users of
 standard software tools for HPLC-DAD analysis. <em>chromatographR</em>
 includes tools for a) pre-processing, b) retention-time alignment, c)
@@ -158,12 +158,12 @@ correction, and interpolation) are available through the
 <p>To select a narrower range of times and/or wavelengths, arguments can
 be provided to the optional <code>dim1</code> and <code>dim2</code>
 arguments. The <code>baseline_cor</code> function from the <em>ptw</em>
-package <span class="citation">(Bloemberg et al. 2010)</span> takes
-arguments <code>p</code> (an asymmetry parameter) and
-<code>lambda</code> (a smoothing parameter). You can read more about
-these in the documentation for <code><a href="https://rdrr.io/pkg/ptw/man/asysm.html" class="external-link">ptw::asysm</a></code>. You may want to
-experiment with these parameters before choosing values to use on your
-whole dataset.</p>
+package <span class="citation">(<span class="nocase">Bloemberg et
+al.</span> 2010)</span> takes arguments <code>p</code> (an asymmetry
+parameter) and <code>lambda</code> (a smoothing parameter). You can read
+more about these in the documentation for <code><a href="https://rdrr.io/pkg/ptw/man/asysm.html" class="external-link">ptw::asysm</a></code>. You
+may want to experiment with these parameters before choosing values to
+use on your whole dataset.</p>
 <pre class="text"><code>&gt; i &lt;- 2 # chromatogram number in list of data
 &gt; tpoints &lt;- get_times(Sa)
 &gt; wavelength &lt;- '200.00000' # this must match one of the column names from your chromatogram
@@ -199,16 +199,14 @@ degradation, or subtle changes in mobile-phase composition), which can
 make it very difficult to compare peaks across samples. Luckily, a
 number of “time-warping” algorithms have been developed for correcting
 these kinds of shifts. In <code>chromatographR</code>, parametric time
-warping (<code>ptw</code>) <span class="citation">(Eilers 2004;
-Bloemberg et al. 2010)</span> and variable penalty dynamic time warping
-(<code>vpdtw</code>) <span class="citation">(Clifford et al. 2009;
-Clifford and Stone 2012)</span> are available for correcting retention
-time shifts through the <code>correct_rt</code> function. Both warping
-functions aim to produce a better alignment of features by “warping” the
-time-axis of each supplied chromatogram to match a reference
-chromatogram. (The reference chromatogram can either be determined
-algorithmically or selected manually by setting the
-<code>reference</code> argument).</p>
+warping (<code>ptw</code>) <span class="citation">(Eilers 2004; <span class="nocase">Bloemberg et al.</span> 2010)</span> and variable penalty
+dynamic time warping (<code>vpdtw</code>) <span class="citation">(Clifford et al. 2009; Clifford and Stone 2012)</span>
+are available for correcting retention time shifts through the
+<code>correct_rt</code> function. Both warping functions aim to produce
+a better alignment of features by “warping” the time-axis of each
+supplied chromatogram to match a reference chromatogram. (The reference
+chromatogram can either be determined algorithmically or selected
+manually by setting the <code>reference</code> argument).</p>
 <p>First, we check the alignment of our chromatograms using the
 <code>plot_chroms</code> function.</p>
 <pre class="text"><code>&gt; plot_chroms(dat.pr, lambdas = 210, show_legend = TRUE)</code></pre>
@@ -273,8 +271,8 @@ warping (DTW) works by repeatedly shifting, expanding or contracting the
 time axis in small steps until a satisfactory alignment is attained.
 This process can result in very close matching of peaks, but can also
 lead to severe peak distortion if the time axis is repeatedly expanded
-and/or contracted <span class="citation">(Tomasi, van den Berg, and
-Andersson 2004)</span>. <strong>Variable penalty dynamic time
+and/or contracted <span class="citation">(<span class="nocase">Tomasi et
+al.</span> 2004)</span>. <strong>Variable penalty dynamic time
 warping</strong> is a derivative of DTW that constrains expansion and
 contraction of the time-axis by applying a penalty to these types of
 “risky” moves. This can often achieve a very good alignment with minimal
@@ -531,14 +529,12 @@ to quickly compare results across treatments by calling
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-bloemberg2010" class="csl-entry">
-Bloemberg, Tom G., Jan Gerretzen, Hans J. P. Wouters, Jolein Gloerich,
-Maurice van Dael, Hans J. C. T. Wessels, Lambert P. van den Heuvel, Paul
-H. C. Eilers, Lutgarde M. C. Buydens, and Ron Wehrens. 2010.
-<span>“Improved Parametric Time Warping for Proteomics.”</span>
-<em>Chemometrics and Intelligent Laboratory Systems</em>,
-<span>OMICS</span>, 104 (1): 65–74. <a href="https://doi.org/10.1016/j.chemolab.2010.04.008" class="external-link">https://doi.org/10.1016/j.chemolab.2010.04.008</a>.
+<span class="nocase">Bloemberg, Tom G., Jan Gerretzen, Hans J. P.
+Wouters, et al.</span> 2010. <span>“Improved Parametric Time Warping for
+Proteomics.”</span> <em>Chemometrics and Intelligent Laboratory
+Systems</em>, <span>OMICS</span>, vol. 104 (1): 65–74. <a href="https://doi.org/10.1016/j.chemolab.2010.04.008" class="external-link">https://doi.org/10.1016/j.chemolab.2010.04.008</a>.
 </div>
 <div id="ref-clifford2012" class="csl-entry">
 Clifford, David, and Glenn Stone. 2012. <span>“Variable <span>Penalty
@@ -547,9 +543,8 @@ Chromatograms</span> in <span>R</span>.”</span> <em>Journal of
 Statistical Software</em> 47 (April): 1–17. <a href="https://doi.org/10.18637/jss.v047.i08" class="external-link">https://doi.org/10.18637/jss.v047.i08</a>.
 </div>
 <div id="ref-clifford2009" class="csl-entry">
-Clifford, David, Glenn Stone, Ivan Montoliu, Serge Rezzi,
-François-Pierre Martin, Philippe Guy, Stephen Bruce, and Sunil Kochhar.
-2009. <span>“Alignment <span>Using Variable Penalty Dynamic Time
+Clifford, David, Glenn Stone, Ivan Montoliu, et al. 2009.
+<span>“Alignment <span>Using Variable Penalty Dynamic Time
 Warping</span>.”</span> <em>Analytical Chemistry</em> 81 (3): 1000–1007.
 <a href="https://doi.org/10.1021/ac802041e" class="external-link">https://doi.org/10.1021/ac802041e</a>.
 </div>
@@ -563,10 +558,10 @@ and Gaussian Functions as a Simple Model of Asymmetric Chromatographic
 Peaks.”</span> <em>Journal of Chromatography A</em> 915 (1): 1–13. <a href="https://doi.org/10.1016/S0021-9673(01)00594-5" class="external-link">https://doi.org/10.1016/S0021-9673(01)00594-5</a>.
 </div>
 <div id="ref-tomasi2004" class="csl-entry">
-Tomasi, Giorgio, Frans van den Berg, and Claus Andersson. 2004.
-<span>“Correlation Optimized Warping and Dynamic Time Warping as
-Preprocessing Methods for Chromatographic Data.”</span> <em>Journal of
-Chemometrics</em> 18 (5): 231–41. <a href="https://doi.org/10.1002/cem.859" class="external-link">https://doi.org/10.1002/cem.859</a>.
+<span class="nocase">Tomasi, Giorgio, Frans van den Berg, and Claus
+Andersson</span>. 2004. <span>“Correlation Optimized Warping and Dynamic
+Time Warping as Preprocessing Methods for Chromatographic Data.”</span>
+<em>Journal of Chemometrics</em> 18 (5): 231–41. <a href="https://doi.org/10.1002/cem.859" class="external-link">https://doi.org/10.1002/cem.859</a>.
 </div>
 <div id="ref-uesugi2013" class="csl-entry">
 Uesugi, Akane, and André Kessler. 2013. <span>“Herbivore Exclusion
@@ -619,17 +614,17 @@ loaded via a namespace (and not attached):
 [19] Formula_1.2-5         purrr_1.2.2           scales_1.4.0         
 [22] RaMS_1.4.3            pbapply_1.7-4         textshaping_1.0.5    
 [25] jquerylib_0.1.4       cli_3.6.6             rlang_1.2.0          
-[28] bit64_4.8.0           ptw_1.9-17            base64enc_0.1-6      
+[28] bit64_4.8.2           ptw_1.9-17            base64enc_0.1-6      
 [31] cachem_1.1.0          yaml_2.3.12           otel_0.2.0           
 [34] tools_4.6.0           minpack.lm_1.2-4      RcppDE_0.1.9         
 [37] reticulate_1.46.0     vctrs_0.7.3           R6_2.6.1             
 [40] png_0.1-9             lifecycle_1.0.5       stringr_1.6.0        
 [43] fs_2.1.0              htmlwidgets_1.6.4     bit_4.6.0            
 [46] ragg_1.5.2            desc_1.4.3            pkgdown_2.2.0.9000   
-[49] bslib_0.10.0          VPdtw_2.2.1           data.table_1.18.2.1  
+[49] bslib_0.11.0          VPdtw_2.2.1           data.table_1.18.4    
 [52] glue_1.8.1            Rcpp_1.1.1-1.1        systemfonts_1.3.2    
 [55] xfun_0.57             farver_2.1.2          htmltools_0.5.9      
-[58] rmarkdown_2.31        compiler_4.6.0        readxl_1.4.5         </code></pre>
+[58] rmarkdown_2.31        compiler_4.6.0        readxl_1.5.0         </code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -13,13 +13,13 @@
 Source:
 [`inst/CITATION`](https://github.com/ethanbass/chromatographR/blob/master/inst/CITATION)
 
-Bass, E. (2023). chromatographR: Chromatographic Data Analysis Toolset
+Bass, E. (2026). chromatographR: Chromatographic Data Analysis Toolset
 (version 0.7.5). http://doi.org/10.5281/zenodo.6944334
 
     @Manual{,
       title = {chromatographR: Chromatographic Data Analysis Toolset},
       author = {Ethan Bass},
-      year = {2023},
+      year = {2026},
       note = {version 0.7.5},
       url = {https://ethanbass.github.io/chromatographR/},
       doi = {10.5281/zenodo.6944334},

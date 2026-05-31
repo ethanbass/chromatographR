@@ -73,5 +73,5 @@ page).
 
 If you use chromatographR in published work, please cite it as follows:
 
-Bass, E. (2023). chromatographR: Chromatographic Data Analysis Toolset
+Bass, E. (2026). chromatographR: Chromatographic Data Analysis Toolset
 (version 0.7.5). <http://doi.org/10.5281/zenodo.6944334>

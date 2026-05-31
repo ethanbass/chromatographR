@@ -1,6 +1,7 @@
 # Frequently asked questions
 
 ``` r
+
 library(chromatographR)
 ```
 
@@ -12,6 +13,7 @@ retention times in the first column, you should be able to read the
 files into R as follows:
 
 ``` r
+
 lapply(vector_of_file_paths, function(f){
   read.csv(f, row.names = 1)
 })
@@ -33,6 +35,7 @@ successfully integrate all of our peaks. If this fails, try adjusting
 the `smooth_window`.
 
 ``` r
+
 data(Sa_pr)
 par(mfrow=c(2,1))
 pks <- get_peaks(Sa_warp, lambdas = "210", fit = "egh", sd.max = 2.5)

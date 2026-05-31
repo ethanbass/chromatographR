@@ -17,14 +17,14 @@ entire analysis can be stored and easily repeated by anyone using
 publicly available software.
 
 The *chromatographR* package began as a fork from the previously
-published *alsace* package (Wehrens, Carvalho, and Fraser 2015), but has
-been reworked with improved functions for peak-finding, integration and
-peak table generation as well as a number of new tools for data
-visualization and downstream analysis. Unlike *alsace*, which emphasized
-multivariate curve resolution through alternating least squares
-(MCR-ALS), *chromatographR* is developed around a more conventional
-workflow that should seem more familiar to users of standard software
-tools for HPLC-DAD analysis. *chromatographR* includes tools for a)
+published *alsace* package (Wehrens et al. 2015), but has been reworked
+with improved functions for peak-finding, integration and peak table
+generation as well as a number of new tools for data visualization and
+downstream analysis. Unlike *alsace*, which emphasized multivariate
+curve resolution through alternating least squares (MCR-ALS),
+*chromatographR* is developed around a more conventional workflow that
+should seem more familiar to users of standard software tools for
+HPLC-DAD analysis. *chromatographR* includes tools for a)
 pre-processing, b) retention-time alignment, c) peak-finding, d)
 peak-integration and e) peak-table construction, as well as additional
 functions useful for analyzing the resulting peak table.
@@ -216,18 +216,17 @@ warping function, dynamic time warping (DTW) works by repeatedly
 shifting, expanding or contracting the time axis in small steps until a
 satisfactory alignment is attained. This process can result in very
 close matching of peaks, but can also lead to severe peak distortion if
-the time axis is repeatedly expanded and/or contracted (Tomasi, van den
-Berg, and Andersson 2004). **Variable penalty dynamic time warping** is
-a derivative of DTW that constrains expansion and contraction of the
-time-axis by applying a penalty to these types of “risky” moves. This
-can often achieve a very good alignment with minimal peak distortion.
-VPdtw package is a suggested dependency since it requires a working C++
-compiler. Unlike `PTW`, `VPdtw` can only take a single wavelength as
-input (but it returns a global warping on the whole chromatographic
-matrix). The code snippet below uses VPdtw to warp the example
-chromatograms using the first chromatogram as a reference. The `penalty`
-and `maxshift` parameters can be adjusted to control the degree of
-warping.
+the time axis is repeatedly expanded and/or contracted (Tomasi et al.
+2004). **Variable penalty dynamic time warping** is a derivative of DTW
+that constrains expansion and contraction of the time-axis by applying a
+penalty to these types of “risky” moves. This can often achieve a very
+good alignment with minimal peak distortion. VPdtw package is a
+suggested dependency since it requires a working C++ compiler. Unlike
+`PTW`, `VPdtw` can only take a single wavelength as input (but it
+returns a global warping on the whole chromatographic matrix). The code
+snippet below uses VPdtw to warp the example chromatograms using the
+first chromatogram as a reference. The `penalty` and `maxshift`
+parameters can be adjusted to control the degree of warping.
 
 ``` text
 > warp_vpdtw <- correct_rt(chrom_list = dat.pr, alg = "vpdtw", lambdas = 210, 
@@ -505,11 +504,9 @@ compare results across treatments by calling `boxplot`.
 
 ## References
 
-Bloemberg, Tom G., Jan Gerretzen, Hans J. P. Wouters, Jolein Gloerich,
-Maurice van Dael, Hans J. C. T. Wessels, Lambert P. van den Heuvel, Paul
-H. C. Eilers, Lutgarde M. C. Buydens, and Ron Wehrens. 2010. “Improved
-Parametric Time Warping for Proteomics.” *Chemometrics and Intelligent
-Laboratory Systems*, OMICS, 104 (1): 65–74.
+Bloemberg, Tom G., Jan Gerretzen, Hans J. P. Wouters, et al. 2010.
+“Improved Parametric Time Warping for Proteomics.” *Chemometrics and
+Intelligent Laboratory Systems*, OMICS, vol. 104 (1): 65–74.
 <https://doi.org/10.1016/j.chemolab.2010.04.008>.
 
 Clifford, David, and Glenn Stone. 2012. “Variable Penalty Dynamic Time
@@ -517,11 +514,9 @@ Warping Code for Aligning Mass Spectrometry Chromatograms in R.”
 *Journal of Statistical Software* 47 (April): 1–17.
 <https://doi.org/10.18637/jss.v047.i08>.
 
-Clifford, David, Glenn Stone, Ivan Montoliu, Serge Rezzi,
-François-Pierre Martin, Philippe Guy, Stephen Bruce, and Sunil Kochhar.
-2009. “Alignment Using Variable Penalty Dynamic Time Warping.”
-*Analytical Chemistry* 81 (3): 1000–1007.
-<https://doi.org/10.1021/ac802041e>.
+Clifford, David, Glenn Stone, Ivan Montoliu, et al. 2009. “Alignment
+Using Variable Penalty Dynamic Time Warping.” *Analytical Chemistry* 81
+(3): 1000–1007. <https://doi.org/10.1021/ac802041e>.
 
 Eilers, Paul H. C. 2004. “Parametric Time Warping.” *Analytical
 Chemistry* 76 (2): 404–11. <https://doi.org/10.1021/ac034800e>.
@@ -585,14 +580,14 @@ Package for R.” *Metabolomics* 11 (1): 143–54.
     [19] Formula_1.2-5         purrr_1.2.2           scales_1.4.0         
     [22] RaMS_1.4.3            pbapply_1.7-4         textshaping_1.0.5    
     [25] jquerylib_0.1.4       cli_3.6.6             rlang_1.2.0          
-    [28] bit64_4.8.0           ptw_1.9-17            base64enc_0.1-6      
+    [28] bit64_4.8.2           ptw_1.9-17            base64enc_0.1-6      
     [31] cachem_1.1.0          yaml_2.3.12           otel_0.2.0           
     [34] tools_4.6.0           minpack.lm_1.2-4      RcppDE_0.1.9         
     [37] reticulate_1.46.0     vctrs_0.7.3           R6_2.6.1             
     [40] png_0.1-9             lifecycle_1.0.5       stringr_1.6.0        
     [43] fs_2.1.0              htmlwidgets_1.6.4     bit_4.6.0            
     [46] ragg_1.5.2            desc_1.4.3            pkgdown_2.2.0.9000   
-    [49] bslib_0.10.0          VPdtw_2.2.1           data.table_1.18.2.1  
+    [49] bslib_0.11.0          VPdtw_2.2.1           data.table_1.18.4    
     [52] glue_1.8.1            Rcpp_1.1.1-1.1        systemfonts_1.3.2    
     [55] xfun_0.57             farver_2.1.2          htmltools_0.5.9      
-    [58] rmarkdown_2.31        compiler_4.6.0        readxl_1.4.5         
+    [58] rmarkdown_2.31        compiler_4.6.0        readxl_1.5.0         
