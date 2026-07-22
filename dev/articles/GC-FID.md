@@ -326,8 +326,8 @@ m
 #> POLISTES_SPECIES   3 1.3830e+11 0.12124 8.7638  0.001 ***
 #> STATE              7 1.3067e+11 0.11455 3.5489  0.001 ***
 #> SEX                1 4.2418e+10 0.03719 8.0641  0.001 ***
-#> LAT                1 9.3279e+09 0.00818 1.7733  0.084 .  
-#> LON                1 1.5117e+10 0.01325 2.8740  0.014 *  
+#> LAT                1 9.3279e+09 0.00818 1.7733  0.109    
+#> LON                1 1.5117e+10 0.01325 2.8740  0.020 *  
 #> Residual         105 5.5231e+11 0.48418                  
 #> Total            118 1.1407e+12 1.00000                  
 #> ---
@@ -566,7 +566,7 @@ Tunnel.” *Journal of Chemical Ecology* 16 (4): 1277–87.
 ``` r
 
 sessionInfo()
-#> R version 4.6.0 (2026-04-24)
+#> R version 4.6.1 (2026-06-24)
 #> Platform: x86_64-pc-linux-gnu
 #> Running under: Ubuntu 24.04.4 LTS
 #> 
@@ -592,30 +592,30 @@ sessionInfo()
 #> [5] chromatographR_0.7.5.9000
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] gtable_0.3.6          xfun_0.57             caTools_1.18.3       
+#>  [1] gtable_0.3.6          xfun_0.60             caTools_1.18.4       
 #>  [4] lattice_0.22-9        generics_0.1.4        vctrs_0.7.3          
-#>  [7] tools_4.6.0           bitops_1.0-9          curl_7.1.0           
-#> [10] parallel_4.6.0        tibble_3.3.1          cluster_2.1.8.2      
+#>  [7] tools_4.6.1           bitops_1.0-9          curl_7.1.0           
+#> [10] parallel_4.6.1        tibble_3.3.1          cluster_2.1.8.2      
 #> [13] pkgconfig_2.0.3       Matrix_1.7-5          data.table_1.18.4    
 #> [16] RColorBrewer_1.1-3    S7_0.2.2              readxl_1.5.0         
-#> [19] lifecycle_1.0.5       compiler_4.6.0        farver_2.1.2         
+#> [19] lifecycle_1.0.5       compiler_4.6.1        farver_2.1.2         
 #> [22] stringr_1.6.0         ptw_1.9-17            RcppDE_0.1.9         
 #> [25] minpack.lm_1.2-4      htmltools_0.5.9       yaml_2.3.12          
 #> [28] Formula_1.2-5         pillar_1.11.1         MASS_7.3-65          
 #> [31] RaMS_1.4.3            nlme_3.1-169          mime_0.13            
-#> [34] tidyselect_1.2.1      zip_2.3.3             digest_0.6.39        
+#> [34] tidyselect_1.2.1      zip_3.0.1             digest_0.6.39        
 #> [37] stringi_1.8.7         dplyr_1.2.1           purrr_1.2.2          
-#> [40] labeling_0.4.3        VPdtw_2.2.1           splines_4.6.0        
-#> [43] rprojroot_2.1.1       fastmap_1.2.0         grid_4.6.0           
-#> [46] here_1.0.2            cli_3.6.6             chromConverter_0.7.5 
+#> [40] labeling_0.4.3        VPdtw_2.2.1           splines_4.6.1        
+#> [43] rprojroot_2.1.1       fastmap_1.2.0         grid_4.6.1           
+#> [46] here_1.0.2            cli_3.6.6             chromConverter_0.9.0 
 #> [49] magrittr_2.0.5        base64enc_0.1-6       crul_1.6.0           
-#> [52] dynamicTreeCut_1.63-1 withr_3.0.2           ggordiplots_0.4.3    
+#> [52] dynamicTreeCut_1.63-1 withr_3.0.3           ggordiplots_0.4.3    
 #> [55] scales_1.4.0          rappdirs_0.3.4        bit64_4.8.2          
 #> [58] rmarkdown_2.31        bit_4.6.0             otel_0.2.0           
 #> [61] reticulate_1.46.0     cellranger_1.1.0      fastcluster_1.3.0    
 #> [64] png_0.1-9             pbapply_1.7-4         evaluate_1.0.5       
 #> [67] knitr_1.51            hoardr_0.5.5          mgcv_1.9-4           
-#> [70] rlang_1.2.0           Rcpp_1.1.1-1.1        glue_1.8.1           
-#> [73] httpcode_0.3.0        xml2_1.5.2            jsonlite_2.0.0       
+#> [70] rlang_1.3.0           Rcpp_1.1.2            glue_1.8.1           
+#> [73] httpcode_0.3.0        xml2_1.6.0            jsonlite_2.0.0       
 #> [76] R6_2.6.1
 ```

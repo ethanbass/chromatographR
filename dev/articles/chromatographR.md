@@ -546,7 +546,7 @@ Package for R.” *Metabolomics* 11 (1): 143–54.
 > sessionInfo()
 ```
 
-    R version 4.6.0 (2026-04-24)
+    R version 4.6.1 (2026-06-24)
     Platform: x86_64-pc-linux-gnu
     Running under: Ubuntu 24.04.4 LTS
 
@@ -571,23 +571,23 @@ Package for R.” *Metabolomics* 11 (1): 143–54.
     [1] chromatographR_0.7.5.9000 knitr_1.51               
 
     loaded via a namespace (and not attached):
-     [1] sass_0.4.10           bitops_1.0-9          xml2_1.5.2           
+     [1] sass_0.4.10           bitops_1.0-9          xml2_1.6.0           
      [4] fastcluster_1.3.0     stringi_1.8.7         lattice_0.22-9       
-     [7] digest_0.6.39         magrittr_2.0.5        caTools_1.18.3       
-    [10] chromConverter_0.7.5  RColorBrewer_1.1-3    evaluate_1.0.5       
-    [13] grid_4.6.0            dynamicTreeCut_1.63-1 fastmap_1.2.0        
+     [7] digest_0.6.39         magrittr_2.0.5        caTools_1.18.4       
+    [10] chromConverter_0.9.0  RColorBrewer_1.1-3    evaluate_1.0.5       
+    [13] grid_4.6.1            dynamicTreeCut_1.63-1 fastmap_1.2.0        
     [16] cellranger_1.1.0      jsonlite_2.0.0        Matrix_1.7-5         
     [19] Formula_1.2-5         purrr_1.2.2           scales_1.4.0         
     [22] RaMS_1.4.3            pbapply_1.7-4         textshaping_1.0.5    
-    [25] jquerylib_0.1.4       cli_3.6.6             rlang_1.2.0          
+    [25] jquerylib_0.1.4       cli_3.6.6             rlang_1.3.0          
     [28] bit64_4.8.2           ptw_1.9-17            base64enc_0.1-6      
     [31] cachem_1.1.0          yaml_2.3.12           otel_0.2.0           
-    [34] tools_4.6.0           minpack.lm_1.2-4      RcppDE_0.1.9         
+    [34] tools_4.6.1           minpack.lm_1.2-4      RcppDE_0.1.9         
     [37] reticulate_1.46.0     vctrs_0.7.3           R6_2.6.1             
     [40] png_0.1-9             lifecycle_1.0.5       stringr_1.6.0        
     [43] fs_2.1.0              htmlwidgets_1.6.4     bit_4.6.0            
-    [46] ragg_1.5.2            desc_1.4.3            pkgdown_2.2.0.9000   
+    [46] ragg_1.5.2            desc_1.4.3            pkgdown_2.2.1.9000   
     [49] bslib_0.11.0          VPdtw_2.2.1           data.table_1.18.4    
-    [52] glue_1.8.1            Rcpp_1.1.1-1.1        systemfonts_1.3.2    
-    [55] xfun_0.57             farver_2.1.2          htmltools_0.5.9      
-    [58] rmarkdown_2.31        compiler_4.6.0        readxl_1.5.0         
+    [52] glue_1.8.1            Rcpp_1.1.2            systemfonts_1.3.2    
+    [55] xfun_0.60             farver_2.1.2          htmltools_0.5.9      
+    [58] rmarkdown_2.31        compiler_4.6.1        readxl_1.5.0         
