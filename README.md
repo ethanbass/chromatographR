@@ -14,7 +14,7 @@
    <!-- badges: end -->
 
 ## Overview
-`chromatographR` is a package for the reproducible analysis of HPLC-DAD chromatographic data in R. It can also be used to analyze other "simple" chromatographic data like GC-FID, HPLC-UV, or HPLC-FD.
+`chromatographR` is a package for the reproducible analysis of HPLC-DAD chromatographic data in R. It can also be used to analyze other "simple" chromatographic data like GC-FID, HPLC-UV, or HPLC-FD. Data import is handled by the companion package [chromConverter](https://ethanbass.github.io/chromConverter/), which supports a wide range of vendor file formats.
   
 ## Installation
 
@@ -26,14 +26,14 @@ install.packages("chromatographR")
 
 However, it's recommended to install the latest development version of chromatographR from GitHub using the devtools package:
 
-```
+```r
 if (!require("pak", quietly=TRUE)) install.packages("pak")
 pak::pak("ethanbass/chromatographR")
 ```
 
 or from R Universe:
 
-```
+```r
 install.packages("chromatographR", repos="https://ethanbass.r-universe.dev/")
 ```
 
