@@ -271,12 +271,12 @@ fit_gaussian <- function(x, y, start.center = NULL,
   starts <- list("center" = start.center, "width" = start.width,
                   "height" = start.height)
   if (!fit.floor) {
-    nlsAns <- try(nlsLM(y ~ gaussian(x, center, width, height),
+    nlsAns <- try(minpack.lm::nlsLM(y ~ gaussian(x, center, width, height),
                          start = starts, control = controlList), silent = TRUE)
   } else{
     if (is.null(start.floor)) start.floor <- quantile(y, seq(0, 1, 0.1))[2]
     starts <- c(starts, "floor" = start.floor)
-    nlsAns <- try(nlsLM( y ~ gaussian(x, center, width, height, floor),
+    nlsAns <- try(minpack.lm::nlsLM( y ~ gaussian(x, center, width, height, floor),
                          start = starts, control = controlList), silent = TRUE)
   }
   # package up the results to pass back
@@ -339,12 +339,12 @@ fit_egh <- function(x1, y1, start.center = NULL, start.width = NULL,
   starts <- list("center" = start.center, "width" = start.width, 
                  "height" = start.height, "tau" = start.tau)
   if (!fit.floor){
-    nlsAns <- try(nlsLM(y1 ~ egh(x1, center, width, height, tau),
+    nlsAns <- try(minpack.lm::nlsLM(y1 ~ egh(x1, center, width, height, tau),
                         start = starts, control = controlList), silent = TRUE)
   } else{
     if (is.null( start.floor)) start.floor <- quantile( y1, seq(0, 1, 0.1))[2]
     starts <- c(starts, "floor" = start.floor)
-    nlsAns <- try(nlsLM(y1 ~ egh(x1, center, width, height, tau, floor),
+    nlsAns <- try(minpack.lm::nlsLM(y1 ~ egh(x1, center, width, height, tau, floor),
                         start = starts, control = controlList), silent = TRUE)
   }
   
