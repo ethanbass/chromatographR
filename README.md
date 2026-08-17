@@ -14,7 +14,14 @@
    <!-- badges: end -->
 
 ## Overview
-`chromatographR` is a package for the reproducible analysis of HPLC-DAD and other "simple" chromatographic data (e.g., GC-FID, HPLC-UV, or HPLC-FD) in R.
+
+`chromatographR` provides a vendor-agnostic and fully scriptable alternative  for the reproducible analysis of HPLC-DAD and other chromatographic data (e.g., GC-FID, HPLC-UV, or HPLC-FD) in R. It enables a scriptable workflow as an open-source alternative to proprietary chromatography software, including:
+
+- **Pre-processing**: smoothing, baseline correction, and interpolation
+- **Retention-time alignment**: parametric time warping (PTW) and variable penalty dynamic time warping (VPdtw)
+- **Peak detection and integration**: Gaussian, exponential-Gaussian hybrid (EGH), or raw trapezoidal integration
+- **Peak table construction**: hierarchical clustering to match peaks across samples
+- **Downstream analysis**: metadata attachment, normalization, UV spectral analysis, and visualization
   
 ## Installation
 
