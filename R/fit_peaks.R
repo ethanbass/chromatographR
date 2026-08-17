@@ -446,7 +446,7 @@ fitpk_raw <- function(x, pos, lambda, max_iter,
   purity <- get_purity(x = x, pos = pos, try = estimate_purity,
                        noise_threshold = noise_threshold)
   c("rt" = pos[1], "start" = pos[2], "end" = pos[3], 
-    "sd" = pos[3] - pos[2], "FWHM" = 2.35 * pos[3] - pos[2],
+    "sd" = pos[3] - pos[2], "FWHM" = 2.35 * (pos[3] - pos[2]),
     "height" = y[xloc], "area" = area, purity = purity)
 }
 

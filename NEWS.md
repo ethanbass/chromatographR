@@ -54,6 +54,7 @@
 * Fixed `reshape_chroms` so it returns a factor for the `sample` column.
 * Fixed `plot_chroms` so chromatograms are black when plotting a single chromatogram with plotly or ggplot.
 * Fixed error in equation describing spectral clustering in documentation for `get_peaktable`.
+* Fixed bug in FWHM calculation for raw peakshape.
 
 # chromatographR 0.7.5
 
