@@ -74,10 +74,18 @@ console.}
 \item{...}{Additional arguments to \link{boxplot}.}
 }
 \value{
-If \code{export_spectrum} is \code{TRUE}, returns the spectrum as a
+\itemize{
+\item If \code{export_spectrum = FALSE} (default), a \code{plotly} or \code{ggplot} object, or
+nothing if \code{engine == "base"}.
+\item If \code{export_spectrum = TRUE}, invisibly returns the spectrum as a
+\code{data.frame} with wavelengths as rows and a single column per sample encoding absorbance at each
+wavelength (normalized if \code{scale_spectrum = TRUE}).
+Otherwise, if \code{engine == "base"}, there is no
+return value. If \code{export_spectrum} is \code{TRUE}, returns the spectrum as a
 \code{data.frame} with wavelengths as rows and columns encoding the
 absorbance (or normalized absorbance, if \code{scale_spectrum} is \code{TRUE}) for
-the specified sample(s). Otherwise, there is no return value.
+the specified sample(s).
+}
 }
 \description{
 Plots the trace and/or spectrum for a given peak in peak table.
@@ -87,20 +95,19 @@ Can be used to confirm the identity of a peak or check that a particular
 column in the peak table represents a single compound. Can also be used
 to create simple box-plots to examine the distribution of a peak with respect
 to variables defined in sample metadata.
+
+When \code{plot_trace} is \code{TRUE}, plots the chromatographic trace of the
+specified chromatogram (\code{idx}), at the specified wavelength
+(\code{lambda}) with a dotted red line to indicate the retention time given
+by \code{loc}. The trace is a single column from the chromatographic matrix. When
+\code{plot_spectrum} is \code{TRUE}, plots the spectrum for the specified
+chromatogram at the specified retention time. The spectrum represents a single
+row from the chromatographic matrix. When \code{box_plot} is \code{TRUE}, produces a
+\code{\link{boxplot}} from the specified peak with groups defined by the \code{vars} argument.
 }
 \section{Side effects}{
 
-\itemize{
-\item If \code{plot_trace} is \code{TRUE}, plots the chromatographic trace of the
-specified chromatogram (\code{idx}), at the specified wavelength
-(\code{lambda}) with a dotted red line to indicate the retention time given
-by \code{loc}. The trace is a single column from the chromatographic matrix.
-\item If \code{plot_spectrum} is \code{TRUE}, plots the spectrum for the specified
-chromatogram at the specified retention time. The spectrum represents a single
-row from the chromatographic matrix.
-\item If \code{box_plot} is \code{TRUE}, produces a \code{\link{boxplot}} from the specified peak
-with groups defined by the \code{vars} argument.
-}
+If \code{engine == "base"}, plots are rendered to the active graphics device.
 }
 
 \seealso{

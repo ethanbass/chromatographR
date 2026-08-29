@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.peak_list.R
 \name{plot.peak_list}
 \alias{plot.peak_list}
-\title{Plot fitted peak shapes.}
+\title{Overlay fitted peak shapes on chromatograms}
 \usage{
 \method{plot}{peak_list}(
   x,
@@ -28,40 +28,55 @@
 \item{...}{Additional arguments to main plot function.}
 
 \item{chrom_list}{List of chromatograms (retention time x wavelength
-matrices)}
+matrices). If missing, extracted from environment using the pointer in \code{x}.}
 
-\item{idx}{Index or name of chromatogram to be plotted.}
+\item{idx}{Index or name of chromatogram to plot from \code{chrom_list}.}
 
-\item{lambda}{Wavelength to use for plotting.}
+\item{lambda}{Wavelength (column) to use for plotting.}
 
-\item{points}{Logical. If \code{TRUE}, plot peak maxima. Defaults to \code{FALSE}.}
-
-\item{ticks}{Logical. If \code{TRUE}, mark beginning and end of each peak.
+\item{points}{Logical. If \code{TRUE}, display peak apex locations as points.
 Defaults to \code{FALSE}.}
 
-\item{alpha}{Parameter controlling the transparency of fitted shapes.
-Defaults to \code{0.5}.}
+\item{ticks}{Logical. If \code{TRUE}, mark peak boundaries with tick marks.
+Defaults to \code{FALSE}.}
 
-\item{color}{The color of the fitted shapes.}
+\item{alpha}{Transparency of fitted peak shapes. Defaults to \code{0.5}.}
+
+\item{color}{Color used to fill fitted peak shapes. If \code{NULL}, a default
+color is chosen based on the fitted model type.}
 
 \item{cex.points}{Size of points. Defaults to \code{0.5}.}
 
-\item{numbers}{Whether to number peaks. Defaults to \code{FALSE}.}
+\item{numbers}{If \code{TRUE}, label peaks with numeric identifiers. Defaults to
+\code{FALSE}.}
 
 \item{cex.font}{Font size if peaks are numbered. Defaults to \code{0.5}.}
 
 \item{y.offset}{Y offset for peak numbers. Defaults to \code{25}.}
 
-\item{plot_purity}{Logical. Whether to add visualization of peak purity.
-Defaults to \code{FALSE}.}
+\item{plot_purity}{Logical. If \code{TRUE}, overlays peak purity traces based on
+peak boundaries. Defaults to \code{FALSE}.}
 
-\item{res}{Time resolution for peak fitting.}
+\item{res}{Time resolution for peak fitting. If missing, inferred from
+\code{chrom_list}.}
 }
 \value{
 No return value, called for side effects.
 }
 \description{
-Visually assess integration accuracy by plotting fitted peaks over trace.
+Visually assess peak integration accuracy by overlaying fitted peak shapes
+over chromatographic traces.
+}
+\details{
+The appearance of fitted peaks depends on the \code{"fit"} attribute of \code{x}, which
+may be \code{"gaussian"}, \code{"egh"}, \code{"bemg"}, or \code{"raw"}.
+
+Peak lists are expected to contain columns such as \code{rt}, \code{height}, \code{start},
+\code{end}, and \code{sd}, with additional parameters depending on the fit type.
+
+Time units in \code{x} are used to rescale width parameters for plotting.
+
+Peak rendering errors are silently ignored.
 }
 \section{Side effects}{
 

@@ -23,8 +23,8 @@ get_peaks(
 )
 }
 \arguments{
-\item{chrom_list}{A list of profile matrices, each of the same dimensions
-(timepoints × wavelengths).}
+\item{chrom_list}{A list of chromatograms in matrix format (timepoints x
+wavelengths).}
 
 \item{lambdas}{A character or numeric vector specifying the wavelengths to
 find peaks at. For one-dimensional chromatograms, this argument can be ignored.}
@@ -42,7 +42,7 @@ in \code{\link{fit_peaks}}.}
 
 \item{time_unit}{Specifies the units for \code{sd}, \code{FWHM}, \code{area}, and \code{tau} (if
 applicable). Options are minutes (\code{"min"}), seconds (\code{"s"}), or
-milliseconds (\code{"ms"}).}
+milliseconds (\code{"ms"}). Defaults to \code{"min"}.}
 
 \item{estimate_purity}{Logical. Whether to estimate purity or not. Defaults
 to \code{FALSE}. (If \code{TRUE}, this will slow down the function significantly).}
@@ -52,7 +52,7 @@ to \code{FALSE}. (If \code{TRUE}, this will slow down the function significantly
 \item{show_progress}{Logical. Whether to show progress bar. Defaults to
 \code{TRUE} if \code{\link[pbapply:pbapply]{pbapply}} is installed.}
 
-\item{cl}{Either an integer specifying the number of clusters to use for
+\item{cl}{Either an integer specifying the number of cores to use for
 parallel processing or a cluster object created by
 \code{\link[parallel:makeCluster]{makeCluster}}. Defaults to \code{2}. On Windows integer
 values will be ignored.}
@@ -85,7 +85,7 @@ information about various peak parameters:
 \item \code{start}: The retention time where the peak is estimated to begin.
 \item \code{end}: The retention time where the peak is estimated to end.
 \item \code{sd}: The standard deviation (\eqn{\sigma}) of the fitted peak shape.
-\item \code{tau} Empirical skewness parameter (in units of time) determining peak
+\item \code{tau}: Empirical skewness parameter (in units of time) determining peak
 asymmetry when \code{fit == "egh"}.
 \item \code{tau_right}: Exponential rate constant controlling right-sided tailing
 when \code{fit = "bemg"}. Note that unlike \code{tau} in the EGH model,
@@ -106,30 +106,27 @@ squares. Nevertheless, it can still be useful as a rough metric for
 }
 }
 \description{
-Finds and fits peaks and extracts peak parameters from a list of chromatograms
-at the specified wavelengths.
+Detects chromatographic peaks, fits peak models, and extracts peak parameters
+at one or more wavelengths.
 }
 \details{
-Peaks are located by finding zero-crossings in the smoothed first derivative
-of the specified chromatographic traces (using the \code{\link{find_peaks}} function).
-At the given positions, a peak model is then fit to the signal using
-\code{\link{fit_peaks}} according to the value of the \code{fit} argument.
-Available models include the bidirectional exponentially modified gaussian
-(\code{"bemg"}),exponential-gaussian hybrid (\code{"egh"}) or regular
-\code{"gaussian"}.  Finally, the area is calculated using a trapezoidal
-approximation.
+Peaks are detected by finding zero-crossings in the smoothed first derivative
+of the specified chromatographic traces (using \code{\link{find_peaks}}).
+Peak models are then fit to the detected features using \code{\link{fit_peaks}}
+according to the value of \code{fit}. Available models include the bidirectional
+exponentially modified gaussian (\code{"bemg"}), exponential-gaussian hybrid
+(\code{"egh"}) or \code{"gaussian"}. Peak areas are then calculated using a
+trapezoidal approximation.
 
 Additional arguments can be provided to \code{find_peaks} to fine-tune
 the peak-finding algorithm. For example, the \code{smooth_window} can be
-increased to prevent peaks from being split into multiple features. Overly
+increased to reduce splitting of broad peaks into multiple features. Overly
 aggressive smoothing may cause small peaks to be overlooked.
 
-The standard deviation (\code{sd}), full-width at half maximum (\code{FWHM}),
-\eqn{\tau} (\code{tau}), \eqn{\tau_{R}} (\code{tau_right}),
-\eqn{\tau_{L}} (\code{tau_left}), and \code{area} are returned in units determined by
-the \code{time_unit} argument. By default, the units are in minutes. To compare
-directly with 'ChemStation' integration results, the time units should be
-changed to seconds.
+The parameters \code{sd}, \code{FWHM}, \code{tau}, \code{tau_right}, \code{tau_left}, and
+\code{area} are returned in units determined by \code{time_unit}, which defaults to
+\code{minutes}. To compare directly with 'ChemStation' integration results,
+the time units should be changed to seconds.
 }
 \note{
 The bones of this function are adapted from the

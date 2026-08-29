@@ -12,8 +12,7 @@
 \item{...}{Additional arguments (currently unused).}
 }
 \value{
-A list containing basic information about the supplied
-\code{peak_table} object.
+A list containing basic information about the supplied \code{peak_table}.
 }
 \description{
 Prints basic statistics about \code{peak_table} to the console (e.g., the

@@ -1,17 +1,14 @@
-#' Attach experimental metadata
+#' Attaches sample metadata to a `peak_table` object by matching sample names.
 #' 
-#' Attaches sample metadata to a `peak_table` object. Metadata should be
-#' provided as a `data.frame`. One of the columns in the supplied metadata must 
-#' match exactly the row names of the peak table.
+#' Metadata is provided as a `data.frame`, with one column containing sample
+#' identifiers matching the row names of `peak_table$tab`.
 #' 
 #' @aliases attach_metadata
-#' @param peak_table A `peak_table` object created by [get_peaktable].
-#' @param metadata A `data.frame` containing the sample metadata.
-#' @param column The name of the column in the provided `metadata` object
-#' containing the sample names. Sample names must match the row names of 
-#' `peak_table$tab`.
-#' @return A `peak_table` object with metadata attached in the `sample_meta` 
-#' slot.
+#' @param peak_table A `peak_table` object created by [`get_peaktable`].
+#' @param metadata A `data.frame` of sample metadata.
+#' @param column Name of the column in `metadata` containing sample identifiers.
+#' Must match the row names of `peak_table$tab`.
+#' @return A `peak_table` object with metadata stored in the `sample_meta` slot.
 #' @author Ethan Bass
 #' @seealso [`get_peaktable`], [`normalize_data`]
 #' @examples
@@ -48,22 +45,20 @@ attach_metadata <- function(peak_table, metadata, column){
   return(peak_table)
 }
 
-#' Attach reference spectra
+#' Attach reference spectra to a `peak_table` object.
 #' 
-#' Gathers reference spectra and attaches them to a `peak_table` object.
-#' Reference spectra are defined either as the spectrum with the highest 
-#' intensity (`"max.int"`) or as the spectrum with the highest average
-#' correlation to the other spectra in the peak table (`"max.cor"`).
+#' Reference spectra are selected either as the spectrum with maximum intensity
+#' (`"max.int"`) or as the spectrum with the highest average correlation to all
+#' other spectra in the peak table (`"max.cor"`).
 #' 
 #' @aliases attach_ref_spectra
-#' @param peak_table Peak table from [`get_peaktable`].
-#' @param chrom_list A list of chromatograms in matrix format (timepoints x
-#' wavelengths). If no argument is provided here, the function will try to find
-#' the `chrom_list` object used to create the provided `peak_table`.
-#' @param ref What criterion to use to select reference spectra. The current 
-#' options are maximum correlation (`"max.cor"`) or maximum signal intensity 
-#' (`"max.int"`).
-#' @return A `peak_table` object with reference spectra attached in the
+#' @param peak_table A `peak_table` object created by [`get_peaktable`].
+#' @param chrom_list Optional list of chromatograms (timepoints × wavelengths).
+#' If `NULL`, the function attempts to retrieve the original `chrom_list`
+#' used to generate `peak_table`.
+#' @param ref Method for selecting reference spectra. Options are `"max.int"`
+#' (maximum intensity) or `"max.cor"` (maximum average correlation).
+#' @return A `peak_table` object with reference spectra stored in the
 #' `$ref_spectra` slot.
 #' @author Ethan Bass
 #' @seealso [`get_peaks`], [`get_peaktable`]

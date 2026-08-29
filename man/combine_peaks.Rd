@@ -2,13 +2,14 @@
 % Please edit documentation in R/combine_peaks.R
 \name{combine_peaks}
 \alias{combine_peaks}
-\title{Combine peaks}
+\title{Combine duplicate peaks}
 \usage{
 combine_peaks(
   peak_table,
   tol = 0.01,
   min.cor = 0.9,
-  choose = "max",
+  choose = c("max", "least_sparse", "lambda"),
+  lambda = NULL,
   verbose = getOption("verbose")
 )
 }
@@ -21,8 +22,10 @@ difference). Defaults to \code{0.01}.}
 \item{min.cor}{Minimum spectral correlation to confirm a match. Defaults to
 \code{0.9}.}
 
-\item{choose}{If \code{max}, the peak with highest intensity will be retained.
-Otherwise, the first column in the data.frame will be retained.}
+\item{choose}{Method used to select a representative peak from each group of
+duplicate peaks. \code{"max"} retains the peak with the greatest total intensity,
+\code{"least_sparse"} retains the peak detected in the greatest number of samples,
+and \code{"lambda"} retains peaks matching the preferred wavelength(s).}
 
 \item{verbose}{Logical. Whether to print status to the console.}
 }
@@ -31,6 +34,9 @@ A peak table derived from the original, but with columns corresponding
 to duplicate peaks combined according to the specified criteria.
 }
 \description{
+Identifies groups of duplicate peaks in a peak table and retain a single
+representative peak from each group. Peaks are considered duplicates when
+their retention times differ by less than \code{tol} and their
 Utility function to combine duplicate peaks in peak table, (i.e., peaks that
 were integrated at more than one wavelength or component) based on retention
 time and/or spectral similarity. Specify tolerance (\code{tol}) for

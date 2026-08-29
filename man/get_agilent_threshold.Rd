@@ -33,7 +33,8 @@ Returns a vector of purity thresholds at each retention time index
 within the peak specified by \code{pos}.
 }
 \description{
-Calculate purity thresholds
+Intermediate function used in \code{\link{get_purity}} to compute variance-based
+thresholds.
 }
 \references{
 Stahl, Mark. “Peak Purity Analysis in HPLC and CE Using Diode-Array Technology.”

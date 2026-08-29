@@ -22,12 +22,11 @@ wavelengths). If no argument is provided here, the function will try to find
 the \code{chrom_list} object using the pointer in the \code{peak_table}.}
 
 \item{idx}{Numerical index of chromatogram you wish to plot, or "max" to
-automatically plot the chromatogram with the largest signal at the given peak
-or retention time.}
+automatically select the chromatogram with the highest signal intensity at
+the specified peak or retention time.}
 
-\item{lambda}{The wavelength you wish to plot the trace at if \code{plot_trace} is
-\code{TRUE} and/or the wavelength to be used for the determination of signal
-abundance.}
+\item{lambda}{The wavelength used for plotting chromatographic traces and
+determining signal intensity.}
 
 \item{plot_spectrum}{Logical. If \code{TRUE}, plots the spectrum of the chosen
 peak. Defaults to \code{TRUE}.}
@@ -46,27 +45,22 @@ Defaults to \code{FALSE}.}
 \item{...}{Additional arguments to \code{plot_spectrum}.}
 }
 \value{
-If \code{export_spectrum} is \code{TRUE}, returns the spectrum as a
-\code{data.frame} with wavelengths as rows and a single column encoding the
-absorbance (or normalized absorbance, if \code{scale_spectrum} is \code{TRUE})
-at each wavelength. If \code{export_spectrum} is \code{FALSE}, the output depends on
-the plotting \code{engine}. If \code{engine == "plotly"}, returns a \code{plotly} object
-containing the specified plots. Otherwise, if \code{engine == "base"}, there is no
-return value.
+Invisibly returns the numeric index of the scan selected by the user.
 }
 \description{
-Plot spectra by clicking on the chromatogram.
-}
-\section{Side effects}{
-
 Plots a chromatographic trace from the specified chromatogram (\code{idx}),
 at the specified wavelength (\code{lambda}) with a dotted red line to indicate
 the user-selected retention time. The trace is a single column from the
 chromatographic matrix.
-
+}
+\details{
 If \code{plot_spectrum} is \code{TRUE}, plots the spectrum for the specified
 chromatogram at the user-specified retention time. The spectrum is a single
 row from the chromatographic matrix.
+}
+\section{Side effects}{
+
+If \code{engine == "base"}, plots are rendered to the active graphics device.
 }
 
 \examples{

@@ -2,7 +2,7 @@
 % Please edit documentation in R/correct_rt.R
 \name{correct_rt}
 \alias{correct_rt}
-\title{Correct retention time}
+\title{Retention time alignment via time warping}
 \usage{
 correct_rt(
   chrom_list,
@@ -44,7 +44,7 @@ similarity matrix of the supplied chromatograms using the
 \item{alg}{Alignment algorithm to use: parametric time warping (\code{"ptw"}),
 or variable penalty dynamic time warping (\code{"vpdtw"}).}
 
-\item{what}{What to return: either the \code{"corrected.values"} (useful for
+\item{what}{Output type: either the \code{"corrected.values"} (useful for
 visual inspection and downstream analysis) or the warping \code{"models"}
 (for further programmatic use).}
 
@@ -53,8 +53,7 @@ visual inspection and downstream analysis) or the warping \code{"models"}
 \item{n.traces}{Number of traces to use.}
 
 \item{fill_zeros}{Logical. If \code{TRUE}, out-of-bounds regions produced by
-warping are filled with zeros. If \code{FALSE} (default), these regions are
-returned as \code{NA}.}
+warping are filled with zeros; otherwise they are returned as \code{NA} (default).}
 
 \item{n.zeros}{Number of zeros to add for padding chromatograms at the edges.}
 
@@ -80,10 +79,10 @@ Defaults to \code{50}.}
 \code{TRUE} if \code{\link[pbapply:pbapply]{pbapply}} is installed. Currently works
 only for \code{ptw} alignments.}
 
-\item{cl}{Argument to \code{pbapply} or \code{\link[parallel:mclapply]{mclapply}}. Either
-an integer specifying the number of clusters to use for parallel processing
-or a cluster object created by \code{\link[parallel:makeCluster]{makeCluster}}.
-Defaults to \code{2}. On Windows systems, integer values will be ignored.}
+\item{cl}{Either an integer specifying the number of cores to use for
+parallel processing or a cluster object created by
+\code{\link[parallel:makeCluster]{makeCluster}}. Defaults to \code{2}. On Windows systems,
+integer values will be ignored.}
 
 \item{...}{Optional additional arguments to \code{ptw}. The only argument that
 cannot be changed is \code{warp.type} which is hard-coded to \code{"global"} to permit
@@ -94,10 +93,9 @@ A list of warping models or a list of warped absorbance profiles,
 according to the value of the \code{what} argument.
 }
 \description{
-Aligns chromatograms using one of two algorithms, according to the value of
-\code{alg}: parametric time warping (\code{"ptw"}), as implemented in \code{\link[ptw:ptw]{ptw}};
-variable penalty dynamic time warping (\code{"vpdtw"}), as implemented in
-\code{\link[VPdtw:VPdtw]{VPdtw}}.
+Chromatograms are aligned using either parametric time warping (\code{"ptw"}),
+as implemented in \code{\link[ptw:ptw]{ptw}} or variable penalty dynamic time warping
+(\code{"vpdtw"}), as implemented in \code{\link[VPdtw:VPdtw]{VPdtw}}.
 }
 \details{
 Some arguments are specific to particular warping functions. For example
@@ -123,7 +121,7 @@ warping. \emph{Analytical chemistry}, 81(3):1000-1007. \doi{10.1021/ac802041e}.
 for Aligning Mass Spectrometry Chromatograms in R. \emph{Journal of
 Statistical Software}, 47(8):1-17. \doi{10.18637/jss.v047.i08}.
 \item Eilers, P.H.C. 2004. Parametric Time Warping.
-\emph{Anal. Chem.}, 76:404-411. \doi{10.1021/ac034800e}.
+\emph{Analytical Chemistry}, 76:404-411. \doi{10.1021/ac034800e}.
 \item Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast
 parametric time warping of peak lists. \emph{Bioinformatics},
 31:3063-3065. \doi{10.1093/bioinformatics/btv299}.

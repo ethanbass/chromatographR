@@ -1,34 +1,39 @@
-#' Converts peak list into an ordered peak table.
+#' Convert peak lists into an aligned peak table.
 #' 
-#' The function performs a complete linkage clustering of retention times across
-#' all samples, and cuts at a height given by the user (which can be understood
-#' as the maximal inter-cluster retention time difference) in the simple case
-#' based on retention times. Optionally, clustering can also incorporate 
-#' information about spectral similarity.
+#' Converts a `peak_list` object containing peaks from multiple samples into
+#' an aligned peak table by clustering peaks across samples according to
+#' retention time and (optionally) spectral similarity. Clusters are defined 
+#' by cutting a complete-linkage dendrogram at height `hmax`, which can be 
+#' understood as the maximal allowed clustering distance.
 #' 
-#' By default, clustering is performed on retention times only (when 
-#' `clust == "rt"`). Clustering can also incorporate information about
-#' spectral similarity (when `clust == "sp.rt"`) using a distance function 
+#' By default, clustering is performed on retention times alone (when 
+#' `clust = "rt"`). Alternatively, clustering can also incorporate information 
+#' about spectral similarity (when `clust = "sp.rt"`) using a similarity function 
 #' adapted from Broeckling et al., 2014:
-#' \deqn{e^{-\frac{(1-c_{ij})^2}{2\sigma_r^2}} \cdot e^{-\frac{(t_i-t_j)^2}{2\sigma_t^2}}}
-#' where \eqn{c_{ij}} is the spectral correlation coefficient between spectra
-#' \eqn{i} and \eqn{j}, and \eqn{\sigma_t} and \eqn{\sigma_r} control the
-#' relative contributions of retention time and spectral similarity,
-#' respectively (see `sigma.t` and `sigma.r`).
+#' \deqn{
+#' S_{ij} =
+#'   \exp\left(-\frac{(t_i - t_j)^2}{2\sigma_t^2}\right)
+#'    \cdot
+#'    \exp\left(-\frac{(1 - c_{ij})^2}{2\sigma_r^2}\right)
+#' }
+#' where \eqn{c_{ij}} is the spectral correlation between spectra \eqn{i} and 
+#' \eqn{j}, and \eqn{\sigma_t} and \eqn{\sigma_r} control the relative 
+#' contributions of retention time and spectral similarity, respectively (see
+#' `sigma.t` and `sigma.r`).
 #' 
 #' If two peaks from the same sample are assigned to the same cluster, a warning
-#' message is printed to the console. These warnings can usually be ignored, but
-#' one could also consider reducing the `hmax` variable. However, this may 
-#' lead to splitting of peaks across multiple clusters. Another option is to
-#' filter the peaks by intensity to remove small features.
+#' message is printed to the console. These warnings are often benign but may
+#' also indicate that `hmax` is too large. Reducing `hmax` may prevent excessive
+#' clustering, although overly small values may instead lead to splitting of 
+#' peaks across multiple clusters. Filtering low-intensity peaks prior to
+#' clustering may also help reduce these warnings. 
 #' 
-#' Once clusters are formed, peak metadata is summarized across all peaks within
-#' each cluster according to `summarize_by`. By default, the peak metadata are 
-#' summarized as the mean within each cluster weighted by the relative size of
-#' each peak. This downweights the importance of small peaks that are more 
-#' likely to represent noise, resulting in a more robust estimate of the cluster
-#' center. Alternatively, if the `"max"` option is selected, the metadata
-#' associated with the most intense peak in each cluster will be returned here.
+#' Once clusters are formed, peak metadata are summarized within each cluster
+#' according to `summarize_by`. By default (`"weighted.mean"`), peak metadata 
+#' are averaged using peak intensity as weights, reducing the influence of small
+#' peaks which are more likely to represent noise. Alternatively, the `"max"`
+#' argument selects the metadata associated with the most intense peak in each
+#' cluster. 
 #' 
 #' @name get_peaktable
 #' @aliases get_peaktable
@@ -44,9 +49,10 @@
 #' level is the spectral wavelength. Every sample x wavelength component is 
 #' described by a  `data.frame` with a row for each peak and columns containing 
 #' information on various peak parameters.
-#' @param chrom_list A list of chromatographic matrices.
-#' @param response Indicates whether peak `area` or peak `height` is to be used
-#' as intensity measure. Defaults to `area` setting.
+#' @param chrom_list A list of chromatographic matrices. Only required when
+#' `clust = "sp.rt"`.
+#' @param response Peak intensity measure: either `"area"` (default) or 
+#' `"height"`.
 #' @param use.cor Logical. Indicates whether to use corrected retention times
 #' (`rt.cor` column) or raw retention times `rt` column). Unless
 #' otherwise specified, the `rt.cor` column will be used by default if it 
@@ -64,13 +70,13 @@
 #' @param clust Specify whether to perform hierarchical clustering based on
 #' spectral similarity and retention time (`sp.rt`) or retention time alone
 #' (`rt`). Defaults to `rt`.
-#' @param sigma.t Width of gaussian in retention time distance function.
-#' Controls weight given to retention time if `sp.rt` is selected.
-#' @param sigma.r Width of gaussian in spectral similarity function. Controls
-#' weight given to spectral correlation if `sp.rt` is selected.
+#' @param sigma.t Width of Gaussian kernel for retention time similarity.
+#' Controls weight given to retention time when `"sp.rt"` is selected.
+#' @param sigma.r Width of Gaussian kernel for spectral similarity. Controls
+#' weight given to spectral correlation if `"sp.rt"` is selected.
 #' @param deepSplit Logical. Controls sensitivity to cluster splitting. If
-#' `TRUE`, function will return more smaller clusters. See documentation for
-#' [`cutreeDynamic`][dynamicTreeCut::cutreeDynamic] for additional information.
+#' `TRUE`, function will return a larger number of smaller clusters. For
+#' additional information, see [`cutreeDynamic`][dynamicTreeCut::cutreeDynamic].
 #' @param verbose Logical. Whether to print warning when combining peaks into 
 #' single time window. Defaults to `FALSE`.
 #' @param out Specify `data.frame` (default) or `matrix` as output.
@@ -78,11 +84,11 @@
 #' @return The function returns an S3 [`peak_table`] object, containing the
 #' following elements:
 #' * `tab`: The peak table itself -- a `data.frame` of intensities in a
-#' sample x peak configuration.
-#' * `pk_meta`: A `data.frame` containing peak meta-data (e.g., the spectral
+#' sample × peak configuration.
+#' * `pk_meta`: A `data.frame` containing peak metadata (e.g., the spectral
 #' component, peak number, and average retention time), summarized across all
 #' peaks in each cluster according to `summarize_by`.
-#' * `sample_meta`: A `data.frame` of sample meta-data. Must be added using
+#' * `sample_meta`: A `data.frame` of sample metadata. Must be added using
 #' [`attach_metadata`].
 #' * `ref_spectra`: A `data.frame` of reference spectra (in a wavelength × 
 #' peak configuration). Must be added using [`attach_ref_spectra`].

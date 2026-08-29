@@ -2,30 +2,28 @@
 % Please edit documentation in R/attach_metadata.R
 \name{attach_ref_spectra}
 \alias{attach_ref_spectra}
-\title{Attach reference spectra}
+\title{Attach reference spectra to a \code{peak_table} object.}
 \usage{
 attach_ref_spectra(peak_table, chrom_list, ref = c("max.cor", "max.int"))
 }
 \arguments{
-\item{peak_table}{Peak table from \code{\link{get_peaktable}}.}
+\item{peak_table}{A \code{peak_table} object created by \code{\link{get_peaktable}}.}
 
-\item{chrom_list}{A list of chromatograms in matrix format (timepoints x
-wavelengths). If no argument is provided here, the function will try to find
-the \code{chrom_list} object used to create the provided \code{peak_table}.}
+\item{chrom_list}{Optional list of chromatograms (timepoints × wavelengths).
+If \code{NULL}, the function attempts to retrieve the original \code{chrom_list}
+used to generate \code{peak_table}.}
 
-\item{ref}{What criterion to use to select reference spectra. The current
-options are maximum correlation (\code{"max.cor"}) or maximum signal intensity
-(\code{"max.int"}).}
+\item{ref}{Method for selecting reference spectra. Options are \code{"max.int"}
+(maximum intensity) or \code{"max.cor"} (maximum average correlation).}
 }
 \value{
-A \code{peak_table} object with reference spectra attached in the
+A \code{peak_table} object with reference spectra stored in the
 \verb{$ref_spectra} slot.
 }
 \description{
-Gathers reference spectra and attaches them to a \code{peak_table} object.
-Reference spectra are defined either as the spectrum with the highest
-intensity (\code{"max.int"}) or as the spectrum with the highest average
-correlation to the other spectra in the peak table (\code{"max.cor"}).
+Reference spectra are selected either as the spectrum with maximum intensity
+(\code{"max.int"}) or as the spectrum with the highest average correlation to all
+other spectra in the peak table (\code{"max.cor"}).
 }
 \examples{
 data(pk_tab)

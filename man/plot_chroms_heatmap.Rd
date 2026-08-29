@@ -17,23 +17,23 @@ plot_chroms_heatmap(
 )
 }
 \arguments{
-\item{x}{A list of chromatograms in matrix format (timepoints x wavelengths)
-or a \code{peak_table} containing a pointer toward the chromatograms, if present
-in the environment.}
+\item{x}{A list of chromatograms in matrix format (timepoints × wavelengths)
+or a \code{peak_table} containing a pointer to a list of chromatograms accessible
+in the current environment.}
 
 \item{idx}{A vector representing the names or numerical indices of the
 chromatograms to plot.}
 
 \item{lambdas}{A character or numeric vector specifying the wavelengths to
-plot. For one-dimensional chromatograms, this argument can be ignored.}
+plot. Ignored for one-dimensional chromatograms.}
 
-\item{engine}{Plotting engine. Either \code{\link[graphics:matplot]{"base"}},
-\code{\link[plotly:plotly]{"plotly"}}, or \code{\link[ggplot2:ggplot2-package]{"ggplot"}}.}
+\item{engine}{Plotting backend to use. One of \code{\link[graphics:matplot]{"base"}},
+\code{\link[ggplot2:ggplot2-package]{"ggplot"}}, or \code{\link[plotly:plotly]{"plotly"}}.}
 
 \item{show_legend}{Logical. Whether to display legend or not. Defaults to
 \code{TRUE}.}
 
-\item{xlim}{Range of x axis (numeric vector).}
+\item{xlim}{Range of x axis values.}
 
 \item{legend_position}{Position of legend. Defaults to \code{"topright"}}
 
@@ -42,20 +42,22 @@ plot. For one-dimensional chromatograms, this argument can be ignored.}
 \item{show_ylabs}{Logical. Whether to show y labels. Defaults to \code{FALSE}.}
 }
 \value{
-No return value, called for side effects.
+A \code{plotly} or \code{ggplot} object when \code{engine = "plotly"} or
+\code{engine = "ggplot"}, respectively. No value is returned when
+\code{engine = "base"}.
 }
 \description{
 Plots the specified traces from a list of chromatograms as a heatmap.
 }
 \details{
-Adapted from \code{\link[VPdtw:plot.VPdtw]{VPdtw::plot.VPdtw}}.
-}
-\section{Side effects}{
-
 Plots the traces of the chromatograms specified by \code{idx} at the specified
 wavelengths (\code{lambdas}) as a heatmap. Plots can be produced using base
 graphics engine, \code{ggplot2}, or \code{plotly}, according to the value of the
-\code{engine} argument.
+\code{engine} argument. Adapted from \code{\link[VPdtw:plot.VPdtw]{VPdtw::plot.VPdtw}}.
+}
+\section{Side effects}{
+
+If \code{engine == "base"}, the plot is rendered to the active graphics device.
 }
 
 \examples{

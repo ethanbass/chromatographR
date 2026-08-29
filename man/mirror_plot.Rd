@@ -65,6 +65,7 @@ to variables defined in sample metadata.
 }
 \section{Side effects}{
 
+Plots are rendered to the active graphics device.
 If \code{mirror_plot} is \code{TRUE}, plots a mirror plot comparing two treatments
 defined by \code{var} and \code{subset} (if more than two factors are present
 in \code{var}).

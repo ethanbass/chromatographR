@@ -1,6 +1,6 @@
 # chromatographR 0.8.0
 
-#### Breaking changes
+### Breaking changes
 
 * Added support for bidirectional exponentially modified gaussian (BEMG) peak shape, now used as the new default for peak fitting.
 * Added `summarize_by` argument to `get_peaktable` controlling how peak metadata (e.g., retention time) are summarized across peaks within each cluster. The new default (`"weighted.mean"`) weights peaks by their intensity, making it more robust to the presence of small noisy peaks which may skew the results of aggregation, especially when the dominant peak does not occur in every sample. Alternative options include `"mean"`, `"median"`, and `"max"`, the last of which uses the most intense peak in each cluster directly rather than aggregating. To reproduce previous behavior, set `summarize_by = "mean"`.
@@ -54,6 +54,7 @@
 * Fixed `reshape_chroms` so it returns a factor for the `sample` column.
 * Fixed `plot_chroms` so chromatograms are black when plotting a single chromatogram with plotly or ggplot.
 * Fixed error in equation describing spectral clustering in documentation for `get_peaktable`.
+* Made substantial revisions to documentation to improve clarity.
 * Fixed bug in FWHM calculation for raw peakshape.
 
 # chromatographR 0.7.5

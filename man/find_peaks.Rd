@@ -37,7 +37,7 @@ filters on the basis of peak height, such that larger values will exclude
 small peaks from the peak list. Defaults to \code{0}.}
 
 \item{bounds}{Logical. If \code{TRUE} (default), includes peak boundaries in
-data.frame.}
+\code{data.frame}.}
 }
 \value{
 If \code{bounds == TRUE}, returns a \code{data.frame} containing the center,
@@ -45,25 +45,21 @@ start, and end of each identified peak. Otherwise, returns a numeric vector
 of peak centers. All locations are expressed as indices.
 }
 \description{
-Detects peaks in chromatographic profile.
+Detects peaks in a chromatographic profile by identifying zero-crossings in
+the smoothed first derivative of the signal (\code{y}) that exceed a specified
+slope threshold (\code{slope_thresh}). Smoothing reduces spurious local extrema
+that do not represent true features. Peaks can be filtered using a minimum
+amplitude threshold (\code{amp_thresh}), which removes low-intensity peaks.
 }
 \details{
-Detects peaks by looking for zero-crossings in the smoothed first derivative of
-the signal (\code{y}) that exceed the specified slope threshold (\code{slope_thresh}).
-Additionally, peaks can be filtered by supplying a minimal
-amplitude threshold (\code{amp_thresh}), filtering out peaks below the
-specified height. Smoothing is intended to prevent the algorithm from
-getting caught up on local minima and maxima that do not represent true
-features. Several smoothing options are available, including \code{"gaussian"},
-box kernel (\code{"box"}), savitzky-golay smoothing (\code{"savgol"}),
-moving average (\code{"mva"}), triangular moving average (\code{"tmva"}), or
-no smoothing (\code{"none"}).
+Available smoothing methods include Gaussian kernel (\code{"gaussian"}),
+box kernel (\code{"box"}), Savitzky–Golay (\code{"savgol"}), moving average (\code{"mva"}),
+triangular moving average (\code{"tmva"}), and no smoothing (\code{"none"}).
 
-It is recommended to do pre-processing using the \code{\link{preprocess}}
-function before peak detection. Overly high chromatographic resolution can
-sometimes cause peaks to be split into multiple segments. In this case,
-it is recommended to increase the \code{smooth_window} or reduce the
-resolution along the time axis by adjusting the \code{dim1} argument during
+Preprocessing with \code{\link{preprocess}} is recommended prior to peak detection.
+Overly high chromatographic resolution may sometimes cause peak splitting.
+In such cases, it is recommended to either increase the \code{smooth_window} or
+reduce the time-axis resolution by adjusting the \code{dim1} argument during
 preprocessing.
 }
 \note{

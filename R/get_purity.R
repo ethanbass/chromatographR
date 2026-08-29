@@ -1,16 +1,15 @@
-#' Calculate mean peak purity
+#' Calculate peak purity
 #' 
-#' Estimates peak purity by assessing the dissimilarity of the spectra
-#' comprising the peak, using the method described in Stahl 2003.
+#' Estimates peak purity by assessing spectral dissimilarity across the peak
+#' region, following Stahl (2003).
 #' 
-#' @param x A chromatogram in matrix format.
-#' @param pos A vector containing the center, lower and upper bounds of a peak
-#' as numeric indices.
-#' @param weight Weight provided to [`get_agilent_threshold`].
+#' @param x A chromatographic matrix (timepoints × wavelengths).
+#' @param pos Numeric indices defining the peak region (i.e. center, lower and 
+#' upper bounds).
+#' @param weight Weight parameter passed to [`get_agilent_threshold`].
 #' @param cutoff Proportion of maximum absorbance to use as cutoff.
-#' Argument to [`trim_peak`]. Defaults to `0.05`.
-#' @param noise_variance Variance of noise. Argument to 
-#' `get_agilent_threshold`.
+#' Passed to [`trim_peak`]. Defaults to `0.05`.
+#' @param noise_variance Variance of noise. Passed to `get_agilent_threshold`.
 #' @param noise_threshold Threshold to define noise. Highest proportion of 
 #' maximum absorbance. Defaults to `0.01`.
 #' @param lambdas Wavelengths to include in calculations.
@@ -47,6 +46,10 @@ get_purity <- function(x, pos, weight = 1, cutoff = 0.05,
 }
 
 #' Calculate variance of noise regions
+#' 
+#' Estimates variance of spectral noise regions used in peak purity calculations.
+#' Identified noise regions are defined by `find_noise`.
+#' 
 #' @param x A chromatogram in matrix format
 #' @param noise_threshold Threshold to define noise. Highest proportion of 
 #' maximum absorbance. Defaults to `0.01`.
@@ -64,10 +67,6 @@ get_noise_variance <- function(x, noise_threshold = .01, lambdas){
   noise_idx <- find_noise(x = x, noise_threshold = noise_threshold, 
                       lambdas = lambdas)
   mean(apply(x[noise_idx,], 1, var), na.rm = TRUE)
-  # if (plot_it){
-  #   matplot(x,type='l')
-  #   
-  # }
 }
 
 #' Define noise spectra based on specified threshold
@@ -86,6 +85,10 @@ find_noise <- function(x, noise_threshold = 0.01, lambdas){
 }
 
 #' Calculate purity thresholds
+#' 
+#' Intermediate function used in [`get_purity`] to compute variance-based 
+#' thresholds.
+#' 
 #' @param x A chromatogram in matrix format.
 #' @param pos A vector containing peak information.
 #' @param weight Scaling parameter affecting stringency of threshold. Defaults
@@ -125,6 +128,9 @@ get_agilent_threshold <- function(x, pos, weight = 1, noise_variance = NULL,
 }
 
 #' Calculate spectral similarity
+#' 
+#' Computes spectral similarity used in peak purity calculations (`get_purity`).
+#' 
 #' @param x A chromatogram in matrix format
 #' @param pos A vector containing peak information.
 #' @return Returns a vector of spectral similarities of the reference spectrum

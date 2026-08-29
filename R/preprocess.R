@@ -1,42 +1,44 @@
 #' Preprocess time/wavelength data
 #' 
-#' Standard pre-processing of response matrices, consisting of a time axis and
-#' a spectral axis (e.g. HPLC-DAD/UV data). For smooth data, like UV-VIS data,
-#' the size of the matrix can be reduced by interpolation. By default,
-#' the data are baseline-corrected in the time direction 
-#' ([`baseline.corr`][ptw::baseline.corr]) and smoothed in the spectral dimension
-#' using cubic smoothing splines ([`smooth.spline`]).
+#' Standard preprocessing of time × wavelength response matrices
+#' (e.g. HPLC-DAD/UV data), consisting of: (i) baseline correction along the 
+#' time axis, (ii) smoothing along the spectral axis, and (iii) optional 
+#' interpolation in either dimension for dimensionality reduction. For densely 
+#' sampled data, (e.g.,  UV-VIS spectra, the size of the matrix can be reduced 
+#' by interpolation. By default, the data are baseline-corrected along the time
+#' axis using [`baseline.corr`][ptw::baseline.corr], and smoothed along the
+#' spectral axis using cubic smoothing splines ([`smooth.spline`]).
 #' 
-#' @import ptw
+#' @importFrom ptw baseline.corr
 #' @importFrom stats approx smooth.spline
-#' @param X A numerical data matrix, or list of data matrices. Missing values
-#' are not allowed. If rownames or colnames attributes are used, they should be
-#' numerical and signify time points and wavelengths, respectively.
-#' @param dim1 A new, usually shorter, set of time points (numerical). The
-#' range of these should not exceed the range of the original time points.
-#' @param dim2 A new, usually shorter, set of wavelengths (numerical). The
-#' range of these should not exceed the range of the original wavelengths.
+#' @param X A numeric matrix (time × wavelength) or a list of such matrices.
+#' Row names must correspond to time points and column names to wavelengths.
+#' @param dim1 Numeric vector specifying the target time grid. The data will be
+#' interpolated onto these time points. The range of the new values should not 
+#' exceed the range of the original time points.
+#' @param dim2 Numeric vector specifying the target wavelength grid.
+#' The data will be interpolated onto these wavelengths. The range of the new 
+#' values should not exceed the range of the original wavelengths.
 #' @param remove.time.baseline Logical, indicating whether baseline correction
-#' should be done in the time direction, according to
-#' [`baseline.corr`][ptw::baseline.corr]. Default is `TRUE`.
-#' @param spec.smooth Logical, indicating whether smoothing should be done in
-#' the spectral direction, according to
-#' [`smooth.spline`][stats::smooth.spline]. Default is `TRUE`.
-#' @param maxI if given, the maximum intensity in the matrix is set to this
-#' value.
+#' should be done along the time axis, according to
+#' [`baseline.corr`][ptw::baseline.corr]. Defaults to `TRUE`.
+#' @param spec.smooth Logical, indicating whether smoothing should be done along
+#' the spectral axis, according to [`smooth.spline`]. Defaults to `TRUE`.
+#' @param maxI If supplied, all values are rescaled so that the maximum
+#' intensity equals `maxI`.
 #' @param interpolate_rows Logical. Whether to interpolate along the time axis 
 #' (`dim1`). Defaults to `TRUE`.
 #' @param interpolate_cols Logical. Whether to interpolate along the spectral 
 #' axis (`dim2`). Defaults to `TRUE`.
-#' @param cl Either an integer specifying the number of clusters to use for 
-#' parallel processing or a cluster object created by 
-#' [`makeCluster`][parallel::makeCluster]. Defaults to `2`. On Windows integer 
+#' @param cl Either an integer specifying the number of cores to use for
+#' parallel processing or a cluster object created by
+#' [`makeCluster`][parallel::makeCluster]. Defaults to `2`. On Windows integer
 #' values will be ignored.
 #' @param show_progress Logical. Whether to show progress bar. Defaults to 
 #' `TRUE` if [`pbapply`][pbapply::pbapply] is installed.
-#' @param outlier_cutoff Threshold for excluding chromatograms that end 
-#' prematurely. Chromatograms ending more than this value (in seconds) before 
-#' the median end time are excluded. Default is 5 seconds. Only applies when 
+#' @param outlier_cutoff Threshold (in seconds) for excluding chromatograms
+#' that end earlier than expected. Samples ending more than this value before
+#' the median end time are removed. Defaults to `5` seconds. Only applies when 
 #' `dim1` is not specified.
 #' @param ... Additional arguments to [`baseline.corr`][ptw::baseline.corr].
 #' @return The function returns the preprocessed data matrix (or list of 
@@ -46,9 +48,9 @@
 #' @note Adapted from the `preprocess` function in the alsace package by 
 #' Ron Wehrens: <https://github.com/rwehrens/alsace/blob/master/R/preprocess.R>.
 #' @references 
-#' * Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast
-#' parametric time warping of peak lists. *Bioinformatics*
-#' 31:3063-3065. \doi{10.1093/bioinformatics/btv299}.
+#' * Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast parametric 
+#' time warping of peak lists. *Bioinformatics* 31:3063-3065. 
+#' \doi{10.1093/bioinformatics/btv299}.
 #' * Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
 #' LC–DAD using multivariate curve resolution: the alsace package for R. 
 #' *Metabolomics* 11:1:143-154. \doi{10.1007/s11306-014-0683-5}.

@@ -1,39 +1,55 @@
 #' Plot traces from list of chromatograms.
 #' 
-#' Plots the specified traces from a list of chromatograms.
+#' Visualizes absorbance traces from a list of one- or multi-wavelength
+#' chromatograms using base R, ggplot2, or plotly graphics. For
+#' multi-wavelength chromatograms, one or more wavelengths can be selected
+#' using `lambdas`. When plotting many chromatograms, traces are automatically
+#' thinned according to `time_resolution` to improve rendering performance. 
+#' Each chromatogram specified by `idx` is plotted as a separate trace and
+#' assigned a distinct color.
 #' 
 #' @importFrom graphics matplot axis box
-#' @param x A list of chromatograms in matrix format (timepoints x wavelengths)
-#' or a `peak_table` containing a pointer toward the chromatograms, if present
-#' in the environment.
+#' @param x A list of chromatograms in matrix format (timepoints × wavelengths)
+#' or a `peak_table` containing a pointer to a list of chromatograms accessible
+#' in the current environment.
 #' @param lambdas A character or numeric vector specifying the wavelengths to 
-#' plot. For one-dimensional chromatograms, this argument can be ignored.
+#' plot. Ignored for one-dimensional chromatograms.
 #' @param idx A vector representing the names or numerical indices of the 
 #' chromatograms to plot.
-#' @param time_resolution Time resolution for plot (in minutes). Defaults to 
-#' `0.01`. Thinning the time axis dramatically improved speed when plotting
-#' many chromatograms.
+#' @param time_resolution Desired temporal resolution for plotting (in minutes).
+#' Chromatograms are thinned to approximately this interval prior to plotting,
+#' which can substantially improve performance for large datasets.  Defaults to 
+#' `0.01`.
 #' @param time_unit Time units of the provided chromatograms: either `min`, `s`,
-#' or `ms`. If possible, units will be detected automatically if possible from 
-#' chromatogram metadata. If `time_unit` attribute is not present and no
-#' argument is provided, the time units will default to minutes.
-#' @param xlim Range of x axis (numeric vector).
-#' @param ylim Range of y axis (numeric vector).
+#' or `ms`. If possible, units will be detected automatically from chromatogram
+#' metadata. If `time_unit` attribute is not present and no argument is 
+#' provided, the time units will default to minutes.
+#' @param xlim Range of x axis values.
+#' @param ylim Range of y axis values.
 #' @param ylab Y label. Defaults to `"Absorbance"`.
 #' @param xlab X label.
-#' @param engine Plotting engine. Either [`"base"`][graphics::matplot], 
-#' [`"plotly"`][plotly::plotly], or [`"ggplot"`][ggplot2::ggplot2-package].
+#' @param engine Plotting backend to use. One of [`"base"`][graphics::matplot], 
+#' [`"ggplot"`][ggplot2::ggplot2-package], or [`"plotly"`][plotly::plotly].
 #' @param linewidth Line width. Defaults to `1`.
 #' @param show_legend Logical. Whether to display legend or not. Defaults to 
 #' `FALSE`.
 #' @param legend_position Position of legend. Defaults to `"topright"`
 #' @param title Title for plot.
 #' @param ... Additional arguments to plotting function specified by `engine`.
-#' @return No return value, called for side effects.
+#' @return A `plotly` or `ggplot` object when `engine = "plotly"` or
+#' `engine = "ggplot"`, respectively. No value is returned when
+#' `engine = "base"`.
 #' @section Side effects:
-#' Plots the traces of the specified chromatograms `idx` at the specified
-#' wavelengths (`lambdas`). Plots can be produced using base graphics, ggplot2,
-#' or plotly, according to the value of the `engine` argument.
+#' If `engine == "base"`, the plot is rendered to the active graphics device.
+#' @details
+#' For multi-wavelength chromatograms, wavelength indices are resolved
+#' internally using `get_lambda_idx()`. Time values are converted according
+#' to `time_unit`, either supplied explicitly or inferred from chromatogram
+#' metadata.
+#'
+#' When using the `"ggplot"` or `"plotly"` engines, chromatograms are first
+#' reshaped into long format using `reshape_chroms()`.
+#'
 #' @author Ethan Bass
 #' @examples 
 #' data(Sa_warp)
@@ -178,7 +194,10 @@ position_plotly_legend <- function(pos){
 #' 
 #' Plots the specified traces from a list of chromatograms as a heatmap.
 #' 
-#' Adapted from [`VPdtw::plot.VPdtw`].
+#' Plots the traces of the chromatograms specified by `idx` at the specified
+#' wavelengths (`lambdas`) as a heatmap. Plots can be produced using base 
+#' graphics engine, `ggplot2`, or `plotly`, according to the value of the 
+#' `engine` argument. Adapted from [`VPdtw::plot.VPdtw`].
 #' 
 #' @importFrom grDevices grey hcl.colors
 #' @importFrom graphics image layout mtext rect
@@ -186,12 +205,11 @@ position_plotly_legend <- function(pos){
 #' @param show_legend Logical. Whether to display legend or not. Defaults to
 #' `TRUE`.
 #' @param show_ylabs Logical. Whether to show y labels. Defaults to `FALSE`.
-#' @return No return value, called for side effects.
+#' @return A `plotly` or `ggplot` object when `engine = "plotly"` or
+#' `engine = "ggplot"`, respectively. No value is returned when
+#' `engine = "base"`.
 #' @section Side effects:
-#' Plots the traces of the chromatograms specified by `idx` at the specified
-#' wavelengths (`lambdas`) as a heatmap. Plots can be produced using base 
-#' graphics engine, `ggplot2`, or `plotly`, according to the value of the 
-#' `engine` argument.
+#' If `engine == "base"`, the plot is rendered to the active graphics device.
 #' @author Ethan Bass
 #' @examples 
 #' data(Sa_warp)

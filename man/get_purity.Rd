@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_purity.R
 \name{get_purity}
 \alias{get_purity}
-\title{Calculate mean peak purity}
+\title{Calculate peak purity}
 \usage{
 get_purity(
   x,
@@ -16,18 +16,17 @@ get_purity(
 )
 }
 \arguments{
-\item{x}{A chromatogram in matrix format.}
+\item{x}{A chromatographic matrix (timepoints × wavelengths).}
 
-\item{pos}{A vector containing the center, lower and upper bounds of a peak
-as numeric indices.}
+\item{pos}{Numeric indices defining the peak region (i.e. center, lower and
+upper bounds).}
 
-\item{weight}{Weight provided to \code{\link{get_agilent_threshold}}.}
+\item{weight}{Weight parameter passed to \code{\link{get_agilent_threshold}}.}
 
 \item{cutoff}{Proportion of maximum absorbance to use as cutoff.
-Argument to \code{\link{trim_peak}}. Defaults to \code{0.05}.}
+Passed to \code{\link{trim_peak}}. Defaults to \code{0.05}.}
 
-\item{noise_variance}{Variance of noise. Argument to
-\code{get_agilent_threshold}.}
+\item{noise_variance}{Variance of noise. Passed to \code{get_agilent_threshold}.}
 
 \item{noise_threshold}{Threshold to define noise. Highest proportion of
 maximum absorbance. Defaults to \code{0.01}.}
@@ -41,8 +40,8 @@ Returns the mean purity of the peak specified by \code{pos}, defined
 as the proportion of timepoints with purity values below 1.
 }
 \description{
-Estimates peak purity by assessing the dissimilarity of the spectra
-comprising the peak, using the method described in Stahl 2003.
+Estimates peak purity by assessing spectral dissimilarity across the peak
+region, following Stahl (2003).
 }
 \references{
 Stahl, Mark. “Peak Purity Analysis in HPLC and CE Using Diode-Array Technology.”

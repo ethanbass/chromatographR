@@ -16,27 +16,29 @@ normalize_data(
 \arguments{
 \item{peak_table}{A \code{peak_table} object.}
 
-\item{column}{A string specifying the column containing the weights.}
+\item{column}{The name of the column to be used for normalization.}
 
 \item{chrom_list}{List of chromatograms for normalization. The samples must
-be in same order as the peak_table. If omitted, the function will attempt to
-find it automatically using information stored in the \code{peak_table}.}
+be in same order as the \code{peak_table}. If omitted, the function will attempt to
+find it automatically using the pointer from the \code{peak_table}.}
 
-\item{what}{A \code{peak_table} or list of chromatograms (\code{chrom_list}).}
+\item{what}{Output type to return: either \code{"peak_table"} (default) or
+\code{"chrom_list"}.}
 
 \item{by}{Whether to normalize by a column in sample metadata (\code{meta}) or by
 a column in the peak table (\code{peak}). By default, this parameter is inferred
 based on the \code{column} name.}
 
 \item{on_invalid}{How to handle invalid normalization values (i.e. zero,
-negative, or \code{NA} values). One of \code{"warn"} (the default), \code{"silent"}, or \code{ "error"}. The former two options will replace invalid values with \code{NA}.}
+negative, or \code{NA} values). One of \code{"warn"} (the default), \code{"silent"}, or
+\code{"error"}. Invalid values are replaced with \code{NA} unless \code{"error"} is chosen.}
 }
 \value{
-A \code{peak_table} object where values are normalized by the values in
-the specified \code{column}.
+Either a normalized \code{peak_table} object or a normalized \code{chrom_list},
+depending on the value of \code{what}.
 }
 \description{
-Normalizes peak table or list of chromatograms by specified column in sample
+Normalizes peak table or list of chromatograms by a column in the sample
 metadata or in the peak table. For normalization by sample metadata, the
 metadata must first be attached to the \code{peak_table} using \code{\link{attach_metadata}}.
 }

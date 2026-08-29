@@ -2,20 +2,24 @@
 #' 
 #' Plots [`ptw`][ptw::ptw] alignments.
 #' 
-#' @importFrom graphics matplot
-#' @param x A `ptw_list` object created by [`correct_rt`].
-#' @param what What type of plot to return. Either `traces` or `heatmap`.
-#' @param engine What plotting engine to use. Either `base`, `ggplot`, or
-#' `plotly`.
-#' @param lambdas Which lambdas to plot.
-#' @param show_legend Logical. Whether to include sample legend.
-#' @param ... Additional arguments (placeholder).
-#' @return No return value, called for side effects.
-#' @section Side effects:
 #' Plots PTW alignments at the specified wavelength (`lambda`) either as
 #' individual traces or as a heatmap, according to the value of `what`. The
 #' plot can be produced using either base R graphics, `ggplot2`, or `plotly`,
 #' according to the value of the `engine` argument. 
+#' 
+#' @importFrom graphics matplot
+#' @param x A `ptw_list` object created by [`correct_rt`].
+#' @param what What type of plot to return. Either `traces` or `heatmap`.
+#' @param engine What plotting engine to use. One of `base`, `ggplot`, or
+#' `plotly`.
+#' @param lambdas Which lambdas to plot.
+#' @param show_legend Logical. Whether to include sample legend.
+#' @param ... Additional arguments (placeholder).
+#' @return A `plotly` or `ggplot` object when `engine = "plotly"` or
+#' `engine = "ggplot"`, respectively. No value is returned when
+#' `engine = "base"`.
+#' @section Side effects:
+#' If `engine == "base"`, plots are rendered to the active graphics device.
 #' @author Ethan Bass
 #' @examplesIf interactive()
 #' data(Sa_pr)

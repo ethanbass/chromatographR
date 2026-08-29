@@ -7,6 +7,15 @@
 #' to create simple box-plots to examine the distribution of a peak with respect
 #' to variables defined in sample metadata.
 #' 
+#' When `plot_trace` is `TRUE`, plots the chromatographic trace of the 
+#' specified chromatogram (`idx`), at the specified wavelength 
+#' (`lambda`) with a dotted red line to indicate the retention time given 
+#' by `loc`. The trace is a single column from the chromatographic matrix. When
+#' `plot_spectrum` is `TRUE`, plots the spectrum for the specified 
+#' chromatogram at the specified retention time. The spectrum represents a single 
+#' row from the chromatographic matrix. When `box_plot` is `TRUE`, produces a 
+#' [`boxplot`] from the specified peak with groups defined by the `vars` argument.
+#' 
 #' @importFrom scales rescale
 #' @importFrom graphics identify title text boxplot
 #' @importFrom stats as.formula
@@ -25,22 +34,19 @@
 #' @param verbose Logical. If `TRUE` (default), prints verbose output to the
 #' console.
 #' @param ... Additional arguments to [boxplot].
-#' @return If `export_spectrum` is `TRUE`, returns the spectrum as a 
+#' @return 
+#' * If `export_spectrum = FALSE` (default), a `plotly` or `ggplot` object, or
+#' nothing if `engine == "base"`. 
+#' * If `export_spectrum = TRUE`, invisibly returns the spectrum as a
+#' `data.frame` with wavelengths as rows and a single column per sample encoding absorbance at each 
+#' wavelength (normalized if `scale_spectrum = TRUE`).
+#' Otherwise, if `engine == "base"`, there is no 
+#' return value. If `export_spectrum` is `TRUE`, returns the spectrum as a 
 #' `data.frame` with wavelengths as rows and columns encoding the
 #' absorbance (or normalized absorbance, if `scale_spectrum` is `TRUE`) for 
-#' the specified sample(s). Otherwise, there is no return value.
+#' the specified sample(s).
 #' @section Side effects:
-#' * If `plot_trace` is `TRUE`, plots the chromatographic trace of the 
-#' specified chromatogram (`idx`), at the specified wavelength 
-#' (`lambda`) with a dotted red line to indicate the retention time given 
-#' by `loc`. The trace is a single column from the chromatographic matrix.
-#'
-#' * If `plot_spectrum` is `TRUE`, plots the spectrum for the specified 
-#' chromatogram at the specified retention time. The spectrum represents a single 
-#' row from the chromatographic matrix.
-#' 
-#' * If `box_plot` is `TRUE`, produces a [`boxplot`] from the specified peak 
-#' with groups defined by the `vars` argument.
+#' If `engine == "base"`, plots are rendered to the active graphics device.
 #' @author Ethan Bass
 #' @rdname plot.peak_table
 #' @family visualization functions
@@ -63,7 +69,7 @@ plot.peak_table <- function(x, loc, chrom_list, what = "peak",
   }
   for (loc in loc){
     if (plot_spectrum | plot_trace){
-      if (idx == "all"){
+      if (identical(idx, "all")){
         out <- plot_all_spectra(loc, x, chrom_list,
                                 plot_spectrum = plot_spectrum,
                                 export_spectrum = export_spectrum,
@@ -166,6 +172,7 @@ boxplot.peak_table <- function(x, formula, ...){
 #' @param ... Additional arguments to `matplot` function.
 #' @return No return value, called for side effects.
 #' @section Side effects:
+#' Plots are rendered to the active graphics device.
 #' If `mirror_plot` is `TRUE`, plots a mirror plot comparing two treatments
 #' defined by `var` and `subset` (if more than two factors are present
 #' in `var`).

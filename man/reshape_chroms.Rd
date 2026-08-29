@@ -19,24 +19,29 @@ reshape_chroms(
 
 \item{idx}{Indices of chromatograms to convert.}
 
-\item{time_resolution}{Time resolution for plot. This argument can be used
-to thin the time axis while reshaping. By default the time resolution is not
-altered.}
+\item{time_resolution}{Time resolution used when reshaping. Can be used
+to subsample the time axis. Defaults to full resolution.}
 
-\item{sample_var}{String with name of new column containing sample IDs.}
+\item{sample_var}{Name of the new column containing sample identifiers}
 
-\item{lambdas}{Vector specifying wavelength(s) to include.}
+\item{lambdas}{Wavelength(s) to include.}
 
-\item{rts}{Vector specifying retention times to include.}
+\item{rts}{Retention times to include.}
 
-\item{transfer_metadata}{Logical. Whether to transfer metadata attributes or
-not. Defaults to \code{FALSE}.}
+\item{transfer_metadata}{Logical. If \code{TRUE}, metadata attributes are
+transferred to the output. Defaults to \code{FALSE}.}
 }
 \value{
-A list of chromatographic matrices in long format.
+A data frame in long format with columns \code{rt}, \code{lambda}, \code{absorbance},
+and a sample identifier column specified by \code{sample_var}.
 }
 \description{
-Reshapes a list of chromatograms from wide to long format.
+Converts a list of chromatographic matrices into a single long-format
+data frame with one row per sample × retention time × wavelength combination.
+}
+\details{
+Each row corresponds to a single measurement of signal intensity at
+a given retention time and wavelength for a specific sample.
 }
 \seealso{
 Other utility functions:

@@ -10,7 +10,7 @@
 \item{x}{A \code{\link{peak_table}} object.}
 
 \item{subset}{Logical expression indicating rows (samples) to keep from
-\code{peak_table}; missing values are taken as false.}
+\code{peak_table}; missing values are taken as \code{FALSE}.}
 
 \item{select}{Logical expression indicating columns (peaks) to select from
 \code{peak_table}.}

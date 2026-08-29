@@ -1,33 +1,30 @@
 #' Get peak list.
 #' 
-#' Finds and fits peaks and extracts peak parameters from a list of chromatograms
-#' at the specified wavelengths.
+#' Detects chromatographic peaks, fits peak models, and extracts peak parameters
+#' at one or more wavelengths.
 #' 
-#' Peaks are located by finding zero-crossings in the smoothed first derivative
-#' of the specified chromatographic traces (using the [`find_peaks`] function).
-#' At the given positions, a peak model is then fit to the signal using 
-#' [`fit_peaks`] according to the value of the `fit` argument.
-#' Available models include the bidirectional exponentially modified gaussian
-#' (`"bemg"`),exponential-gaussian hybrid (`"egh"`) or regular 
-#' `"gaussian"`.  Finally, the area is calculated using a trapezoidal 
-#' approximation.
-#'
+#' Peaks are detected by finding zero-crossings in the smoothed first derivative
+#' of the specified chromatographic traces (using [`find_peaks`]).
+#' Peak models are then fit to the detected features using [`fit_peaks`] 
+#' according to the value of `fit`. Available models include the bidirectional
+#' exponentially modified gaussian (`"bemg"`), exponential-gaussian hybrid 
+#' (`"egh"`) or `"gaussian"`. Peak areas are then calculated using a 
+#' trapezoidal approximation.
+#' 
 #' Additional arguments can be provided to `find_peaks` to fine-tune
 #' the peak-finding algorithm. For example, the `smooth_window` can be
-#' increased to prevent peaks from being split into multiple features. Overly
+#' increased to reduce splitting of broad peaks into multiple features. Overly
 #' aggressive smoothing may cause small peaks to be overlooked. 
 #' 
-#' The standard deviation (`sd`), full-width at half maximum (`FWHM`),
-#' \eqn{\tau} (`tau`), \eqn{\tau_{R}} (`tau_right`), 
-#' \eqn{\tau_{L}} (`tau_left`), and `area` are returned in units determined by 
-#' the `time_unit` argument. By default, the units are in minutes. To compare
-#' directly with 'ChemStation' integration results, the time units should be 
-#' changed to seconds.
+#' The parameters `sd`, `FWHM`, `tau`, `tau_right`, `tau_left`, and
+#' `area` are returned in units determined by `time_unit`, which defaults to
+#' `minutes`. To compare directly with 'ChemStation' integration results, 
+#' the time units should be changed to seconds.
 #' 
 #' @aliases get_peaks
 #' @importFrom stats median
-#' @param chrom_list A list of profile matrices, each of the same dimensions
-#' (timepoints × wavelengths).
+#' @param chrom_list A list of chromatograms in matrix format (timepoints x
+#' wavelengths).
 #' @param lambdas A character or numeric vector specifying the wavelengths to 
 #' find peaks at. For one-dimensional chromatograms, this argument can be ignored.
 #' @param fit What type of fit to use. Current options are bidirectional 
@@ -43,7 +40,7 @@
 #' instead.
 #' @param time_unit Specifies the units for `sd`, `FWHM`, `area`, and `tau` (if
 #' applicable). Options are minutes (`"min"`), seconds (`"s"`), or 
-#' milliseconds (`"ms"`).
+#' milliseconds (`"ms"`). Defaults to `"min"`.
 #' @param time.units The `time.units` argument is deprecated. Please use 
 #' `time_unit` instead.
 #' @param estimate_purity Logical. Whether to estimate purity or not. Defaults
@@ -51,10 +48,10 @@
 #' @param noise_threshold Noise threshold. Argument to `get_purity`.
 #' @param show_progress Logical. Whether to show progress bar. Defaults to 
 #' `TRUE` if [`pbapply`][pbapply::pbapply] is installed.
-#' @param cl Either an integer specifying the number of clusters to use for 
-#' parallel processing or a cluster object created by 
+#' @param cl Either an integer specifying the number of cores to use for
+#' parallel processing or a cluster object created by
 #' [`makeCluster`][parallel::makeCluster]. Defaults to `2`. On Windows integer
-#' values will be ignored. 
+#' values will be ignored.
 #' @param collapse Logical. Whether to collapse multiple peak lists per sample
 #' into a single list when multiple wavelengths (`lambdas`) are provided.
 #' @param \dots Additional arguments to [`find_peaks`]. Arguments provided to 
@@ -71,7 +68,7 @@
 #' * `start`: The retention time where the peak is estimated to begin.
 #' * `end`: The retention time where the peak is estimated to end.
 #' * `sd`: The standard deviation (\eqn{\sigma}) of the fitted peak shape.
-#' * `tau` Empirical skewness parameter (in units of time) determining peak
+#' * `tau`: Empirical skewness parameter (in units of time) determining peak
 #' asymmetry when `fit == "egh"`.
 #' * `tau_right`: Exponential rate constant controlling right-sided tailing
 #' when `fit = "bemg"`. Note that unlike `tau` in the EGH model,

@@ -56,60 +56,73 @@ importFrom(caTools,runmean)
 importFrom(chromConverter,read_chroms)
 importFrom(dynamicTreeCut,cutreeDynamicTree)
 importFrom(fastcluster,hclust)
-importFrom(grDevices,colorRampPalette)
-importFrom(grDevices,grey)
-importFrom(grDevices,hcl.colors)
-importFrom(graphics,abline)
-importFrom(graphics,arrows)
-importFrom(graphics,axis)
-importFrom(graphics,box)
-importFrom(graphics,boxplot)
-importFrom(graphics,identify)
-importFrom(graphics,image)
-importFrom(graphics,layout)
-importFrom(graphics,legend)
-importFrom(graphics,matplot)
-importFrom(graphics,mtext)
-importFrom(graphics,par)
-importFrom(graphics,plot.new)
-importFrom(graphics,plot.window)
-importFrom(graphics,polygon)
-importFrom(graphics,rect)
-importFrom(graphics,text)
-importFrom(graphics,title)
-importFrom(lattice,panel.abline)
-importFrom(lattice,panel.stripplot)
-importFrom(lattice,stripplot)
+importFrom(grDevices,
+  colorRampPalette,
+  grey,
+  hcl.colors
+)
+importFrom(graphics,
+  abline,
+  arrows,
+  axis,
+  box,
+  boxplot,
+  identify,
+  image,
+  layout,
+  legend,
+  matplot,
+  mtext,
+  par,
+  plot.new,
+  plot.window,
+  polygon,
+  rect,
+  text,
+  title
+)
+importFrom(lattice,
+  panel.abline,
+  panel.stripplot,
+  stripplot
+)
 importFrom(methods,new)
 importFrom(minpack.lm,nlsLM)
 importFrom(parallel,mclapply)
-importFrom(scales,alpha)
-importFrom(scales,rescale)
-importFrom(stats,aggregate)
-importFrom(stats,approx)
-importFrom(stats,as.dist)
-importFrom(stats,as.formula)
-importFrom(stats,coef)
-importFrom(stats,convolve)
-importFrom(stats,cor)
-importFrom(stats,cutree)
-importFrom(stats,deriv)
-importFrom(stats,dist)
-importFrom(stats,fitted)
-importFrom(stats,ksmooth)
-importFrom(stats,lm)
-importFrom(stats,median)
-importFrom(stats,nls.control)
-importFrom(stats,predict)
-importFrom(stats,quantile)
-importFrom(stats,reformulate)
-importFrom(stats,reshape)
-importFrom(stats,residuals)
-importFrom(stats,sd)
-importFrom(stats,setNames)
-importFrom(stats,smooth.spline)
-importFrom(stats,terms)
-importFrom(stats,var)
-importFrom(utils,head)
-importFrom(utils,tail)
-importFrom(utils,write.csv)
+importFrom(ptw,baseline.corr)
+importFrom(scales,
+  alpha,
+  rescale
+)
+importFrom(stats,
+  aggregate,
+  approx,
+  as.dist,
+  as.formula,
+  coef,
+  convolve,
+  cor,
+  cutree,
+  deriv,
+  dist,
+  fitted,
+  ksmooth,
+  lm,
+  median,
+  nls.control,
+  predict,
+  quantile,
+  reformulate,
+  reshape,
+  residuals,
+  sd,
+  setNames,
+  smooth.spline,
+  terms,
+  var
+)
+importFrom(utils,
+  head,
+  tail,
+  write.csv
+)

@@ -1,22 +1,21 @@
 #' Filter peak lists
 #' 
-#' Utility function to remove peaks from a peak list (e.g., because their
-#' intensity is too low). Currently one can filter on peak height, peak area,
-#' standard deviation, and/or retention time.
+#' Utility function for filtering peaks from a `peak_list` object. Peaks can be
+#' filtered according to height, area, standard deviation, and/or retention time.
 #' 
-#' @param peak_list A peak_list object, consisting of a nested list of peak
+#' @param peak_list A `peak_list` object, consisting of a nested list of peak
 #' tables, where the first level is the sample, and the second level is the 
-#' spectral component. Every component is described by a matrix where every row 
-#' is one peak, and the columns contain information on retention time, 
-#' full width at half maximum (FWHM), peak width, height, and area.
+#' spectral component. Every component is described by a `data.frame` where 
+#' every row represents a peak, and the columns contain information on 
+#' retention time,  peak shape, height, and area.
 #' @param min_height Minimum peak height.
 #' @param min_area Minimum peak area.
 #' @param min_sd Minimal standard deviation.
 #' @param max_sd Maximum standard deviation.
 #' @param min_rt Minimum retention time.
 #' @param max_rt Maximum retention time.
-#' @return A peak list similar to the input, with all rows removed that do not
-#' satisfy the specified criteria.
+#' @return A filtered `peak_list` object containing only peaks that satisfy the
+#' specified criteria.
 #' @author Ron Wehrens, Ethan Bass
 #' @seealso [`get_peaks`], [`filter_peaktable`]
 #' @export filter_peaks
@@ -73,23 +72,32 @@ filter_peaks <- function(peak_list, min_height, min_area,
 
 #' Filter peak table
 #' 
-#' Utility function to remove peaks from peak table, e.g., because their
-#' intensity is too low. Currently one can filter on `"mean"`, `"median"`,
-#' or maximum (`"max"`) peak intensity or retention time.
+#' Utility function to filter features (columns) in a `peak_table`. Filtering is
+#' applied consistently across all components of the peak table, including the 
+#' intensity matrix (`tab`), feature metadata (`pk_meta`), and reference spectra
+#' (if present). Filtering can be based on retention time, wavelength, feature
+#' intensity summarized across samples (mean, median, or max), and/or feature
+#' sparsity (i.e., proportion of zero values across samples).
 #' 
 #' @param peak_table A peak_table object from [`get_peaktable`].
-#' @param rts Vector of retention times to include in the peak table.
-#' @param min_rt Minimum retention time to include in the peak table.
-#' @param max_rt Maximum retention time to include in the peak table.
-#' @param min_value Minimal cutoff for summarized peak intensity.
-#' @param max_zeros Maximum proportion of zero values to allow.
-#' @param what Whether to summarize intensities using `mean`, `median` (default), 
-#' or `max`.
-#' @param lambda Component(s) to include in peak table (e.g. wavelengths if you
-#' are using HPLC-DAD/UV).
-#' @param tol Tolerance for matching of retention times to `rts`.
-#' @return A peak table similar to the input, with all columns removed from the
-#' peak table that do not satisfy the specified criteria.
+#' @param rts Vector of retention times used to select features. Values are
+#' mapped to the closest retention times in the peak table. If no 
+#' match is found within `tol`, the value is ignored and a warning is issued.
+#' @param min_rt Minimum retention time for features to be retained.
+#' @param max_rt Maximum retention time for features to be retained.
+#' @param min_value Minimum threshold for feature intensity summarized across
+#' samples (using the method specified by `what`).
+#' @param max_zeros Maximum allowed feature sparsity (proportion of zero values 
+#' across samples).
+#' @param what Method used to summarize feature intensity across samples for
+#' filtering. One of `"mean"`, `"median"` (default),  or `"max"`.
+#' @param lambda Wavelength(s) used to select features in the peak table.
+#' Only features matching the specified wavelength(s) are retained.
+#' @param tol Tolerance for matching of retention times to `rts`. A
+#' feature is considered a match if the absolute difference is ≤ `tol`.
+#' @return A filtered `peak_table` containing only features (columns) that
+#' satisfy the specified criteria. The same feature indices are applied to all
+#' `peak_table` components.
 #' @author Ethan Bass
 #' @seealso [`get_peaktable`], [`filter_peaks`]
 #' @examples

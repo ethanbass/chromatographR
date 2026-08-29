@@ -19,32 +19,41 @@ filter_peaktable(
 \arguments{
 \item{peak_table}{A peak_table object from \code{\link{get_peaktable}}.}
 
-\item{rts}{Vector of retention times to include in the peak table.}
+\item{rts}{Vector of retention times used to select features. Values are
+mapped to the closest retention times in the peak table. If no
+match is found within \code{tol}, the value is ignored and a warning is issued.}
 
-\item{min_rt}{Minimum retention time to include in the peak table.}
+\item{min_rt}{Minimum retention time for features to be retained.}
 
-\item{max_rt}{Maximum retention time to include in the peak table.}
+\item{max_rt}{Maximum retention time for features to be retained.}
 
-\item{min_value}{Minimal cutoff for summarized peak intensity.}
+\item{min_value}{Minimum threshold for feature intensity summarized across
+samples (using the method specified by \code{what}).}
 
-\item{max_zeros}{Maximum proportion of zero values to allow.}
+\item{max_zeros}{Maximum allowed feature sparsity (proportion of zero values
+across samples).}
 
-\item{lambda}{Component(s) to include in peak table (e.g. wavelengths if you
-are using HPLC-DAD/UV).}
+\item{lambda}{Wavelength(s) used to select features in the peak table.
+Only features matching the specified wavelength(s) are retained.}
 
-\item{what}{Whether to summarize intensities using \code{mean}, \code{median} (default),
-or \code{max}.}
+\item{what}{Method used to summarize feature intensity across samples for
+filtering. One of \code{"mean"}, \code{"median"} (default),  or \code{"max"}.}
 
-\item{tol}{Tolerance for matching of retention times to \code{rts}.}
+\item{tol}{Tolerance for matching of retention times to \code{rts}. A
+feature is considered a match if the absolute difference is ≤ \code{tol}.}
 }
 \value{
-A peak table similar to the input, with all columns removed from the
-peak table that do not satisfy the specified criteria.
+A filtered \code{peak_table} containing only features (columns) that
+satisfy the specified criteria. The same feature indices are applied to all
+\code{peak_table} components.
 }
 \description{
-Utility function to remove peaks from peak table, e.g., because their
-intensity is too low. Currently one can filter on \code{"mean"}, \code{"median"},
-or maximum (\code{"max"}) peak intensity or retention time.
+Utility function to filter features (columns) in a \code{peak_table}. Filtering is
+applied consistently across all components of the peak table, including the
+intensity matrix (\code{tab}), feature metadata (\code{pk_meta}), and reference spectra
+(if present). Filtering can be based on retention time, wavelength, feature
+intensity summarized across samples (mean, median, or max), and/or feature
+sparsity (i.e., proportion of zero values across samples).
 }
 \examples{
 data(pk_tab)

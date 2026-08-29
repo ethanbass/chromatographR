@@ -19,18 +19,17 @@ fit_peaks(
 \arguments{
 \item{x}{A single chromatogram in matrix format.}
 
-\item{lambda}{Wavelength to fit peaks at.}
+\item{lambda}{Wavelength at which to fit peaks. Must correspond to a wavelength present in \code{x}.}
 
 \item{pos}{Locations of peaks in vector \code{y}. If \code{NULL}, \code{find_peaks} will run
 automatically to find peak positions.}
 
 \item{sd_max}{Maximum width (standard deviation) for peaks. Defaults to \code{50}.}
 
-\item{fit}{Function for peak fitting. Currently, bidirectional exponentially
-modified Gaussian (\code{"bemg"}), exponential-gaussian hybrid (\code{"egh"}),
-\code{"gaussian"} and \code{"raw"} settings are supported. If \code{raw} mode is
-selected, trapezoidal integration will be performed on raw data
-without fitting a model to the peak. Defaults to \code{"bemg"}.)}
+\item{fit}{Peak model to use. Options include \code{"bemg"} (bidirectional
+exponentially modified Gaussian), \code{"egh"} (exponential-Gaussian hybrid),
+\code{"gaussian"}, and \code{"raw"}. If \code{raw} is selected, peaks are integrated using
+trapezoidal integration without model fitting. Defaults to \code{"bemg"}.}
 
 \item{max_iter}{Maximum number of iterations to use in nonlinear least
 squares peak-fitting. Defaults to \code{1000}.}
@@ -43,13 +42,12 @@ to \code{TRUE}.}
 \item{...}{Additional arguments to \code{find_peaks}.}
 }
 \value{
-Returns a matrix with columns containing the following information
-about each peak:
+A matrix with one row per peak and the following columns:
 \itemize{
-\item \code{rt}: Location of the peak maximum.
-\item \code{start}: Start of peak (only included in table if \code{bounds = TRUE}).
-\item \code{end}: End of peak (only included in table if \code{bounds = TRUE}).
-\item \code{sd}: The standard deviation of the peak.
+\item \code{rt}: Peak maximum location.
+\item \code{start}: Peak start (only included in table if \code{bounds = TRUE}).
+\item \code{end}: Peak end (only included in table if \code{bounds = TRUE}).
+\item \code{sd}: Peak standard deviation.
 \item \code{tau}: Exponential decay constant (only included in table if
 \code{fit = "egh"}).
 \item \code{tau_right}: Exponential decay constant for right side of peak (when
@@ -61,19 +59,16 @@ about each peak:
 \item \code{area}: Peak area.
 \item \code{r.squared}: The R\if{html}{\out{<sup>}}2\if{html}{\out{</sup>}} value for linear fit of the model to the data.
 \item \code{purity}: The spectral purity of peak as assessed by \code{\link{get_purity}}.
-Again, the first five elements (rt, start, end, sd and FWHM) are expressed
-as indices, so not in terms of the real retention times. The transformation
-to "real" time is done in function the \code{get_peaks} function.
+The first five elements (\code{rt}, \code{start}, \code{end}, \code{sd} and \code{FWHM}) are expressed
+as index positions rather than absolute retention times. The transformation
+to real time is done in \code{get_peaks}.
 }
 }
 \description{
-Fit peak parameters using the specified peak model
-}
-\details{
-Peak parameters are calculated by fitting the data to a gaussian,
-bidirectional exponentially modified gaussian, or exponential-gaussian hybrid
-curve using non-linear least squares estimation as implemented in
-\code{\link[minpack.lm:nlsLM]{nlsLM}}. The area under the fitted curve is then
+Peak parameters are estimated by fitting one of several models to the data
+using nonlinear least squares (\code{\link[minpack.lm:nlsLM]{nlsLM}}). Supported
+models include Gaussian, bidirectional exponentially modified Gaussian,
+or exponential-Gaussian hybrid functions. The area under each fitted curve is
 estimated using trapezoidal approximation.
 }
 \note{
@@ -101,4 +96,3 @@ good model for chromatographic peaks in isocratic HPLC? \emph{Chromatographia},
 \author{
 Ethan Bass
 }
-\keyword{internal}

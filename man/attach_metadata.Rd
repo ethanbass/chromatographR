@@ -2,27 +2,24 @@
 % Please edit documentation in R/attach_metadata.R
 \name{attach_metadata}
 \alias{attach_metadata}
-\title{Attach experimental metadata}
+\title{Attaches sample metadata to a \code{peak_table} object by matching sample names.}
 \usage{
 attach_metadata(peak_table, metadata, column)
 }
 \arguments{
-\item{peak_table}{A \code{peak_table} object created by \link{get_peaktable}.}
+\item{peak_table}{A \code{peak_table} object created by \code{\link{get_peaktable}}.}
 
-\item{metadata}{A \code{data.frame} containing the sample metadata.}
+\item{metadata}{A \code{data.frame} of sample metadata.}
 
-\item{column}{The name of the column in the provided \code{metadata} object
-containing the sample names. Sample names must match the row names of
-\code{peak_table$tab}.}
+\item{column}{Name of the column in \code{metadata} containing sample identifiers.
+Must match the row names of \code{peak_table$tab}.}
 }
 \value{
-A \code{peak_table} object with metadata attached in the \code{sample_meta}
-slot.
+A \code{peak_table} object with metadata stored in the \code{sample_meta} slot.
 }
 \description{
-Attaches sample metadata to a \code{peak_table} object. Metadata should be
-provided as a \code{data.frame}. One of the columns in the supplied metadata must
-match exactly the row names of the peak table.
+Metadata is provided as a \code{data.frame}, with one column containing sample
+identifiers matching the row names of \code{peak_table$tab}.
 }
 \examples{
 data(pk_tab)

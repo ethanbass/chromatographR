@@ -20,26 +20,26 @@ preprocess(
 )
 }
 \arguments{
-\item{X}{A numerical data matrix, or list of data matrices. Missing values
-are not allowed. If rownames or colnames attributes are used, they should be
-numerical and signify time points and wavelengths, respectively.}
+\item{X}{A numeric matrix (time × wavelength) or a list of such matrices.
+Row names must correspond to time points and column names to wavelengths.}
 
-\item{dim1}{A new, usually shorter, set of time points (numerical). The
-range of these should not exceed the range of the original time points.}
+\item{dim1}{Numeric vector specifying the target time grid. The data will be
+interpolated onto these time points. The range of the new values should not
+exceed the range of the original time points.}
 
-\item{dim2}{A new, usually shorter, set of wavelengths (numerical). The
-range of these should not exceed the range of the original wavelengths.}
+\item{dim2}{Numeric vector specifying the target wavelength grid.
+The data will be interpolated onto these wavelengths. The range of the new
+values should not exceed the range of the original wavelengths.}
 
 \item{remove.time.baseline}{Logical, indicating whether baseline correction
-should be done in the time direction, according to
-\code{\link[ptw:baseline.corr]{baseline.corr}}. Default is \code{TRUE}.}
+should be done along the time axis, according to
+\code{\link[ptw:baseline.corr]{baseline.corr}}. Defaults to \code{TRUE}.}
 
-\item{spec.smooth}{Logical, indicating whether smoothing should be done in
-the spectral direction, according to
-\code{\link[stats:smooth.spline]{smooth.spline}}. Default is \code{TRUE}.}
+\item{spec.smooth}{Logical, indicating whether smoothing should be done along
+the spectral axis, according to \code{\link{smooth.spline}}. Defaults to \code{TRUE}.}
 
-\item{maxI}{if given, the maximum intensity in the matrix is set to this
-value.}
+\item{maxI}{If supplied, all values are rescaled so that the maximum
+intensity equals \code{maxI}.}
 
 \item{interpolate_rows}{Logical. Whether to interpolate along the time axis
 (\code{dim1}). Defaults to \code{TRUE}.}
@@ -55,9 +55,9 @@ values will be ignored.}
 \item{show_progress}{Logical. Whether to show progress bar. Defaults to
 \code{TRUE} if \code{\link[pbapply:pbapply]{pbapply}} is installed.}
 
-\item{outlier_cutoff}{Threshold for excluding chromatograms that end
-prematurely. Chromatograms ending more than this value (in seconds) before
-the median end time are excluded. Default is 5 seconds. Only applies when
+\item{outlier_cutoff}{Threshold (in seconds) for excluding chromatograms
+that end earlier than expected. Samples ending more than this value before
+the median end time are removed. Defaults to \code{5} seconds. Only applies when
 \code{dim1} is not specified.}
 
 \item{...}{Additional arguments to \code{\link[ptw:baseline.corr]{baseline.corr}}.}
@@ -68,12 +68,14 @@ matrices), with row names and column names indicating the time points and
 wavelengths, respectively.
 }
 \description{
-Standard pre-processing of response matrices, consisting of a time axis and
-a spectral axis (e.g. HPLC-DAD/UV data). For smooth data, like UV-VIS data,
-the size of the matrix can be reduced by interpolation. By default,
-the data are baseline-corrected in the time direction
-(\code{\link[ptw:baseline.corr]{baseline.corr}}) and smoothed in the spectral dimension
-using cubic smoothing splines (\code{\link{smooth.spline}}).
+Standard preprocessing of time × wavelength response matrices
+(e.g. HPLC-DAD/UV data), consisting of: (i) baseline correction along the
+time axis, (ii) smoothing along the spectral axis, and (iii) optional
+interpolation in either dimension for dimensionality reduction. For densely
+sampled data, (e.g.,  UV-VIS spectra, the size of the matrix can be reduced
+by interpolation. By default, the data are baseline-corrected along the time
+axis using \code{\link[ptw:baseline.corr]{baseline.corr}}, and smoothed along the
+spectral axis using cubic smoothing splines (\code{\link{smooth.spline}}).
 }
 \note{
 Adapted from the \code{preprocess} function in the alsace package by
@@ -89,9 +91,9 @@ Sa_pr <- preprocess(Sa[[1]], dim1 = new.ts, dim2 = new.lambdas)
 }
 \references{
 \itemize{
-\item Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast
-parametric time warping of peak lists. \emph{Bioinformatics}
-31:3063-3065. \doi{10.1093/bioinformatics/btv299}.
+\item Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast parametric
+time warping of peak lists. \emph{Bioinformatics} 31:3063-3065.
+\doi{10.1093/bioinformatics/btv299}.
 \item Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
 LC–DAD using multivariate curve resolution: the alsace package for R.
 \emph{Metabolomics} 11:1:143-154. \doi{10.1007/s11306-014-0683-5}.

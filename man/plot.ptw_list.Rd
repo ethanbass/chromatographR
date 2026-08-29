@@ -18,7 +18,7 @@
 
 \item{what}{What type of plot to return. Either \code{traces} or \code{heatmap}.}
 
-\item{engine}{What plotting engine to use. Either \code{base}, \code{ggplot}, or
+\item{engine}{What plotting engine to use. One of \code{base}, \code{ggplot}, or
 \code{plotly}.}
 
 \item{lambdas}{Which lambdas to plot.}
@@ -28,17 +28,22 @@
 \item{...}{Additional arguments (placeholder).}
 }
 \value{
-No return value, called for side effects.
+A \code{plotly} or \code{ggplot} object when \code{engine = "plotly"} or
+\code{engine = "ggplot"}, respectively. No value is returned when
+\code{engine = "base"}.
 }
 \description{
 Plots \code{\link[ptw:ptw]{ptw}} alignments.
 }
-\section{Side effects}{
-
+\details{
 Plots PTW alignments at the specified wavelength (\code{lambda}) either as
 individual traces or as a heatmap, according to the value of \code{what}. The
 plot can be produced using either base R graphics, \code{ggplot2}, or \code{plotly},
 according to the value of the \code{engine} argument.
+}
+\section{Side effects}{
+
+If \code{engine == "base"}, plots are rendered to the active graphics device.
 }
 
 \examples{

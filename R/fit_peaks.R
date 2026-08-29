@@ -1,23 +1,20 @@
 #' Find peaks
 #' 
-#' Detects peaks in chromatographic profile.
+#' Detects peaks in a chromatographic profile by identifying zero-crossings in
+#' the smoothed first derivative of the signal (`y`) that exceed a specified 
+#' slope threshold (`slope_thresh`). Smoothing reduces spurious local extrema 
+#' that do not represent true features. Peaks can be filtered using a minimum 
+#' amplitude threshold (`amp_thresh`), which removes low-intensity peaks.
 #' 
-#' Detects peaks by looking for zero-crossings in the smoothed first derivative of
-#' the signal (`y`) that exceed the specified slope threshold (`slope_thresh`).
-#' Additionally, peaks can be filtered by supplying a minimal
-#' amplitude threshold (`amp_thresh`), filtering out peaks below the
-#' specified height. Smoothing is intended to prevent the algorithm from
-#' getting caught up on local minima and maxima that do not represent true
-#' features. Several smoothing options are available, including `"gaussian"`,
-#' box kernel (`"box"`), savitzky-golay smoothing (`"savgol"`),
-#' moving average (`"mva"`), triangular moving average (`"tmva"`), or 
-#' no smoothing (`"none"`).
+#' @details
+#' Available smoothing methods include Gaussian kernel (`"gaussian"`),
+#' box kernel (`"box"`), Savitzky–Golay (`"savgol"`), moving average (`"mva"`),
+#' triangular moving average (`"tmva"`), and no smoothing (`"none"`).
 #' 
-#' It is recommended to do pre-processing using the [`preprocess`]
-#' function before peak detection. Overly high chromatographic resolution can 
-#' sometimes cause peaks to be split into multiple segments. In this case,
-#' it is recommended to increase the `smooth_window` or reduce the
-#' resolution along the time axis by adjusting the `dim1` argument during
+#' Preprocessing with [`preprocess`] is recommended prior to peak detection.
+#' Overly high chromatographic resolution may sometimes cause peak splitting. 
+#' In such cases, it is recommended to either increase the `smooth_window` or 
+#' reduce the time-axis resolution by adjusting the `dim1` argument during
 #' preprocessing.
 #' 
 #' @importFrom caTools runmean
@@ -42,7 +39,7 @@
 #' filters on the basis of peak height, such that larger values will exclude 
 #' small peaks from the peak list. Defaults to `0`.
 #' @param bounds Logical. If `TRUE` (default), includes peak boundaries in 
-#' data.frame.
+#' `data.frame`.
 #' @return If `bounds == TRUE`, returns a `data.frame` containing the center,
 #' start, and end of each identified peak. Otherwise, returns a numeric vector
 #' of peak centers. All locations are expressed as indices.
@@ -118,36 +115,32 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 
 #' Fit chromatographic peaks
 #' 
-#' Fit peak parameters using the specified peak model
-#' 
-#' Peak parameters are calculated by fitting the data to a gaussian, 
-#' bidirectional exponentially modified gaussian, or exponential-gaussian hybrid
-#' curve using non-linear least squares estimation as implemented in 
-#' [`nlsLM`][minpack.lm::nlsLM]. The area under the fitted curve is then 
+#' Peak parameters are estimated by fitting one of several models to the data
+#' using nonlinear least squares ([`nlsLM`][minpack.lm::nlsLM]). Supported 
+#' models include Gaussian, bidirectional exponentially modified Gaussian,
+#' or exponential-Gaussian hybrid functions. The area under each fitted curve is 
 #' estimated using trapezoidal approximation.
 #' 
 #' @param x A single chromatogram in matrix format.
-#' @param lambda Wavelength to fit peaks at.
+#' @param lambda Wavelength at which to fit peaks. Must correspond to a wavelength present in `x`.
 #' @param pos Locations of peaks in vector `y`. If `NULL`, `find_peaks` will run
 #' automatically to find peak positions.
 #' @param sd_max Maximum width (standard deviation) for peaks. Defaults to `50`.
-#' @param fit Function for peak fitting. Currently, bidirectional exponentially 
-#' modified Gaussian (`"bemg"`), exponential-gaussian hybrid (`"egh"`),
-#' `"gaussian"` and `"raw"` settings are supported. If `raw` mode is
-#' selected, trapezoidal integration will be performed on raw data
-#' without fitting a model to the peak. Defaults to `"bemg"`.)
+#' @param fit Peak model to use. Options include `"bemg"` (bidirectional 
+#' exponentially modified Gaussian), `"egh"` (exponential-Gaussian hybrid),
+#' `"gaussian"`, and `"raw"`. If `raw` is selected, peaks are integrated using
+#' trapezoidal integration without model fitting. Defaults to `"bemg"`.
 #' @param max_iter Maximum number of iterations to use in nonlinear least
 #' squares peak-fitting. Defaults to `1000`.
 #' @param estimate_purity Logical. Whether to estimate purity or not. Defaults
 #' to `TRUE`.
 #' @param noise_threshold Noise threshold. Input to `get_purity`.
 #' @param ... Additional arguments to `find_peaks`.
-#' @return Returns a matrix with columns containing the following information 
-#' about each peak:
-#' * `rt`: Location of the peak maximum.
-#' * `start`: Start of peak (only included in table if `bounds = TRUE`).
-#' * `end`: End of peak (only included in table if `bounds = TRUE`).
-#' * `sd`: The standard deviation of the peak.
+#' @return A matrix with one row per peak and the following columns:
+#' * `rt`: Peak maximum location.
+#' * `start`: Peak start (only included in table if `bounds = TRUE`).
+#' * `end`: Peak end (only included in table if `bounds = TRUE`).
+#' * `sd`: Peak standard deviation.
 #' * `tau`: Exponential decay constant (only included in table if 
 #' `fit = "egh"`).
 #' * `tau_right`: Exponential decay constant for right side of peak (when 
@@ -159,9 +152,9 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' * `area`: Peak area.
 #' * `r.squared`: The R<sup>2</sup> value for linear fit of the model to the data.
 #' * `purity`: The spectral purity of peak as assessed by [`get_purity`].
-#' Again, the first five elements (rt, start, end, sd and FWHM) are expressed
-#' as indices, so not in terms of the real retention times. The transformation
-#' to "real" time is done in function the `get_peaks` function.
+#' The first five elements (`rt`, `start`, `end`, `sd` and `FWHM`) are expressed
+#' as index positions rather than absolute retention times. The transformation
+#' to real time is done in `get_peaks`.
 #' @note The `fit_peaks` function is adapted from Dr. Robert Morrison's
 #' [DuffyTools](https://github.com/robertdouglasmorrison/DuffyTools) package
 #' as well as code published in Ron Wehrens' [alsace](
@@ -180,7 +173,6 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' good model for chromatographic peaks in isocratic HPLC? *Chromatographia*,
 #' 26: 285-296. \doi{10.1007/BF02268168}.
 #' @export fit_peaks
-#' @keywords internal
 #' @md
 
 fit_peaks <- function (x, lambda, pos = NULL, sd_max = 50,

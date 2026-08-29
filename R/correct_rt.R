@@ -1,9 +1,8 @@
-#' Correct retention time
+#' Retention time alignment via time warping
 #' 
-#' Aligns chromatograms using one of two algorithms, according to the value of
-#' `alg`: parametric time warping (`"ptw"`), as implemented in [`ptw`][ptw::ptw]; 
-#' variable penalty dynamic time warping (`"vpdtw"`), as implemented in 
-#' [`VPdtw`][VPdtw::VPdtw].
+#' Chromatograms are aligned using either parametric time warping (`"ptw"`), 
+#' as implemented in [`ptw`][ptw::ptw] or variable penalty dynamic time warping
+#' (`"vpdtw"`), as implemented in [`VPdtw`][VPdtw::VPdtw].
 #' 
 #' Some arguments are specific to particular warping functions. For example 
 #' the `init.coef` and `n.traces` arguments apply only to `"ptw"` warping, while 
@@ -25,14 +24,13 @@
 #' [`bestref`][ptw::bestref] function from `ptw`.
 #' @param alg Alignment algorithm to use: parametric time warping (`"ptw"`), 
 #' or variable penalty dynamic time warping (`"vpdtw"`).
-#' @param what What to return: either the `"corrected.values"` (useful for 
+#' @param what Output type: either the `"corrected.values"` (useful for 
 #' visual inspection and downstream analysis) or the warping `"models"`
 #' (for further programmatic use).
 #' @param init.coef Starting values for the optimization.
 #' @param n.traces Number of traces to use.
 #' @param fill_zeros Logical. If `TRUE`, out-of-bounds regions produced by 
-#' warping are filled with zeros. If `FALSE` (default), these regions are 
-#' returned as `NA`.
+#' warping are filled with zeros; otherwise they are returned as `NA` (default).
 #' @param n.zeros Number of zeros to add for padding chromatograms at the edges.
 #' @param scale Logical. If `TRUE`, scale chromatograms before warping.
 #' @param trwdth Argument to [`ptw`][ptw::ptw]. Width of the triangle in 
@@ -49,10 +47,10 @@
 #' @param show_progress Logical. Whether to show progress bar. Defaults to 
 #' `TRUE` if [`pbapply`][pbapply::pbapply] is installed. Currently works 
 #' only for `ptw` alignments.
-#' @param cl Argument to `pbapply` or [`mclapply`][parallel::mclapply]. Either 
-#' an integer specifying the number of clusters to use for parallel processing 
-#' or a cluster object created by [`makeCluster`][parallel::makeCluster]. 
-#' Defaults to `2`. On Windows systems, integer values will be ignored.
+#' @param cl Either an integer specifying the number of cores to use for
+#' parallel processing or a cluster object created by
+#' [`makeCluster`][parallel::makeCluster]. Defaults to `2`. On Windows systems,
+#' integer values will be ignored.
 #' @param ... Optional additional arguments to `ptw`. The only argument that 
 #' cannot be changed is `warp.type` which is hard-coded to `"global"` to permit
 #' warping on multiple wavelengths.
@@ -73,7 +71,7 @@
 #' Statistical Software*, 47(8):1-17. \doi{10.18637/jss.v047.i08}.
 #' 
 #' * Eilers, P.H.C. 2004. Parametric Time Warping.
-#' *Anal. Chem.*, 76:404-411. \doi{10.1021/ac034800e}.
+#' *Analytical Chemistry*, 76:404-411. \doi{10.1021/ac034800e}.
 #' 
 #' * Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast
 #' parametric time warping of peak lists. *Bioinformatics*,

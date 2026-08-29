@@ -23,35 +23,36 @@ plot_chroms(
 )
 }
 \arguments{
-\item{x}{A list of chromatograms in matrix format (timepoints x wavelengths)
-or a \code{peak_table} containing a pointer toward the chromatograms, if present
-in the environment.}
+\item{x}{A list of chromatograms in matrix format (timepoints × wavelengths)
+or a \code{peak_table} containing a pointer to a list of chromatograms accessible
+in the current environment.}
 
 \item{lambdas}{A character or numeric vector specifying the wavelengths to
-plot. For one-dimensional chromatograms, this argument can be ignored.}
+plot. Ignored for one-dimensional chromatograms.}
 
 \item{idx}{A vector representing the names or numerical indices of the
 chromatograms to plot.}
 
-\item{time_resolution}{Time resolution for plot (in minutes). Defaults to
-\code{0.01}. Thinning the time axis dramatically improved speed when plotting
-many chromatograms.}
+\item{time_resolution}{Desired temporal resolution for plotting (in minutes).
+Chromatograms are thinned to approximately this interval prior to plotting,
+which can substantially improve performance for large datasets.  Defaults to
+\code{0.01}.}
 
 \item{time_unit}{Time units of the provided chromatograms: either \code{min}, \code{s},
-or \code{ms}. If possible, units will be detected automatically if possible from
-chromatogram metadata. If \code{time_unit} attribute is not present and no
-argument is provided, the time units will default to minutes.}
+or \code{ms}. If possible, units will be detected automatically from chromatogram
+metadata. If \code{time_unit} attribute is not present and no argument is
+provided, the time units will default to minutes.}
 
-\item{xlim}{Range of x axis (numeric vector).}
+\item{xlim}{Range of x axis values.}
 
-\item{ylim}{Range of y axis (numeric vector).}
+\item{ylim}{Range of y axis values.}
 
 \item{xlab}{X label.}
 
 \item{ylab}{Y label. Defaults to \code{"Absorbance"}.}
 
-\item{engine}{Plotting engine. Either \code{\link[graphics:matplot]{"base"}},
-\code{\link[plotly:plotly]{"plotly"}}, or \code{\link[ggplot2:ggplot2-package]{"ggplot"}}.}
+\item{engine}{Plotting backend to use. One of \code{\link[graphics:matplot]{"base"}},
+\code{\link[ggplot2:ggplot2-package]{"ggplot"}}, or \code{\link[plotly:plotly]{"plotly"}}.}
 
 \item{linewidth}{Line width. Defaults to \code{1}.}
 
@@ -65,16 +66,31 @@ argument is provided, the time units will default to minutes.}
 \item{...}{Additional arguments to plotting function specified by \code{engine}.}
 }
 \value{
-No return value, called for side effects.
+A \code{plotly} or \code{ggplot} object when \code{engine = "plotly"} or
+\code{engine = "ggplot"}, respectively. No value is returned when
+\code{engine = "base"}.
 }
 \description{
-Plots the specified traces from a list of chromatograms.
+Visualizes absorbance traces from a list of one- or multi-wavelength
+chromatograms using base R, ggplot2, or plotly graphics. For
+multi-wavelength chromatograms, one or more wavelengths can be selected
+using \code{lambdas}. When plotting many chromatograms, traces are automatically
+thinned according to \code{time_resolution} to improve rendering performance.
+Each chromatogram specified by \code{idx} is plotted as a separate trace and
+assigned a distinct color.
+}
+\details{
+For multi-wavelength chromatograms, wavelength indices are resolved
+internally using \code{get_lambda_idx()}. Time values are converted according
+to \code{time_unit}, either supplied explicitly or inferred from chromatogram
+metadata.
+
+When using the \code{"ggplot"} or \code{"plotly"} engines, chromatograms are first
+reshaped into long format using \code{reshape_chroms()}.
 }
 \section{Side effects}{
 
-Plots the traces of the specified chromatograms \code{idx} at the specified
-wavelengths (\code{lambdas}). Plots can be produced using base graphics, ggplot2,
-or plotly, according to the value of the \code{engine} argument.
+If \code{engine == "base"}, the plot is rendered to the active graphics device.
 }
 
 \examples{

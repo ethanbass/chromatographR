@@ -1,6 +1,7 @@
-#' Plot fitted peak shapes.
+#' Overlay fitted peak shapes on chromatograms
 #' 
-#' Visually assess integration accuracy by plotting fitted peaks over trace.
+#' Visually assess peak integration accuracy by overlaying fitted peak shapes
+#' over chromatographic traces.
 #'
 #' @importFrom stats median
 #' @importFrom graphics polygon arrows
@@ -8,27 +9,41 @@
 #' @param x A `peak_list` object. Output from the `get_peaks` function.
 #' @param ... Additional arguments to main plot function.
 #' @param chrom_list List of chromatograms (retention time x wavelength
-#' matrices)
-#' @param idx Index or name of chromatogram to be plotted.
-#' @param lambda Wavelength to use for plotting.
-#' @param points Logical. If `TRUE`, plot peak maxima. Defaults to `FALSE`.
-#' @param ticks Logical. If `TRUE`, mark beginning and end of each peak. 
+#' matrices). If missing, extracted from environment using the pointer in `x`.
+#' @param idx Index or name of chromatogram to plot from `chrom_list`.
+#' @param lambda Wavelength (column) to use for plotting.
+#' @param points Logical. If `TRUE`, display peak apex locations as points. 
 #' Defaults to `FALSE`.
-#' @param alpha Parameter controlling the transparency of fitted shapes.
-#' Defaults to `0.5`.
-#' @param color The color of the fitted shapes.
+#' @param ticks Logical. If `TRUE`, mark peak boundaries with tick marks. 
+#' Defaults to `FALSE`.
+#' @param alpha Transparency of fitted peak shapes. Defaults to `0.5`.
+#' @param color Color used to fill fitted peak shapes. If `NULL`, a default 
+#' color is chosen based on the fitted model type.
 #' @param cex.points Size of points. Defaults to `0.5`.
-#' @param numbers Whether to number peaks. Defaults to `FALSE`.
+#' @param numbers If `TRUE`, label peaks with numeric identifiers. Defaults to 
+#' `FALSE`.
 #' @param cex.font Font size if peaks are numbered. Defaults to `0.5`.
 #' @param y.offset Y offset for peak numbers. Defaults to `25`.
-#' @param plot_purity Logical. Whether to add visualization of peak purity. 
-#' Defaults to `FALSE`.
-#' @param res Time resolution for peak fitting.
+#' @param plot_purity Logical. If `TRUE`, overlays peak purity traces based on
+#' peak boundaries. Defaults to `FALSE`.
+#' @param res Time resolution for peak fitting. If missing, inferred from 
+#' `chrom_list`.
 #' @return No return value, called for side effects.
 #' @section Side effects:
 #' Plots a chromatographic trace from the specified chromatogram (`chr`)
 #' at the specified wavelength (`lambda`) with fitted peak shapes from the
 #' provided `peak_list` drawn underneath the curve. 
+#' @details
+#' The appearance of fitted peaks depends on the `"fit"` attribute of `x`, which
+#' may be `"gaussian"`, `"egh"`, `"bemg"`, or `"raw"`.
+#'
+#' Peak lists are expected to contain columns such as `rt`, `height`, `start`, 
+#' `end`, and `sd`, with additional parameters depending on the fit type.
+#'
+#' Time units in `x` are used to rescale width parameters for plotting.
+#'
+#' Peak rendering errors are silently ignored.
+#' 
 #' @author Ethan Bass
 #' @examples 
 #' data(Sa_warp)

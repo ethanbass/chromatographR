@@ -1,19 +1,22 @@
 #' Reshape chromatograms
 #' 
-#' Reshapes a list of chromatograms from wide to long format.
-#' 
+#' Converts a list of chromatographic matrices into a single long-format
+#' data frame with one row per sample × retention time × wavelength combination.
+#'
+#' @details Each row corresponds to a single measurement of signal intensity at
+#' a given retention time and wavelength for a specific sample.
 #' @name reshape_chroms
 #' @param x A list of chromatographic matrices in wide format.
 #' @param idx Indices of chromatograms to convert.
-#' @param time_resolution Time resolution for plot. This argument can be used
-#' to thin the time axis while reshaping. By default the time resolution is not
-#' altered.
-#' @param sample_var String with name of new column containing sample IDs.
-#' @param lambdas Vector specifying wavelength(s) to include.
-#' @param rts Vector specifying retention times to include.
-#' @param transfer_metadata Logical. Whether to transfer metadata attributes or
-#' not. Defaults to `FALSE`.
-#' @return A list of chromatographic matrices in long format.
+#' @param time_resolution Time resolution used when reshaping. Can be used
+#' to subsample the time axis. Defaults to full resolution.
+#' @param sample_var Name of the new column containing sample identifiers
+#' @param lambdas Wavelength(s) to include.
+#' @param rts Retention times to include.
+#' @param transfer_metadata Logical. If `TRUE`, metadata attributes are
+#' transferred to the output. Defaults to `FALSE`.
+#' @return A data frame in long format with columns `rt`, `lambda`, `absorbance`,
+#' and a sample identifier column specified by `sample_var`.
 #' @author Ethan Bass
 #' @family utility functions
 #' @export
