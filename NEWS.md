@@ -21,6 +21,7 @@
 
 #### New functions
 
+* Added `subtract_blanks` function for subtracting blank chromatograms from a `chrom_list`.
 * Added `correct_rt_group` function for group-wise warping function estimation using within-group averages. This improves alignment accuracy when samples share batch-level retention time shifts or contain group-specific peaks, and is generally faster than per-sample alignment.
 * Added `plot_spectrum_inset` function for plotting UV spectra overlaid onto a chromatogram.
 * Added `annotate_peaks` function for adding text labels to peaks in plots created by `plot_chroms`.
