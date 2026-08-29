@@ -143,7 +143,7 @@ filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value,
                       peak_table$pk_meta["rt",] <= max_rt)
   } else{idx.rt <- seq_along(peak_table$pk_meta)}
   if (!missing(min_value)){
-    val <- apply(peak_table$tab, 2, eval(what))
+    val <- apply(peak_table$tab, 2, eval(what), na.rm = TRUE)
     idx.val <- which(val >= min_value)
   } else (idx.val <- seq_along(peak_table$tab))
   if (!missing(max_zeros)){
