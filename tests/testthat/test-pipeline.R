@@ -90,7 +90,8 @@ test_that("correct_rt works", {
   expect_error(correct_rt(dat.pr), regexp = "Must specify wavelengths")
   expect_error(correct_rt(dat.pr, what="x"), regexp = "'arg' should be one of")
   expect_error(correct_rt(dat.pr, lambdas = "x"), regexp = "Lambdas not found")
-  expect_error(correct_rt(dat.pr, lambdas = "210", alg="x"), regexp = "'arg' should be one of")
+  expect_error(correct_rt(dat.pr, lambdas = "210", alg="x"), 
+               regexp = "'arg' should be one of")
   expect_error(correct_rt(dat.pr, lambdas = "210", 
                           models = "warping.models", alg = "vpdtw"), 
                regexp = "The supplied models do not match")
@@ -550,7 +551,6 @@ test_that("plot_peak.list works", {
     plot(pks_egh, chrom_list = dat.pr, idx = 2)
   }
   vdiffr::expect_doppelganger("plot_peaklist", plot_peaklist)
-  plot(pks_egh, chrom_list = dat.pr, lambda = 210)
 })
 
 test_that("write_peaktable writes csvs correctly", {

@@ -77,17 +77,13 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
   y <- chrom_list[[idx]][,lambda]
   pks <- data.frame(x[[idx]][[lambda]])
   fit <- attr(x,"fit")
-  plot(new.ts, y, type = 'l', xlab = '', ylab = '', xaxt = 'n', yaxt = 'n', ...)
+  plot(new.ts, y, type = 'l', xlab = '', ylab = '', 
+       xaxt = 'n', yaxt = 'n', ...)
   if (points){
     points(pks$rt, pks$height, pch = 20, cex = cex.points, col = 'red')
   }
   if (ticks){
-    arrows(pks$start, y[which(new.ts %in% pks$start)] - 5,
-           pks$start, y[which(new.ts %in% pks$start)] + 5,
-           col = "blue", length = 0)
-    arrows(pks$end, y[which(new.ts %in% pks$end)] - 5,
-           pks$end,y[which(new.ts %in% pks$end)] + 5,
-           col = "blue", length = 0)
+    draw_peak_ticks(pks, new.ts, y)
   }
   if (numbers){
     text(pks$rt, y[pks$rt] + y.offset, labels = seq_len(nrow(pks)), 
@@ -95,57 +91,144 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
   }
   if (missing(res))
     res <- get_time_resolution(chrom_list)
+  if (is.null(color)) {
+    color <- switch(fit,
+                    gaussian = "red",
+                    egh = "purple",
+                    bemg = "darkgreen",
+                    raw = "hotpink")
+  }
+  fit_fun <- switch(fit,
+                    gaussian = gaussian_from_peak,
+                    egh      = egh_from_peak,
+                    bemg     = bemg_from_peak,
+                    raw      = raw_from_peak
+  )
   for (i in seq_len(nrow(pks))){
-    try({
+    tryCatch({
       peak.loc <- seq.int((pks$start[i]),(pks$end[i]), by = res)
-      if (fit == "gaussian"){
-        yvals <- gaussian(peak.loc, center=pks$rt[i],
-                          width=pks$sd[i]*tfac, height = pks$height[i])
-        if (is.null(color)) color <- "red"
-      }
-      else if (fit == "egh"){
-        yvals <- egh(x = peak.loc, center = pks$rt[i],
-                     width=pks$sd[i]*tfac, height = pks$height[i],
-                     tau = pks$tau[i]*tfac)
-        if (is.null(color)) color <- "purple"
-      } else if (fit == "bemg"){
-        yvals <- bemg(x = peak.loc, center = pks$rt[i], width = pks$sd[i]*tfac,
-                      height = pks$h[i], a = pks$tau_right[i]*tfac, 
-                      b = pks$tau_left[i]*tfac)
-        if (is.null(color)) color <- "darkgreen"
-      }
-      else if (fit == "raw"){
-        yvals <- chrom_list[[idx]][as.character(peak.loc), lambda]
-        if (is.null(color)) color <- "hotpink"
-      }
-      draw_trapezoid(peak.loc, yvals, color, alpha = alpha)
-    }, silent = TRUE)
+      yvals <- fit_fun(peak.loc, pks[i,], tfac, chrom_list, idx, lambda)
+      draw_trapezoid(peak.loc = peak.loc, yvals = yvals, 
+                     color = color, alpha = alpha)
+    }, error = function(e){
+      warning(
+        sprintf(
+          "Peak %d failed (rt=%.3f): %s",
+          i, pks$rt[i], conditionMessage(e)
+        ),
+        call. = FALSE
+      )
+    })
   }
   if (plot_purity){
-    try({
-      peaks <- x[[idx]][[lambda]][,3:5]
-      # color <- "#FFB000"
-      color="black"
-      p <- apply(peaks, 1, function(pos){
-        pos[1] <- which(new.ts %in% pos[[1]])
-        pos[2] <- which(new.ts %in% pos[[2]])
-        pos[3] <- which(new.ts %in% pos[[3]])
-        pk_indices <- seq(pos[[2]], pos[[3]])
-        yvals <- chrom_list[[idx]][,lambda][pk_indices]
-        p <- get_purity_values(chrom_list[[idx]], pos)
-        lim = -20
-        draw_trapezoid(new.ts[pk_indices], scales::rescale(p, c(0, lim)), 
-                       color = "black", alpha = 0.6)
-        abline(h = lim, lty = 3, col = "darkgray")
-      })
-    }, silent = TRUE)
+    plot_peak_purity(x, chrom_list, idx, lambda, new.ts)
   }
 }
 
+#' Draw trapezoid
 #' @noRd
 draw_trapezoid <- function(peak.loc, yvals, color, alpha){
   sapply(seq_len(length(peak.loc) - 1), function(i){
     polygon(peak.loc[c(i, i, (i + 1), (i + 1))], c(0, yvals[i:(i + 1)], 0),
             col = scales::alpha(color, alpha), lty = 3, border = NA)
+  })
+}
+
+#' Gaussian from peak
+#' Helper for `plot.peak_list`
+#' @noRd
+gaussian_from_peak <- function(x, peak, tfac = 1, ...) {
+  if (anyNA(c(peak$rt, peak$sd, peak$h))) {
+    warning("bemg: NA parameters for peak at rt=", peak$rt)
+    return(rep(NA_real_, length(x)))
+  }
+  
+  gaussian(
+    x,
+    center = peak$rt,
+    width  = peak$sd * tfac,
+    height = peak$height
+  )
+}
+
+#' EGH from peak
+#' Helper for `plot.peak_list`
+#' @noRd
+egh_from_peak <- function(x, peak, tfac = 1, ...) {
+  if (anyNA(c(peak$rt, peak$sd, peak$h, peak$tau))) {
+    warning("bemg: NA parameters for peak at rt=", peak$rt)
+    return(rep(NA_real_, length(x)))
+  }
+  egh(
+    x,
+    center = peak$rt,
+    width  = peak$sd * tfac,
+    height = peak$height,
+    tau    = peak$tau * tfac
+  )
+}
+
+#' BEMG from peak
+#' Helper for `plot.peak_list`
+#' @noRd
+bemg_from_peak <- function(x, peak, tfac = 1, ...) {
+  if (anyNA(c(peak$rt, peak$sd, peak$h, peak$tau_left, peak$tau_right))) {
+    warning("bemg: NA parameters for peak at rt=", peak$rt)
+    return(rep(NA_real_, length(x)))
+  }
+  bemg(
+    x,
+    center = peak$rt,
+    width  = peak$sd * tfac,
+    height = peak$h,
+    a = peak$tau_right * tfac,
+    b = peak$tau_left * tfac
+  )
+}
+
+#' Raw from peak
+#' Helper for `plot.peak_list`
+#' @noRd
+raw_from_peak <- function(x, peak, tfac, chrom_list, idx, lambda) {
+  chrom_list[[idx]][as.character(x), lambda]
+}
+
+#' Draw peak boundaries
+#' Helper for `plot.peak_list`
+#' @noRd
+draw_peak_ticks <- function(pks, new.ts, y) {
+  
+  arrows(pks$start, y[match(pks$start, new.ts)] - 5,
+         pks$start, y[match(pks$start, new.ts)] + 5,
+         col = "blue", length = 0)
+  
+  arrows(pks$end, y[match(pks$end, new.ts)] - 5,
+         pks$end, y[match(pks$end, new.ts)] + 5,
+         col = "blue", length = 0)
+}
+
+#' Plot peak purity
+#' Helper for `plot.peak_list`
+#' @noRd
+plot_peak_purity <- function(x, chrom_list, idx, lambda, new.ts) {
+  peaks <- x[[idx]][[lambda]][, 3:5]
+  
+  p <- apply(peaks, 1, function(pos) {
+    
+    pos <- as.integer(sapply(pos, function(p) which(new.ts %in% p)))
+    
+    pk_indices <- seq(pos[2], pos[3])
+    
+    p <- get_purity_values(chrom_list[[idx]], pos)
+    
+    lim <- -20
+    
+    draw_trapezoid(
+      new.ts[pk_indices],
+      scales::rescale(p, c(0, lim)),
+      color = "black",
+      alpha = 0.6
+    )
+    abline(h = lim, lty = 3, col = "darkgray")
   })
 }

@@ -52,7 +52,7 @@
 #' @family visualization functions
 #' @export
 
-plot.peak_table <- function(x, loc, chrom_list, what = "peak",
+plot.peak_table <- function(x, loc, chrom_list = NULL, what = "peak",
                             idx = 'max', lambda = 'max',
                             plot_spectrum = TRUE, plot_trace = TRUE,
                             box_plot = FALSE, vars = NULL,

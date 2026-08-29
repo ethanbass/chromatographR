@@ -7,7 +7,7 @@
 plot_spectrum(
   loc = NULL,
   peak_table,
-  chrom_list,
+  chrom_list = NULL,
   idx = "max",
   lambda = "max",
   plot_spectrum = TRUE,
@@ -22,8 +22,8 @@ plot_spectrum(
 )
 }
 \arguments{
-\item{loc}{The peak, retention time, or index for which you wish to
-extract spectral data.}
+\item{loc}{The peak, retention time, or scan index from which to extract
+spectral data.}
 
 \item{peak_table}{A \code{peak_table} object created by \code{\link{get_peaktable}}.}
 
@@ -32,12 +32,11 @@ wavelengths). If no argument is provided here, the function will try to find
 the \code{chrom_list} object using the pointer in the \code{peak_table}.}
 
 \item{idx}{Numerical index of chromatogram you wish to plot, or "max" to
-automatically plot the chromatogram with the largest signal at the given peak
-or retention time.}
+automatically select the chromatogram with the highest signal intensity at
+the specified peak or retention time.}
 
-\item{lambda}{The wavelength you wish to plot the trace at if \code{plot_trace} is
-\code{TRUE} and/or the wavelength to be used for the determination of signal
-abundance.}
+\item{lambda}{The wavelength used for plotting chromatographic traces and
+determining signal intensity.}
 
 \item{plot_spectrum}{Logical. If \code{TRUE}, plots the spectrum of the chosen
 peak. Defaults to \code{TRUE}.}
@@ -51,7 +50,7 @@ plot. Defaults to \code{TRUE}.}
 \item{scale_spectrum}{Logical. If \code{TRUE}, scales spectrum to unit height.
 Defaults to \code{FALSE}.}
 
-\item{export_spectrum}{Logical. If \code{TRUE}, exports spectrum to console.
+\item{export_spectrum}{Logical. If \code{TRUE}, invisibly returns the spectrum as a \code{data.frame}.
 Defaults to \code{FALSE}.}
 
 \item{verbose}{Logical. If \code{TRUE} (default), prints verbose output to console.}
@@ -67,37 +66,38 @@ retention time by clicking on the chromatogram. Defaults to \code{"peak"} mode.}
 \item{...}{Additional arguments.}
 }
 \value{
-If \code{export_spectrum} is \code{TRUE}, returns the spectrum as a
+\itemize{
+\item If \code{export_spectrum = FALSE} (default), returns a \code{plotly} or \code{ggplot}
+object according to the specified \code{engine}. No value is returned when
+\code{engine = "base"}.
+\item If \code{export_spectrum} is \code{TRUE}, invisibly returns the spectrum as a
 \code{data.frame} with wavelengths as rows and a single column encoding the
-absorbance (or normalized absorbance, if \code{scale_spectrum} is \code{TRUE})
-at each wavelength. If \code{export_spectrum} is \code{FALSE}, the output depends on
-the plotting \code{engine}. If \code{engine == "plotly"}, returns a \code{plotly} object
-containing the specified plots. Otherwise, if \code{engine == "base"}, there is no
-return value.
+absorbance (normalized, if \code{scale_spectrum = TRUE}).
+}
 }
 \description{
-Plots the trace and/or spectrum for a given peak or retention time in a
-\code{peak_table} object or a list of chromatograms.
+Visualizes chromatographic traces and/or UV spectra for a selected peak,
+retention time, or scan index from a \code{peak_table} or list of chromatograms.
+Spectra can also be exported as a \code{data.frame} when \code{export_spectrum = TRUE}.
 }
 \details{
-Can be used to confirm the identity of a peak or check that a particular
-column in the peak table represents a single compound. Retention times can
-also be selected by clicking on the plotted trace if \code{what == 'click'}.
-Plots can be produced using either base R graphics,
-\code{\link[ggplot2:ggplot2]{ggplot2}}, or \code{plotly}, according to the value
-of the \code{engine} argument.
+This function can be used to confirm the identity of a peak or assess whether
+a peak table column likely represents a single compound. Retention times may
+also be selected interactively by clicking on a chromatographic trace when
+\code{what = "click"}.
+
+When \code{plot_trace} is \code{TRUE}, the chromatographic trace for the
+specified chromatogram (\code{idx}) is plotted at wavelength \code{lambda}, with a
+dotted red line indicating the selected retention time (\code{loc}). The trace
+corresponds to a single column of the chromatographic matrix.
+
+When \code{plot_spectrum} is \code{TRUE}, the UV spectrum at the specified retention
+time is plotted. The spectrum corresponds to a single row of the
+chromatographic matrix.
 }
 \section{Side effects}{
 
-\itemize{
-\item If \code{plot_trace} is \code{TRUE}, plots the chromatographic trace of the
-specified chromatogram (\code{idx}), at the specified wavelength (\code{lambda}) with a
-dotted red line to indicate the retention time given by \code{loc}. The trace is a
-single column from the chromatographic matrix.
-\item If \code{plot_spectrum} is \code{TRUE}, plots the spectrum for the specified
-chromatogram at the specified retention time. The spectrum is a single row
-from the chromatographic matrix.
-}
+If \code{engine == "base"}, plots are rendered to the active graphics device.
 }
 
 \examples{

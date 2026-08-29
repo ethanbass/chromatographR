@@ -47,7 +47,7 @@ intensity equals \code{maxI}.}
 \item{interpolate_cols}{Logical. Whether to interpolate along the spectral
 axis (\code{dim2}). Defaults to \code{TRUE}.}
 
-\item{cl}{Either an integer specifying the number of clusters to use for
+\item{cl}{Either an integer specifying the number of cores to use for
 parallel processing or a cluster object created by
 \code{\link[parallel:makeCluster]{makeCluster}}. Defaults to \code{2}. On Windows integer
 values will be ignored.}

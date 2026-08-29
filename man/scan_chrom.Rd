@@ -39,7 +39,7 @@ Defaults to \code{FALSE}.}
 \item{spectrum_labels}{Logical. If \code{TRUE}, plots labels on maxima in spectral
 plot. Defaults to \code{TRUE}.}
 
-\item{export_spectrum}{Logical. If \code{TRUE}, exports spectrum to console.
+\item{export_spectrum}{Logical. If \code{TRUE}, invisibly returns the spectrum as a \code{data.frame}.
 Defaults to \code{FALSE}.}
 
 \item{...}{Additional arguments to \code{plot_spectrum}.}

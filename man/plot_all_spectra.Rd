@@ -21,8 +21,8 @@ plot_all_spectra(
 )
 }
 \arguments{
-\item{loc}{The peak, retention time, or index for which you wish to
-extract spectral data.}
+\item{loc}{The peak, retention time, or scan index from which to extract
+spectral data.}
 
 \item{peak_table}{A \code{peak_table} object created by \code{\link{get_peaktable}}.}
 
@@ -38,7 +38,7 @@ the \code{chrom_list} object using the pointer in the \code{peak_table}.}
 \item{plot_spectrum}{Logical. If \code{TRUE}, plots the spectrum of the chosen
 peak. Defaults to \code{TRUE}.}
 
-\item{export_spectrum}{Logical. If \code{TRUE}, exports spectrum to console.
+\item{export_spectrum}{Logical. If \code{TRUE}, invisibly returns the spectrum as a \code{data.frame}.
 Defaults to \code{FALSE}.}
 
 \item{scale_spectrum}{Logical. If \code{TRUE}, scales spectrum to unit height.
@@ -58,20 +58,21 @@ information for a certain peak, \code{"rt"} to scan by retention time, or
 \item{...}{Additional arguments to \code{plot_spectrum.}}
 }
 \value{
-If \code{export_spectrum} is \code{TRUE}, invisibly returns the
-spectra as a \code{data.frame} with wavelengths as rows and one column for
-each sample in the \code{chrom_list} encoding the absorbance (or normalized
-absorbance if \code{scale_spectrum} is \code{TRUE}) at each wavelength.
-Otherwise, there is no return value.
+\itemize{
+\item If \code{export_spectrum = FALSE} (default), a \code{plotly} or \code{ggplot} object, or
+nothing if \code{engine == "base"}.
+\item If \code{export_spectrum = TRUE}, invisibly returns a \code{data.frame} with
+wavelengths as rows and one column per sample encoding absorbance at each
+wavelength (normalized if \code{scale_spectrum = TRUE}).
+}
 }
 \description{
 Plot multiple for a given peak in peak table. Wrapper for \code{\link{plot_spectrum}}.
 }
 \section{Side effects}{
 
-If \code{plot_spectrum} is \code{TRUE}, plots the spectra for the specified
-chromatogram (\code{idx}) of the given peak. Each spectrum represents a single
-row from the chromatographic matrix.
+If \code{engine == "base"}, the spectra are rendered to the active graphics
+device.
 }
 
 \examples{

@@ -7,7 +7,7 @@
 \method{plot}{peak_table}(
   x,
   loc,
-  chrom_list,
+  chrom_list = NULL,
   what = "peak",
   idx = "max",
   lambda = "max",
@@ -62,7 +62,7 @@ plot. Defaults to \code{TRUE}.}
 \item{scale_spectrum}{Logical. If \code{TRUE}, scales spectrum to unit height.
 Defaults to \code{FALSE}.}
 
-\item{export_spectrum}{Logical. If \code{TRUE}, exports spectrum to console.
+\item{export_spectrum}{Logical. If \code{TRUE}, invisibly returns the spectrum as a \code{data.frame}.
 Defaults to \code{FALSE}.}
 
 \item{verbose}{Logical. If \code{TRUE} (default), prints verbose output to the

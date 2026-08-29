@@ -114,6 +114,57 @@ test_that("plot_spectrum works", {
 })
 
 
+test_that("get_spectra returns correct structure (wide format)", {
+  data(pk_tab); data(Sa_warp)
+  x <- get_spectra("V14", peak_table = pk_tab, chrom_list = Sa_warp, what = "peak")
+  expect_equal(class(x), "data.frame")
+  expect_equal(rownames(x), as.character(get_lambdas(Sa_warp)))
+  expect_equal(ncol(x), length(Sa_warp))
+  expect_equal(colnames(x), names(Sa_warp))
+})
+
+test_that("get_spectra works with what = 'rt'", {
+  data(Sa_warp)
+  x <- get_spectra("13.75", chrom_list = Sa_warp, what = "rt")
+  expect_equal(class(x), "data.frame")
+  expect_equal(rownames(x), as.character(get_lambdas(Sa_warp)))
+})
+
+test_that("get_spectra works with what = 'idx'", {
+  data(Sa_warp)
+  x <- get_spectra(100, chrom_list = Sa_warp, what = "idx")
+  expect_equal(class(x), "data.frame")
+  expect_equal(rownames(x), as.character(get_lambdas(Sa_warp)))
+})
+
+test_that("get_spectra format = 'long' returns correct columns", {
+  data(pk_tab); data(Sa_warp)
+  x <- get_spectra("V14", peak_table = pk_tab, chrom_list = Sa_warp,
+                   what = "peak", format = "long")
+  expect_equal(class(x), "data.frame")
+  expect_equal(colnames(x), c("wavelength", "absorbance", "sample", "rt"))
+  expect_equal(nrow(x), length(get_lambdas(Sa_warp)) * length(Sa_warp))
+})
+
+test_that("get_spectra subset of idx returns correct number of columns", {
+  data(Sa_warp)
+  x <- get_spectra("13.75", chrom_list = Sa_warp, what = "rt", idx = c(1, 2))
+  expect_equal(ncol(x), 2)
+  expect_equal(colnames(x), names(Sa_warp)[c(1, 2)])
+})
+
+test_that("get_spectra scale_spectrum normalizes to [0, 1]", {
+  data(Sa_warp)
+  x <- get_spectra("13.75", chrom_list = Sa_warp, what = "rt",
+                   scale_spectrum = TRUE)
+  expect_true(all(x >= 0 & x <= 1))
+})
+
+test_that("get_spectra errors when neither peak_table nor chrom_list provided", {
+  expect_error(get_spectra("13.75", what = "rt"),
+               regexp = "Must provide either")
+})
+
 test_that("plot_spectrum works with ggplot2", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
@@ -135,6 +186,30 @@ test_that("plot_spectrum works with ggplot2", {
                       export_spectrum = FALSE, what="rt", idx = 1,
                       verbose = FALSE, engine = "ggplot", plot_spectrum = FALSE)
   vdiffr::expect_doppelganger(title = "plot_trace_ggplot", fig = p3)
+})
+
+test_that("plot_spectrum multi-sample works with base engine", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  data(pk_tab); data(Sa_warp)
+  plot_multi_base <- function(){
+    par(mfrow = c(2, 1))
+    plot_spectrum(loc = "13.75", chrom_list = Sa_warp, what = "rt",
+                 idx = c(1, 2), lambda = "210", verbose = FALSE)
+  }
+  vdiffr::expect_doppelganger("plot_spectrum_multi_base", plot_multi_base)
+})
+
+test_that("plot_spectrum multi-sample works with ggplot2 engine", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  skip_if_not_installed("ggplot2")
+  skip_if_not_installed("cowplot")
+  data(pk_tab); data(Sa_warp)
+  p <- plot_spectrum(loc = "13.75", chrom_list = Sa_warp, what = "rt",
+                    idx = c(1, 2), lambda = "210", verbose = FALSE,
+                    engine = "ggplot2")
+  vdiffr::expect_doppelganger("plot_spectrum_multi_ggplot", p)
 })
 
 test_that("plot_spectrum_inset works correctly", {
@@ -206,11 +281,20 @@ test_that("plot_chroms can subset chromatograms correctly", {
     plot_chroms_heatmap(Sa_pr, idx=c(1, 3), lambdas = 210)
   }
   vdiffr::expect_doppelganger("heatmap_plot_trace", numeric_indices)
-  
+
   numeric_indices_rev <- function(){
     plot_chroms_heatmap(Sa_pr, idx=c(3, 1), lambdas = 210)
   }
   vdiffr::expect_doppelganger("heatmap_plot_trace_rev", numeric_indices_rev)
+})
+
+test_that("plot_chroms handles unrecognized character idx", {
+  data(Sa_warp)
+  expect_error(plot_chroms(Sa_warp, lambdas = "210", idx = "bad_name"),
+               regexp = "could not be found")
+  expect_warning(plot_chroms(Sa_warp, lambdas = "210",
+                             idx = c(names(Sa_warp)[1], "bad_name")),
+                 regexp = "bad_name")
 })
 
 # run the following line to activate plotly tests:

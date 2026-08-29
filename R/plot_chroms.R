@@ -81,7 +81,14 @@ plot_chroms <- function(x, lambdas, idx, time_resolution = 0.01,
     idx <- seq_along(x)
   }
   if (is.character(idx)){
+    orig_idx <- idx
     idx <- match(idx, names(x))
+    if (all(is.na(idx))) stop("Chromatogram could not be found. Please check names and try again.")
+    if (any(is.na(idx))){
+      warning(sprintf("The following chromatograms could not be found: %s",
+                      paste(sQuote(orig_idx[is.na(idx)]), collapse = ", ")))
+      idx <- idx[!is.na(idx)]
+    }
   }
   if (ncol(x[[1]]) == 1){
     lambdas.idx <- 1

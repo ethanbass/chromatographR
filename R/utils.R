@@ -119,7 +119,7 @@ check_idx <- function(idx, chrom_list){
 get_lambda_idx <- function(lambda, lambdas, y, allow_max = TRUE){
   if (identical(lambda, "max")){
     if (allow_max){
-      lambda.idx <- which.max(y)
+      lambda.idx <- which.max(if (is.null(dim(y))) y else rowMeans(y, na.rm = TRUE))
     } else{
       stop("Wavelength (`lambda`) must be specified for interactive scanning.")
     }
@@ -484,16 +484,26 @@ get_peak_coordinates <- function(peak_table, chrom_list=NULL, loc, idx, lambda){
     idx <- idx_max
   }
   rt <- peak_table$pk_meta["rt", loc]
-  rt_idx <- get_retention_idx(rt, get_times(chrom_list))
-  
+  times <- get_times(chrom_list)
+  rt_idx <- get_retention_idx(rt, times)
+  has_bounds <- all(c("start", "end") %in% rownames(peak_table$pk_meta))
+  if (has_bounds){
+    start_idx <- get_retention_idx(as.numeric(peak_table$pk_meta["start", loc]), times)
+    end_idx   <- get_retention_idx(as.numeric(peak_table$pk_meta["end",   loc]), times)
+  }
+
   lambda_indices <- sapply(lambda, function(l) {
-    get_lambda_idx(l, get_lambdas(chrom_list), 
+    get_lambda_idx(l, get_lambdas(chrom_list),
                    y = chrom_list[[idx_max]][rt_idx, ])
   })
   lambda_idx <- lambda_indices[which.max(chrom_list[[idx_max]][rt_idx, lambda_indices])]
-  
-  int <- max(vapply(chrom_list[idx], function(chr) chr[rt_idx, lambda_idx], 
-                    numeric(1)))
+
+  int <- max(vapply(chrom_list[idx], function(chr){
+    if (has_bounds)
+      max(chr[start_idx:end_idx, lambda_idx])
+    else
+      chr[rt_idx, lambda_idx]
+  }, numeric(1)))
   list(coordinates = c(rt, int), lambda_idx = lambda_idx, 
        lambda = get_lambdas(chrom_list)[lambda_idx])
 }
