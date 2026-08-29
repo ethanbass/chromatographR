@@ -147,6 +147,45 @@ test_that("flat baseline fit subtracts the offset and recovers the Gaussian area
   expect_lt(pks_baseline$area, pks_none$area)
 })
 
+# ── Sloped baseline ───────────────────────────────────────────────────────────
+
+test_that("sloped baseline fit subtracts a linear ramp and recovers the Gaussian area", {
+  skip_on_cran()
+  # Signal = Gaussian + linear ramp from 20 to 80 over the window
+  n <- 501; center <- 251; width <- 20; height <- 1000
+  x_idx <- seq_len(n)
+  ramp <- seq(20, 80, length.out = n)
+  y <- height * exp(-(x_idx - center)^2 / (2 * width^2)) + ramp
+  mat <- matrix(y, ncol = 1, dimnames = list(as.character(x_idx), "220"))
+  true_area <- height * width * sqrt(2 * pi)
+  pos <- data.frame(pos = center, lower = 1, upper = n)
+
+  pks_sloped <- fit_peaks(mat, lambda = "220", pos = pos, fit = "gaussian",
+                          baseline = "sloped", estimate_purity = FALSE)
+  pks_none   <- fit_peaks(mat, lambda = "220", pos = pos, fit = "gaussian",
+                          baseline = "none",   estimate_purity = FALSE)
+
+  expect_equal(pks_sloped$area, true_area,   tolerance = 0.02)
+  expect_lt(pks_sloped$area, pks_none$area)
+  expect_gt(pks_sloped$floor_start, 0)
+  expect_gt(pks_sloped$floor_end,   pks_sloped$floor_start)
+})
+
+# ── Automatic peak detection ───────────────────────────────────────────────────────
+
+test_that("get_peaks detects and integrates a synthetic Gaussian peak automatically", {
+  skip_on_cran()
+  # No pos supplied: find_peaks must locate the peak from the signal itself.
+  p <- make_gaussian_chrom(n = 501, center = 251, width = 20, height = 1000)
+  pks <- get_peaks(list(s = p$mat), lambdas = "220", fit = "gaussian",
+                   smooth_type = "none", estimate_purity = FALSE,
+                   show_progress = FALSE)[[1]][[1]]
+  expect_equal(nrow(pks), 1L)
+  # rt is in time units (rownames of mat are "1".."501", so 1 min steps → rt ≈ 251)
+  expect_equal(as.numeric(pks$rt), p$center, tolerance = 0.5)
+  expect_equal(pks$area, p$true_area, tolerance = 0.01)
+})
+
 # ── get_peaks end-to-end: time-unit scaling ───────────────────────────────────
 
 test_that("get_peaks area scales with dt and matches the analytical value", {
