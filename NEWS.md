@@ -14,6 +14,8 @@
 * Removed `index` and `chr` arguments across plotting functions, previously deprecated in v0.7.0. Use `idx` instead.
 * Deprecated arguments in `get_peaks` still using dot notation (e.g., `sd.max`). Use new snake case arguments (e.g., `sd_max`) instead!
 * Deprecated `peak` argument in `plot_all_spectra` in favor of `loc` for consistency with other plotting functions.
+* Deprecated the `save` argument in `cluster_spectra` in favor of `outfile`, which specifies the file path for saving cluster objects.
+* Removed deprecated `peak_no` argument from `cluster_spectra`.
 
 ### New features
 

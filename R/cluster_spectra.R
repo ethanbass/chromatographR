@@ -6,21 +6,21 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' 
 #' Before using this function, reference spectra must be attached to the 
 #' `peak_table` using the [`attach_ref_spectra`] function. These spectra are 
-#' then used to construct a distance matrix based on spectral similarity 
-#' (pearson correlation) between peaks. Hierarchical clustering with bootstrap 
+#' then used to construct a distance matrix derived from pairwise Pearson
+#' correlations among peaks. Hierarchical clustering with bootstrap 
 #' resampling is performed on the resulting correlation matrix to classify peaks 
 #' by their spectral similarity as implemented in [`pvclust`][pvclust::pvclust].
 #' Finally, bootstrap values can be used to select clusters that exceed a 
-#' certain confidence threshold as defined by `alpha`. 
+#' certain confidence specified by `alpha`. 
 #' 
 #' Clusters can be filtered by the minimum and maximum size of the cluster using
 #' the `min_size` and `max_size` arguments respectively. Users should
 #' be aware that the clustering algorithm will often return nested clusters.
 #' Thus, an individual peak could appear in more than one cluster. If 
-#' `max_only` is `TRUE`, only the largest cluster in a nested tree of 
+#' `max.only` is `TRUE`, only the largest cluster in a nested tree of 
 #' clusters meeting the specified confidence threshold will be returned.
 #' 
-#' It is highly suggested to use more than 100 bootstraps if you run the 
+#' It is strongly recommended to use more than 100 bootstraps if you run the 
 #' clustering algorithm on real data even though we use `nboot = 100` in
 #' the example to reduce run time. The authors of `pvclust` suggest using at
 #' least 10,000 bootstrap replicates.
@@ -29,22 +29,23 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' @importFrom methods new
 #' @importFrom graphics matplot
 #' @param peak_table A `peak_table` object from [`get_peaktable`].
+#' @param alpha Significance threshold used to select clusters based on 
+#' bootstrap AU p-values.
 #' @param min_size Minimum number of peaks a cluster may have.
 #' @param max_size Maximum number of peaks a cluster may have.
-#' @param peak_no Minimum and maximum thresholds for the number of peaks a
-#' cluster may have. This argument is deprecated in favor of `min_size` and
-#' `max_size`.
-#' @param alpha Confidence threshold for inclusion of cluster.
 #' @param nboot Number of bootstrap replicates for [`pvclust`][pvclust::pvclust].
 #' @param plot_dend Logical. If `TRUE`, plots dendrogram with bootstrap values.
 #' @param plot_spectra Logical. If `TRUE`, plots overlapping spectra for each
 #' cluster.
 #' @param verbose Logical. If `TRUE`, prints progress report to console.
 #' @param save Logical. If `TRUE`, saves pvclust object to current directory.
+#' @param outfile Optional path to an `.RDS` file. If not `NULL`, the
+#' `pvclust` object is saved file using `saveRDS()`. Existing files are
+#' overwritten.
 #' @param parallel Logical. If `TRUE`, use parallel processing for 
 #' [`pvclust`][pvclust::pvclust].
-#' @param max.only Logical. If `TRUE`, returns only highest level for nested
-#' dendrograms. 
+#' @param max.only Logical. If `TRUE`, returns only highest level cluster from
+#' each nested set of clusters.
 #' @param output What to return. Either `"clusters"` to return list of clusters,
 #' `"pvclust"` to return pvclust object, or `"both"` to return both items.
 #' @param ... Additional arguments to [`pvclust`][pvclust::pvclust].
@@ -56,10 +57,10 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' object, and `[[2]]` the list of S4 `cluster` objects.
 #'
 #' The `cluster` objects consist of the following components:
-#' * `peaks`: a character vector containing the names
-#' of all peaks contained in the given cluster.
-#' * `pval`: a numeric vector of length 1 containing
-#' the bootstrap p-value (au) for the given cluster.
+#' * `peaks`: a character vector containing the names of all peaks contained in
+#' the given cluster.
+#' * `pval`: a numeric scalar containing the AU bootstrap p-value for the given 
+#' cluster.
 #' @author Ethan Bass
 #' @references R. Suzuki & H. Shimodaira. 2006. Pvclust: an R package for assessing
 #' the uncertainty in hierarchical clustering. *Bioinformatics*,
@@ -76,33 +77,45 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' @export cluster_spectra
 #' @md
 
-cluster_spectra <- function(peak_table, peak_no = NULL, alpha = 0.05, 
+cluster_spectra <- function(peak_table, alpha = 0.05, 
                             min_size = 5, max_size = NULL,
                             nboot = 1000, plot_dend = TRUE, plot_spectra = TRUE, 
-                            verbose = getOption("verbose"), 
-                            save = FALSE, parallel = TRUE, max.only = FALSE,
-                            output = c("pvclust", "clusters"),
-                            ...){
+                            verbose = getOption("verbose"), outfile = NULL,
+                            save = NULL, parallel = TRUE, max.only = FALSE,
+                            output = c("pvclust", "clusters"), ...){
   check_for_pkg("pvclust")
   check_peaktable(peak_table)
-  if (!is.null(peak_no)){
-    min_size <- peak_no[1]
-    max_size <- peak_no[2]
-    warning("The `peak_no` argument is deprecated. Please use `min_size` and
-            `max_size` instead.", .immediate = TRUE)
+  if (!is.null(save)){
+    if (save){
+      warning("The `save` argument is deprecated and will be removed in a future release. ",
+      "Please just use `outfile` instead.", call. = FALSE, immediate. = TRUE)
+      if (is.null(outfile)){
+        outfile <- "pvclust.RDS"
+      }
+    }
+  }
+  if (!is.null(outfile)){
+    outdir <- dirname(outfile)
+    if (!dir.exists(outdir)) {
+      stop("Directory does not exist: ", sQuote(outdir))
+    }
+    if (file.access(outdir, 2) != 0) {
+      stop("Directory is not writable: ", sQuote(outdir))
+    }
   }
   if (is.null(max_size)) max_size <- ncol(peak_table)
   output <- match.arg(output, c("pvclust", "clusters"), several.ok = TRUE)
   if (is.data.frame(peak_table$ref_spectra) | is.matrix(peak_table$ref_spectra)){
     spectra <- peak_table$ref_spectra
   } else {
-    stop("Please attach reference spectra (using the `attach_ref_spectra` function) before running `cluster_spectra`.")
+    stop("Please attach reference spectra using the `attach_ref_spectra` ",
+    "function before running `cluster_spectra`.")
   }
   rm <- which(apply(spectra, 2, sd) == 0)
   if (length(rm) > 0){
     if (verbose){
       message(paste0("Removing peaks due to bad spectra: ",
-                     paste(sQuote(colnames(spectra)[rm]),collapse=", ")))
+                     paste(sQuote(colnames(spectra)[rm]), collapse=", ")))
     }
     spectra <- spectra[, -rm]
   }
@@ -113,12 +126,15 @@ cluster_spectra <- function(peak_table, peak_no = NULL, alpha = 0.05,
                                               quiet = !verbose, ...)
   )
   if (plot_dend){
-    plot(result, labels = FALSE, cex.pv = 0.5, print.pv = 'au',
-         print.num = FALSE)
+    plot(result, labels = FALSE, cex.pv = 0.5, 
+         print.pv = 'au', print.num = FALSE)
     pvclust::pvrect(result, alpha = (1-alpha), max.only = max.only)
   }
-  if (save){
-    saveRDS(result, 'pvclust.RDS')
+  if (!is.null(outfile)){
+    tryCatch(saveRDS(result, outfile),
+             error = function(e){
+               warning("Could not save to '", outfile, "': ", e$message)
+             })
   }
   picks <- pvclust::pvpick(result, alpha = (1-alpha), max.only = max.only)
   cl_size <- sapply(picks$clusters, length)
