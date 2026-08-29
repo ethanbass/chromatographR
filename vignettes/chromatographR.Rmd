@@ -162,10 +162,6 @@ pks_gauss <- get_peaks(warp_vpdtw, lambdas = c(210), sd_max = 40, fit = "gaussia
 pks_egh <- get_peaks(warp_vpdtw, lambdas = c(210), sd_max = 40, fit = "egh")
 ```
 
-#### Filtering
-
-The peak-finding algorithm may often detect a lot of peaks that are little more than noise. Thus, it is recommended to filter out extraneous peaks at this stage (especially if you are processing a lot of samples) as it can greatly reduce the computational burden of peak table construction. This can be accomplished directly by using the arguments `sd_max` (to filter by peak width) and/or `amp_thresh` (to filter by peak height). Alternatively, the `filter_peaks` function can be used to filter peaks after the `peak_list` has already been created.
-
 #### Visualization
 
 The `plot.peak_list` function allows you to visually assess the peak integration accuracy. Below we compare the peaks fitted for the first chromatogram (`idx = 1`) using the two algorithms. Usually the egh function performs slightly better for asymmetrical peaks. Even though the peaks are fully filled in when the `raw` setting is selected, the results may not necessarily be more accurate.
@@ -182,7 +178,34 @@ plot(pks_bemg, idx = 1, lambda = 210)
 legend("topright", "Bidirectional exponentially modified gaussian", bty = "n")
 ```
 
+#### Local baseline correction
+
+When peaks sit on a rising or falling background — for example, during gradient elution — the `baseline` argument can be used to fit a local baseline beneath each peak. Setting `baseline = "flat"` fits a constant offset per peak; `baseline = "sloped"` fits a linearly varying baseline across the peak window. In both cases peak heights and areas are computed above the fitted baseline.
+
+The effect is most visible on data that has not been baseline-corrected during preprocessing. Below, we preprocess the raw data without baseline correction to better illustrate the difference.
+
+```{r baseline-fitting, warning = FALSE, fig.height = 6, fig.cap = "Comparison of peak fitting with no baseline (top), a flat baseline (middle), and a sloped baseline (bottom) on un-baseline-corrected data. Shaded areas represent the fitted peak above the local baseline."}
+dat.pr.ubc <- preprocess(Sa[2], dim1 = new_times, dim2 = new_wavelengths,
+                        remove.time.baseline = FALSE, cl = 1)
+
+pks_ubc <- get_peaks(dat.pr.ubc, lambdas = 210, fit = "egh", cl = 1)
+pks_flat <- get_peaks(dat.pr.ubc, lambdas = 210, fit = "egh", baseline = "flat", cl = 1)
+pks_sloped <- get_peaks(dat.pr.ubc, lambdas = 210, fit = "egh", baseline = "sloped", cl = 1)
+
+par(mfrow=c(3,1))
+plot(pks_ubc, lambda = 210)
+legend("topright", "Uncorrected", bty = "n")
+
+plot(pks_flat, lambda = 210)
+legend("topright", "Flat baseline", bty = "n")
+
+plot(pks_sloped, lambda = 210)
+legend("topright", "Sloped baseline", bty = "n")
 ```
+
+#### Peak filtering
+
+The peak-finding algorithm may often detect a lot of peaks that are little more than noise. Thus, it is recommended to filter out extraneous peaks at this stage (especially if you are processing a lot of samples) as it can greatly reduce the computational burden of peak table construction. This can be accomplished directly by using the arguments `sd_max` (to filter by peak width) and/or `amp_thresh` (to filter by peak height). Alternatively, the `filter_peaks` function can be used to filter peaks after the `peak_list` has already been created.
 
 ### Peak table assembly
 
