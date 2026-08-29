@@ -122,12 +122,13 @@
 #' @export get_peaks
 #' @md
 
-get_peaks <- function(chrom_list, lambdas, 
+get_peaks <- function(chrom_list, lambdas,
                       fit = c("bemg", "egh", "gaussian", "raw"),
                       sd_max = 50, max_iter = 100,
                       time_unit = c("min", "s", "ms"),
+                      fit_floor = FALSE,
                       estimate_purity = FALSE,  noise_threshold = .001,
-                      show_progress = NULL, cl = 2, collapse = FALSE, 
+                      show_progress = NULL, cl = 2, collapse = FALSE,
                       time.units = NULL, sd.max = NULL, max.iter = NULL, ...){
   check_duplicated_names(names(chrom_list))
   max_iter <- resolve_deprecated(max.iter, max_iter)
@@ -160,7 +161,8 @@ get_peaks <- function(chrom_list, lambdas,
       pks <- fit_peaks(chrom_list[[sample]], lambda = lambda, fit = fit,
                        max_iter = max_iter, sd_max = sd_max,
                        estimate_purity = estimate_purity,
-                       noise_threshold = noise_threshold, ...)
+                       noise_threshold = noise_threshold,
+                       fit_floor = fit_floor, ...)
       pks <- cbind(sample = names(chrom_list)[sample], lambda, pks)
       pks <- remove_bad_peaks(pks)
       pks <- convert_indices_to_times(pks, chrom_list = chrom_list, 
@@ -184,6 +186,7 @@ get_peaks <- function(chrom_list, lambdas,
             lambdas = lambdas, fit = fit, sd_max = sd_max,
             max_iter = max_iter,
             time_unit = time_unit,
+            fit_floor = fit_floor,
             intensity_unit = get_metadata_attribute(chrom_list[[1]], "detector_y_unit"),
             class = c("peak_list", "list"))
 }

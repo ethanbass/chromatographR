@@ -176,9 +176,9 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' @md
 
 fit_peaks <- function (x, lambda, pos = NULL, sd_max = 50,
-                       fit = c("bemg", "egh", "gaussian", "raw"), 
-                       max_iter = 1000, estimate_purity = TRUE, 
-                       noise_threshold = .001, ...){
+                       fit = c("bemg", "egh", "gaussian", "raw"),
+                       max_iter = 1000, estimate_purity = TRUE,
+                       noise_threshold = .001, fit_floor = FALSE, ...){
   lambda.idx <- get_lambda_idx(lambda, get_lambdas(x))
   y <- x[,lambda.idx]
   fit <- match.arg(fit, c("bemg", "egh", "gaussian", "raw"))
@@ -189,16 +189,17 @@ fit_peaks <- function (x, lambda, pos = NULL, sd_max = 50,
     estimate_purity <- FALSE
   }
   tabnames <- switch(fit,
-                     "gaussian" = c("rt", "start", "end", "sd", "FWHM", 
+                     "gaussian" = c("rt", "start", "end", "sd", "FWHM",
                                     "height", "area", "r-squared", "purity"),
-                     "egh" = c("rt", "start", "end", "sd", "tau", "FWHM", 
+                     "egh" = c("rt", "start", "end", "sd", "tau", "FWHM",
                                "height", "area", "r.squared", "purity"),
-                     "bemg" = c("rt", "start", "end", "sd", "tau_right", 
-                                "tau_left", "h", "FWHM", "height", "area", 
+                     "bemg" = c("rt", "start", "end", "sd", "tau_right",
+                                "tau_left", "h", "FWHM", "height", "area",
                                 "r.squared", "purity"),
                      "raw" = c("rt", "start", "end", "sd", "FWHM", "height",
                                                       "area", "purity")
   )
+  if (fit_floor && fit != "raw") tabnames <- c(tabnames, "floor")
     noPeaksMat <- matrix(rep(NA, length(tabnames)),
                          nrow = 1, dimnames = list(NULL, tabnames))
     on.edge <- sapply(pos$pos, function(x){
@@ -216,7 +217,8 @@ fit_peaks <- function (x, lambda, pos = NULL, sd_max = 50,
   huhn <- data.frame(t(apply(pos, 1, fitpk, x = x,
                              lambda = lambda.idx, max_iter = max_iter,
                              estimate_purity = estimate_purity,
-                             noise_threshold = noise_threshold)))
+                             noise_threshold = noise_threshold,
+                             fit_floor = fit_floor)))
   colnames(huhn) <- tabnames
   huhn <- data.frame(sapply(huhn, as.numeric, simplify = FALSE))
   if (!is.null(sd_max)) {
@@ -249,7 +251,7 @@ gaussian <- function(x, center = 0, width = 1, height = NULL, floor = 0){
 #' @noRd
 fit_gaussian <- function(x, y, start.center = NULL,
                          start.width = NULL, start.height = NULL,
-                         start.floor = NULL, fit.floor = FALSE,
+                         start.floor = NULL, fit_floor = FALSE,
                          max_iter = 1000){
   # estimate starting values
   who.max <- which.max(y)
@@ -262,32 +264,39 @@ fit_gaussian <- function(x, y, start.center = NULL,
                               warnOnly = TRUE)
   starts <- list("center" = start.center, "width" = start.width,
                   "height" = start.height)
-  if (!fit.floor) {
-    nlsAns <- try(minpack.lm::nlsLM(y ~ gaussian(x, center, width, height),
-                         start = starts, control = controlList), silent = TRUE)
-  } else{
-    if (is.null(start.floor)) start.floor <- quantile(y, seq(0, 1, 0.1))[2]
+  nlsAns <- try(minpack.lm::nlsLM(y ~ gaussian(x, center, width, height),
+                       start = starts, control = controlList), silent = TRUE)
+  nls_stage1 <- nlsAns
+  if (fit_floor) {
+    if (!inherits(nlsAns, "try-error")) starts <- as.list(coef(nlsAns))
+    if (is.null(start.floor)) start.floor <- 0
     starts <- c(starts, "floor" = start.floor)
-    nlsAns <- try(minpack.lm::nlsLM( y ~ gaussian(x, center, width, height, floor),
-                         start = starts, control = controlList), silent = TRUE)
+    nlsAns <- try(minpack.lm::nlsLM(y ~ gaussian(x, center, width, height, floor),
+                       start = starts, control = controlList,
+                       lower = c(center = -Inf, width = -Inf, height = -Inf, floor = 0),
+                       upper = c(center = Inf, width = Inf, height = Inf,
+                                 floor = min(y))), silent = TRUE)
   }
-  # package up the results to pass back
-    if (inherits(nlsAns, "try-error")){
-      yAns <- gaussian(x, start.center, start.width, start.height, start.floor)
-      out <- list("center" = start.center, "width" = start.width,
-                  "height" = start.height,
-                  "y" = yAns, "residual" = y - yAns)
-      floorAns <- if (fit.floor) start.floor else 0
+  if (inherits(nlsAns, "try-error")){
+    floorAns <- if (fit_floor) start.floor else 0
+    if (fit_floor && !inherits(nls_stage1, "try-error")) {
+      s1 <- coef(nls_stage1)
+      yAns <- gaussian(x, s1["center"], s1["width"], s1["height"], floorAns)
+      out <- list("center" = s1["center"], "width" = s1["width"],
+                  "height" = s1["height"], "y" = yAns, "residual" = y - yAns)
     } else {
-      coefs <-coef(nlsAns)
-      out <- list( "center" = coefs[1], "width" = coefs[2], "height" = coefs[3],
-                   "y" = fitted(nlsAns), "residual" = residuals(nlsAns))
-      floorAns <- if (fit.floor) coefs[4] else 0
+      yAns <- gaussian(x, start.center, start.width, start.height, floorAns)
+      out <- list("center" = start.center, "width" = start.width,
+                  "height" = start.height, "y" = yAns, "residual" = y - yAns)
     }
-    if (fit.floor) {
-      out <- c( out, "floor" = floorAns)
-    }
-  return( out)
+  } else {
+    coefs <- coef(nlsAns)
+    out <- list("center" = coefs[1], "width" = coefs[2], "height" = coefs[3],
+                "y" = fitted(nlsAns), "residual" = residuals(nlsAns))
+    floorAns <- if (fit_floor) coefs[4] else 0
+  }
+  if (fit_floor) out <- c(out, "floor" = floorAns)
+  return(out)
 }
 
 ###############################################################################
@@ -298,7 +307,7 @@ egh <- function(x, center, width,  height, tau, floor = 0){
   result <- rep(0, length(x))
   index <- which(2*width^2 + tau*(x-center)>0)
   result[index] <- height*exp(-(x[index] - center)^2/(2*width^2 + tau*(x[index] - center)))
-  return(result)
+  return(result + floor)
 }
 
 
@@ -307,7 +316,7 @@ egh <- function(x, center, width,  height, tau, floor = 0){
 #' @noRd
 fit_egh <- function(x1, y1, start.center = NULL, start.width = NULL,
                     start.tau = NULL, start.height = NULL, start.floor = NULL,
-                    fit.floor = FALSE, max_iter = 1000) {
+                    fit_floor = FALSE, max_iter = 1000) {
   
   # try to find the best egh to fit the given data
   
@@ -330,105 +339,129 @@ fit_egh <- function(x1, y1, start.center = NULL, start.width = NULL,
                              warnOnly = TRUE)
   starts <- list("center" = start.center, "width" = start.width, 
                  "height" = start.height, "tau" = start.tau)
-  if (!fit.floor){
-    nlsAns <- try(minpack.lm::nlsLM(y1 ~ egh(x1, center, width, height, tau),
-                        start = starts, control = controlList), silent = TRUE)
-  } else{
-    if (is.null( start.floor)) start.floor <- quantile( y1, seq(0, 1, 0.1))[2]
+  nlsAns <- try(minpack.lm::nlsLM(y1 ~ egh(x1, center, width, height, tau),
+                      start = starts, control = controlList), silent = TRUE)
+  nls_stage1 <- nlsAns
+  if (fit_floor) {
+    if (!inherits(nlsAns, "try-error")) starts <- as.list(coef(nlsAns))
+    if (is.null(start.floor)) start.floor <- 0
     starts <- c(starts, "floor" = start.floor)
     nlsAns <- try(minpack.lm::nlsLM(y1 ~ egh(x1, center, width, height, tau, floor),
-                        start = starts, control = controlList), silent = TRUE)
+                      start = starts, control = controlList,
+                      lower = c(center = -Inf, width = -Inf, height = -Inf,
+                                tau = -Inf, floor = 0),
+                      upper = c(center = Inf, width = Inf, height = Inf,
+                                tau = Inf, floor = min(y1))), silent = TRUE)
   }
-  
-  # package up the results to pass back
+
   if (inherits(nlsAns, "try-error")) {
-    yAns <- egh(x1, start.center, start.width, start.height,
-                start.tau, start.floor)
-    out <- list("center" = start.center, "width" = start.width,
-                "height" = start.height, "tau" = start.tau,
-                "y" = yAns, "residual" = y1 - yAns)
-    floorAns <- if (fit.floor) start.floor else 0
+    floorAns <- if (fit_floor) start.floor else 0
+    if (fit_floor && !inherits(nls_stage1, "try-error")) {
+      s1 <- coef(nls_stage1)
+      yAns <- egh(x1, s1["center"], s1["width"], s1["height"], s1["tau"], floorAns)
+      out <- list("center" = s1["center"], "width" = s1["width"],
+                  "height" = s1["height"], "tau" = s1["tau"],
+                  "y" = yAns, "residual" = y1 - yAns)
+    } else {
+      yAns <- egh(x1, start.center, start.width, start.height, start.tau, floorAns)
+      out <- list("center" = start.center, "width" = start.width,
+                  "height" = start.height, "tau" = start.tau,
+                  "y" = yAns, "residual" = y1 - yAns)
+    }
   } else {
-    coefs <-coef(nlsAns)
-    out <- list( "center" = coefs[1], "width" = coefs[2], "height" = coefs[3],
-                 "tau" = coefs[4], "y" = fitted(nlsAns),
-                 "residual" = residuals(nlsAns))
-    floorAns <- if (fit.floor) coefs[5] else 0
+    coefs <- coef(nlsAns)
+    out <- list("center" = coefs[1], "width" = coefs[2], "height" = coefs[3],
+                "tau" = coefs[4], "y" = fitted(nlsAns),
+                "residual" = residuals(nlsAns))
+    floorAns <- if (fit_floor) coefs[5] else 0
   }
-  
-  if (fit.floor) {
-    out <- c( out, "floor" = floorAns)
-  }
+
+  if (fit_floor) out <- c(out, "floor" = floorAns)
   return(out)
 }
 
 fitpk_bemg <- function(x, pos, lambda, max_iter,
-                       estimate_purity = TRUE, noise_threshold = .001){
+                       estimate_purity = TRUE, noise_threshold = .001,
+                       fit_floor = FALSE){
   y <- x[,lambda]
   xloc <- pos[[1]]
   peak.loc <- seq.int(pos[2], pos[3])
   suppressWarnings(m <- fit_bemg(peak.loc, y[peak.loc], start.center = xloc,
-                                 start.height = y[[xloc]], max_iter = max_iter)
+                                 start.height = y[[xloc]], max_iter = max_iter,
+                                 fit_floor = fit_floor)
   )
   r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE)
   purity <- get_purity(x = x, pos = pos, try = estimate_purity,
                        noise_threshold = noise_threshold)
-  # trapezoidal integration
-  area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y, -1))))
-  c("rt" = unname(round(m$center)), "start" = pos[[2]], "end" = pos[[3]], 
-    "sd" = unname(m$width), "tau_right" = unname(m$a), "tau_left" = unname(m$b), 
+  floor_val <- if (fit_floor) unname(m$floor) else 0
+  y_above <- m$y - floor_val
+  area <- sum(diff(peak.loc) * mean(c(y_above[-1], tail(y_above, -1))))
+  result <- c("rt" = unname(round(m$center)), "start" = pos[[2]], "end" = pos[[3]],
+    "sd" = unname(m$width), "tau_right" = unname(m$a), "tau_left" = unname(m$b),
     "h" = unname(m$height), "FWHM" = 2.35 * unname(m$width),
-    "height" = unname(max(m$y)), "area" = area, "r.squared" = unname(r.squared), 
+    "height" = unname(max(m$y)) - floor_val,
+    "area" = area, "r.squared" = unname(r.squared),
     purity = purity)
+  if (fit_floor) c(result, floor = floor_val) else result
 }
 
 #' Fit peak (gaussian)
 #' @noRd
 fitpk_gaussian <- function(x, pos, lambda, max_iter,
-                           estimate_purity = TRUE, noise_threshold = .001, ...){
-  
+                           estimate_purity = TRUE, noise_threshold = .001,
+                           fit_floor = FALSE, ...){
   y <- x[,lambda]
-  xloc <- pos[1]
+  xloc <- pos[[1]]
   peak.loc <- seq.int(pos[2], pos[3])
   suppressWarnings(m <- fit_gaussian(peak.loc, y[peak.loc],
                                      start.center = xloc,
-                                     start.height = y[xloc],
-                                     max_iter = max_iter)
+                                     start.height = y[[xloc]],
+                                     max_iter = max_iter,
+                                     fit_floor = fit_floor)
   )
-  area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y,-1))))
+  floor_val <- if (fit_floor) unname(m$floor) else 0
+  y_above <- m$y - floor_val
+  area <- sum(diff(peak.loc) * mean(c(y_above[-1], tail(y_above, -1))))
   r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE)
   purity <- get_purity(x = x, pos = pos, try = estimate_purity,
                        noise_threshold = noise_threshold)
-  c("rt" = m$center, "start" = pos[2], "end" = pos[3], 
-    "sd" = m$width, "FWHM" = 2.35 * m$width,
-    "height" = m$height, "area" = area, "r.squared" = r.squared, purity = purity)
+  result <- c("rt" = unname(m$center), "start" = pos[2], "end" = pos[3],
+    "sd" = unname(m$width), "FWHM" = 2.35 * unname(m$width),
+    "height" = unname(m$height), "area" = area,
+    "r.squared" = unname(r.squared), purity = purity)
+  if (fit_floor) c(result, floor = floor_val) else result
 }
 
 #' Fit peak (exponential-gaussian hybrid)
 #' @noRd
 fitpk_egh <- function(x, pos, lambda, max_iter,
-                      estimate_purity = TRUE, noise_threshold = .001){
+                      estimate_purity = TRUE, noise_threshold = .001,
+                      fit_floor = FALSE){
   y <- x[,lambda]
-  xloc <- pos[1]
+  xloc <- pos[[1]]
   peak.loc <- seq.int(pos[2], pos[3])
   suppressWarnings(m <- fit_egh(peak.loc, y[peak.loc], start.center = xloc,
-                                start.height = y[xloc], max_iter = max_iter)
+                                start.height = y[[xloc]], max_iter = max_iter,
+                                fit_floor = fit_floor)
   )
   r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE)
   purity <- get_purity(x = x, pos = pos, try = estimate_purity,
                        noise_threshold = noise_threshold)
-  # trapezoidal integration
-  area <- sum(diff(peak.loc) * mean(c(m$y[-1], tail(m$y, -1))))
-  c("rt" = m$center, "start" = pos[2], "end" = pos[3], 
-    "sd" = m$width, "tau" = m$tau, "FWHM" = 2.35 * m$width,
-    "height" = m$height, "area" = area, "r.squared" = r.squared, 
-    purity = purity)
+  floor_val <- if (fit_floor) unname(m$floor) else 0
+  y_above <- m$y - floor_val
+  area <- sum(diff(peak.loc) * mean(c(y_above[-1], tail(y_above, -1))))
+  result <- c("rt" = unname(m$center), "start" = pos[2], "end" = pos[3],
+    "sd" = unname(m$width), "tau" = unname(m$tau), "FWHM" = 2.35 * unname(m$width),
+    "height" = unname(m$height), "area" = area,
+    "r.squared" = unname(r.squared), purity = purity)
+  if (fit_floor) c(result, floor = floor_val) else result
 }
 
 #' Fit peak (raw)
 #' @noRd
 fitpk_raw <- function(x, pos, lambda, max_iter,
-                      estimate_purity = TRUE, noise_threshold = .001){
+                      estimate_purity = TRUE, noise_threshold = .001,
+                      fit_floor = FALSE){
   y <- x[,lambda]
   xloc <- pos[1]
   peak.loc <- seq.int(pos[2], pos[3])
@@ -517,7 +550,7 @@ bemg <- function(x, center, width, height, a, b, floor = 0) {
 #' @noRd
 fit_bemg <- function(x1, y1, start.center = NULL, start.width = NULL,
                      start.a = NULL, start.b = NULL, start.height = NULL,
-                     start.floor = NULL, fit.floor = FALSE, max_iter = 1000) {
+                     start.floor = NULL, fit_floor = FALSE, max_iter = 1000) {
   
   who.max <- which.max(y1)
   if (is.null(start.center)) start.center <- x1[who.max]
@@ -531,34 +564,47 @@ fit_bemg <- function(x1, y1, start.center = NULL, start.width = NULL,
   starts <- list(center = start.center, width = start.width,
                  height = start.height, a = start.a, b = start.b)
   
-  if (!fit.floor) {
-    nlsAns <- try(minpack.lm::nlsLM(
-      y1 ~ bemg(x1, center, width, height, a, b),
-      start = starts, control = controlList), silent = TRUE)
-  } else {
-    if (is.null(start.floor)) start.floor <- quantile(y1, seq(0, 1, 0.1))[2]
+  upper <- c(center = Inf, width = Inf, height = 5 * start.height, a = Inf, b = Inf)
+  nlsAns <- try(minpack.lm::nlsLM(
+    y1 ~ bemg(x1, center, width, height, a, b),
+    start = starts, control = controlList, upper = upper), silent = TRUE)
+  nls_stage1 <- nlsAns
+  if (fit_floor) {
+    if (!inherits(nlsAns, "try-error")) {
+      starts <- as.list(coef(nlsAns))
+    }
+    if (is.null(start.floor)) start.floor <- 0
     starts <- c(starts, floor = start.floor)
     nlsAns <- try(minpack.lm::nlsLM(
       y1 ~ bemg(x1, center, width, height, a, b, floor),
-      start = starts, control = controlList), silent = TRUE)
+      start = starts, control = controlList,
+      upper = c(center = Inf, width = Inf, height = 5 * start.height,
+                a = Inf, b = Inf, floor = min(y1))), silent = TRUE)
   }
-  
+
   if (inherits(nlsAns, "try-error")) {
-    yAns <- bemg(x1, start.center, start.width, start.height,
-                 start.a, start.b, if (fit.floor) start.floor else 0)
-    out <- list(center = start.center, width = start.width,
-                height = start.height, a = start.a, b = start.b,
-                y = yAns, residual = y1 - yAns)
-    floorAns <- if (fit.floor) start.floor else 0
+    floorAns <- if (fit_floor) start.floor else 0
+    if (fit_floor && !inherits(nls_stage1, "try-error")) {
+      s1 <- coef(nls_stage1)
+      yAns <- bemg(x1, s1["center"], s1["width"], s1["height"], s1["a"], s1["b"], floorAns)
+      out <- list(center = s1["center"], width = s1["width"], height = s1["height"],
+                  a = s1["a"], b = s1["b"], y = yAns, residual = y1 - yAns)
+    } else {
+      yAns <- bemg(x1, start.center, start.width, start.height,
+                   start.a, start.b, floorAns)
+      out <- list(center = start.center, width = start.width,
+                  height = start.height, a = start.a, b = start.b,
+                  y = yAns, residual = y1 - yAns)
+    }
   } else {
     coefs <- coef(nlsAns)
     out <- list(center = coefs["center"], width = coefs["width"],
                 height = coefs["height"], a = coefs["a"], b = coefs["b"],
                 y = fitted(nlsAns), residual = residuals(nlsAns))
-    floorAns <- if (fit.floor) coefs["floor"] else 0
+    floorAns <- if (fit_floor) coefs["floor"] else 0
   }
-  
-  if (fit.floor) out <- c(out, floor = floorAns)
+
+  if (fit_floor) out <- c(out, floor = floorAns)
   return(out)
 }
 
