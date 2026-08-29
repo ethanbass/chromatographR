@@ -77,7 +77,13 @@ preprocess <- function(X, dim1, dim2,
     X <- list(X)
     return_matrix <- TRUE
   } else return_matrix <- FALSE
-  if (!inherits(X, c("list", "matrix")) && !all(sapply(X, is.matrix)))
+  if (base::inherits(X, "list") &&
+      base::all(base::sapply(X, function(x) {
+        base::inherits(x, "list") && "dad" %in% base::names(x) && base::is.matrix(x$dad)
+      }))) {
+    X <- base::lapply(X, function(x) x$dad)
+  }
+  if (!(inherits(X, "matrix") || (inherits(X, "list") && all(sapply(X, is.matrix)))))
     stop("X should be a matrix or a list of matrices")
   if (ncol(X[[1]]) == 1){
     interpolate_cols <- FALSE

@@ -26,8 +26,19 @@ test_that("Preprocess works without providing dimensions", {
   expect_equal(colnames(out[[1]]), as.character(new.lambdas))
 })
 
+test_that("preprocess unwraps nested lists with a dad element", {
+  dad_list <- lapply(Sa[1:2], function(x) list(dad = x, meta = "foo"))
+  result <- preprocess(X = dad_list, dim1 = new.ts, dim2 = new.lambdas,
+                       show_progress = FALSE)
+  expect_equal(length(result), 2)
+  expect_equal(class(result[[1]])[1], "matrix")
+  expect_equal(rownames(result[[1]]), as.character(new.ts))
+})
+
 test_that("preprocess returns correct errors and warnings", {
-  expect_error(preprocess(X = as.data.frame(Sa[[1]]), show_progress = FALSE), 
+  expect_error(preprocess(X = list(Sa[[1]], "not_a_matrix"), show_progress = FALSE),
+               regexp = "X should be a matrix")
+  expect_error(preprocess(X = as.data.frame(Sa[[1]]), show_progress = FALSE),
                regexp = "X should be a matrix")
   expect_error(preprocess(Sa, dim1 = seq(8,15, by=.01)), 
                regexp = "incompatible with actual data")

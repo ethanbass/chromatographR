@@ -41,6 +41,21 @@
 
 ### Bug fixes and other minor changes
 
+#### Enhancements
+
+* Preprocess can now take nested lists containing a `dad` element in each list. This change allows better compatibility with chromConverter.
+* Added more informative warnings and errors to `preprocess` function.
+* Added support for numeric input to `lambda` argument in `reshape_chroms`.
+* Refactored `normalize_data` for improved performance and added `on_invalid` argument to specify behavior for dealing with invalid normalization values (zero, negative or `NA`).
+* Refactored `normalize_data` for automatic detection of column names so that user no longer has to specify whether they wish to normalize by a metadata column or a column in the peak table.
+* Refactored `ptw` warping in `correct_rt` using whole-matrix interpolation resulting in substantial speedup.
+* Added `max_zeros` argument in `filter_peaktable` to exclude features above a threshold proportion of zero values.
+* Added support for new `chrom_list` class introduced in chromConverter v0.9.0.
+
+### Bug fixes and other minor changes
+
+* Fixed `preprocess` function incorrectly truncating chromatograms when outliers are present and `dim1` is not specified.
+* Fixed input validation in `preprocess` so lists containing non-matrix elements no longer pass validation without error.
 * Fixed bug in `filter_peaktable` when filtering peaks based on specific retention times with the `rts` argument.
 * Fixed `filter_peaktable` and `filter_peaks` to make filtering criteria inclusive (e.g., `min_rt = 5` now retains peaks with `rt == 5`).
 * Added error when duplicated sample names are provided to `get_peaktable` or `get_peaks` since this will cause downstream issues.
