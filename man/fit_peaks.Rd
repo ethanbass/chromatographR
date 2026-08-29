@@ -9,10 +9,11 @@ fit_peaks(
   lambda,
   pos = NULL,
   sd_max = 50,
-  fit = c("bemg", "egh", "gaussian", "raw"),
+  fit = c("egh", "bemg", "gaussian", "raw"),
   max_iter = 1000,
   estimate_purity = TRUE,
   noise_threshold = 0.001,
+  baseline = c("none", "flat", "sloped"),
   ...
 )
 }
@@ -29,7 +30,7 @@ automatically to find peak positions.}
 \item{fit}{Peak model to use. Options include \code{"bemg"} (bidirectional
 exponentially modified Gaussian), \code{"egh"} (exponential-Gaussian hybrid),
 \code{"gaussian"}, and \code{"raw"}. If \code{raw} is selected, peaks are integrated using
-trapezoidal integration without model fitting. Defaults to \code{"bemg"}.}
+trapezoidal integration without model fitting. Defaults to \code{"egh"}.}
 
 \item{max_iter}{Maximum number of iterations to use in nonlinear least
 squares peak-fitting. Defaults to \code{1000}.}
@@ -38,6 +39,10 @@ squares peak-fitting. Defaults to \code{1000}.}
 to \code{TRUE}.}
 
 \item{noise_threshold}{Noise threshold. Input to \code{get_purity}.}
+
+\item{baseline}{Whether to fit a baseline offset beneath each peak model.
+Options are \code{"none"} (no baseline, default), \code{"flat"} (constant offset), or
+\code{"sloped"} (linearly varying offset). Not available when \code{fit = "raw"}.}
 
 \item{...}{Additional arguments to \code{find_peaks}.}
 }
@@ -55,10 +60,15 @@ A matrix with one row per peak and the following columns:
 \item \code{tau_left}: Exponential decay constant for left side of peak (when
 \code{bemg} is selected).
 \item \code{FWHM}: The full width at half maximum.
-\item \code{height}: Peak height.
-\item \code{area}: Peak area.
+\item \code{height}: Peak height above the fitted baseline.
+\item \code{area}: Peak area above the fitted baseline.
 \item \code{r.squared}: The R\if{html}{\out{<sup>}}2\if{html}{\out{</sup>}} value for linear fit of the model to the data.
 \item \code{purity}: The spectral purity of peak as assessed by \code{\link{get_purity}}.
+\item \code{floor}: Constant baseline offset (only when \code{baseline = "flat"}).
+\item \code{floor_start}: Baseline level at the left edge of the peak window (only
+when \code{baseline = "sloped"}).
+\item \code{floor_end}: Baseline level at the right edge of the peak window (only
+when \code{baseline = "sloped"}).
 The first five elements (\code{rt}, \code{start}, \code{end}, \code{sd} and \code{FWHM}) are expressed
 as index positions rather than absolute retention times. The transformation
 to real time is done in \code{get_peaks}.
