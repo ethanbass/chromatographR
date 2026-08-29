@@ -52,17 +52,21 @@
 #' parallel processing or a cluster object created by
 #' [`makeCluster`][parallel::makeCluster]. Defaults to `2`. On Windows integer
 #' values will be ignored.
+#' @param baseline Whether to fit a baseline offset beneath each peak model.
+#' Options are `"none"` (no baseline, default), `"flat"` (constant offset per
+#' peak), or `"sloped"` (linearly varying offset per peak, useful for gradient
+#' elution). Not available when `fit = "raw"`.
 #' @param collapse Logical. Whether to collapse multiple peak lists per sample
 #' into a single list when multiple wavelengths (`lambdas`) are provided.
-#' @param \dots Additional arguments to [`find_peaks`]. Arguments provided to 
-#' `find_peaks` can be used to fine-tune the peak-finding algorithm. Most 
-#' importantly, the `smooth_window` should be increased if features are being 
+#' @param \dots Additional arguments to [`find_peaks`]. Arguments provided to
+#' `find_peaks` can be used to fine-tune the peak-finding algorithm. Most
+#' importantly, the `smooth_window` should be increased if features are being
 #' split into multiple bins. Other arguments that can be used
 #' here include `smooth_type`, `slope_thresh`, and `amp_thresh`.
-#' @return The result is an S3 object of class `peak_list`, containing a 
-#' nested list of data.frames containing information about the peaks fitted for 
+#' @return The result is an S3 object of class `peak_list`, containing a
+#' nested list of data.frames containing information about the peaks fitted for
 #' each chromatogram at each of wavelengths specified by the `lambdas`
-#' argument. Each row in these data.frames is a peak and the columns contain 
+#' argument. Each row in these data.frames is a peak and the columns contain
 #' information about various peak parameters:
 #' * `rt`: The retention time of the peak maximum.
 #' * `start`: The retention time where the peak is estimated to begin.
@@ -76,16 +80,31 @@
 #' * `tau_left`: Exponential rate constant controlling left-sided tailing
 #' when `fit = "bemg"`. Note that unlike `tau` in the EGH model,
 #' this parameter has units of 1/time.
+#' * `h`: The `height` parameter of the fitted BEMG shape function (only when
+#' `fit = "bemg"`). This is the value of the pure shape at `center`, before
+#' any baseline is added, and is distinct from `height`.
+#' * `center`: The center parameter of the fitted BEMG shape function (only
+#' when `fit = "bemg"`). This is the location around which the exponential
+#' tails are applied. Because BEMG peaks can be asymmetric
+#' (`tau_right ≠ tau_left`) and a sloped baseline shifts the fitted curve,
+#' the actual peak maximum (`rt`) may differ from `center`.
 #' * `FWHM`: The full-width at half maximum calculated as \eqn{2.355 \sigma}.
-#' * `height`: The height of the peak.
-#' * `area`: The area of the peak as determined by trapezoidal approximation.
+#' * `height`: The height of the peak above the fitted baseline.
+#' * `area`: The area of the peak above the fitted baseline, estimated by
+#' trapezoidal approximation.
 #' * `r.squared`: The coefficient of determination (\eqn{R^2}) of the fitted
 #' model to the raw data. (**Note**: this value is calculated by fitting a
 #' linear model of the fitted peak values to the raw data. This approach is
 #' statistically dubious, since the models are fit using non-linear least
-#' squares. Nevertheless, it can still be useful as a rough metric for 
+#' squares. Nevertheless, it can still be useful as a rough metric for
 #' "goodness-of-fit").
 #' * `purity`: The peak purity as estimated by [`get_purity`].
+#' * `floor`: Constant baseline level (only when `baseline = "flat"`).
+#' * `floor_start`: Baseline level at the left edge of the peak window (only
+#' when `baseline = "sloped"`).
+#' * `floor_end`: Baseline level at the right edge of the peak window (only
+#' when `baseline = "sloped"`). Both `floor_start` and `floor_end` are
+#' constrained to be non-negative.
 #' @author Ethan Bass
 #' @note The bones of this function are adapted from the
 #' `getAllPeaks` function (<https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R>)
@@ -126,7 +145,7 @@ get_peaks <- function(chrom_list, lambdas,
                       fit = c("bemg", "egh", "gaussian", "raw"),
                       sd_max = 50, max_iter = 100,
                       time_unit = c("min", "s", "ms"),
-                      fit_floor = FALSE,
+                      baseline = c("none", "flat", "sloped"),
                       estimate_purity = FALSE,  noise_threshold = .001,
                       show_progress = NULL, cl = 2, collapse = FALSE,
                       time.units = NULL, sd.max = NULL, max.iter = NULL, ...){
@@ -137,6 +156,7 @@ get_peaks <- function(chrom_list, lambdas,
   time_unit <- match.arg(time_unit, c("min", "s", "ms"))
   tfac <- switch(time_unit, "min" = 1, "s" = 60, "ms" = 60*1000)
   fit <- match.arg(fit, c("bemg", "egh", "gaussian", "raw"))
+  baseline <- match.arg(baseline, c("none", "flat", "sloped"))
   chrom_list_string <- deparse(substitute(chrom_list))
   if (class(chrom_list)[1] == "matrix")
     chrom_list <- list(chrom_list)
@@ -162,7 +182,7 @@ get_peaks <- function(chrom_list, lambdas,
                        max_iter = max_iter, sd_max = sd_max,
                        estimate_purity = estimate_purity,
                        noise_threshold = noise_threshold,
-                       fit_floor = fit_floor, ...)
+                       baseline = baseline, ...)
       pks <- cbind(sample = names(chrom_list)[sample], lambda, pks)
       pks <- remove_bad_peaks(pks)
       pks <- convert_indices_to_times(pks, chrom_list = chrom_list, 
@@ -186,7 +206,7 @@ get_peaks <- function(chrom_list, lambdas,
             lambdas = lambdas, fit = fit, sd_max = sd_max,
             max_iter = max_iter,
             time_unit = time_unit,
-            fit_floor = fit_floor,
+            baseline = baseline,
             intensity_unit = get_metadata_attribute(chrom_list[[1]], "detector_y_unit"),
             class = c("peak_list", "list"))
 }
@@ -211,8 +231,8 @@ remove_bad_peaks <- function(pks){
 convert_indices_to_times <- function(x, chrom_list, idx, tfac){
   timepoints <- get_times(chrom_list, idx = idx)
   tdiff <- get_time_resolution(chrom_list, idx = idx)
-  x[, c('rt', 'start', 'end')] <- sapply(c('rt', 'start', 'end'),
-                                         function(j) timepoints[x[, j]])
+  idx_cols <- intersect(c('rt', 'start', 'end', 'center'), colnames(x))
+  x[, idx_cols] <- sapply(idx_cols, function(j) timepoints[x[, j]])
   x[, c('sd', 'FWHM', 'area')] <- x[, c('sd', 'FWHM', 'area')] * tdiff * tfac
   if (!is.null(x$tau)){
     x[, c('tau')] <- x[, c('tau')] * tdiff * tfac

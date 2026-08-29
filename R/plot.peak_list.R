@@ -58,6 +58,8 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
                            points = FALSE, ticks = FALSE, alpha = 0.5, color = NULL,
                            cex.points = 0.5, numbers = FALSE, cex.font = 0.5, 
                            y.offset = 25, plot_purity = FALSE, res){
+  baseline <- attr(x, "baseline")
+  if (is.null(baseline)) baseline <- "none"
   time.units <- attributes(x)$time.units
   time.units <- ifelse(is.null(time.units), "", time.units)
   tfac <- switch(time.units, "min" = 1, "s" = 1/60, "ms" = 1/60000, 1)
@@ -80,7 +82,15 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
   plot(new.ts, y, type = 'l', xlab = '', ylab = '', 
        xaxt = 'n', yaxt = 'n', ...)
   if (points){
-    apex_y <- pks$height + if (!is.null(pks$floor)) pks$floor else 0
+    apex_y <- if (baseline == "flat" && !is.null(pks$floor)) {
+      pks$height + pks$floor
+    } else if (baseline == "sloped" && !is.null(pks$floor_start) && !is.null(pks$floor_end)) {
+      # apex is at rt; interpolate baseline linearly between start and end
+      frac <- (pks$rt - pks$start) / (pks$end - pks$start)
+      pks$height + pks$floor_start + frac * (pks$floor_end - pks$floor_start)
+    } else {
+      pks$height
+    }
     points(pks$rt, apex_y, pch = 20, cex = cex.points, col = 'red')
   }
   if (ticks){
@@ -109,9 +119,15 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
     tryCatch({
       peak.loc <- seq.int((pks$start[i]),(pks$end[i]), by = res)
       yvals <- fit_fun(peak.loc, pks[i,], tfac, chrom_list, idx, lambda)
-      floor_val <- if (!is.null(pks$floor)) pks$floor[i] else 0
+      floor_vec <- if (baseline == "flat" && !is.null(pks$floor)) {
+        pks$floor[i]
+      } else if (baseline == "sloped" && !is.null(pks$floor_start)) {
+        seq(pks$floor_start[i], pks$floor_end[i], length.out = length(peak.loc))
+      } else {
+        0
+      }
       draw_trapezoid(peak.loc = peak.loc, yvals = yvals,
-                     color = color, alpha = alpha, floor = floor_val)
+                     color = color, alpha = alpha, floor = floor_vec)
     }, error = function(e){
       warning(
         sprintf(
@@ -130,8 +146,10 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
 #' Draw trapezoid
 #' @noRd
 draw_trapezoid <- function(peak.loc, yvals, color, alpha, floor = 0){
+  floor_vec <- if (length(floor) == 1) rep(floor, length(peak.loc)) else floor
   sapply(seq_len(length(peak.loc) - 1), function(i){
-    polygon(peak.loc[c(i, i, (i + 1), (i + 1))], c(floor, yvals[i:(i + 1)], floor),
+    polygon(peak.loc[c(i, i, (i + 1), (i + 1))],
+            c(floor_vec[i], yvals[i:(i + 1)], floor_vec[i + 1]),
             col = scales::alpha(color, alpha), lty = 3, border = NA)
   })
 }
@@ -144,13 +162,20 @@ gaussian_from_peak <- function(x, peak, tfac = 1, ...) {
     warning("gaussian: NA parameters for peak at rt=", peak$rt)
     return(rep(NA_real_, length(x)))
   }
-  floor_val <- if (!is.null(peak$floor) && !is.na(peak$floor)) peak$floor else 0
+  floor_val <- if (!is.null(peak$floor_start) && !is.na(peak$floor_start)) {
+    peak$floor_start
+  } else if (!is.null(peak$floor) && !is.na(peak$floor)) peak$floor else 0
+  slope_val <- if (!is.null(peak$floor_start) && !is.na(peak$floor_start) &&
+                   length(x) > 1 && (x[length(x)] != x[1])) {
+    (peak$floor_end - peak$floor_start) / (x[length(x)] - x[1])
+  } else 0
   gaussian(
     x,
     center = peak$rt,
     width  = peak$sd * tfac,
     height = peak$height,
-    floor  = floor_val
+    floor  = floor_val,
+    slope  = slope_val
   )
 }
 
@@ -162,14 +187,21 @@ egh_from_peak <- function(x, peak, tfac = 1, ...) {
     warning("egh: NA parameters for peak at rt=", peak$rt)
     return(rep(NA_real_, length(x)))
   }
-  floor_val <- if (!is.null(peak$floor) && !is.na(peak$floor)) peak$floor else 0
+  floor_val <- if (!is.null(peak$floor_start) && !is.na(peak$floor_start)) {
+    peak$floor_start
+  } else if (!is.null(peak$floor) && !is.na(peak$floor)) peak$floor else 0
+  slope_val <- if (!is.null(peak$floor_start) && !is.na(peak$floor_start) &&
+                   length(x) > 1 && (x[length(x)] != x[1])) {
+    (peak$floor_end - peak$floor_start) / (x[length(x)] - x[1])
+  } else 0
   egh(
     x,
     center = peak$rt,
     width  = peak$sd * tfac,
     height = peak$height,
     tau    = peak$tau * tfac,
-    floor  = floor_val
+    floor  = floor_val,
+    slope  = slope_val
   )
 }
 
@@ -181,15 +213,23 @@ bemg_from_peak <- function(x, peak, tfac = 1, ...) {
     warning("bemg: NA parameters for peak at rt=", peak$rt)
     return(rep(NA_real_, length(x)))
   }
-  floor_val <- if (!is.null(peak$floor) && !is.na(peak$floor)) peak$floor else 0
+  center_val <- if (!is.null(peak$center) && !is.na(peak$center)) peak$center else peak$rt
+  floor_val <- if (!is.null(peak$floor_start) && !is.na(peak$floor_start)) {
+    peak$floor_start
+  } else if (!is.null(peak$floor) && !is.na(peak$floor)) peak$floor else 0
+  slope_val <- if (!is.null(peak$floor_start) && !is.na(peak$floor_start) &&
+                   length(x) > 1 && (x[length(x)] != x[1])) {
+    (peak$floor_end - peak$floor_start) / (x[length(x)] - x[1])
+  } else 0
   bemg(
     x,
-    center = peak$rt,
+    center = center_val,
     width  = peak$sd * tfac,
     height = peak$h,
     a      = peak$tau_right * tfac,
     b      = peak$tau_left * tfac,
-    floor  = floor_val
+    floor  = floor_val,
+    slope  = slope_val
   )
 }
 
