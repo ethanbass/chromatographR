@@ -27,6 +27,11 @@ duplicate peaks. \code{"max"} retains the peak with the greatest total intensity
 \code{"least_sparse"} retains the peak detected in the greatest number of samples,
 and \code{"lambda"} retains peaks matching the preferred wavelength(s).}
 
+\item{lambda}{Character vector of preferred wavelength(s) to retain when
+\code{choose = "lambda"}. The function keeps the duplicate peak whose integration
+wavelength matches one of the supplied values. An error is thrown if none of
+the supplied values match any peak in the peak table.}
+
 \item{verbose}{Logical. Whether to print status to the console.}
 }
 \value{
@@ -34,14 +39,11 @@ A peak table derived from the original, but with columns corresponding
 to duplicate peaks combined according to the specified criteria.
 }
 \description{
-Identifies groups of duplicate peaks in a peak table and retain a single
+Identifies groups of duplicate peaks in a peak table and retains a single
 representative peak from each group. Peaks are considered duplicates when
-their retention times differ by less than \code{tol} and their
-Utility function to combine duplicate peaks in peak table, (i.e., peaks that
-were integrated at more than one wavelength or component) based on retention
-time and/or spectral similarity. Specify tolerance (\code{tol}) for
-retention time matching and minimum spectral correlation (\code{min.cor}) for
-a match.
+their retention times differ by less than \code{tol} and their spectral
+correlation exceeds \code{min.cor}. This is useful for collapsing peaks that were
+integrated at more than one wavelength or chromatographic component.
 }
 \examples{
 data(pk_tab)

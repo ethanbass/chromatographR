@@ -391,6 +391,59 @@ test_that("combine_peaks works", {
   expect_equal(rownames(pk_tab_c$tab), rownames(pk_tab$tab))
 })
 
+# Minimal synthetic peak_table for testing combine_peaks choose options.
+# V1 (lambda=210) and V2 (lambda=260) are duplicates: same RT, nearly identical
+# spectra. V3 is a distinct peak. V1 is present in all 3 samples (colSums=60);
+# V2 is missing in sample 3 (colSums=40, 2 obs).
+.base_spec <- sin(seq(0, pi, length.out = 20))
+pk2 <- structure(
+  list(
+    tab = data.frame(V1 = c(10, 20, 30), V2 = c(15, 25, NA), V3 = c(5, 8, 12),
+                     row.names = paste0("S", 1:3)),
+    pk_meta = data.frame(
+      V1 = c("210", "pk1", "5.000", "4.5", "5.5", "0.1", "0.01", "0.24", "0.99", "0.98"),
+      V2 = c("260", "pk1", "5.000", "4.5", "5.5", "0.1", "0.01", "0.24", "0.99", "0.98"),
+      V3 = c("210", "pk3", "10.00", "9.5", "10.5", "0.1", "0.01", "0.24", "0.99", "0.98"),
+      row.names = c("lambda", "peak", "rt", "start", "end", "sd", "tau", "FWHM",
+                    "r.squared", "purity"),
+      stringsAsFactors = FALSE
+    ),
+    ref_spectra = matrix(
+      c(.base_spec, .base_spec * 1.05, rev(.base_spec)),
+      nrow = 20, dimnames = list(as.character(seq(200, 390, length.out = 20)),
+                                 c("V1", "V2", "V3"))
+    ),
+    sample_meta = data.frame(row.names = paste0("S", 1:3)),
+    args = list()
+  ),
+  class = c("peak_table", "list")
+)
+
+test_that("combine_peaks choose = 'least_sparse' keeps peak present in most samples", {
+  res <- combine_peaks(pk2, choose = "least_sparse", verbose = FALSE)
+  expect_true("V1" %in% colnames(res$tab))
+  expect_false("V2" %in% colnames(res$tab))
+  expect_equal(colnames(res$tab), colnames(res$pk_meta))
+})
+
+test_that("combine_peaks choose = 'lambda' keeps preferred wavelength", {
+  res <- combine_peaks(pk2, choose = "lambda", lambda = "260", verbose = FALSE)
+  expect_true("V2" %in% colnames(res$tab))
+  expect_false("V1" %in% colnames(res$tab))
+  expect_equal(colnames(res$tab), colnames(res$pk_meta))
+})
+
+test_that("combine_peaks choose = 'lambda' errors when lambda not found in peak table", {
+  expect_error(
+    combine_peaks(pk2, choose = "lambda", lambda = "999", verbose = FALSE),
+    "None of the specified lambda"
+  )
+})
+
+test_that("combine_peaks choose = 'lambda' with lambda = NULL errors", {
+  expect_error(combine_peaks(pk2, choose = "lambda", verbose = FALSE),
+               "Please select preferred lambda")
+})
 test_that("merge_peaks works with max method", {
   pk_tab_m <- merge_peaks(pk_tab, peaks=c("V10","V11"))
   expect_equal(pk_tab_m$tab$V11, pmax(pk_tab$tab$V10, pk_tab$tab$V11))
