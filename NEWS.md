@@ -69,8 +69,9 @@
 * Fixed `reshape_chroms` so it returns a factor for the `sample` column.
 * Fixed `plot_chroms` so chromatograms are black when plotting a single chromatogram with plotly or ggplot.
 * Fixed error in equation describing spectral clustering in documentation for `get_peaktable`.
+* Fixed `get_peaktable` (with `clust = "sp.rt"`) to no longer take the absolute value of spectral similarity scores. Previously, `abs()` caused negatively correlated spectra to be treated as similar; now they are correctly penalized as dissimilar.
+* Fixed bug in FWHM calculation in `get_peaktable` for raw peak shape.
 * Made substantial revisions to documentation to improve clarity.
-* Fixed bug in FWHM calculation for raw peakshape.
 
 # chromatographR 0.7.5
 

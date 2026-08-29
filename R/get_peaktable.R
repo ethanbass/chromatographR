@@ -172,9 +172,11 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
         rescale(t(chrom_list[[file.idx[i]]][
           which(elementwise.all.equal(ts, pkcenters[i])),]))
       }, simplify = TRUE)
-      cor.matrix <- cor(sp, method = "pearson")
-      mint <- abs(outer(unlist(pkcenters), unlist(pkcenters), FUN="-"))
-      S <- (exp((-(1 - abs(cor.matrix))^2)/(2*sigma.r^2)))*exp(-(mint^2)/(2*sigma.t^2))
+      cor.spec <- cor(sp, method = "pearson")
+      rt.diff <- abs(outer(unlist(pkcenters), unlist(pkcenters), FUN="-"))
+      sim.spec <- exp((-(1 - cor.spec)^2)/(2*sigma.r^2))
+      sim.time <- exp(-(rt.diff^2)/(2*sigma.t^2))
+      S <- sim.spec*sim.time
       D <- 1 - S
       linkage <- "average"
       pkcenters.hcl <- fastcluster::hclust(as.dist(D), method = linkage)
