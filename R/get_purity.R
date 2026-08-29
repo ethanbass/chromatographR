@@ -29,7 +29,7 @@ get_purity <- function(x, pos, weight = 1, cutoff = 0.05,
                        noise_threshold = 0.01,
                        lambdas, try = TRUE){
   if (try){
-    try({
+    tryCatch({
       if (missing(lambdas)){
         lambdas <- seq_len(ncol(x))
       }
@@ -40,8 +40,7 @@ get_purity <- function(x, pos, weight = 1, cutoff = 0.05,
                              noise_variance = noise_variance,
                              lambdas = lambdas)
       mean(p[trim_peak(x, pos, cutoff = cutoff)] < 1, na.rm = TRUE)
-      }, NA
-    )
+      }, error = function(e) NA)
   } else NA
 }
 
