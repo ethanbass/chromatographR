@@ -135,23 +135,31 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' @param estimate_purity Logical. Whether to estimate purity or not. Defaults
 #' to `TRUE`.
 #' @param noise_threshold Noise threshold. Input to `get_purity`.
+#' @param baseline Whether to fit a baseline offset beneath each peak model.
+#' Options are `"none"` (no baseline, default), `"flat"` (constant offset), or
+#' `"sloped"` (linearly varying offset). Not available when `fit = "raw"`.
 #' @param ... Additional arguments to `find_peaks`.
 #' @return A matrix with one row per peak and the following columns:
 #' * `rt`: Peak maximum location.
 #' * `start`: Peak start (only included in table if `bounds = TRUE`).
 #' * `end`: Peak end (only included in table if `bounds = TRUE`).
 #' * `sd`: Peak standard deviation.
-#' * `tau`: Exponential decay constant (only included in table if 
+#' * `tau`: Exponential decay constant (only included in table if
 #' `fit = "egh"`).
-#' * `tau_right`: Exponential decay constant for right side of peak (when 
+#' * `tau_right`: Exponential decay constant for right side of peak (when
 #' `bemg` is selected).
-#' * `tau_left`: Exponential decay constant for left side of peak (when 
+#' * `tau_left`: Exponential decay constant for left side of peak (when
 #' `bemg` is selected).
 #' * `FWHM`: The full width at half maximum.
-#' * `height`: Peak height.
-#' * `area`: Peak area.
+#' * `height`: Peak height above the fitted baseline.
+#' * `area`: Peak area above the fitted baseline.
 #' * `r.squared`: The R<sup>2</sup> value for linear fit of the model to the data.
 #' * `purity`: The spectral purity of peak as assessed by [`get_purity`].
+#' * `floor`: Constant baseline offset (only when `baseline = "flat"`).
+#' * `floor_start`: Baseline level at the left edge of the peak window (only
+#' when `baseline = "sloped"`).
+#' * `floor_end`: Baseline level at the right edge of the peak window (only
+#' when `baseline = "sloped"`).
 #' The first five elements (`rt`, `start`, `end`, `sd` and `FWHM`) are expressed
 #' as index positions rather than absolute retention times. The transformation
 #' to real time is done in `get_peaks`.
@@ -178,10 +186,12 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 fit_peaks <- function (x, lambda, pos = NULL, sd_max = 50,
                        fit = c("bemg", "egh", "gaussian", "raw"),
                        max_iter = 1000, estimate_purity = TRUE,
-                       noise_threshold = .001, fit_floor = FALSE, ...){
+                       noise_threshold = .001,
+                       baseline = c("none", "flat", "sloped"), ...){
   lambda.idx <- get_lambda_idx(lambda, get_lambdas(x))
   y <- x[,lambda.idx]
   fit <- match.arg(fit, c("bemg", "egh", "gaussian", "raw"))
+  baseline <- match.arg(baseline, c("none", "flat", "sloped"))
   if (is.null(pos)){
     pos <- find_peaks(y = y, ...)
   }
@@ -194,21 +204,22 @@ fit_peaks <- function (x, lambda, pos = NULL, sd_max = 50,
                      "egh" = c("rt", "start", "end", "sd", "tau", "FWHM",
                                "height", "area", "r.squared", "purity"),
                      "bemg" = c("rt", "start", "end", "sd", "tau_right",
-                                "tau_left", "h", "FWHM", "height", "area",
-                                "r.squared", "purity"),
+                                "tau_left", "h", "center", "FWHM", "height",
+                                "area", "r.squared", "purity"),
                      "raw" = c("rt", "start", "end", "sd", "FWHM", "height",
-                                                      "area", "purity")
+                               "area", "purity")
   )
-  if (fit_floor && fit != "raw") tabnames <- c(tabnames, "floor")
-    noPeaksMat <- matrix(rep(NA, length(tabnames)),
-                         nrow = 1, dimnames = list(NULL, tabnames))
-    on.edge <- sapply(pos$pos, function(x){
-      x <= 1 || is.na(y[x + 1]) || is.na(y[x - 1])
-    })
-    pos <- pos[!on.edge,]
-    
-    if (nrow(pos) == 0) 
-      return(noPeaksMat)
+  if (baseline == "flat" && fit != "raw")    tabnames <- c(tabnames, "floor")
+  if (baseline == "sloped" && fit != "raw") tabnames <- c(tabnames, "floor_start", "floor_end")
+  noPeaksMat <- matrix(rep(NA, length(tabnames)),
+                       nrow = 1, dimnames = list(NULL, tabnames))
+  on.edge <- sapply(pos$pos, function(x){
+    x <= 1 || is.na(y[x + 1]) || is.na(y[x - 1])
+  })
+  pos <- pos[!on.edge,]
+
+  if (nrow(pos) == 0)
+    return(noPeaksMat)
   fitpk <- switch(fit,
                   "gaussian" = fitpk_gaussian,
                   "egh" = fitpk_egh,
@@ -218,7 +229,7 @@ fit_peaks <- function (x, lambda, pos = NULL, sd_max = 50,
                              lambda = lambda.idx, max_iter = max_iter,
                              estimate_purity = estimate_purity,
                              noise_threshold = noise_threshold,
-                             fit_floor = fit_floor)))
+                             baseline = baseline)))
   colnames(huhn) <- tabnames
   huhn <- data.frame(sapply(huhn, as.numeric, simplify = FALSE))
   if (!is.null(sd_max)) {
@@ -231,19 +242,19 @@ fit_peaks <- function (x, lambda, pos = NULL, sd_max = 50,
 #' Gaussian function
 #' @note: Adapted from <https://github.com/robertdouglasmorrison/DuffyTools/blob/master/R/gaussian.R>
 #' @noRd
-gaussian <- function(x, center = 0, width = 1, height = NULL, floor = 0){
-  
+gaussian <- function(x, center = 0, width = 1, height = NULL, floor = 0, slope = 0){
+
   # adapted from Earl F. Glynn;  Stowers Institute for Medical Research, 2007
   twoVar <- 2 * width * width
   sqrt2piVar <- sqrt( pi * twoVar)
   y <- exp( -( x - center)^2 / twoVar) / sqrt2piVar
-  
+
   # by default, the height is such that the curve has unit volume
   if ( ! is.null (height)) {
     scalefactor <- sqrt2piVar
     y <- y * scalefactor * height
   }
-  y + floor
+  y + floor + slope * (x - x[1])
 }
 
 #' Fit gaussian peak
@@ -251,41 +262,71 @@ gaussian <- function(x, center = 0, width = 1, height = NULL, floor = 0){
 #' @noRd
 fit_gaussian <- function(x, y, start.center = NULL,
                          start.width = NULL, start.height = NULL,
-                         start.floor = NULL, fit_floor = FALSE,
+                         start.floor = NULL, baseline = "none",
                          max_iter = 1000){
-  # estimate starting values
   who.max <- which.max(y)
   if (is.null(start.center)) start.center <- x[who.max]
   if (is.null(start.height)) start.height <- y[who.max]
-  if (is.null(start.width)) start.width <- sum( y > (start.height/2)) / 2
-  
-  # call the Nonlinear Least Squares, either fitting the floor too or not
-  controlList <- nls.control(maxiter = max_iter, minFactor = 1/512,
-                              warnOnly = TRUE)
-  starts <- list("center" = start.center, "width" = start.width,
-                  "height" = start.height)
+  if (is.null(start.width))  start.width  <- sum(y > (start.height / 2)) / 2
+
+  controlList <- nls.control(maxiter = max_iter, minFactor = 1/512, warnOnly = TRUE)
+  starts <- list("center" = start.center, "width" = start.width, "height" = start.height)
+
+  # Stage 1: shape only
   nlsAns <- try(minpack.lm::nlsLM(y ~ gaussian(x, center, width, height),
                        start = starts, control = controlList), silent = TRUE)
   nls_stage1 <- nlsAns
-  if (fit_floor) {
+
+  peak_width <- x[length(x)] - x[1]
+  if (peak_width == 0) peak_width <- 1
+  upper_floor <- max(min(y), 0)
+
+  # Stage 2: add constant floor
+  if (baseline != "none") {
     if (!inherits(nlsAns, "try-error")) starts <- as.list(coef(nlsAns))
     if (is.null(start.floor)) start.floor <- 0
     starts <- c(starts, "floor" = start.floor)
-    nlsAns <- try(minpack.lm::nlsLM(y ~ gaussian(x, center, width, height, floor),
-                       start = starts, control = controlList,
-                       lower = c(center = -Inf, width = -Inf, height = -Inf, floor = 0),
-                       upper = c(center = Inf, width = Inf, height = Inf,
-                                 floor = min(y))), silent = TRUE)
+    nlsAns <- try(minpack.lm::nlsLM(
+      y ~ gaussian(x, center, width, height, floor),
+      start = starts, control = controlList,
+      lower = c(center = -Inf, width = -Inf, height = -Inf, floor = 0),
+      upper = c(center = Inf, width = Inf, height = Inf, floor = upper_floor)
+    ), silent = TRUE)
   }
-  if (inherits(nlsAns, "try-error")){
-    floorAns <- if (fit_floor) start.floor else 0
-    if (fit_floor && !inherits(nls_stage1, "try-error")) {
-      s1 <- coef(nls_stage1)
-      yAns <- gaussian(x, s1["center"], s1["width"], s1["height"], floorAns)
-      out <- list("center" = s1["center"], "width" = s1["width"],
-                  "height" = s1["height"], "y" = yAns, "residual" = y - yAns)
+  nls_stage2 <- nlsAns
+
+  # Stage 3: slope via (floor_s, floor_e) so both endpoints are bounded >= 0
+  # and m$y stays consistent with baseline_vec in fitpk_*
+  if (baseline == "sloped") {
+    f0 <- if (!inherits(nlsAns, "try-error")) unname(coef(nlsAns)["floor"])
+          else if (!is.null(start.floor)) start.floor else 0
+    s3 <- c(as.list(if (!inherits(nlsAns, "try-error"))
+                      coef(nlsAns)[c("center", "width", "height")]
+                    else c(center = start.center, width = start.width, height = start.height)),
+            floor_s = f0, floor_e = f0)
+    nlsAns <- try(minpack.lm::nlsLM(
+      y ~ gaussian(x, center, width, height, floor_s, (floor_e - floor_s) / peak_width),
+      start = s3, control = controlList,
+      lower = c(center = -Inf, width = -Inf, height = -Inf, floor_s = 0, floor_e = 0)
+    ), silent = TRUE)
+  }
+
+  if (inherits(nlsAns, "try-error")) {
+    if (baseline == "sloped" && !inherits(nls_stage2, "try-error")) {
+      fb <- coef(nls_stage2)
+      floorAns <- unname(fb["floor"]); slopeAns <- 0
+      yAns <- gaussian(x, fb[1], fb[2], fb[3], floorAns, slopeAns)
+      out <- list("center" = fb[1], "width" = fb[2], "height" = fb[3],
+                  "y" = yAns, "residual" = y - yAns)
+    } else if (!inherits(nls_stage1, "try-error")) {
+      fb <- coef(nls_stage1)
+      floorAns <- if (baseline != "none") start.floor else 0; slopeAns <- 0
+      yAns <- gaussian(x, fb[1], fb[2], fb[3], floorAns, slopeAns)
+      out <- list("center" = fb[1], "width" = fb[2], "height" = fb[3],
+                  "y" = yAns, "residual" = y - yAns)
     } else {
-      yAns <- gaussian(x, start.center, start.width, start.height, floorAns)
+      floorAns <- if (baseline != "none") start.floor else 0; slopeAns <- 0
+      yAns <- gaussian(x, start.center, start.width, start.height, floorAns, slopeAns)
       out <- list("center" = start.center, "width" = start.width,
                   "height" = start.height, "y" = yAns, "residual" = y - yAns)
     }
@@ -293,9 +334,15 @@ fit_gaussian <- function(x, y, start.center = NULL,
     coefs <- coef(nlsAns)
     out <- list("center" = coefs[1], "width" = coefs[2], "height" = coefs[3],
                 "y" = fitted(nlsAns), "residual" = residuals(nlsAns))
-    floorAns <- if (fit_floor) coefs[4] else 0
+    if (baseline == "sloped") {
+      floorAns <- coefs["floor_s"]
+      slopeAns  <- (coefs["floor_e"] - coefs["floor_s"]) / peak_width
+    } else {
+      floorAns <- if (baseline != "none") coefs["floor"] else 0; slopeAns <- 0
+    }
   }
-  if (fit_floor) out <- c(out, "floor" = floorAns)
+  if (baseline != "none")    out <- c(out, "floor" = unname(floorAns))
+  if (baseline == "sloped")  out <- c(out, "slope" = unname(slopeAns))
   return(out)
 }
 
@@ -303,11 +350,11 @@ fit_gaussian <- function(x, y, start.center = NULL,
 
 #' Expontential-gaussian hybrid
 #' @noRd
-egh <- function(x, center, width,  height, tau, floor = 0){
+egh <- function(x, center, width, height, tau, floor = 0, slope = 0){
   result <- rep(0, length(x))
   index <- which(2*width^2 + tau*(x-center)>0)
   result[index] <- height*exp(-(x[index] - center)^2/(2*width^2 + tau*(x[index] - center)))
-  return(result + floor)
+  return(result + floor + slope * (x - x[1]))
 }
 
 
@@ -316,54 +363,73 @@ egh <- function(x, center, width,  height, tau, floor = 0){
 #' @noRd
 fit_egh <- function(x1, y1, start.center = NULL, start.width = NULL,
                     start.tau = NULL, start.height = NULL, start.floor = NULL,
-                    fit_floor = FALSE, max_iter = 1000) {
-  
-  # try to find the best egh to fit the given data
-  
-  # make some rough estimates from the values of Y
+                    baseline = "none", max_iter = 1000) {
+
   who.max <- which.max(y1)
-  if (is.null(start.center)){
-    start.center <- x1[who.max]
-  }
-  if (is.null(start.height)){
-    start.height <- y1[who.max]
-  }
-  if (is.null(start.width)){
-    start.width <- sum(y1 > (start.height/2)) / 2
-  }
-  if (is.null(start.tau)){
-    start.tau <- 0
-  }
-  # call the Nonlinear Least Squares, either fitting the floor too or not
-  controlList <- nls.control(maxiter = max_iter, minFactor = 1/512,
-                             warnOnly = TRUE)
-  starts <- list("center" = start.center, "width" = start.width, 
+  if (is.null(start.center)) start.center <- x1[who.max]
+  if (is.null(start.height)) start.height <- y1[who.max]
+  if (is.null(start.width))  start.width  <- sum(y1 > (start.height / 2)) / 2
+  if (is.null(start.tau))    start.tau    <- 0
+
+  controlList <- nls.control(maxiter = max_iter, minFactor = 1/512, warnOnly = TRUE)
+  starts <- list("center" = start.center, "width" = start.width,
                  "height" = start.height, "tau" = start.tau)
+
+  # Stage 1: shape only
   nlsAns <- try(minpack.lm::nlsLM(y1 ~ egh(x1, center, width, height, tau),
                       start = starts, control = controlList), silent = TRUE)
   nls_stage1 <- nlsAns
-  if (fit_floor) {
+
+  peak_width <- x1[length(x1)] - x1[1]
+  if (peak_width == 0) peak_width <- 1
+  upper_floor <- max(min(y1), 0)
+
+  # Stage 2: add constant floor
+  if (baseline != "none") {
     if (!inherits(nlsAns, "try-error")) starts <- as.list(coef(nlsAns))
     if (is.null(start.floor)) start.floor <- 0
     starts <- c(starts, "floor" = start.floor)
-    nlsAns <- try(minpack.lm::nlsLM(y1 ~ egh(x1, center, width, height, tau, floor),
-                      start = starts, control = controlList,
-                      lower = c(center = -Inf, width = -Inf, height = -Inf,
-                                tau = -Inf, floor = 0),
-                      upper = c(center = Inf, width = Inf, height = Inf,
-                                tau = Inf, floor = min(y1))), silent = TRUE)
+    nlsAns <- try(minpack.lm::nlsLM(
+      y1 ~ egh(x1, center, width, height, tau, floor),
+      start = starts, control = controlList,
+      lower = c(center = -Inf, width = -Inf, height = -Inf, tau = -Inf, floor = 0),
+      upper = c(center = Inf, width = Inf, height = Inf, tau = Inf, floor = upper_floor)
+    ), silent = TRUE)
+  }
+  nls_stage2 <- nlsAns
+
+  # Stage 3: slope via (floor_s, floor_e) so both endpoints are bounded >= 0
+  if (baseline == "sloped") {
+    f0 <- if (!inherits(nlsAns, "try-error")) unname(coef(nlsAns)["floor"])
+          else if (!is.null(start.floor)) start.floor else 0
+    s3 <- c(as.list(if (!inherits(nlsAns, "try-error"))
+                      coef(nlsAns)[c("center", "width", "height", "tau")]
+                    else c(center = start.center, width = start.width,
+                           height = start.height, tau = start.tau)),
+            floor_s = f0, floor_e = f0)
+    nlsAns <- try(minpack.lm::nlsLM(
+      y1 ~ egh(x1, center, width, height, tau, floor_s, (floor_e - floor_s) / peak_width),
+      start = s3, control = controlList,
+      lower = c(center = -Inf, width = -Inf, height = -Inf, tau = -Inf, floor_s = 0, floor_e = 0)
+    ), silent = TRUE)
   }
 
   if (inherits(nlsAns, "try-error")) {
-    floorAns <- if (fit_floor) start.floor else 0
-    if (fit_floor && !inherits(nls_stage1, "try-error")) {
-      s1 <- coef(nls_stage1)
-      yAns <- egh(x1, s1["center"], s1["width"], s1["height"], s1["tau"], floorAns)
-      out <- list("center" = s1["center"], "width" = s1["width"],
-                  "height" = s1["height"], "tau" = s1["tau"],
-                  "y" = yAns, "residual" = y1 - yAns)
+    if (baseline == "sloped" && !inherits(nls_stage2, "try-error")) {
+      fb <- coef(nls_stage2)
+      floorAns <- unname(fb["floor"]); slopeAns <- 0
+      yAns <- egh(x1, fb[1], fb[2], fb[3], fb[4], floorAns, slopeAns)
+      out <- list("center" = fb[1], "width" = fb[2], "height" = fb[3],
+                  "tau" = fb[4], "y" = yAns, "residual" = y1 - yAns)
+    } else if (!inherits(nls_stage1, "try-error")) {
+      fb <- coef(nls_stage1)
+      floorAns <- if (baseline != "none") start.floor else 0; slopeAns <- 0
+      yAns <- egh(x1, fb[1], fb[2], fb[3], fb[4], floorAns, slopeAns)
+      out <- list("center" = fb[1], "width" = fb[2], "height" = fb[3],
+                  "tau" = fb[4], "y" = yAns, "residual" = y1 - yAns)
     } else {
-      yAns <- egh(x1, start.center, start.width, start.height, start.tau, floorAns)
+      floorAns <- if (baseline != "none") start.floor else 0; slopeAns <- 0
+      yAns <- egh(x1, start.center, start.width, start.height, start.tau, floorAns, slopeAns)
       out <- list("center" = start.center, "width" = start.width,
                   "height" = start.height, "tau" = start.tau,
                   "y" = yAns, "residual" = y1 - yAns)
@@ -371,45 +437,59 @@ fit_egh <- function(x1, y1, start.center = NULL, start.width = NULL,
   } else {
     coefs <- coef(nlsAns)
     out <- list("center" = coefs[1], "width" = coefs[2], "height" = coefs[3],
-                "tau" = coefs[4], "y" = fitted(nlsAns),
-                "residual" = residuals(nlsAns))
-    floorAns <- if (fit_floor) coefs[5] else 0
+                "tau" = coefs[4], "y" = fitted(nlsAns), "residual" = residuals(nlsAns))
+    if (baseline == "sloped") {
+      floorAns <- coefs["floor_s"]
+      slopeAns  <- (coefs["floor_e"] - coefs["floor_s"]) / peak_width
+    } else {
+      floorAns <- if (baseline != "none") coefs["floor"] else 0; slopeAns <- 0
+    }
   }
 
-  if (fit_floor) out <- c(out, "floor" = floorAns)
+  if (baseline != "none")    out <- c(out, "floor" = unname(floorAns))
+  if (baseline == "sloped")  out <- c(out, "slope" = unname(slopeAns))
   return(out)
 }
 
 fitpk_bemg <- function(x, pos, lambda, max_iter,
                        estimate_purity = TRUE, noise_threshold = .001,
-                       fit_floor = FALSE){
+                       baseline = "none"){
   y <- x[,lambda]
   xloc <- pos[[1]]
   peak.loc <- seq.int(pos[2], pos[3])
   suppressWarnings(m <- fit_bemg(peak.loc, y[peak.loc], start.center = xloc,
                                  start.height = y[[xloc]], max_iter = max_iter,
-                                 fit_floor = fit_floor)
+                                 baseline = baseline)
   )
-  r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE)
+  r.squared <- suppressWarnings(try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE))
   purity <- get_purity(x = x, pos = pos, try = estimate_purity,
                        noise_threshold = noise_threshold)
-  floor_val <- if (fit_floor) unname(m$floor) else 0
-  y_above <- m$y - floor_val
-  area <- sum(diff(peak.loc) * mean(c(y_above[-1], tail(y_above, -1))))
-  result <- c("rt" = unname(round(m$center)), "start" = pos[[2]], "end" = pos[[3]],
+  floor_val <- if (baseline != "none") unname(m$floor) else 0
+  slope_val <- if (baseline == "sloped") unname(m$slope) else 0
+  baseline_vec <- floor_val + slope_val * (peak.loc - peak.loc[1])
+  y_above <- m$y - baseline_vec
+  area <- sum(diff(peak.loc) * (y_above[-length(y_above)] + y_above[-1]) / 2)
+  apex_idx <- which.max(y_above)
+  rt_val <- if (length(apex_idx) == 1L) peak.loc[apex_idx] else unname(round(m$center))
+  result <- c("rt" = rt_val, "start" = pos[[2]], "end" = pos[[3]],
     "sd" = unname(m$width), "tau_right" = unname(m$a), "tau_left" = unname(m$b),
-    "h" = unname(m$height), "FWHM" = 2.35 * unname(m$width),
-    "height" = unname(max(m$y)) - floor_val,
+    "h" = unname(m$height), "center" = unname(round(m$center)),
+    "FWHM" = 2.35 * unname(m$width),
+    "height" = unname(max(y_above)),
     "area" = area, "r.squared" = unname(r.squared),
     purity = purity)
-  if (fit_floor) c(result, floor = floor_val) else result
+  if (baseline == "flat")    result <- c(result, floor = floor_val)
+  if (baseline == "sloped") result <- c(result,
+    floor_start = floor_val,
+    floor_end   = floor_val + slope_val * (tail(peak.loc, 1) - peak.loc[1]))
+  result
 }
 
 #' Fit peak (gaussian)
 #' @noRd
 fitpk_gaussian <- function(x, pos, lambda, max_iter,
                            estimate_purity = TRUE, noise_threshold = .001,
-                           fit_floor = FALSE, ...){
+                           baseline = "none", ...){
   y <- x[,lambda]
   xloc <- pos[[1]]
   peak.loc <- seq.int(pos[2], pos[3])
@@ -417,57 +497,70 @@ fitpk_gaussian <- function(x, pos, lambda, max_iter,
                                      start.center = xloc,
                                      start.height = y[[xloc]],
                                      max_iter = max_iter,
-                                     fit_floor = fit_floor)
+                                     baseline = baseline)
   )
-  floor_val <- if (fit_floor) unname(m$floor) else 0
-  y_above <- m$y - floor_val
-  area <- sum(diff(peak.loc) * mean(c(y_above[-1], tail(y_above, -1))))
-  r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE)
+  floor_val <- if (baseline != "none") unname(m$floor) else 0
+  slope_val <- if (baseline == "sloped") unname(m$slope) else 0
+  baseline_vec <- floor_val + slope_val * (peak.loc - peak.loc[1])
+  y_above <- m$y - baseline_vec
+  area <- sum(diff(peak.loc) * (y_above[-length(y_above)] + y_above[-1]) / 2)
+  r.squared <- suppressWarnings(try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE))
   purity <- get_purity(x = x, pos = pos, try = estimate_purity,
                        noise_threshold = noise_threshold)
   result <- c("rt" = unname(m$center), "start" = pos[2], "end" = pos[3],
     "sd" = unname(m$width), "FWHM" = 2.35 * unname(m$width),
     "height" = unname(m$height), "area" = area,
     "r.squared" = unname(r.squared), purity = purity)
-  if (fit_floor) c(result, floor = floor_val) else result
+  if (baseline == "flat")    result <- c(result, floor = floor_val)
+  if (baseline == "sloped") result <- c(result,
+    floor_start = floor_val,
+    floor_end   = floor_val + slope_val * (tail(peak.loc, 1) - peak.loc[1]))
+  result
 }
 
 #' Fit peak (exponential-gaussian hybrid)
 #' @noRd
 fitpk_egh <- function(x, pos, lambda, max_iter,
                       estimate_purity = TRUE, noise_threshold = .001,
-                      fit_floor = FALSE){
+                      baseline = "none"){
   y <- x[,lambda]
   xloc <- pos[[1]]
   peak.loc <- seq.int(pos[2], pos[3])
   suppressWarnings(m <- fit_egh(peak.loc, y[peak.loc], start.center = xloc,
                                 start.height = y[[xloc]], max_iter = max_iter,
-                                fit_floor = fit_floor)
+                                baseline = baseline)
   )
-  r.squared <- try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE)
+  r.squared <- suppressWarnings(try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE))
   purity <- get_purity(x = x, pos = pos, try = estimate_purity,
                        noise_threshold = noise_threshold)
-  floor_val <- if (fit_floor) unname(m$floor) else 0
-  y_above <- m$y - floor_val
-  area <- sum(diff(peak.loc) * mean(c(y_above[-1], tail(y_above, -1))))
+  floor_val <- if (baseline != "none") unname(m$floor) else 0
+  slope_val <- if (baseline == "sloped") unname(m$slope) else 0
+  baseline_vec <- floor_val + slope_val * (peak.loc - peak.loc[1])
+  y_above <- m$y - baseline_vec
+  area <- sum(diff(peak.loc) * (y_above[-length(y_above)] + y_above[-1]) / 2)
   result <- c("rt" = unname(m$center), "start" = pos[2], "end" = pos[3],
     "sd" = unname(m$width), "tau" = unname(m$tau), "FWHM" = 2.35 * unname(m$width),
     "height" = unname(m$height), "area" = area,
     "r.squared" = unname(r.squared), purity = purity)
-  if (fit_floor) c(result, floor = floor_val) else result
+  if (baseline == "flat")    result <- c(result, floor = floor_val)
+  if (baseline == "sloped") result <- c(result,
+    floor_start = floor_val,
+    floor_end   = floor_val + slope_val * (tail(peak.loc, 1) - peak.loc[1]))
+  result
 }
 
 #' Fit peak (raw)
 #' @noRd
 fitpk_raw <- function(x, pos, lambda, max_iter,
                       estimate_purity = TRUE, noise_threshold = .001,
-                      fit_floor = FALSE){
+                      baseline = "none"){
   y <- x[,lambda]
   xloc <- pos[1]
   peak.loc <- seq.int(pos[2], pos[3])
   
   # perform trapezoidal integration on raw signal
-  area <- sum(diff(peak.loc) * mean(c(y[peak.loc][-1], tail(y[peak.loc],-1))))
+  yp <- y[peak.loc]
+  area <- sum(diff(peak.loc) * (yp[-length(yp)] + yp[-1]) / 2)
   purity <- get_purity(x = x, pos = pos, try = estimate_purity,
                        noise_threshold = noise_threshold)
   c("rt" = pos[1], "start" = pos[2], "end" = pos[3], 
@@ -533,16 +626,16 @@ pinv <- function (A, tol = .Machine$double.eps^(2/3)) {
 
 #' Bi-Exponentially Modified Gaussian
 #' @noRd
-bemg <- function(x, center, width, height, a, b, floor = 0) {
+bemg <- function(x, center, width, height, a, b, floor = 0, slope = 0) {
   tm <- x - center
   as2 <- a * width^2
   bs2 <- b * width^2
   sq2s2 <- sqrt(2 * width^2)
-  
+
   tau_right <- exp(a * as2 / 2 + a * tm) * erfc((as2 + tm) / sq2s2)
-  tau_left <- exp(b * bs2 / 2 - b * tm) * erfc((bs2 - tm) / sq2s2)
-  
-  return(floor + height * 0.5 * (tau_right + tau_left))
+  tau_left  <- exp(b * bs2 / 2 - b * tm) * erfc((bs2 - tm) / sq2s2)
+
+  return(floor + slope * (x - x[1]) + height * 0.5 * (tau_right + tau_left))
 }
 
 #' Fit Bi-Exponentially Modified Gaussian peak
@@ -550,48 +643,85 @@ bemg <- function(x, center, width, height, a, b, floor = 0) {
 #' @noRd
 fit_bemg <- function(x1, y1, start.center = NULL, start.width = NULL,
                      start.a = NULL, start.b = NULL, start.height = NULL,
-                     start.floor = NULL, fit_floor = FALSE, max_iter = 1000) {
-  
+                     start.floor = NULL, baseline = "none", max_iter = 1000) {
+
   who.max <- which.max(y1)
   if (is.null(start.center)) start.center <- x1[who.max]
   if (is.null(start.height)) start.height <- y1[who.max]
   if (is.null(start.width))  start.width  <- sum(y1 > (start.height / 2)) / 2
   if (is.null(start.a))      start.a      <- 1.0
   if (is.null(start.b))      start.b      <- 1.0
-  
-  controlList <- nls.control(maxiter = max_iter, minFactor = 1/512,
-                             warnOnly = TRUE)
+
+  controlList <- nls.control(maxiter = max_iter, minFactor = 1/512, warnOnly = TRUE)
   starts <- list(center = start.center, width = start.width,
                  height = start.height, a = start.a, b = start.b)
-  
+
+  # Stage 1: shape only
   upper <- c(center = Inf, width = Inf, height = 5 * start.height, a = Inf, b = Inf)
   nlsAns <- try(minpack.lm::nlsLM(
     y1 ~ bemg(x1, center, width, height, a, b),
     start = starts, control = controlList, upper = upper), silent = TRUE)
   nls_stage1 <- nlsAns
-  if (fit_floor) {
-    if (!inherits(nlsAns, "try-error")) {
-      starts <- as.list(coef(nlsAns))
-    }
+
+  peak_width <- x1[length(x1)] - x1[1]
+  if (peak_width == 0) peak_width <- 1
+  upper_floor <- max(min(y1), 0)
+
+  # Stage 2: add constant floor
+  if (baseline != "none") {
+    if (!inherits(nlsAns, "try-error")) starts <- as.list(coef(nlsAns))
     if (is.null(start.floor)) start.floor <- 0
     starts <- c(starts, floor = start.floor)
     nlsAns <- try(minpack.lm::nlsLM(
       y1 ~ bemg(x1, center, width, height, a, b, floor),
       start = starts, control = controlList,
+      lower = c(center = -Inf, width = -Inf, height = -Inf, a = -Inf, b = -Inf, floor = 0),
       upper = c(center = Inf, width = Inf, height = 5 * start.height,
-                a = Inf, b = Inf, floor = min(y1))), silent = TRUE)
+                a = Inf, b = Inf, floor = upper_floor)
+    ), silent = TRUE)
+  }
+  nls_stage2 <- nlsAns
+
+  # Stage 3: slope via (floor_s, floor_e) so both endpoints are bounded >= 0
+  if (baseline == "sloped") {
+    f0 <- if (!inherits(nlsAns, "try-error")) unname(coef(nlsAns)["floor"])
+          else if (!is.null(start.floor)) start.floor else 0
+    s3 <- c(as.list(if (!inherits(nlsAns, "try-error"))
+                      coef(nlsAns)[c("center", "width", "height", "a", "b")]
+                    else c(center = start.center, width = start.width,
+                           height = start.height, a = start.a, b = start.b)),
+            floor_s = f0, floor_e = f0)
+    nlsAns <- try(minpack.lm::nlsLM(
+      y1 ~ bemg(x1, center, width, height, a, b, floor_s, (floor_e - floor_s) / peak_width),
+      start = s3, control = controlList,
+      lower = c(center = -Inf, width = -Inf, height = -Inf, a = -Inf, b = -Inf,
+                floor_s = 0, floor_e = 0),
+      upper = c(center = Inf, width = Inf, height = 5 * start.height,
+                a = Inf, b = Inf, floor_s = Inf, floor_e = Inf)
+    ), silent = TRUE)
   }
 
   if (inherits(nlsAns, "try-error")) {
-    floorAns <- if (fit_floor) start.floor else 0
-    if (fit_floor && !inherits(nls_stage1, "try-error")) {
-      s1 <- coef(nls_stage1)
-      yAns <- bemg(x1, s1["center"], s1["width"], s1["height"], s1["a"], s1["b"], floorAns)
-      out <- list(center = s1["center"], width = s1["width"], height = s1["height"],
-                  a = s1["a"], b = s1["b"], y = yAns, residual = y1 - yAns)
+    if (baseline == "sloped" && !inherits(nls_stage2, "try-error")) {
+      fb <- coef(nls_stage2)
+      floorAns <- unname(fb["floor"]); slopeAns <- 0
+      yAns <- bemg(x1, fb["center"], fb["width"], fb["height"],
+                   fb["a"], fb["b"], floorAns, slopeAns)
+      out <- list(center = fb["center"], width = fb["width"],
+                  height = fb["height"], a = fb["a"], b = fb["b"],
+                  y = yAns, residual = y1 - yAns)
+    } else if (!inherits(nls_stage1, "try-error")) {
+      fb <- coef(nls_stage1)
+      floorAns <- if (baseline != "none") start.floor else 0; slopeAns <- 0
+      yAns <- bemg(x1, fb["center"], fb["width"], fb["height"],
+                   fb["a"], fb["b"], floorAns, slopeAns)
+      out <- list(center = fb["center"], width = fb["width"],
+                  height = fb["height"], a = fb["a"], b = fb["b"],
+                  y = yAns, residual = y1 - yAns)
     } else {
+      floorAns <- if (baseline != "none") start.floor else 0; slopeAns <- 0
       yAns <- bemg(x1, start.center, start.width, start.height,
-                   start.a, start.b, floorAns)
+                   start.a, start.b, floorAns, slopeAns)
       out <- list(center = start.center, width = start.width,
                   height = start.height, a = start.a, b = start.b,
                   y = yAns, residual = y1 - yAns)
@@ -601,10 +731,16 @@ fit_bemg <- function(x1, y1, start.center = NULL, start.width = NULL,
     out <- list(center = coefs["center"], width = coefs["width"],
                 height = coefs["height"], a = coefs["a"], b = coefs["b"],
                 y = fitted(nlsAns), residual = residuals(nlsAns))
-    floorAns <- if (fit_floor) coefs["floor"] else 0
+    if (baseline == "sloped") {
+      floorAns <- coefs["floor_s"]
+      slopeAns  <- (coefs["floor_e"] - coefs["floor_s"]) / peak_width
+    } else {
+      floorAns <- if (baseline != "none") coefs["floor"] else 0; slopeAns <- 0
+    }
   }
 
-  if (fit_floor) out <- c(out, floor = floorAns)
+  if (baseline != "none")    out <- c(out, floor = unname(floorAns))
+  if (baseline == "sloped")  out <- c(out, slope = unname(slopeAns))
   return(out)
 }
 
