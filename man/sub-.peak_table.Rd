@@ -22,7 +22,7 @@ A \code{peak_table} object.
 }
 \description{
 Subsets a \code{peak_table} while preserving and subsetting all associated
-slots (\code{tab}, \code{pk_meta}, \code{sample_meta}, \code{ref_spectra}).
+slots (\code{tab}, \code{pk_meta}, \code{sample_meta}, \code{instrument_meta}, \code{ref_spectra}).
 }
 \note{
 Subsetting a \code{peak_table} does not modify the associated \code{chrom_list}.

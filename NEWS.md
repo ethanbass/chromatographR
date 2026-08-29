@@ -39,8 +39,6 @@
 * Added `[` method for `peak_list` objects to preserve metadata attributes when subsetting.
 * Added `print` method for `peak_list` objects, summarizing samples, wavelengths, fit method, and peak counts.
 
-### Bug fixes and other minor changes
-
 #### Enhancements
 
 * Preprocess can now take nested lists containing a `dad` element in each list. This change allows better compatibility with chromConverter.
@@ -71,6 +69,7 @@
 * Fixed error in equation describing spectral clustering in documentation for `get_peaktable`.
 * Fixed `get_peaktable` (with `clust = "sp.rt"`) to no longer take the absolute value of spectral similarity scores. Previously, `abs()` caused negatively correlated spectra to be treated as similar; now they are correctly penalized as dissimilar.
 * Fixed bug in FWHM calculation in `get_peaktable` for raw peak shape.
+* Fixed bug in `subset.peak_table()` where `sample_meta` was subset based on the wrong condition, so it was sometimes not filtered by `subset`.
 * Made substantial revisions to documentation to improve clarity.
 
 # chromatographR 0.7.5

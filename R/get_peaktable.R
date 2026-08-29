@@ -90,6 +90,8 @@
 #' peaks in each cluster according to `summarize_by`.
 #' * `sample_meta`: A `data.frame` of sample metadata. Must be added using
 #' [`attach_metadata`].
+#' * `instrument_meta`: A `data.frame` of instrumental metadata transferred
+#' automatically from the chromatograms.
 #' * `ref_spectra`: A `data.frame` of reference spectra (in a wavelength × 
 #' peak configuration). Must be added using [`attach_ref_spectra`].
 #' * `args`: A vector of arguments given to [`get_peaktable`] to 
@@ -257,6 +259,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
                  pk_meta = as.structure(t(do.call("rbind", lapply(result, 
                                                         function(x) x[[2]])))),
                  sample_meta = NA,
+                 instrument_meta = chromConverter::extract_metadata(peak_list),
                  ref_spectra = NA,
                  args = list(peak_list = deparse(substitute(peak_list)),
                         chrom_list = attr(peak_list, "chrom_list"),

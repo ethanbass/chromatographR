@@ -9,7 +9,7 @@ write_peaktable(
   path,
   filename = "peak_table",
   format = c("csv", "xlsx"),
-  what = c("tab", "pk_meta", "sample_meta", "ref_spectra", "args")
+  what = c("tab", "pk_meta", "sample_meta", "instrument_meta", "ref_spectra", "args")
 )
 }
 \arguments{
@@ -21,7 +21,9 @@ write_peaktable(
 
 \item{format}{File format to export. Either \code{csv} or \code{xlsx}.}
 
-\item{what}{Which elements of the \code{peak_table} to export.}
+\item{what}{Which elements of the \code{peak_table} to export. One or more of
+\code{"tab"}, \code{"pk_meta"}, \code{"sample_meta"}, \code{"instrument_meta"},
+\code{"ref_spectra"}, and \code{"args"}.}
 }
 \value{
 No return value. The function is called for its side effects.

@@ -15,6 +15,8 @@
 #' component, peak number, and average retention time).
 #' * `sample_meta`: A `data.frame` of sample meta-data. Must be added using
 #' [`attach_metadata`].
+#' * `instrument_meta`: A `data.frame` of instrumental metadata transferred
+#' automatically from the chromatograms.
 #' * `ref_spectra`: A `data.frame` of reference spectra (in a wavelength x peak
 #' configuration). Must be added using [`attach_ref_spectra`].
 #' * `args`: A vector of arguments given to [`get_peaktable`] to generate

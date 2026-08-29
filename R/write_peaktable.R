@@ -6,7 +6,9 @@
 #' @param path Path to write file.
 #' @param filename File name. Defaults to `"peak_table"`.
 #' @param format File format to export. Either `csv` or `xlsx`.
-#' @param what Which elements of the `peak_table` to export.
+#' @param what Which elements of the `peak_table` to export. One or more of
+#' `"tab"`, `"pk_meta"`, `"sample_meta"`, `"instrument_meta"`,
+#' `"ref_spectra"`, and `"args"`.
 #' @importFrom utils write.csv
 #' @return No return value. The function is called for its side effects.
 #' @section Side effects:
@@ -22,7 +24,7 @@
 write_peaktable <- function(peak_table, path, filename = "peak_table",
                             format=c("csv", "xlsx"),
                              what = c("tab", "pk_meta", "sample_meta",
-                                      "ref_spectra", "args")){
+                                      "instrument_meta", "ref_spectra", "args")){
   check_peaktable(peak_table)
   if (missing(path)){
     stop("Please provide a path to write the files.")
@@ -30,19 +32,20 @@ write_peaktable <- function(peak_table, path, filename = "peak_table",
   if (!fs::dir_exists(path)){
     stop("The specified directory does not exist.")
   }
-  what <- match.arg(what, c("tab", "pk_meta",
-                            "sample_meta", "ref_spectra",
+  what <- match.arg(what, c("tab", "pk_meta", "sample_meta",
+                            "instrument_meta", "ref_spectra",
                             "args"), several.ok = TRUE)
   format <- match.arg(format, c("csv", "xlsx"))
   sheets <- list("tab" = peak_table$tab,
                  "pk_meta" = peak_table$pk_meta,
                  "sample_meta" = peak_table$sample_meta,
+                 "instrument_meta" = peak_table$instrument_meta,
                  "ref_spectra" = peak_table$ref_spectra,
                  "args" = as.matrix(peak_table$args)
   )
 
   sheets <- sheets[what]
-  
+
   if (format == "csv"){
     writer <- purrr::partial(write_csvs, filename = filename)
   } else if (format == "xlsx"){
@@ -51,6 +54,7 @@ write_peaktable <- function(peak_table, path, filename = "peak_table",
       names(sheets) <- c(tab = "Peak Table",
                          pk_meta = "Peak Metadata",
                          sample_meta = "Sample Metadata",
+                         instrument_meta = "Instrument Metadata",
                          ref_spectra = "Reference Spectra",
                          args = "Arguments")[what]
       path <- fs::path(path, filename, ext = "xlsx")

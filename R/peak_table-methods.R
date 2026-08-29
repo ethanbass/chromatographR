@@ -59,7 +59,7 @@ row.names.peak_table <- function(x, ...){
 #' 
 #' @param x A [`peak_table`] object.
 #' @param subset Logical expression indicating rows (samples) to keep from
-#' `peak_table`; missing values are taken as false.
+#' `peak_table`; missing values are taken as `FALSE`.
 #' @param select Logical expression indicating columns (peaks) to select from
 #' `peak_table`.
 #' @param drop Logical. Passed to indexing operator.
@@ -73,12 +73,15 @@ row.names.peak_table <- function(x, ...){
 subset.peak_table <- function(x, subset, select, drop = FALSE, ...){
   x$tab <- subset(x$tab, subset = subset, 
                   select = select, drop = drop)
-  if (!is.null(dim(x$ref_spectra))){
+  if (!missing(subset) && is_attached(x$sample_meta)){
     x$sample_meta <- subset(x$sample_meta, subset = subset, drop = drop)
+  }
+  if (!missing(subset) && is_attached(x$instrument_meta)){
+    x$instrument_meta <- subset(x$instrument_meta, subset = subset, drop = drop)
   }
   if (!missing(select)){
     x$pk_meta <- subset(x$pk_meta, select = select, drop = drop)
-    if (!is.null(dim(x$ref_spectra))){
+    if (is_attached(x$ref_spectra)){
       x$ref_spectra <- subset(x$ref_spectra, select = select, drop = drop)
     }
   }
@@ -96,11 +99,9 @@ subset.peak_table <- function(x, subset, select, drop = FALSE, ...){
 #' @method summary peak_table
 #' @keywords internal
 #' @export
-#' @return A list containing basic information about the supplied 
-#' `peak_table` object.
+#' @return A list containing basic information about the supplied `peak_table`.
 summary.peak_table <- function(object, ...) {
   
-  # Calculate summary statistics
   intensities <- as.vector(as.matrix(object$tab))
   intensities <- intensities[!is.na(intensities)]
   
@@ -180,7 +181,7 @@ print.peak_table <- function(x, ...){
 #' Subset peak table
 #'
 #' Subsets a `peak_table` while preserving and subsetting all associated
-#' slots (`tab`, `pk_meta`, `sample_meta`, `ref_spectra`).
+#' slots (`tab`, `pk_meta`, `sample_meta`, `instrument_meta`, `ref_spectra`).
 #'
 #' @note Subsetting a `peak_table` does not modify the associated `chrom_list`.
 #' Methods that rely on the `chrom_list` (e.g., [`plot_spectrum`]) may not work
@@ -198,8 +199,8 @@ print.peak_table <- function(x, ...){
 #' @export
 
 `[.peak_table` <- function(x, i, j, ..., drop = FALSE) {
-  if (missing(i)) i <- seq_len(nrow(x$tab))
-  if (missing(j)) j <- seq_len(ncol(x$tab))
+  if (missing(i)) i <- TRUE
+  if (missing(j)) j <- TRUE
   
   x$tab <- x$tab[i, j, drop = drop]
   
@@ -208,6 +209,9 @@ print.peak_table <- function(x, ...){
   
   if (is_attached(x$sample_meta))
     x$sample_meta <- x$sample_meta[i, , drop = drop]
+  
+  if (is_attached(x$instrument_meta))
+    x$instrument_meta <- x$instrument_meta[i, , drop = drop]
   
   if (is_attached(x$ref_spectra))
     x$ref_spectra <- x$ref_spectra[, j, drop = drop]

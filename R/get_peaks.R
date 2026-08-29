@@ -171,6 +171,10 @@ get_peaks <- function(chrom_list, lambdas,
     if (collapse){
       ptable <- do.call(rbind, ptable)
     }
+    ptable <- transfer_metadata(ptable, chrom_list[[sample]], 
+                                exclude = c('names','row.names','dim',
+                                              'dimnames', "format_out", 
+                                              "data_format", "parser"))
     ptable
   })
   names(result) <- names(chrom_list)

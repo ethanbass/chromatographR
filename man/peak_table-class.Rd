@@ -18,6 +18,8 @@ sample x peak configuration.
 component, peak number, and average retention time).
 \item \code{sample_meta}: A \code{data.frame} of sample meta-data. Must be added using
 \code{\link{attach_metadata}}.
+\item \code{instrument_meta}: A \code{data.frame} of instrumental metadata transferred
+automatically from the chromatograms.
 \item \code{ref_spectra}: A \code{data.frame} of reference spectra (in a wavelength x peak
 configuration). Must be added using \code{\link{attach_ref_spectra}}.
 \item \code{args}: A vector of arguments given to \code{\link{get_peaktable}} to generate
