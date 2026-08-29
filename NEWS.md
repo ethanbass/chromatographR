@@ -37,7 +37,7 @@
 
 #### Enhancements
 
-* Added `baseline` argument to `get_peaks` and `fit_peaks` for fitting a local baseline beneath each peak. Options are `"none"` (default, no baseline), `"flat"` (constant offset), and `"sloped"`. Peak heights and areas are computed above the fitted baseline.
+* Added support for fitting a local baseline beneath each peak through the `baseline` argument in `get_peaks`. Options are `"none"` (default, no baseline), `"flat"` (constant offset), and `"sloped"`. Peak heights and areas are computed above the fitted baseline.
 * Added support for plotting spectra from multiple chromatograms in `plot_spectrum` by supplying a vector to `idx` (e.g. `idx = c(1, 2, 4)`). Overlaid traces and spectra are color-coded by sample.
 * Added new options to `combine_peaks` (`"least_sparse"` and `"lambda"`) via the `choose` argument: `"least_sparse"` retains the peak detected in the greatest number of samples; `"lambda"` retains the peak measured at a preferred wavelength (supplied via the new `lambda` argument), falling back to `"max"` when no match is found.
 * Preprocess can now take nested lists containing a `dad` element in each list. This change allows better compatibility with chromConverter.
