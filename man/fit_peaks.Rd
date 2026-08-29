@@ -9,7 +9,7 @@ fit_peaks(
   lambda,
   pos = NULL,
   sd_max = 50,
-  fit = c("bemg", "egh", "gaussian", "raw"),
+  fit = c("egh", "bemg", "gaussian", "raw"),
   max_iter = 1000,
   estimate_purity = TRUE,
   noise_threshold = 0.001,
@@ -30,7 +30,7 @@ automatically to find peak positions.}
 \item{fit}{Peak model to use. Options include \code{"bemg"} (bidirectional
 exponentially modified Gaussian), \code{"egh"} (exponential-Gaussian hybrid),
 \code{"gaussian"}, and \code{"raw"}. If \code{raw} is selected, peaks are integrated using
-trapezoidal integration without model fitting. Defaults to \code{"bemg"}.}
+trapezoidal integration without model fitting. Defaults to \code{"egh"}.}
 
 \item{max_iter}{Maximum number of iterations to use in nonlinear least
 squares peak-fitting. Defaults to \code{1000}.}

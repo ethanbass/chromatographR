@@ -7,7 +7,7 @@
 get_peaks(
   chrom_list,
   lambdas,
-  fit = c("bemg", "egh", "gaussian", "raw"),
+  fit = c("egh", "bemg", "gaussian", "raw"),
   sd_max = 50,
   max_iter = 100,
   time_unit = c("min", "s", "ms"),
@@ -34,7 +34,7 @@ find peaks at. For one-dimensional chromatograms, this argument can be ignored.}
 exponentially modified gaussian (\code{"bemg"}), exponential-gaussian
 hybrid (\code{"egh"}), \code{"gaussian"}, or \code{"raw"}. The \code{raw} setting
 performs trapezoidal integration directly on the raw data without fitting a
-model to the data. Defaults to \code{bemg}.}
+model to the data. Defaults to \code{egh}.}
 
 \item{sd_max}{Maximum width (standard deviation) for peaks. Defaults to \code{50}.}
 

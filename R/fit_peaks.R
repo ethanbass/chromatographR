@@ -129,7 +129,7 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' @param fit Peak model to use. Options include `"bemg"` (bidirectional 
 #' exponentially modified Gaussian), `"egh"` (exponential-Gaussian hybrid),
 #' `"gaussian"`, and `"raw"`. If `raw` is selected, peaks are integrated using
-#' trapezoidal integration without model fitting. Defaults to `"bemg"`.
+#' trapezoidal integration without model fitting. Defaults to `"egh"`.
 #' @param max_iter Maximum number of iterations to use in nonlinear least
 #' squares peak-fitting. Defaults to `1000`.
 #' @param estimate_purity Logical. Whether to estimate purity or not. Defaults
@@ -184,13 +184,13 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' @md
 
 fit_peaks <- function (x, lambda, pos = NULL, sd_max = 50,
-                       fit = c("bemg", "egh", "gaussian", "raw"),
+                       fit = c("egh", "bemg", "gaussian", "raw"),
                        max_iter = 1000, estimate_purity = TRUE,
                        noise_threshold = .001,
                        baseline = c("none", "flat", "sloped"), ...){
   lambda.idx <- get_lambda_idx(lambda, get_lambdas(x))
   y <- x[,lambda.idx]
-  fit <- match.arg(fit, c("bemg", "egh", "gaussian", "raw"))
+  fit <- match.arg(fit, c("egh", "bemg", "gaussian", "raw"))
   baseline <- match.arg(baseline, c("none", "flat", "sloped"))
   if (is.null(pos)){
     pos <- find_peaks(y = y, ...)
