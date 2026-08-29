@@ -31,7 +31,7 @@
 #' exponentially modified gaussian (`"bemg"`), exponential-gaussian
 #' hybrid (`"egh"`), `"gaussian"`, or `"raw"`. The `raw` setting 
 #' performs trapezoidal integration directly on the raw data without fitting a 
-#' model to the data. Defaults to `bemg`.
+#' model to the data. Defaults to `egh`.
 #' @param sd_max Maximum width (standard deviation) for peaks. Defaults to `50`.
 #' @param sd.max The `sd.max` argument is deprecated. Please use `sd_max` instead.
 #' @param max_iter Maximum number of iterations for non-linear least squares
@@ -142,7 +142,7 @@
 #' @md
 
 get_peaks <- function(chrom_list, lambdas,
-                      fit = c("bemg", "egh", "gaussian", "raw"),
+                      fit = c("egh", "bemg", "gaussian", "raw"),
                       sd_max = 50, max_iter = 100,
                       time_unit = c("min", "s", "ms"),
                       baseline = c("none", "flat", "sloped"),
@@ -155,7 +155,7 @@ get_peaks <- function(chrom_list, lambdas,
   time_unit <- resolve_deprecated(time.units, time_unit)
   time_unit <- match.arg(time_unit, c("min", "s", "ms"))
   tfac <- switch(time_unit, "min" = 1, "s" = 60, "ms" = 60*1000)
-  fit <- match.arg(fit, c("bemg", "egh", "gaussian", "raw"))
+  fit <- match.arg(fit, c("egh", "bemg", "gaussian", "raw"))
   baseline <- match.arg(baseline, c("none", "flat", "sloped"))
   chrom_list_string <- deparse(substitute(chrom_list))
   if (class(chrom_list)[1] == "matrix")

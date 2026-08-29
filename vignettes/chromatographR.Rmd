@@ -70,7 +70,7 @@ matplot(x = tpoints, y = ptw::baseline.corr(Sa[[i]][,wavelength], p = .1, lambda
        type = 'l', add = TRUE, col='firebrick2', lty = 3)
 ```
 
-After selecting parameters for baseline correction, you can proceed with the pre-processing step as shown below. For 2D data with just one column, the `dim2` argument should be left blank.
+After selecting parameters for baseline correction, you can proceed with the pre-processing step as shown below. For 2D data (e.g., from a single-wavelength detector), the `dim2` argument should be left blank.
 
 ```{r preprocessing}
 # choose dimensions for interpolation
@@ -137,7 +137,7 @@ Chromatograms can also be visualized as heatmaps with `plot_chroms_heatmap`, whi
 
 ```{r plot-chroms-heatmap, fig.height = 6, fig.cap = "Comparison of variable penalty dynamic time warping (VPdtw) aligned chromatograms (top) with raw data (bottom) via heatmap plot."}
 par(mfrow=c(3,1))
-plot_chroms_heatmap(dat.pr, lambdas = 210, show_legend = FALSE, 
+plot_chroms_heatmap(dat.pr, lambdas = 210, show_legend = FALSE,
                     title="Raw data")
 plot_chroms_heatmap(warp_ptw, lambdas = 210, show_legend = FALSE,
                     title="Parametric Time Warping (PTW)")
@@ -149,7 +149,7 @@ In this case the alignments produced by the two algorithms are quite similar, bu
 
 ### Peak detection and integration
 
-The `get_peaks` function produced a nested list of peaks by looping through the supplied chromatograms at the specified wavelengths, finding peaks, and fitting them to the specified function using non-linear least squares. The area under the curve for each peak is then estimated using trapezoidal approximation. The `fit` argument can be used to specify a peak-fitting model. The current options are exponential-gaussian hybrid (`egh`) [@lan2001] (the default setting) or `gaussian`. Alternatively, peak areas can be integrated without applying a model (`fit = raw`). The function returns a nested list of data.frames containing parameters for the peaks identified in each chromatogram.
+The `get_peaks` function produced a nested list of peaks by looping through the supplied chromatograms at the specified wavelengths, finding peaks, and fitting them to the specified function using non-linear least squares. The area under the curve for each peak is then estimated using trapezoidal approximation. The `fit` argument can be used to specify a peak-fitting model. By default, peaks will be fit to an exponential-gaussian hybrid function (`"egh"`) [@lan2001]. Other options include the bidirectional exponentially modified gaussian (`"bemg"`) or `"gaussian"`. Alternatively, peak areas can be integrated without applying a model (`fit = "raw"`). The function returns a nested list of data.frames containing parameters for the peaks identified in each chromatogram.
 
 ```{r get-peaks, message = FALSE, warning = FALSE}
 # find and integrate peaks using exponential-gaussian hybrid model

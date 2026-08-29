@@ -2,7 +2,7 @@
 
 ### Breaking changes
 
-* Added support for bidirectional exponentially modified gaussian (BEMG) peak shape, now used as the new default for peak fitting.
+* Added support for bidirectional exponentially modified gaussian (BEMG) peak shape (`fit = "bemg"` in `get_peaks`/`fit_peaks`). The default peak shape remains `"egh"` for now but this may change in a future release.
 * Added `summarize_by` argument to `get_peaktable` controlling how peak metadata (e.g., retention time) are summarized across peaks within each cluster. The new default (`"weighted.mean"`) weights peaks by their intensity, making it more robust to the presence of small noisy peaks which may skew the results of aggregation, especially when the dominant peak does not occur in every sample. Alternative options include `"mean"`, `"median"`, and `"max"`, the last of which uses the most intense peak in each cluster directly rather than aggregating. To reproduce previous behavior, set `summarize_by = "mean"`.
 * Added automatic thinning of chromatograms in `plot_chroms` to speed up plotting of raw data. The time resolution can be adjusted with the new `time_resolution` argument.
 * Changed behavior of `plot_chroms` so legend is no longer displayed by default to avoid overloading plots with many chromatograms.
