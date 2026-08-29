@@ -98,6 +98,7 @@ test_that("correct_rt works", {
 })
 
 test_that("correct_rt works with VPdtw", {
+  skip_on_cran()
   warp <- correct_rt(dat.pr, lambdas = "210", alg = "vpdtw")
   expect_equal(names(warp), names(dat.pr[1:2]))
   expect_equal(colnames(warp[[1]]), colnames(dat.pr[[1]]), ignore_attr = TRUE)
@@ -444,6 +445,7 @@ test_that("combine_peaks choose = 'lambda' with lambda = NULL errors", {
   expect_error(combine_peaks(pk2, choose = "lambda", verbose = FALSE),
                "Please select preferred lambda")
 })
+
 test_that("merge_peaks works with max method", {
   pk_tab_m <- merge_peaks(pk_tab, peaks=c("V10","V11"))
   expect_equal(pk_tab_m$tab$V11, pmax(pk_tab$tab$V10, pk_tab$tab$V11))
