@@ -82,7 +82,7 @@ Also see the
 [contributing.md](https://github.com/ethanbass/chromatographR/blob/master/.github/contributing.md)
 page for more details.
 
-(**Note:** Please post questions about file conversions to the
+(**Note:** Please direct questions about file conversions to the
 [chromConverter](https://github.com/ethanbass/chromConverter/issues)
 page).
 
