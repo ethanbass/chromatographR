@@ -553,16 +553,8 @@ test_that("plot.peak_list works", {
   skip_on_os(c("windows", "linux"))
   vdiffr::expect_doppelganger("plot.peak_list_bemg", plot_peaks_bemg)
   
-  # something raw with this test on GitHub actions
-  # plot_peaks_raw <- function(){
-  #   plot(pks_raw, chrom_list = dat.pr)
-  # }
-  # vdiffr::expect_doppelganger("plot.peak_list_raw", plot_peaks_raw)
-  
   expect_error(plot(pks_egh, chrom_list = dat.pr, lambda = 190),
                regexp = "must match one of the wavelengths in your peak list")
-  
-  
 })
 
 test_that("purity plot works", {

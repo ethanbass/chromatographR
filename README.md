@@ -63,7 +63,7 @@ Contributions are always welcome. Please get in touch (preferable by opening a G
 
 Also see the [contributing.md](https://github.com/ethanbass/chromatographR/blob/master/.github/contributing.md) page for more details.
 
-(**Note:** Please post questions about file conversions to the [chromConverter](https://github.com/ethanbass/chromConverter/issues) page).
+(**Note:** Please direct questions about file conversions to the [chromConverter](https://github.com/ethanbass/chromConverter/issues) page).
 
 ## Citation:
 

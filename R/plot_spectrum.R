@@ -428,7 +428,7 @@ plot_all_spectra <- function(loc, peak_table, chrom_list, idx = "all",
       return(invisible(sp))
   } else {
     sp_long <- lapply(seq_along(sp), function(i){
-      data.frame(lambda = get_lambdas(chrom_list), absorbance = sp[[i]], 
+      data.frame(wavelength = get_lambdas(chrom_list), absorbance = sp[[i]],
                  sample = names(sp)[i])
     })
     sp_long <- do.call(rbind, sp_long)
@@ -815,7 +815,8 @@ plot_spectrum_inset <- function(loc, peak_table, chrom_list=NULL,
       p2 <- plot_spectrum(loc = loc[i], peak_table = peak_table,
                           chrom_list = chrom_list, idx = idx,
                           lambda = lambda, plot_spectrum = TRUE,
-                          plot_trace = FALSE, engine = engine, verbose = verbose)
+                          plot_trace = FALSE, engine = engine, verbose = verbose,
+                          scale_spectrum = scale_spectrum)
     } else {
       p2 <- plot_all_spectra(loc = loc[i], peak_table = peak_table, 
                              idx = idx, engine = engine, 

@@ -27,12 +27,20 @@ test_that("plot_all_spectra works with ggplot2", {
   skip_if_not_installed("vdiffr")
   data(pk_tab); data(Sa_warp)
   plot_spectra <- function(){
-    plot_all_spectra("V13", peak_table = pk_tab, chrom_list = Sa_warp, 
-                     export = FALSE, overlapping = TRUE, engine = "ggplot")
+    print(plot_all_spectra("V13", peak_table = pk_tab, chrom_list = Sa_warp,
+                           export_spectrum = FALSE, overlapping = TRUE,
+                           engine = "ggplot2"))
   }
-  x <- plot_all_spectra("V13", peak_table = pk_tab, chrom_list = Sa_warp, 
-                        export=FALSE, overlapping=TRUE, engine = "ggplot")
   vdiffr::expect_doppelganger("plot_all_spectra_ggplot", plot_spectra)
+})
+
+test_that("plot_all_spectra ggplot2 has correct wavelengths on x-axis", {
+  skip_if_not_installed("ggplot2")
+  data(pk_tab); data(Sa_warp)
+  p <- plot_all_spectra("V13", peak_table = pk_tab, chrom_list = Sa_warp,
+                        export_spectrum = FALSE, engine = "ggplot2")
+  expect_s3_class(p, "gg")
+  expect_equal(sort(unique(p$data$wavelength)), sort(get_lambdas(Sa_warp)))
 })
 
 test_that("plot_spectrum works", {
@@ -220,14 +228,15 @@ test_that("plot_spectrum_inset works correctly", {
   data(Sa_warp)
   data(pk_tab)
   plot_inset <- function(){
-    plot_spectrum_inset(c(Unk1 = "V9", Unk2 = "V15", Unk3 = "V26"), 
-                        peak_table = pk_tab, chrom_list = Sa_warp,
-                        position=list(c(0.35, 0.7), c(0.45, 0.4),
-                                      c(0.72,0.4)), 
-                        inset_width = 0.25, inset_height = 0.25)
+    print(plot_spectrum_inset(c(Unk1 = "V9", Unk2 = "V15", Unk3 = "V26"), idx=c(1:3),
+                              peak_table = pk_tab, chrom_list = Sa_warp,
+                              scale_spectrum = FALSE,
+                              position = list(c(0.35, 0.7), c(0.45, 0.4),
+                                              c(0.72, 0.4)),
+                              inset_width = 0.25, inset_height = 0.25,
+                              verbose = FALSE))
   }
-  vdiffr::expect_doppelganger("plot_inset",
-                              plot_inset)
+  vdiffr::expect_doppelganger("plot_inset", plot_inset)
 })
 
 test_that("annotate_peaks works correctly", {
@@ -256,14 +265,14 @@ test_that("plot_chroms_heatmap works to plot alignments with ggplot", {
   data(Sa_warp)
   data(pk_tab)
   alignment_ggplot_heatmap <- function(){
-    plot_chroms_heatmap(Sa_warp, lambdas = 210, engine = "ggplot")
+    print(plot_chroms_heatmap(Sa_warp, lambdas = 210, engine = "ggplot"))
   }
   vdiffr::expect_doppelganger("alignment_ggplot_heatmap",
                               alignment_ggplot_heatmap)
-  
+
   alignment_ggplot_heatmap_zoom <- function(){
-    plot_chroms_heatmap(Sa_warp, lambdas = 210, engine = "ggplot", 
-                        show_legend = TRUE, xlim = c(10, 15))
+    print(plot_chroms_heatmap(Sa_warp, lambdas = 210, engine = "ggplot",
+                              show_legend = TRUE, xlim = c(10, 15)))
   }
   suppressWarnings(vdiffr::expect_doppelganger("alignment_ggplot_heatmap_zoom",
                                                alignment_ggplot_heatmap_zoom))
