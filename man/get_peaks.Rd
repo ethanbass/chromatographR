@@ -7,10 +7,11 @@
 get_peaks(
   chrom_list,
   lambdas,
-  fit = c("bemg", "egh", "gaussian", "raw"),
+  fit = c("egh", "bemg", "gaussian", "raw"),
   sd_max = 50,
   max_iter = 100,
   time_unit = c("min", "s", "ms"),
+  baseline = c("none", "flat", "sloped"),
   estimate_purity = FALSE,
   noise_threshold = 0.001,
   show_progress = NULL,
@@ -33,7 +34,7 @@ find peaks at. For one-dimensional chromatograms, this argument can be ignored.}
 exponentially modified gaussian (\code{"bemg"}), exponential-gaussian
 hybrid (\code{"egh"}), \code{"gaussian"}, or \code{"raw"}. The \code{raw} setting
 performs trapezoidal integration directly on the raw data without fitting a
-model to the data. Defaults to \code{bemg}.}
+model to the data. Defaults to \code{egh}.}
 
 \item{sd_max}{Maximum width (standard deviation) for peaks. Defaults to \code{50}.}
 
@@ -43,6 +44,11 @@ in \code{\link{fit_peaks}}.}
 \item{time_unit}{Specifies the units for \code{sd}, \code{FWHM}, \code{area}, and \code{tau} (if
 applicable). Options are minutes (\code{"min"}), seconds (\code{"s"}), or
 milliseconds (\code{"ms"}). Defaults to \code{"min"}.}
+
+\item{baseline}{Whether to fit a baseline offset beneath each peak model.
+Options are \code{"none"} (no baseline, default), \code{"flat"} (constant offset per
+peak), or \code{"sloped"} (linearly varying offset per peak, useful for gradient
+elution). Not available when \code{fit = "raw"}.}
 
 \item{estimate_purity}{Logical. Whether to estimate purity or not. Defaults
 to \code{FALSE}. (If \code{TRUE}, this will slow down the function significantly).}
@@ -93,9 +99,18 @@ this parameter has units of 1/time.
 \item \code{tau_left}: Exponential rate constant controlling left-sided tailing
 when \code{fit = "bemg"}. Note that unlike \code{tau} in the EGH model,
 this parameter has units of 1/time.
+\item \code{h}: The \code{height} parameter of the fitted BEMG shape function (only when
+\code{fit = "bemg"}). This is the value of the pure shape at \code{center}, before
+any baseline is added, and is distinct from \code{height}.
+\item \code{center}: The center parameter of the fitted BEMG shape function (only
+when \code{fit = "bemg"}). This is the location around which the exponential
+tails are applied. Because BEMG peaks can be asymmetric
+(\verb{tau_right ≠ tau_left}) and a sloped baseline shifts the fitted curve,
+the actual peak maximum (\code{rt}) may differ from \code{center}.
 \item \code{FWHM}: The full-width at half maximum calculated as \eqn{2.355 \sigma}.
-\item \code{height}: The height of the peak.
-\item \code{area}: The area of the peak as determined by trapezoidal approximation.
+\item \code{height}: The height of the peak above the fitted baseline.
+\item \code{area}: The area of the peak above the fitted baseline, estimated by
+trapezoidal approximation.
 \item \code{r.squared}: The coefficient of determination (\eqn{R^2}) of the fitted
 model to the raw data. (\strong{Note}: this value is calculated by fitting a
 linear model of the fitted peak values to the raw data. This approach is
@@ -103,6 +118,12 @@ statistically dubious, since the models are fit using non-linear least
 squares. Nevertheless, it can still be useful as a rough metric for
 "goodness-of-fit").
 \item \code{purity}: The peak purity as estimated by \code{\link{get_purity}}.
+\item \code{floor}: Constant baseline level (only when \code{baseline = "flat"}).
+\item \code{floor_start}: Baseline level at the left edge of the peak window (only
+when \code{baseline = "sloped"}).
+\item \code{floor_end}: Baseline level at the right edge of the peak window (only
+when \code{baseline = "sloped"}). Both \code{floor_start} and \code{floor_end} are
+constrained to be non-negative.
 }
 }
 \description{

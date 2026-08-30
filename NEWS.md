@@ -2,7 +2,7 @@
 
 ### Breaking changes
 
-* Added support for bidirectional exponentially modified gaussian (BEMG) peak shape, now used as the new default for peak fitting.
+* Added support for bidirectional exponentially modified gaussian (BEMG) peak shape (`fit = "bemg"` in `get_peaks`/`fit_peaks`). The default peak shape remains `"egh"` for now but this may change in a future release.
 * Added `summarize_by` argument to `get_peaktable` controlling how peak metadata (e.g., retention time) are summarized across peaks within each cluster. The new default (`"weighted.mean"`) weights peaks by their intensity, making it more robust to the presence of small noisy peaks which may skew the results of aggregation, especially when the dominant peak does not occur in every sample. Alternative options include `"mean"`, `"median"`, and `"max"`, the last of which uses the most intense peak in each cluster directly rather than aggregating. To reproduce previous behavior, set `summarize_by = "mean"`.
 * Added automatic thinning of chromatograms in `plot_chroms` to speed up plotting of raw data. The time resolution can be adjusted with the new `time_resolution` argument.
 * Changed behavior of `plot_chroms` so legend is no longer displayed by default to avoid overloading plots with many chromatograms.
@@ -21,6 +21,7 @@
 
 #### New functions
 
+* Added `subtract_blanks` function for subtracting blank chromatograms from a `chrom_list`.
 * Added `correct_rt_group` function for group-wise warping function estimation using within-group averages. This improves alignment accuracy when samples share batch-level retention time shifts or contain group-specific peaks, and is generally faster than per-sample alignment.
 * Added `plot_spectrum_inset` function for plotting UV spectra overlaid onto a chromatogram.
 * Added `annotate_peaks` function for adding text labels to peaks in plots created by `plot_chroms`.
@@ -36,6 +37,7 @@
 
 #### Enhancements
 
+* Added support for fitting a local baseline beneath each peak through the `baseline` argument in `get_peaks`. Options are `"none"` (default, no baseline), `"flat"` (constant offset), and `"sloped"`. Peak heights and areas are computed above the fitted baseline.
 * Added support for plotting spectra from multiple chromatograms in `plot_spectrum` by supplying a vector to `idx` (e.g. `idx = c(1, 2, 4)`). Overlaid traces and spectra are color-coded by sample.
 * Added new options to `combine_peaks` (`"least_sparse"` and `"lambda"`) via the `choose` argument: `"least_sparse"` retains the peak detected in the greatest number of samples; `"lambda"` retains the peak measured at a preferred wavelength (supplied via the new `lambda` argument), falling back to `"max"` when no match is found.
 * Preprocess can now take nested lists containing a `dad` element in each list. This change allows better compatibility with chromConverter.
@@ -69,6 +71,7 @@
 * Fixed `get_peaktable` (with `clust = "sp.rt"`) to no longer take the absolute value of spectral similarity scores. Previously, `abs()` caused negatively correlated spectra to be treated as similar; now they are correctly penalized as dissimilar.
 * Fixed bug in FWHM calculation in `get_peaktable` for raw peak shape.
 * Fixed `filter_peaktable` so that peaks with `NA` values in some samples are not excluded when filtering by `min_value`.
+* Suppressed spurious "essentially perfect fit" warning from `summary.lm` when computing R² in `fit_peaks`.
 * Fixed bug in `subset.peak_table()` where `sample_meta` was subset based on the wrong condition, so it was sometimes not filtered by `subset`.
 * Made substantial revisions to documentation to improve clarity.
 
