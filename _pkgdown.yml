@@ -8,14 +8,17 @@ reference:
     contents:
     - chromatographR-package
   - title: "Analysis functions"
-    contents: 
+    contents:
     - read_chroms
     - preprocess
+    - subtract_blanks
     - correct_rt
     - correct_rt_group
     - correct_peaks
     - get_peaks
+    - fit_peaks
     - get_peaktable
+    - get_spectra
     - attach_metadata
     - attach_ref_spectra
     - normalize_data
