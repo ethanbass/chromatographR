@@ -13,7 +13,7 @@ merge_peaks(peak_table, peaks, method = c("max", "sum"))
 
 - peak_table:
 
-  Peak table from
+  A `peak_table` object from
   [`get_peaktable`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md).
 
 - peaks:
@@ -23,7 +23,7 @@ merge_peaks(peak_table, peaks, method = c("max", "sum"))
 - method:
 
   Method to merge peaks. Either `max` to select the largest peak from
-  each sample or `sum` to sum the peaks together.
+  each sample or `sum` to add the peaks together.
 
 ## Value
 
@@ -33,8 +33,8 @@ columns are combined.
 ## Details
 
 Merges the specified peaks in peak table, by selecting the largest value
-from each column if `method` is `"max"`. If `method` is `"sum"`, merges
-peak by summing their values.
+from each column if `method` is `"max"`. If `method` is `"sum"`, peaks
+will be merged by summing their values.
 
 ## See also
 
@@ -53,5 +53,5 @@ Ethan Bass
 
 ``` r
 data(pk_tab)
-pk_tab <- merge_peaks(peak_table = pk_tab, peaks=c("V10","V11"))
+pk_tab <- merge_peaks(peak_table = pk_tab, peaks = c("V10","V11"))
 ```

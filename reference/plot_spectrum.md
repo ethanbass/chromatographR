@@ -1,7 +1,9 @@
 # Plot spectrum from peak table
 
-Plots the trace and/or spectrum for a given peak or retention time in a
-`peak_table` object or a list of chromatograms.
+Visualizes chromatographic traces and/or UV spectra for a selected peak,
+retention time, or scan index from a `peak_table` or list of
+chromatograms. Spectra can also be exported as a `data.frame` when
+`export_spectrum = TRUE`.
 
 ## Usage
 
@@ -9,7 +11,7 @@ Plots the trace and/or spectrum for a given peak or retention time in a
 plot_spectrum(
   loc = NULL,
   peak_table,
-  chrom_list,
+  chrom_list = NULL,
   idx = "max",
   lambda = "max",
   plot_spectrum = TRUE,
@@ -20,7 +22,6 @@ plot_spectrum(
   verbose = TRUE,
   what = c("peak", "rt", "idx", "click"),
   engine = c("base", "plotly", "ggplot2"),
-  chr = NULL,
   ...
 )
 ```
@@ -29,31 +30,30 @@ plot_spectrum(
 
 - loc:
 
-  The name of the peak or retention time for which you wish to extract
-  spectral data.
+  The peak, retention time, or scan index from which to extract spectral
+  data.
 
 - peak_table:
 
-  The peak table (output from
-  [`get_peaktable`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md)).
+  A `peak_table` object created by
+  [`get_peaktable`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md).
 
 - chrom_list:
 
   A list of chromatograms in matrix format (timepoints x wavelengths).
   If no argument is provided here, the function will try to find the
-  `chrom_list` object used to create the provided `peak_table`.
+  `chrom_list` object using the pointer in the `peak_table`.
 
 - idx:
 
   Numerical index of chromatogram you wish to plot, or "max" to
-  automatically plot the chromatogram with the largest signal at the
-  given peak or retention time.
+  automatically select the chromatogram with the highest signal
+  intensity at the specified peak or retention time.
 
 - lambda:
 
-  The wavelength you wish to plot the trace at if plot_trace == TRUE
-  and/or the wavelength to be used for the determination of signal
-  abundance.
+  The wavelength used for plotting chromatographic traces and
+  determining signal intensity.
 
 - plot_spectrum:
 
@@ -77,27 +77,23 @@ plot_spectrum(
 
 - export_spectrum:
 
-  Logical. If `TRUE`, exports spectrum to console. Defaults to `FALSE`.
+  Logical. If `TRUE`, invisibly returns the spectrum as a `data.frame`.
+  Defaults to `FALSE`.
 
 - verbose:
 
-  Logical. If `TRUE`, prints verbose output to console. Defaults to
-  `TRUE`.
+  Logical. If `TRUE` (default), prints verbose output to console.
 
 - what:
 
   What to look for. Either `peak` to extract spectral information for a
   certain peak, `rt` to scan by retention time, `idx` to scan by numeric
   index, or `click` to manually select retention time by clicking on the
-  chromatogram. Defaults to "peak" mode.
+  chromatogram. Defaults to `"peak"` mode.
 
 - engine:
 
   Which plotting engine to use: `base`, `ggplot2`, or `plotly`.
-
-- chr:
-
-  Deprecated. Please use `idx` instead.
 
 - ...:
 
@@ -105,33 +101,33 @@ plot_spectrum(
 
 ## Value
 
-If `export_spectrum` is TRUE, returns the spectrum as a ` data.frame`
-with wavelengths as rows and a single column encoding the absorbance (or
-normalized absorbance, if `scale_spectrum` is TRUE) at each wavelength.
-If `export_spectrum` is FALSE, the output depends on the plotting
-`engine`. If `engine == "plotly"`, returns a `plotly` object containing
-the specified plots. Otherwise, if `engine == "base"`, there is no
-return value.
+- If `export_spectrum = FALSE` (default), returns a `plotly` or `ggplot`
+  object according to the specified `engine`. No value is returned when
+  `engine = "base"`.
+
+- If `export_spectrum` is `TRUE`, invisibly returns the spectrum as a
+  `data.frame` with wavelengths as rows and a single column encoding the
+  absorbance (normalized, if `scale_spectrum = TRUE`).
 
 ## Details
 
-Can be used to confirm the identity of a peak or check that a particular
-column in the peak table represents a single compound. Retention times
-can also be selected by clicking on the plotted trace if
-`what == 'click'`. Plots can be produced using either base R graphics,
-[`ggplot2`](https://ggplot2.tidyverse.org/reference/ggplot2-package.html),
-or `plotly`, according to the value of the `engine` argument.
+This function can be used to confirm the identity of a peak or assess
+whether a peak table column likely represents a single compound.
+Retention times may also be selected interactively by clicking on a
+chromatographic trace when `what = "click"`.
+
+When `plot_trace` is `TRUE`, the chromatographic trace for the specified
+chromatogram (`idx`) is plotted at wavelength `lambda`, with a dotted
+red line indicating the selected retention time (`loc`). The trace
+corresponds to a single column of the chromatographic matrix.
+
+When `plot_spectrum` is `TRUE`, the UV spectrum at the specified
+retention time is plotted. The spectrum corresponds to a single row of
+the chromatographic matrix.
 
 ## Side effects
 
-- If `plot_trace` is `TRUE`, plots the chromatographic trace of the
-  specified chromatogram (`idx`), at the specified wavelength (`lambda`)
-  with a dotted red line to indicate the retention time given by `loc`.
-  The trace is a single column from the chromatographic matrix.
-
-- If `plot_spectrum` is `TRUE`, plots the spectrum for the specified
-  chromatogram at the specified retention time. The spectrum is a single
-  row from the chromatographic matrix.
+If `engine == "base"`, plots are rendered to the active graphics device.
 
 ## See also
 

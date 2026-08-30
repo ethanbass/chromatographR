@@ -1,6 +1,11 @@
 # Find peaks
 
-Detects peaks in chromatographic profile.
+Detects peaks in a chromatographic profile by identifying zero-crossings
+in the smoothed first derivative of the signal (`y`) that exceed a
+specified slope threshold (`slope_thresh`). Smoothing reduces spurious
+local extrema that do not represent true features. Peaks can be filtered
+using a minimum amplitude threshold (`amp_thresh`), which removes
+low-intensity peaks.
 
 ## Usage
 
@@ -19,65 +24,58 @@ find_peaks(
 
 - y:
 
-  Signal (as a numerical vector).
+  A chromatographic signal (as a numeric vector).
 
 - smooth_type:
 
   Type of smoothing. Either gaussian kernel (`"gaussian"`), box kernel
-  (`"box"`), savitzky-golay smoothing (`"savgol"`), moving average
+  (`"box"`), Savitzky-Golay smoothing (`"savgol"`), moving average
   (`"mva"`), triangular moving average (`"tmva"`), or no smoothing
   (`"none"`).
 
 - smooth_window:
 
   Smoothing window. Larger values of this parameter will exclude sharp,
-  narrow features. If the supplied value is between 0 and 1, window will
-  be interpreted as a proportion of points to include. Otherwise, the
-  window will be the absolute number of points to include in the window.
-  (Defaults to `.001`).
+  narrow features. If the supplied value is between 0 and 1, the window
+  will be interpreted as a proportion of points to include. Otherwise,
+  the window will be interpreted as the absolute number of points to
+  include in the window. Defaults to `0.001`.
 
 - slope_thresh:
 
   Minimum threshold for slope of the smoothed first derivative. This
-  parameter filters on the basis of peak width, such that larger values
-  will exclude broad peaks from the peak list. (Defaults to `0`).
+  parameter filters peaks on the basis of their width, such that larger
+  values will exclude broad peaks from the peak list. Defaults to `0`.
 
 - amp_thresh:
 
   Minimum threshold for peak amplitude. This parameter filters on the
   basis of peak height, such that larger values will exclude small peaks
-  from the peak list. (Defaults to `0`).
+  from the peak list. Defaults to `0`.
 
 - bounds:
 
-  Logical. If TRUE, includes peak boundaries in data.frame. (Defaults to
-  `TRUE`).
+  Logical. If `TRUE` (default), includes peak boundaries in
+  `data.frame`.
 
 ## Value
 
-If `bounds == TRUE`, returns a data.frame containing the center, start,
-and end of each identified peak. Otherwise, returns a numeric vector of
-peak centers. All locations are expressed as indices.
+If `bounds == TRUE`, returns a `data.frame` containing the center,
+start, and end of each identified peak. Otherwise, returns a numeric
+vector of peak centers. All locations are expressed as indices.
 
 ## Details
 
-Detects peaks by looking for zero-crossings in the smoothed first
-derivative of the signal (`y`) that exceed the specified slope threshold
-(`slope_thresh`). Additionally, peaks can be filtered by supplying a
-minimal amplitude threshold (`amp_thresh`), filtering out peaks below
-the specified height. Smoothing is intended to prevent the algorithm
-from getting caught up on local minima and maxima that do not represent
-true features. Several smoothing options are available, including
-`"gaussian"`, box kernel (`"box"`), savitzky-golay smoothing
-(`"savgol"`), moving average (`"mva"`), triangular moving average
-(`"tmva"`), or no smoothing (`"none"`).
+Available smoothing methods include Gaussian kernel (`"gaussian"`), box
+kernel (`"box"`), Savitzky–Golay (`"savgol"`), moving average (`"mva"`),
+triangular moving average (`"tmva"`), and no smoothing (`"none"`).
 
-It is recommended to do pre-processing using the
+Preprocessing with
 [`preprocess`](https://ethanbass.github.io/chromatographR/reference/preprocess.md)
-function before peak detection. Overly high chromatographic resolution
-can sometimes cause peaks to be split into multiple segments. In this
-case, it is recommended to increase the `smooth_window` or reduce the
-resolution along the time axis by adjusting the `dim1` argument during
+is recommended prior to peak detection. Overly high chromatographic
+resolution may sometimes cause peak splitting. In such cases, it is
+recommended to either increase the `smooth_window` or reduce the
+time-axis resolution by adjusting the `dim1` argument during
 preprocessing.
 
 ## Note

@@ -1,8 +1,12 @@
 # Filter peak table
 
-Utility function to remove peaks from peak table, e.g., because their
-intensity is too low. Currently one can filter on `mean`, `median`, or
-maximum (`"max"`) peak intensity or retention time.
+Utility function to filter features (columns) in a `peak_table`.
+Filtering is applied consistently across all components of the peak
+table, including the intensity matrix (`tab`), feature metadata
+(`pk_meta`), and reference spectra (if present). Filtering can be based
+on retention time, wavelength, feature intensity summarized across
+samples (mean, median, or max), and/or feature sparsity (i.e.,
+proportion of zero values across samples).
 
 ## Usage
 
@@ -13,6 +17,7 @@ filter_peaktable(
   min_rt,
   max_rt,
   min_value,
+  max_zeros,
   lambda,
   what = c("median", "mean", "max"),
   tol = 0
@@ -28,38 +33,48 @@ filter_peaktable(
 
 - rts:
 
-  Vector of retention times to include in the peak table.
+  Vector of retention times used to select features. Values are mapped
+  to the closest retention times in the peak table. If no match is found
+  within `tol`, the value is ignored and a warning is issued.
 
 - min_rt:
 
-  Minimum retention time to include in the peak table.
+  Minimum retention time for features to be retained.
 
 - max_rt:
 
-  Maximum retention time to include in the peak table.
+  Maximum retention time for features to be retained.
 
 - min_value:
 
-  Minimal cutoff for summarized peak intensity.
+  Minimum threshold for feature intensity summarized across samples
+  (using the method specified by `what`).
+
+- max_zeros:
+
+  Maximum allowed feature sparsity (proportion of zero values across
+  samples).
 
 - lambda:
 
-  Component(s) to include in peak table (e.g. wavelengths if you are
-  using HPLC-DAD/UV).
+  Wavelength(s) used to select features in the peak table. Only features
+  matching the specified wavelength(s) are retained.
 
 - what:
 
-  Whether to summarize intensities using `mean`, `median`, or `max`.
-  Defaults to `median`.
+  Method used to summarize feature intensity across samples for
+  filtering. One of `"mean"`, `"median"` (default), or `"max"`.
 
 - tol:
 
-  Tolerance for matching of retention times to `rts`.
+  Tolerance for matching of retention times to `rts`. A feature is
+  considered a match if the absolute difference is ≤ `tol`.
 
 ## Value
 
-A peak table similar to the input, with all columns removed from the
-peak table that do not satisfy the specified criteria.
+A filtered `peak_table` containing only features (columns) that satisfy
+the specified criteria. The same feature indices are applied to all
+`peak_table` components.
 
 ## See also
 

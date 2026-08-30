@@ -1,7 +1,11 @@
 # Analysis of *Polistes* cuticular hydrocarbons with GC-FID
 
 ``` r
+
 library(chromatographR)
+#> Registered S3 method overwritten by 'chromatographR':
+#>   method      from
+#>   predict.ptw ptw
 library(rdryad)
 library(vegan)
 #> Loading required package: permute
@@ -19,18 +23,18 @@ chromatographR to analyze GC-FID data (or other 2D chromatography data).
 To demonstrate the use of `chromatographR` for the analysis GC-FID data,
 we will analyze a dataset on cuticular hydrocarbons (CHCs) composition
 in four species of paper wasps (*Polistes spp.*) collected by Dr. Andrew
-Legan ([Andrew W. Legan 2022](#ref-legan2022); [A. Legan et al.
+Legan ([Legan 2022](#ref-legan2022); [Legan et al.
 2022](#ref-legan2022a)). The dataset includes CHCs collected from
 *Polistes dominula* (european paper wasp), *Polistes exclamans* (common
 paper wasp), *P. fuscatus* (northern paper wasp), and *P. metricus*
 (metric paper wasp). As in other social insects, cuticular hydrocarbons
 serve as chemical cues mediating a number of social behaviors in paper
-wasps ([Andrew W. Legan et al. 2021](#ref-legan2021)), including
-nestmate recognition ([G. J. Gamboa, Reeve, and Pfennig
-1986](#ref-gamboa1986); [George J. Gamboa et al. 1996](#ref-gamboa1996);
-[Bruschini et al. 2011](#ref-bruschini2011)), establishment of social
-hierarchies ([Jandt, Tibbetts, and Toth 2014](#ref-jandt2014)) and mate
-choice ([Reed and Landolt 1990](#ref-reed1990)).
+wasps ([Legan et al. 2021](#ref-legan2021)), including nestmate
+recognition ([Gamboa et al. 1986](#ref-gamboa1986); [Gamboa et al.
+1996](#ref-gamboa1996); [Bruschini et al. 2011](#ref-bruschini2011)),
+establishment of social hierarchies ([Jandt et al.
+2014](#ref-jandt2014)) and mate choice ([Reed and Landolt
+1990](#ref-reed1990)).
 
 ![](images/pdom_pipe_c.jpg)
 
@@ -51,6 +55,7 @@ choice ([Reed and Landolt 1990](#ref-reed1990)).
 Figure 1: *Polistes* species includes in this study.
 
 ``` r
+
 is_github_actions <- Sys.getenv("GITHUB_ACTIONS") == "true"
 
 if (is_github_actions){
@@ -81,6 +86,7 @@ computation time while seemingly having little effect on the accuracy of
 the integration results.
 
 ``` r
+
 dat.pr <- preprocess(dat, spec.smooth = FALSE, dim1 = seq(from = 4, to = 59.9, by = .005), # .005 minutes = 300 ms
                      cl = 1)
 names(dat.pr) <- gsub(".txt", "", names(dat.pr))
@@ -89,6 +95,7 @@ names(dat.pr) <- gsub(".txt", "", names(dat.pr))
 We can then group the chromatograms by species for further analysis.
 
 ``` r
+
 species <- c(dominula = "DOMINULA", exclamans.= "EXCLAMANS", 
              fuscatus = "FUSCATUS", metricus = "METRICUS")
 
@@ -105,14 +112,18 @@ function to remove features that do not have an amplitude of at least
 10^4 response units.
 
 ``` r
+
 ladder <- grep("LADDER", names(dat.pr))
 pks <- get_peaks(dat.pr[ladder], time.units = "s")
+#> Warning in resolve_deprecated(time.units, time_unit): The 'time.units' function
+#> is deprecated. Please use 'time_unit' instead.
 plot(pks, chrom_list = dat.pr[ladder])
 ```
 
 ![](GC-FID_files/figure-html/integrate_alkanes-1.png)
 
 ``` r
+
 pks_f <- filter_peaks(pks, min_height = 10000)
 ```
 
@@ -121,11 +132,13 @@ LabSolutions’, so we can check the integration results provided by
 `chromatographR` against the results from LabSolutions.
 
 ``` r
+
 path_to_annotated_alkanes <- grep("ANNOTATED", files[[1]], value = TRUE)
 alkanes <- read.csv(path_to_annotated_alkanes, sep="\t")
 ```
 
 ``` r
+
 # check equality of retention times
 # all.equal(alkanes$RT[-1], pks_f$ALKANE_LADDER[[1]]$rt)
 
@@ -159,37 +172,39 @@ We can align chromatograms by species using variable dynamic time
 warping.
 
 ``` r
+
 warp_dominula <- suppressWarnings(correct_rt(dat.pr[species_idx$dominula], 
                                             alg = "vpdtw", 
                                             what = "corrected.values", 
                                             plot_it = TRUE, verbose = TRUE, 
                                             penalty = 1, maxshift = 100))
 #> Selected chromatogram 9 as best reference.
+#> Fitting VPdtw warping models.
 ```
 
 ![](GC-FID_files/figure-html/single_species_alignments-1.png)
 
+    #> Applying VPdtw warping models to chromatograms.
+
+    warp_metricus <- suppressWarnings(correct_rt(dat.pr[species_idx$metricus],
+                                                alg = "vpdtw",
+                                                what = "corrected.values",
+                                                plot_it = FALSE, verbose = FALSE,
+                                                penalty = 2, maxshift = 100))
+
+    warp_exclamans <- suppressWarnings(correct_rt(dat.pr[species_idx$exclamans],
+                                                 alg = "vpdtw",
+                                                 what = "corrected.values",
+                                                 plot_it = FALSE, verbose = FALSE,
+                                                 penalty = 2, maxshift = 200))
+
+    warp_fuscatus <- suppressWarnings(correct_rt(dat.pr[species_idx$fuscatus],
+                                alg = "vpdtw", what = "corrected.values",
+                                plot_it = FALSE, verbose = FALSE,
+                                penalty = 2, maxshift = 200))
+
 ``` r
 
-warp_metricus <- suppressWarnings(correct_rt(dat.pr[species_idx$metricus], 
-                                            alg = "vpdtw", 
-                                            what = "corrected.values", 
-                                            plot_it = FALSE, verbose = FALSE, 
-                                            penalty = 2, maxshift = 100))
-
-warp_exclamans <- suppressWarnings(correct_rt(dat.pr[species_idx$exclamans],
-                                             alg = "vpdtw",
-                                             what = "corrected.values", 
-                                             plot_it = FALSE, verbose = FALSE, 
-                                             penalty = 2, maxshift = 200))
-
-warp_fuscatus <- suppressWarnings(correct_rt(dat.pr[species_idx$fuscatus],
-                            alg = "vpdtw", what = "corrected.values",
-                            plot_it = FALSE, verbose = FALSE, 
-                            penalty = 2, maxshift = 200))
-```
-
-``` r
 warp_all <- suppressWarnings(correct_rt(dat.pr[-1], alg = "vpdtw",
                        what = "corrected.values", plot_it = FALSE,
                        verbose = FALSE, penalty = 2, maxshift = 200))
@@ -202,6 +217,7 @@ chromatograms.
 Utility function to format text in base R plots with italics.
 
 ``` r
+
 format_italics <- function(str) {
   spl <- strsplit(str, "\\*")[[1]]
   non_empty <- spl[spl != ""]
@@ -210,6 +226,7 @@ format_italics <- function(str) {
 ```
 
 ``` r
+
 par(mfrow=c(3,1))
 plot_chroms_heatmap(dat.pr[species_idx$metricus], show_legend = FALSE, 
                     title = format_italics("*P. metricus* (raw data)"), xlim=c(25, 50))
@@ -226,6 +243,7 @@ plot_chroms_heatmap(warp_all[grep("PMET", names(warp_all))], show_legend = FALSE
 ![](GC-FID_files/figure-html/plot_metricus_alignments-1.png)
 
 ``` r
+
 par(mfrow=c(3,1))
 plot_chroms_heatmap(dat.pr[species_idx$fuscatus], show_legend = FALSE, 
                     title = format_italics("*P. fuscatus* (raw data)"),
@@ -243,6 +261,7 @@ plot_chroms_heatmap(warp_all[grep("PFUS", names(warp_all))], show_legend = FALSE
 ![](GC-FID_files/figure-html/plot_fuscatus_alignments-1.png)
 
 ``` r
+
 par(mfrow=c(3,1))
 plot_chroms_heatmap(dat.pr[species_idx$dominula], show_legend = FALSE, 
                     title = format_italics("*P. dominula* (raw data)"),
@@ -260,6 +279,7 @@ plot_chroms_heatmap(warp_all[grep("PDOM", names(warp_all))], show_legend = FALSE
 ![](GC-FID_files/figure-html/plot_dominula_alignments-1.png)
 
 ``` r
+
 par(mfrow = c(3,1))
 plot_chroms_heatmap(dat.pr[species_idx$exclamans], show_legend = FALSE, 
                     title = format_italics("*P. exclamans* (raw data)"),
@@ -284,6 +304,7 @@ species, we will proceed with the imperfect multi-species alignments.
 ### Integration and peaktable assembly
 
 ``` r
+
 pks <- get_peaks(warp_all)
 pktab <- get_peaktable(pks)
 pktab <- attach_metadata(pktab, metadata = meta, column = "SAMPLE_ID")
@@ -292,6 +313,7 @@ pktab <- attach_metadata(pktab, metadata = meta, column = "SAMPLE_ID")
 ### Analysis of cuticular hydrocarbon composition
 
 ``` r
+
 m <- vegan::adonis2(pktab$tab ~ POLISTES_SPECIES + STATE + SEX + LAT + LON,
                data = pktab$sample_meta, method = "manhattan",
                na.action = na.omit, by = "margin")
@@ -303,25 +325,26 @@ m
 #> 
 #> vegan::adonis2(formula = pktab$tab ~ POLISTES_SPECIES + STATE + SEX + LAT + LON, data = pktab$sample_meta, method = "manhattan", by = "margin", na.action = na.omit)
 #>                   Df   SumOfSqs      R2      F Pr(>F)    
-#> POLISTES_SPECIES   3 1.3830e+11 0.12124 8.7638  0.001 ***
-#> STATE              7 1.3067e+11 0.11455 3.5489  0.001 ***
-#> SEX                1 4.2418e+10 0.03719 8.0641  0.001 ***
-#> LAT                1 9.3279e+09 0.00818 1.7733  0.094 .  
-#> LON                1 1.5117e+10 0.01325 2.8740  0.013 *  
-#> Residual         105 5.5231e+11 0.48418                  
-#> Total            118 1.1407e+12 1.00000                  
+#> POLISTES_SPECIES   3 1.3191e+11 0.12374 9.1912  0.001 ***
+#> STATE              7 1.2344e+11 0.11579 3.6861  0.001 ***
+#> SEX                1 4.1426e+10 0.03886 8.6592  0.001 ***
+#> LAT                1 8.1923e+09 0.00768 1.7124  0.106    
+#> LON                1 1.3227e+10 0.01241 2.7648  0.016 *  
+#> Residual         105 5.0233e+11 0.47119                  
+#> Total            118 1.0661e+12 1.00000                  
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
 As one might expect, the permanova results shows that species is the
 largest contributor to the variance in CHC profiles (R²_(marginal) =
-0.12), followed by state of origin (R²_(marginal) = 0.11) and sex
+0.12), followed by state of origin (R²_(marginal) = 0.12) and sex
 (R²_(marginal) = 0.04).
 
 Modified `ggordiplot` function with added `shape` argument.
 
 ``` r
+
 # ggordiplot function (modified from https://github.com/jfq3/ggordiplots/blob/master/R/gg_ordiplot.R) with added shape argument
 
 gg_ordiplot <- function (ord, groups, shape = NULL, scaling = 1, choices = c(1, 2), 
@@ -431,6 +454,7 @@ gg_ordiplot <- function (ord, groups, shape = NULL, scaling = 1, choices = c(1, 
 ```
 
 ``` r
+
 ord <- vegan::rda(pktab$tab, scale = TRUE)
 pktab$sample_meta$SEX_SP <- interaction(pktab$sample_meta$SEX,
                                       pktab$sample_meta$POLISTES_SPECIES)
@@ -452,6 +476,7 @@ We can get even better separation if we break down our data by sex,
 though there is considerable intraspecific variation.
 
 ``` r
+
 cond <- which(pktab$sample_meta$SEX == "M")
 ord_m <- vegan::rda(pktab$tab[cond,], scale = TRUE)
 
@@ -478,6 +503,7 @@ p_male
 ![](GC-FID_files/figure-html/pca_by_species-1.png)
 
 ``` r
+
 p_female
 ```
 
@@ -485,18 +511,17 @@ p_female
 
 ### References
 
-Bruschini, Claudia, Rita Cervo, Alessandro Cini, Giuseppe Pieraccini,
-Luigi Pontieri, Lisa Signorotti, and Stefano Turillazzi. 2011.
-“Cuticular Hydrocarbons Rather Than Peptides Are Responsible for
-Nestmate Recognition in Polistes Dominulus.” *Chemical Senses* 36 (8):
-715–23. <https://doi.org/10.1093/chemse/bjr042>.
+Bruschini, Claudia, Rita Cervo, Alessandro Cini, et al. 2011. “Cuticular
+Hydrocarbons Rather Than Peptides Are Responsible for Nestmate
+Recognition in Polistes Dominulus.” *Chemical Senses* 36 (8): 715–23.
+<https://doi.org/10.1093/chemse/bjr042>.
 
 Cook, Bruce. 2022. “Northern Paper Wasp (Polistes Fuscatus).”
-iNaturalist; iNaturalist. August 20, 2022.
+iNaturalist; iNaturalist, August 20.
 <https://www.inaturalist.org/observations/131629083>.
 
 Drabik-Hamshare, Martyn. 2022. “Metric Paper Wasp (Polistes Metricus).”
-iNaturalist; iNaturalist. August 23, 2022.
+iNaturalist; iNaturalist, August 23.
 <https://www.inaturalist.org/observations/132080545>.
 
 Gamboa, G. J., H. K. Reeve, and D. W. Pfennig. 1986. “The Evolution and
@@ -515,11 +540,11 @@ Wasps: A Model Genus for the Study of Social Dominance Hierarchies.”
 <https://doi.org/10.1007/s00040-013-0328-0>.
 
 Kranz, Adam. 2020. “European Paper Wasp (Polistes Dominula).”
-iNaturalist; iNaturalist. July 29, 2020.
+iNaturalist; iNaturalist, July 29.
 <https://www.inaturalist.org/observations/54801686>.
 
-Legan, Andrew W. 2022. “Molecular and Chemical Basis of Social Olfaction
-in Polistes Paper Wasps.” <https://doi.org/10.7298/CZ0P-6J74>.
+Legan, Andrew W. 2022. *Molecular and Chemical Basis of Social Olfaction
+in Polistes Paper Wasps*. <https://doi.org/10.7298/CZ0P-6J74>.
 
 Legan, Andrew W, Christopher M Jernigan, Sara E Miller, Matthieu F
 Fuchs, and Michael J Sheehan. 2021. “Expansion and Accelerated Evolution
@@ -529,7 +554,8 @@ and Evolution* 38 (9): 3832–46.
 
 Legan, Andrew, Arthur Chen, Matthieu Fuchs, and Michael Sheehan. 2022.
 “119 Chromatograms (GC-FID) of the Cuticular Hydrocarbons of Four
-Polistes Paper Wasp Species (Hymenoptera: Vespidae: Polistinae).” Dryad.
+Polistes Paper Wasp Species (Hymenoptera: Vespidae: Polistinae).”
+Version 3. Dryad, November 29.
 <https://doi.org/10.5061/DRYAD.WPZGMSBR8>.
 
 Reed, H. C., and P. J. Landolt. 1990. “Sex Attraction in Paper
@@ -540,10 +566,11 @@ Tunnel.” *Journal of Chemical Ecology* 16 (4): 1277–87.
 ### Session Information
 
 ``` r
+
 sessionInfo()
-#> R version 4.5.2 (2025-10-31)
+#> R version 4.6.1 (2026-06-24)
 #> Platform: x86_64-pc-linux-gnu
-#> Running under: Ubuntu 24.04.3 LTS
+#> Running under: Ubuntu 24.04.4 LTS
 #> 
 #> Matrix products: default
 #> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -562,34 +589,34 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] ggplot2_4.0.2        vegan_2.7-2          permute_0.9-10      
-#> [4] rdryad_1.0.0         chromatographR_0.7.5
+#> [1] ggplot2_4.0.3        vegan_2.7-5          permute_0.9-10      
+#> [4] rdryad_1.0.0         chromatographR_0.8.0
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] gtable_0.3.6          xfun_0.56             caTools_1.18.3       
-#>  [4] lattice_0.22-7        generics_0.1.4        vctrs_0.7.1          
-#>  [7] tools_4.5.2           bitops_1.0-9          curl_7.0.0           
-#> [10] parallel_4.5.2        tibble_3.3.1          cluster_2.1.8.1      
-#> [13] pkgconfig_2.0.3       Matrix_1.7-4          data.table_1.18.2.1  
-#> [16] RColorBrewer_1.1-3    S7_0.2.1              readxl_1.4.5         
-#> [19] lifecycle_1.0.5       compiler_4.5.2        farver_2.1.2         
-#> [22] stringr_1.6.0         ptw_1.9-17            RcppDE_0.1.8         
+#>  [1] gtable_0.3.6          xfun_0.60             caTools_1.18.4       
+#>  [4] lattice_0.22-9        generics_0.1.4        vctrs_0.7.3          
+#>  [7] tools_4.6.1           bitops_1.1-0          curl_8.0.0           
+#> [10] parallel_4.6.1        tibble_3.3.1          cluster_2.1.8.2      
+#> [13] pkgconfig_2.0.3       Matrix_1.7-5          data.table_1.18.6.1  
+#> [16] RColorBrewer_1.1-3    S7_0.2.2              readxl_1.5.0         
+#> [19] lifecycle_1.0.5       compiler_4.6.1        farver_2.1.2         
+#> [22] stringr_1.6.0         ptw_1.9-17            RcppDE_0.1.9         
 #> [25] minpack.lm_1.2-4      htmltools_0.5.9       yaml_2.3.12          
-#> [28] Formula_1.2-5         pillar_1.11.1         MASS_7.3-65          
-#> [31] RaMS_1.4.3            nlme_3.1-168          mime_0.13            
-#> [34] tidyselect_1.2.1      zip_2.3.3             digest_0.6.39        
-#> [37] stringi_1.8.7         dplyr_1.2.0           purrr_1.2.1          
-#> [40] labeling_0.4.3        VPdtw_2.2.1           splines_4.5.2        
-#> [43] rprojroot_2.1.1       fastmap_1.2.0         grid_4.5.2           
-#> [46] here_1.0.2            cli_3.6.5             chromConverter_0.7.5 
-#> [49] magrittr_2.0.4        base64enc_0.1-6       crul_1.6.0           
-#> [52] dynamicTreeCut_1.63-1 withr_3.0.2           ggordiplots_0.4.3    
-#> [55] scales_1.4.0          rappdirs_0.3.4        bit64_4.6.0-1        
-#> [58] rmarkdown_2.30        bit_4.6.0             otel_0.2.0           
-#> [61] reticulate_1.45.0     cellranger_1.1.0      fastcluster_1.3.0    
-#> [64] png_0.1-8             pbapply_1.7-4         evaluate_1.0.5       
-#> [67] knitr_1.51            hoardr_0.5.5          mgcv_1.9-3           
-#> [70] rlang_1.1.7           Rcpp_1.1.1            glue_1.8.0           
-#> [73] httpcode_0.3.0        xml2_1.5.2            jsonlite_2.0.0       
+#> [28] Formula_1.2-6         pillar_1.11.1         MASS_7.3-65          
+#> [31] RaMS_1.4.3            nlme_3.1-169          mime_0.13            
+#> [34] tidyselect_1.2.1      zip_3.0.2             digest_0.6.39        
+#> [37] stringi_1.8.9         dplyr_1.2.1           purrr_1.2.2          
+#> [40] labeling_0.4.3        VPdtw_2.2.1           splines_4.6.1        
+#> [43] rprojroot_2.1.1       fastmap_1.2.0         grid_4.6.1           
+#> [46] here_1.0.2            cli_3.6.6             chromConverter_0.9.0 
+#> [49] magrittr_2.0.5        base64enc_0.1-6       crul_1.6.0           
+#> [52] dynamicTreeCut_1.63-1 withr_3.0.3           ggordiplots_0.4.3    
+#> [55] scales_1.4.0          rappdirs_0.3.4        bit64_4.8.4          
+#> [58] rmarkdown_2.31        bit_4.6.0             otel_0.2.0           
+#> [61] reticulate_1.46.0     cellranger_1.1.0      fastcluster_1.3.0    
+#> [64] png_0.1-9             pbapply_1.7-4         evaluate_1.0.5       
+#> [67] knitr_1.51            hoardr_0.5.5          mgcv_1.9-4           
+#> [70] rlang_1.3.0           Rcpp_1.1.2            glue_1.8.1           
+#> [73] httpcode_0.3.0        xml2_1.6.0            jsonlite_2.0.0       
 #> [76] R6_2.6.1
 ```

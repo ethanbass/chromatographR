@@ -1,11 +1,21 @@
 # Reshape chromatograms
 
-Reshapes a list of chromatograms from wide to long format.
+Converts a list of chromatographic matrices into a single long-format
+data frame with one row per sample × retention time × wavelength
+combination.
 
 ## Usage
 
 ``` r
-reshape_chroms(x, idx, sample_var = "sample", lambdas = NULL, rts = NULL)
+reshape_chroms(
+  x,
+  idx,
+  time_resolution = NULL,
+  sample_var = "sample",
+  lambdas = NULL,
+  rts = NULL,
+  transfer_metadata = FALSE
+)
 ```
 
 ## Arguments
@@ -18,21 +28,37 @@ reshape_chroms(x, idx, sample_var = "sample", lambdas = NULL, rts = NULL)
 
   Indices of chromatograms to convert.
 
+- time_resolution:
+
+  Time resolution used when reshaping. Can be used to subsample the time
+  axis. Defaults to full resolution.
+
 - sample_var:
 
-  String with name of new column containing sample IDs.
+  Name of the new column containing sample identifiers
 
 - lambdas:
 
-  Vector specifying wavelength(s) to include.
+  Wavelength(s) to include.
 
 - rts:
 
-  Vector specifying retention times to include.
+  Retention times to include.
+
+- transfer_metadata:
+
+  Logical. If `TRUE`, metadata attributes are transferred to the output.
+  Defaults to `FALSE`.
 
 ## Value
 
-A list of chromatographic matrices in long format.
+A data frame in long format with columns `rt`, `lambda`, `absorbance`,
+and a sample identifier column specified by `sample_var`.
+
+## Details
+
+Each row corresponds to a single measurement of signal intensity at a
+given retention time and wavelength for a specific sample.
 
 ## See also
 

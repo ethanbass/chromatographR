@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="chromatographR: An introduction to HPLC-DAD analysis">
 </head>
@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.7.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,20 +64,16 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>chromatographR: An introduction to HPLC-DAD analysis</h1>
-                        <h4 data-toc-skip class="author">Ethan
-Bass<sup>1</sup>
-</h4>
+                        <h4 data-toc-skip class="author">Ethan Bass</h4>
             
-            <h4 data-toc-skip class="date">2026-02-17</h4>
+            <h4 data-toc-skip class="date">2026-08-30</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/v0.7.5/vignettes/chromatographR.Rmd" class="external-link"><code>vignettes/chromatographR.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/master/vignettes/chromatographR.Rmd" class="external-link"><code>vignettes/chromatographR.Rmd</code></a></small>
       <div class="d-none name"><code>chromatographR.Rmd</code></div>
     </div>
 
     
     
-<p><sup>1</sup> Department of Ecology and Evolutionary Biology, Cornell
-University, Ithaca NY</p>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -95,12 +91,12 @@ repeated. Reproducibility is much higher in command line workflows, like
 <em>chromatographR</em>, where the entire analysis can be stored and
 easily repeated by anyone using publicly available software.</p>
 <p>The <em>chromatographR</em> package began as a fork from the
-previously published <em>alsace</em> package <span class="citation">(Wehrens, Carvalho, and Fraser 2015)</span>, but has
-been reworked with improved functions for peak-finding, integration and
-peak table generation as well as a number of new tools for data
-visualization and downstream analysis. Unlike <em>alsace</em>, which
-emphasized multivariate curve resolution through alternating least
-squares (MCR-ALS), <em>chromatographR</em> is developed around a more
+previously published <em>alsace</em> package <span class="citation">(Wehrens et al. 2015)</span>, but has been reworked
+with improved functions for peak-finding, integration and peak table
+generation as well as a number of new tools for data visualization and
+downstream analysis. Unlike <em>alsace</em>, which emphasized
+multivariate curve resolution through alternating least squares
+(MCR-ALS), <em>chromatographR</em> is developed around a more
 conventional workflow that should seem more familiar to users of
 standard software tools for HPLC-DAD analysis. <em>chromatographR</em>
 includes tools for a) pre-processing, b) retention-time alignment, c)
@@ -115,13 +111,14 @@ table.</p>
 <h3 id="loading-data">Loading data<a class="anchor" aria-label="anchor" href="#loading-data"></a>
 </h3>
 <p>chromatographR can import data from a growing list of proprietary
-file formats using the <code>read_chroms</code> function. Supported file
-formats include ‘Agilent ChemStation’ and ‘MassHunter’ (<code>.D</code>)
-files, ‘Thermo Raw’ (<code>.raw</code>), ‘Chromeleon’ UV ASCII
-(<code>.txt</code>), ‘Waters ARW’ (<code>.arw</code>), ‘Shimadzu’ ASCII
-(<code>.txt</code>), and more. (For a full list, see the <a href="https://ethanbass.github.io/chromConverter/" class="external-link">chromConverter
+file formats using the <code>read_chroms</code> function from the
+chromConverter package. Supported file formats include ‘Agilent
+ChemStation’ and ‘MassHunter’ (<code>.D</code>) files, ‘Thermo Raw’
+(<code>.raw</code>), ‘Chromeleon’ UV ASCII (<code>.txt</code>), ‘Waters
+ARW’ (<code>.arw</code>), ‘Shimadzu’ ASCII (<code>.txt</code>), and
+more. (For a complete list, see the <a href="https://ethanbass.github.io/chromConverter/" class="external-link">chromConverter
 documentation</a>). Select the appropriate file format by specifying the
-<code>format_in</code> argument (e.g. <code>csv</code>,
+<code>format_in</code> argument (e.g., <code>csv</code>,
 <code>chemstation_uv</code>, <code>masshunter_dad</code>,
 <code>chromeleon_uv</code>, <code>waters_arw</code>, etc).</p>
 <pre class="text"><code>&gt; # single folder
@@ -161,61 +158,61 @@ correction, and interpolation) are available through the
 <p>To select a narrower range of times and/or wavelengths, arguments can
 be provided to the optional <code>dim1</code> and <code>dim2</code>
 arguments. The <code>baseline_cor</code> function from the <em>ptw</em>
-package <span class="citation">(Bloemberg et al. 2010)</span> takes
-arguments <code>p</code> (an asymmetry parameter) and
-<code>lambda</code> (a smoothing parameter). You can read more about
-these in the documentation for <code><a href="https://rdrr.io/pkg/ptw/man/asysm.html" class="external-link">ptw::asysm</a></code>. You may want to
-experiment with these parameters before choosing values to use on your
-whole dataset.</p>
+package <span class="citation">(<span class="nocase">Bloemberg et
+al.</span> 2010)</span> takes arguments <code>p</code> (an asymmetry
+parameter) and <code>lambda</code> (a smoothing parameter). You can read
+more about these in the documentation for <code><a href="https://rdrr.io/pkg/ptw/man/asysm.html" class="external-link">ptw::asysm</a></code>. You
+may want to experiment with these parameters before choosing values to
+use on your whole dataset.</p>
 <pre class="text"><code>&gt; i &lt;- 2 # chromatogram number in list of data
-&gt; tpoints &lt;- as.numeric(rownames(Sa[[i]]))
-&gt; lambda &lt;- '200.00000'
+&gt; tpoints &lt;- get_times(Sa)
+&gt; wavelength &lt;- '200.00000' # this must match one of the column names from your chromatogram
 &gt; 
-&gt; matplot(x = tpoints, y = Sa[[i]][,lambda],
+&gt; matplot(x = tpoints, y = Sa[[i]][,wavelength],
 +        type = 'l', ylab = 'Abs (mAU)', xlab = 'Time (min)')
-&gt; matplot(x = tpoints, y = ptw::baseline.corr(Sa[[i]][,lambda], p = .001, lambda = 1e5),
+&gt; matplot(x = tpoints, y = ptw::baseline.corr(Sa[[i]][,wavelength], p = .001, lambda = 1e5),
 +        type = 'l', add = TRUE, col='darkgreen', lty = 3)
-&gt; matplot(x = tpoints, y = ptw::baseline.corr(Sa[[i]][,lambda], p = .1, lambda = 1e5),
+&gt; matplot(x = tpoints, y = ptw::baseline.corr(Sa[[i]][,wavelength], p = .1, lambda = 1e5),
 +        type = 'l', add = TRUE, col='firebrick2', lty = 3)</code></pre>
 <div class="figure">
-<img src="chromatographR_files/figure-html/choose_parameters_for_fitting_baseline-1.png" class="r-plt" alt="Comparison of baseline correction parameters: raw data (black), mild correction (green, p = 0.001), strong correction (red, p = 0.1)." width="600px"><p class="caption">
+<img src="chromatographR_files/figure-html/choose-parameters-for-fitting-baseline-1.png" class="r-plt" alt="Comparison of baseline correction parameters: raw data (black), mild correction (green, p = 0.001), strong correction (red, p = 0.1)." width="600px"><p class="caption">
 Comparison of baseline correction parameters: raw data (black), mild
 correction (green, p = 0.001), strong correction (red, p = 0.1).
 </p>
 </div>
 <p>After selecting parameters for baseline correction, you can proceed
-with the pre-processing step as shown below.</p>
+with the pre-processing step as shown below. For 2D data (e.g., from a
+single-wavelength detector), the <code>dim2</code> argument should be
+left blank.</p>
 <pre class="text"><code>&gt; # choose dimensions for interpolation
-&gt; new.ts &lt;- seq(10, 18.66, by = .01) # choose time-points
-&gt; new.lambdas &lt;- seq(200, 318, by = 2) # choose wavelengths
+&gt; new_times &lt;- seq(10, 18.66, by = .01) # choose time-points
+&gt; new_wavelengths &lt;- seq(200, 318, by = 2) # choose wavelengths
 &gt; 
-&gt; dat.pr &lt;- preprocess(Sa, dim1 = new.ts, dim2 = new.lambdas, p = .001, 
+&gt; dat.pr &lt;- preprocess(Sa, dim1 = new_times, dim2 = new_wavelengths, p = .001, 
 +                      lambda = 1e5, cl = 1)</code></pre>
 </div>
 <div class="section level3">
 <h3 id="alignment">Alignment<a class="anchor" aria-label="anchor" href="#alignment"></a>
 </h3>
 <p>In many cases, liquid chromatography can suffer from retention time
-shifts (e.g. due to temperature fluctuations, column degradation, or
-subtle changes in mobile-phase composition), which can make it very
-difficult to compare peaks across samples. Luckily, a number of
-“time-warping” algorithms have been developed for correcting these kinds
-of shifts. In <code>chromatographR</code>, parametric time warping
-(<code>ptw</code>) <span class="citation">(Eilers 2004; Bloemberg et al.
-2010)</span> and variable penalty dynamic time warping
-(<code>vpdtw</code>) <span class="citation">(Clifford et al. 2009;
-Clifford and Stone 2012)</span> are available for correcting retention
-time shifts through the <code>correct_rt</code> function. Both warping
-functions aim to produce a better alignment of features by “warping” the
-time-axis of each supplied chromatogram to match a reference
-chromatogram. (The reference chromatogram can either be determined
-algorithmically or selected manually by setting the
-<code>reference</code> argument).</p>
+shifts of varying degree (e.g., due to temperature fluctuations, column
+degradation, or subtle changes in mobile-phase composition), which can
+make it very difficult to compare peaks across samples. Luckily, a
+number of “time-warping” algorithms have been developed for correcting
+these kinds of shifts. In <code>chromatographR</code>, parametric time
+warping (<code>ptw</code>) <span class="citation">(Eilers 2004; <span class="nocase">Bloemberg et al.</span> 2010)</span> and variable penalty
+dynamic time warping (<code>vpdtw</code>) <span class="citation">(Clifford et al. 2009; Clifford and Stone 2012)</span>
+are available for correcting retention time shifts through the
+<code>correct_rt</code> function. Both warping functions aim to produce
+a better alignment of features by “warping” the time-axis of each
+supplied chromatogram to match a reference chromatogram. (The reference
+chromatogram can either be determined algorithmically or selected
+manually by setting the <code>reference</code> argument).</p>
 <p>First, we check the alignment of our chromatograms using the
 <code>plot_chroms</code> function.</p>
-<pre class="text"><code>&gt; plot_chroms(dat.pr, lambdas = 210)</code></pre>
+<pre class="text"><code>&gt; plot_chroms(dat.pr, lambdas = 210, show_legend = TRUE)</code></pre>
 <div class="figure">
-<img src="chromatographR_files/figure-html/check%20alignment-1.png" class="r-plt" alt="Chromatographic traces of four *S. altissima* root chromatograms at 210 nm." width="600px"><p class="caption">
+<img src="chromatographR_files/figure-html/check-alignment-1.png" class="r-plt" alt="Chromatographic traces of four *S. altissima* root chromatograms at 210 nm." width="600px"><p class="caption">
 Chromatographic traces of four <em>S. altissima</em> root chromatograms
 at 210 nm.
 </p>
@@ -252,7 +249,7 @@ of warped (top panel) and unwarped (bottom panel) chromatograms.</p>
 &gt; plot_chroms(warp_ptw, lambdas = 210, show_legend = FALSE)
 &gt; legend("topleft", legend = "PTW", bty = "n")</code></pre>
 <div class="figure">
-<img src="chromatographR_files/figure-html/alignment_plot-1.png" class="r-plt" alt="Comparison of parametric time warping (PTW) aligned chromatograms and raw data." width="600px"><p class="caption">
+<img src="chromatographR_files/figure-html/alignment-plot-1.png" class="r-plt" alt="Comparison of parametric time warping (PTW) aligned chromatograms and raw data." width="600px"><p class="caption">
 Comparison of parametric time warping (PTW) aligned chromatograms and
 raw data.
 </p>
@@ -275,8 +272,8 @@ warping (DTW) works by repeatedly shifting, expanding or contracting the
 time axis in small steps until a satisfactory alignment is attained.
 This process can result in very close matching of peaks, but can also
 lead to severe peak distortion if the time axis is repeatedly expanded
-and/or contracted <span class="citation">(Tomasi, van den Berg, and
-Andersson 2004)</span>. <strong>Variable penalty dynamic time
+and/or contracted <span class="citation">(<span class="nocase">Tomasi et
+al.</span> 2004)</span>. <strong>Variable penalty dynamic time
 warping</strong> is a derivative of DTW that constrains expansion and
 contraction of the time-axis by applying a penalty to these types of
 “risky” moves. This can often achieve a very good alignment with minimal
@@ -297,7 +294,7 @@ of warping.</p>
 &gt; plot_chroms(warp_vpdtw, lambdas = 210, show_legend = FALSE)
 &gt; legend("topleft", legend = "VPdtw", bty = "n")</code></pre>
 <div class="figure">
-<img src="chromatographR_files/figure-html/plot_chroms-1.png" class="r-plt" alt="Comparison of variable penalty dynamic time warping (VPdtw) aligned chromatograms (top) with raw data (bottom)." width="600px"><p class="caption">
+<img src="chromatographR_files/figure-html/plot-chroms-1.png" class="r-plt" alt="Comparison of variable penalty dynamic time warping (VPdtw) aligned chromatograms (top) with raw data (bottom)." width="600px"><p class="caption">
 Comparison of variable penalty dynamic time warping (VPdtw) aligned
 chromatograms (top) with raw data (bottom).
 </p>
@@ -306,11 +303,14 @@ chromatograms (top) with raw data (bottom).
 <code>plot_chroms_heatmap</code>, which can be a powerful way to check
 the alignment of chromatograms across samples.</p>
 <pre class="text"><code>&gt; par(mfrow=c(3,1))
-&gt; plot_chroms_heatmap(dat.pr, lambdas = 210, show_legend = FALSE, title="Raw data")
-&gt; plot_chroms_heatmap(warp_ptw, lambdas = 210, show_legend = FALSE, title="Parametric Time Warping (PTW)")
-&gt; plot_chroms_heatmap(warp_vpdtw, lambdas = 210, show_legend = FALSE, title="Variable Penalty Dynamic Time Warping (VPdtw)")</code></pre>
+&gt; plot_chroms_heatmap(dat.pr, lambdas = 210, show_legend = FALSE,
++                     title="Raw data")
+&gt; plot_chroms_heatmap(warp_ptw, lambdas = 210, show_legend = FALSE,
++                     title="Parametric Time Warping (PTW)")
+&gt; plot_chroms_heatmap(warp_vpdtw, lambdas = 210, show_legend = FALSE,
++                     title="Variable Penalty Dynamic Time Warping (VPdtw)")</code></pre>
 <div class="figure">
-<img src="chromatographR_files/figure-html/plot_chroms_heatmap-1.png" class="r-plt" alt="Comparison of variable penalty dynamic time warping (VPdtw) aligned chromatograms (top) with raw data (bottom) via heatmap plot." width="600px"><p class="caption">
+<img src="chromatographR_files/figure-html/plot-chroms-heatmap-1.png" class="r-plt" alt="Comparison of variable penalty dynamic time warping (VPdtw) aligned chromatograms (top) with raw data (bottom) via heatmap plot." width="600px"><p class="caption">
 Comparison of variable penalty dynamic time warping (VPdtw) aligned
 chromatograms (top) with raw data (bottom) via heatmap plot.
 </p>
@@ -332,33 +332,23 @@ by looping through the supplied chromatograms at the specified
 wavelengths, finding peaks, and fitting them to the specified function
 using non-linear least squares. The area under the curve for each peak
 is then estimated using trapezoidal approximation. The <code>fit</code>
-argument can be used to specify a peak-fitting model. The current
-options are exponential-gaussian hybrid (<code>egh</code>) <span class="citation">(Lan and Jorgenson 2001)</span> (the default setting)
-or <code>gaussian</code>. Alternatively, peak areas can be integrated
-without applying a model (<code>fit = raw</code>). The function returns
-a nested list of data.frames containing parameters for the peaks
-identified in each chromatogram.</p>
-<pre class="text"><code>&gt; # find and integrate peaks using gaussian peak fitting
-&gt; pks_gauss &lt;- get_peaks(warp_vpdtw, lambdas = c(210), sd.max = 40, fit = "gaussian")
+argument can be used to specify a peak-fitting model. By default, peaks
+will be fit to an exponential-gaussian hybrid function
+(<code>"egh"</code>) <span class="citation">(Lan and Jorgenson
+2001)</span>. Other options include the bidirectional exponentially
+modified gaussian (<code>"bemg"</code>) or <code>"gaussian"</code>.
+Alternatively, peak areas can be integrated without applying a model
+(<code>fit = "raw"</code>). The function returns a nested list of
+data.frames containing parameters for the peaks identified in each
+chromatogram.</p>
+<pre class="text"><code>&gt; # find and integrate peaks using exponential-gaussian hybrid model
+&gt; pks_bemg &lt;- get_peaks(warp_vpdtw, lambdas = c(210), sd_max = 40, fit = "bemg")
+&gt; 
+&gt; # find and integrate peaks using gaussian peak fitting
+&gt; pks_gauss &lt;- get_peaks(warp_vpdtw, lambdas = c(210), sd_max = 40, fit = "gaussian")
 &gt; 
 &gt; # find and integrate peaks using exponential-gaussian hybrid model
-&gt; pks_egh &lt;- get_peaks(warp_vpdtw, lambdas = c(210), sd.max = 40, fit = "egh")
-&gt; 
-&gt; # find and integrate peaks without modeling peak shape
-&gt; pks_raw &lt;- get_peaks(warp_vpdtw, lambdas = c(210), sd.max = 100, fit = "raw")</code></pre>
-<div class="section level4">
-<h4 id="filtering">Filtering<a class="anchor" aria-label="anchor" href="#filtering"></a>
-</h4>
-<p>The peak-finding algorithm may often detect a lot of peaks that are
-little more than noise. Thus, it is recommended to filter out extraneous
-peaks at this stage (especially if you are processing a lot of samples)
-as it can greatly reduce the computational burden of peak table
-construction. This can be accomplished directly by using the arguments
-<code>sd_max</code> (to filter by peak width) and/or
-<code>amp_thresh</code> (to filter by peak height). Alternatively, the
-<code>filter_peaks</code> function can be used to filter peaks after the
-<code>peak_list</code> has already been created.</p>
-</div>
+&gt; pks_egh &lt;- get_peaks(warp_vpdtw, lambdas = c(210), sd_max = 40, fit = "egh")</code></pre>
 <div class="section level4">
 <h4 id="visualization">Visualization<a class="anchor" aria-label="anchor" href="#visualization"></a>
 </h4>
@@ -376,14 +366,65 @@ more accurate.</p>
 &gt; plot(pks_egh, idx = 1, lambda = 210)
 &gt; legend("topright", "Exponential-gaussian hybrid", bty = "n")
 &gt; 
-&gt; plot(pks_raw, idx = 1, lambda = 210)
-&gt; legend("topright", "Raw", bty = "n")</code></pre>
+&gt; plot(pks_bemg, idx = 1, lambda = 210)
+&gt; legend("topright", "Bidirectional exponentially modified gaussian", bty = "n")</code></pre>
 <div class="figure">
-<img src="chromatographR_files/figure-html/plot_peaks-1.png" class="r-plt" alt="Comparison of peak fitting algorithms: gaussian (top), exponential-gaussian hybrid (middle) and raw (bottom)." width="600px"><p class="caption">
+<img src="chromatographR_files/figure-html/plot-peaks-1.png" class="r-plt" alt="Comparison of peak fitting algorithms: gaussian (top), exponential-gaussian hybrid (middle) and raw (bottom)." width="600px"><p class="caption">
 Comparison of peak fitting algorithms: gaussian (top),
 exponential-gaussian hybrid (middle) and raw (bottom).
 </p>
 </div>
+</div>
+<div class="section level4">
+<h4 id="local-baseline-correction">Local baseline correction<a class="anchor" aria-label="anchor" href="#local-baseline-correction"></a>
+</h4>
+<p>When peaks sit on a rising or falling background — for example,
+during gradient elution — the <code>baseline</code> argument can be used
+to fit a local baseline beneath each peak. Setting
+<code>baseline = "flat"</code> fits a constant offset per peak;
+<code>baseline = "sloped"</code> fits a linearly varying baseline across
+the peak window. In both cases peak heights and areas are computed above
+the fitted baseline.</p>
+<p>The effect is most visible on data that has not been
+baseline-corrected during preprocessing. Below, we preprocess the raw
+data without baseline correction to better illustrate the
+difference.</p>
+<pre class="text"><code>&gt; dat.pr.ubc &lt;- preprocess(Sa[2], dim1 = new_times, dim2 = new_wavelengths,
++                         remove.time.baseline = FALSE, cl = 1)
+&gt; 
+&gt; pks_ubc &lt;- get_peaks(dat.pr.ubc, lambdas = 210, fit = "egh", cl = 1)
+&gt; pks_flat &lt;- get_peaks(dat.pr.ubc, lambdas = 210, fit = "egh", baseline = "flat", cl = 1)
+&gt; pks_sloped &lt;- get_peaks(dat.pr.ubc, lambdas = 210, fit = "egh", baseline = "sloped", cl = 1)
+&gt; 
+&gt; par(mfrow=c(3,1))
+&gt; plot(pks_ubc, lambda = 210)
+&gt; legend("topright", "Uncorrected", bty = "n")
+&gt; 
+&gt; plot(pks_flat, lambda = 210)
+&gt; legend("topright", "Flat baseline", bty = "n")
+&gt; 
+&gt; plot(pks_sloped, lambda = 210)
+&gt; legend("topright", "Sloped baseline", bty = "n")</code></pre>
+<div class="figure">
+<img src="chromatographR_files/figure-html/baseline-fitting-1.png" class="r-plt" alt="Comparison of peak fitting with no baseline (top), a flat baseline (middle), and a sloped baseline (bottom) on un-baseline-corrected data. Shaded areas represent the fitted peak above the local baseline." width="600px"><p class="caption">
+Comparison of peak fitting with no baseline (top), a flat baseline
+(middle), and a sloped baseline (bottom) on un-baseline-corrected data.
+Shaded areas represent the fitted peak above the local baseline.
+</p>
+</div>
+</div>
+<div class="section level4">
+<h4 id="peak-filtering">Peak filtering<a class="anchor" aria-label="anchor" href="#peak-filtering"></a>
+</h4>
+<p>The peak-finding algorithm may often detect a lot of peaks that are
+little more than noise. Thus, it is recommended to filter out extraneous
+peaks at this stage (especially if you are processing a lot of samples)
+as it can greatly reduce the computational burden of peak table
+construction. This can be accomplished directly by using the arguments
+<code>sd_max</code> (to filter by peak width) and/or
+<code>amp_thresh</code> (to filter by peak height). Alternatively, the
+<code>filter_peaks</code> function can be used to filter peaks after the
+<code>peak_list</code> has already been created.</p>
 </div>
 </div>
 <div class="section level3">
@@ -410,11 +451,11 @@ erroneously combining multiple peaks into the same column.</p>
 &gt; 
 &gt; # print first six columns of peak table
 &gt; head(pk_tab$tab[,1:6])</code></pre>
-<pre><code>          V1       V2        V3        V4       V5        V6
-119 0.000000 5.496455 0.0000000 0.6572183 1.991365 15.199917
-121 6.067418 4.200859 1.0746359 0.6078366 0.000000  7.908693
-122 4.033380 8.261218 0.9544689 1.9510595 0.000000 25.772683
-458 6.545535 6.201729 2.2880101 1.9889770 5.308515 13.995000</code></pre>
+<pre><code>          V1        V2        V3       V4        V5        V6
+119 5.493307 0.0000000 0.6623171 1.893488 15.255301 0.3155420
+121 4.200404 1.0795517 0.5923461 0.000000  7.918288 0.0000000
+122 8.252965 0.9604691 1.8955526 0.000000 25.785386 1.8048131
+458 6.197835 2.2994969 1.9235836 5.154698 14.086791 0.3030461</code></pre>
 </div>
 <div class="section level3">
 <h3 id="further-analysis-and-data-visualization">Further analysis and data-visualization<a class="anchor" aria-label="anchor" href="#further-analysis-and-data-visualization"></a>
@@ -431,7 +472,7 @@ metadata, where one of the columns matches the names of your samples.
 This column should be specified by supplying the column name as a string
 to the <code>column</code> argument. This will attach the ordered
 metadata in the <code>sample_meta</code> slot of your peak table. The
-peak table can then be normalized (e.g. by dividing out the sample
+peak table can then be normalized (e.g., by dividing out the sample
 weight) using the <code>normalize_data</code> function.</p>
 <pre class="text"><code>&gt; # load example metadata
 &gt; path &lt;- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
@@ -446,7 +487,7 @@ weight) using the <code>normalize_data</code> function.</p>
 </h4>
 <p>Optionally, you can attach scaled reference spectra to the peak_table
 using the <code>attach_ref_spectra</code> function. This can be helpful
-for working with UV spectra programmatically (e.g. to sort peaks by
+for working with UV spectra programmatically (e.g., to sort peaks by
 their chromophores). Reference spectra are defined either as the
 spectrum with the highest intensity for each peak (when
 <code>ref = "max.int"</code>) or as the spectrum with the highest
@@ -461,7 +502,7 @@ particular chromophore.</p>
 +                    y = pk_tab$ref_spectra[, hx], type = 'l',
 +                    ylab = "Abs (mAU)", 
 +                    xlab = "Wavelength (nm)")</code></pre>
-<p><img src="chromatographR_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="600px"></p>
+<p><img src="chromatographR_files/figure-html/attach-reference-spectra-1.png" class="r-plt" alt="" width="600px"></p>
 </div>
 <div class="section level4">
 <h4 id="data-visualization">Data visualization<a class="anchor" aria-label="anchor" href="#data-visualization"></a>
@@ -472,7 +513,7 @@ particular chromophore.</p>
 <p>The <code>mirror_plot</code> function provides a quick way to
 visually compare results across treatment groups.</p>
 <pre class="text"><code>&gt; mirror_plot(pk_tab, lambdas = c(210), var = "trt", legend_size = 2)</code></pre>
-<p><img src="chromatographR_files/figure-html/mirror_plot-1.png" class="r-plt" alt="" width="600px"></p>
+<p><img src="chromatographR_files/figure-html/mirror-plot-1.png" class="r-plt" alt="" width="600px"></p>
 </div>
 <div class="section level5">
 <h5 id="plotting-spectra">Plotting spectra<a class="anchor" aria-label="anchor" href="#plotting-spectra"></a>
@@ -492,18 +533,42 @@ index and wavelength using the <code>idx</code> and <code>lambda</code>
 arguments.</p>
 <pre class="text"><code>&gt; par(mfrow = c(2,1))
 &gt; peak &lt;- "V7"
-&gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp_vpdtw, 
+&gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp_vpdtw,
 +               verbose = FALSE)</code></pre>
-<p><img src="chromatographR_files/figure-html/plot_spectra-1.png" class="r-plt" alt="Output of `plot_spectrum` function. Trace of chromatogram 4 at 318 nm (top) and spectrum of peak `V7` (bottom)." width="600px"></p>
+<p><img src="chromatographR_files/figure-html/plot-spectra-1.png" class="r-plt" alt="Output of `plot_spectrum` function. Trace of chromatogram 4 at 318 nm (top) and spectrum of peak `V7` (bottom)." width="600px"></p>
 <p>The <code>plot_spectrum</code> function can also be used to generate
 interactive plots using <a href="https://plotly.com/r/" class="external-link">plotly</a>.</p>
 <pre class="text"><code>&gt; plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp_vpdtw, 
 +               verbose = FALSE, engine = "plotly")</code></pre>
 <p>The <code>plot_all_spectra</code> function can be used to visually
 compare the spectra for a specified peak across all samples.</p>
-<pre class="text"><code>&gt; peak &lt;- "V13"
-&gt; plot_all_spectra(peak, peak_table = pk_tab, export = FALSE)</code></pre>
-<p><img src="chromatographR_files/figure-html/plot_all_spectra-1.png" class="r-plt" alt="Output of `plot_all_spectra` function showing scaled spectra of peak `V3`." width="600px"></p>
+<pre class="text"><code>&gt; par(mfrow=c(1,2))
+&gt; plot_all_spectra("V13", peak_table = pk_tab, export = FALSE)
+&gt; plot_all_spectra("V14", peak_table = pk_tab, export = FALSE)</code></pre>
+<p><img src="chromatographR_files/figure-html/plot-all-spectra-1.png" class="r-plt" alt="Output of `plot_all_spectra` function showing scaled spectra of peaks `V13` and `V14`." width="600px"></p>
+<p>Inconsistencies in the spectra (as can be seen with “V13”) can be
+indicative of a problem with the alignment or co-elution of multiple
+substances during the same retention window. By contrast, “V14” looks
+relatively pure.</p>
+<p>The new <code>plot_spectrum_inset</code> function can also be used to
+plot spectra onto the chromatogram.</p>
+<pre class="text"><code>&gt; plot_spectrum_inset("V13", peak_table = pk_tab, 
++               verbose = FALSE, xlab="Retention time (min)",
++               position="top", inset_width = 0.25)</code></pre>
+<p><img src="chromatographR_files/figure-html/inset-plot-1.png" class="r-plt" alt="" width="600px"></p>
+<p>This function can also be used to produce multiple insets. The
+spectra can also be given titles using the <code>title</code> argument.
+Additional peaks can be labeled with arbitrary labels using the
+<code>annotate_peaks</code> function.</p>
+<pre class="text"><code>&gt; plot_spectrum_inset(c("Unknown 1" = "V7",
++                       "Unknown 2" = "V15"), idx=c(1:4), 
++                     peak_table = pk_tab, 
++               verbose = FALSE, xlab="Retention time (min)",
++               position=list(c(0.0,0.6),c(0.55,0.4)), inset_width = 0.25,
++               scale_spectrum = FALSE) |&gt;
++    annotate_peaks(loc = c(A = "V5", B = "V7", C="V17",
++                           D = "V21", E = "V22"), peak_table = pk_tab)</code></pre>
+<p><img src="chromatographR_files/figure-html/double-inset-plot-1.png" class="r-plt" alt="" width="600px"></p>
 </div>
 <div class="section level5">
 <h5 id="plot-peak-table-function">Plot peak table function<a class="anchor" aria-label="anchor" href="#plot-peak-table-function"></a>
@@ -517,7 +582,7 @@ to quickly compare results across treatments by calling
 <code>boxplot</code>.</p>
 <pre class="text"><code>&gt; par(mfrow = c(3,1))
 &gt; plot(pk_tab, loc = "V13", box_plot = TRUE, vars = "trt", verbose = FALSE)</code></pre>
-<p><img src="chromatographR_files/figure-html/plot_peaktable-1.png" class="r-plt" alt="" width="600px"></p>
+<p><img src="chromatographR_files/figure-html/plot-peaktable-1.png" class="r-plt" alt="" width="600px"></p>
 </div>
 </div>
 </div>
@@ -525,14 +590,12 @@ to quickly compare results across treatments by calling
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-bloemberg2010" class="csl-entry">
-Bloemberg, Tom G., Jan Gerretzen, Hans J. P. Wouters, Jolein Gloerich,
-Maurice van Dael, Hans J. C. T. Wessels, Lambert P. van den Heuvel, Paul
-H. C. Eilers, Lutgarde M. C. Buydens, and Ron Wehrens. 2010.
-<span>“Improved Parametric Time Warping for Proteomics.”</span>
-<em>Chemometrics and Intelligent Laboratory Systems</em>,
-<span>OMICS</span>, 104 (1): 65–74. <a href="https://doi.org/10.1016/j.chemolab.2010.04.008" class="external-link">https://doi.org/10.1016/j.chemolab.2010.04.008</a>.
+<span class="nocase">Bloemberg, Tom G., Jan Gerretzen, Hans J. P.
+Wouters, et al.</span> 2010. <span>“Improved Parametric Time Warping for
+Proteomics.”</span> <em>Chemometrics and Intelligent Laboratory
+Systems</em>, <span>OMICS</span>, vol. 104 (1): 65–74. <a href="https://doi.org/10.1016/j.chemolab.2010.04.008" class="external-link">https://doi.org/10.1016/j.chemolab.2010.04.008</a>.
 </div>
 <div id="ref-clifford2012" class="csl-entry">
 Clifford, David, and Glenn Stone. 2012. <span>“Variable <span>Penalty
@@ -541,9 +604,8 @@ Chromatograms</span> in <span>R</span>.”</span> <em>Journal of
 Statistical Software</em> 47 (April): 1–17. <a href="https://doi.org/10.18637/jss.v047.i08" class="external-link">https://doi.org/10.18637/jss.v047.i08</a>.
 </div>
 <div id="ref-clifford2009" class="csl-entry">
-Clifford, David, Glenn Stone, Ivan Montoliu, Serge Rezzi,
-François-Pierre Martin, Philippe Guy, Stephen Bruce, and Sunil Kochhar.
-2009. <span>“Alignment <span>Using Variable Penalty Dynamic Time
+Clifford, David, Glenn Stone, Ivan Montoliu, et al. 2009.
+<span>“Alignment <span>Using Variable Penalty Dynamic Time
 Warping</span>.”</span> <em>Analytical Chemistry</em> 81 (3): 1000–1007.
 <a href="https://doi.org/10.1021/ac802041e" class="external-link">https://doi.org/10.1021/ac802041e</a>.
 </div>
@@ -557,10 +619,10 @@ and Gaussian Functions as a Simple Model of Asymmetric Chromatographic
 Peaks.”</span> <em>Journal of Chromatography A</em> 915 (1): 1–13. <a href="https://doi.org/10.1016/S0021-9673(01)00594-5" class="external-link">https://doi.org/10.1016/S0021-9673(01)00594-5</a>.
 </div>
 <div id="ref-tomasi2004" class="csl-entry">
-Tomasi, Giorgio, Frans van den Berg, and Claus Andersson. 2004.
-<span>“Correlation Optimized Warping and Dynamic Time Warping as
-Preprocessing Methods for Chromatographic Data.”</span> <em>Journal of
-Chemometrics</em> 18 (5): 231–41. <a href="https://doi.org/10.1002/cem.859" class="external-link">https://doi.org/10.1002/cem.859</a>.
+<span class="nocase">Tomasi, Giorgio, Frans van den Berg, and Claus
+Andersson</span>. 2004. <span>“Correlation Optimized Warping and Dynamic
+Time Warping as Preprocessing Methods for Chromatographic Data.”</span>
+<em>Journal of Chemometrics</em> 18 (5): 231–41. <a href="https://doi.org/10.1002/cem.859" class="external-link">https://doi.org/10.1002/cem.859</a>.
 </div>
 <div id="ref-uesugi2013" class="csl-entry">
 Uesugi, Akane, and André Kessler. 2013. <span>“Herbivore Exclusion
@@ -579,9 +641,9 @@ Curve Resolution: The Alsace Package for <span>R</span>.”</span>
 <h2 id="session-information">Session Information<a class="anchor" aria-label="anchor" href="#session-information"></a>
 </h2>
 <pre class="text"><code>&gt; sessionInfo()</code></pre>
-<pre><code>R version 4.5.2 (2025-10-31)
+<pre><code>R version 4.6.1 (2026-06-24)
 Platform: x86_64-pc-linux-gnu
-Running under: Ubuntu 24.04.3 LTS
+Running under: Ubuntu 24.04.4 LTS
 
 Matrix products: default
 BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -601,29 +663,33 @@ attached base packages:
 [8] base     
 
 other attached packages:
-[1] chromatographR_0.7.5 knitr_1.51          
+[1] chromatographR_0.8.0 knitr_1.51          
 
 loaded via a namespace (and not attached):
- [1] sass_0.4.10           bitops_1.0-9          xml2_1.5.2           
- [4] fastcluster_1.3.0     stringi_1.8.7         lattice_0.22-7       
- [7] digest_0.6.39         magrittr_2.0.4        caTools_1.18.3       
-[10] chromConverter_0.7.5  RColorBrewer_1.1-3    evaluate_1.0.5       
-[13] grid_4.5.2            dynamicTreeCut_1.63-1 fastmap_1.2.0        
-[16] cellranger_1.1.0      jsonlite_2.0.0        Matrix_1.7-4         
-[19] Formula_1.2-5         purrr_1.2.1           scales_1.4.0         
-[22] RaMS_1.4.3            pbapply_1.7-4         textshaping_1.0.4    
-[25] jquerylib_0.1.4       cli_3.6.5             rlang_1.1.7          
-[28] bit64_4.6.0-1         ptw_1.9-17            base64enc_0.1-6      
-[31] cachem_1.1.0          yaml_2.3.12           otel_0.2.0           
-[34] tools_4.5.2           minpack.lm_1.2-4      RcppDE_0.1.8         
-[37] reticulate_1.45.0     vctrs_0.7.1           R6_2.6.1             
-[40] png_0.1-8             lifecycle_1.0.5       stringr_1.6.0        
-[43] fs_1.6.6              htmlwidgets_1.6.4     bit_4.6.0            
-[46] ragg_1.5.0            desc_1.4.3            pkgdown_2.2.0.9000   
-[49] bslib_0.10.0          VPdtw_2.2.1           data.table_1.18.2.1  
-[52] glue_1.8.0            Rcpp_1.1.1            systemfonts_1.3.1    
-[55] xfun_0.56             farver_2.1.2          htmltools_0.5.9      
-[58] rmarkdown_2.30        compiler_4.5.2        readxl_1.4.5         </code></pre>
+ [1] gtable_0.3.6          xfun_0.60             bslib_0.12.0         
+ [4] ggplot2_4.0.3         htmlwidgets_1.6.4     caTools_1.18.4       
+ [7] lattice_0.22-9        vctrs_0.7.3           tools_4.6.1          
+[10] bitops_1.1-0          generics_0.1.4        tibble_3.3.1         
+[13] pkgconfig_2.0.3       Matrix_1.7-5          data.table_1.18.6.1  
+[16] RColorBrewer_1.1-3    S7_0.2.2              desc_1.4.3           
+[19] readxl_1.5.0          lifecycle_1.0.5       compiler_4.6.1       
+[22] farver_2.1.2          stringr_1.6.0         ptw_1.9-17           
+[25] textshaping_1.0.5     RcppDE_0.1.9          minpack.lm_1.2-4     
+[28] htmltools_0.5.9       sass_0.4.10           yaml_2.3.12          
+[31] Formula_1.2-6         pillar_1.11.1         pkgdown_2.2.1.9000   
+[34] jquerylib_0.1.4       RaMS_1.4.3            cachem_1.1.0         
+[37] tidyselect_1.2.1      digest_0.6.39         stringi_1.8.9        
+[40] dplyr_1.2.1           purrr_1.2.2           labeling_0.4.3       
+[43] VPdtw_2.2.1           fastmap_1.2.0         grid_4.6.1           
+[46] cli_3.6.6             chromConverter_0.9.0  magrittr_2.0.5       
+[49] base64enc_0.1-6       dynamicTreeCut_1.63-1 withr_3.0.3          
+[52] scales_1.4.0          bit64_4.8.4           rmarkdown_2.31       
+[55] bit_4.6.0             otel_0.2.0            reticulate_1.46.0    
+[58] cellranger_1.1.0      fastcluster_1.3.0     ragg_1.5.2           
+[61] png_0.1-9             pbapply_1.7-4         evaluate_1.0.5       
+[64] rlang_1.3.0           Rcpp_1.1.2            glue_1.8.1           
+[67] xml2_1.6.0            jsonlite_2.0.0        R6_2.6.1             
+[70] systemfonts_1.3.2     fs_2.1.0             </code></pre>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -636,7 +702,7 @@ loaded via a namespace (and not attached):
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.9000.</p>
 </div>
 
     </footer>

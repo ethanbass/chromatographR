@@ -1,127 +1,165 @@
-# chromatographR
+# chromatographR: Chromatographic Data Analysis Toolset
 
-Chromatographic Data Analysis Toolset
+Tools for high-throughput analysis of HPLC-DAD/UV chromatographic data.
+The package provides functionality for preprocessing, alignment, peak
+detection and fitting, peak table construction, and visualization of
+chromatographic data.
 
 ## Details
 
-Tools for high-throughput analysis of HPLC-DAD/UV chromatograms (or
-similar data). Includes functions for preprocessing, alignment,
-peak-finding and fitting, peak-table construction, data-visualization,
-etc. Preprocessing and peak-table construction follow the rough formula
-laid out in alsace (Wehrens, R., Bloemberg, T.G., and Eilers P.H.C.,
-2015.
-[doi:10.1093/bioinformatics/btv299](https://doi.org/10.1093/bioinformatics/btv299)
-). Alignment of chromatograms is available using parametric time warping
-(PTW) (Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015.
-[doi:10.1093/bioinformatics/btv299](https://doi.org/10.1093/bioinformatics/btv299)
-) or variable penalty dynamic time warping (VPdtw) (Clifford, D., &
-Stone, G. 2012.
-[doi:10.18637/jss.v047.i08](https://doi.org/10.18637/jss.v047.i08) ).
-Peak-finding relies on the algorithm suggested by Tom O'Haver in his
-[Pragmatic Introduction to Signal
-Processing](https://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm).
-Peaks are then fitted to a gaussian or exponential-gaussian hybrid peak
-shape using non-linear least squares (Lan, K. & Jorgenson, J. W. 2001.
-[doi:10.1016/S0021-9673(01)00594-5](https://doi.org/10.1016/S0021-9673%2801%2900594-5)
-). More details on package usage and a suggested workflow can be found
-in the vignette.
+A typical workflow includes signal preprocessing and peak table
+construction following general approaches described in Wehrens et al.
+(2015).
 
-## Analysis functions
+Chromatogram alignment is implemented using parametric time warping
+(PTW) or variable penalty dynamic time warping (VPdtw).
 
-- - [`read_chroms()`](https://ethanbass.github.io/chromConverter/reference/read_chroms.html):
-    Import chromatograms from a variety of vendor formats.
+Peak detection is based on zero-crossings in smoothed derivatives. Peaks
+are then modeled using Gaussian, exponential-Gaussian hybrid, or
+bidirectional exponentially modified Gaussian peak functions via
+nonlinear least squares.
 
-  - [`preprocess()`](https://ethanbass.github.io/chromatographR/reference/preprocess.md):
-    Preprocess chromatographic matrices.
+Further details and example workflows are provided in the package
+vignettes.
 
-  - [`correct_rt()`](https://ethanbass.github.io/chromatographR/reference/correct_rt.md):
-    Align chromatograms.
+## Core analysis functions
 
-  - [`get_peaks()`](https://ethanbass.github.io/chromatographR/reference/get_peaks.md):
-    Find and integrate peaks.
+- [`read_chroms()`](https://ethanbass.github.io/chromConverter/reference/read_chroms.html):
+  Import chromatograms from a variety of vendor formats.
 
-  - [`get_peaktable()`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md):
-    Assemble peak table.
+- [`preprocess()`](https://ethanbass.github.io/chromatographR/reference/preprocess.md):
+  Preprocess chromatographic matrices.
 
-  - [`attach_metadata()`](https://ethanbass.github.io/chromatographR/reference/attach_metadata.md):
-    Attach metadata to peak table.
+- [`correct_rt()`](https://ethanbass.github.io/chromatographR/reference/correct_rt.md):
+  Align chromatograms.
 
-  - [`attach_ref_spectra()`](https://ethanbass.github.io/chromatographR/reference/attach_ref_spectra.md):
-    Attach reference spectra to peak table.
+- [`get_peaks()`](https://ethanbass.github.io/chromatographR/reference/get_peaks.md):
+  Find and integrate peaks.
 
-  - [`normalize_data()`](https://ethanbass.github.io/chromatographR/reference/normalize_data.md):
-    Normalize `peaktable` or `chrom_list`.
+- [`get_peaktable()`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md):
+  Assemble peak table.
+
+- [`attach_metadata()`](https://ethanbass.github.io/chromatographR/reference/attach_metadata.md):
+  Attach metadata to peak table.
+
+- [`attach_ref_spectra()`](https://ethanbass.github.io/chromatographR/reference/attach_ref_spectra.md):
+  Attach reference spectra to peak table.
+
+- [`normalize_data()`](https://ethanbass.github.io/chromatographR/reference/normalize_data.md):
+  Normalize `peak_table` or `chrom_list`.
+
+## Peak refinement
+
+- [`combine_peaks()`](https://ethanbass.github.io/chromatographR/reference/combine_peaks.md):
+  Combine duplicate peaks based on retention time and spectral
+  similarity.
+
+- [`merge_peaks()`](https://ethanbass.github.io/chromatographR/reference/merge_peaks.md):
+  Merge split peaks into a single feature in a peak table.
+
+- [`filter_peaktable()`](https://ethanbass.github.io/chromatographR/reference/filter_peaktable.md):
+  Filter peak features in a peak table.
+
+- [`filter_peaks()`](https://ethanbass.github.io/chromatographR/reference/filter_peaks.md):
+  Filter peaks in peak lists.
 
 ## Visualization functions
 
-- - [`boxplot.peak_table()`](https://ethanbass.github.io/chromatographR/reference/boxplot.peak_table.md):
-    Create boxplot from peaktable object.
+### Chromatogram plots
 
-  - [`plot_chroms()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms.md):
-    Plot chromatograms as traces.
+- [`plot_chroms()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms.md):
+  Plot chromatograms as traces.
 
-  - [`plot_chroms_heatmap()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms_heatmap.md):
-    Plot chromatograms as heatmap.
+- [`plot_chroms_heatmap()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms_heatmap.md):
+  Plot chromatograms as heatmap.
 
-  - [`plot_spectrum()`](https://ethanbass.github.io/chromatographR/reference/plot_spectrum.md):
-    Plot spectrum and/or trace of specified peak.
+- [`annotate_peaks()`](https://ethanbass.github.io/chromatographR/reference/annotate_peaks.md):
+  Add peak labels to chromatogram plots.
 
-  - [`plot_all_spectra()`](https://ethanbass.github.io/chromatographR/reference/plot_all_spectra.md):
-    Plot all spectra for specified peak.
+- [`mirror_plot()`](https://ethanbass.github.io/chromatographR/reference/mirror_plot.md):
+  Plot chromatograms as mirror plots.
 
-  - [`mirror_plot()`](https://ethanbass.github.io/chromatographR/reference/mirror_plot.md):
-    Plot chromatograms as mirror plot.
+- [`plot.ptw_list()`](https://ethanbass.github.io/chromatographR/reference/plot.ptw_list.md):
+  Plot parametric time warping (PTW) alignment object.
 
-  - [`scan_chrom()`](https://ethanbass.github.io/chromatographR/reference/scan_chrom.md):
-    Plot spectrum at wavelength specified by clicking on a chromatogram.
+### Spectral plots
 
-  - [`plot.peak_list()`](https://ethanbass.github.io/chromatographR/reference/plot.peak_list.md):
-    Plot fitted peaks over chromatographic trace.
+- [`plot_spectrum()`](https://ethanbass.github.io/chromatographR/reference/plot_spectrum.md):
+  Plot spectrum and/or trace of specified peak.
 
-  - [`plot.peak_table()`](https://ethanbass.github.io/chromatographR/reference/plot.peak_table.md):
-    Plot the trace and/or spectrum of a specified peak from the peak
-    table.
+- [`plot_spectrum_inset()`](https://ethanbass.github.io/chromatographR/reference/plot_spectrum_inset.md):
+  Plot spectrum over chromatogram.
 
-  - [`plot.ptw_list()`](https://ethanbass.github.io/chromatographR/reference/plot.ptw_list.md):
-    Plot PTW alignment object.
+- [`plot_all_spectra()`](https://ethanbass.github.io/chromatographR/reference/plot_all_spectra.md):
+  Plot all spectra for specified peak.
 
-## Utility functions
+- [`scan_chrom()`](https://ethanbass.github.io/chromatographR/reference/scan_chrom.md):
+  Interactively extract spectra from a chromatogram.
 
-- - [`combine_peaks()`](https://ethanbass.github.io/chromatographR/reference/combine_peaks.md):
-    Combine duplicate peaks in peak table based on retention time and
-    spectral similarity.
+### Peak plots
 
-  - [`merge_peaks()`](https://ethanbass.github.io/chromatographR/reference/merge_peaks.md):
-    Merge split peaks into a single column of a peak table.
+- [`plot.peak_list()`](https://ethanbass.github.io/chromatographR/reference/plot.peak_list.md):
+  Plot fitted peaks over chromatographic trace.
 
-  - [`get_times()`](https://ethanbass.github.io/chromatographR/reference/get_times.md):
-    Return retention times from a peak table or a list of chromatograms.
+- [`plot.peak_table()`](https://ethanbass.github.io/chromatographR/reference/plot.peak_table.md):
+  Plot chromatograms and/or spectra from a peak table.
 
-  - [`get_lambdas()`](https://ethanbass.github.io/chromatographR/reference/get_lambdas.md):
-    Return wavelengths from a peak table or a list of chromatograms.
+- [`boxplot.peak_table()`](https://ethanbass.github.io/chromatographR/reference/boxplot.peak_table.md):
+  Create boxplot from a peak table object.
 
-  - [`reshape_chroms()`](https://ethanbass.github.io/chromatographR/reference/reshape_chroms.md):
-    Reshape a list of chromatograms to long format.
+## Data utilities and I/O
 
-  - [`reshape_peaktable()`](https://ethanbass.github.io/chromatographR/reference/reshape_peaktable.md):
-    Reshape a `peak_table` object to long format.
+- [`get_times()`](https://ethanbass.github.io/chromatographR/reference/get_times.md):
+  Return retention times from a peak table or a list of chromatograms.
 
-  - [`write_peaktable()`](https://ethanbass.github.io/chromatographR/reference/write_peaktable.md):
-    Export peak table in `csv` or `xlsx` format.
+- [`get_lambdas()`](https://ethanbass.github.io/chromatographR/reference/get_lambdas.md):
+  Return wavelengths from a peak table or a list of chromatograms.
+
+- [`write_peaktable()`](https://ethanbass.github.io/chromatographR/reference/write_peaktable.md):
+  Export peak table to CSV or XLSX format.
+
+- [`reshape_chroms()`](https://ethanbass.github.io/chromatographR/reference/reshape_chroms.md):
+  Reshape a list of chromatograms to long format.
+
+- [`reshape_peaktable()`](https://ethanbass.github.io/chromatographR/reference/reshape_peaktable.md):
+  Reshape a peak table to long format.
 
 ## Example data
 
-- - [Sa](https://ethanbass.github.io/chromatographR/reference/Sa.md): A
-    list of four goldenrod root chromatograms.
+- `Sa`: A list of four goldenrod root chromatograms.
 
-  - [Sa_pr](https://ethanbass.github.io/chromatographR/reference/Sa_pr.md):
-    Preprocessed goldenrod root chromatograms.
+- `Sa_pr`: Preprocessed goldenrod root chromatograms.
 
-  - [Sa_warp](https://ethanbass.github.io/chromatographR/reference/Sa_warp.md):
-    Preprocessed and aligned goldenrod root chromatograms.
+- `Sa_warp`: Preprocessed and aligned goldenrod root chromatograms.
 
-  - [pk_tab](https://ethanbass.github.io/chromatographR/reference/pk_tab.md):
-    Peak table from aligned goldenrod root chromatograms.
+- `pk_tab`: Peak table from aligned goldenrod root chromatograms.
+
+## References
+
+- Clifford, D., Stone, G., Montoliu, I., Rezzi, S., Martin, F. P., Guy,
+  P., Bruce, S., & Kochhar, S. 2009. Alignment using variable penalty
+  dynamic time warping. *Analytical chemistry*, 81(3):1000-1007.
+  [doi:10.1021/ac802041e](https://doi.org/10.1021/ac802041e) .
+
+- Clifford, D., & Stone, G. 2012. Variable Penalty Dynamic Time Warping
+  Code for Aligning Mass Spectrometry Chromatograms in R. *Journal of
+  Statistical Software*, 47(8):1-17.
+  [doi:10.18637/jss.v047.i08](https://doi.org/10.18637/jss.v047.i08) .
+
+- Eilers, P.H.C. 2004. Parametric Time Warping. *Analytical Chemistry*,
+  76:404-411. [doi:10.1021/ac034800e](https://doi.org/10.1021/ac034800e)
+  .
+
+- Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast parametric
+  time warping of peak lists. *Bioinformatics*, 31:3063-3065.
+  [doi:10.1093/bioinformatics/btv299](https://doi.org/10.1093/bioinformatics/btv299)
+  .
+
+- Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
+  LC–DAD using multivariate curve resolution: the alsace package for R.
+  *Metabolomics*, 11:143-154.
+  [doi:10.1007/s11306-014-0683-5](https://doi.org/10.1007/s11306-014-0683-5)
+  .
 
 ## See also
 

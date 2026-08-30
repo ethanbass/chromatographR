@@ -1,6 +1,8 @@
 # Calculate purity thresholds
 
-Calculate purity thresholds
+Intermediate function used in
+[`get_purity`](https://ethanbass.github.io/chromatographR/reference/get_purity.md)
+to compute variance-based thresholds.
 
 ## Usage
 
@@ -36,7 +38,7 @@ get_agilent_threshold(
 - noise_threshold:
 
   Threshold to define noise. Highest proportion of maximum absorbance.
-  Defaults to `.005`.
+  Defaults to `0.005`.
 
 - lambdas:
 
@@ -51,7 +53,7 @@ within the peak specified by `pos`.
 
 Stahl, Mark. “Peak Purity Analysis in HPLC and CE Using Diode-Array
 Technology.” Agilent Technologies, April 1, 2003, 16.
-<https://www.agilent.com/cs/library/applications/5988-8647EN.pdf>
+[5988-8647EN.pdf](https://web.archive.org/web/20220615145615/https://www.agilent.com/cs/library/applications/5988-8647EN.pdf)
 
 ## Author
 

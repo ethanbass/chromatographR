@@ -1,6 +1,9 @@
 # Plot spectra by clicking on the chromatogram.
 
-Plot spectra by clicking on the chromatogram.
+Plots a chromatographic trace from the specified chromatogram (`idx`),
+at the specified wavelength (`lambda`) with a dotted red line to
+indicate the user-selected retention time. The trace is a single column
+from the chromatographic matrix.
 
 ## Usage
 
@@ -14,7 +17,6 @@ scan_chrom(
   scale_spectrum = FALSE,
   spectrum_labels = TRUE,
   export_spectrum = FALSE,
-  chr = NULL,
   ...
 )
 ```
@@ -25,64 +27,61 @@ scan_chrom(
 
   A list of chromatograms in matrix format (timepoints x wavelengths).
   If no argument is provided here, the function will try to find the
-  `chrom_list` object used to create the provided `peak_table`.
+  `chrom_list` object using the pointer in the `peak_table`.
 
 - idx:
 
-  Numerical index of chromatogram you wish to plot.
+  Numerical index of chromatogram you wish to plot, or "max" to
+  automatically select the chromatogram with the highest signal
+  intensity at the specified peak or retention time.
 
 - lambda:
 
-  The wavelength to plot the trace at.
+  The wavelength used for plotting chromatographic traces and
+  determining signal intensity.
 
 - plot_spectrum:
 
-  Logical. Whether to plot the spectrum or not.
+  Logical. If `TRUE`, plots the spectrum of the chosen peak. Defaults to
+  `TRUE`.
 
 - peak_table:
 
-  The peak table (output from
-  [`get_peaktable`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md)
-  function).
+  A `peak_table` object created by
+  [`get_peaktable`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md).
 
 - scale_spectrum:
 
-  Logical. If TRUE, scales spectrum to unit height. Defaults to FALSE.
+  Logical. If `TRUE`, scales spectrum to unit height. Defaults to
+  `FALSE`.
 
 - spectrum_labels:
 
-  Logical. If TRUE, plots labels on maxima in spectral plot. Defaults to
-  TRUE.
+  Logical. If `TRUE`, plots labels on maxima in spectral plot. Defaults
+  to `TRUE`.
 
 - export_spectrum:
 
-  Logical. If TRUE, exports spectrum to console. Defaults to FALSE.
-
-- chr:
-
-  Deprecated. Please use `idx` instead.
+  Logical. If `TRUE`, invisibly returns the spectrum as a `data.frame`.
+  Defaults to `FALSE`.
 
 - ...:
 
-  Additional arguments.
+  Additional arguments to `plot_spectrum`.
 
 ## Value
 
-If `export_spectrum` is TRUE, returns the spectrum as a ` data.frame`
-with wavelengths as rows and a single column encoding the absorbance (or
-normalized absorbance, if `scale_spectrum` is TRUE) at each wavelength.
-Otherwise, there is no return value.
+Invisibly returns the numeric index of the scan selected by the user.
+
+## Details
+
+If `plot_spectrum` is `TRUE`, plots the spectrum for the specified
+chromatogram at the user-specified retention time. The spectrum is a
+single row from the chromatographic matrix.
 
 ## Side effects
 
-Plots a chromatographic trace from the specified chromatogram (`idx`),
-at the specified wavelength (`lambda`) with a dotted red line to
-indicate the user-selected retention time. The trace is a single column
-from the chromatographic matrix.
-
-If `plot_spectrum` is TRUE, plots the spectrum for the specified
-chromatogram at the user-specified retention time. The spectrum is a
-single row from the chromatographic matrix.
+If `engine == "base"`, plots are rendered to the active graphics device.
 
 ## See also
 

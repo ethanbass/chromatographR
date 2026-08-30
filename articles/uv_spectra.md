@@ -1,16 +1,22 @@
 # Programmatic analysis of UV spectra
 
 ``` r
+
 library(chromatographR)
+#> Registered S3 method overwritten by 'chromatographR':
+#>   method      from
+#>   predict.ptw ptw
 data("Sa_warp")
 ```
 
 ``` r
+
 pks <- get_peaks(Sa_warp, lambdas = 210)
 pktab <- get_peaktable(pks)
 ```
 
 ``` r
+
 pktab <- attach_ref_spectra(pktab, ref = "max.cor")
 ```
 
@@ -22,6 +28,7 @@ correlation matrix using the `cor` function.
 ##### Analysis of spectral correlations
 
 ``` r
+
 cor_mat <- cor(pktab$ref_spectra)
 ```
 
@@ -29,6 +36,7 @@ We can then plot spectra falling within a desired similarity threshold
 (`t`) to a reference peak (in this case ‘V21’).
 
 ``` r
+
 par(mfrow=c(2,2))
 idx_90 <- which(cor_mat[,"V21"] > .9)
 matplot(pktab$ref_spectra[,idx_90],type='l', ylab="Abs")
@@ -53,10 +61,11 @@ We can also extract retention times for spectra above the desired
 spectral similarity threshold with the reference spectra.
 
 ``` r
+
 rts_99 = pktab$pk_meta["rt", idx_99]
 rts_99
-#>       V9   V17   V21   V26
-#> rt 12.18 14.44 15.51 16.78
+#>       V9  V17   V21   V26
+#> rt 12.18 14.4 15.51 16.78
 ```
 
 Below we plot traces of our four chromatograms at 210 nm. The 4 peaks
@@ -65,6 +74,7 @@ black lines and the 6 peaks that match the reference spectrum at the 97%
 level are marked with dotted gray lines.
 
 ``` r
+
 par(mfrow = c(1, 1))
 plot_chroms(Sa_warp, lambdas=210)
 
@@ -78,9 +88,10 @@ If we are interested in the combined area of these peaks, we could also
 use these indices to sum them together.
 
 ``` r
+
 apply(pktab$tab[,idx_99], 1, sum)
 #>      119      121      122      458 
-#> 143.6671 100.9055 112.6122 171.6950
+#> 143.5106 100.6672 112.2595 171.5609
 ```
 
 ##### Hierarchical clustering of spectra
@@ -92,8 +103,9 @@ vignette. For simplicity, we use the argument `max.only = TRUE` to
 return only the largest clusters.
 
 ``` r
+
 par(mfrow=c(2,2))
-cl <- cluster_spectra(pktab, alpha = 0.01, iseed = 1, max.only = TRUE)
+cl <- cluster_spectra(pktab, alpha = 0.05, iseed = 1, max.only = TRUE)
 ```
 
 ![](uv_spectra_files/figure-html/hierarchical_clustering-1.png)
@@ -107,15 +119,19 @@ closely matches the spectrum represented by peak `'V21'`. We can access
 the peaks in cluster two as follows:
 
 ``` r
+
 cl2 <- cl$clusters$c2@peaks
 cl2
-#>  [1] "V6"  "V9"  "V11" "V14" "V15" "V17" "V19" "V21" "V22" "V23" "V26"
+#>  [1] "V1"  "V2"  "V3"  "V4"  "V5"  "V7"  "V8"  "V10" "V12" "V13" "V14" "V16"
+#> [13] "V19" "V24" "V25" "V27" "V28" "V29" "V30" "V31" "V32" "V33"
 ```
 
 In this case, the peaks in cluster two happen to overlap completely with
-the peaks recovered through pearson correlation at the 90% threshold.
+the peaks recovered through pearson correlation at the 95% threshold.
 
 ``` r
-all.equal(cl2, names(idx_90))
-#> [1] TRUE
+
+all.equal(cl2, names(idx_95))
+#> [1] "Lengths (22, 7) differ (string compare on first 7)"
+#> [2] "7 string mismatches"
 ```

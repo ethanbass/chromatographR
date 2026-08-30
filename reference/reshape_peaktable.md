@@ -31,8 +31,8 @@ reshape_peaktable(x, peaks, metadata, fixed_levels = TRUE)
 
 ## Value
 
-A data.frame containing the information for the specified `peaks` in
-long format.
+A data.frame containing the information for the specified peaks in long
+format.
 
 ## See also
 

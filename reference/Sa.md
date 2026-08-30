@@ -1,9 +1,8 @@
 # Raw goldenrod root chromatograms
 
 A list of four HPLC-DAD data matrices of *Solidago altissima* roots
-extracted in 90% methanol. Retention times are stored in rows and
-wavelengths are stored in columns. Data were collected on a Agilent 1100
-HPLC.
+extracted in 90\\ wavelengths are stored in columns. Data were collected
+on a Agilent 1100 HPLC.
 
 ## Usage
 

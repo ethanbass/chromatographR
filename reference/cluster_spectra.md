@@ -7,7 +7,6 @@ Cluster peaks by spectral similarity.
 ``` r
 cluster_spectra(
   peak_table,
-  peak_no = NULL,
   alpha = 0.05,
   min_size = 5,
   max_size = NULL,
@@ -15,7 +14,8 @@ cluster_spectra(
   plot_dend = TRUE,
   plot_spectra = TRUE,
   verbose = getOption("verbose"),
-  save = FALSE,
+  outfile = NULL,
+  save = NULL,
   parallel = TRUE,
   max.only = FALSE,
   output = c("pvclust", "clusters"),
@@ -27,18 +27,13 @@ cluster_spectra(
 
 - peak_table:
 
-  Peak table from
+  A `peak_table` object from
   [`get_peaktable`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md).
-
-- peak_no:
-
-  Minimum and maximum thresholds for the number of peaks a cluster may
-  have. This argument is deprecated in favor of `min_size` and
-  `max_size`.
 
 - alpha:
 
-  Confidence threshold for inclusion of cluster.
+  Significance threshold used to select clusters based on bootstrap AU
+  p-values.
 
 - min_size:
 
@@ -55,33 +50,42 @@ cluster_spectra(
 
 - plot_dend:
 
-  Logical. If TRUE, plots dendrogram with bootstrap values.
+  Logical. If `TRUE`, plots dendrogram with bootstrap values.
 
 - plot_spectra:
 
-  Logical. If TRUE, plots overlapping spectra for each cluster.
+  Logical. If `TRUE`, plots overlapping spectra for each cluster.
 
 - verbose:
 
-  Logical. If TRUE, prints progress report to console.
+  Logical. If `TRUE`, prints progress report to console.
+
+- outfile:
+
+  Optional path to an `.RDS` file. If not `NULL`, the `pvclust` object
+  is saved file using
+  [`saveRDS()`](https://rdrr.io/r/base/readRDS.html). Existing files are
+  overwritten.
 
 - save:
 
-  Logical. If TRUE, saves pvclust object to current directory.
+  Logical. If `TRUE`, saves pvclust object to current directory.
 
 - parallel:
 
-  Logical. If TRUE, use parallel processing for
+  Logical. If `TRUE`, use parallel processing for
   [`pvclust`](https://rdrr.io/pkg/pvclust/man/pvclust.html).
 
 - max.only:
 
-  Logical. If TRUE, returns only highest level for nested dendrograms.
+  Logical. If `TRUE`, returns only highest level cluster from each
+  nested set of clusters.
 
 - output:
 
-  What to return. Either `clusters` to return list of clusters,
-  `pvclust` to return pvclust object, or `both` to return both items.
+  What to return. Either `"clusters"` to return list of clusters,
+  `"pvclust"` to return pvclust object, or `"both"` to return both
+  items.
 
 - ...:
 
@@ -95,51 +99,51 @@ Returns clusters and/or `pvclust` object according to the value of the
 
 - If `output = clusters`, returns a list of S4 `cluster` objects.
 
-- If `output = pvclust`, returns a
-  [`pvclust`](https://rdrr.io/pkg/pvclust/man/pvclust.html) object.
+- If `output = pvclust`, returns a `pvclust` object.
 
 - If `output = both`, returns a nested list containing `[[1]]` the
-  [`pvclust`](https://rdrr.io/pkg/pvclust/man/pvclust.html) object, and
-  `[[2]]` the list of S4 `cluster` objects.
+  `pvclust` object, and `[[2]]` the list of S4 `cluster` objects.
 
 The `cluster` objects consist of the following components:
 
 - `peaks`: a character vector containing the names of all peaks
   contained in the given cluster.
 
-- `pval`: a numeric vector of length 1 containing the bootstrap p-value
-  (au) for the given cluster.
+- `pval`: a numeric scalar containing the AU bootstrap p-value for the
+  given cluster.
 
 ## Details
 
 Before using this function, reference spectra must be attached to the
-`peak_table` using the ` attach_ref_spectra` function. These reference
-spectra are then used to construct a distance matrix based on spectral
-similarity (pearson correlation) between peaks. Hierarchical clustering
-with bootstrap resampling is performed on the resulting correlation
-matrix to classify peaks by spectral similarity, as implemented in
+`peak_table` using the
+[`attach_ref_spectra`](https://ethanbass.github.io/chromatographR/reference/attach_ref_spectra.md)
+function. These spectra are then used to construct a distance matrix
+derived from pairwise Pearson correlations among peaks. Hierarchical
+clustering with bootstrap resampling is performed on the resulting
+correlation matrix to classify peaks by their spectral similarity as
+implemented in
 [`pvclust`](https://rdrr.io/pkg/pvclust/man/pvclust.html). Finally,
 bootstrap values can be used to select clusters that exceed a certain
-confidence threshold as defined by `alpha`.
+confidence specified by `alpha`.
 
 Clusters can be filtered by the minimum and maximum size of the cluster
 using the `min_size` and `max_size` arguments respectively. Users should
 be aware that the clustering algorithm will often return nested
 clusters. Thus, an individual peak could appear in more than one
-cluster. If `max_only` is TRUE, only the largest cluster in a nested
+cluster. If `max.only` is `TRUE`, only the largest cluster in a nested
 tree of clusters meeting the specified confidence threshold will be
 returned.
 
-It is highly suggested to use more than 100 bootstraps if you run the
-clustering algorithm on real data even though we use `nboot = 100` in
-the example to reduce runtime. The authors of `pvclust` suggest
-` nboot = 10000`.
+It is strongly recommended to use more than 100 bootstraps if you run
+the clustering algorithm on real data even though we use `nboot = 100`
+in the example to reduce run time. The authors of `pvclust` suggest
+using at least 10,000 bootstrap replicates.
 
 ## References
 
 R. Suzuki & H. Shimodaira. 2006. Pvclust: an R package for assessing the
 uncertainty in hierarchical clustering. *Bioinformatics*,
-**22(12)**:1540-1542.
+22(12):1540-1542.
 [doi:10.1093/bioinformatics/btl117](https://doi.org/10.1093/bioinformatics/btl117)
 .
 
@@ -151,12 +155,13 @@ Ethan Bass
 
 ``` r
 # \donttest{
+if (requireNamespace("pvclust", quietly = TRUE)) {
 data(pk_tab)
 data(Sa_warp)
 pk_tab <- attach_ref_spectra(pk_tab, Sa_warp, ref = "max.int")
 cl <- cluster_spectra(pk_tab, nboot = 100, max.only = FALSE, 
 save = FALSE, alpha = 0.03)
-
+}
 
 
 

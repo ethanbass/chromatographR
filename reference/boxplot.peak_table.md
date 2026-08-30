@@ -19,12 +19,21 @@ boxplot(x, formula, ...)
 
 - formula:
 
-  A [`formula`](https://rdrr.io/r/stats/formula.html) object.
+  A [formula](https://rdrr.io/r/stats/formula.html) object.
 
 - ...:
 
   Additional arguments to
   [`boxplot`](https://rdrr.io/r/graphics/boxplot.html).
+
+## Value
+
+No return value, called for side effects.
+
+## Side effects
+
+Creates a boxplot according to the provided formula, using data from the
+supplied `peak_table` object.
 
 ## See also
 
@@ -37,6 +46,10 @@ Other visualization functions:
 [`plot_chroms_heatmap()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms_heatmap.md),
 [`plot_spectrum()`](https://ethanbass.github.io/chromatographR/reference/plot_spectrum.md),
 [`scan_chrom()`](https://ethanbass.github.io/chromatographR/reference/scan_chrom.md)
+
+## Author
+
+Ethan Bass
 
 ## Examples
 

@@ -5,4 +5,4 @@ to see their documentation.
 
 - chromConverter:
 
-  [`read_chroms`](https://ethanbass.github.io/chromConverter/reference/read_chroms.html)
+  [`read_chroms()`](https://ethanbass.github.io/chromConverter/reference/read_chroms.html)

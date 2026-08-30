@@ -1,9 +1,8 @@
-# Attach reference spectra
+# Attach reference spectra to a `peak_table` object.
 
-Gathers reference spectra and attaches them to a `peak_table` object.
-Reference spectra are defined either as the spectrum with the highest
+Reference spectra are selected either as the spectrum with maximum
 intensity (`"max.int"`) or as the spectrum with the highest average
-correlation to the other spectra in the peak table (`"max.cor"`).
+correlation to all other spectra in the peak table (`"max.cor"`).
 
 ## Usage
 
@@ -15,29 +14,28 @@ attach_ref_spectra(peak_table, chrom_list, ref = c("max.cor", "max.int"))
 
 - peak_table:
 
-  Peak table from
+  A `peak_table` object created by
   [`get_peaktable`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md).
 
 - chrom_list:
 
-  A list of chromatograms in matrix format (timepoints x wavelengths).
-  If no argument is provided here, the function will try to find the
-  `chrom_list` object used to create the provided `peak_table`.
+  Optional list of chromatograms (timepoints × wavelengths). If `NULL`,
+  the function attempts to retrieve the original `chrom_list` used to
+  generate `peak_table`.
 
 - ref:
 
-  What criterion to use to select reference spectra. Current options are
-  maximum correlation (`"max.cor"`) or maximum signal intensity
-  (`"max.int"`).
+  Method for selecting reference spectra. Options are `"max.int"`
+  (maximum intensity) or `"max.cor"` (maximum average correlation).
 
 ## Value
 
-A `peak_table` object with reference spectra attached in the
+A `peak_table` object with reference spectra stored in the
 `$ref_spectra` slot.
 
 ## See also
 
-[`get_peaks`](https://ethanbass.github.io/chromatographR/reference/get_peaks.md)
+[`get_peaks`](https://ethanbass.github.io/chromatographR/reference/get_peaks.md),
 [`get_peaktable`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md)
 
 ## Author

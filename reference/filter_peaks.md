@@ -1,8 +1,8 @@
 # Filter peak lists
 
-Utility function to remove peaks from a peak list (e.g., because their
-intensity is too low). Currently one can filter on peak height, peak
-area, standard deviation, and/or retention time.
+Utility function for filtering peaks from a `peak_list` object. Peaks
+can be filtered according to height, area, standard deviation, and/or
+retention time.
 
 ## Usage
 
@@ -14,11 +14,11 @@ filter_peaks(peak_list, min_height, min_area, min_sd, max_sd, min_rt, max_rt)
 
 - peak_list:
 
-  A peak_list object, consisting of a nested list of peak tables, where
-  the first level is the sample, and the second level is the spectral
-  component. Every component is described by a matrix where every row is
-  one peak, and the columns contain information on retention time, full
-  width at half maximum (FWHM), peak width, height, and area.
+  A `peak_list` object, consisting of a nested list of peak tables,
+  where the first level is the sample, and the second level is the
+  spectral component. Every component is described by a `data.frame`
+  where every row represents a peak, and the columns contain information
+  on retention time, peak shape, height, and area.
 
 - min_height:
 
@@ -46,8 +46,8 @@ filter_peaks(peak_list, min_height, min_area, min_sd, max_sd, min_rt, max_rt)
 
 ## Value
 
-A peak list similar to the input, with all rows removed from that do not
-satisfy the specified criteria.
+A filtered `peak_list` object containing only peaks that satisfy the
+specified criteria.
 
 ## See also
 

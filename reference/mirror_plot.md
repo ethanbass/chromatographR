@@ -27,8 +27,7 @@ mirror_plot(
 - x:
 
   The peak table (output from
-  [`get_peaktable`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md)
-  function).
+  [`get_peaktable`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md).
 
 - chrom_list:
 
@@ -46,7 +45,7 @@ mirror_plot(
 
 - subset:
 
-  Character vector specifying levels to use (if more than 2 levels are
+  Character vector specifying levels to use (if more than two levels are
   present in `var`).
 
 - print_legend:
@@ -63,7 +62,7 @@ mirror_plot(
 
 - legend_size:
 
-  Legend size (`cex` argument). Default is 1.
+  Legend size (`cex` argument). Default is `1`.
 
 - mirror:
 
@@ -80,8 +79,7 @@ mirror_plot(
 
 - ...:
 
-  Additional arguments to
-  [`matplot`](https://rdrr.io/r/graphics/matplot.html) function.
+  Additional arguments to `matplot` function.
 
 ## Value
 
@@ -96,10 +94,11 @@ respect to variables defined in sample metadata.
 
 ## Side effects
 
-If `mirror_plot` is TRUE, plots a mirror plot comparing two treatments
-defined by `var` and `subset` (if more than two factors are present in
-`var`). Otherwise, if `mirror_plot` is FALSE, the treatments are plotted
-in two separate panes.
+Plots are rendered to the active graphics device. If `mirror_plot` is
+`TRUE`, plots a mirror plot comparing two treatments defined by `var`
+and `subset` (if more than two factors are present in `var`). Otherwise,
+if `mirror_plot` is `FALSE`, the treatments are plotted in two separate
+panes.
 
 ## See also
 

@@ -1,8 +1,8 @@
 # Correct peak positions according to a PTW warping model
 
-Corrects retention time differences using parametric time warping as
-implemented in the [`ptw`](https://rdrr.io/pkg/ptw/man/ptw.html)
-package.
+Corrects retention time differences in `peak_list` using parametric time
+warping as implemented in the
+[`ptw`](https://rdrr.io/pkg/ptw/man/ptw.html) package.
 
 ## Usage
 
@@ -14,11 +14,11 @@ correct_peaks(peak_list, mod_list, chrom_list, match_names = TRUE)
 
 - peak_list:
 
-  A \`peak_list\` object created by
+  A `peak_list` object created by
   [`get_peaks`](https://ethanbass.github.io/chromatographR/reference/get_peaks.md),
   containing a nested list of peak tables where the first level is the
   sample, and the second level is the spectral wavelength. Every
-  component is described by a matrix where each row corresponds to a
+  wavelength is described by a matrix where each row corresponds to a
   feature, and the columns contain information on that feature (e.g.,
   retention time, peak width (FWHM), height, area, etc.)
 
@@ -28,7 +28,7 @@ correct_peaks(peak_list, mod_list, chrom_list, match_names = TRUE)
 
 - chrom_list:
 
-  List of chromatograms from which the ptw models are derived.
+  List of chromatograms from which the `ptw` models are derived.
 
 - match_names:
 
@@ -38,7 +38,7 @@ correct_peaks(peak_list, mod_list, chrom_list, match_names = TRUE)
 ## Value
 
 The input list of peak tables is returned with extra columns containing
-the corrected retention time.
+the corrected retention times.
 
 ## Details
 
@@ -48,9 +48,9 @@ separate column in the list of peak tables.
 
 ## Note
 
-This function is adapted from
-[getPeakTable](https://github.com/rwehrens/alsace/blob/master/R/correctPeaks.R)
-function in the alsace package by Ron Wehrens.
+This function is adapted from the `correctPeaks` function in the alsace
+package by Ron Wehrens:
+<https://github.com/rwehrens/alsace/blob/master/R/correctPeaks.R>.
 
 ## See also
 

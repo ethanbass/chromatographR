@@ -7,11 +7,10 @@ Plot multiple for a given peak in peak table. Wrapper for
 
 ``` r
 plot_all_spectra(
-  peak,
+  loc,
   peak_table,
   chrom_list,
   idx = "all",
-  chrs = NULL,
   engine = c("base", "ggplot2", "plotly"),
   plot_spectrum = TRUE,
   export_spectrum = TRUE,
@@ -19,35 +18,32 @@ plot_all_spectra(
   overlapping = TRUE,
   verbose = FALSE,
   what = c("peak", "rt", "idx"),
+  peak = NULL,
   ...
 )
 ```
 
 ## Arguments
 
-- peak:
+- loc:
 
-  The name of a peak to plot (in character format).
+  The peak, retention time, or scan index from which to extract spectral
+  data.
 
 - peak_table:
 
-  The peak table (output from
-  [`get_peaktable`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md)
-  function).
+  A `peak_table` object created by
+  [`get_peaktable`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md).
 
 - chrom_list:
 
-  A list of chromatograms in matrix format (timepoints x components). If
-  no argument is provided here, the function will try to find the
-  `chrom_list` object used to create the provided `peak_table`.
+  A list of chromatograms in matrix format (timepoints x wavelengths).
+  If no argument is provided here, the function will try to find the
+  `chrom_list` object using the pointer in the `peak_table`.
 
 - idx:
 
   Vector of chromatograms to plot.
-
-- chrs:
-
-  Deprecated. Please use `idx` instead.
 
 - engine:
 
@@ -55,47 +51,55 @@ plot_all_spectra(
 
 - plot_spectrum:
 
-  Logical. If TRUE, plots the spectrum of the chosen peak.
+  Logical. If `TRUE`, plots the spectrum of the chosen peak. Defaults to
+  `TRUE`.
 
 - export_spectrum:
 
-  Logical. If TRUE, exports spectrum to console. Defaults to FALSE.
+  Logical. If `TRUE`, invisibly returns the spectrum as a `data.frame`.
+  Defaults to `FALSE`.
 
 - scale_spectrum:
 
-  Logical. If TRUE, scales spectrum to unit height.
+  Logical. If `TRUE`, scales spectrum to unit height. Defaults to
+  `FALSE`.
 
 - overlapping:
 
-  Logical. If TRUE, plot spectra in single plot.
+  Logical. If `TRUE`, plot spectra in single plot.
 
 - verbose:
 
-  Logical. If TRUE, prints verbose output to console.
+  Logical. If `TRUE`, prints verbose output to console. Defaults to
+  `FALSE`.
 
 - what:
 
-  What to look for. Either `peak` to extract spectral information for a
-  certain peak, `rt` to scan by retention time, or `idx` to scan by
-  numeric index. Defaults to "peak" mode.
+  What to look for. Either `"peak"` to extract spectral information for
+  a certain peak, `"rt"` to scan by retention time, or `"idx"` to scan
+  by numeric index. Defaults to "peak" mode.
+
+- peak:
+
+  The name of a peak to plot (in character format).
 
 - ...:
 
-  Additional arguments to plot_spectrum.
+  Additional arguments to `plot_spectrum.`
 
 ## Value
 
-If `export_spectrum` is TRUE, returns the spectra as a ` data.frame`
-with wavelengths as rows and one column for each sample in the
-`chrom_list` encoding the absorbance (or normalized absorbance, if
-`scale_spectrum` is TRUE) at each wavelength. Otherwise, there is no
-return value.
+- If `export_spectrum = FALSE` (default), a `plotly` or `ggplot` object,
+  or nothing if `engine == "base"`.
+
+- If `export_spectrum = TRUE`, invisibly returns a `data.frame` with
+  wavelengths as rows and one column per sample encoding absorbance at
+  each wavelength (normalized if `scale_spectrum = TRUE`).
 
 ## Side effects
 
-If `plot_spectrum` is TRUE, plots the spectra for the specified
-chromatogram (`idx`) of the given `peak`. The spectrum is a single row
-from the chromatographic matrix.
+If `engine == "base"`, the spectra are rendered to the active graphics
+device.
 
 ## See also
 

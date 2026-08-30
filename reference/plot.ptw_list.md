@@ -29,7 +29,7 @@ plot(
 
 - engine:
 
-  What plotting engine to use. Either `base`, `ggplot` or `plotly`
+  What plotting engine to use. One of `base`, `ggplot`, or `plotly`.
 
 - lambdas:
 
@@ -42,6 +42,23 @@ plot(
 - ...:
 
   Additional arguments (placeholder).
+
+## Value
+
+A `plotly` or `ggplot` object when `engine = "plotly"` or
+`engine = "ggplot"`, respectively. No value is returned when
+`engine = "base"`.
+
+## Details
+
+Plots PTW alignments at the specified wavelength (`lambda`) either as
+individual traces or as a heatmap, according to the value of `what`. The
+plot can be produced using either base R graphics, `ggplot2`, or
+`plotly`, according to the value of the `engine` argument.
+
+## Side effects
+
+If `engine == "base"`, plots are rendered to the active graphics device.
 
 ## Author
 

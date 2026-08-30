@@ -1,5 +1,164 @@
 # Changelog
 
+## chromatographR 0.8.0
+
+#### Breaking changes
+
+- Added support for bidirectional exponentially modified gaussian (BEMG)
+  peak shape (`fit = "bemg"` in `get_peaks`/`fit_peaks`). The default
+  peak shape remains `"egh"` for now but this may change in a future
+  release.
+- Added `summarize_by` argument to `get_peaktable` controlling how peak
+  metadata (e.g., retention time) are summarized across peaks within
+  each cluster. The new default (`"weighted.mean"`) weights peaks by
+  their intensity, making it more robust to the presence of small noisy
+  peaks which may skew the results of aggregation, especially when the
+  dominant peak does not occur in every sample. Alternative options
+  include `"mean"`, `"median"`, and `"max"`, the last of which uses the
+  most intense peak in each cluster directly rather than aggregating. To
+  reproduce previous behavior, set `summarize_by = "mean"`.
+- Added automatic thinning of chromatograms in `plot_chroms` to speed up
+  plotting of raw data. The time resolution can be adjusted with the new
+  `time_resolution` argument.
+- Changed behavior of `plot_chroms` so legend is no longer displayed by
+  default to avoid overloading plots with many chromatograms.
+- When `export_spectrum == TRUE` always return spectra invisibly in
+  `plot_spectrum` and `plot_all_spectra` to avoid cluttering up the
+  console.
+- Corrected `get_peaks` to return model-fitted peak heights rather than
+  raw peak heights. This changes numerical output for workflows that
+  relied on the previous (incorrect) behavior.
+- Added `fill_zeros` argument to `correct_rt` to control whether
+  out-of-bounds regions produced by warping are filled with zeros or
+  returned as `NA`. Defaults to `FALSE` which changes the behavior for
+  VPdtw warping which used to automatically fill zeros.
+- Changed the name of the `a` parameter in `plot.peak_list` to `alpha`.
+- Renamed `chrom_list` argument to `x` in `plot_chroms_heatmap` to
+  reflect that the function can now accept a peak table in the first
+  position in addition to a list of chromatograms.
+- Removed `index` and `chr` arguments across plotting functions,
+  previously deprecated in v0.7.0. Use `idx` instead.
+- Deprecated arguments in `get_peaks` still using dot notation (e.g.,
+  `sd.max`). Use new snake case arguments (e.g., `sd_max`) instead!
+- Deprecated `peak` argument in `plot_all_spectra` in favor of `loc` for
+  consistency with other plotting functions.
+- Deprecated the `save` argument in `cluster_spectra` in favor of
+  `outfile`, which specifies the file path for saving cluster objects.
+- Removed deprecated `peak_no` argument from `cluster_spectra`.
+
+#### New features
+
+##### New functions
+
+- Added `subtract_blanks` function for subtracting blank chromatograms
+  from a `chrom_list`.
+- Added `correct_rt_group` function for group-wise warping function
+  estimation using within-group averages. This improves alignment
+  accuracy when samples share batch-level retention time shifts or
+  contain group-specific peaks, and is generally faster than per-sample
+  alignment.
+- Added `plot_spectrum_inset` function for plotting UV spectra overlaid
+  onto a chromatogram.
+- Added `annotate_peaks` function for adding text labels to peaks in
+  plots created by `plot_chroms`.
+- Added `get_spectra` function for extracting spectra from
+  chromatograms. The `export_spectrum` argument in `plot_spectrum` and
+  `plot_all_spectra` is deprecated in favor of `get_spectra`.
+
+##### New generic functions
+
+- Added `summary` method for `peak_table` objects, reporting dimensions,
+  retention time range, intensity statistics, and metadata availability.
+- Added `print.peak_table` function to return just the peak data.
+- Added `[` method for `peak_table` objects for simultaneous subsetting
+  of `tab`, `pk_meta`, `sample_meta`, and `ref_spectra` elements.
+- Added `[` method for `peak_list` objects to preserve metadata
+  attributes when subsetting.
+- Added `print` method for `peak_list` objects, summarizing samples,
+  wavelengths, fit method, and peak counts.
+
+##### Enhancements
+
+- Added support for fitting a local baseline beneath each peak through
+  the `baseline` argument in `get_peaks`. Options are `"none"` (default,
+  no baseline), `"flat"` (constant offset), and `"sloped"`. Peak heights
+  and areas are computed above the fitted baseline.
+- Added support for plotting spectra from multiple chromatograms in
+  `plot_spectrum` by supplying a vector to `idx`
+  (e.g. `idx = c(1, 2, 4)`). Overlaid traces and spectra are color-coded
+  by sample.
+- Added new options to `combine_peaks` (`"least_sparse"` and `"lambda"`)
+  via the `choose` argument: `"least_sparse"` retains the peak detected
+  in the greatest number of samples; `"lambda"` retains the peak
+  measured at a preferred wavelength (supplied via the new `lambda`
+  argument), falling back to `"max"` when no match is found.
+- Preprocess can now take nested lists containing a `dad` element in
+  each list. This change allows better compatibility with
+  chromConverter.
+- Added more informative warnings and errors to `preprocess` function.
+- Added support for numeric input to lambda argument in
+  `reshape_chroms`.
+- Refactored `normalize_data` for improved performance and added
+  `on_invalid` argument to specify behavior for dealing with invalid
+  normalization values (zero, negative or `NA`).
+- Refactored `normalize_data` for automatic detection of column names so
+  that user no longer has to specify whether they wish to normalize by a
+  metadata column or a column in the peak table.
+- Refactored `ptw` warping in `correct_rt` using whole-matrix
+  interpolation resulting in substantial speedup.
+- Added `max_zeros` argument in `filter_peaktable` to exclude features
+  above a threshold proportion of zero values.
+- Added support for new `chrom_list` class introduced in chromConverter
+  v0.9.0.
+- Allow `plot_chroms` and `plot_chroms_heatmap` to accept peak table as
+  first argument.
+
+#### Bug fixes and other minor changes
+
+- Fixed `preprocess` function incorrectly truncating chromatograms when
+  outliers are present and `dim1` is not specified.
+- Fixed input validation in `preprocess` so lists containing non-matrix
+  elements no longer pass validation without error.
+- Fixed bug in `filter_peaktable` when filtering peaks based on specific
+  retention times with the `rts` argument.
+- Fixed `filter_peaktable` and `filter_peaks` to make filtering criteria
+  inclusive (e.g., `min_rt = 5` now retains peaks with `rt == 5`).
+- Added error when duplicated sample names are provided to
+  `get_peaktable` or `get_peaks` since this will cause downstream
+  issues.
+- Fixed issue with visual tests due to new version of Kaleido.
+- Added additional arguments as placeholder for `subset.peak_table`.
+- Fixed bug in `normalize_data` causing loss of sample names when
+  normalizing chromatograms.
+- Formalized requirement for R version 4.1.0.
+- Fixed `plot_spectrum` plots with plotly engine so they always maintain
+  their axis labels.
+- Standardized axis labels across `plot_spectrum` plots.
+- Standardized titles of trace plots across engines so they always use
+  unicode lambda character.
+- Fixed `reshape_chroms` so it returns a factor for the `sample` column.
+- Fixed `plot_chroms` so chromatograms are black when plotting a single
+  chromatogram with plotly or ggplot.
+- Fixed `plot_all_spectra` to consistently export spectra in wide format
+  regardless of plotting engine.
+- Fixed error in equation describing spectral clustering in
+  documentation for `get_peaktable`.
+- Fixed `get_peaktable` (with `clust = "sp.rt"`) to no longer take the
+  absolute value of spectral similarity scores. Previously,
+  [`abs()`](https://rdrr.io/r/base/MathFun.html) caused negatively
+  correlated spectra to be treated as similar; now they are correctly
+  penalized as dissimilar.
+- Fixed bug in FWHM calculation in `get_peaktable` for raw peak shape.
+- Fixed `filter_peaktable` so that peaks with `NA` values in some
+  samples are not excluded when filtering by `min_value`.
+- Suppressed spurious “essentially perfect fit” warning from
+  `summary.lm` when computing R² in `fit_peaks`.
+- Fixed bug in
+  [`subset.peak_table()`](https://ethanbass.github.io/chromatographR/reference/subset.peak_table.md)
+  where `sample_meta` was subset based on the wrong condition, so it was
+  sometimes not filtered by `subset`.
+- Made substantial revisions to documentation to improve clarity.
+
 ## chromatographR 0.7.5
 
 - Fixed bug in `check_chr` when multiple chromatograms are provided.
@@ -94,6 +253,8 @@
 - Eliminated spurious warning from `attach_ref_spectra` function.
 - Changed name of `index` argument in `plot.peak_list` to `idx`. The
   original argument is now deprecated.
+- Deprecated `chr` argument in multiple plotting functions (e.g.,
+  `plot_spectrum`) in favor of new `idx` argument.
 - Fixed bug affecting `plot_purity` argument in `plot.peak_list`.
 - Fixed bug in `reshape_chroms` so empty metadata column no longer
   appears.
@@ -187,9 +348,6 @@
   named character vector.
 
 ## chromatographR 0.5.1
-
-- In `plot_chroms`, `show_legend` now defaults to FALSE to prevent
-  overloading of the plot.
 
 ##### Bug fixes
 

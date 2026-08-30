@@ -20,7 +20,7 @@ trim_peak(x, pos, cutoff = 0.05)
 
 - cutoff:
 
-  Proportion of maximum absorbance to use as cutoff. Defaults to `.05`.
+  Proportion of maximum absorbance to use as cutoff. Defaults to `0.05`.
 
 ## Value
 

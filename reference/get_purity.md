@@ -1,7 +1,7 @@
-# Calculate mean peak purity
+# Calculate peak purity
 
-Estimates peak purity by assessing the dissimilarity of the spectra
-comprising the peak, using the method described in Stahl 2003.
+Estimates peak purity by assessing spectral dissimilarity across the
+peak region, following Stahl (2003).
 
 ## Usage
 
@@ -22,33 +22,32 @@ get_purity(
 
 - x:
 
-  A chromatogram in matrix format.
+  A chromatographic matrix (timepoints × wavelengths).
 
 - pos:
 
-  A vector containing the center, lower and upper bounds of a peak as
-  numeric indices.
+  Numeric indices defining the peak region (i.e. center, lower and upper
+  bounds).
 
 - weight:
 
-  Weight provided to
+  Weight parameter passed to
   [`get_agilent_threshold`](https://ethanbass.github.io/chromatographR/reference/get_agilent_threshold.md).
 
 - cutoff:
 
-  Proportion of maximum absorbance to use as cutoff. Argument to
+  Proportion of maximum absorbance to use as cutoff. Passed to
   [`trim_peak`](https://ethanbass.github.io/chromatographR/reference/trim_peak.md).
-  Defaults to `.05`.
+  Defaults to `0.05`.
 
 - noise_variance:
 
-  Variance of noise. Argument to
-  [`get_agilent_threshold`](https://ethanbass.github.io/chromatographR/reference/get_agilent_threshold.md).
+  Variance of noise. Passed to `get_agilent_threshold`.
 
 - noise_threshold:
 
   Threshold to define noise. Highest proportion of maximum absorbance.
-  Defaults to `.01`.
+  Defaults to `0.01`.
 
 - lambdas:
 
@@ -56,7 +55,7 @@ get_purity(
 
 - try:
 
-  Logical. Whether to estimate the purity or not. Defaults to TRUE.
+  Logical. Whether to estimate the purity or not. Defaults to `TRUE`.
 
 ## Value
 
@@ -67,7 +66,7 @@ proportion of timepoints with purity values below 1.
 
 Stahl, Mark. “Peak Purity Analysis in HPLC and CE Using Diode-Array
 Technology.” Agilent Technologies, April 1, 2003, 16.
-<https://www.agilent.com/cs/library/applications/5988-8647EN.pdf>
+[5988-8647EN.pdf](https://web.archive.org/web/20220615145615/https://www.agilent.com/cs/library/applications/5988-8647EN.pdf)
 
 ## Author
 

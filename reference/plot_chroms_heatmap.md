@@ -6,7 +6,7 @@ Plots the specified traces from a list of chromatograms as a heatmap.
 
 ``` r
 plot_chroms_heatmap(
-  chrom_list,
+  x,
   idx = NULL,
   lambdas,
   engine = c("base", "ggplot", "plotly"),
@@ -20,9 +20,11 @@ plot_chroms_heatmap(
 
 ## Arguments
 
-- chrom_list:
+- x:
 
-  List of chromatograms to plot
+  A list of chromatograms in matrix format (timepoints × wavelengths) or
+  a `peak_table` containing a pointer to a list of chromatograms
+  accessible in the current environment.
 
 - idx:
 
@@ -32,13 +34,14 @@ plot_chroms_heatmap(
 - lambdas:
 
   A character or numeric vector specifying the wavelengths to plot.
+  Ignored for one-dimensional chromatograms.
 
 - engine:
 
-  Plotting engine. Either `base`
-  ([`matplot`](https://rdrr.io/r/graphics/matplot.html)),
-  [`plotly`](https://rdrr.io/pkg/plotly/man/plotly.html), or
-  [ggplot](https://ggplot2.tidyverse.org/reference/ggplot2-package.html).
+  Plotting backend to use. One of
+  [`"base"`](https://rdrr.io/r/graphics/matplot.html),
+  [`"ggplot"`](https://ggplot2.tidyverse.org/reference/ggplot2-package.html),
+  or [`"plotly"`](https://rdrr.io/pkg/plotly/man/plotly.html).
 
 - show_legend:
 
@@ -46,11 +49,11 @@ plot_chroms_heatmap(
 
 - xlim:
 
-  Range of x axis.
+  Range of x axis values.
 
 - legend_position:
 
-  Position of legend.
+  Position of legend. Defaults to `"topright"`
 
 - title:
 
@@ -62,19 +65,22 @@ plot_chroms_heatmap(
 
 ## Value
 
-No return value, called for side effects.
+A `plotly` or `ggplot` object when `engine = "plotly"` or
+`engine = "ggplot"`, respectively. No value is returned when
+`engine = "base"`.
 
 ## Details
 
-Adapted from
-[`plot.VPdtw`](https://rdrr.io/pkg/VPdtw/man/plot.VPdtw.html).
+Plots the traces of the chromatograms specified by `idx` at the
+specified wavelengths (`lambdas`) as a heatmap. Plots can be produced
+using base graphics engine, `ggplot2`, or `plotly`, according to the
+value of the `engine` argument. Adapted from
+[`VPdtw::plot.VPdtw`](https://rdrr.io/pkg/VPdtw/man/plot.VPdtw.html).
 
 ## Side effects
 
-Plots the traces of the specified chromatograms `idx` at the specified
-wavelengths `lambdas` as a heatmap. Plots can be produced using base
-graphics engine, `ggplot2`, or `plotly`, according to the value of
-`engine`.
+If `engine == "base"`, the plot is rendered to the active graphics
+device.
 
 ## See also
 

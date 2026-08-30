@@ -13,12 +13,14 @@ subset(x, subset, select, drop = FALSE, ...)
 
 - x:
 
-  A `peak_table` object.
+  A
+  [`peak_table`](https://ethanbass.github.io/chromatographR/reference/peak_table-class.md)
+  object.
 
 - subset:
 
   Logical expression indicating rows (samples) to keep from
-  `peak_table`; missing values are taken as false.
+  `peak_table`; missing values are taken as `FALSE`.
 
 - select:
 

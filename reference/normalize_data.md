@@ -1,8 +1,8 @@
 # Normalize peak table or chromatograms
 
-Normalizes peak table or list of chromatograms by specified column in
-sample metadata. Metadata must first be attached to the `peak_table`
-using
+Normalizes peak table or list of chromatograms by a column in the sample
+metadata or in the peak table. For normalization by sample metadata, the
+metadata must first be attached to the `peak_table` using
 [`attach_metadata`](https://ethanbass.github.io/chromatographR/reference/attach_metadata.md).
 
 ## Usage
@@ -11,9 +11,10 @@ using
 normalize_data(
   peak_table,
   column,
-  chrom_list,
+  chrom_list = NULL,
   what = c("peak_table", "chrom_list"),
-  by = c("meta", "peak")
+  by = NULL,
+  on_invalid = c("warn", "error", "silent")
 )
 ```
 
@@ -25,28 +26,35 @@ normalize_data(
 
 - column:
 
-  The name of the column containing the weights.
+  The name of the column to be used for normalization.
 
 - chrom_list:
 
   List of chromatograms for normalization. The samples must be in same
-  order as the peak_table. If no argument is provided here, the function
-  will try to find the `chrom_list` object used to create the provided
-  `peak_table`.
+  order as the `peak_table`. If omitted, the function will attempt to
+  find it automatically using the pointer from the `peak_table`.
 
 - what:
 
-  \`peak_table\` or list of chromatograms (\`chrom_list\`).
+  Output type to return: either `"peak_table"` (default) or
+  `"chrom_list"`.
 
 - by:
 
   Whether to normalize by a column in sample metadata (`meta`) or by a
-  column in the peak table itself (`peak`).
+  column in the peak table (`peak`). By default, this parameter is
+  inferred based on the `column` name.
+
+- on_invalid:
+
+  How to handle invalid normalization values (i.e. zero, negative, or
+  `NA` values). One of `"warn"` (the default), `"silent"`, or `"error"`.
+  Invalid values are replaced with `NA` unless `"error"` is chosen.
 
 ## Value
 
-A `peak_table` object where the peaks are normalized by the mass of each
-sample.
+Either a normalized `peak_table` object or a normalized `chrom_list`,
+depending on the value of `what`.
 
 ## See also
 
@@ -63,6 +71,11 @@ Ethan Bass
 data(pk_tab)
 path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
 meta <- read.csv(path)
+
+# normalize by sample mass
 pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
 norm <- normalize_data(pk_tab, "mass", what = "peak_table")
+
+# normalize by internal standard
+norm <- normalize_data(pk_tab, column = "V16", by = "peak")
 ```

@@ -1,10 +1,11 @@
-# Combine peaks
+# Combine duplicate peaks
 
-Utility function to combine duplicate peaks in peak table, (i.e., peaks
-that were integrated at more than one wavelength or component) based on
-retention time and/or spectral similarity. Specify tolerance (`tol`) for
-retention time matching and minimum spectral correlation (`min.cor`) for
-a match.
+Identifies groups of duplicate peaks in a peak table and retains a
+single representative peak from each group. Peaks are considered
+duplicates when their retention times differ by less than `tol` and
+their spectral correlation exceeds `min.cor`. This is useful for
+collapsing peaks that were integrated at more than one wavelength or
+chromatographic component.
 
 ## Usage
 
@@ -13,7 +14,8 @@ combine_peaks(
   peak_table,
   tol = 0.01,
   min.cor = 0.9,
-  choose = "max",
+  choose = c("max", "least_sparse", "lambda"),
+  lambda = NULL,
   verbose = getOption("verbose")
 )
 ```
@@ -28,7 +30,7 @@ combine_peaks(
 - tol:
 
   Tolerance for matching retention times (maximum retention time
-  difference). Defaults to `.01`.
+  difference). Defaults to `0.01`.
 
 - min.cor:
 
@@ -36,8 +38,19 @@ combine_peaks(
 
 - choose:
 
-  If `max` will retain peak with highest intensity. Otherwise, the first
-  column in the data.frame will be retained.
+  Method used to select a representative peak from each group of
+  duplicate peaks. `"max"` retains the peak with the greatest total
+  intensity, `"least_sparse"` retains the peak detected in the greatest
+  number of samples, and `"lambda"` retains peaks matching the preferred
+  wavelength(s).
+
+- lambda:
+
+  Character vector of preferred wavelength(s) to retain when
+  `choose = "lambda"`. The function keeps the duplicate peak whose
+  integration wavelength matches one of the supplied values. An error is
+  thrown if none of the supplied values match any peak in the peak
+  table.
 
 - verbose:
 

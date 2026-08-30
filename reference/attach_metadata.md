@@ -1,8 +1,7 @@
-# Attach experimental metadata
+# Attaches sample metadata to a `peak_table` object by matching sample names.
 
-Attaches sample metadata to a `peak_table` object. Metadata should be
-provided as a data.frame object. One of the columns in the supplied
-metadata must match exactly the row names of the peak table.
+Metadata is provided as a `data.frame`, with one column containing
+sample identifiers matching the row names of `peak_table$tab`.
 
 ## Usage
 
@@ -14,25 +13,25 @@ attach_metadata(peak_table, metadata, column)
 
 - peak_table:
 
-  A `peak_table` object.
+  A `peak_table` object created by
+  [`get_peaktable`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md).
 
 - metadata:
 
-  A `data.frame` containing the sample metadata.
+  A `data.frame` of sample metadata.
 
 - column:
 
-  The name of the column in your `metadata` object containing the sample
-  names. Sample names must match the row names of `peak_table$tab`.
+  Name of the column in `metadata` containing sample identifiers. Must
+  match the row names of `peak_table$tab`.
 
 ## Value
 
-A `peak_table` object with attached metadata in the ` $sample_meta`
-slot.
+A `peak_table` object with metadata stored in the `sample_meta` slot.
 
 ## See also
 
-[`get_peaktable`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md)
+[`get_peaktable`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md),
 [`normalize_data`](https://ethanbass.github.io/chromatographR/reference/normalize_data.md)
 
 ## Author

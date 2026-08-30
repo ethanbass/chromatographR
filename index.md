@@ -2,9 +2,20 @@
 
 ## Overview
 
-`chromatographR` is a package for the reproducible analysis of HPLC-DAD
-chromatographic data in R. It can also be used to analyze other “simple”
-chromatographic data like GC-FID, HPLC-UV, or HPLC-FD.
+`chromatographR` implements a vendor-agnostic, fully scriptable workflow
+for reproducible analysis of HPLC-DAD and other chromatographic data
+(e.g., GC-FID, HPLC-UV, or HPLC-FD) in R. It provides an open-source
+alternative to proprietary chromatography software, with support for:
+
+- **Pre-processing**: smoothing, baseline correction, and interpolation
+- **Retention-time alignment**: parametric time warping (PTW) and
+  variable penalty dynamic time warping (VPdtw)
+- **Peak detection and integration**: Gaussian, exponential-Gaussian
+  hybrid (EGH), or raw trapezoidal integration
+- **Peak table construction**: hierarchical clustering to match peaks
+  across samples
+- **Downstream analysis**: metadata attachment, normalization, UV
+  spectral analysis, and visualization
 
 ## Installation
 
@@ -15,12 +26,18 @@ chromatographR can now be installed from CRAN:
 However, it’s recommended to install the latest development version of
 chromatographR from GitHub using the devtools package:
 
-    install.packages("remotes")
-    remotes::install_github("https://github.com/ethanbass/chromatographR/")
+``` r
+
+if (!require("pak", quietly=TRUE)) install.packages("pak")
+pak::pak("ethanbass/chromatographR")
+```
 
 or from R Universe:
 
-    install.packages("chromatographR", repos="https://ethanbass.r-universe.dev/", type="source")
+``` r
+
+install.packages("chromatographR", repos="https://ethanbass.r-universe.dev/")
+```
 
 ## Usage
 
@@ -54,7 +71,7 @@ opening a GitHub
 any suggestions or to file a bug report. Some good reasons to file an
 issue:
 
-- You’ve found an actual bug.  
+- You think you’ve found a bug.  
 - You’re getting a cryptic error message that you don’t understand.  
 - You have a file format you’d like to read that isn’t currently
   supported by chromatographR. (If you do this, please make sure to
@@ -73,5 +90,11 @@ page).
 
 If you use chromatographR in published work, please cite it as follows:
 
-Bass, E. (2023). chromatographR: Chromatographic Data Analysis Toolset
-(version 0.7.3). <http://doi.org/10.5281/zenodo.6944334>
+Bass, E. (2026). chromatographR: Chromatographic Data Analysis Toolset
+(version 0.8.0). <http://doi.org/10.5281/zenodo.6944334>
+
+If your workflow includes data import with chromConverter, please also
+cite:
+
+Bass, E. (2026). chromConverter: Chromatographic File Converter.
+<http://doi.org/10.5281/zenodo.6792521>.

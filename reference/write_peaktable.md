@@ -1,7 +1,6 @@
 # Export peak table
 
-Exports peak table in `csv` or `xlsx` format according to the value of
-`format`.
+Exports peak table in `csv` or `xlsx` format.
 
 ## Usage
 
@@ -11,7 +10,7 @@ write_peaktable(
   path,
   filename = "peak_table",
   format = c("csv", "xlsx"),
-  what = c("tab", "pk_meta", "sample_meta", "ref_spectra", "args")
+  what = c("tab", "pk_meta", "sample_meta", "instrument_meta", "ref_spectra", "args")
 )
 ```
 
@@ -28,7 +27,7 @@ write_peaktable(
 
 - filename:
 
-  File name. Defaults to "peak_table".
+  File name. Defaults to `"peak_table"`.
 
 - format:
 
@@ -36,7 +35,9 @@ write_peaktable(
 
 - what:
 
-  Which elements of the `peak_table` to export.
+  Which elements of the `peak_table` to export. One or more of `"tab"`,
+  `"pk_meta"`, `"sample_meta"`, `"instrument_meta"`, `"ref_spectra"`,
+  and `"args"`.
 
 ## Value
 
@@ -45,7 +46,7 @@ No return value. The function is called for its side effects.
 ## Side effects
 
 Exports peak_table object as `.csv` or `.xlsx` file according to the
-value of `format`.
+value of the `format` argument.
 
 ## Examples
 

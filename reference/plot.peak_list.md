@@ -1,7 +1,7 @@
-# Plot fitted peak shapes.
+# Overlay fitted peak shapes on chromatograms
 
-Visually assess integration accuracy by plotting fitted peaks over
-trace.
+Visually assess peak integration accuracy by overlaying fitted peak
+shapes over chromatographic traces.
 
 ## Usage
 
@@ -15,15 +15,14 @@ plot(
   lambda = NULL,
   points = FALSE,
   ticks = FALSE,
-  a = 0.5,
+  alpha = 0.5,
   color = NULL,
   cex.points = 0.5,
   numbers = FALSE,
   cex.font = 0.5,
   y.offset = 25,
   plot_purity = FALSE,
-  res,
-  index = NULL
+  res
 )
 ```
 
@@ -39,64 +38,78 @@ plot(
 
 - chrom_list:
 
-  List of chromatograms (retention time x wavelength matrices)
+  List of chromatograms (retention time x wavelength matrices). If
+  missing, extracted from environment using the pointer in `x`.
 
 - idx:
 
-  Index or name of chromatogram to be plotted.
+  Index or name of chromatogram to plot from `chrom_list`.
 
 - lambda:
 
-  Wavelength for plotting.
+  Wavelength (column) to use for plotting.
 
 - points:
 
-  Logical. If TRUE, plot peak maxima. Defaults to FALSE.
+  Logical. If `TRUE`, display peak apex locations as points. Defaults to
+  `FALSE`.
 
 - ticks:
 
-  Logical. If TRUE, mark beginning and end of each peak. Defaults to
-  FALSE.
+  Logical. If `TRUE`, mark peak boundaries with tick marks. Defaults to
+  `FALSE`.
 
-- a:
+- alpha:
 
-  Alpha parameter controlling the transparency of fitted shapes.
+  Transparency of fitted peak shapes. Defaults to `0.5`.
 
 - color:
 
-  The color of the fitted shapes.
+  Color used to fill fitted peak shapes. If `NULL`, a default color is
+  chosen based on the fitted model type.
 
 - cex.points:
 
-  Size of points. Defaults to 0.5
+  Size of points. Defaults to `0.5`.
 
 - numbers:
 
-  Whether to number peaks. Defaults to FALSE.
+  If `TRUE`, label peaks with numeric identifiers. Defaults to `FALSE`.
 
 - cex.font:
 
-  Font size if peaks are numbered. Defaults to 0.5.
+  Font size if peaks are numbered. Defaults to `0.5`.
 
 - y.offset:
 
-  Y offset for peak numbers. Defaults to 25.
+  Y offset for peak numbers. Defaults to `25`.
 
 - plot_purity:
 
-  Whether to add visualization of peak purity.
+  Logical. If `TRUE`, overlays peak purity traces based on peak
+  boundaries. Defaults to `FALSE`.
 
 - res:
 
-  time resolution for peak fitting
-
-- index:
-
-  This argument is deprecated. Please use `idx` instead.
+  Time resolution for peak fitting. If missing, inferred from
+  `chrom_list`.
 
 ## Value
 
 No return value, called for side effects.
+
+## Details
+
+The appearance of fitted peaks depends on the `"fit"` attribute of `x`,
+which may be `"gaussian"`, `"egh"`, `"bemg"`, or `"raw"`.
+
+Peak lists are expected to contain columns such as `rt`, `height`,
+`start`, `end`, and `sd`, with additional parameters depending on the
+fit type.
+
+Time units in `x` are used to rescale width parameters for plotting.
+
+Peak rendering errors are silently ignored.
 
 ## Side effects
 
