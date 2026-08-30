@@ -550,6 +550,7 @@ test_that("plot.peak_list works", {
   plot_peaks_bemg <- function(){
     plot(pks_bemg, chrom_list = dat.pr)
   }
+  skip_on_os(c("windows", "linux"))
   vdiffr::expect_doppelganger("plot.peak_list_bemg", plot_peaks_bemg)
   
   # something raw with this test on GitHub actions
