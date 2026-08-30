@@ -15,7 +15,7 @@
 
 ## Overview
 
-`chromatographR` provides a vendor-agnostic and fully scriptable alternative  for the reproducible analysis of HPLC-DAD and other chromatographic data (e.g., GC-FID, HPLC-UV, or HPLC-FD) in R. It enables a scriptable workflow as an open-source alternative to proprietary chromatography software, including:
+`chromatographR` implements a vendor-agnostic, fully scriptable workflow for reproducible analysis of HPLC-DAD and other chromatographic data (e.g., GC-FID, HPLC-UV, or HPLC-FD) in R. It provides an open-source alternative to proprietary chromatography software, with support for:
 
 - **Pre-processing**: smoothing, baseline correction, and interpolation
 - **Retention-time alignment**: parametric time warping (PTW) and variable penalty dynamic time warping (VPdtw)
@@ -33,14 +33,14 @@ install.packages("chromatographR")
 
 However, it's recommended to install the latest development version of chromatographR from GitHub using the devtools package:
 
-```
-install.packages("remotes")
-remotes::install_github("https://github.com/ethanbass/chromatographR/")
+```r
+if (!require("pak", quietly=TRUE)) install.packages("pak")
+pak::pak("ethanbass/chromatographR")
 ```
 
 or from R Universe:
 
-```
+```r
 install.packages("chromatographR", repos="https://ethanbass.r-universe.dev/")
 ```
 
