@@ -501,12 +501,23 @@ test_that("normalize_data works", {
   expect_equal(pk_tab_pnorm$args[["normalization_column"]], "V22")
   expect_equal(pk_tab_pnorm$args[["normalization_by"]], "peak")
   
-  expect_warning(pk_tab_pnorm_w <- normalize_data(pk_tab, chrom_list = dat.pr, 
+  expect_warning(pk_tab_pnorm_w <- normalize_data(pk_tab, chrom_list = dat.pr,
                                                    column = "V5", by = "peak"),
                  regexp = "Invalid normalization values")
-  expect_error(pk_tab_pnorm_w <- normalize_data(pk_tab, chrom_list = dat.pr, 
-                                                  column = "V5", by = "peak", 
+  expect_error(pk_tab_pnorm_w <- normalize_data(pk_tab, chrom_list = dat.pr,
+                                                  column = "V5", by = "peak",
                                                 on_invalid = "error"))
+
+  # auto-detection of by = "peak"
+  pk_tab_auto_peak <- normalize_data(pk_tab, column = "V22")
+  expect_equal(pk_tab_auto_peak$args[["normalization_by"]], "peak")
+  expect_equal(pk_tab_auto_peak$tab[1,], pk_tab$tab[1,]/pk_tab$tab$V22[1])
+
+  # disambiguation error when column present in both metadata and peak table
+  pk_tab_ambig <- pk_tab
+  pk_tab_ambig$sample_meta$V22 <- 1
+  expect_error(normalize_data(pk_tab_ambig, column = "V22"),
+               regexp = "disambiguated")
 })
 
 test_that("cluster_spectra works", {

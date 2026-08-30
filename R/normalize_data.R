@@ -42,7 +42,7 @@ normalize_data <- function(peak_table, column, chrom_list = NULL,
   on_invalid <- match.arg(on_invalid)
   check_peaktable(peak_table)
   if (is.null(by)){
-    found_meta <- any(grepl(column, colnames(peak_table$meta)))
+    found_meta <- any(grepl(column, colnames(peak_table$sample_meta)))
     found_tab <- any(grepl(column, colnames(peak_table$tab)))
     if (found_meta & found_tab){
       stop("Column could not be disambiguated. Please specify `by` argument.")
