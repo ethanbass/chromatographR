@@ -1,4 +1,4 @@
-# Plot spectra by clicking on the chromatogram.
+# Plot spectra by clicking on the chromatogram
 
 Plots a chromatographic trace from the specified chromatogram (`idx`),
 at the specified wavelength (`lambda`) with a dotted red line to

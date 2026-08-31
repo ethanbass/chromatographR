@@ -46,6 +46,7 @@ Ethan Bass
 
 ``` r
 data(pk_tab)
+data(Sa_warp)
 pk_tab <- attach_ref_spectra(pk_tab, ref = "max.int")
 pk_tab <- attach_ref_spectra(pk_tab, ref = "max.cor")
 ```

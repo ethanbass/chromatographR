@@ -28,13 +28,10 @@
   : Correct peak positions according to a PTW warping model
 
 - [`get_peaks()`](https://ethanbass.github.io/chromatographR/reference/get_peaks.md)
-  : Get peak list.
-
-- [`fit_peaks()`](https://ethanbass.github.io/chromatographR/reference/fit_peaks.md)
-  : Fit chromatographic peaks
+  : Get peak list
 
 - [`get_peaktable()`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md)
-  : Convert peak lists into an aligned peak table.
+  : Convert peak lists into an aligned peak table
 
 - [`get_spectra()`](https://ethanbass.github.io/chromatographR/reference/get_spectra.md)
   : Extract a spectrum from a chromatogram
@@ -59,9 +56,9 @@
 ## Visualization functions
 
 - [`plot_all_spectra()`](https://ethanbass.github.io/chromatographR/reference/plot_all_spectra.md)
-  : Plot all spectra for chosen peak.
+  : Plot all spectra for chosen peak
 - [`plot_chroms()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms.md)
-  : Plot traces from list of chromatograms.
+  : Plot traces from list of chromatograms
 - [`plot_chroms_heatmap()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms_heatmap.md)
   : Plot chromatograms as heatmap
 - [`plot_spectrum()`](https://ethanbass.github.io/chromatographR/reference/plot_spectrum.md)
@@ -73,9 +70,9 @@
 - [`boxplot(`*`<peak_table>`*`)`](https://ethanbass.github.io/chromatographR/reference/boxplot.peak_table.md)
   : Make boxplot from peak table.
 - [`mirror_plot()`](https://ethanbass.github.io/chromatographR/reference/mirror_plot.md)
-  : Make mirror plot from peak table.
+  : Make mirror plot from peak table
 - [`scan_chrom()`](https://ethanbass.github.io/chromatographR/reference/scan_chrom.md)
-  : Plot spectra by clicking on the chromatogram.
+  : Plot spectra by clicking on the chromatogram
 - [`plot(`*`<peak_list>`*`)`](https://ethanbass.github.io/chromatographR/reference/plot.peak_list.md)
   : Overlay fitted peak shapes on chromatograms
 - [`plot(`*`<peak_table>`*`)`](https://ethanbass.github.io/chromatographR/reference/plot.peak_table.md)
@@ -93,10 +90,6 @@
   : Filter peak table
 - [`merge_peaks()`](https://ethanbass.github.io/chromatographR/reference/merge_peaks.md)
   : Merge split peaks
-- [`get_times()`](https://ethanbass.github.io/chromatographR/reference/get_times.md)
-  : Get retention times
-- [`get_lambdas()`](https://ethanbass.github.io/chromatographR/reference/get_lambdas.md)
-  : Get lambdas
 - [`reshape_chroms()`](https://ethanbass.github.io/chromatographR/reference/reshape_chroms.md)
   : Reshape chromatograms
 - [`reshape_peaktable()`](https://ethanbass.github.io/chromatographR/reference/reshape_peaktable.md)

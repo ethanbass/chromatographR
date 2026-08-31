@@ -69,8 +69,8 @@ region, following Stahl (2003).</p>
 
 
 <dt id="arg-pos">pos<a class="anchor" aria-label="anchor" href="#arg-pos"></a></dt>
-<dd><p>Numeric indices defining the peak region (i.e. center, lower and
-upper bounds).</p></dd>
+<dd><p>A length-3 integer vector <code>c(apex, start, end)</code> giving the row
+indices of the peak apex, left boundary, and right boundary in <code>x</code>.</p></dd>
 
 
 <dt id="arg-weight">weight<a class="anchor" aria-label="anchor" href="#arg-weight"></a></dt>
@@ -115,6 +115,15 @@ Agilent Technologies, April 1, 2003, 16.
     <p>Ethan Bass</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Sa_warp</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="va">Sa_warp</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">pos</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">37</span>, <span class="fl">22</span>, <span class="fl">51</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">get_purity</span><span class="op">(</span><span class="va">x</span>, <span class="va">pos</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.6666667</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

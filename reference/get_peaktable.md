@@ -1,4 +1,4 @@
-# Convert peak lists into an aligned peak table.
+# Convert peak lists into an aligned peak table
 
 Converts a `peak_list` object containing peaks from multiple samples
 into an aligned peak table by clustering peaks across samples according

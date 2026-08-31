@@ -1,4 +1,4 @@
-# Plot traces from list of chromatograms.
+# Plot traces from list of chromatograms
 
 Visualizes absorbance traces from a list of one- or multi-wavelength
 chromatograms using base R, ggplot2, or plotly graphics. For

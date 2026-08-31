@@ -1,4 +1,4 @@
-# Plot all spectra for chosen peak.
+# Plot all spectra for chosen peak
 
 Plot multiple for a given peak in peak table. Wrapper for
 [`plot_spectrum`](https://ethanbass.github.io/chromatographR/reference/plot_spectrum.md).

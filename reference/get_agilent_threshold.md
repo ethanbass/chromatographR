@@ -21,11 +21,12 @@ get_agilent_threshold(
 
 - x:
 
-  A chromatogram in matrix format.
+  A chromatographic matrix (timepoints × wavelengths).
 
 - pos:
 
-  A vector containing peak information.
+  A length-3 integer vector `c(apex, start, end)` giving the row indices
+  of the peak apex, left boundary, and right boundary in `x`.
 
 - weight:
 
@@ -58,3 +59,17 @@ Technology.” Agilent Technologies, April 1, 2003, 16.
 ## Author
 
 Ethan Bass
+
+## Examples
+
+``` r
+data(Sa_warp)
+x <- Sa_warp[[1]]
+pos <- c(37, 22, 51)
+get_agilent_threshold(x, pos)
+#>  [1] 0.08919129 0.04889951 0.02983187 0.00000000 0.00000000 0.00000000
+#>  [7] 0.18706175 0.64143327 0.85443767 0.93649520 0.96786675 0.98059458
+#> [13] 0.98603512 0.98835261 0.98907636 0.98863759 0.98678229 0.98243533
+#> [19] 0.97297769 0.95181639 0.90252245 0.80466241 0.68708839 0.56780858
+#> [25] 0.38645915 0.12893417 0.00000000 0.00000000 0.00000000 0.00000000
+```

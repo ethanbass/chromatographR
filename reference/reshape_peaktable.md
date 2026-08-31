@@ -46,3 +46,19 @@ Other utility functions:
 ## Author
 
 Ethan Bass
+
+## Examples
+
+``` r
+data(pk_tab)
+reshape_peaktable(pk_tab, peaks = c("V10", "V15"))
+#>   peak sample lambda    rt      area
+#> 1  V10    119    210 12.47  2.637016
+#> 2  V10    121    210 12.47  1.042586
+#> 3  V10    122    210 12.47  1.417466
+#> 4  V10    458    210 12.47  4.157266
+#> 5  V15    119    210 13.76 36.585326
+#> 6  V15    121    210 13.76 20.566841
+#> 7  V15    122    210 13.76 31.606156
+#> 8  V15    458    210 13.76 42.991983
+```

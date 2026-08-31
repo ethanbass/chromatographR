@@ -26,8 +26,8 @@ get_purity(
 
 - pos:
 
-  Numeric indices defining the peak region (i.e. center, lower and upper
-  bounds).
+  A length-3 integer vector `c(apex, start, end)` giving the row indices
+  of the peak apex, left boundary, and right boundary in `x`.
 
 - weight:
 
@@ -71,3 +71,13 @@ Technology.” Agilent Technologies, April 1, 2003, 16.
 ## Author
 
 Ethan Bass
+
+## Examples
+
+``` r
+data(Sa_warp)
+x <- Sa_warp[[1]]
+pos <- c(37, 22, 51)
+get_purity(x, pos)
+#> [1] 0.6666667
+```

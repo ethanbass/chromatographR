@@ -57,3 +57,15 @@ specified criteria.
 ## Author
 
 Ron Wehrens, Ethan Bass
+
+## Examples
+
+``` r
+data(Sa_warp)
+pks <- get_peaks(Sa_warp[1], lambda = "210")
+filter_peaks(pks, min_height = 100)
+#> A peak_list with 1 samples and 1 wavelength(s) (210 nm)
+#> Fit method: egh | Time unit: min | sd_max: 50
+#> Total peaks: 8 (mean 8 per sample)
+#> Source: Sa_warp[1]
+```

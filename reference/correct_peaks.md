@@ -59,3 +59,14 @@ package by Ron Wehrens:
 ## Author
 
 Ron Wehrens, Ethan Bass
+
+## Examples
+
+``` r
+if (FALSE) { # interactive()
+data(Sa_pr)
+warp <- correct_rt(chrom_list = Sa_pr, lambdas = 210, what = "models")
+pks <- get_peaks(Sa_pr, lambda = "210")
+correct_peaks(pks, mod_list = warp, chrom_list = Sa_pr)
+}
+```

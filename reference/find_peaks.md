@@ -82,7 +82,7 @@ preprocessing.
 
 The `find_peaks` function is adapted from MATLAB code included in Prof.
 Tom O'Haver's [Pragmatic Introduction to Signal
-Processing](http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm).
+Processing](https://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm).
 
 ## References
 
