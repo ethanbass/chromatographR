@@ -175,6 +175,10 @@ elementwise.all.equal <- Vectorize(function(x, y, ...){
 #' @return Numeric vector of retention times from the chromatogram specified by
 #' `idx`.
 #' @family utility functions
+#' @keywords internal
+#' @examples
+#' data(Sa_warp)
+#' get_times(Sa_warp)
 #' @export
 
 get_times <- function(x, idx = 1){
@@ -195,6 +199,10 @@ get_times <- function(x, idx = 1){
 #' @param x A list of chromatograms or `peak_table` object.
 #' @return A numeric vector of wavelengths.
 #' @family utility functions
+#' @keywords internal
+#' @examples
+#' data(Sa_warp)
+#' get_lambdas(Sa_warp)
 #' @export
 
 get_lambdas <- function(x){

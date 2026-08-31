@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_spectrum.R
 \name{plot_all_spectra}
 \alias{plot_all_spectra}
-\title{Plot all spectra for chosen peak.}
+\title{Plot all spectra for chosen peak}
 \usage{
 plot_all_spectra(
   loc,

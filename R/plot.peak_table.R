@@ -142,7 +142,7 @@ boxplot.peak_table <- function(x, formula, ...){
   }
 }
 
-#' Make mirror plot from peak table.
+#' Make mirror plot from peak table
 #' 
 #' Plots chromatograms as a mirror plot.
 #' 

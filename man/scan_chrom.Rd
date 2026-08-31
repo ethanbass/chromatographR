@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_spectrum.R
 \name{scan_chrom}
 \alias{scan_chrom}
-\title{Plot spectra by clicking on the chromatogram.}
+\title{Plot spectra by clicking on the chromatogram}
 \usage{
 scan_chrom(
   chrom_list,

@@ -18,6 +18,10 @@
 #' specified criteria.
 #' @author Ron Wehrens, Ethan Bass
 #' @seealso [`get_peaks`], [`filter_peaktable`]
+#' @examples
+#' data(Sa_warp)
+#' pks <- get_peaks(Sa_warp[1], lambda = "210")
+#' filter_peaks(pks, min_height = 100)
 #' @export filter_peaks
 
 filter_peaks <- function(peak_list, min_height, min_area,

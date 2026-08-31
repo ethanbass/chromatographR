@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot.peak_table.R
 \name{mirror_plot}
 \alias{mirror_plot}
-\title{Make mirror plot from peak table.}
+\title{Make mirror plot from peak table}
 \usage{
 mirror_plot(
   x,

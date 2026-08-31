@@ -25,6 +25,10 @@ long format.
 \description{
 Reshapes peak table from wide to long format
 }
+\examples{
+data(pk_tab)
+reshape_peaktable(pk_tab, peaks = c("V10", "V15"))
+}
 \seealso{
 Other utility functions:
 \code{\link[=combine_peaks]{combine_peaks()}},

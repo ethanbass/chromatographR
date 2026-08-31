@@ -33,6 +33,11 @@ specified criteria.
 Utility function for filtering peaks from a \code{peak_list} object. Peaks can be
 filtered according to height, area, standard deviation, and/or retention time.
 }
+\examples{
+data(Sa_warp)
+pks <- get_peaks(Sa_warp[1], lambda = "210")
+filter_peaks(pks, min_height = 100)
+}
 \seealso{
 \code{\link{get_peaks}}, \code{\link{filter_peaktable}}
 }

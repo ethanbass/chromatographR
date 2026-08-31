@@ -55,9 +55,11 @@ Adds text labels to peaks on a chromatogram plot produced by
 automatically from the peak table.
 }
 \examples{
-\dontrun{
-plot_chroms(dat, idx = 1:5, lambda = 228, engine = "ggplot") |>
-  annotate_peaks(c(Sinigrin = "V8", `1ME` = "V15"), peak_table = pktab)
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  data(Sa_warp)
+  data(pk_tab)
+  plot_chroms(Sa_warp, lambdas = 210, engine = "ggplot") |>
+    annotate_peaks(c(C1="V9", C2="V11", C3="V17"), peak_table = pk_tab)
 }
 }
 \seealso{

@@ -25,6 +25,11 @@
 #' @note This function is adapted from the `correctPeaks` function in the alsace
 #' package by Ron Wehrens: <https://github.com/rwehrens/alsace/blob/master/R/correctPeaks.R>.
 #' @seealso [`correct_rt`]
+#' @examplesIf interactive()
+#' data(Sa_pr)
+#' warp <- correct_rt(chrom_list = Sa_pr, lambdas = 210, what = "models")
+#' pks <- get_peaks(Sa_pr, lambda = "210")
+#' correct_peaks(pks, mod_list = warp, chrom_list = Sa_pr)
 #' @export correct_peaks
 
 correct_peaks <- function(peak_list, mod_list, chrom_list, match_names = TRUE){

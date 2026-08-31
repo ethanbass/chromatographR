@@ -18,6 +18,10 @@ Numeric vector of retention times from the chromatogram specified by
 \description{
 Get retention times from a list of chromatograms or a \code{peak_table} object.
 }
+\examples{
+data(Sa_warp)
+get_times(Sa_warp)
+}
 \seealso{
 Other utility functions:
 \code{\link[=combine_peaks]{combine_peaks()}},
@@ -27,3 +31,4 @@ Other utility functions:
 \code{\link[=reshape_peaktable]{reshape_peaktable()}}
 }
 \concept{utility functions}
+\keyword{internal}

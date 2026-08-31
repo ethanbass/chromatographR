@@ -14,9 +14,10 @@ get_agilent_threshold(
 )
 }
 \arguments{
-\item{x}{A chromatogram in matrix format.}
+\item{x}{A chromatographic matrix (timepoints × wavelengths).}
 
-\item{pos}{A vector containing peak information.}
+\item{pos}{A length-3 integer vector \code{c(apex, start, end)} giving the row
+indices of the peak apex, left boundary, and right boundary in \code{x}.}
 
 \item{weight}{Scaling parameter affecting stringency of threshold. Defaults
 to \code{1}.}
@@ -35,6 +36,12 @@ within the peak specified by \code{pos}.
 \description{
 Intermediate function used in \code{\link{get_purity}} to compute variance-based
 thresholds.
+}
+\examples{
+data(Sa_warp)
+x <- Sa_warp[[1]]
+pos <- c(37, 22, 51)
+get_agilent_threshold(x, pos)
 }
 \references{
 Stahl, Mark. “Peak Purity Analysis in HPLC and CE Using Diode-Array Technology.”

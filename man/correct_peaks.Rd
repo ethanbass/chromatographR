@@ -39,6 +39,14 @@ in the list of peak tables.
 This function is adapted from the \code{correctPeaks} function in the alsace
 package by Ron Wehrens: \url{https://github.com/rwehrens/alsace/blob/master/R/correctPeaks.R}.
 }
+\examples{
+\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
+data(Sa_pr)
+warp <- correct_rt(chrom_list = Sa_pr, lambdas = 210, what = "models")
+pks <- get_peaks(Sa_pr, lambda = "210")
+correct_peaks(pks, mod_list = warp, chrom_list = Sa_pr)
+\dontshow{\}) # examplesIf}
+}
 \seealso{
 \code{\link{correct_rt}}
 }

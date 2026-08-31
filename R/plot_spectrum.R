@@ -280,7 +280,7 @@ plot_spectrum_ggpl <- function(loc, peak_table, chrom_list,
   } else return(sub)
 }
 
-#' Plot spectra by clicking on the chromatogram.
+#' Plot spectra by clicking on the chromatogram
 #' 
 #' Plots a chromatographic trace from the specified chromatogram (`idx`),
 #' at the specified wavelength (`lambda`) with a dotted red line to indicate
@@ -344,7 +344,7 @@ scan_chrom <- function(chrom_list, idx, lambda,
   invisible(line.idx)
 }
 
-#' Plot all spectra for chosen peak.
+#' Plot all spectra for chosen peak
 #' 
 #' Plot multiple for a given peak in peak table. Wrapper for [`plot_spectrum`].
 #' 
@@ -772,18 +772,26 @@ ggplot_trace <- function(chrom_list, chr, lambda.idx, line.idx = NULL){
 #' @seealso [plot_spectrum()], [plot_chroms()]
 #'
 #' @examples
-#' \dontrun{
-#' # single trace with inset spectrum
-#' plot_spectrum_inset("V10", peak_table = pktab)
+#' if (requireNamespace("ggplot2", quietly = TRUE)) {
+#'   data(pk_tab)
+#'   data(Sa_warp)
+#'   # single trace with inset spectrum
+#'   plot_spectrum_inset("V15", peak_table = pk_tab)
 #'
-#' # multiple traces, inset on the left
-#' plot_spectrum_inset("V15", peak_table = pk_tab)
+#'   # multiple traces, inset in the center
+#'   plot_spectrum_inset("V15", peak_table = pk_tab, idx=c(1:4),
+#'   position = "top")
 #'
-#' # manual inset placement using bottom-left corner
-#' plot_spectrum_inset("V15", peak_table = pk_tab, 
-#'                    position=c(0.6,0.3),
-#'                    inset_width = 0.35, inset_height = 0.25)
-#' }
+#'   # manual inset placement
+#'   plot_spectrum_inset("V15", peak_table = pk_tab,
+#'                       position = c(0.6, 0.3),
+#'                       inset_width = 0.35, inset_height = 0.25)
+#'
+#'   # multiple peaks with a list of positions
+#'   plot_spectrum_inset(c("V15", "V26"), peak_table = pk_tab,
+#'                       position = list(c(0.3, 0.5), c(0.65, 0.3)),
+#'                       inset_width = 0.3, inset_height = 0.3)#'
+#'                       }
 #' @export
 plot_spectrum_inset <- function(loc, peak_table, chrom_list=NULL,
                                 idx = "max", lambda = "max",
@@ -802,9 +810,11 @@ plot_spectrum_inset <- function(loc, peak_table, chrom_list=NULL,
   idx <- peak_data$idx
   lambda <- peak_data$lambda
   named <- !is.null(names(loc))
+  if (is.numeric(position) && !is.list(position))
+    position <- list(position)
   if (length(loc) > 1 && length(position) != length(loc))
     stop("When annotating multiple peaks, `position` must have the same length as `loc`.")
-  
+
   p1 <- plot_chroms(chrom_list, idx = idx, lambdas = lambda,
                     ylim = ylim, xlim = xlim, engine = "ggplot", ...) + 
     ggplot2::theme(panel.grid = ggplot2::element_blank())

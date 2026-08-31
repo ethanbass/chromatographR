@@ -19,6 +19,9 @@
 #' and a sample identifier column specified by `sample_var`.
 #' @author Ethan Bass
 #' @family utility functions
+#' @examples
+#' data(Sa_warp)
+#' reshape_chroms(Sa_warp, lambdas = 210)
 #' @export
 
 reshape_chroms <- function(x, idx, time_resolution = NULL,  

@@ -44,6 +44,11 @@ rows and each column is a sample. In long format, columns are \code{wavelength},
 A \code{data.frame} in the format specified by \code{format}.
 }
 \description{
-Extracts the UV-Vis spectrum at a specified retention time from one or more
+Extracts the UV-VIS spectrum at a specified retention time from one or more
 chromatograms in a \code{chrom_list}.
+}
+\examples{
+data(pk_tab)
+data(Sa_warp)
+get_spectra("V10", peak_table = pk_tab)
 }

@@ -64,6 +64,7 @@ attach_metadata <- function(peak_table, metadata, column){
 #' @seealso [`get_peaks`], [`get_peaktable`]
 #' @examples
 #' data(pk_tab)
+#' data(Sa_warp)
 #' pk_tab <- attach_ref_spectra(pk_tab, ref = "max.int")
 #' pk_tab <- attach_ref_spectra(pk_tab, ref = "max.cor")
 #' @export attach_ref_spectra

@@ -7,19 +7,27 @@
 trim_peak(x, pos, cutoff = 0.05)
 }
 \arguments{
-\item{x}{A chromatogram in matrix format.}
+\item{x}{A numeric vector of signal intensities (a single wavelength trace).}
 
-\item{pos}{A vector containing peak information.}
+\item{pos}{A length-3 integer vector \code{c(apex, start, end)} giving the row
+indices of the peak apex, left boundary, and right boundary respectively.}
 
 \item{cutoff}{Proportion of maximum absorbance to use as cutoff. Defaults to
 \code{0.05}.}
 }
 \value{
-Returns indices within the peak specified by \code{pos} with a higher
-signal intensity than the specified cutoff.
+Returns indices within the peak region (\code{start:end}) where the
+signal exceeds \code{cutoff} times the apex intensity.
 }
 \description{
 Trim peak
+}
+\examples{
+data(Sa_warp)
+x <- Sa_warp[[1]]
+signal <- x[, "210"]
+pos <- c(37, 22, 51)
+trim_peak(signal, pos)
 }
 \author{
 Ethan Bass

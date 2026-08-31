@@ -1,4 +1,4 @@
-#' Plot traces from list of chromatograms.
+#' Plot traces from list of chromatograms
 #' 
 #' Visualizes absorbance traces from a list of one- or multi-wavelength
 #' chromatograms using base R, ggplot2, or plotly graphics. For
@@ -443,9 +443,11 @@ plot_chroms_heatmap_plotly <- function(chrom_list, lambdas.idx = 1, idx = NULL,
 #' @seealso [plot_chroms()], [plot_spectrum_inset()]
 #'
 #' @examples
-#' \dontrun{
-#' plot_chroms(dat, idx = 1:5, lambda = 228, engine = "ggplot") |>
-#'   annotate_peaks(c(Sinigrin = "V8", `1ME` = "V15"), peak_table = pktab)
+#' if (requireNamespace("ggplot2", quietly = TRUE)) {
+#'   data(Sa_warp)
+#'   data(pk_tab)
+#'   plot_chroms(Sa_warp, lambdas = 210, engine = "ggplot") |>
+#'     annotate_peaks(c(C1="V9", C2="V11", C3="V17"), peak_table = pk_tab)
 #' }
 #' @export
 annotate_peaks <- function(p, loc, peak_table, chrom_list=NULL, label = NULL, 

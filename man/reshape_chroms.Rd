@@ -43,6 +43,10 @@ data frame with one row per sample × retention time × wavelength combination.
 Each row corresponds to a single measurement of signal intensity at
 a given retention time and wavelength for a specific sample.
 }
+\examples{
+data(Sa_warp)
+reshape_chroms(Sa_warp, lambdas = 210)
+}
 \seealso{
 Other utility functions:
 \code{\link[=combine_peaks]{combine_peaks()}},

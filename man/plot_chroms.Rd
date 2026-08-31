@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_chroms.R
 \name{plot_chroms}
 \alias{plot_chroms}
-\title{Plot traces from list of chromatograms.}
+\title{Plot traces from list of chromatograms}
 \usage{
 plot_chroms(
   x,

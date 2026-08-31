@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_peaktable.R
 \name{get_peaktable}
 \alias{get_peaktable}
-\title{Convert peak lists into an aligned peak table.}
+\title{Convert peak lists into an aligned peak table}
 \usage{
 get_peaktable(
   peak_list,

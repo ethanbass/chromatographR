@@ -1,4 +1,4 @@
-#' Convert peak lists into an aligned peak table.
+#' Convert peak lists into an aligned peak table
 #' 
 #' Converts a `peak_list` object containing peaks from multiple samples into
 #' an aligned peak table by clustering peaks across samples according to
@@ -296,10 +296,13 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
 #' @param metadata A character vector specifying the metadata fields to include.
 #' @param fixed_levels Logical. Whether to fix factor levels of features in the
 #' order provided. Defaults to `TRUE`.
-#' @return A data.frame containing the information for the specified peaks in 
+#' @return A data.frame containing the information for the specified peaks in
 #' long format.
 #' @author Ethan Bass
 #' @family utility functions
+#' @examples
+#' data(pk_tab)
+#' reshape_peaktable(pk_tab, peaks = c("V10", "V15"))
 #' @export
 reshape_peaktable <- function(x, peaks, metadata, fixed_levels = TRUE){
   if (!missing(peaks)){

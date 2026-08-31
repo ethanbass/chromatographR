@@ -27,7 +27,7 @@ Description: Tools for high-throughput analysis of HPLC-DAD/UV
     for peak detection; Lan & Jorgenson (2001)
     <doi:10.1016/S0021-9673(01)00594-5> for exponential-Gaussian hybrid
     fitting; and Naish & Hartwell (1988) <doi:10.1007/BF02268168> for
-    biexponentially modified Gaussian fitting.
+    bi-exponentially modified Gaussian fitting.
 License: GPL (>= 2)
 URL: https://ethanbass.github.io/chromatographR/, https://github.com/ethanbass/chromatographR/
 BugReports: https://github.com/ethanbass/chromatographR/issues/

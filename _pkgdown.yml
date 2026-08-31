@@ -16,7 +16,6 @@ reference:
     - correct_rt_group
     - correct_peaks
     - get_peaks
-    - fit_peaks
     - get_peaktable
     - get_spectra
     - attach_metadata
@@ -37,8 +36,6 @@ reference:
     - filter_peaks
     - filter_peaktable
     - merge_peaks
-    - get_times
-    - get_lambdas
     - reshape_chroms
     - reshape_peaktable
     - write_peaktable

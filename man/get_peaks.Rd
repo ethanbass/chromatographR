@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_peaks.R
 \name{get_peaks}
 \alias{get_peaks}
-\title{Get peak list.}
+\title{Get peak list}
 \usage{
 get_peaks(
   chrom_list,

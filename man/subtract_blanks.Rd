@@ -41,3 +41,7 @@ Subtracts a blank chromatogram from each sample in a \code{chrom_list},
 using either the mean of all blanks, the nearest blank in run order,
 or the most recent preceding blank.
 }
+\examples{
+data(Sa_warp)
+subtract_blanks(Sa_warp, blank_id = 1)
+}

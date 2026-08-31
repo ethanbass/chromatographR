@@ -4,8 +4,8 @@
 #' region, following Stahl (2003).
 #' 
 #' @param x A chromatographic matrix (timepoints × wavelengths).
-#' @param pos Numeric indices defining the peak region (i.e. center, lower and 
-#' upper bounds).
+#' @param pos A length-3 integer vector `c(apex, start, end)` giving the row
+#' indices of the peak apex, left boundary, and right boundary in `x`.
 #' @param weight Weight parameter passed to [`get_agilent_threshold`].
 #' @param cutoff Proportion of maximum absorbance to use as cutoff.
 #' Passed to [`trim_peak`]. Defaults to `0.05`.
@@ -22,6 +22,11 @@
 #' [5988-8647EN.pdf](https://web.archive.org/web/20220615145615/https://www.agilent.com/cs/library/applications/5988-8647EN.pdf)
 #' @author Ethan Bass
 #' @keywords internal
+#' @examples
+#' data(Sa_warp)
+#' x <- Sa_warp[[1]]
+#' pos <- c(37, 22, 51)
+#' get_purity(x, pos)
 #' @export
 
 get_purity <- function(x, pos, weight = 1, cutoff = 0.05, 
@@ -88,8 +93,9 @@ find_noise <- function(x, noise_threshold = 0.01, lambdas){
 #' Intermediate function used in [`get_purity`] to compute variance-based 
 #' thresholds.
 #' 
-#' @param x A chromatogram in matrix format.
-#' @param pos A vector containing peak information.
+#' @param x A chromatographic matrix (timepoints × wavelengths).
+#' @param pos A length-3 integer vector `c(apex, start, end)` giving the row
+#' indices of the peak apex, left boundary, and right boundary in `x`.
 #' @param weight Scaling parameter affecting stringency of threshold. Defaults
 #' to `1`.
 #' @param noise_variance Variance of noise.
@@ -104,6 +110,11 @@ find_noise <- function(x, noise_threshold = 0.01, lambdas){
 #' [5988-8647EN.pdf](https://web.archive.org/web/20220615145615/https://www.agilent.com/cs/library/applications/5988-8647EN.pdf)
 #' @author Ethan Bass
 #' @keywords internal
+#' @examples
+#' data(Sa_warp)
+#' x <- Sa_warp[[1]]
+#' pos <- c(37, 22, 51)
+#' get_agilent_threshold(x, pos)
 #' @export
 
 get_agilent_threshold <- function(x, pos, weight = 1, noise_variance = NULL,
@@ -177,14 +188,21 @@ get_purity_values <- function(x, pos, weight = 1, noise_variance = NULL,
 }
 
 #' Trim peak
-#' @param x A chromatogram in matrix format.
-#' @param pos A vector containing peak information.
+#' @param x A numeric vector of signal intensities (a single wavelength trace).
+#' @param pos A length-3 integer vector `c(apex, start, end)` giving the row
+#' indices of the peak apex, left boundary, and right boundary respectively.
 #' @param cutoff Proportion of maximum absorbance to use as cutoff. Defaults to
 #' `0.05`.
-#' @return Returns indices within the peak specified by `pos` with a higher
-#' signal intensity than the specified cutoff.
+#' @return Returns indices within the peak region (`start:end`) where the
+#' signal exceeds `cutoff` times the apex intensity.
 #' @author Ethan Bass
 #' @keywords internal
+#' @examples
+#' data(Sa_warp)
+#' x <- Sa_warp[[1]]
+#' signal <- x[, "210"]
+#' pos <- c(37, 22, 51)
+#' trim_peak(signal, pos)
 #' @export
 
 trim_peak <- function(x, pos, cutoff = 0.05){

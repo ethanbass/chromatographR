@@ -64,7 +64,7 @@ preprocessing.
 }
 \note{
 The \code{find_peaks} function is adapted from MATLAB code included in
-Prof. Tom O'Haver's \href{http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{Pragmatic Introduction to Signal Processing}.
+Prof. Tom O'Haver's \href{https://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{Pragmatic Introduction to Signal Processing}.
 }
 \examples{
 data(Sa_pr)

@@ -45,7 +45,7 @@
 #' of peak centers. All locations are expressed as indices.
 #' @note The `find_peaks` function is adapted from MATLAB code included in
 #' Prof. Tom O'Haver's [Pragmatic Introduction to Signal Processing](
-#' http://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm).
+#' https://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm).
 #' @keywords internal
 #' @author Ethan Bass
 #' @examples
@@ -182,6 +182,7 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' 26: 285-296. \doi{10.1007/BF02268168}.
 #' @export fit_peaks
 #' @md
+#' @keywords internal
 
 fit_peaks <- function (x, lambda, pos = NULL, sd_max = 50,
                        fit = c("egh", "bemg", "gaussian", "raw"),

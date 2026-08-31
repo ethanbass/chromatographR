@@ -1,6 +1,6 @@
 #' Extract a spectrum from a chromatogram
 #'
-#' Extracts the UV-Vis spectrum at a specified retention time from one or more
+#' Extracts the UV-VIS spectrum at a specified retention time from one or more
 #' chromatograms in a `chrom_list`.
 #'
 #' @param loc Peak or retention time to extract the spectrum at. Interpretation
@@ -22,6 +22,10 @@
 #'
 #' @return A `data.frame` in the format specified by `format`.
 #'
+#' @examples
+#' data(pk_tab)
+#' data(Sa_warp)
+#' get_spectra("V10", peak_table = pk_tab)
 #' @export
 
 get_spectra <- function(loc, peak_table, chrom_list = NULL, 

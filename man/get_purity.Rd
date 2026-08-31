@@ -18,8 +18,8 @@ get_purity(
 \arguments{
 \item{x}{A chromatographic matrix (timepoints × wavelengths).}
 
-\item{pos}{Numeric indices defining the peak region (i.e. center, lower and
-upper bounds).}
+\item{pos}{A length-3 integer vector \code{c(apex, start, end)} giving the row
+indices of the peak apex, left boundary, and right boundary in \code{x}.}
 
 \item{weight}{Weight parameter passed to \code{\link{get_agilent_threshold}}.}
 
@@ -42,6 +42,12 @@ as the proportion of timepoints with purity values below 1.
 \description{
 Estimates peak purity by assessing spectral dissimilarity across the peak
 region, following Stahl (2003).
+}
+\examples{
+data(Sa_warp)
+x <- Sa_warp[[1]]
+pos <- c(37, 22, 51)
+get_purity(x, pos)
 }
 \references{
 Stahl, Mark. “Peak Purity Analysis in HPLC and CE Using Diode-Array Technology.”

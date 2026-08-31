@@ -22,6 +22,9 @@
 #' @return A `chrom_list` with blank-subtracted samples. Blanks
 #'   themselves are removed from the returned list.
 #'
+#' @examples
+#' data(Sa_warp)
+#' subtract_blanks(Sa_warp, blank_id = 1)
 #' @export
 subtract_blanks <- function(chrom_list, pattern = NULL, blank_id,
                            method = c("mean", "nearest", "preceding"),

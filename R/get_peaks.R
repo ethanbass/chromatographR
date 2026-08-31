@@ -1,4 +1,4 @@
-#' Get peak list.
+#' Get peak list
 #' 
 #' Detects chromatographic peaks, fits peak models, and extracts peak parameters
 #' at one or more wavelengths.
