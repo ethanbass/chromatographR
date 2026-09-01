@@ -328,8 +328,8 @@ m
 #> POLISTES_SPECIES   3 1.3191e+11 0.12374 9.1912  0.001 ***
 #> STATE              7 1.2344e+11 0.11579 3.6861  0.001 ***
 #> SEX                1 4.1426e+10 0.03886 8.6592  0.001 ***
-#> LAT                1 8.1923e+09 0.00768 1.7124  0.104    
-#> LON                1 1.3227e+10 0.01241 2.7648  0.015 *  
+#> LAT                1 8.1923e+09 0.00768 1.7124  0.105    
+#> LON                1 1.3227e+10 0.01241 2.7648  0.025 *  
 #> Residual         105 5.0233e+11 0.47119                  
 #> Total            118 1.0661e+12 1.00000                  
 #> ---
@@ -589,7 +589,7 @@ sessionInfo()
 #> [1] stats     graphics  grDevices utils     datasets  methods   base     
 #> 
 #> other attached packages:
-#> [1] ggplot2_4.0.3        vegan_2.7-5          permute_0.9-10      
+#> [1] ggplot2_4.0.3        vegan_2.7-6          permute_0.9-10      
 #> [4] rdryad_1.0.0         chromatographR_0.8.0
 #> 
 #> loaded via a namespace (and not attached):
