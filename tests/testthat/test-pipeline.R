@@ -36,16 +36,19 @@ test_that("preprocess unwraps nested lists with a dad element", {
 })
 
 test_that("preprocess returns correct errors and warnings", {
-  expect_error(preprocess(X = list(Sa[[1]], "not_a_matrix"), show_progress = FALSE),
+  expect_error(preprocess(X = list(Sa[[1]], "not_a_matrix"),
+                          show_progress = FALSE),
                regexp = "X should be a matrix")
   expect_error(preprocess(X = as.data.frame(Sa[[1]]), show_progress = FALSE),
                regexp = "X should be a matrix")
-  expect_error(preprocess(Sa, dim1 = seq(8,15, by=.01)), 
+  expect_error(preprocess(Sa, dim1 = seq(8,15, by=.01), show_progress = FALSE), 
                regexp = "incompatible with actual data")
-  expect_error(preprocess(Sa, dim1 = seq(10,20, by=.01)), 
+  expect_error(preprocess(Sa, dim1 = seq(10,20, by=.01),
+                          show_progress = FALSE), 
                regexp = "incompatible with actual data")
   expect_warning(suppressMessages(
-      xx <- preprocess(Sa, dim1 = seq(16,18.664, by=.001), show_progress = FALSE)
+      xx <- preprocess(Sa, dim1 = seq(16,18.664, by=.001),
+                       show_progress = FALSE)
     ), regexp = "No extrapolation allowed")
   expect_length(xx, 2)
   expect_warning(suppressMessages(
@@ -87,25 +90,32 @@ test_that("correct_rt works", {
   expect_equal(colnames(warp[[1]]), colnames(dat.pr[[1]]), ignore_attr=TRUE)
   expect_equal(t(warping.models[[1]]$warped.sample)[,1], 
                as.numeric(warp[[1]][,"210"]))
-  expect_error(correct_rt(dat.pr), regexp = "Must specify wavelengths")
-  expect_error(correct_rt(dat.pr, what="x"), regexp = "'arg' should be one of")
-  expect_error(correct_rt(dat.pr, lambdas = "x"), regexp = "Lambdas not found")
-  expect_error(correct_rt(dat.pr, lambdas = "210", alg="x"), 
+  expect_error(correct_rt(dat.pr, show_progress = FALSE),
+               regexp = "Must specify wavelengths")
+  expect_error(correct_rt(dat.pr, what="x", show_progress = FALSE),
+               regexp = "'arg' should be one of")
+  expect_error(correct_rt(dat.pr, lambdas = "x", show_progress = FALSE),
+               regexp = "Lambdas not found")
+  expect_error(correct_rt(dat.pr, lambdas = "210", alg="x",
+                          show_progress = FALSE), 
                regexp = "'arg' should be one of")
   expect_error(correct_rt(dat.pr, lambdas = "210", 
-                          models = "warping.models", alg = "vpdtw"), 
+                          models = "warping.models", alg = "vpdtw",
+                          show_progress = FALSE), 
                regexp = "The supplied models do not match")
 })
 
 test_that("correct_rt works with VPdtw", {
   skip_on_cran()
-  warp <- correct_rt(dat.pr, lambdas = "210", alg = "vpdtw")
+  warp <- correct_rt(dat.pr, lambdas = "210", alg = "vpdtw",
+                     show_progress = FALSE)
   expect_equal(names(warp), names(dat.pr[1:2]))
   expect_equal(colnames(warp[[1]]), colnames(dat.pr[[1]]), ignore_attr = TRUE)
   expect_error(correct_rt(dat.pr, lambdas = c("210", "260"),
                           alg="vpdtw",  show_progress = FALSE), 
                regexp = "only supports warping by a single wavelength")
-  expect_error(correct_rt(dat.pr, lambdas = "x", alg = "vpdtw"), 
+  expect_error(correct_rt(dat.pr, lambdas = "x", alg = "vpdtw",
+                          show_progress = FALSE), 
                regexp = "Lambdas not found")
 })
 
@@ -113,7 +123,8 @@ test_that("VPdtw plot displays correctly", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
   vpdtw_alignment <- function(){
-    warp <- correct_rt(dat.pr, lambdas = "210", alg = "vpdtw", plot_it = TRUE)
+    warp <- correct_rt(dat.pr, lambdas = "210", alg = "vpdtw", plot_it = TRUE,
+                       show_progress = FALSE)
   }
   vdiffr::expect_doppelganger("vpdtw_alignment", vpdtw_alignment)
 })
@@ -195,9 +206,10 @@ test_that("get_peaks works", {
   expect_equal(names(pks_egh[[1]]), lam)
   expect_equal(names(pks_gaussian[[1]]), lam)
   expect_equal(class(pks_egh), c("peak_list","list"))
-  expect_error(get_peaks(dat.pr), 
+  expect_error(get_peaks(dat.pr, show_progress = FALSE), 
                regexp = "must be provided.")
-  expect_error(get_peaks(dat.pr, lambdas = "210", fit = "nonsense"), 
+  expect_error(get_peaks(dat.pr, lambdas = "210", fit = "nonsense",
+                         show_progress = FALSE), 
                regexp = "'arg' should be one of")
 })
 
@@ -447,8 +459,13 @@ test_that("combine_peaks choose = 'lambda' with lambda = NULL errors", {
 })
 
 test_that("merge_peaks works with max method", {
-  pk_tab_m <- merge_peaks(pk_tab, peaks=c("V10","V11"))
-  expect_equal(pk_tab_m$tab$V11, pmax(pk_tab$tab$V10, pk_tab$tab$V11))
+  # `merge_peaks` keeps whichever peak is more intense, and clustering decides
+  # the numbering, so derive the surviving name rather than assuming it
+  pr <- colnames(pk_tab$tab)[1:2]
+  kept <- pr[which.max(colMeans(pk_tab$tab[, pr], na.rm = TRUE))]
+  pk_tab_m <- merge_peaks(pk_tab, peaks = pr)
+  expect_equal(pk_tab_m$tab[[kept]],
+               pmax(pk_tab$tab[[pr[1]]], pk_tab$tab[[pr[2]]]))
   expect_equal(ncol(pk_tab_m), ncol(pk_tab)-1)
   expect_equal(ncol(pk_tab_m$pk_meta), ncol(pk_tab$pk_meta)-1)
   expect_equal(rownames(pk_tab_m$tab), rownames(pk_tab$tab))
@@ -456,14 +473,22 @@ test_that("merge_peaks works with max method", {
 
 test_that("merge_peaks works with sum method", {
   data(pk_tab)
-  pk_tab_m <- merge_peaks(pk_tab, peaks=c("V10","V11"), method = "sum")
-  expect_equal(pk_tab_m$tab[["V11"]], (pk_tab$tab$V10 + pk_tab$tab$V11))
+  pr <- colnames(pk_tab$tab)[1:2]
+  kept <- pr[which.max(colMeans(pk_tab$tab[, pr], na.rm = TRUE))]
+  pk_tab_m <- merge_peaks(pk_tab, peaks = pr, method = "sum")
+  expect_equal(pk_tab_m$tab[[kept]],
+               (pk_tab$tab[[pr[1]]] + pk_tab$tab[[pr[2]]]))
   expect_equal(ncol(pk_tab_m), ncol(pk_tab)-1)
   expect_equal(ncol(pk_tab_m$pk_meta), ncol(pk_tab$pk_meta) - 1)
   expect_equal(rownames(pk_tab_m$tab), rownames(pk_tab$tab))
 })
 
 test_that("normalize_data works", {
+  # peaks are chosen by property, not name: clustering decides the numbering,
+  # so `good` must be positive in every sample and `bad` must not be
+  .ok <- vapply(pk_tab$tab, function(x) all(is.finite(x) & x > 0), logical(1))
+  good <- names(which(.ok))[1]
+  bad <- names(which(!.ok))[1]
   pk_tab_norm <- normalize_data(pk_tab, chrom_list = dat.pr, column = "mass")
   expect_equal(rownames(pk_tab_norm$tab), rownames(pk_tab$tab))
   expect_equal(class(pk_tab_norm), class(pk_tab))
@@ -493,32 +518,32 @@ test_that("normalize_data works", {
                regexp = "'arg' should be one of")
   
   pk_tab_pnorm <- normalize_data(pk_tab, chrom_list = dat.pr, 
-                                column = "V22", by = "peak")
+                                column = good, by = "peak")
   expect_equal(rownames(pk_tab_pnorm$tab), rownames(pk_tab$tab))
   expect_equal(class(pk_tab_pnorm), class(pk_tab))
   expect_equal(colnames(pk_tab_pnorm$tab), colnames(pk_tab$tab))
-  expect_equal(pk_tab_pnorm$tab[1,], pk_tab$tab[1,]/pk_tab$tab$V22[1])
-  expect_equal(pk_tab_pnorm$tab[2,], pk_tab$tab[2,]/pk_tab$tab$V22[2])
+  expect_equal(pk_tab_pnorm$tab[1,], pk_tab$tab[1,]/pk_tab$tab[[good]][1])
+  expect_equal(pk_tab_pnorm$tab[2,], pk_tab$tab[2,]/pk_tab$tab[[good]][2])
   expect_equal(pk_tab_pnorm$args[["normalized"]], TRUE)
-  expect_equal(pk_tab_pnorm$args[["normalization_column"]], "V22")
+  expect_equal(pk_tab_pnorm$args[["normalization_column"]], good)
   expect_equal(pk_tab_pnorm$args[["normalization_by"]], "peak")
   
   expect_warning(pk_tab_pnorm_w <- normalize_data(pk_tab, chrom_list = dat.pr,
-                                                   column = "V5", by = "peak"),
+                                                   column = bad, by = "peak"),
                  regexp = "Invalid normalization values")
   expect_error(pk_tab_pnorm_w <- normalize_data(pk_tab, chrom_list = dat.pr,
-                                                  column = "V5", by = "peak",
+                                                  column = bad, by = "peak",
                                                 on_invalid = "error"))
 
   # auto-detection of by = "peak"
-  pk_tab_auto_peak <- normalize_data(pk_tab, column = "V22")
+  pk_tab_auto_peak <- normalize_data(pk_tab, column = good)
   expect_equal(pk_tab_auto_peak$args[["normalization_by"]], "peak")
-  expect_equal(pk_tab_auto_peak$tab[1,], pk_tab$tab[1,]/pk_tab$tab$V22[1])
+  expect_equal(pk_tab_auto_peak$tab[1,], pk_tab$tab[1,]/pk_tab$tab[[good]][1])
 
   # disambiguation error when column present in both metadata and peak table
   pk_tab_ambig <- pk_tab
-  pk_tab_ambig$sample_meta$V22 <- 1
-  expect_error(normalize_data(pk_tab_ambig, column = "V22"),
+  pk_tab_ambig$sample_meta[[good]] <- 1
+  expect_error(normalize_data(pk_tab_ambig, column = good),
                regexp = "disambiguated")
 })
 
@@ -683,4 +708,27 @@ test_that("plot.ptw_list (heatmap) works with plotly", {
   
   expect_doppelganger_plotly(name = "plot_ptw_list_heatmap_plotly", 
                              p = plot_ptw_list_heatmap_plotly)
+})
+
+test_that("merge_peaks does not depend on the order of `peaks`", {
+  # `sel` is a position among the selected columns, which are in column order,
+  # so resolving it against `peaks` kept the right column but left it holding
+  # its original, unmerged value.
+  data(pk_tab)
+  pt <- pk_tab
+  # make the first peak win in one sample, so the merge differs from either
+  # column on its own
+  pr <- colnames(pt$tab)[c(10, 11)]
+  pt$tab[[pr[1]]][1] <- pt$tab[[pr[2]]][1] * 3
+  for (method in c("max", "sum")){
+    expected <- if (method == "max"){
+      pmax(pt$tab[[pr[1]]], pt$tab[[pr[2]]])
+    } else pt$tab[[pr[1]]] + pt$tab[[pr[2]]]
+    fwd <- merge_peaks(pt, peaks = pr, method = method)
+    rev <- merge_peaks(pt, peaks = rev(pr), method = method)
+    kept <- setdiff(pr, setdiff(pr, colnames(fwd$tab)))
+    expect_equal(colnames(fwd$tab), colnames(rev$tab), info = method)
+    expect_equal(fwd$tab[[kept]], expected, info = method)
+    expect_equal(rev$tab[[kept]], expected, info = method)
+  }
 })

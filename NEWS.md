@@ -12,6 +12,18 @@
 * Changed the name of the `a` parameter in `plot.peak_list` to `alpha`.
 * Renamed `chrom_list` argument to `x` in `plot_chroms_heatmap` to reflect that the function can now accept a peak table in the first position in addition to a list of chromatograms.
 * Removed `index` and `chr` arguments across plotting functions, previously deprecated in v0.7.0. Use `idx` instead.
+* Corrected `merge_peaks` so that the result no longer depends on the order in
+which `peaks` are supplied. Previously, supplying peaks in an order other than
+their order in the peak table retained the correct column but left it holding
+its original value rather than the merged one.
+* Corrected `get_purity`, which used the wrong wavelength to decide which
+timepoints belong to a peak. Purity is reported as the fraction of in-peak
+timepoints whose purity ratio falls below 1, and `cutoff` determines which
+timepoints count as in-peak. That determination was always made from the first
+wavelength in the chromatogram rather than from the wavelength where the peak
+actually absorbs. It now uses the wavelength of maximum absorbance at the peak
+apex. Purity values change for any peak that does not absorb maximally at the
+first wavelength.
 * Deprecated arguments in `get_peaks` still using dot notation (e.g., `sd.max`). Use new snake case arguments (e.g., `sd_max`) instead!
 * Deprecated `peak` argument in `plot_all_spectra` in favor of `loc` for consistency with other plotting functions.
 * Deprecated the `save` argument in `cluster_spectra` in favor of `outfile`, which specifies the file path for saving cluster objects.
@@ -51,6 +63,10 @@
 * Allow `plot_chroms` and `plot_chroms_heatmap` to accept peak table as first argument.
 
 ### Bug fixes and other minor changes
+
+* Corrected two minor bugs in `get_purity`: one which counted a pure timepoint
+as impure when the estimated noise variance was zero, and another which returned
+`NA` without warning when only one timepoint fell below the noise threshold.
 
 * Fixed `preprocess` function incorrectly truncating chromatograms when outliers are present and `dim1` is not specified.
 * Fixed input validation in `preprocess` so lists containing non-matrix elements no longer pass validation without error.

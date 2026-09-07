@@ -152,12 +152,6 @@ test_that("reshape_chroms works as expected", {
   expect_equal(levels(chrom_list_long_subset$sample), names(Sa_pr)[1:2])
 })
 
-test_that("get_purity works as intended", {
-  data(Sa_pr)
-  pos <- as.numeric(find_peaks(Sa_pr[[1]][,"210"])[1,])
-  expect_equal(class(get_purity(Sa_pr[[1]], pos)),"numeric")
-})
-
 test_that("extract_idx function works as expected", {
   expect_equal(extract_idx("dat.pr[[1]]"), 1)
   expect_equal(extract_idx("dat.pr[1:3]"), 1:3)

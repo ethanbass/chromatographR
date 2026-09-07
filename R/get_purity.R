@@ -44,7 +44,8 @@ get_purity <- function(x, pos, weight = 1, cutoff = 0.05,
       p <- get_purity_values(x, pos, weight = weight,
                              noise_variance = noise_variance,
                              lambdas = lambdas)
-      mean(p[trim_peak(x, pos, cutoff = cutoff)] < 1, na.rm = TRUE)
+      trace <- x[, which.max(x[as.numeric(pos[1]), lambdas, drop = FALSE])]
+      mean(p[trim_peak(trace, pos, cutoff = cutoff)] < 1, na.rm = TRUE)
       }, error = function(e) NA)
   } else NA
 }
@@ -70,7 +71,7 @@ get_noise_variance <- function(x, noise_threshold = .01, lambdas){
   }
   noise_idx <- find_noise(x = x, noise_threshold = noise_threshold, 
                       lambdas = lambdas)
-  mean(apply(x[noise_idx,], 1, var), na.rm = TRUE)
+  mean(apply(x[noise_idx, , drop = FALSE], 1, var), na.rm = TRUE)
 }
 
 #' Define noise spectra based on specified threshold
@@ -180,11 +181,17 @@ get_purity_values <- function(x, pos, weight = 1, noise_variance = NULL,
   if (missing(lambdas)){
     lambdas <- seq_len(ncol(x))
   }
-  ((1 - get_spectral_similarity(x, pos)))/
-    (1 - get_agilent_threshold(x, pos, weight = weight,
-                               noise_variance = noise_variance,
-                               noise_threshold = noise_threshold,
-                               lambdas = lambdas))
+  num <- 1 - get_spectral_similarity(x, pos)
+  den <- 1 - get_agilent_threshold(x, pos, weight = weight,
+                                   noise_variance = noise_variance,
+                                   noise_threshold = noise_threshold,
+                                   lambdas = lambdas)
+  out <- num / den
+  degenerate <- which(den == 0)
+  if (length(degenerate) > 0){
+    out[degenerate] <- ifelse(num[degenerate] < sqrt(.Machine$double.eps), 0, Inf)
+  }
+  out
 }
 
 #' Trim peak

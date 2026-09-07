@@ -122,8 +122,8 @@ summary.peak_table <- function(object, ...) {
     ),
     time_units = object$args$time_unit,
     response = object$args$response,
-    has_sample_meta = !is.null(object$sample_meta),
-    has_ref_spectra = !is.null(object$ref_spectra),
+    has_sample_meta = is_attached(object$sample_meta),
+    has_ref_spectra = is_attached(object$ref_spectra),
     normalized = object$args$normalized,
     normalization_method = if(object$args$normalized) object$args$normalization_by else NA
   )

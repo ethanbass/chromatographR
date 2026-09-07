@@ -147,7 +147,8 @@ merge_peaks <- function(peak_table, peaks, method = c("max", "sum")){
     pks.idx <- peaks
   }
   sel <- which.max(colMeans(peak_table$tab[, pks.idx, drop=FALSE], na.rm = TRUE))
-  sel.idx <- which(colnames(peak_table$tab) == peaks[sel])
+  sel.idx <- pks.idx[sel]
+  sel.name <- colnames(peak_table$tab)[sel.idx]
   if (method == "max"){
     peak_table$tab[[sel.idx]] <- do.call(pmax, peak_table$tab[, pks.idx, 
                                                               drop = FALSE])

@@ -21,8 +21,8 @@
       
       Arguments:
         Response: Area 
-        Sample Metadata: Yes 
-        Reference Spectra: Yes 
+        Sample Metadata: No 
+        Reference Spectra: No 
         Normalization: N/A 
 
 # head.peak_table works as expected
