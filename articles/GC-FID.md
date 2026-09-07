@@ -328,8 +328,8 @@ m
 #> POLISTES_SPECIES   3 1.3191e+11 0.12374 9.1912  0.001 ***
 #> STATE              7 1.2344e+11 0.11579 3.6861  0.001 ***
 #> SEX                1 4.1426e+10 0.03886 8.6592  0.001 ***
-#> LAT                1 8.1923e+09 0.00768 1.7124  0.105    
-#> LON                1 1.3227e+10 0.01241 2.7648  0.025 *  
+#> LAT                1 8.1923e+09 0.00768 1.7124  0.116    
+#> LON                1 1.3227e+10 0.01241 2.7648  0.021 *  
 #> Residual         105 5.0233e+11 0.47119                  
 #> Total            118 1.0661e+12 1.00000                  
 #> ---
@@ -611,11 +611,11 @@ sessionInfo()
 #> [46] here_1.0.2            cli_3.6.6             chromConverter_0.9.0 
 #> [49] magrittr_2.0.5        base64enc_0.1-6       crul_1.6.0           
 #> [52] dynamicTreeCut_1.63-1 withr_3.0.3           ggordiplots_0.4.3    
-#> [55] scales_1.4.0          rappdirs_0.3.4        bit64_4.8.4          
-#> [58] rmarkdown_2.31        bit_4.6.0             otel_0.2.0           
-#> [61] reticulate_1.46.0     cellranger_1.1.0      fastcluster_1.3.0    
-#> [64] png_0.1-9             pbapply_1.7-4         evaluate_1.0.5       
-#> [67] knitr_1.51            hoardr_0.5.5          mgcv_1.9-4           
+#> [55] scales_1.4.0          rappdirs_0.3.4        bit64_4.8.6          
+#> [58] rmarkdown_2.32        bit_4.6.0             otel_0.2.0           
+#> [61] reticulate_1.47.0     cellranger_1.1.0      fastcluster_1.3.0    
+#> [64] png_0.1-9             pbapply_1.7-5         evaluate_1.0.5       
+#> [67] knitr_1.52            hoardr_0.5.5          mgcv_1.9-4           
 #> [70] rlang_1.3.0           Rcpp_1.1.2            glue_1.8.1           
 #> [73] httpcode_0.3.0        xml2_1.6.0            jsonlite_2.0.0       
 #> [76] R6_2.6.1

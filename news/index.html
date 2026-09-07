@@ -52,6 +52,8 @@
 <li>Changed the name of the <code>a</code> parameter in <code>plot.peak_list</code> to <code>alpha</code>.</li>
 <li>Renamed <code>chrom_list</code> argument to <code>x</code> in <code>plot_chroms_heatmap</code> to reflect that the function can now accept a peak table in the first position in addition to a list of chromatograms.</li>
 <li>Removed <code>index</code> and <code>chr</code> arguments across plotting functions, previously deprecated in v0.7.0. Use <code>idx</code> instead.</li>
+<li>Corrected <code>merge_peaks</code> so that the result no longer depends on the order in which <code>peaks</code> are supplied. Previously, supplying peaks in an order other than their order in the peak table retained the correct column but left it holding its original value rather than the merged one.</li>
+<li>Corrected <code>get_purity</code>, which used the wrong wavelength to decide which timepoints belong to a peak. Purity is reported as the fraction of in-peak timepoints whose purity ratio falls below 1, and <code>cutoff</code> determines which timepoints count as in-peak. That determination was always made from the first wavelength in the chromatogram rather than from the wavelength where the peak actually absorbs. It now uses the wavelength of maximum absorbance at the peak apex. Purity values change for any peak that does not absorb maximally at the first wavelength.</li>
 <li>Deprecated arguments in <code>get_peaks</code> still using dot notation (e.g., <code>sd.max</code>). Use new snake case arguments (e.g., <code>sd_max</code>) instead!</li>
 <li>Deprecated <code>peak</code> argument in <code>plot_all_spectra</code> in favor of <code>loc</code> for consistency with other plotting functions.</li>
 <li>Deprecated the <code>save</code> argument in <code>cluster_spectra</code> in favor of <code>outfile</code>, which specifies the file path for saving cluster objects.</li>
@@ -93,28 +95,29 @@
 </div>
 <div class="section level4">
 <h4 id="bug-fixes-and-other-minor-changes-0-8-0">Bug fixes and other minor changes<a class="anchor" aria-label="anchor" href="#bug-fixes-and-other-minor-changes-0-8-0"></a></h4>
-<ul><li>Fixed <code>preprocess</code> function incorrectly truncating chromatograms when outliers are present and <code>dim1</code> is not specified.</li>
-<li>Fixed input validation in <code>preprocess</code> so lists containing non-matrix elements no longer pass validation without error.</li>
-<li>Fixed bug in <code>filter_peaktable</code> when filtering peaks based on specific retention times with the <code>rts</code> argument.</li>
-<li>Fixed <code>filter_peaktable</code> and <code>filter_peaks</code> to make filtering criteria inclusive (e.g., <code>min_rt = 5</code> now retains peaks with <code>rt == 5</code>).</li>
-<li>Added error when duplicated sample names are provided to <code>get_peaktable</code> or <code>get_peaks</code> since this will cause downstream issues.</li>
-<li>Fixed issue with visual tests due to new version of Kaleido.</li>
-<li>Added additional arguments as placeholder for <code>subset.peak_table</code>.</li>
-<li>Fixed bug in <code>normalize_data</code> causing loss of sample names when normalizing chromatograms.</li>
-<li>Formalized requirement for R version 4.1.0.</li>
-<li>Fixed <code>plot_spectrum</code> plots with plotly engine so they always maintain their axis labels.</li>
-<li>Standardized axis labels across <code>plot_spectrum</code> plots.</li>
-<li>Standardized titles of trace plots across engines so they always use unicode lambda character.</li>
-<li>Fixed <code>reshape_chroms</code> so it returns a factor for the <code>sample</code> column.</li>
-<li>Fixed <code>plot_chroms</code> so chromatograms are black when plotting a single chromatogram with plotly or ggplot.</li>
-<li>Fixed <code>plot_all_spectra</code> to consistently export spectra in wide format regardless of plotting engine.</li>
-<li>Fixed error in equation describing spectral clustering in documentation for <code>get_peaktable</code>.</li>
-<li>Fixed <code>get_peaktable</code> (with <code>clust = "sp.rt"</code>) to no longer take the absolute value of spectral similarity scores. Previously, <code><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs()</a></code> caused negatively correlated spectra to be treated as similar; now they are correctly penalized as dissimilar.</li>
-<li>Fixed bug in FWHM calculation in <code>get_peaktable</code> for raw peak shape.</li>
-<li>Fixed <code>filter_peaktable</code> so that peaks with <code>NA</code> values in some samples are not excluded when filtering by <code>min_value</code>.</li>
-<li>Suppressed spurious “essentially perfect fit” warning from <code>summary.lm</code> when computing R² in <code>fit_peaks</code>.</li>
-<li>Fixed bug in <code><a href="../reference/subset.peak_table.html">subset.peak_table()</a></code> where <code>sample_meta</code> was subset based on the wrong condition, so it was sometimes not filtered by <code>subset</code>.</li>
-<li>Made substantial revisions to documentation to improve clarity.</li>
+<ul><li><p>Corrected two minor bugs in <code>get_purity</code>: one which counted a pure timepoint as impure when the estimated noise variance was zero, and another which returned <code>NA</code> without warning when only one timepoint fell below the noise threshold.</p></li>
+<li><p>Fixed <code>preprocess</code> function incorrectly truncating chromatograms when outliers are present and <code>dim1</code> is not specified.</p></li>
+<li><p>Fixed input validation in <code>preprocess</code> so lists containing non-matrix elements no longer pass validation without error.</p></li>
+<li><p>Fixed bug in <code>filter_peaktable</code> when filtering peaks based on specific retention times with the <code>rts</code> argument.</p></li>
+<li><p>Fixed <code>filter_peaktable</code> and <code>filter_peaks</code> to make filtering criteria inclusive (e.g., <code>min_rt = 5</code> now retains peaks with <code>rt == 5</code>).</p></li>
+<li><p>Added error when duplicated sample names are provided to <code>get_peaktable</code> or <code>get_peaks</code> since this will cause downstream issues.</p></li>
+<li><p>Fixed issue with visual tests due to new version of Kaleido.</p></li>
+<li><p>Added additional arguments as placeholder for <code>subset.peak_table</code>.</p></li>
+<li><p>Fixed bug in <code>normalize_data</code> causing loss of sample names when normalizing chromatograms.</p></li>
+<li><p>Formalized requirement for R version 4.1.0.</p></li>
+<li><p>Fixed <code>plot_spectrum</code> plots with plotly engine so they always maintain their axis labels.</p></li>
+<li><p>Standardized axis labels across <code>plot_spectrum</code> plots.</p></li>
+<li><p>Standardized titles of trace plots across engines so they always use unicode lambda character.</p></li>
+<li><p>Fixed <code>reshape_chroms</code> so it returns a factor for the <code>sample</code> column.</p></li>
+<li><p>Fixed <code>plot_chroms</code> so chromatograms are black when plotting a single chromatogram with plotly or ggplot.</p></li>
+<li><p>Fixed <code>plot_all_spectra</code> to consistently export spectra in wide format regardless of plotting engine.</p></li>
+<li><p>Fixed error in equation describing spectral clustering in documentation for <code>get_peaktable</code>.</p></li>
+<li><p>Fixed <code>get_peaktable</code> (with <code>clust = "sp.rt"</code>) to no longer take the absolute value of spectral similarity scores. Previously, <code><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs()</a></code> caused negatively correlated spectra to be treated as similar; now they are correctly penalized as dissimilar.</p></li>
+<li><p>Fixed bug in FWHM calculation in <code>get_peaktable</code> for raw peak shape.</p></li>
+<li><p>Fixed <code>filter_peaktable</code> so that peaks with <code>NA</code> values in some samples are not excluded when filtering by <code>min_value</code>.</p></li>
+<li><p>Suppressed spurious “essentially perfect fit” warning from <code>summary.lm</code> when computing R² in <code>fit_peaks</code>.</p></li>
+<li><p>Fixed bug in <code><a href="../reference/subset.peak_table.html">subset.peak_table()</a></code> where <code>sample_meta</code> was subset based on the wrong condition, so it was sometimes not filtered by <code>subset</code>.</p></li>
+<li><p>Made substantial revisions to documentation to improve clarity.</p></li>
 </ul></div>
 </div>
     <div class="section level2">

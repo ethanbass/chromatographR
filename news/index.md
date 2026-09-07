@@ -38,6 +38,20 @@
   position in addition to a list of chromatograms.
 - Removed `index` and `chr` arguments across plotting functions,
   previously deprecated in v0.7.0. Use `idx` instead.
+- Corrected `merge_peaks` so that the result no longer depends on the
+  order in which `peaks` are supplied. Previously, supplying peaks in an
+  order other than their order in the peak table retained the correct
+  column but left it holding its original value rather than the merged
+  one.
+- Corrected `get_purity`, which used the wrong wavelength to decide
+  which timepoints belong to a peak. Purity is reported as the fraction
+  of in-peak timepoints whose purity ratio falls below 1, and `cutoff`
+  determines which timepoints count as in-peak. That determination was
+  always made from the first wavelength in the chromatogram rather than
+  from the wavelength where the peak actually absorbs. It now uses the
+  wavelength of maximum absorbance at the peak apex. Purity values
+  change for any peak that does not absorb maximally at the first
+  wavelength.
 - Deprecated arguments in `get_peaks` still using dot notation (e.g.,
   `sd.max`). Use new snake case arguments (e.g., `sd_max`) instead!
 - Deprecated `peak` argument in `plot_all_spectra` in favor of `loc` for
@@ -115,48 +129,74 @@
 
 #### Bug fixes and other minor changes
 
+- Corrected two minor bugs in `get_purity`: one which counted a pure
+  timepoint as impure when the estimated noise variance was zero, and
+  another which returned `NA` without warning when only one timepoint
+  fell below the noise threshold.
+
 - Fixed `preprocess` function incorrectly truncating chromatograms when
   outliers are present and `dim1` is not specified.
+
 - Fixed input validation in `preprocess` so lists containing non-matrix
   elements no longer pass validation without error.
+
 - Fixed bug in `filter_peaktable` when filtering peaks based on specific
   retention times with the `rts` argument.
+
 - Fixed `filter_peaktable` and `filter_peaks` to make filtering criteria
   inclusive (e.g., `min_rt = 5` now retains peaks with `rt == 5`).
+
 - Added error when duplicated sample names are provided to
   `get_peaktable` or `get_peaks` since this will cause downstream
   issues.
+
 - Fixed issue with visual tests due to new version of Kaleido.
+
 - Added additional arguments as placeholder for `subset.peak_table`.
+
 - Fixed bug in `normalize_data` causing loss of sample names when
   normalizing chromatograms.
+
 - Formalized requirement for R version 4.1.0.
+
 - Fixed `plot_spectrum` plots with plotly engine so they always maintain
   their axis labels.
+
 - Standardized axis labels across `plot_spectrum` plots.
+
 - Standardized titles of trace plots across engines so they always use
   unicode lambda character.
+
 - Fixed `reshape_chroms` so it returns a factor for the `sample` column.
+
 - Fixed `plot_chroms` so chromatograms are black when plotting a single
   chromatogram with plotly or ggplot.
+
 - Fixed `plot_all_spectra` to consistently export spectra in wide format
   regardless of plotting engine.
+
 - Fixed error in equation describing spectral clustering in
   documentation for `get_peaktable`.
+
 - Fixed `get_peaktable` (with `clust = "sp.rt"`) to no longer take the
   absolute value of spectral similarity scores. Previously,
   [`abs()`](https://rdrr.io/r/base/MathFun.html) caused negatively
   correlated spectra to be treated as similar; now they are correctly
   penalized as dissimilar.
+
 - Fixed bug in FWHM calculation in `get_peaktable` for raw peak shape.
+
 - Fixed `filter_peaktable` so that peaks with `NA` values in some
   samples are not excluded when filtering by `min_value`.
+
 - Suppressed spurious “essentially perfect fit” warning from
   `summary.lm` when computing R² in `fit_peaks`.
+
 - Fixed bug in
   [`subset.peak_table()`](https://ethanbass.github.io/chromatographR/reference/subset.peak_table.md)
   where `sample_meta` was subset based on the wrong condition, so it was
   sometimes not filtered by `subset`.
+
 - Made substantial revisions to documentation to improve clarity.
 
 ## chromatographR 0.7.5

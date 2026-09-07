@@ -640,7 +640,7 @@ Package for R.” *Metabolomics* 11 (1): 143–54.
     [8] base     
 
     other attached packages:
-    [1] chromatographR_0.8.0 knitr_1.51          
+    [1] chromatographR_0.8.0 knitr_1.52          
 
     loaded via a namespace (and not attached):
      [1] gtable_0.3.6          xfun_0.60             bslib_0.12.0         
@@ -660,10 +660,10 @@ Package for R.” *Metabolomics* 11 (1): 143–54.
     [43] VPdtw_2.2.1           fastmap_1.2.0         grid_4.6.1           
     [46] cli_3.6.6             chromConverter_0.9.0  magrittr_2.0.5       
     [49] base64enc_0.1-6       dynamicTreeCut_1.63-1 withr_3.0.3          
-    [52] scales_1.4.0          bit64_4.8.4           rmarkdown_2.31       
-    [55] bit_4.6.0             otel_0.2.0            reticulate_1.46.0    
+    [52] scales_1.4.0          bit64_4.8.6           rmarkdown_2.32       
+    [55] bit_4.6.0             otel_0.2.0            reticulate_1.47.0    
     [58] cellranger_1.1.0      fastcluster_1.3.0     ragg_1.5.2           
-    [61] png_0.1-9             pbapply_1.7-4         evaluate_1.0.5       
+    [61] png_0.1-9             pbapply_1.7-5         evaluate_1.0.5       
     [64] rlang_1.3.0           Rcpp_1.1.2            glue_1.8.1           
     [67] xml2_1.6.0            jsonlite_2.0.0        R6_2.6.1             
     [70] systemfonts_1.3.2     fs_2.1.0             
