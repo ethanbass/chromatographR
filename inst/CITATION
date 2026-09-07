@@ -9,7 +9,7 @@ bibentry(
   url      = "https://ethanbass.github.io/chromatographR/",
   doi      = "10.5281/zenodo.6944334",
   textVersion = paste("Bass, E. (2026).",
-        "chromatographR: Chromatographic Data Analysis Toolset (version 0.8.0).",
+        "chromatographR: Chromatographic Data Analysis Toolkit (version 0.8.0).",
         "http://doi.org/10.5281/zenodo.6944334"
         )
   )

@@ -31,7 +31,7 @@ chromatographR can now be installed from CRAN:
 install.packages("chromatographR")
 ```
 
-However, it's recommended to install the latest development version of chromatographR from GitHub using the devtools package:
+However, it's recommended to install the latest development version of chromatographR from GitHub using the `pak` package:
 
 ```r
 if (!require("pak", quietly=TRUE)) install.packages("pak")
@@ -69,7 +69,7 @@ Also see the [contributing.md](https://github.com/ethanbass/chromatographR/blob/
 
 If you use chromatographR in published work, please cite it as follows:
 
-`Bass, E. (2026). chromatographR: Chromatographic Data Analysis Toolset (version 0.8.0). http://doi.org/10.5281/zenodo.6944334`.
+`Bass, E. (2026). chromatographR: Chromatographic Data Analysis Toolkit. http://doi.org/10.5281/zenodo.6944334`.
 
 If your workflow includes data import with chromConverter, please also cite:
 

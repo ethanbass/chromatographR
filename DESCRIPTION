@@ -1,6 +1,6 @@
 Type: Package
 Package: chromatographR
-Title: Chromatographic Data Analysis Toolset
+Title: Chromatographic Data Analysis Toolkit
 Version: 0.8.0
 Authors@R: c(
     person("Ethan", "Bass", , "ethanbass@gmail.com", role = c("aut", "cre"),
