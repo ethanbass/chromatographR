@@ -14,7 +14,6 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(chromatographR)
-library(rdryad)
 library(vegan)
 library(ggplot2)
 ```
@@ -41,18 +40,16 @@ To demonstrate the use of `chromatographR` for the analysis GC-FID data, we will
 
 
 ```{r download_data}
-is_github_actions <- Sys.getenv("GITHUB_ACTIONS") == "true"
+# These data are archived on Dryad (doi:10.5061/dryad.wpzgmsbr8), but Dryad's API now
+# requires an authentication token, so we retrieve them from a mirror on GitHub:
+# https://github.com/ethanbass/10_5061_dryad_wpzgmsbr8/releases/tag/v1.0
+tmp <- tempfile(fileext = ".zip")
+curl::curl_download("https://github.com/ethanbass/10_5061_dryad_wpzgmsbr8/archive/refs/tags/v1.0.zip",
+                    destfile = tmp)
 
-if (is_github_actions){
-  # Load files from GitHub (https://github.com/ethanbass/10_5061_dryad_wpzgmsbr8/releases/tag/v1.0)
-  tmp <- tempfile(fileext = ".zip")
-  curl::curl_download("https://github.com/ethanbass/10_5061_dryad_wpzgmsbr8/archive/refs/tags/v1.0.zip", destfile = tmp)
-  unzip(tmp, exdir = "./data/")
-  files <- list.files("./data/10_5061_dryad_wpzgmsbr8-1.0", full.names = TRUE)
-} else{
-  # Load files from Dryad
-  files <- rdryad::dryad_download("10.5061/dryad.wpzgmsbr8")[[1]]
-}
+exdir <- tempfile()
+unzip(tmp, exdir = exdir)
+files <- list.files(exdir, recursive = TRUE, full.names = TRUE)
 
 chrom_paths <- grep("README|METADATA|ANNOTATED", files, invert = TRUE, 
                     value = TRUE)
@@ -94,7 +91,7 @@ pks_f <- filter_peaks(pks, min_height = 10000)
 In this case, we also have integration results from 'Shimadzu LabSolutions', so we can check the integration results provided by `chromatographR` against the results from LabSolutions.
 
 ```{r load_SLS_alkanes}
-path_to_annotated_alkanes <- grep("ANNOTATED", files[[1]], value = TRUE)
+path_to_annotated_alkanes <- grep("ANNOTATED", files, value = TRUE)
 alkanes <- read.csv(path_to_annotated_alkanes, sep="\t")
 ```
 

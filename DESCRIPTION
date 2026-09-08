@@ -68,7 +68,7 @@ Suggests:
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3
-Config/Needs/website: ggordiplots, rdryad, vegan, quarto
+Config/Needs/website: curl, ggordiplots, vegan, quarto
 Encoding: UTF-8
 Language: en-US
 LazyData: true

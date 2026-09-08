@@ -90,6 +90,7 @@ as impure when the estimated noise variance was zero, and another which returned
 * Suppressed spurious "essentially perfect fit" warning from `summary.lm` when computing R² in `fit_peaks`.
 * Fixed bug in `subset.peak_table()` where `sample_meta` was subset based on the wrong condition, so it was sometimes not filtered by `subset`.
 * Made substantial revisions to documentation to improve clarity.
+* Changed the GC-FID vignette to fetch its example data from a mirror on GitHub, since Dryad now requires authentication for all downloads.
 
 # chromatographR 0.7.5
 
