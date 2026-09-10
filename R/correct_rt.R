@@ -237,7 +237,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
       } else end <- NULL
       new.times <- c(beg, times[!is.na(times)], end)
       result <- mapply(function(x,idx){
-        rownames(x) <- new.times
+        rownames(x) <- format_axis(new.times)
         x <- transfer_metadata(x, chrom_list_og[[idx]])
         x
       }, result, seq_along(result), SIMPLIFY = FALSE)
@@ -288,7 +288,7 @@ apply_vpdtw <- function(chrom_list, models, reference, args = NULL,
   
   # assign times and metadata
   result <- mapply(function(x, idx) {
-    rownames(x) <- new.times
+    rownames(x) <- format_axis(new.times)
     transfer_metadata(x, chrom_list[[idx]])
   }, result, seq_along(result), SIMPLIFY = FALSE)
   names(result) <- names(chrom_list)

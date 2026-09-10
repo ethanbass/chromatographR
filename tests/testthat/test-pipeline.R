@@ -11,7 +11,7 @@ test_that("preprocess works on matrix", {
   out <- preprocess_matrix(X = Sa[[1]], dim1 = new.ts, dim2 = new.lambdas, 
                            maxI = 1)
   expect_equal(class(out)[1],"matrix")
-  expect_equal(rownames(out), as.character(new.ts))
+  expect_equal(rownames(out), format_axis(new.ts))
   expect_equal(colnames(out), as.character(new.lambdas))
   expect_error(preprocess_matrix(Sa), regexp = "X should be a matrix")
   expect_error(preprocess_matrix(Sa[[1]], dim2 = seq(9, 20, by = .01)), 
@@ -22,7 +22,7 @@ test_that("Preprocess works without providing dimensions", {
   out <- suppressMessages(preprocess(X = (Sa[1]), show_progress = FALSE))
   testthat::expect_true(inherits(out, "list"))
   expect_equal(class(out[[1]])[1], "matrix")
-  expect_equal(rownames(out[[1]]), as.character(new.ts))
+  expect_equal(rownames(out[[1]]), format_axis(new.ts))
   expect_equal(colnames(out[[1]]), as.character(new.lambdas))
 })
 
@@ -32,7 +32,7 @@ test_that("preprocess unwraps nested lists with a dad element", {
                        show_progress = FALSE)
   expect_equal(length(result), 2)
   expect_equal(class(result[[1]])[1], "matrix")
-  expect_equal(rownames(result[[1]]), as.character(new.ts))
+  expect_equal(rownames(result[[1]]), format_axis(new.ts))
 })
 
 test_that("preprocess returns correct errors and warnings", {
@@ -71,7 +71,7 @@ dat.pr <- preprocess(X = Sa[1:2], dim1 = new.ts, dim2 = new.lambdas,
 
 test_that("preprocess works on a list", {
   expect_equal(length(dat.pr),length(Sa[1:2]))
-  expect_equal(rownames(dat.pr[[1]]), as.character(new.ts))
+  expect_equal(rownames(dat.pr[[1]]), format_axis(new.ts))
   expect_equal(colnames(dat.pr[[1]]), as.character(new.lambdas))
   expect_equal(names(dat.pr), names(Sa[1:2]))
 })

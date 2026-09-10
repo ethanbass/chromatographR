@@ -207,7 +207,8 @@ preprocess_matrix <- function(X,
   if (!is.null(maxI)){
     X <- maxI * X / max(X)
   }
-  dimnames(X) <- list(dim1, dim2)
+  dimnames(X) <- list(if (interpolate_rows) format_axis(dim1) else dim1,
+                      if (interpolate_cols) format_axis(dim2) else dim2)
   attributes(X) <- c(attributes(X), metadata)
   X
 }

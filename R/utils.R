@@ -262,7 +262,7 @@ convert_time_units <- function(chrom_list, time_unit = c("min", "s", "ms")){
   time_unit <- match.arg(time_unit, c("min", "s", "ms"))
   tfac <- switch(time_unit, "min" = 1, "s" = 60, "ms" = 60*1000)
   lapply(chrom_list, function(x){
-    rownames(x) <- as.numeric(rownames(x))*tfac
+    rownames(x) <- format_axis(as.numeric(rownames(x))*tfac)
     attr(x, "time_unit") <- time_unit
     x
   })
@@ -514,4 +514,31 @@ get_peak_coordinates <- function(peak_table, chrom_list=NULL, loc, idx, lambda){
   }, numeric(1)))
   list(coordinates = c(rt, int), lambda_idx = lambda_idx, 
        lambda = get_lambdas(chrom_list)[lambda_idx])
+}
+#' Format a numeric axis as fixed-width dimnames
+#'
+#' Gives every element of an axis the same number of decimal places: the fewest
+#' that still resolve neighboring values, which on a regular grid is the
+#' precision the axis was written in. Assigning a numeric axis to `dimnames`
+#' goes through `as.character`, which formats each element independently and
+#' drops trailing zeros, so a regular grid comes out ragged (`10.09`, `10.1`,
+#' `10.11`) and lookup by name depends on which values happen to end in a
+#' zero.
+#'
+#' @param x A numeric vector, or a character vector of numbers.
+#' @return A character vector of the same length, using a common number of
+#' decimal places.
+#' @author Ethan Bass
+#' @noRd
+format_axis <- function(x){
+  if (is.null(x) || length(x) == 0) return(x)
+  num <- suppressWarnings(as.numeric(x))
+  if (!all(is.finite(num))) return(as.character(x))
+  gaps <- diff(sort(unique(num)))
+  tol <- min(gaps) / 1000
+  for (digits in 0:12){
+    out <- formatC(num, format = "f", digits = digits)
+    if (max(abs(as.numeric(out) - num)) < tol) return(out)
+  }
+  formatC(num, format = "f", digits = 12)
 }
