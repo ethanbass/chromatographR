@@ -3,15 +3,17 @@
 #' Identifies groups of duplicate peaks in a peak table and retains a single
 #' representative peak from each group. Peaks are considered duplicates when
 #' their retention times differ by less than `tol` and their spectral
-#' correlation exceeds `min.cor`. This is useful for collapsing peaks that were
+#' correlation exceeds `min_cor`. This is useful for collapsing peaks that were
 #' integrated at more than one wavelength or chromatographic component.
 #' 
 #' @name combine_peaks
 #' @param peak_table Peak table from [`get_peaktable`].
 #' @param tol Tolerance for matching retention times (maximum retention time
 #' difference). Defaults to `0.01`.
-#' @param min.cor Minimum spectral correlation to confirm a match. Defaults to 
+#' @param min_cor Minimum spectral correlation to confirm a match. Defaults to 
 #' `0.9`.
+#' @param min.cor The `min.cor` argument is deprecated. Please use `min_cor`
+#' instead.
 #' @param choose Method used to select a representative peak from each group of
 #' duplicate peaks. `"max"` retains the peak with the greatest total intensity,
 #' `"least_sparse"` retains the peak detected in the greatest number of samples,
@@ -29,14 +31,15 @@
 #' data(pk_tab)
 #' data(Sa_warp)
 #' pk_tab <- attach_ref_spectra(pk_tab)
-#' combine_peaks(pk_tab, tol = 0.02, min.cor = 0.9)
+#' combine_peaks(pk_tab, tol = 0.02, min_cor = 0.9)
 #' @family utility functions
 #' @export combine_peaks
 
-combine_peaks <- function(peak_table, tol = .01, min.cor = 0.9,
+combine_peaks <- function(peak_table, tol = .01, min_cor = 0.9,
                           choose = c("max", "least_sparse", "lambda"),
                           lambda = NULL,
-                          verbose = getOption("verbose")){
+                          verbose = getOption("verbose"), min.cor = NULL){
+  min_cor <- resolve_deprecated(min.cor, min_cor)
   check_peaktable(peak_table)
   if (!(is.data.frame(peak_table$ref_spectra) | is.matrix(peak_table$ref_spectra))){
     stop("No reference spectra found. Use attach_ref_spectra function first.")
@@ -68,7 +71,7 @@ combine_peaks <- function(peak_table, tol = .01, min.cor = 0.9,
     
     i <- which(mat[, idx] == 1)
     
-    j <- which(spectral_cor_mat[i, idx] > min.cor)
+    j <- which(spectral_cor_mat[i, idx] > min_cor)
     k <- i[j]
     
     if (length(k) <= 1) return(NULL)

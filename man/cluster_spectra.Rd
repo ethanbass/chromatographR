@@ -50,7 +50,8 @@ overwritten.}
 \code{\link[pvclust:pvclust]{pvclust}}.}
 
 \item{max.only}{Logical. If \code{TRUE}, returns only highest level cluster from
-each nested set of clusters.}
+each nested set of clusters. Named to match the argument of the same name in
+\code{\link[pvclust:pvrect]{pvrect}} and \code{\link[pvclust:pvpick]{pvpick}}, which receive it.}
 
 \item{output}{What to return. Either \code{"clusters"} to return list of clusters,
 \code{"pvclust"} to return pvclust object, or \code{"both"} to return both items.}

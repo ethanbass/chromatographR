@@ -7,10 +7,11 @@
 combine_peaks(
   peak_table,
   tol = 0.01,
-  min.cor = 0.9,
+  min_cor = 0.9,
   choose = c("max", "least_sparse", "lambda"),
   lambda = NULL,
-  verbose = getOption("verbose")
+  verbose = getOption("verbose"),
+  min.cor = NULL
 )
 }
 \arguments{
@@ -19,7 +20,7 @@ combine_peaks(
 \item{tol}{Tolerance for matching retention times (maximum retention time
 difference). Defaults to \code{0.01}.}
 
-\item{min.cor}{Minimum spectral correlation to confirm a match. Defaults to
+\item{min_cor}{Minimum spectral correlation to confirm a match. Defaults to
 \code{0.9}.}
 
 \item{choose}{Method used to select a representative peak from each group of
@@ -33,6 +34,9 @@ wavelength matches one of the supplied values. An error is thrown if none of
 the supplied values match any peak in the peak table.}
 
 \item{verbose}{Logical. Whether to print status to the console.}
+
+\item{min.cor}{The \code{min.cor} argument is deprecated. Please use \code{min_cor}
+instead.}
 }
 \value{
 A peak table derived from the original, but with columns corresponding
@@ -42,14 +46,14 @@ to duplicate peaks combined according to the specified criteria.
 Identifies groups of duplicate peaks in a peak table and retains a single
 representative peak from each group. Peaks are considered duplicates when
 their retention times differ by less than \code{tol} and their spectral
-correlation exceeds \code{min.cor}. This is useful for collapsing peaks that were
+correlation exceeds \code{min_cor}. This is useful for collapsing peaks that were
 integrated at more than one wavelength or chromatographic component.
 }
 \examples{
 data(pk_tab)
 data(Sa_warp)
 pk_tab <- attach_ref_spectra(pk_tab)
-combine_peaks(pk_tab, tol = 0.02, min.cor = 0.9)
+combine_peaks(pk_tab, tol = 0.02, min_cor = 0.9)
 }
 \seealso{
 \code{\link{get_peaks}}

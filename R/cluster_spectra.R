@@ -45,7 +45,8 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' @param parallel Logical. If `TRUE`, use parallel processing for 
 #' [`pvclust`][pvclust::pvclust].
 #' @param max.only Logical. If `TRUE`, returns only highest level cluster from
-#' each nested set of clusters.
+#' each nested set of clusters. Named to match the argument of the same name in 
+#' [`pvrect`][pvclust::pvrect] and [`pvpick`][pvclust::pvpick], which receive it.
 #' @param output What to return. Either `"clusters"` to return list of clusters,
 #' `"pvclust"` to return pvclust object, or `"both"` to return both items.
 #' @param ... Additional arguments to [`pvclust`][pvclust::pvclust].
@@ -128,7 +129,7 @@ cluster_spectra <- function(peak_table, alpha = 0.05,
   if (plot_dend){
     plot(result, labels = FALSE, cex.pv = 0.5, 
          print.pv = 'au', print.num = FALSE)
-    pvclust::pvrect(result, alpha = (1-alpha), max.only = max.only)
+    pvclust::pvrect(result, alpha = (1 - alpha), max.only = max.only)
   }
   if (!is.null(outfile)){
     tryCatch(saveRDS(result, outfile),

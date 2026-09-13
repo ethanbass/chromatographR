@@ -397,6 +397,14 @@ test_that("filter_peaktable works", {
   expect_true(all(pktab_s2$tab != 0))
 })
 
+test_that("the deprecated `min.cor` argument still works", {
+  expect_warning(old <- combine_peaks(pk_tab, tol = 0.02, min.cor = 0.9,
+                                      verbose = FALSE),
+                 regexp = "`min.cor` argument is deprecated")
+  expect_equal(old, combine_peaks(pk_tab, tol = 0.02, min_cor = 0.9,
+                                  verbose = FALSE))
+})
+
 test_that("combine_peaks works", {
   pk_tab_c <- combine_peaks(pk_tab, verbose = FALSE)
   expect_lt(ncol(pk_tab_c), ncol(pk_tab))
