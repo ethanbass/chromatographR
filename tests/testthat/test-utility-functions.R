@@ -168,7 +168,7 @@ test_that("resolve_deprecated works as expected", {
   max_iter <- 100
   max.iter <- 50
   expect_warning(resolve_deprecated(max.iter, max_iter), 
-                 regexp = "The 'max.iter' function is deprecated")
+                 regexp = "The `max.iter` argument is deprecated")
   expect_equal(suppressWarnings(resolve_deprecated(max.iter, max_iter)),50)
   
   max_iter <- 100

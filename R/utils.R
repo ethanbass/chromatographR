@@ -412,8 +412,9 @@ simpleCap <- function(x) {
 #' @noRd
 resolve_deprecated <- function(arg, new_arg){
   if (!is.null(arg)){
-    warning(sprintf("The '%s' function is deprecated. Please use '%s' instead.", 
-                    deparse(substitute(arg)), deparse(substitute(new_arg))))
+    warning(sprintf("The `%s` argument is deprecated. Please use `%s` instead.",
+                    deparse(substitute(arg)), deparse(substitute(new_arg))),
+            immediate. = TRUE)
     arg
   } else{
     new_arg
