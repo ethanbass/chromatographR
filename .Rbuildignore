@@ -7,7 +7,7 @@
 ^pkgdown$
 ^CRAN-SUBMISSION$
 ^LICENSE$
-^\.DS_Store$
+\.DS_Store$
 ^\.zenodo.json
 ^vignettes/articles$
 ^\.httr-oauth$
