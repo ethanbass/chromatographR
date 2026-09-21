@@ -176,6 +176,19 @@ test_that("resolve_deprecated works as expected", {
   expect_equal(resolve_deprecated(max.iter, max_iter),100)
 })
 
+test_that("the deprecated `spec.smooth` argument still works", {
+  skip_on_cran()
+  data(Sa)
+  args <- list(dim1 = seq(10, 18.66, by = .01), dim2 = seq(200, 318, by = 2),
+               show_progress = FALSE, cl = 1)
+  expect_warning(old <- do.call(preprocess, c(list(Sa[[1]]), args,
+                                              spec.smooth = FALSE)),
+                 regexp = "`spec.smooth` argument is deprecated")
+  expect_equal(as.vector(old),
+               as.vector(do.call(preprocess, c(list(Sa[[1]]), args,
+                                               smooth_spectra = FALSE))))
+})
+
 test_that("check_norm_values behaves correctly for all on_invalid options", {
   samples <- c("s1", "s2", "s3")
   valid   <- c(1.5, 2.0, 3.0)

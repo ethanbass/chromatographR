@@ -59,10 +59,10 @@ path_to_metadata <- grep("METADATA", files, value = TRUE)
 meta <- read.csv(path_to_metadata, sep = "\t")
 ```
 
-In order to get a good alignment, it is helpful to remove the solvent peak. To accomplish this, we can use the `preprocess` function to remove the first four minutes of the chromatogram. We also reduce the time-axis resolution (from 40 ms to 300 ms) since it drastically reduces computation time while seemingly having little effect on the accuracy of the integration results.
+In order to get a good alignment, it is helpful to remove the solvent peak. We also want to reduce the time-axis resolution (from 40 ms to 300 ms), since it drastically reduces computation time while seemingly having little effect on the accuracy of the integration results. The `preprocess` function does both at once: interpolating onto a new time axis resamples the signal and restricts it to the range of the new axis, so supplying `dim1` starting at four minutes drops the solvent peak as a side effect. (If you only want to trim a chromatogram, without resampling it, use `crop_chroms` instead — it subsets the existing time points rather than interpolating onto new ones.)
 
 ```{r preprocess_data}
-dat.pr <- preprocess(dat, spec.smooth = FALSE, dim1 = seq(from = 4, to = 59.9, by = .005), # .005 minutes = 300 ms
+dat.pr <- preprocess(dat, smooth_spectra = FALSE, dim1 = seq(from = 4, to = 59.9, by = .005), # .005 minutes = 300 ms
                      cl = 1)
 names(dat.pr) <- gsub(".txt", "", names(dat.pr))
 ```
@@ -233,7 +233,7 @@ plot_chroms_heatmap(warp_all[grep("PEXC", names(warp_all))], show_legend = FALSE
 
 In general, the results are quite similar between multi-species and single species alignments, though the single-species alignments are noticeably better in some areas. Since we want to compare CHCs across species, we will proceed with the imperfect multi-species alignments.
 
-### Integration and peaktable assembly
+### Integration and peak table assembly
 
 ```{r assemble_peak_table}
 pks <- get_peaks(warp_all)

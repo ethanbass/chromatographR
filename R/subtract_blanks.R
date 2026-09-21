@@ -22,6 +22,8 @@
 #' @return A `chrom_list` with blank-subtracted samples. Blanks
 #'   themselves are removed from the returned list.
 #'
+#' @family preprocessing functions
+#' @seealso [`preprocess`] [`correct_baseline`]
 #' @examples
 #' data(Sa_warp)
 #' subtract_blanks(Sa_warp, blank_id = 1)
@@ -66,10 +68,11 @@ subtract_blanks <- function(chrom_list, pattern = NULL, blank_id,
       closest <- max(preceding)
       chrom_list[[i]] - chrom_list[[closest]]
     })
-  }
-  
-  out <- Map(function(new, old) transfer_metadata(new, old, transfer_class = FALSE),
-             out, chrom_list[sample_id])
+  }  
+  out <- Map(function(new, old){
+    attr(new, "baseline") <- NULL
+    transfer_metadata(new, old, transfer_class = FALSE)
+  }, out, chrom_list[sample_id])
   if (zero_floor)
     out <- lapply(out, function(x) pmax(x, 0))
   names(out) <- names(chrom_list)[sample_id]

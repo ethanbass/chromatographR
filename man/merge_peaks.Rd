@@ -34,6 +34,7 @@ pk_tab <- merge_peaks(peak_table = pk_tab, peaks = c("V10","V11"))
 \seealso{
 Other utility functions:
 \code{\link[=combine_peaks]{combine_peaks()}},
+\code{\link[=get_baseline]{get_baseline()}},
 \code{\link[=get_lambdas]{get_lambdas()}},
 \code{\link[=get_times]{get_times()}},
 \code{\link[=reshape_chroms]{reshape_chroms()}},

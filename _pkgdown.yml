@@ -11,6 +11,7 @@ reference:
     contents:
     - read_chroms
     - preprocess
+    - correct_baseline
     - subtract_blanks
     - correct_rt
     - correct_rt_group
@@ -39,6 +40,9 @@ reference:
     - reshape_chroms
     - reshape_peaktable
     - write_peaktable
+  - title: "Background"
+    contents:
+    - baseline_estimators
   - title: "Data structures"
     contents:
     - peak_table-class

@@ -29,6 +29,8 @@ Further details and example workflows are provided in the package vignettes.
 \itemize{
 \item \code{read_chroms()}: Import chromatograms from a variety of vendor formats.
 \item \code{preprocess()}: Preprocess chromatographic matrices.
+\item \code{correct_baseline()}: Estimate and subtract a baseline.
+\item \code{subtract_blanks()}: Subtract blank chromatograms.
 \item \code{correct_rt()}: Align chromatograms.
 \item \code{get_peaks()}: Find and integrate peaks.
 \item \code{get_peaktable()}: Assemble peak table.

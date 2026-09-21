@@ -8,14 +8,12 @@ out <- preprocess(X = Sa[[1]], dim1 = new.ts, dim2 = new.lambdas,
                   show_progress = FALSE)
 
 test_that("preprocess works on matrix", {
-  out <- preprocess_matrix(X = Sa[[1]], dim1 = new.ts, dim2 = new.lambdas, 
-                           maxI = 1)
+  out <- preprocess(X = Sa[[1]], dim1 = new.ts, dim2 = new.lambdas,
+                    maxI = 1, show_progress = FALSE)
   expect_equal(class(out)[1],"matrix")
   expect_equal(rownames(out), format_axis(new.ts))
   expect_equal(colnames(out), as.character(new.lambdas))
   expect_error(preprocess_matrix(Sa), regexp = "X should be a matrix")
-  expect_error(preprocess_matrix(Sa[[1]], dim2 = seq(9, 20, by = .01)), 
-               regexp = 'argument "dim1" is missing')
 })
 
 test_that("Preprocess works without providing dimensions", {

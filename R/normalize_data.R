@@ -83,6 +83,9 @@ normalize_data <- function(peak_table, column, chrom_list = NULL,
       stop("Names of chromatograms do not match the peak table.")
     chrom_list <- setNames(lapply(seq_nrow(peak_table$tab), function(samp){
       chrom <- chrom_list[[samp]]/norm_vals[samp]
+      # division is linear, so the retained baseline rescales with the signal
+      bl <- attr(chrom, "baseline", exact = TRUE)
+      if (!is.null(bl)) attr(chrom, "baseline") <- bl/norm_vals[samp]
       attr(chrom, "normalized") <- TRUE
       attr(chrom, "normalized_by") <- by
       attr(chrom, "normalization_column") <- column

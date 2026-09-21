@@ -1,29 +1,70 @@
 #' Preprocess time/wavelength data
 #' 
 #' Standard preprocessing of time × wavelength response matrices
-#' (e.g. HPLC-DAD/UV data), consisting of: (i) baseline correction along the 
-#' time axis, (ii) smoothing along the spectral axis, and (iii) optional 
-#' interpolation in either dimension for dimensionality reduction. For densely 
-#' sampled data, (e.g.,  UV-VIS spectra, the size of the matrix can be reduced 
-#' by interpolation. By default, the data are baseline-corrected along the time
-#' axis using [`baseline.corr`][ptw::baseline.corr], and smoothed along the
-#' spectral axis using cubic smoothing splines ([`smooth.spline`]).
+#' (e.g. HPLC-DAD/UV data), consisting of: (i) optional interpolation in either
+#' dimension for dimensionality reduction, (ii) optional smoothing along the
+#' spectral axis, and (iii) optional baseline correction along the time axis.
+#' For densely sampled data (e.g., UV-VIS spectra), the size of the matrix can
+#' be reduced by interpolation. By default, the data are smoothed along the
+#' spectral axis using cubic smoothing splines ([`smooth.spline`]), then
+#' baseline-corrected along the time axis by asymmetric least squares
+#' ([`asysm`][ptw::asysm]). Three other baseline estimators are available
+#' through `baseline`, and `baseline = "none"` skips the step; see
+#' [`baseline_estimators`].
 #' 
-#' @importFrom ptw baseline.corr
-#' @importFrom stats approx smooth.spline
+#' @details
+#' Note that the operations are applied in the order given above: interpolation
+#' first, then spectral smoothing, then baseline correction. Because the
+#' baseline is estimated after the time axis is interpolated, `stiffness` is
+#' tied to whichever `dim1` grid was chosen: it sets a span of
+#' `stiffness^(1/4)` *timepoints*, so the same value is a different span in
+#' time on a different grid. Convert deliberately when the sampling interval
+#' changes: `stiffness = (span / dt)^4`.
+#'
+#' @importFrom ptw asysm
+#' @importFrom stats approx smooth.spline median
 #' @param X A numeric matrix (time × wavelength) or a list of such matrices.
 #' Row names must correspond to time points and column names to wavelengths.
-#' @param dim1 Numeric vector specifying the target time grid. The data will be
-#' interpolated onto these time points. The range of the new values should not 
-#' exceed the range of the original time points.
-#' @param dim2 Numeric vector specifying the target wavelength grid.
-#' The data will be interpolated onto these wavelengths. The range of the new 
-#' values should not exceed the range of the original wavelengths.
-#' @param remove.time.baseline Logical, indicating whether baseline correction
-#' should be done along the time axis, according to
-#' [`baseline.corr`][ptw::baseline.corr]. Defaults to `TRUE`.
-#' @param spec.smooth Logical, indicating whether smoothing should be done along
+#' @param dim1 Numeric vector specifying the target time grid, usually built
+#' with [`seq`]. The data will be interpolated onto these time points. The
+#' range of the new values should not exceed the range of the original time
+#' points, and the values must be strictly increasing. Note that writing
+#' `c(from, to, by = x)` in place of `seq(from, to, by = x)` yields a
+#' three-element vector rather than a sequence; this is detected and raises an
+#' error.
+#' @param dim2 Numeric vector specifying the target wavelength grid, usually
+#' built with [`seq`]. The data will be interpolated onto these wavelengths.
+#' The range of the new values should not exceed the range of the original
+#' wavelengths, and the values must be strictly increasing (unless
+#' `interpolate_cols = FALSE`, in which case `dim2` is ignored).
+#' @param remove.time.baseline The `remove.time.baseline` argument is
+#' deprecated. Please use `baseline = "none"` instead.
+#' @param baseline Baseline estimator to use along the time axis. Either
+#' asymmetric least squares (`"als"`, the default, via
+#' [`asysm`][ptw::asysm]), asymmetrically reweighted penalized least squares
+#' (`"arpls"`), adaptive smoothness parameter penalized least squares
+#' (`"aspls"`), statistics-sensitive non-linear iterative peak-clipping
+#' (`"snip"`), or `"none"` to skip baseline correction along the time axis
+#' altogether. See [`baseline_estimators`] for a description of each.
+#' @param attach_baseline Logical. Whether to retain the estimated baseline
+#' alongside the corrected data as a `"baseline"` attribute. The smoothing
+#' parameter that produced it is always recorded, as a `"baseline_param"`
+#' attribute, whether or not the baseline itself is kept. The baseline is 
+#' subtracted either way; this argument only controls whether the estimate is
+#' kept for inspection. Defaults to `FALSE`: the baseline is estimated
+#' separately for each wavelength, so it is the same size as the data and
+#' retaining it roughly doubles memory use. Adding the attribute back to the returned data recovers the
+#' uncorrected matrix only when `zero_floor = FALSE` and `maxI` is unset:
+#' clipping alters the data without altering the stored estimate, and `maxI`
+#' rescales both by a factor derived from the clipped data.
+#' @param zero_floor Logical. Whether to clip negative values in the
+#' corrected data to zero. Defaults to `FALSE`. Clipping rectifies the noise,
+#' destroying the symmetric below-baseline residual that diagnostics of
+#' over-fitting rely on, so it is off by default.
+#' @param smooth_spectra Logical, indicating whether smoothing should be done along
 #' the spectral axis, according to [`smooth.spline`]. Defaults to `TRUE`.
+#' @param spec.smooth The `spec.smooth` argument is deprecated. Please use
+#' `smooth_spectra` instead.
 #' @param maxI If supplied, all values are rescaled so that the maximum
 #' intensity equals `maxI`.
 #' @param interpolate_rows Logical. Whether to interpolate along the time axis 
@@ -36,25 +77,29 @@
 #' values will be ignored.
 #' @param show_progress Logical. Whether to show progress bar. Defaults to 
 #' `TRUE` if [`pbapply`][pbapply::pbapply] is installed.
-#' @param outlier_cutoff Threshold (in seconds) for excluding chromatograms
+#' @param outlier_cutoff Threshold (in minutes) for excluding chromatograms
 #' that end earlier than expected. Samples ending more than this value before
-#' the median end time are removed. Defaults to `5` seconds. Only applies when 
-#' `dim1` is not specified.
-#' @param ... Additional arguments to [`baseline.corr`][ptw::baseline.corr].
+#' the median end time are removed. The value is converted into the time unit
+#' of the data, so it is always expressed in minutes regardless of how the
+#' chromatograms are stored. Defaults to `5/60`, i.e. 5 seconds. Only applies
+#' when `dim1` is not specified.
+#' @param ... Additional arguments to the selected `baseline` estimator: e.g.
+#' `stiffness` and `p` for `"als"` ([`asysm`][ptw::asysm]), `stiffness` for
+#' `"arpls"`, `stiffness` and `k` for `"aspls"`, or `m` for `"snip"`. Note that
+#' `maxI` follows `...` in the signature and so must be named in
+#' full: otherwise R's partial matching would bind `m` 
+#' to `maxI` instead of passing them through to the estimator.
 #' @return The function returns the preprocessed data matrix (or list of 
 #' matrices), with row names and column names indicating the time points and 
 #' wavelengths, respectively.
 #' @author Ethan Bass
+#' @family preprocessing functions
+#' @seealso [`baseline_estimators`] [`correct_baseline`] [`crop_chroms`]
+#' [`get_baseline`]
 #' @note Adapted from the `preprocess` function in the alsace package by 
 #' Ron Wehrens: <https://github.com/rwehrens/alsace/blob/master/R/preprocess.R>.
-#' @references 
-#' * Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast parametric 
-#' time warping of peak lists. *Bioinformatics* 31:3063-3065. 
-#' \doi{10.1093/bioinformatics/btv299}.
-#' * Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
-#' LC–DAD using multivariate curve resolution: the alsace package for R. 
-#' *Metabolomics* 11:1:143-154. \doi{10.1007/s11306-014-0683-5}.
-#' @examplesIf interactive()
+#' @inherit baseline_estimators references
+#' @examples
 #' data(Sa)
 #' new.ts <- seq(10,18.66,by=.01) # choose time-points
 #' new.lambdas <- seq(200, 318, by = 2) # choose wavelengths
@@ -63,31 +108,37 @@
 #' @export preprocess
 
 preprocess <- function(X, dim1, dim2,
-                       remove.time.baseline = TRUE,
-                       spec.smooth = TRUE, maxI = NULL,
+                       remove.time.baseline = NULL,
+                       baseline = c("als", "arpls", "aspls", "snip", "none"),
+                       attach_baseline = FALSE,
+                       zero_floor = FALSE,
+                       smooth_spectra = TRUE,
                        interpolate_rows = TRUE,
                        interpolate_cols = TRUE,
                        cl = 2, show_progress = NULL,
-                       outlier_cutoff = 5/60, ...){
+                       outlier_cutoff = 5/60, ...,
+                       maxI = NULL,
+                       spec.smooth = NULL){
+  smooth_spectra <- resolve_deprecated(spec.smooth, smooth_spectra)
   laplee <- choose_apply_fnc(show_progress = show_progress, cl = cl)
+  baseline_supplied <- !missing(baseline)
+  baseline <- match.arg(baseline, c("als", "arpls", "aspls", "snip", "none"))
+  baseline <- resolve_remove_time_baseline(remove.time.baseline, baseline,
+                                           baseline_supplied)
+  prep <- as_chrom_list(X)
+  X <- prep$chrom_list
   time_unit <- get_time_unit(X, na_value = "min")
-  tfac <- switch(time_unit, "min" = 1, "s" = 60, "ms" = 60*1000)
-  X_class <- class(X)
-  if (is.matrix(X)){
-    X <- list(X)
-    return_matrix <- TRUE
-  } else return_matrix <- FALSE
-  if (base::inherits(X, "list") &&
-      base::all(base::sapply(X, function(x) {
-        base::inherits(x, "list") && "dad" %in% base::names(x) && base::is.matrix(x$dad)
-      }))) {
-    X <- base::lapply(X, function(x) x$dad)
-  }
-  if (!(inherits(X, "matrix") || (inherits(X, "list") && all(sapply(X, is.matrix)))))
-    stop("X should be a matrix or a list of matrices")
+  tfac <- time_factor(time_unit)
   if (ncol(X[[1]]) == 1){
     interpolate_cols <- FALSE
   }
+  # the order check applies only to an axis that is actually interpolated: a
+  # supplied `dim2` is ignored when `interpolate_cols = FALSE`, and a scalar is
+  # legitimate there
+  if (!missing(dim1))
+    check_interp_grid(dim1, "dim1", check_order = interpolate_rows)
+  if (!missing(dim2))
+    check_interp_grid(dim2, "dim2", check_order = interpolate_cols)
   if (interpolate_rows){
     limits <- sapply(X, function(x){
       ts <- as.numeric(rownames(x))
@@ -120,7 +171,7 @@ preprocess <- function(X, dim1, dim2,
       
       if (length(too_early) > 0) {
         labeled <- paste0(too_early, " (", sQuote(names(too_early)), ")", collapse = ", ")
-        plural <- ifelse(length(too_early) > 1, "s", "")
+        plural <- plural(length(too_early))
         warning(sprintf(paste(
           "No extrapolation allowed. New time axis (dim1) begins at %.2f, before actual data begins.",
           "\n\tExcluding chromatogram%s: %s."),
@@ -130,7 +181,7 @@ preprocess <- function(X, dim1, dim2,
       
       if (length(too_late) > 0) {
         labeled <- paste0(too_late, " (", sQuote(names(too_late)), ")", collapse = ", ")
-        plural <- ifelse(length(too_late) > 1, "s", "")
+        plural <- plural(length(too_late))
         warning(sprintf(paste(
           "No extrapolation allowed. New time axis (dim1) ends at %.2f, after actual data ends.",
           "\n\tExcluding chromatogram%s: %s."),
@@ -148,36 +199,109 @@ preprocess <- function(X, dim1, dim2,
     message("...Wavelengths not provided. Extrapolating from matrix dimensions for interpolation.")
     dim2 <- as.numeric(colnames(X[[1]]))
   }
+  if (attach_baseline && baseline == "none"){
+    warning("`attach_baseline` is ignored when `baseline = \"none\"`, ",
+            "since no baseline is estimated.", immediate. = TRUE)
+    attach_baseline <- FALSE
+  }
+  warn_na_gaps(X, bridge = interpolate_rows || interpolate_cols,
+               baseline = baseline)
   X <- laplee(X, FUN = preprocess_matrix,
                           dim1 = dim1,
                           dim2 = dim2,
-                          remove.time.baseline = remove.time.baseline,
-                          spec.smooth = spec.smooth, maxI = maxI,
+                          dim1_names = if (interpolate_rows) format_axis(dim1),
+                          dim2_names = if (interpolate_cols) format_axis(dim2),
+                          dt = if (interpolate_rows) axis_dt(dim1),
+                          baseline = baseline,
+                          attach_baseline = attach_baseline,
+                          zero_floor = zero_floor,
+                          smooth_spectra = smooth_spectra, maxI = maxI,
                           interpolate_rows = interpolate_rows,
                           interpolate_cols = interpolate_cols,
                           ...)
-    if (return_matrix){
-      X[[1]]
-    } else{
-      class(X) <- X_class
-      X
-    }
+  X <- flush_baseline_warnings(X)
+  if (prep$return_matrix){
+    X[[1]]
+  } else{
+    class(X) <- prep$class
+    X
+  }
+}
+
+#' @noRd
+warn_na_gaps <- function(X, bridge, baseline){
+  if (!bridge) return(invisible(NULL))
+  gaps <- lapply(X, function(x){
+    if (!anyNA(x)) return(NULL)
+    runs <- apply(x, 2, function(y){
+      r <- rle(is.na(y))
+      if (any(r$values)) max(r$lengths[r$values]) else 0L
+    })
+    c(n = sum(is.na(x)), run = max(runs), dt = axis_dt(rownames(x)))
+  })
+  hit <- which(!vapply(gaps, is.null, logical(1)))
+  if (length(hit) == 0) return(invisible(NULL))
+  nm <- names(X)[hit]
+  if (is.null(nm)) nm <- paste("sample", hit)
+  detail <- vapply(seq_along(hit), function(i){
+    g <- gaps[[hit[i]]]
+    span <- if (is.finite(g[["dt"]])){
+      sprintf(" = %.3g time units", g[["run"]] * g[["dt"]])
+    } else ""
+    sprintf("%s (%d missing, longest run %d timepoints%s)", nm[i],
+            g[["n"]], g[["run"]], span)
+  }, character(1))
+  consequence <- if (baseline == "none") "" else
+    ", so the baseline will be fit partly through interpolated data"
+  warning(sprintf("Missing values will be bridged by linear interpolation%s.\n\t%s.",
+                  consequence, paste(detail, collapse = ", ")),
+          immediate. = TRUE)
+  invisible(NULL)
+}
+
+#' @noRd
+subtract_baseline <- function(X, baseline,
+                              dt = NA_real_, attach_baseline = TRUE,
+                              ...){
+  bl_args <- list(...)
+  warnings <- character(0)
+  bl <- withCallingHandlers(
+    apply(X, 2, function(y)
+      do.call(estimate_baseline,
+              c(list(y, baseline = baseline, dt = dt), bl_args))),
+    warning = function(w){
+      warnings <<- c(warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    })
+  dim(bl) <- dim(X)
+  # the baseline is the same size as the data, so it is not worth keeping alive
+  # for the rest of the call when nobody will read it
+  list(x = structure(X - bl, baseline = NULL, baseline_warnings = NULL),
+       baseline = if (attach_baseline) bl else NULL,
+       param = effective_baseline_param(baseline, bl_args, dt = dt),
+       warnings = warnings)
 }
 
 #' @noRd
 preprocess_matrix <- function(X,
                               dim1, ## time axis
                               dim2, ## spectral axis
-                              remove.time.baseline = TRUE,
-                              spec.smooth = TRUE,
-                              maxI = NULL,
+                              baseline,
+                              attach_baseline = FALSE,
+                              zero_floor = FALSE,
+                              smooth_spectra = TRUE,
                               interpolate_rows = TRUE,
                               interpolate_cols = TRUE,
-                              ...) {
+                              ...,
+                              maxI = NULL,
+                              dim1_names = NULL,
+                              dim2_names = NULL,
+                              dt = NULL) {
   if (!is.matrix(X))
     stop("X should be a matrix!")
   metadata <- attributes(X)
-  metadata[c("dimnames", "names", "row.names", "dim", "class", "levels")] <- NULL
+  metadata[c("dimnames", "names", "row.names", "dim", "class", "levels",
+             "baseline", "baseline_param", "baseline_warnings")] <- NULL
   if (interpolate_rows){
     if (length(tpoints <- as.numeric(rownames(X))) == 0)
       tpoints <- seq_nrow(X)
@@ -192,23 +316,48 @@ preprocess_matrix <- function(X,
       stop("No extrapolation allowed - check dim2 argument")
     X <- t(apply(X, 1, function(xx) approx(lambdas, xx, dim2)$y)) 
   } else dim2 <- colnames(X)
-  if (ncol(X) == 1){
-    spec.smooth <- FALSE
+  if (ncol(X) < 4){
+    smooth_spectra <- FALSE
   }
-  if (spec.smooth){
-    X <- t(apply(X, 1, function(xxx) smooth.spline(xxx)$y))
+  if (smooth_spectra){
+    sm_x <- suppressWarnings(as.numeric(dim2))
+    if (length(sm_x) != ncol(X) || !all(is.finite(sm_x)))
+      sm_x <- seq_ncol(X)
+    X <- t(apply(X, 1, function(xxx) smooth.spline(sm_x, xxx)$y))
   }
-  if (remove.time.baseline){
-    X <- apply(X, 2, ptw::baseline.corr, ...)
+  if (baseline != "none"){
+    # `ptw::baseline.corr(y, ...)` is `y - asysm(y, ...)` for a vector, so
+    # subtracting the estimate explicitly is bit-identical to the previous
+    # implementation while making the baseline available to keep.
+    corrected <- subtract_baseline(X, baseline = baseline,
+                                            dt = dt %||% axis_dt(dim1),
+                                   attach_baseline = attach_baseline, ...)
+    X <- corrected$x
+    bl <- corrected$baseline
+    bl_param <- corrected$param
+    bl_warnings <- corrected$warnings
+  } else {
+    bl_param <- NULL
+    bl_warnings <- character(0)
   }
-  if (min(X, na.rm = TRUE) < 0){
+  if (zero_floor && min(X, na.rm = TRUE) < 0){
     X[X < 0] <- 0
   }
   if (!is.null(maxI)){
-    X <- maxI * X / max(X)
+    scale_factor <- maxI / max(X, na.rm = TRUE)
+    X <- scale_factor * X
+    if (attach_baseline) bl <- scale_factor * bl
   }
-  dimnames(X) <- list(if (interpolate_rows) format_axis(dim1) else dim1,
-                      if (interpolate_cols) format_axis(dim2) else dim2)
+  dimnames(X) <- list(
+    dim1_names %||% (if (interpolate_rows) format_axis(dim1) else dim1),
+    dim2_names %||% (if (interpolate_cols) format_axis(dim2) else dim2))
   attributes(X) <- c(attributes(X), metadata)
+  if (attach_baseline){
+    dimnames(bl) <- dimnames(X)
+    attr(X, "baseline") <- bl
+  }
+  if (!is.null(bl_param)) attr(X, "baseline_param") <- bl_param
+  if (length(bl_warnings) > 0)
+    attr(X, "baseline_warnings") <- unique(bl_warnings)
   X
 }

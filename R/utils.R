@@ -216,6 +216,42 @@ get_lambdas <- function(x){
   }
 }
 
+#' Retrieve estimated baseline
+#'
+#' Retrieves the baseline estimated by [`preprocess`] from a chromatogram, or a
+#' list of chromatograms, preprocessed with `attach_baseline = TRUE`. This
+#' function does not estimate a baseline itself; to compute one, see the
+#' `baseline` argument of [`preprocess`] or [`correct_baseline`].
+#'
+#' The baseline is indexed by the time axis, so it is deliberately dropped by
+#' any transform that resamples the signal ([`correct_rt`] and
+#' [`subtract_blanks`]). Call this before aligning, or re-run [`preprocess`].
+#'
+#' @param x A chromatogram, or a list of chromatograms, returned by
+#' [`preprocess`] with `attach_baseline = TRUE`.
+#' @return A matrix of the same dimensions as `x` containing the estimated
+#' baseline, or a list of such matrices if `x` is a list.
+#' @family utility functions
+#' @examples
+#' data(Sa)
+#' pr <- preprocess(Sa[[1]], dim1 = seq(10, 18.66, by = .01),
+#'                  dim2 = seq(200, 318, by = 2), attach_baseline = TRUE)
+#' bl <- get_baseline(pr)
+#' @export
+
+get_baseline <- function(x){
+  if (inherits(x, "chrom_list") | inherits(x, "list")){
+    out <- lapply(x, get_baseline)
+    class(out) <- class(x)
+    return(out)
+  }
+  bl <- attr(x, "baseline", exact = TRUE)
+  if (is.null(bl))
+    stop("No baseline found. `preprocess` and `correct_baseline` retain the ",
+         "estimated baseline only when called with `attach_baseline = TRUE`.")
+  bl
+}
+
 #' Get time resolution
 #' @return Returns average gap between time points.
 #' @noRd
@@ -223,6 +259,75 @@ get_time_resolution <- function(chrom_list, idx = 1){
   ts <- get_times(x = chrom_list, idx = idx)
   signif(median(diff(ts)))
 }
+
+#' Format numbers for an error message, one at a time
+#' @noRd
+num_label <- function(v){
+  vapply(v, function(z) format(z, trim = TRUE, scientific = FALSE,
+                               drop0trailing = TRUE), character(1),
+         USE.NAMES = FALSE)
+}
+
+#' Validate an interpolation grid
+#'
+#' `preprocess` reads the range of `dim1`/`dim2` with `head`/`tail` and
+#' interpolates onto them with `approx`, both of which assume a sorted grid, so
+#' the assumption is checked once here rather than surfacing as a confusing
+#' extrapolation error. A named `by`, `length.out` or `along.with` element is
+#' the fingerprint of `c(from, to, by = x)` written where `seq(from, to,
+#' by = x)` was meant: `c()` silently returns a three-element vector.
+#' @noRd
+check_interp_grid <- function(v, arg, check_order = TRUE){
+  nm <- names(v)
+  seq_arg <- intersect(nm, c("by", "length.out", "along.with", "from", "to"))
+  if (length(seq_arg) > 0){
+    # formatted element-wise: `format` on a vector pads to a common width and
+    # switches to scientific notation, neither of which echoes what was typed
+    args <- paste0(ifelse(nzchar(nm), paste0(nm, " = "), ""), num_label(v),
+                   collapse = ", ")
+    stop(sprintf(paste0(
+      "`%s` was given `c(%s)`, which is a %d-element vector rather than a ",
+      "sequence.\n  Did you mean `seq(%s)`?"),
+      arg, args, length(v), args))
+  }
+  if (!is.numeric(v) || length(v) == 0 || !all(is.finite(v)))
+    stop(sprintf("`%s` must be a numeric vector of finite values.", arg))
+  if (check_order && length(v) < 2)
+    stop(sprintf(paste(
+      "`%s` must contain at least two values to interpolate onto, but it has",
+      "%d. To select a single %s without interpolating, set `%s = FALSE`."),
+      arg, length(v), if (arg == "dim1") "timepoint" else "wavelength",
+      if (arg == "dim1") "interpolate_rows" else "interpolate_cols"))
+  if (check_order && length(v) > 1){
+    bad <- which(diff(v) <= 0)
+    if (length(bad) > 0)
+      stop(sprintf(paste0(
+        "`%s` must be strictly increasing, but element %d (%s) does not ",
+        "precede element %d (%s)."),
+        arg, bad[1], num_label(v[bad[1]]), bad[1] + 1L,
+        num_label(v[bad[1] + 1L])))
+  }
+  invisible(v)
+}
+
+#' Sampling interval of a numeric axis
+#' @noRd
+axis_dt <- function(v){
+  v <- suppressWarnings(as.numeric(v))
+  if (length(v) > 1 && all(is.finite(v))) median(diff(v)) else NA_real_
+}
+
+
+#' Multiplier from minutes into a given time unit
+#' @noRd
+time_factor <- function(time_unit = c("min", "s", "ms")){
+  time_unit <- match.arg(time_unit)
+  switch(time_unit, "min" = 1, "s" = 60, "ms" = 60*1000)
+}
+
+#' Plural suffix
+#' @noRd
+plural <- function(n) if (n > 1) "s" else ""
 
 #' Get time unit
 #' 
@@ -318,11 +423,54 @@ get_lhs_vars <- function(formula) {
   all.vars(form)
 }
 
+#' Coerce preprocessing input to a list of matrices
+#' @noRd
+as_chrom_list <- function(x, arg = "X"){
+  x_class <- class(x)
+  if (is.matrix(x)){
+    x <- list(x)
+    return_matrix <- TRUE
+  } else return_matrix <- FALSE
+  if (inherits(x, "list") &&
+      all(sapply(x, function(xx){
+        inherits(xx, "list") && "dad" %in% names(xx) && is.matrix(xx$dad)
+      }))){
+    x <- lapply(x, function(xx) xx$dad)
+  }
+  if (!(inherits(x, "matrix") || (inherits(x, "list") && all(sapply(x, is.matrix)))))
+    stop(sprintf("%s should be a matrix or a list of matrices", arg))
+  list(chrom_list = x, return_matrix = return_matrix, class = x_class)
+}
+
+#' Re-emit baseline warnings stashed by the per-matrix workers
+#' @noRd
+flush_baseline_warnings <- function(x){
+  bl_warnings <- unique(unlist(lapply(x, attr, "baseline_warnings")))
+  x <- lapply(x, function(xx){
+    attr(xx, "baseline_warnings") <- NULL
+    xx
+  })
+  for (w in bl_warnings) warning(w, call. = FALSE, immediate. = TRUE)
+  x
+}
+
 #' Transfer metadata
 #' Transfers metadata attributes between objects.
+#' @details
+#' `"baseline"` is excluded by default because it is indexed by the time axis
+#' and is therefore invalidated by any transform that resamples or rescales the
+#' signal. This matters most for warping: `correct_rt` transfers metadata over
+#' the warped matrices, and under `vpdtw` the baseline and the data end up with
+#' different numbers of rows outright, while under `ptw` the shapes and
+#' rownames still agree even though the signal has been mapped onto a new time
+#' axis and the baseline has not -- so it looks valid while being silently
+#' misaligned. Note that `exclude` only filters what is copied from
+#' `old_object`: an attribute that arithmetic already carried onto `new_object`
+#' survives, which is why `subtract_blanks` drops the baseline itself.
 #' @noRd
 transfer_metadata <- function(new_object, old_object, transfer_class = TRUE,
-                              exclude = c('names','row.names','dim','dimnames')){
+                              exclude = c('names','row.names','dim','dimnames',
+                                          'baseline')){
   if (!transfer_class){
     exclude <- c(exclude, "class")
   }
@@ -421,6 +569,27 @@ resolve_deprecated <- function(arg, new_arg){
   }
 }
 
+#' Resolve the deprecated `remove.time.baseline` argument
+#' @noRd
+resolve_remove_time_baseline <- function(remove.time.baseline, baseline,
+                                        baseline_supplied){
+  if (is.null(remove.time.baseline)) return(baseline)
+  if (!isTRUE(remove.time.baseline) && !isFALSE(remove.time.baseline))
+    stop("`remove.time.baseline` must be either `TRUE` or `FALSE`.")
+  warning("The `remove.time.baseline` argument is deprecated. Please use ",
+          "`baseline = \"none\"` instead.", immediate. = TRUE)
+  if (isFALSE(remove.time.baseline)){
+    if (baseline_supplied && baseline != "none")
+      stop("`remove.time.baseline = FALSE` conflicts with `baseline = \"",
+           baseline, "\"`. Supply `baseline = \"none\"` alone instead.")
+    return("none")
+  }
+  if (baseline_supplied && baseline == "none")
+    stop("`remove.time.baseline = TRUE` conflicts with `baseline = \"none\"`. ",
+         "Supply `baseline` alone instead.")
+  baseline
+}
+
 #' Get metadata attribute
 #' @noRd
 get_metadata_attribute <- function(x, which, ...){
@@ -516,6 +685,15 @@ get_peak_coordinates <- function(peak_table, chrom_list=NULL, loc, idx, lambda){
   list(coordinates = c(rt, int), lambda_idx = lambda_idx, 
        lambda = get_lambdas(chrom_list)[lambda_idx])
 }
+
+#' Default operator for `NULL`
+#'
+#' `%||%` entered base R in 4.4.0, but the package supports R >= 4.1.0. The
+#' right-hand side must stay lazy, since every call site pairs it with
+#' `skip_underdetermined` to avoid an expensive fit.
+#' @noRd
+`%||%` <- function(x, y) if (is.null(x)) y else x
+
 #' Format a numeric axis as fixed-width dimnames
 #'
 #' Gives every element of an axis the same number of decimal places: the fewest

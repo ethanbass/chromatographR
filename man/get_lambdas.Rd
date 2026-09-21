@@ -22,6 +22,7 @@ get_lambdas(Sa_warp)
 \seealso{
 Other utility functions:
 \code{\link[=combine_peaks]{combine_peaks()}},
+\code{\link[=get_baseline]{get_baseline()}},
 \code{\link[=get_times]{get_times()}},
 \code{\link[=merge_peaks]{merge_peaks()}},
 \code{\link[=reshape_chroms]{reshape_chroms()}},

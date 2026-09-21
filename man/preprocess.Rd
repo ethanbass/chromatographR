@@ -8,38 +8,69 @@ preprocess(
   X,
   dim1,
   dim2,
-  remove.time.baseline = TRUE,
-  spec.smooth = TRUE,
-  maxI = NULL,
+  remove.time.baseline = NULL,
+  baseline = c("als", "arpls", "aspls", "snip", "none"),
+  attach_baseline = FALSE,
+  zero_floor = FALSE,
+  smooth_spectra = TRUE,
   interpolate_rows = TRUE,
   interpolate_cols = TRUE,
   cl = 2,
   show_progress = NULL,
   outlier_cutoff = 5/60,
-  ...
+  ...,
+  maxI = NULL,
+  spec.smooth = NULL
 )
 }
 \arguments{
 \item{X}{A numeric matrix (time × wavelength) or a list of such matrices.
 Row names must correspond to time points and column names to wavelengths.}
 
-\item{dim1}{Numeric vector specifying the target time grid. The data will be
-interpolated onto these time points. The range of the new values should not
-exceed the range of the original time points.}
+\item{dim1}{Numeric vector specifying the target time grid, usually built
+with \code{\link{seq}}. The data will be interpolated onto these time points. The
+range of the new values should not exceed the range of the original time
+points, and the values must be strictly increasing. Note that writing
+\code{c(from, to, by = x)} in place of \code{seq(from, to, by = x)} yields a
+three-element vector rather than a sequence; this is detected and raises an
+error.}
 
-\item{dim2}{Numeric vector specifying the target wavelength grid.
-The data will be interpolated onto these wavelengths. The range of the new
-values should not exceed the range of the original wavelengths.}
+\item{dim2}{Numeric vector specifying the target wavelength grid, usually
+built with \code{\link{seq}}. The data will be interpolated onto these wavelengths.
+The range of the new values should not exceed the range of the original
+wavelengths, and the values must be strictly increasing (unless
+\code{interpolate_cols = FALSE}, in which case \code{dim2} is ignored).}
 
-\item{remove.time.baseline}{Logical, indicating whether baseline correction
-should be done along the time axis, according to
-\code{\link[ptw:baseline.corr]{baseline.corr}}. Defaults to \code{TRUE}.}
+\item{remove.time.baseline}{The \code{remove.time.baseline} argument is
+deprecated. Please use \code{baseline = "none"} instead.}
 
-\item{spec.smooth}{Logical, indicating whether smoothing should be done along
+\item{baseline}{Baseline estimator to use along the time axis. Either
+asymmetric least squares (\code{"als"}, the default, via
+\code{\link[ptw:asysm]{asysm}}), asymmetrically reweighted penalized least squares
+(\code{"arpls"}), adaptive smoothness parameter penalized least squares
+(\code{"aspls"}), statistics-sensitive non-linear iterative peak-clipping
+(\code{"snip"}), or \code{"none"} to skip baseline correction along the time axis
+altogether. See \code{\link{baseline_estimators}} for a description of each.}
+
+\item{attach_baseline}{Logical. Whether to retain the estimated baseline
+alongside the corrected data as a \code{"baseline"} attribute. The smoothing
+parameter that produced it is always recorded, as a \code{"baseline_param"}
+attribute, whether or not the baseline itself is kept. The baseline is
+subtracted either way; this argument only controls whether the estimate is
+kept for inspection. Defaults to \code{FALSE}: the baseline is estimated
+separately for each wavelength, so it is the same size as the data and
+retaining it roughly doubles memory use. Adding the attribute back to the returned data recovers the
+uncorrected matrix only when \code{zero_floor = FALSE} and \code{maxI} is unset:
+clipping alters the data without altering the stored estimate, and \code{maxI}
+rescales both by a factor derived from the clipped data.}
+
+\item{zero_floor}{Logical. Whether to clip negative values in the
+corrected data to zero. Defaults to \code{FALSE}. Clipping rectifies the noise,
+destroying the symmetric below-baseline residual that diagnostics of
+over-fitting rely on, so it is off by default.}
+
+\item{smooth_spectra}{Logical, indicating whether smoothing should be done along
 the spectral axis, according to \code{\link{smooth.spline}}. Defaults to \code{TRUE}.}
-
-\item{maxI}{If supplied, all values are rescaled so that the maximum
-intensity equals \code{maxI}.}
 
 \item{interpolate_rows}{Logical. Whether to interpolate along the time axis
 (\code{dim1}). Defaults to \code{TRUE}.}
@@ -55,12 +86,25 @@ values will be ignored.}
 \item{show_progress}{Logical. Whether to show progress bar. Defaults to
 \code{TRUE} if \code{\link[pbapply:pbapply]{pbapply}} is installed.}
 
-\item{outlier_cutoff}{Threshold (in seconds) for excluding chromatograms
+\item{outlier_cutoff}{Threshold (in minutes) for excluding chromatograms
 that end earlier than expected. Samples ending more than this value before
-the median end time are removed. Defaults to \code{5} seconds. Only applies when
-\code{dim1} is not specified.}
+the median end time are removed. The value is converted into the time unit
+of the data, so it is always expressed in minutes regardless of how the
+chromatograms are stored. Defaults to \code{5/60}, i.e. 5 seconds. Only applies
+when \code{dim1} is not specified.}
 
-\item{...}{Additional arguments to \code{\link[ptw:baseline.corr]{baseline.corr}}.}
+\item{...}{Additional arguments to the selected \code{baseline} estimator: e.g.
+\code{stiffness} and \code{p} for \code{"als"} (\code{\link[ptw:asysm]{asysm}}), \code{stiffness} for
+\code{"arpls"}, \code{stiffness} and \code{k} for \code{"aspls"}, or \code{m} for \code{"snip"}. Note that
+\code{maxI} follows \code{...} in the signature and so must be named in
+full: otherwise R's partial matching would bind \code{m}
+to \code{maxI} instead of passing them through to the estimator.}
+
+\item{maxI}{If supplied, all values are rescaled so that the maximum
+intensity equals \code{maxI}.}
+
+\item{spec.smooth}{The \code{spec.smooth} argument is deprecated. Please use
+\code{smooth_spectra} instead.}
 }
 \value{
 The function returns the preprocessed data matrix (or list of
@@ -69,36 +113,65 @@ wavelengths, respectively.
 }
 \description{
 Standard preprocessing of time × wavelength response matrices
-(e.g. HPLC-DAD/UV data), consisting of: (i) baseline correction along the
-time axis, (ii) smoothing along the spectral axis, and (iii) optional
-interpolation in either dimension for dimensionality reduction. For densely
-sampled data, (e.g.,  UV-VIS spectra, the size of the matrix can be reduced
-by interpolation. By default, the data are baseline-corrected along the time
-axis using \code{\link[ptw:baseline.corr]{baseline.corr}}, and smoothed along the
-spectral axis using cubic smoothing splines (\code{\link{smooth.spline}}).
+(e.g. HPLC-DAD/UV data), consisting of: (i) optional interpolation in either
+dimension for dimensionality reduction, (ii) optional smoothing along the
+spectral axis, and (iii) optional baseline correction along the time axis.
+For densely sampled data (e.g., UV-VIS spectra), the size of the matrix can
+be reduced by interpolation. By default, the data are smoothed along the
+spectral axis using cubic smoothing splines (\code{\link{smooth.spline}}), then
+baseline-corrected along the time axis by asymmetric least squares
+(\code{\link[ptw:asysm]{asysm}}). Three other baseline estimators are available
+through \code{baseline}, and \code{baseline = "none"} skips the step; see
+\code{\link{baseline_estimators}}.
+}
+\details{
+Note that the operations are applied in the order given above: interpolation
+first, then spectral smoothing, then baseline correction. Because the
+baseline is estimated after the time axis is interpolated, \code{stiffness} is
+tied to whichever \code{dim1} grid was chosen: it sets a span of
+\code{stiffness^(1/4)} \emph{timepoints}, so the same value is a different span in
+time on a different grid. Convert deliberately when the sampling interval
+changes: \code{stiffness = (span / dt)^4}.
 }
 \note{
 Adapted from the \code{preprocess} function in the alsace package by
 Ron Wehrens: \url{https://github.com/rwehrens/alsace/blob/master/R/preprocess.R}.
 }
 \examples{
-\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 data(Sa)
 new.ts <- seq(10,18.66,by=.01) # choose time-points
 new.lambdas <- seq(200, 318, by = 2) # choose wavelengths
 Sa_pr <- preprocess(Sa[[1]], dim1 = new.ts, dim2 = new.lambdas)
-\dontshow{\}) # examplesIf}
 }
 \references{
 \itemize{
-\item Wehrens, R., Bloemberg, T.G., and Eilers P.H.C. 2015. Fast parametric
-time warping of peak lists. \emph{Bioinformatics} 31:3063-3065.
-\doi{10.1093/bioinformatics/btv299}.
-\item Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
-LC–DAD using multivariate curve resolution: the alsace package for R.
-\emph{Metabolomics} 11:1:143-154. \doi{10.1007/s11306-014-0683-5}.
+\item Baek, S.-J., Park, A., Ahn, Y.-J., and Choo, J. 2015. Baseline correction
+using asymmetrically reweighted penalized least squares smoothing.
+\emph{Analyst} 140:250-257. \doi{10.1039/C4AN01061B}.
+\item Zhang, F., Tang, X., Tong, A., Wang, B., Wang, J., Lv, Y., Tang, C., and
+Wang, J. 2020. Baseline correction for infrared spectra using adaptive
+smoothness parameter penalized least squares method. \emph{Spectroscopy Letters}
+53:222-233. \doi{10.1080/00387010.2020.1730908}.
+\item Ryan, C.G., Clayton, E., Griffin, W.L., Sie, S.H., and Cousens, D.R. 1988.
+SNIP, a statistics-sensitive background treatment for the quantitative
+analysis of PIXE spectra in geoscience applications. \emph{Nuclear Instruments
+and Methods in Physics Research B} 34:396-402.
+\doi{10.1016/0168-583X(88)90063-8}.
+\item Erb, D. 2025. \emph{pybaselines: A Python library of algorithms for the
+baseline correction of experimental data}.
+\doi{10.5281/zenodo.5608581}.
 }
+}
+\seealso{
+\code{\link{baseline_estimators}} \code{\link{correct_baseline}} \code{\link{crop_chroms}}
+\code{\link{get_baseline}}
+
+Other preprocessing functions:
+\code{\link[=correct_baseline]{correct_baseline()}},
+\code{\link[=crop_chroms]{crop_chroms()}},
+\code{\link[=subtract_blanks]{subtract_blanks()}}
 }
 \author{
 Ethan Bass
 }
+\concept{preprocessing functions}

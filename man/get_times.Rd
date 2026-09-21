@@ -25,6 +25,7 @@ get_times(Sa_warp)
 \seealso{
 Other utility functions:
 \code{\link[=combine_peaks]{combine_peaks()}},
+\code{\link[=get_baseline]{get_baseline()}},
 \code{\link[=get_lambdas]{get_lambdas()}},
 \code{\link[=merge_peaks]{merge_peaks()}},
 \code{\link[=reshape_chroms]{reshape_chroms()}},

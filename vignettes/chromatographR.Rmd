@@ -55,30 +55,48 @@ data(Sa)
 
 Data from liquid chromatography often suffer from a variety of non-informative artifacts, such as noise or a drifting baseline. In addition, the data produced by the instrument may have a higher resolution or wider range (along either the time or spectral dimensions) than we require. Fortunately, most of these issues can be remedied fairly easily. For example, smoothing can reduce noise in the spectral direction while baseline subtraction can help correct a drifting baseline. Interpolation of wavelengths and retention times can be used to reduce the dimensionality of the data, facilitating comparison across samples and reducing the time and computational load required by downstream analyses. All of these functions (smoothing, baseline correction, and interpolation) are available through the `preprocess` function and are enabled by default.
 
-To select a narrower range of times and/or wavelengths, arguments can be provided to the optional `dim1` and `dim2` arguments. The `baseline_cor` function from the *ptw* package [@bloemberg2010] takes arguments `p` (an asymmetry parameter) and `lambda` (a smoothing parameter). You can read more about these in the documentation for `ptw::asysm`. You may want to experiment with these parameters before choosing values to use on your whole dataset.
+To select a narrower range of times and/or wavelengths, arguments can be provided to the optional `dim1` and `dim2` arguments.
 
-```{r choose-parameters-for-fitting-baseline, fig.cap = "Comparison of baseline correction parameters: raw data (black), mild correction (green, p = 0.001), strong correction (red, p = 0.1)."}
-i <- 2 # chromatogram number in list of data
-tpoints <- get_times(Sa)
-wavelength <- '200.00000' # this must match one of the column names from your chromatogram
+Several estimators are available for baseline correction. Here we focus on the default estimator: asymmetric least squares (`"als"`, via `ptw::asysm` [@bloemberg2010]), which fits a smooth curve to the signal while weighting points above the fit differently from points below it; the strength of that asymmetry is set by `p` and the stiffness of the curve by `stiffness`. Three other estimators are available -- `"arpls"`, `"aspls"` and `"snip"` -- which differ in how they decide what counts as baseline (see `?baseline_estimators` for further details).
 
-matplot(x = tpoints, y = Sa[[i]][,wavelength],
-       type = 'l', ylab = 'Abs (mAU)', xlab = 'Time (min)')
-matplot(x = tpoints, y = ptw::baseline.corr(Sa[[i]][,wavelength], p = .001, lambda = 1e5),
-       type = 'l', add = TRUE, col='darkgreen', lty = 3)
-matplot(x = tpoints, y = ptw::baseline.corr(Sa[[i]][,wavelength], p = .1, lambda = 1e5),
-       type = 'l', add = TRUE, col='firebrick2', lty = 3)
-```
+The stiffness argument controls how rapidly the estimated baseline can vary. Larger values produce a stiffer baseline that follows only slower changes in the signal. The effective stiffness depends on the sampling interval, so the same value can produce different baselines for differently sampled data. Because baseline correction is applied after interpolation, the effective `stiffness` is determined by the `dim1` grid. Accordingly, the time grid should be chosen before tuning stiffness.
 
-After selecting parameters for baseline correction, you can proceed with the pre-processing step as shown below. For 2D data (e.g., from a single-wavelength detector), the `dim2` argument should be left blank.
-
-```{r preprocessing}
+```{r choose-dimensions}
 # choose dimensions for interpolation
 new_times <- seq(10, 18.66, by = .01) # choose time-points
 new_wavelengths <- seq(200, 318, by = 2) # choose wavelengths
+```
 
-dat.pr <- preprocess(Sa, dim1 = new_times, dim2 = new_wavelengths, p = .001, 
-                     lambda = 1e5, cl = 1)
+Making the baseline too flexible is the failure mode to watch out for. Below, the zoomed chromatogram is plotted with two estimated baselines. At `stiffness = 2e3` the baseline bends up into the peak shoulders around 12.5 and 13.8 minutes, and the signal it absorbs is subtracted from the peaks above it. At 2e5, the baseline follows the drift while remaining below the peak shoulders. There is no universally correct value here: what works depends mostly on how sharply your own baseline curves, which is why it is worth plotting the fit.
+
+```{r choose-parameters-for-fitting-baseline, fig.cap = "Estimated baselines on one wavelength of one chromatogram, plotted so that only the baseline region is visible (the peaks run off the top of the panel). At `stiffness = 1e3` (red, dashed) the baseline rides up into the peak shoulders; at `2e5` (green) it follows only the drift."}
+i <- 2 # chromatogram number in list of data
+wavelength <- '200.00000' # this must match one of the column names from your chromatogram
+trace <- Sa[[i]][, wavelength, drop = FALSE]
+
+fit_baseline <- function(stiffness){
+  preprocess(trace, dim1 = new_times, interpolate_cols = FALSE,
+             stiffness = stiffness, attach_baseline = TRUE,
+             show_progress = FALSE)
+}
+too_flexible <- fit_baseline(1e3)
+about_right <- fit_baseline(2e5)
+
+# the same trace on the same grid, with no baseline subtracted
+uncorrected <- preprocess(trace, dim1 = new_times, interpolate_cols = FALSE,
+                          baseline = "none", show_progress = FALSE)
+cluttr::source_all("R")
+plot_baseline(too_flexible, lty=2, zoom = TRUE, annotate=FALSE, main="")
+plot_baseline(about_right, add=TRUE, col="darkgreen")
+legend("topright", c("stiffness = 2e5", "stiffness = 2e3"),
+       col = c("darkgreen", "firebrick2"), lty = c(1, 2), lwd = 2, bty = "n")
+```
+
+The `stiffness` chosen above carries straight into the call below, which applies it to the whole dataset on the same time grid. For 2D data (e.g., from a single-wavelength detector), the `dim2` argument should be left blank.
+
+```{r preprocessing}
+dat.pr <- preprocess(Sa, dim1 = new_times, dim2 = new_wavelengths, 
+                     stiffness = 2e5, cl = 1)
 ```
 
 ### Alignment
