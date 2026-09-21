@@ -12,6 +12,7 @@ reference:
     - read_chroms
     - preprocess
     - correct_baseline
+    - crop_chroms
     - subtract_blanks
     - correct_rt
     - correct_rt_group

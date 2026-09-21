@@ -596,6 +596,83 @@ test_that("correct_baseline refuses an incomplete trace and offers no `none`", {
                regexp = "x should be a matrix or a list of matrices")
 })
 
+test_that("crop_chroms returns an exact submatrix, dimnames included", {
+  data(Sa)
+  x <- Sa[[1]]
+  ts <- as.numeric(rownames(x))
+  lambdas <- as.numeric(colnames(x))
+
+  expect_identical(crop_chroms(x, rt_range = c(12, 16)),
+                   x[ts >= 12 & ts <= 16, , drop = FALSE])
+  expect_identical(crop_chroms(x, lambda_range = c(220, 300)),
+                   x[, lambdas >= 220 & lambdas <= 300, drop = FALSE])
+  expect_identical(crop_chroms(x, rt_range = c(12, 16),
+                               lambda_range = c(220, 300)),
+                   x[ts >= 12 & ts <= 16, lambdas >= 220 & lambdas <= 300,
+                     drop = FALSE])
+  # bounds are inclusive, and an NA leaves that end open
+  expect_identical(crop_chroms(x, rt_range = c(NA, 12)),
+                   x[ts <= 12, , drop = FALSE])
+  expect_identical(crop_chroms(x, rt_range = c(12, NA)),
+                   x[ts >= 12, , drop = FALSE])
+})
+
+test_that("crop_chroms never resamples, unlike cropping via preprocess", {
+  data(Sa)
+  x <- Sa[[1]]
+  ts <- as.numeric(rownames(x))
+  keep <- ts[ts >= 12 & ts <= 16]
+  cropped <- crop_chroms(x, rt_range = c(12, 16))
+  interpolated <- preprocess(x, dim1 = keep, interpolate_cols = FALSE,
+                             baseline = "none", smooth_spectra = FALSE,
+                             show_progress = FALSE, cl = 1)
+  # the values coincide, but `preprocess` reformats the retention times
+  expect_equal(unname(interpolated), unname(cropped), tolerance = 0)
+  expect_false(identical(rownames(interpolated), rownames(cropped)))
+  expect_identical(rownames(cropped), rownames(x)[ts >= 12 & ts <= 16])
+})
+
+test_that("crop_chroms preserves list shape, names and metadata", {
+  data(Sa)
+  out <- crop_chroms(Sa[1:2], rt_range = c(12, 16))
+  expect_length(out, 2)
+  expect_equal(names(out), names(Sa[1:2]))
+  expect_equal(class(out), class(Sa[1:2]))
+
+  m <- Sa[[1]]
+  attr(m, "time_unit") <- "min"
+  attr(m, "sample_name") <- "s1"
+  attr(m, "parser") <- "chromConverter"
+  cm <- crop_chroms(m, rt_range = c(12, 16))
+  for (a in c("time_unit", "sample_name", "parser"))
+    expect_equal(attr(cm, a), attr(m, a), info = a)
+})
+
+test_that("crop_chroms crops an attached baseline alongside the data", {
+  data(Sa_pr)
+  a <- correct_baseline(Sa_pr[[1]], attach_baseline = TRUE,
+                        show_progress = FALSE, cl = 1)
+  cropped <- crop_chroms(a, rt_range = c(12, 16), lambda_range = c(220, 300))
+  bl <- get_baseline(cropped)
+  expect_equal(dim(bl), dim(cropped))
+  expect_equal(dimnames(bl), dimnames(cropped))
+  expect_identical(bl, get_baseline(a)[rownames(cropped), colnames(cropped)])
+})
+
+test_that("crop_chroms rejects unusable ranges", {
+  data(Sa)
+  x <- Sa[[1]]
+  expect_error(crop_chroms(x), regexp = "at least one of")
+  expect_error(crop_chroms(x, rt_range = c(16, 12)), regexp = "must be increasing")
+  expect_error(crop_chroms(x, rt_range = 12), regexp = "length 2")
+  expect_error(crop_chroms(x, rt_range = c("a", "b")), regexp = "length 2")
+  expect_error(crop_chroms(x, rt_range = c(NA, NA)), regexp = "at least one bound")
+  expect_error(crop_chroms(x, rt_range = c(50, 60)), regexp = "does not overlap")
+  expect_error(crop_chroms(x, lambda_range = c(900, 1000)), regexp = "does not overlap")
+  expect_error(crop_chroms("foo", rt_range = c(12, 16)),
+               regexp = "x should be a matrix or a list of matrices")
+})
+
 test_that("preprocess smooths only when there are enough wavelengths", {
   data(Sa)
   ts <- seq(10, 18.66, by = .01)
@@ -633,6 +710,35 @@ test_that("estimator arguments are matched exactly, not by prefix", {
                regexp = "does not accept")
 })
 
+test_that("crop_chroms warns when a range reaches past the data", {
+  data(Sa)
+  x <- Sa[[1]]
+  expect_silent(crop_chroms(x, rt_range = c(12, 16)))
+  expect_silent(crop_chroms(x, rt_range = c(12, NA)))
+  expect_silent(crop_chroms(x, lambda_range = c(NA, 300)))
+  expect_warning(crop_chroms(x, rt_range = c(5, 12)),
+                 regexp = "extends beyond the available data")
+  expect_warning(crop_chroms(x, lambda_range = c(300, 400)),
+                 regexp = "extends beyond the available data")
+  # the warning reports what was actually kept
+  expect_warning(crop_chroms(x, rt_range = c(5, 12)), regexp = "kept")
+  # named chromatograms are identified
+  expect_warning(crop_chroms(Sa[1:2], rt_range = c(5, 25)), regexp = "119")
+})
+
+test_that("crop_chroms warns when offset time axes give unequal lengths", {
+  a <- matrix(1, 11, 4,
+              dimnames = list(seq(0, 1, by = .1), c(200, 210, 220, 230)))
+  b <- matrix(1, 11, 4,
+              dimnames = list(seq(0.05, 1.05, by = .1), c(200, 210, 220, 230)))
+  # rectangular in, ragged out: the requested range lies inside both spans,
+  # but the samples do not sample it identically
+  expect_warning(out <- crop_chroms(list(a = a, b = b), rt_range = c(0.1, 0.5)),
+                 regexp = "unequal dimensions")
+  expect_equal(unname(sapply(out, nrow)), c(5L, 4L))
+  # a shared axis crops to equal lengths without complaint
+  expect_silent(crop_chroms(list(a = a, a2 = a), rt_range = c(0.1, 0.5)))
+})
 
 # ── interpolation grids ───────────────────────────────────────────────────────
 

@@ -19,6 +19,9 @@ by = x)`.
 #### Retention time correction
 
 * Added `fill_zeros` to `correct_rt`, controlling whether out-of-bounds regions
+produced by warping are filled with zeros or returned as `NA`. Defaults to
+`FALSE`, which changes VPdtw behavior.
+
 #### Peak purity
 
 * `get_purity` now decides which timepoints belong to a peak from the
@@ -79,6 +82,10 @@ preprocessed or aligned.
 * Added `get_baseline` and `plot_baseline` for retrieving and plotting the
 baseline retained by `preprocess` or `correct_baseline` when
 `attach_baseline = TRUE`.
+* Added `crop_chroms` function for restricting chromatograms to a range of
+retention times (`rt_range`) and/or wavelengths (`lambda_range`). Cropping is
+pure subsetting, so values and dimnames pass through unchanged, unlike
+`preprocess(dim1 = )`, which interpolates onto a new axis.
 * Added `subtract_blanks` function for subtracting blank chromatograms from a
 `chrom_list`.
 * Added `correct_rt_group` function for group-wise warping function estimation

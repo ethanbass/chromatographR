@@ -30,6 +30,7 @@ Further details and example workflows are provided in the package vignettes.
 \item \code{read_chroms()}: Import chromatograms from a variety of vendor formats.
 \item \code{preprocess()}: Preprocess chromatographic matrices.
 \item \code{correct_baseline()}: Estimate and subtract a baseline.
+\item \code{crop_chroms()}: Restrict chromatograms to a range of times or wavelengths.
 \item \code{subtract_blanks()}: Subtract blank chromatograms.
 \item \code{correct_rt()}: Align chromatograms.
 \item \code{get_peaks()}: Find and integrate peaks.

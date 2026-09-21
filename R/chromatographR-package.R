@@ -21,6 +21,7 @@
 #' - `read_chroms()`: Import chromatograms from a variety of vendor formats.
 #' - `preprocess()`: Preprocess chromatographic matrices.
 #' - `correct_baseline()`: Estimate and subtract a baseline.
+#' - `crop_chroms()`: Restrict chromatograms to a range of times or wavelengths.
 #' - `subtract_blanks()`: Subtract blank chromatograms.
 #' - `correct_rt()`: Align chromatograms.
 #' - `get_peaks()`: Find and integrate peaks.

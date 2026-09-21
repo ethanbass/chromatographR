@@ -50,6 +50,7 @@ subtract_blanks(Sa_warp, blank_id = 1)
 
 Other preprocessing functions:
 \code{\link[=correct_baseline]{correct_baseline()}},
+\code{\link[=crop_chroms]{crop_chroms()}},
 \code{\link[=preprocess]{preprocess()}}
 }
 \concept{preprocessing functions}
