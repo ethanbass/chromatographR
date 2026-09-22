@@ -64,8 +64,9 @@ Suggests:
     rsvg,
     spelling,
     testthat (>= 3.0.0),
-    vdiffr
-VignetteBuilder: 
+    vdiffr,
+    withr
+VignetteBuilder:
     knitr
 Config/testthat/edition: 3
 Config/Needs/website: curl, ggordiplots, vegan, quarto
