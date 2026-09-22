@@ -89,15 +89,25 @@ check_chrom_list <- function(x, chrom_list, verbose = FALSE){
 }
 
 #' Get retention index
+#'
+#' Matches retention times to the nearest positions on a sorted time axis.
+#' @param RT Numeric vector of retention times to locate.
+#' @param times Sorted numeric vector of time points, e.g. from [`get_times`].
+#' @param clamp Logical. Whether to snap retention times falling outside
+#' `times` to the ends of the axis instead of erroring. Defaults to `FALSE`.
+#' @return Returns an integer vector of positions in `times`, one per element
+#' of `RT`.
 #' @author Ethan Bass
 #' @noRd
-get_retention_idx <- function(RT, times){
+get_retention_idx <- function(RT, times, clamp = FALSE){
   if (!is.numeric(RT))
     stop("Retention time not found!")
-  if (RT > tail(times, 1) | RT < head(times, 1))
+  if (!clamp && any(RT > tail(times, 1) | RT < head(times, 1)))
     stop("The supplied retention time falls outside the bounds of the chromatogram.")
-  idx <- which.min(abs(RT - times))
-  idx
+  if (length(times) < 2) return(rep(1L, length(RT)))
+  i <- findInterval(RT, times, all.inside = TRUE)
+  j <- pmin(i + 1L, length(times))
+  ifelse(abs(RT - times[i]) <= abs(times[j] - RT), i, j)
 }
 
 #' Check index
@@ -348,6 +358,74 @@ axis_dt <- function(v){
   if (length(v) > 1 && all(is.finite(v))) median(diff(v)) else NA_real_
 }
 
+
+#' Check manual integration windows
+#'
+#' Validates and standardizes the `windows` argument to [`get_peaks`] and
+#' [`fit_peaks`], returning a two-column numeric matrix of start and end
+#' retention times.
+#' @author Ethan Bass
+#' @noRd
+check_windows <- function(windows, times){
+  if (is.null(dim(windows))){
+    if (length(windows) != 2L){
+      stop("`windows` must be a two-column matrix or data.frame of start and end retention times, or a single pair of times.")
+    }
+    windows <- matrix(windows, nrow = 1L)
+  }
+  if (ncol(windows) != 2L){
+    stop(sprintf(
+      "`windows` must have exactly two columns (start and end retention times), not %d.",
+      ncol(windows)))
+  }
+  # `data.matrix` is deliberately avoided here: on a character matrix it
+  # silently returns factor codes rather than `NA`.
+  values <- suppressWarnings(as.numeric(as.matrix(windows)))
+  if (anyNA(values)){
+    stop("Please provide numeric retention times to `windows`.")
+  }
+  windows <- matrix(values, ncol = 2L)
+  bad <- which(windows[, 1] >= windows[, 2])
+  if (length(bad) > 0){
+    stop(sprintf(
+      "The start of each window in `windows` must precede its end. Check window%s %s.",
+      plural(length(bad)), paste(bad, collapse = ", ")))
+  }
+  ts_range <- range(times, na.rm = TRUE)
+  oob <- which(windows < ts_range[1] | windows > ts_range[2], arr.ind = TRUE)
+  if (nrow(oob) > 0){
+    stop(sprintf(
+      "The following windows fall outside the bounds of the chromatograms (%s-%s):\n%s",
+      signif(ts_range[1], 4), signif(ts_range[2], 4),
+      paste(sprintf("         %d (%s-%s)", sort(unique(oob[, "row"])),
+                    sQuote(windows[sort(unique(oob[, "row"])), 1]),
+                    sQuote(windows[sort(unique(oob[, "row"])), 2])),
+            collapse = ", \n")))
+  }
+  colnames(windows) <- c("start", "end")
+  windows
+}
+
+#' Convert manual integration windows to peak positions
+#'
+#' Converts a two-column matrix of start and end retention times into the
+#' `pos`/`lower`/`upper` table consumed by [`fit_peaks`], snapping each bound to
+#' the nearest time point and locating the apex within each window.
+#'
+#' The apex must be derived here rather than supplied by the user, since `rt`
+#' and `height` are read from it. Two windows sharing a boundary time resolve to
+#' the same index, which is what makes a shared boundary behave as a vertical
+#' drop line: the trapezoidal sum telescopes over the shared node, so the areas
+#' of the two windows sum exactly to the area of their union.
+#' @author Ethan Bass
+#' @noRd
+windows_to_pos <- function(windows, y, times){
+  windows <- check_windows(windows, times = times)
+  lower <- get_retention_idx(windows[, 1], times = times)
+  upper <- get_retention_idx(windows[, 2], times = times)
+  apex <- mapply(function(l, u) l - 1L + which.max(y[seq.int(l, u)]), lower, upper)
+  data.frame(pos = unname(apex), lower = unname(lower), upper = unname(upper))
+}
 
 #' Multiplier from minutes into a given time unit
 #' @noRd

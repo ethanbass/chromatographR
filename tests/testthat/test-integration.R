@@ -212,3 +212,57 @@ test_that("get_peaks area scales with dt and matches the analytical value", {
   # absolute area should match height * sigma_time * sqrt(2*pi)
   expect_equal(area_coarse, height * (width_idx * dt) * sqrt(2 * pi), tolerance = 0.01)
 })
+
+test_that("`windows` integrates the supplied window and recovers the area", {
+  skip_on_cran()
+  p <- make_gaussian_chrom()
+  pks <- fit_peaks(p$mat, lambda = "220", windows = rbind(c(1, p$n)),
+                   fit = "raw", estimate_purity = FALSE)
+  expect_equal(nrow(pks), 1L)
+  expect_equal(pks$start, 1)
+  expect_equal(pks$end, p$n)
+  expect_equal(pks$area, p$true_area, tolerance = 0.01)
+})
+
+test_that("windows sharing a boundary act as a drop line and are exactly additive", {
+  skip_on_cran()
+  p <- make_gaussian_chrom()
+  whole <- fit_peaks(p$mat, lambda = "220", windows = rbind(c(1, p$n)),
+                     fit = "raw", estimate_purity = FALSE)
+  split <- fit_peaks(p$mat, lambda = "220",
+                     windows = rbind(c(1, 200), c(200, 350), c(350, p$n)),
+                     fit = "raw", estimate_purity = FALSE)
+  expect_equal(nrow(split), 3L)
+  expect_equal(sum(split$area), whole$area)
+})
+
+test_that("`windows` returns a peak for a window containing no peak", {
+  skip_on_cran()
+  # forced integration: this is what `rts` cannot do, since it filters detected apexes
+  p <- make_gaussian_chrom()
+  pks <- fit_peaks(p$mat, lambda = "220", windows = rbind(c(1, 20)),
+                   fit = "raw", estimate_purity = FALSE)
+  expect_equal(nrow(pks), 1L)
+  expect_equal(pks$area, 0, tolerance = 1e-6)
+})
+
+test_that("`rt` and `height` come from the apex within the window", {
+  skip_on_cran()
+  p <- make_gaussian_chrom()
+  # a window whose midpoint (251) is the apex, and one whose midpoint is not
+  off <- fit_peaks(p$mat, lambda = "220", windows = rbind(c(1, 400)),
+                   fit = "raw", estimate_purity = FALSE)
+  expect_equal(off$rt, p$center)
+  expect_equal(off$height, p$height, tolerance = 1e-6)
+  # midpoint of c(1, 400) is 200, where the signal is well below the maximum
+  expect_gt(off$height, p$mat[200, 1])
+})
+
+test_that("`windows` cannot be combined with `pos`", {
+  skip_on_cran()
+  p <- make_gaussian_chrom()
+  pos <- data.frame(pos = p$center, lower = 1, upper = p$n)
+  expect_error(fit_peaks(p$mat, lambda = "220", windows = rbind(c(1, p$n)),
+                         pos = pos, fit = "raw"),
+               "either `windows` or `pos`")
+})

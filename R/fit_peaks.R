@@ -222,6 +222,15 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' @param lambda Wavelength at which to fit peaks. Must correspond to a wavelength present in `x`.
 #' @param pos Locations of peaks in vector `y`. If `NULL`, `find_peaks` will run
 #' automatically to find peak positions.
+#' @param windows Optional two-column matrix or `data.frame` of start and end
+#' retention times (or a single pair of times), giving manual integration
+#' windows. If provided, peak detection is skipped entirely and one peak is
+#' returned for every window, whether or not a peak is detectable there. Two
+#' adjacent windows sharing a boundary time act as a vertical drop line: their
+#' areas sum exactly to the area of their union, which is how a peak is split at
+#' a chosen time. `max_fwhm` is ignored, since the width of each window is
+#' chosen by the user. Cannot be combined with `pos` or `rts`. Defaults to
+#' `NULL`.
 #' @param sd_max Maximum width (standard deviation) for peaks. Defaults to `50`.
 #' @param fit Peak model to use. Options include `"bemg"` (bidirectional 
 #' exponentially modified Gaussian), `"egh"` (exponential-Gaussian hybrid),
@@ -281,7 +290,7 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' @md
 #' @keywords internal
 
-fit_peaks <- function (x, lambda, pos = NULL, sd_max = 50,
+fit_peaks <- function (x, lambda, pos = NULL, windows = NULL, sd_max = 50,
                        fit = c("egh", "bemg", "gaussian", "raw"),
                        max_iter = 1000, estimate_purity = TRUE,
                        noise_threshold = .001,
@@ -290,6 +299,13 @@ fit_peaks <- function (x, lambda, pos = NULL, sd_max = 50,
   y <- x[,lambda.idx]
   fit <- match.arg(fit, c("egh", "bemg", "gaussian", "raw"))
   baseline <- match.arg(baseline, c("none", "flat", "sloped"))
+  if (!is.null(windows)){
+    if (!is.null(pos)){
+      stop("Please supply either `windows` or `pos`, not both.")
+    }
+    pos <- windows_to_pos(windows, y = y, times = get_times(x))
+    sd_max <- NULL
+  }
   if (is.null(pos)){
     pos <- find_peaks(y = y, ...)
   }

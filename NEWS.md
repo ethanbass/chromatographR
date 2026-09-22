@@ -169,6 +169,10 @@ topographic prominence in multiples of the estimated noise. Unlike
 `min_curvature` and `min_amplitude` this threshold is scale-free, so it
 transfers between datasets. `find_peaks` now also returns a `prominence`
 column.
+* Added manual integration of fixed retention-time windows to `get_peaks`
+and `fit_peaks` via a `windows` argument, quantifying a compound even where
+no peak is detected. `get_peaktable` gives one column per window. See
+`?get_peaks`.
 
 #### Peak tables and plotting
 

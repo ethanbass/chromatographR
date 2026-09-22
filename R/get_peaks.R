@@ -32,6 +32,17 @@
 #' hybrid (`"egh"`), `"gaussian"`, or `"raw"`. The `raw` setting 
 #' performs trapezoidal integration directly on the raw data without fitting a 
 #' model to the data. Defaults to `egh`.
+#' @param windows Optional two-column matrix or `data.frame` of start and end
+#' retention times (or a single pair of times), giving manual integration
+#' windows that are applied to every chromatogram. If provided, peak detection
+#' is skipped entirely and one peak is returned for every window in every
+#' sample, whether or not a peak is detectable there. This lets you
+#' quantify a compound in samples where it is not detected, and guarantees that
+#' every sample contributes to the same set of peak table columns. Two adjacent
+#' windows sharing a boundary time act as a vertical drop line: their areas sum
+#' exactly to the area of their union, which is how a peak is split at a chosen
+#' time. `max_fwhm` is ignored, since the width of each window is chosen by
+#' the user. Cannot be combined with `rts`. Defaults to `NULL`.
 #' @param sd_max Maximum width (standard deviation) for peaks. Defaults to `50`.
 #' @param sd.max The `sd.max` argument is deprecated. Please use `sd_max` instead.
 #' @param max_iter Maximum number of iterations for non-linear least squares
@@ -143,6 +154,7 @@
 
 get_peaks <- function(chrom_list, lambdas,
                       fit = c("egh", "bemg", "gaussian", "raw"),
+                      windows = NULL,
                       sd_max = 50, max_iter = 100,
                       time_unit = c("min", "s", "ms"),
                       baseline = c("none", "flat", "sloped"),
@@ -155,6 +167,7 @@ get_peaks <- function(chrom_list, lambdas,
   time_unit <- resolve_deprecated(time.units, time_unit)
   time_unit <- match.arg(time_unit, c("min", "s", "ms"))
   tfac <- switch(time_unit, "min" = 1, "s" = 60, "ms" = 60*1000)
+  fit_is_default <- missing(fit)
   fit <- match.arg(fit, c("egh", "bemg", "gaussian", "raw"))
   baseline <- match.arg(baseline, c("none", "flat", "sloped"))
   chrom_list_string <- deparse(substitute(chrom_list))
@@ -173,12 +186,23 @@ get_peaks <- function(chrom_list, lambdas,
             immediate. = TRUE)
     names(chrom_list) <- seq_along(chrom_list)
   }
+  if (!is.null(windows)){
+    windows <- check_windows(windows, times = get_times(chrom_list))
+    if (fit_is_default){
+      message("`windows` was supplied with the default `fit = \"egh\"`, so a peak model will be fit within each window. Set `fit = \"raw\"` to integrate the raw signal against a zero baseline instead.")
+    }
+    if (estimate_purity){
+      warning("Spectral purity is not meaningful across a manual integration window spanning more than one component.",
+              immediate. = TRUE)
+    }
+  }
   peaks <- list()
   laplee <- choose_apply_fnc(show_progress, cl = cl)
   
   result <- laplee(seq_along(chrom_list), function(sample){
     suppressWarnings(ptable <- lapply(lambdas, function(lambda){
       pks <- fit_peaks(chrom_list[[sample]], lambda = lambda, fit = fit,
+                       windows = windows,
                        max_iter = max_iter, sd_max = sd_max,
                        estimate_purity = estimate_purity,
                        noise_threshold = noise_threshold,
@@ -200,11 +224,35 @@ get_peaks <- function(chrom_list, lambdas,
     ptable
   })
   names(result) <- names(chrom_list)
+
+  collect <- function(var){
+    unlist(lapply(result, function(s){
+      if (is.data.frame(s)) s[[var]] else lapply(s, function(d) d[[var]])
+    }), use.names = FALSE)
+  }
+  if (!is.null(windows)){
+    n_expected <- nrow(windows) * length(lambdas)
+    dropped <- vapply(result, function(s){
+      n_expected - ifelse(is.data.frame(s), nrow(s), sum(vapply(s, nrow, numeric(1))))
+    }, numeric(1))
+    if (any(dropped > 0)){
+      warning(sprintf(
+        "Some windows were dropped because their apex fell on the edge of the chromatogram, in the following sample%s: %s.",
+        plural(sum(dropped > 0)),
+        paste(names(dropped)[dropped > 0], collapse = ", ")), immediate. = TRUE)
+    }
+    n_negative <- sum(collect("area") < 0, na.rm = TRUE)
+    if (n_negative > 0){
+      warning(sprintf(
+        "The local baseline lies above the signal in %d window%s, giving a negative area.\n     Negative areas are reported as such, but are coerced to zero by `get_peaktable`.",
+        n_negative, plural(n_negative)), immediate. = TRUE)
+    }
+  }
   
   structure(result,
             chrom_list = chrom_list_string,
             lambdas = lambdas, fit = fit, sd_max = sd_max,
-            max_iter = max_iter,
+            max_iter = max_iter, windows = windows,
             time_unit = time_unit,
             baseline = baseline,
             intensity_unit = get_metadata_attribute(chrom_list[[1]], "detector_y_unit"),

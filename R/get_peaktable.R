@@ -1,3 +1,9 @@
+## Fitted peak-model columns carried into a peak table's `pk_meta`, shared by
+## the `peak_list` and `matched_peak_list` methods so a new model column is
+## registered in one place.
+PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
+                    "window_limited", "converged")
+
 #' Convert peak lists into an aligned peak table
 #' 
 #' Converts a `peak_list` object containing peaks from multiple samples into
@@ -46,20 +52,22 @@
 #' @importFrom graphics par
 #' @param peak_list A `peak_list` object created by [`get_peaks`], containing a
 #' nested list of features, where the first level is the sample, and the second 
-#' level is the spectral wavelength. Every sample x wavelength component is 
-#' described by a  `data.frame` with a row for each peak and columns containing 
+#' level is the spectral wavelength. Every sample × wavelength component is 
+#' described by a `data.frame` with a row for each peak and columns containing 
 #' information on various peak parameters.
 #' @param chrom_list A list of chromatographic matrices. Only required when
 #' `clust = "sp.rt"`.
 #' @param response Peak intensity measure: either `"area"` (default) or 
 #' `"height"`.
 #' @param use.cor Logical. Indicates whether to use corrected retention times
-#' (`rt.cor` column) or raw retention times `rt` column). Unless
+#' (`rt.cor` column) or raw retention times (`rt` column). Unless
 #' otherwise specified, the `rt.cor` column will be used by default if it 
 #' exists in the provided `peak_list`.
 #' @param hmax Height at which the complete linkage dendrogram will be cut. Can
-#' be interpreted as the maximal intercluster retention time difference.
-#' @param summarize_by How to select the representative peak from each cluster.
+#' be interpreted as the maximal intercluster retention time difference. Ignored
+#' for peak lists produced by `get_peaks(windows = )`, since those peaks are
+#' grouped by integration window instead of being clustered.
+#' @param summarize_by How to summarize peak metadata within each cluster.
 #' Options are `"weighted.mean"` (default, weights peaks by their intensity as
 #' given by `response`), `"mean"`, `"median"` (which aggregate metadata across 
 #' all peaks in the cluster) or `"max"` (which selects the most intense peak in 
@@ -69,7 +77,8 @@
 #' @param ask Logical. Ask before showing new plot? Defaults to `TRUE`.
 #' @param clust Specify whether to perform hierarchical clustering based on
 #' spectral similarity and retention time (`sp.rt`) or retention time alone
-#' (`rt`). Defaults to `rt`.
+#' (`rt`). Defaults to `rt`. Ignored for peak lists produced by
+#' `get_peaks(windows = )`, which are grouped by window.
 #' @param sigma.t Width of Gaussian kernel for retention time similarity.
 #' Controls weight given to retention time when `"sp.rt"` is selected.
 #' @param sigma.r Width of Gaussian kernel for spectral similarity. Controls
@@ -79,11 +88,14 @@
 #' additional information, see [`cutreeDynamic`][dynamicTreeCut::cutreeDynamic].
 #' @param verbose Logical. Whether to print warning when combining peaks into 
 #' single time window. Defaults to `FALSE`.
-#' @param out Specify `data.frame` (default) or `matrix` as output.
-#' @md
+#' @param out Output format: `data.frame` (default) or `matrix`.
+#' @param na.fill Value used to fill cells where no peak was matched in a given
+#'   sample. Defaults to `0`. Only used by the `matched_peak_list`
+#'   method.
+#' @param ... Additional arguments (currently unused).
 #' @return The function returns an S3 [`peak_table`] object, containing the
 #' following elements:
-#' * `tab`: The peak table itself -- a `data.frame` of intensities in a
+#' * `tab`: The peak table itself — a `data.frame` of intensities in a
 #' sample × peak configuration.
 #' * `pk_meta`: A `data.frame` containing peak metadata (e.g., the spectral
 #' component, peak number, and average retention time), summarized across all
@@ -97,6 +109,10 @@
 #' * `args`: A vector of arguments given to [`get_peaktable`] to 
 #' generate the peak table.
 #' @author Ethan Bass
+#' @note Peak lists produced by `get_peaks(windows = )` are grouped by
+#' integration window rather than clustered by retention time. This gives one
+#' peak table column per window, in the order the windows were given, with
+#' every sample contributing to each.
 #' @note This function is adapted from the `getPeakTable` function in the alsace
 #' package by Ron Wehrens: <https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R>.
 #' @md
@@ -134,10 +150,9 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
   rt <- ifelse(use.cor, "rt.cor", "rt")
   start <- ifelse(use.cor, "start.cor", "start")
   end <- ifelse(use.cor, "end.cor", "end")
-  if (!inherits(peak_list, "peak_list"))
-    stop("Peak list must be of the associated class.")
   check_duplicated_names(names(peak_list))
-  if (clust == "sp.rt"){
+  windows <- if (use.cor) NULL else attr(peak_list, "windows")
+  if (clust == "sp.rt" && is.null(windows)){
     if (missing(chrom_list)){
       chrom_list <- get_chrom_list(peak_list)
     } else get_chrom_list(peak_list, chrom_list)
@@ -161,7 +176,12 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
     names(pkcenters) <- NULL
     if (length(pkcenters) < 2) 
       return(NULL)
-    if (clust == 'rt'){
+    if (!is.null(windows)){
+      dist_to_window <- outer(xx[[start]], windows[, 1], function(a, b) abs(a - b)) +
+                        outer(xx[[end]], windows[, 2], function(a, b) abs(a - b))
+      win_idx <- apply(dist_to_window, 1, which.min)
+      pkcenters.cl <- match(win_idx, sort(unique(win_idx)))
+    } else if (clust == 'rt'){
       pkcenters.hcl <- fastcluster::hclust(dist(pkcenters), method = "complete")
       pkcenters.cl <- cutree(pkcenters.hcl, h = hmax)
     } else if (clust == 'sp.rt'){

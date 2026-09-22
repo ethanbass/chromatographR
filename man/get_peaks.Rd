@@ -8,6 +8,7 @@ get_peaks(
   chrom_list,
   lambdas,
   fit = c("egh", "bemg", "gaussian", "raw"),
+  windows = NULL,
   sd_max = 50,
   max_iter = 100,
   time_unit = c("min", "s", "ms"),
@@ -35,6 +36,18 @@ exponentially modified gaussian (\code{"bemg"}), exponential-gaussian
 hybrid (\code{"egh"}), \code{"gaussian"}, or \code{"raw"}. The \code{raw} setting
 performs trapezoidal integration directly on the raw data without fitting a
 model to the data. Defaults to \code{egh}.}
+
+\item{windows}{Optional two-column matrix or \code{data.frame} of start and end
+retention times (or a single pair of times), giving manual integration
+windows that are applied to every chromatogram. If provided, peak detection
+is skipped entirely and one peak is returned for every window in every
+sample, whether or not a peak is detectable there. This lets you
+quantify a compound in samples where it is not detected, and guarantees that
+every sample contributes to the same set of peak table columns. Two adjacent
+windows sharing a boundary time act as a vertical drop line: their areas sum
+exactly to the area of their union, which is how a peak is split at a chosen
+time. \code{max_fwhm} is ignored, since the width of each window is chosen by
+the user. Cannot be combined with \code{rts}. Defaults to \code{NULL}.}
 
 \item{sd_max}{Maximum width (standard deviation) for peaks. Defaults to \code{50}.}
 

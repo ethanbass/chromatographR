@@ -8,6 +8,7 @@ fit_peaks(
   x,
   lambda,
   pos = NULL,
+  windows = NULL,
   sd_max = 50,
   fit = c("egh", "bemg", "gaussian", "raw"),
   max_iter = 1000,
@@ -24,6 +25,16 @@ fit_peaks(
 
 \item{pos}{Locations of peaks in vector \code{y}. If \code{NULL}, \code{find_peaks} will run
 automatically to find peak positions.}
+
+\item{windows}{Optional two-column matrix or \code{data.frame} of start and end
+retention times (or a single pair of times), giving manual integration
+windows. If provided, peak detection is skipped entirely and one peak is
+returned for every window, whether or not a peak is detectable there. Two
+adjacent windows sharing a boundary time act as a vertical drop line: their
+areas sum exactly to the area of their union, which is how a peak is split at
+a chosen time. \code{max_fwhm} is ignored, since the width of each window is
+chosen by the user. Cannot be combined with \code{pos} or \code{rts}. Defaults to
+\code{NULL}.}
 
 \item{sd_max}{Maximum width (standard deviation) for peaks. Defaults to \code{50}.}
 

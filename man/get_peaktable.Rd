@@ -24,8 +24,8 @@ get_peaktable(
 \arguments{
 \item{peak_list}{A \code{peak_list} object created by \code{\link{get_peaks}}, containing a
 nested list of features, where the first level is the sample, and the second
-level is the spectral wavelength. Every sample x wavelength component is
-described by a  \code{data.frame} with a row for each peak and columns containing
+level is the spectral wavelength. Every sample × wavelength component is
+described by a \code{data.frame} with a row for each peak and columns containing
 information on various peak parameters.}
 
 \item{chrom_list}{A list of chromatographic matrices. Only required when
@@ -35,14 +35,16 @@ information on various peak parameters.}
 \code{"height"}.}
 
 \item{use.cor}{Logical. Indicates whether to use corrected retention times
-(\code{rt.cor} column) or raw retention times \code{rt} column). Unless
+(\code{rt.cor} column) or raw retention times (\code{rt} column). Unless
 otherwise specified, the \code{rt.cor} column will be used by default if it
 exists in the provided \code{peak_list}.}
 
 \item{hmax}{Height at which the complete linkage dendrogram will be cut. Can
-be interpreted as the maximal intercluster retention time difference.}
+be interpreted as the maximal intercluster retention time difference. Ignored
+for peak lists produced by \code{get_peaks(windows = )}, since those peaks are
+grouped by integration window instead of being clustered.}
 
-\item{summarize_by}{How to select the representative peak from each cluster.
+\item{summarize_by}{How to summarize peak metadata within each cluster.
 Options are \code{"weighted.mean"} (default, weights peaks by their intensity as
 given by \code{response}), \code{"mean"}, \code{"median"} (which aggregate metadata across
 all peaks in the cluster) or \code{"max"} (which selects the most intense peak in
@@ -55,7 +57,8 @@ shown indicating the clustering.}
 
 \item{clust}{Specify whether to perform hierarchical clustering based on
 spectral similarity and retention time (\code{sp.rt}) or retention time alone
-(\code{rt}). Defaults to \code{rt}.}
+(\code{rt}). Defaults to \code{rt}. Ignored for peak lists produced by
+\code{get_peaks(windows = )}, which are grouped by window.}
 
 \item{sigma.t}{Width of Gaussian kernel for retention time similarity.
 Controls weight given to retention time when \code{"sp.rt"} is selected.}
@@ -70,13 +73,19 @@ additional information, see \code{\link[dynamicTreeCut:cutreeDynamic]{cutreeDyna
 \item{verbose}{Logical. Whether to print warning when combining peaks into
 single time window. Defaults to \code{FALSE}.}
 
-\item{out}{Specify \code{data.frame} (default) or \code{matrix} as output.}
+\item{out}{Output format: \code{data.frame} (default) or \code{matrix}.}
+
+\item{na.fill}{Value used to fill cells where no peak was matched in a given
+sample. Defaults to \code{0}. Only used by the \code{matched_peak_list}
+method.}
+
+\item{...}{Additional arguments (currently unused).}
 }
 \value{
 The function returns an S3 \code{\link{peak_table}} object, containing the
 following elements:
 \itemize{
-\item \code{tab}: The peak table itself -- a \code{data.frame} of intensities in a
+\item \code{tab}: The peak table itself — a \code{data.frame} of intensities in a
 sample × peak configuration.
 \item \code{pk_meta}: A \code{data.frame} containing peak metadata (e.g., the spectral
 component, peak number, and average retention time), summarized across all
@@ -129,6 +138,11 @@ argument selects the metadata associated with the most intense peak in each
 cluster.
 }
 \note{
+Peak lists produced by \code{get_peaks(windows = )} are grouped by
+integration window rather than clustered by retention time. This gives one
+peak table column per window, in the order the windows were given, with
+every sample contributing to each.
+
 This function is adapted from the \code{getPeakTable} function in the alsace
 package by Ron Wehrens: \url{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}.
 }
