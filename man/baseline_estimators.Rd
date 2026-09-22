@@ -9,8 +9,7 @@ argument of \code{\link{preprocess}} and \code{\link{correct_baseline}}.
 }
 \section{Baseline estimators}{
 
-Four estimators are available. What follows describes what each one does.
-Which performs best on a given chromatogram is an empirical question that
+Four estimators are available. Which performs best on a given chromatogram is an empirical question that
 depends on the noise, the drift, and how crowded the trace is, and is not
 one this page can settle for your data.
 \itemize{
@@ -27,8 +26,8 @@ it a failure mode on very clean traces: as the noise falls, the standard
 deviation the weights are scaled by collapses, the weighting becomes a hard
 one-sided clamp, and the fit can no longer be pulled up to follow a steep
 drift, detaching from the trace where the drift is steepest. This is a
-property of the published method rather than of this implementation --
-\code{pybaselines} reproduces it -- and \code{"aspls"} does not share it.
+property of the published method rather than of this implementation —
+\code{pybaselines} reproduces it — and \code{"aspls"} does not share it.
 \item \code{"aspls"} is adaptive smoothness parameter penalized least squares (Zhang
 et al. 2020). It keeps the re-weighting and additionally scales the penalty
 at each timepoint by the normalized absolute residual, so the fit is
@@ -98,7 +97,7 @@ baseline correction of experimental data}.
 }
 }
 \seealso{
-\code{\link{preprocess}} \code{\link{correct_baseline}} \code{\link{get_baseline}}
+\code{\link{preprocess}}, \code{\link{correct_baseline}}, \code{\link{get_baseline}}
 }
 \author{
 Ethan Bass

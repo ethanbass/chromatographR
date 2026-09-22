@@ -2,7 +2,7 @@
 % Please edit documentation in R/attach_metadata.R
 \name{attach_ref_spectra}
 \alias{attach_ref_spectra}
-\title{Attach reference spectra to a \code{peak_table} object.}
+\title{Attach reference spectra to a \code{peak_table} object}
 \usage{
 attach_ref_spectra(peak_table, chrom_list, ref = c("max.cor", "max.int"))
 }

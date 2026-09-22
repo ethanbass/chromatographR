@@ -23,7 +23,7 @@
 #'   themselves are removed from the returned list.
 #'
 #' @family preprocessing functions
-#' @seealso [`preprocess`] [`correct_baseline`]
+#' @seealso [`preprocess`], [`correct_baseline`]
 #' @examples
 #' data(Sa_warp)
 #' subtract_blanks(Sa_warp, blank_id = 1)

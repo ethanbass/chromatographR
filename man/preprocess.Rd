@@ -128,10 +128,9 @@ through \code{baseline}, and \code{baseline = "none"} skips the step; see
 Note that the operations are applied in the order given above: interpolation
 first, then spectral smoothing, then baseline correction. Because the
 baseline is estimated after the time axis is interpolated, \code{stiffness} is
-tied to whichever \code{dim1} grid was chosen: it sets a span of
-\code{stiffness^(1/4)} \emph{timepoints}, so the same value is a different span in
-time on a different grid. Convert deliberately when the sampling interval
-changes: \code{stiffness = (span / dt)^4}.
+tied to whichever \code{dim1} grid was chosen: the penalty applies on the index
+axis, so the same value gives a different baseline on a differently sampled
+grid. Choose \code{dim1} first, then tune \code{stiffness} against that grid.
 }
 \note{
 Adapted from the \code{preprocess} function in the alsace package by
@@ -163,7 +162,7 @@ baseline correction of experimental data}.
 }
 }
 \seealso{
-\code{\link{baseline_estimators}} \code{\link{correct_baseline}} \code{\link{crop_chroms}}
+\code{\link{baseline_estimators}}, \code{\link{correct_baseline}}, \code{\link{crop_chroms}},
 \code{\link{get_baseline}}
 
 Other preprocessing functions:

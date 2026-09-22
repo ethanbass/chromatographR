@@ -31,7 +31,7 @@ Defaults to \code{1}.}
 \item{zoom}{Logical. Whether to scale the y axis to the baseline, letting
 the peaks run off the top of the panel. A baseline is usually a small
 fraction of the signal, so at full scale it is pressed against the axis and
-the failure mode worth looking for -- the estimate bending up into a peak --
+the failure mode worth looking for — the estimate bending up into a peak —
 is not visible. Defaults to \code{TRUE}; set \code{FALSE} to see the whole trace.}
 
 \item{col, lty, lwd}{Graphical parameters for the baseline itself. The trace
@@ -48,7 +48,7 @@ its smoothing parameter. Set \code{FALSE} when overlaying two estimates with
 \code{\link[graphics:legend]{legend}} instead. Defaults to \code{TRUE}.}
 
 \item{...}{Additional arguments to \code{\link[graphics:plot.default]{plot}}, which
-override the defaults chosen here -- \code{main = ""} suppresses the title, and
+override the defaults chosen here — \code{main = ""} suppresses the title, and
 an explicit \code{ylim} overrides \code{zoom}.}
 }
 \value{
@@ -75,7 +75,7 @@ plot_baseline(x, lambda = 210)
 }
 }
 \seealso{
-\code{\link{get_baseline}} \code{\link{preprocess}} \code{\link{correct_baseline}}
+\code{\link{get_baseline}}, \code{\link{preprocess}}, \code{\link{correct_baseline}}
 }
 \author{
 Ethan Bass

@@ -3,9 +3,9 @@
 \docType{data}
 \name{Sa_warp}
 \alias{Sa_warp}
-\title{Warped goldenrod root chromatograms.}
+\title{Warped goldenrod root chromatograms}
 \format{
-A list of four pre-processed and warped matrices (434 times x
+A list of four pre-processed and warped matrices (434 timepoints ×
 60 wavelengths).
 }
 \usage{

@@ -2,7 +2,7 @@
 % Please edit documentation in R/peak_table-methods.R
 \name{row.names.peak_table}
 \alias{row.names.peak_table}
-\title{Return row names from a \code{peak_table} object.}
+\title{Return row names from a \code{peak_table} object}
 \usage{
 \method{row.names}{peak_table}(x, ...)
 }

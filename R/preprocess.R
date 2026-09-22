@@ -16,10 +16,9 @@
 #' Note that the operations are applied in the order given above: interpolation
 #' first, then spectral smoothing, then baseline correction. Because the
 #' baseline is estimated after the time axis is interpolated, `stiffness` is
-#' tied to whichever `dim1` grid was chosen: it sets a span of
-#' `stiffness^(1/4)` *timepoints*, so the same value is a different span in
-#' time on a different grid. Convert deliberately when the sampling interval
-#' changes: `stiffness = (span / dt)^4`.
+#' tied to whichever `dim1` grid was chosen: the penalty applies on the index
+#' axis, so the same value gives a different baseline on a differently sampled
+#' grid. Choose `dim1` first, then tune `stiffness` against that grid.
 #'
 #' @importFrom ptw asysm
 #' @importFrom stats approx smooth.spline median
@@ -94,7 +93,7 @@
 #' wavelengths, respectively.
 #' @author Ethan Bass
 #' @family preprocessing functions
-#' @seealso [`baseline_estimators`] [`correct_baseline`] [`crop_chroms`]
+#' @seealso [`baseline_estimators`], [`correct_baseline`], [`crop_chroms`],
 #' [`get_baseline`]
 #' @note Adapted from the `preprocess` function in the alsace package by 
 #' Ron Wehrens: <https://github.com/rwehrens/alsace/blob/master/R/preprocess.R>.

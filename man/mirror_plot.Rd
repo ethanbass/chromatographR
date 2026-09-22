@@ -21,9 +21,9 @@ mirror_plot(
 )
 }
 \arguments{
-\item{x}{The peak table (output from \code{\link{get_peaktable}}.}
+\item{x}{The peak table (output from \code{\link{get_peaktable}}).}
 
-\item{chrom_list}{A list of chromatograms in matrix format (timepoints x
+\item{chrom_list}{A list of chromatograms in matrix format (timepoints ×
 wavelengths). If no argument is provided here, the function will try to find the
 \code{chrom_list} object used to create the \code{peak_table}.}
 
@@ -58,19 +58,15 @@ No return value, called for side effects.
 Plots chromatograms as a mirror plot.
 }
 \details{
-Can be used to confirm the identity of a peak or check that a particular
-column in the peak table represents a single compound. Can also be used
-to create simple box-plots to examine the distribution of a peak with respect
-to variables defined in sample metadata.
+Compares two treatments defined by \code{var}, or by \code{var} together with \code{subset}
+when \code{var} has more than two levels. Exactly two levels can be compared.
+When \code{mirror} is \code{TRUE} both are drawn in one panel, with the second
+inverted below the axis; when it is \code{FALSE} they are drawn in two stacked
+panes.
 }
 \section{Side effects}{
 
 Plots are rendered to the active graphics device.
-If \code{mirror_plot} is \code{TRUE}, plots a mirror plot comparing two treatments
-defined by \code{var} and \code{subset} (if more than two factors are present
-in \code{var}).
-Otherwise, if \code{mirror_plot} is \code{FALSE}, the treatments are plotted in two
-separate panes.
 }
 
 \examples{

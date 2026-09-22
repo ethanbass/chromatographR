@@ -94,7 +94,7 @@
 #' @docType data
 #' @keywords data
 #' @usage data(Sa)
-#' @format  A list of four matrices (1301 times x 60 wavelengths).
+#' @format A list of four matrices (1301 timepoints × 60 wavelengths).
 #' @family data objects
 NULL
 
@@ -109,11 +109,11 @@ NULL
 #' @keywords data
 #' @docType data
 #' @usage data(Sa_pr)
-#' @format  A list of four pre-processed matrices (434 retention times x 60 wavelengths).
+#' @format A list of four pre-processed matrices (434 timepoints × 60 wavelengths).
 #' @family data objects
 NULL
 
-#' Warped goldenrod root chromatograms.
+#' Warped goldenrod root chromatograms
 #' 
 #' A list of four pre-processed and warped goldenrod root chromatograms derived
 #' from the raw data stored in [`Sa`].
@@ -122,7 +122,7 @@ NULL
 #' @docType data
 #' @keywords data
 #' @usage data(Sa_warp)
-#' @format  A list of four pre-processed and warped matrices (434 times x 
+#' @format A list of four pre-processed and warped matrices (434 timepoints ×
 #' 60 wavelengths).
 #' @family data objects
 NULL
@@ -136,6 +136,6 @@ NULL
 #' @docType data
 #' @keywords data
 #' @usage data(pk_tab)
-#' @format  A `peak_table` object.
+#' @format A `peak_table` object.
 #' @family data objects
 NULL

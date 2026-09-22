@@ -1,4 +1,4 @@
-#' Attaches sample metadata to a `peak_table` object by matching sample names.
+#' Attaches sample metadata to a `peak_table` object by matching sample names
 #' 
 #' Metadata is provided as a `data.frame`, with one column containing sample
 #' identifiers matching the row names of `peak_table$tab`.
@@ -45,7 +45,7 @@ attach_metadata <- function(peak_table, metadata, column){
   return(peak_table)
 }
 
-#' Attach reference spectra to a `peak_table` object.
+#' Attach reference spectra to a `peak_table` object
 #' 
 #' Reference spectra are selected either as the spectrum with maximum intensity
 #' (`"max.int"`) or as the spectrum with the highest average correlation to all
@@ -101,7 +101,7 @@ keep_order <- function(data, fn, ...) {
 #' 
 #' @importFrom stats cor sd
 #' @param peak_table Peak table from [`get_peaktable`].
-#' @param chrom_list A list of chromatograms in matrix format (timepoints x
+#' @param chrom_list A list of chromatograms in matrix format (timepoints ×
 #' wavelengths). If no argument is provided here, the function will try to find
 #' the `chrom_list` object used to create the provided `peak_table`.
 #' @param ref What criterion to use to select reference spectra.

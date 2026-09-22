@@ -17,7 +17,7 @@ scan_chrom(
 )
 }
 \arguments{
-\item{chrom_list}{A list of chromatograms in matrix format (timepoints x
+\item{chrom_list}{A list of chromatograms in matrix format (timepoints ×
 wavelengths). If no argument is provided here, the function will try to find
 the \code{chrom_list} object using the pointer in the \code{peak_table}.}
 

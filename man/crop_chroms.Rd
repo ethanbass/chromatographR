@@ -36,14 +36,14 @@ retention times either way.
 Bounds are inclusive, and either end of a range may be \code{NA} to leave it
 open. Ranges are expressed in the units of the data itself: retention times
 in whatever unit the chromatogram carries, as returned by \code{\link{get_times}}, and
-wavelengths as labelled in the column names, as returned by \code{\link{get_lambdas}}.
+wavelengths as labeled in the column names, as returned by \code{\link{get_lambdas}}.
 
 A \code{"baseline"} attribute attached by \code{\link{preprocess}} or \code{\link{correct_baseline}}
 is cropped alongside the data, so it stays aligned and can still be
 retrieved with \code{\link{get_baseline}}.
 
 A range that does not overlap the data at all is an error. A range that
-merely extends past one end is honoured as far as the data allow, with a
+merely extends past one end is honored as far as the data allow, with a
 warning reporting what was actually kept, since this is usually a typo or a
 unit mismatch. Cropping chromatograms whose time axes are offset from one
 another — as unaligned chromatograms generally are — can leave them with
@@ -57,7 +57,7 @@ cropped <- crop_chroms(Sa_pr, rt_range = c(12, 16))
 trimmed <- crop_chroms(Sa_pr, lambda_range = c(220, NA))
 }
 \seealso{
-\code{\link{preprocess}} \code{\link{correct_baseline}} \code{\link{get_times}} \code{\link{get_lambdas}}
+\code{\link{preprocess}}, \code{\link{correct_baseline}}, \code{\link{get_times}}, \code{\link{get_lambdas}}
 
 Other preprocessing functions:
 \code{\link[=correct_baseline]{correct_baseline()}},

@@ -5,7 +5,7 @@
 \alias{Sa_pr}
 \title{Preprocessed goldenrod root chromatograms}
 \format{
-A list of four pre-processed matrices (434 retention times x 60 wavelengths).
+A list of four pre-processed matrices (434 timepoints × 60 wavelengths).
 }
 \usage{
 data(Sa_pr)

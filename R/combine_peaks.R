@@ -120,8 +120,7 @@ combine_peaks <- function(peak_table, tol = .01, min_cor = 0.9,
 
 #' Merge split peaks
 #' 
-#' Utility function to combine split peaks into a single column of the peak 
-#' table.
+#' Combines split peaks into a single column of the peak table.
 #' 
 #' Merges the specified peaks in peak table, by selecting the largest value from 
 #' each column if `method` is `"max"`. If `method` is `"sum"`, peaks will be 

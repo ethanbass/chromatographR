@@ -21,7 +21,7 @@
 #' @return Either a normalized `peak_table` object or a normalized `chrom_list`,
 #' depending on the value of `what`.
 #' @author Ethan Bass
-#' @seealso [`get_peaktable`] [`attach_metadata`]
+#' @seealso [`get_peaktable`], [`attach_metadata`]
 #' @examples
 #' data(pk_tab)
 #' path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")

@@ -2,10 +2,10 @@
 #' 
 #' Plots the trace and/or spectrum for a given peak in peak table. 
 #' 
-#' Can be used to confirm the identity of a peak or check that a particular
-#' column in the peak table represents a single compound. Can also be used
-#' to create simple box-plots to examine the distribution of a peak with respect
-#' to variables defined in sample metadata.
+#' Use it to confirm the identity of a peak, or to check that a particular
+#' column in the peak table represents a single compound. It also draws simple
+#' box plots of the distribution of a peak against variables defined in sample
+#' metadata.
 #' 
 #' When `plot_trace` is `TRUE`, plots the chromatographic trace of the 
 #' specified chromatogram (`idx`), at the specified wavelength 
@@ -25,26 +25,22 @@
 #' @param idx Numerical index of chromatogram you wish to plot; "max" to
 #' plot the chromatogram with the largest signal; or "all" to plot spectra
 #' for all chromatograms.
-#' @param lambda The wavelength you wish to plot the trace at (if `plot_chrom` 
-#' is `TRUE`. Otherwise, the wavelength to be used for the determination
+#' @param lambda The wavelength you wish to plot the trace at (if `plot_trace`
+#' is `TRUE`). Otherwise, the wavelength to be used for the determination
 #' of signal abundance.
 #' @param box_plot Logical. If `TRUE`, plots box plot using categories
 #' defined by `vars`.
 #' @param vars Independent variables for boxplot. Righthand side of formula.
-#' @param verbose Logical. If `TRUE` (default), prints verbose output to the
-#' console.
+#' @param verbose Logical. If `TRUE` (default), prints the index and name of
+#' each chromatogram plotted, with its retention time, wavelength and
+#' absorbance.
 #' @param ... Additional arguments to [boxplot].
-#' @return 
+#' @return
 #' * If `export_spectrum = FALSE` (default), a `plotly` or `ggplot` object, or
-#' nothing if `engine == "base"`. 
+#' nothing if `engine == "base"`.
 #' * If `export_spectrum = TRUE`, invisibly returns the spectrum as a
-#' `data.frame` with wavelengths as rows and a single column per sample encoding absorbance at each 
+#' `data.frame` with wavelengths as rows and a single column per sample encoding absorbance at each
 #' wavelength (normalized if `scale_spectrum = TRUE`).
-#' Otherwise, if `engine == "base"`, there is no 
-#' return value. If `export_spectrum` is `TRUE`, returns the spectrum as a 
-#' `data.frame` with wavelengths as rows and columns encoding the
-#' absorbance (or normalized absorbance, if `scale_spectrum` is `TRUE`) for 
-#' the specified sample(s).
 #' @section Side effects:
 #' If `engine == "base"`, plots are rendered to the active graphics device.
 #' @author Ethan Bass
@@ -101,7 +97,7 @@ plot.peak_table <- function(x, loc, chrom_list = NULL, what = "peak",
   }
 }
 
-#' Make boxplot from peak table.
+#' Make boxplot from peak table
 #' 
 #' The function can take multiple response variables on the left hand side of the
 #' formula (separated by `+`). In this case, a separate boxplot will be
@@ -145,16 +141,17 @@ boxplot.peak_table <- function(x, formula, ...){
 #' Make mirror plot from peak table
 #' 
 #' Plots chromatograms as a mirror plot.
-#' 
-#' Can be used to confirm the identity of a peak or check that a particular
-#' column in the peak table represents a single compound. Can also be used
-#' to create simple box-plots to examine the distribution of a peak with respect
-#' to variables defined in sample metadata.
-#' 
+#'
+#' Compares two treatments defined by `var`, or by `var` together with `subset`
+#' when `var` has more than two levels. Exactly two levels can be compared.
+#' When `mirror` is `TRUE` both are drawn in one panel, with the second
+#' inverted below the axis; when it is `FALSE` they are drawn in two stacked
+#' panes.
+#'
 #' @importFrom graphics matplot legend plot.new plot.window par
 #' @importFrom utils head tail
-#' @param x The peak table (output from [`get_peaktable`].
-#' @param chrom_list A list of chromatograms in matrix format (timepoints x
+#' @param x The peak table (output from [`get_peaktable`]).
+#' @param chrom_list A list of chromatograms in matrix format (timepoints ×
 #' wavelengths). If no argument is provided here, the function will try to find the
 #' `chrom_list` object used to create the `peak_table`.
 #' @param lambdas The wavelength you wish to plot the traces at.
@@ -173,11 +170,6 @@ boxplot.peak_table <- function(x, formula, ...){
 #' @return No return value, called for side effects.
 #' @section Side effects:
 #' Plots are rendered to the active graphics device.
-#' If `mirror_plot` is `TRUE`, plots a mirror plot comparing two treatments
-#' defined by `var` and `subset` (if more than two factors are present
-#' in `var`).
-#' Otherwise, if `mirror_plot` is `FALSE`, the treatments are plotted in two
-#' separate panes.
 #' @author Ethan Bass
 #' @examples
 #' data(Sa_warp)

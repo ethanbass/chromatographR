@@ -27,7 +27,7 @@ plot_spectrum_inset(
 
 \item{peak_table}{A \code{peak_table} object created by \code{\link{get_peaktable}}.}
 
-\item{chrom_list}{A list of chromatograms in matrix format (timepoints x
+\item{chrom_list}{A list of chromatograms in matrix format (timepoints ×
 wavelengths). If no argument is provided here, the function will try to find
 the \code{chrom_list} object using the pointer in the \code{peak_table}.}
 
@@ -62,7 +62,9 @@ Defaults to \code{0.35}.}
 \item{scale_spectrum}{Logical. If \code{TRUE}, scales spectrum to unit height.
 Defaults to \code{FALSE}.}
 
-\item{verbose}{Logical. If \code{TRUE} (default), prints verbose output to console.}
+\item{verbose}{Logical. If \code{TRUE} (default), prints the index and name of
+each chromatogram plotted, with its retention time, wavelength and
+absorbance.}
 
 \item{inset_text_size}{Base size for text elements in inset. Defaults to \code{8}.}
 

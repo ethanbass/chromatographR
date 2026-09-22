@@ -4,7 +4,7 @@
 #' retention time, or scan index from a `peak_table` or list of chromatograms.
 #' Spectra can also be exported as a `data.frame` when `export_spectrum = TRUE`.
 #' 
-#' This function can be used to confirm the identity of a peak or assess whether
+#' Use it to confirm the identity of a peak, or to assess whether
 #' a peak table column likely represents a single compound. Retention times may
 #' also be selected interactively by clicking on a chromatographic trace when
 #' `what = "click"`.
@@ -24,7 +24,7 @@
 #' @param loc The peak, retention time, or scan index from which to extract
 #' spectral data.
 #' @param peak_table A `peak_table` object created by [`get_peaktable`].
-#' @param chrom_list A list of chromatograms in matrix format (timepoints x
+#' @param chrom_list A list of chromatograms in matrix format (timepoints ×
 #' wavelengths). If no argument is provided here, the function will try to find
 #' the `chrom_list` object using the pointer in the `peak_table`.
 #' @param idx Numerical index of chromatogram you wish to plot, or "max" to
@@ -42,13 +42,17 @@
 #' Defaults to `FALSE`.
 #' @param export_spectrum Logical. If `TRUE`, invisibly returns the spectrum as a `data.frame`.
 #' Defaults to `FALSE`.
-#' @param verbose Logical. If `TRUE` (default), prints verbose output to console.
+#' @param verbose Logical. If `TRUE` (default), prints the index and name of
+#' each chromatogram plotted, with its retention time, wavelength and
+#' absorbance.
 #' @param what What to look for. Either `peak` to extract spectral 
 #' information for a certain peak, `rt` to scan by retention time, 
 #' `idx` to scan by numeric index, or `click` to manually select 
 #' retention time by clicking on the chromatogram. Defaults to `"peak"` mode.
-#' @param engine Which plotting engine to use: `base`, `ggplot2`, or
-#' `plotly`.
+#' @param engine Plotting backend to use. One of `"base"`,
+#' [`"ggplot"`][ggplot2::ggplot2-package], or [`"plotly"`][plotly::plotly].
+#' `"ggplot2"` is also accepted here, for backward compatibility, but `"ggplot"`
+#' is the spelling the other plotting functions take.
 #' @param ... Additional arguments.
 #' @return 
 #' * If `export_spectrum = FALSE` (default), returns a `plotly` or `ggplot` 
@@ -346,18 +350,19 @@ scan_chrom <- function(chrom_list, idx, lambda,
 
 #' Plot all spectra for chosen peak
 #' 
-#' Plot multiple for a given peak in peak table. Wrapper for [`plot_spectrum`].
+#' Plot multiple spectra for a given peak in peak table. Wrapper for [`plot_spectrum`].
 #' 
 #' @inheritParams plot_spectrum
-#' @param peak The name of a peak to plot (in character format).
+#' @param peak The `peak` argument is deprecated. Please use `loc` instead.
 #' @param idx Vector of chromatograms to plot.
 #' @param overlapping Logical. If `TRUE`, plot spectra in single plot.
-#' @param verbose Logical. If `TRUE`, prints verbose output to console. Defaults
-#' to `FALSE`.
+#' @param verbose Logical. If `TRUE`, prints the index and name of each
+#' chromatogram plotted, with its retention time, wavelength and absorbance.
+#' Defaults to `FALSE`.
 #' @param what What to look for. Either `"peak"` to extract spectral 
 #' information for a certain peak, `"rt"` to scan by retention time, or 
 #' `"idx"` to scan by numeric index. Defaults to "peak" mode.
-#' @param ... Additional arguments to `plot_spectrum.`
+#' @param ... Additional arguments to `plot_spectrum`.
 #' @return 
 #' * If `export_spectrum = FALSE` (default), a `plotly` or `ggplot` object, or
 #' nothing if `engine == "base"`.

@@ -13,14 +13,14 @@
 #' Bounds are inclusive, and either end of a range may be `NA` to leave it
 #' open. Ranges are expressed in the units of the data itself: retention times
 #' in whatever unit the chromatogram carries, as returned by [`get_times`], and
-#' wavelengths as labelled in the column names, as returned by [`get_lambdas`].
+#' wavelengths as labeled in the column names, as returned by [`get_lambdas`].
 #'
 #' A `"baseline"` attribute attached by [`preprocess`] or [`correct_baseline`]
 #' is cropped alongside the data, so it stays aligned and can still be
 #' retrieved with [`get_baseline`].
 #'
 #' A range that does not overlap the data at all is an error. A range that
-#' merely extends past one end is honoured as far as the data allow, with a
+#' merely extends past one end is honored as far as the data allow, with a
 #' warning reporting what was actually kept, since this is usually a typo or a
 #' unit mismatch. Cropping chromatograms whose time axes are offset from one
 #' another — as unaligned chromatograms generally are — can leave them with
@@ -39,7 +39,7 @@
 #' @return The cropped data, in the same shape as `x`.
 #' @author Ethan Bass
 #' @family preprocessing functions
-#' @seealso [`preprocess`] [`correct_baseline`] [`get_times`] [`get_lambdas`]
+#' @seealso [`preprocess`], [`correct_baseline`], [`get_times`], [`get_lambdas`]
 #' @examples
 #' data(Sa_pr)
 #' cropped <- crop_chroms(Sa_pr, rt_range = c(12, 16))
@@ -86,7 +86,7 @@ sample_labels <- function(x){
 
 #' @noRd
 warn_crop_clamped <- function(before, after, range, arg, which_axis, axes,
-                              axis_fn, unlabelled = FALSE){
+                              axis_fn, unlabeled = FALSE){
   if (is.null(range)) return(invisible(NULL))
   lo <- if (is.na(range[1])) -Inf else range[1]
   hi <- if (is.na(range[2])) Inf else range[2]
@@ -99,7 +99,7 @@ warn_crop_clamped <- function(before, after, range, arg, which_axis, axes,
   detail <- vapply(hit, function(i){
     v <- suppressWarnings(as.numeric(axis_fn(after[[i]])))
     span <- sprintf("[%s, %s]", format(min(v)), format(max(v)))
-    if (unlabelled) sprintf("kept %s", span)
+    if (unlabeled) sprintf("kept %s", span)
     else sprintf("%s kept %s", nm[i], span)
   }, character(1))
   warning(sprintf(paste("`%s` extends beyond the available data, so the crop",

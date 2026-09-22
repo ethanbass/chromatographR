@@ -87,7 +87,7 @@ par(mfrow=c(2,2))
 cl <- cluster_spectra(pktab, alpha = 0.05, iseed = 1, max.only = TRUE)
 ```
 
-The output is a dendrogram of peaks annotated with bootstrap values showing the support for each node and spectra of the clusters with p-values below the significance level specified by `alpha`. In this case, we recovered two clusters, representing two different classes of compounds distinguished by their chromophores. The second cluster closely matches the spectrum represented by peak `'V21'`. We can access the peaks in cluster two as follows:
+The output is a dendrogram of peaks, annotated with bootstrap values (cluster support estimated by resampling) at each node. It also plots the spectra of clusters whose bootstrap p-value falls below the significance level specified by `alpha`. In this case, we recovered two clusters, representing two different classes of compounds distinguished by their chromophores. The second cluster closely matches the spectrum represented by peak `'V21'`. We can access the peaks in cluster two as follows:
 
 ```{r return_peaks}
 cl2 <- cl$clusters$c2@peaks

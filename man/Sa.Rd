@@ -5,7 +5,7 @@
 \alias{Sa}
 \title{Raw goldenrod root chromatograms}
 \format{
-A list of four matrices (1301 times x 60 wavelengths).
+A list of four matrices (1301 timepoints × 60 wavelengths).
 }
 \usage{
 data(Sa)

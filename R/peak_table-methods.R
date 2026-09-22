@@ -25,7 +25,7 @@ tail.peak_table <- function(x,...){
   tail(x$tab, ...)
 }
 
-#' Return dimensions of a `peak_table` object.
+#' Return dimensions of a `peak_table` object
 #'
 #' Returns the dimensions of a `peak_table`, where the first dimension is
 #' the number of samples and the second dimension is the number of peaks.
@@ -39,7 +39,7 @@ dim.peak_table <- function(x){
   dim(x$tab)
 }
 
-#' Return row names from a `peak_table` object.
+#' Return row names from a `peak_table` object
 #'
 #' These will be the names of the samples.
 #'

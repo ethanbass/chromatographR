@@ -46,7 +46,7 @@ data(Sa_warp)
 subtract_blanks(Sa_warp, blank_id = 1)
 }
 \seealso{
-\code{\link{preprocess}} \code{\link{correct_baseline}}
+\code{\link{preprocess}}, \code{\link{correct_baseline}}
 
 Other preprocessing functions:
 \code{\link[=correct_baseline]{correct_baseline()}},

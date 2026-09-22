@@ -19,8 +19,7 @@ A peak table similar to the input peak table, but where the specified
 columns are combined.
 }
 \description{
-Utility function to combine split peaks into a single column of the peak
-table.
+Combines split peaks into a single column of the peak table.
 }
 \details{
 Merges the specified peaks in peak table, by selecting the largest value from

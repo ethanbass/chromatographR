@@ -18,7 +18,7 @@
 #' @param zoom Logical. Whether to scale the y axis to the baseline, letting
 #' the peaks run off the top of the panel. A baseline is usually a small
 #' fraction of the signal, so at full scale it is pressed against the axis and
-#' the failure mode worth looking for -- the estimate bending up into a peak --
+#' the failure mode worth looking for — the estimate bending up into a peak —
 #' is not visible. Defaults to `TRUE`; set `FALSE` to see the whole trace.
 #' @param col,lty,lwd Graphical parameters for the baseline itself. The trace
 #' beneath it is always drawn in gray.
@@ -31,13 +31,13 @@
 #' `add`, since a single annotation cannot describe both; label them with
 #' [`legend`][graphics::legend] instead. Defaults to `TRUE`.
 #' @param ... Additional arguments to [`plot`][graphics::plot.default], which
-#' override the defaults chosen here -- `main = ""` suppresses the title, and
+#' override the defaults chosen here — `main = ""` suppresses the title, and
 #' an explicit `ylim` overrides `zoom`.
 #' @return The annotation label, invisibly, so it can be reused in a
 #' [`legend`][graphics::legend]. The plot is rendered to the active graphics
 #' device.
 #' @author Ethan Bass
-#' @seealso [`get_baseline`] [`preprocess`] [`correct_baseline`]
+#' @seealso [`get_baseline`], [`preprocess`], [`correct_baseline`]
 #' @examples \donttest{
 #' data(Sa)
 #' x <- preprocess(Sa[1], dim1 = seq(10, 18, by = .01),

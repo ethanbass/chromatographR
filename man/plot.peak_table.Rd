@@ -28,7 +28,7 @@
 
 \item{loc}{A vector specifying the peak(s) or retention time(s) to plot.}
 
-\item{chrom_list}{A list of chromatograms in matrix format (timepoints x
+\item{chrom_list}{A list of chromatograms in matrix format (timepoints ×
 wavelengths). If no argument is provided here, the function will try to find
 the \code{chrom_list} object using the pointer in the \code{peak_table}.}
 
@@ -41,8 +41,8 @@ retention time by clicking on the chromatogram. Defaults to \code{"peak"} mode.}
 plot the chromatogram with the largest signal; or "all" to plot spectra
 for all chromatograms.}
 
-\item{lambda}{The wavelength you wish to plot the trace at (if \code{plot_chrom}
-is \code{TRUE}. Otherwise, the wavelength to be used for the determination
+\item{lambda}{The wavelength you wish to plot the trace at (if \code{plot_trace}
+is \code{TRUE}). Otherwise, the wavelength to be used for the determination
 of signal abundance.}
 
 \item{plot_spectrum}{Logical. If \code{TRUE}, plots the spectrum of the chosen
@@ -65,11 +65,14 @@ Defaults to \code{FALSE}.}
 \item{export_spectrum}{Logical. If \code{TRUE}, invisibly returns the spectrum as a \code{data.frame}.
 Defaults to \code{FALSE}.}
 
-\item{verbose}{Logical. If \code{TRUE} (default), prints verbose output to the
-console.}
+\item{verbose}{Logical. If \code{TRUE} (default), prints the index and name of
+each chromatogram plotted, with its retention time, wavelength and
+absorbance.}
 
-\item{engine}{Which plotting engine to use: \code{base}, \code{ggplot2}, or
-\code{plotly}.}
+\item{engine}{Plotting backend to use. One of \code{"base"},
+\code{\link[ggplot2:ggplot2-package]{"ggplot"}}, or \code{\link[plotly:plotly]{"plotly"}}.
+\code{"ggplot2"} is also accepted here, for backward compatibility, but \code{"ggplot"}
+is the spelling the other plotting functions take.}
 
 \item{...}{Additional arguments to \link{boxplot}.}
 }
@@ -80,21 +83,16 @@ nothing if \code{engine == "base"}.
 \item If \code{export_spectrum = TRUE}, invisibly returns the spectrum as a
 \code{data.frame} with wavelengths as rows and a single column per sample encoding absorbance at each
 wavelength (normalized if \code{scale_spectrum = TRUE}).
-Otherwise, if \code{engine == "base"}, there is no
-return value. If \code{export_spectrum} is \code{TRUE}, returns the spectrum as a
-\code{data.frame} with wavelengths as rows and columns encoding the
-absorbance (or normalized absorbance, if \code{scale_spectrum} is \code{TRUE}) for
-the specified sample(s).
 }
 }
 \description{
 Plots the trace and/or spectrum for a given peak in peak table.
 }
 \details{
-Can be used to confirm the identity of a peak or check that a particular
-column in the peak table represents a single compound. Can also be used
-to create simple box-plots to examine the distribution of a peak with respect
-to variables defined in sample metadata.
+Use it to confirm the identity of a peak, or to check that a particular
+column in the peak table represents a single compound. It also draws simple
+box plots of the distribution of a peak against variables defined in sample
+metadata.
 
 When \code{plot_trace} is \code{TRUE}, plots the chromatographic trace of the
 specified chromatogram (\code{idx}), at the specified wavelength

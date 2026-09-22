@@ -2,7 +2,7 @@
 % Please edit documentation in R/peak_table-methods.R
 \name{dim.peak_table}
 \alias{dim.peak_table}
-\title{Return dimensions of a \code{peak_table} object.}
+\title{Return dimensions of a \code{peak_table} object}
 \usage{
 \method{dim}{peak_table}(x)
 }

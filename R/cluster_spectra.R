@@ -14,9 +14,8 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' certain confidence specified by `alpha`. 
 #' 
 #' Clusters can be filtered by the minimum and maximum size of the cluster using
-#' the `min_size` and `max_size` arguments respectively. Users should
-#' be aware that the clustering algorithm will often return nested clusters.
-#' Thus, an individual peak could appear in more than one cluster. If 
+#' the `min_size` and `max_size` arguments. The clustering algorithm often
+#' returns nested clusters, so an individual peak can appear in more than one. If 
 #' `max.only` is `TRUE`, only the largest cluster in a nested tree of 
 #' clusters meeting the specified confidence threshold will be returned.
 #' 
@@ -38,9 +37,10 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' @param plot_spectra Logical. If `TRUE`, plots overlapping spectra for each
 #' cluster.
 #' @param verbose Logical. If `TRUE`, prints progress report to console.
-#' @param save Logical. If `TRUE`, saves pvclust object to current directory.
+#' @param save The `save` argument is deprecated. Please use `outfile`
+#' instead.
 #' @param outfile Optional path to an `.RDS` file. If not `NULL`, the
-#' `pvclust` object is saved file using `saveRDS()`. Existing files are
+#' `pvclust` object is saved to file using `saveRDS()`. Existing files are
 #' overwritten.
 #' @param parallel Logical. If `TRUE`, use parallel processing for 
 #' [`pvclust`][pvclust::pvclust].
@@ -52,7 +52,7 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' @param ... Additional arguments to [`pvclust`][pvclust::pvclust].
 #' @return Returns clusters and/or `pvclust` object according to the value
 #' of the `output` argument.
-#' * If `output = clusters`,  returns a list of S4 `cluster` objects.
+#' * If `output = clusters`, returns a list of S4 `cluster` objects.
 #' * If `output = pvclust`, returns a `pvclust` object.
 #' * If `output = both`, returns a nested list containing `[[1]]` the `pvclust`
 #' object, and `[[2]]` the list of S4 `cluster` objects.

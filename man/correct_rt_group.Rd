@@ -50,8 +50,7 @@ supplied, overrides \code{reference}. Defaults to \code{NULL}.}
 \item{n.traces}{Number of traces to use.}
 
 \item{fill_zeros}{Logical. If \code{TRUE}, out-of-bounds regions produced by
-warping are filled with zeros. If \code{FALSE} (default), these regions are
-returned as \code{NA}.}
+warping are filled with zeros; otherwise they are returned as \code{NA} (default).}
 
 \item{n.zeros}{Number of zeros to add for padding chromatograms at the edges.}
 
@@ -77,10 +76,10 @@ Defaults to \code{50}.}
 \code{TRUE} if \code{\link[pbapply:pbapply]{pbapply}} is installed. Currently works
 only for \code{ptw} alignments.}
 
-\item{cl}{Argument to \code{pbapply} or \code{\link[parallel:mclapply]{mclapply}}. Either
-an integer specifying the number of clusters to use for parallel processing
-or a cluster object created by \code{\link[parallel:makeCluster]{makeCluster}}.
-Defaults to \code{2}. On Windows systems, integer values will be ignored.}
+\item{cl}{Either an integer specifying the number of cores to use for
+parallel processing or a cluster object created by
+\code{\link[parallel:makeCluster]{makeCluster}}. Defaults to \code{2}. On Windows systems,
+integer values will be ignored.}
 
 \item{...}{Optional additional arguments to \code{ptw}. The only argument that
 cannot be changed is \code{warp.type} which is hard-coded to \code{"global"} to permit

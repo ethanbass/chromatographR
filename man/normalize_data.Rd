@@ -55,7 +55,7 @@ norm <- normalize_data(pk_tab, "mass", what = "peak_table")
 norm <- normalize_data(pk_tab, column = "V16", by = "peak")
 }
 \seealso{
-\code{\link{get_peaktable}} \code{\link{attach_metadata}}
+\code{\link{get_peaktable}}, \code{\link{attach_metadata}}
 }
 \author{
 Ethan Bass

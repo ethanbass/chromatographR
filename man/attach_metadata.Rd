@@ -2,7 +2,7 @@
 % Please edit documentation in R/attach_metadata.R
 \name{attach_metadata}
 \alias{attach_metadata}
-\title{Attaches sample metadata to a \code{peak_table} object by matching sample names.}
+\title{Attaches sample metadata to a \code{peak_table} object by matching sample names}
 \usage{
 attach_metadata(peak_table, metadata, column)
 }

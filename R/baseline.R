@@ -4,8 +4,7 @@
 #' argument of [`preprocess`] and [`correct_baseline`].
 #'
 #' @section Baseline estimators:
-#' Four estimators are available. What follows describes what each one does.
-#' Which performs best on a given chromatogram is an empirical question that
+#' Four estimators are available. Which performs best on a given chromatogram is an empirical question that
 #' depends on the noise, the drift, and how crowded the trace is, and is not
 #' one this page can settle for your data.
 #'
@@ -23,8 +22,8 @@
 #' deviation the weights are scaled by collapses, the weighting becomes a hard
 #' one-sided clamp, and the fit can no longer be pulled up to follow a steep
 #' drift, detaching from the trace where the drift is steepest. This is a
-#' property of the published method rather than of this implementation --
-#' `pybaselines` reproduces it -- and `"aspls"` does not share it.
+#' property of the published method rather than of this implementation —
+#' `pybaselines` reproduces it — and `"aspls"` does not share it.
 
 #' * `"aspls"` is adaptive smoothness parameter penalized least squares (Zhang
 #' et al. 2020). It keeps the re-weighting and additionally scales the penalty
@@ -74,7 +73,7 @@
 #'
 #' @name baseline_estimators
 #' @author Ethan Bass
-#' @seealso [`preprocess`] [`correct_baseline`] [`get_baseline`]
+#' @seealso [`preprocess`], [`correct_baseline`], [`get_baseline`]
 #' @references
 #' * Baek, S.-J., Park, A., Ahn, Y.-J., and Choo, J. 2015. Baseline correction
 #' using asymmetrically reweighted penalized least squares smoothing.
@@ -216,7 +215,7 @@ estimate_baseline <- function(y, baseline = c("als", "arpls", "aspls", "snip"),
 #' with the current weights, and the residuals `d <- y - z` are computed. The
 #' mean `m` and standard deviation `s` of the *negative* residuals describe the
 #' noise below the current fit. New weights are then assigned by a logistic
-#' function centred at `-m + 2 * s`, so that points well above the fit (likely
+#' function centered at `-m + 2 * s`, so that points well above the fit (likely
 #' peak) receive weights near zero while points scattered symmetrically about it
 #' (likely noise) receive weights near one. Iteration stops when the relative
 #' change in the weight vector falls below `tol`.
@@ -270,23 +269,23 @@ arpls_baseline <- function(y, stiffness = 1e7, tol = 1e-6, maxit = 50){
 #'
 #' Weights use the asPLS logistic `w <- 1 / (1 + exp(k * (d - s) / s))`, where
 #' `s` is the standard deviation of the negative residuals. Note that this is
-#' centred on `s` rather than arPLS's `-m + 2 * s`, so it is a distinct
+#' centered on `s` rather than arPLS's `-m + 2 * s`, so it is a distinct
 #' weighting, not just a reparameterization.
 #'
 #' Dividing that system through by `stiffness * alpha` gives
 #' `(diag(w / (stiffness * alpha)) + t(D) %*% D) z = diag(w / (stiffness *
 #' alpha)) y`, which is exactly the system [`whit2`][ptw::whit2] solves at
 #' `lambda = 1` with weights `w / (stiffness * alpha)`. Using that identity
-#' keeps the whole solve in
-#' `ptw`'s compiled banded code: it is ~16x faster than a sparse solve and needs
-#' no additional dependency. `alpha` is floored at `alpha_min` so the reciprocal
+#' keeps the whole solve in `ptw`'s compiled banded code, which avoids a sparse
+#' solve and an additional dependency. `alpha` is floored at `alpha_min` so the
+#' reciprocal
 #' stays finite where a residual is exactly zero.
 #'
 #' @param y A numeric vector (a chromatographic signal).
 #' @param stiffness Smoothing penalty (the \eqn{\lambda} of the Whittaker
 #' smoother). Defaults to `1e9`, 100x the `"arpls"` default, because
 #' `alpha <= 1` scales the penalty down, shifting the useful range up
-#' accordingly -- an `"arpls"` `stiffness` will under-smooth here.
+#' accordingly — an `"arpls"` `stiffness` will under-smooth here.
 #' @param k Asymmetric coefficient of the weighting logistic. Larger values
 #' give a more step-like weight curve. Defaults to `0.5` rather than the `2`
 #' printed in Zhang et al., following `pybaselines`, which found `0.5` both
@@ -416,10 +415,9 @@ sigma_clipped_sd <- function(z, k = 4, tol = 1e-5, max_iter = 50, min_sd = 0){
   sd(z)
 }
 
-## A second-difference penalty spans ~stiffness^(1/4) timepoints, so these are
-## spans of 56 and 178 timepoints -- 0.56 and 1.78 minutes at dt = 0.01. That
-## makes them grid-dependent: the same value is a different span in time on a
-## differently sampled run. They are starting points, not calibrated optima.
+## These defaults are grid-dependent: the penalty applies on the index axis, so
+## the same value spans a different amount of time on a differently sampled
+## run. They are starting points, not calibrated optima.
 ##
 ## asPLS multiplies the penalty by `alpha = |d| / max|d| <= 1`, so its useful
 ## range sits ~2 decades higher than the uniform-penalty estimators'.

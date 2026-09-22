@@ -27,7 +27,7 @@ spectral data.}
 
 \item{peak_table}{A \code{peak_table} object created by \code{\link{get_peaktable}}.}
 
-\item{chrom_list}{A list of chromatograms in matrix format (timepoints x
+\item{chrom_list}{A list of chromatograms in matrix format (timepoints ×
 wavelengths). If no argument is provided here, the function will try to find
 the \code{chrom_list} object using the pointer in the \code{peak_table}.}
 
@@ -53,15 +53,19 @@ Defaults to \code{FALSE}.}
 \item{export_spectrum}{Logical. If \code{TRUE}, invisibly returns the spectrum as a \code{data.frame}.
 Defaults to \code{FALSE}.}
 
-\item{verbose}{Logical. If \code{TRUE} (default), prints verbose output to console.}
+\item{verbose}{Logical. If \code{TRUE} (default), prints the index and name of
+each chromatogram plotted, with its retention time, wavelength and
+absorbance.}
 
 \item{what}{What to look for. Either \code{peak} to extract spectral
 information for a certain peak, \code{rt} to scan by retention time,
 \code{idx} to scan by numeric index, or \code{click} to manually select
 retention time by clicking on the chromatogram. Defaults to \code{"peak"} mode.}
 
-\item{engine}{Which plotting engine to use: \code{base}, \code{ggplot2}, or
-\code{plotly}.}
+\item{engine}{Plotting backend to use. One of \code{"base"},
+\code{\link[ggplot2:ggplot2-package]{"ggplot"}}, or \code{\link[plotly:plotly]{"plotly"}}.
+\code{"ggplot2"} is also accepted here, for backward compatibility, but \code{"ggplot"}
+is the spelling the other plotting functions take.}
 
 \item{...}{Additional arguments.}
 }
@@ -81,7 +85,7 @@ retention time, or scan index from a \code{peak_table} or list of chromatograms.
 Spectra can also be exported as a \code{data.frame} when \code{export_spectrum = TRUE}.
 }
 \details{
-This function can be used to confirm the identity of a peak or assess whether
+Use it to confirm the identity of a peak, or to assess whether
 a peak table column likely represents a single compound. Retention times may
 also be selected interactively by clicking on a chromatographic trace when
 \code{what = "click"}.

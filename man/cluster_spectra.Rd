@@ -41,10 +41,11 @@ cluster.}
 \item{verbose}{Logical. If \code{TRUE}, prints progress report to console.}
 
 \item{outfile}{Optional path to an \code{.RDS} file. If not \code{NULL}, the
-\code{pvclust} object is saved file using \code{saveRDS()}. Existing files are
+\code{pvclust} object is saved to file using \code{saveRDS()}. Existing files are
 overwritten.}
 
-\item{save}{Logical. If \code{TRUE}, saves pvclust object to current directory.}
+\item{save}{The \code{save} argument is deprecated. Please use \code{outfile}
+instead.}
 
 \item{parallel}{Logical. If \code{TRUE}, use parallel processing for
 \code{\link[pvclust:pvclust]{pvclust}}.}
@@ -62,7 +63,7 @@ each nested set of clusters. Named to match the argument of the same name in
 Returns clusters and/or \code{pvclust} object according to the value
 of the \code{output} argument.
 \itemize{
-\item If \code{output = clusters},  returns a list of S4 \code{cluster} objects.
+\item If \code{output = clusters}, returns a list of S4 \code{cluster} objects.
 \item If \code{output = pvclust}, returns a \code{pvclust} object.
 \item If \code{output = both}, returns a nested list containing \verb{[[1]]} the \code{pvclust}
 object, and \verb{[[2]]} the list of S4 \code{cluster} objects.
@@ -90,9 +91,8 @@ Finally, bootstrap values can be used to select clusters that exceed a
 certain confidence specified by \code{alpha}.
 
 Clusters can be filtered by the minimum and maximum size of the cluster using
-the \code{min_size} and \code{max_size} arguments respectively. Users should
-be aware that the clustering algorithm will often return nested clusters.
-Thus, an individual peak could appear in more than one cluster. If
+the \code{min_size} and \code{max_size} arguments. The clustering algorithm often
+returns nested clusters, so an individual peak can appear in more than one. If
 \code{max.only} is \code{TRUE}, only the largest cluster in a nested tree of
 clusters meeting the specified confidence threshold will be returned.
 

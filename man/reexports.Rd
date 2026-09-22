@@ -4,7 +4,7 @@
 \name{reexports}
 \alias{reexports}
 \alias{read_chroms}
-\title{Read chromatograms.}
+\title{Read chromatograms}
 \keyword{internal}
 \description{
 These objects are imported from other packages. Follow the links
