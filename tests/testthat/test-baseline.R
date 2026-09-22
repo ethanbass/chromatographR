@@ -81,3 +81,22 @@ test_that("subtract_baseline always returns a baseline shaped like the data", {
   expect_equal(dim(res$x), dim(X))
   expect_null(attr(res$x, "baseline", exact = TRUE))
 })
+
+test_that("correct_baseline accepts a bare numeric vector", {
+  sim <- sim_offset_chrom()
+  y <- setNames(sim$y, sim$t)
+  v <- correct_baseline(y, cl = 1, show_progress = FALSE,
+                        attach_baseline = TRUE)
+  m <- correct_baseline(as.matrix(y), cl = 1, show_progress = FALSE,
+                        attach_baseline = TRUE)
+  expect_null(dim(v))
+  expect_equal(names(v), names(y))
+  expect_equal(as.numeric(v), as.numeric(m))
+  expect_equal(as.numeric(get_baseline(v)), as.numeric(get_baseline(m)))
+  expect_null(dim(get_baseline(v)))
+  expect_equal(names(get_baseline(v)), names(y))
+  # the time axis is still read off the names
+  expect_equal(attr(attr(v, "baseline_param"), "dt"), 0.01)
+  expect_null(names(correct_baseline(unname(y), cl = 1,
+                                     show_progress = FALSE)))
+})

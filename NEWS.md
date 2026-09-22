@@ -126,6 +126,8 @@ along the time axis: `"als"` (still the default), `"arpls"`, `"aspls"` or
 baseline as a `"baseline"` attribute so a poor fit can be inspected or plotted.
 It is dropped by any transform that invalidates it (`correct_rt`,
 `subtract_blanks`), since it is indexed by the time axis.
+* `correct_baseline` now accepts a single trace as a plain numeric vector, and
+returns one, carrying names through to the result and its baseline.
 * Baseline estimators now require a complete trace, raising an informative error
 when the signal contains missing or non-finite values rather than failing
 obscurely or silently splicing the two sides of a gap together.
