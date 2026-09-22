@@ -2,10 +2,10 @@
 # `correct_baseline` plumbing. See also test-preprocess.R, which covers the
 # SNIP width criterion itself.
 
-sim_offset_chrom <- function(dt = 0.01, seed = 1){
+sim_offset_chrom <- function(dt = 0.01, seed = 1, drift = TRUE){
   set.seed(seed)
   tt <- seq(0, 30, by = dt)
-  b <- 50 + 30 * exp(tt / 12)
+  b <- if (drift) 50 + 30 * exp(tt / 12) else rep(50, length(tt))
   pk <- 1000 * dnorm(tt, 10, 0.12) + 200 * dnorm(tt, 15, 0.12) +
     60 * dnorm(tt, 20, 0.12)
   list(t = tt, b = b, y = b + pk + rnorm(length(tt)))
@@ -28,10 +28,20 @@ test_that("estimate_noise survives a detector offset", {
 
 test_that("the prominence SNR filter is not disabled by an offset", {
   # clipping about zero collapsed the noise estimate, which silently switched
-  # `min_prominence_snr` off on any trace with a baseline offset
-  y <- sim_offset_chrom()$y
-  expect_equal(nrow(find_peaks(y + 100, bounds = TRUE, min_prominence_snr = 5)),
-               nrow(find_peaks(y, bounds = TRUE, min_prominence_snr = 5)))
+  # `min_prominence_snr` off on any trace with a baseline offset.
+  # The trace is flat and lightly smoothed so that the filter has something to
+  # do and enough peak-free timepoints survive to estimate the noise from;
+  # `min_amplitude` cannot be used to thin the noise apices here because it is
+  # absolute, and so is not invariant to the offset under test.
+  y <- sim_offset_chrom(drift = FALSE)$y
+  args <- list(bounds = TRUE, smooth_window = 0.02)
+  filtered <- nrow(do.call(find_peaks, c(list(y), args,
+                                         min_prominence_snr = 5)))
+  # guard against the assertion below passing because nothing was filtered
+  expect_lt(filtered, nrow(do.call(find_peaks, c(list(y), args))))
+  expect_equal(nrow(do.call(find_peaks, c(list(y + 100), args,
+                                          min_prominence_snr = 5))),
+               filtered)
 })
 
 test_that("a stale baseline attribute does not survive re-correction", {

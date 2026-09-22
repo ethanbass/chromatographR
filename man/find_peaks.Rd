@@ -8,9 +8,12 @@ find_peaks(
   y,
   smooth_type = c("gaussian", "box", "savgol", "mva", "tmva", "none"),
   smooth_window = 0.001,
-  slope_thresh = 0,
-  amp_thresh = 0,
-  bounds = TRUE
+  min_curvature = 0,
+  min_amplitude = 0,
+  min_prominence_snr = 0,
+  bounds = TRUE,
+  slope_thresh = NULL,
+  amp_thresh = NULL
 )
 }
 \arguments{
@@ -21,56 +24,137 @@ box kernel (\code{"box"}), Savitzky-Golay smoothing (\code{"savgol"}),
 moving average (\code{"mva"}), triangular moving average (\code{"tmva"}), or
 no smoothing (\code{"none"}).}
 
-\item{smooth_window}{Smoothing window. Larger values of this parameter will
-exclude sharp, narrow features. If the supplied value is between 0 and
-1, the window will be interpreted as a proportion of points to include.
-Otherwise, the window will be interpreted as the absolute number of points to
-include in the window. Defaults to \code{0.001}.}
+\item{smooth_window}{Width of the smoothing window, used to suppress the
+spurious local extrema that noise produces in the first derivative. A value
+between 0 and 1 is interpreted as a proportion of the length of \code{y}; a value
+of 1 or greater is interpreted as an absolute number of timepoints. Defaults
+to \code{0.001}, a proportion, so the window you get follows the length of the
+run rather than the width of the peaks: 3 timepoints for a 3,000-point trace
+but 100 for a 100,000-point one. Set it deliberately, and see \emph{Choosing the
+smoothing window} for how the moving-average and Savitzky-Golay methods
+round a non-integer or even-width value to an odd window.}
 
-\item{slope_thresh}{Minimum threshold for slope of the smoothed first
-derivative. This parameter filters peaks on the basis of their width, such
-that larger values will exclude broad peaks from the peak list. Defaults to
-\code{0}.}
+\item{min_curvature}{Minimum curvature at the apex, as the magnitude of the
+second derivative of the smoothed signal. Curvature scales as height over
+width squared, so larger values exclude broader peaks. Defaults to \code{0}.}
 
-\item{amp_thresh}{Minimum threshold for peak amplitude. This parameter
-filters on the basis of peak height, such that larger values will exclude
-small peaks from the peak list. Defaults to \code{0}.}
+\item{min_amplitude}{Minimum peak amplitude, as the intensity of the
+unsmoothed signal at the apex. Larger values exclude smaller peaks. Defaults
+to \code{0}.}
 
-\item{bounds}{Logical. If \code{TRUE} (default), includes peak boundaries in
+\item{min_prominence_snr}{Minimum peak prominence, expressed as a multiple
+of the baseline noise standard deviation. Unlike \code{min_curvature} and
+\code{min_amplitude}, this threshold is scale-free and transfers between datasets.
+Requires \code{bounds = TRUE}, since the noise estimate masks peak regions using
+the peak boundaries. Only meaningful on baseline-corrected data (see
+\emph{Details}). Defaults to \code{0}, which applies no filtering.}
+
+\item{bounds}{Logical. If \code{TRUE} (default), includes peak boundaries in a
 \code{data.frame}.}
+
+\item{slope_thresh}{The \code{slope_thresh} argument is deprecated. Please use
+\code{min_curvature} instead. (The name is misleading: the filter applies to the
+second derivative, not the slope.)}
+
+\item{amp_thresh}{The \code{amp_thresh} argument is deprecated. Please use
+\code{min_amplitude} instead.}
 }
 \value{
-If \code{bounds == TRUE}, returns a \code{data.frame} containing the center,
-start, and end of each identified peak. Otherwise, returns a numeric vector
-of peak centers. All locations are expressed as indices.
+If \code{bounds == TRUE}, a \code{data.frame} with the center, start, end, and
+prominence of each peak. Otherwise, a numeric vector of peak centers. All
+locations are expressed as indices.
 }
 \description{
-Detects peaks in a chromatographic profile by identifying zero-crossings in
-the smoothed first derivative of the signal (\code{y}) that exceed a specified
-slope threshold (\code{slope_thresh}). Smoothing reduces spurious local extrema
-that do not represent true features. Peaks can be filtered using a minimum
-amplitude threshold (\code{amp_thresh}), which removes low-intensity peaks.
+Detects peaks in a chromatographic profile by finding zero-crossings in the
+smoothed first derivative of the signal (\code{y}). Smoothing suppresses spurious
+local extrema. Peaks can be filtered by minimum curvature (\code{min_curvature}),
+minimum amplitude (\code{min_amplitude}), or minimum prominence relative to the
+baseline noise (\code{min_prominence_snr}).
 }
 \details{
-Available smoothing methods include Gaussian kernel (\code{"gaussian"}),
-box kernel (\code{"box"}), Savitzky–Golay (\code{"savgol"}), moving average (\code{"mva"}),
-triangular moving average (\code{"tmva"}), and no smoothing (\code{"none"}).
+Preprocess with \code{\link{preprocess}} before peak detection: high chromatographic
+resolution can cause peak splitting. Increase \code{smooth_window} or reduce
+time-axis resolution via the \code{dim1} argument to \code{\link{preprocess}}.
 
-Preprocessing with \code{\link{preprocess}} is recommended prior to peak detection.
-Overly high chromatographic resolution may sometimes cause peak splitting.
-In such cases, it is recommended to either increase the \code{smooth_window} or
-reduce the time-axis resolution by adjusting the \code{dim1} argument during
-preprocessing.
+Three filters remove small or spurious peaks after detection:
+\code{min_curvature}, \code{min_amplitude}, and \code{min_prominence_snr}. All three are
+off by default (\code{0}) and can be combined.
+
+\code{min_curvature} and \code{min_amplitude} are in absolute instrument units, so a
+usable value must be chosen for each dataset. \code{min_prominence_snr} measures
+each peak against the noise instead. A peak's prominence is its height above
+the higher of the two valleys bounding it — equal to its height when the peak
+stands alone, but less when a neighboring peak elevates one valley. The noise
+is a single number for the whole chromatogram: \code{find_peaks} masks every
+detected peak, then takes the standard deviation of what remains by iterative
+sigma clipping. \code{min_prominence_snr = 4} keeps a peak that rises four noise
+standard deviations above its own valleys, regardless of signal scale. The
+prominence is local; the noise is not — every peak uses the same estimate.
+
+Because the unmasked timepoints include baseline drift, the estimated
+standard deviation can reflect drift rather than noise, so
+\code{min_prominence_snr} is only meaningful on baseline-corrected data.
+Estimation also requires some timepoints to survive masking: too narrow a
+\code{smooth_window} leaves hundreds of noise-driven apices whose boundaries tile
+the whole trace, in which case the noise cannot be estimated and the filter
+is skipped with a warning. See \emph{Choosing the smoothing window} for guidance
+on when to use it.
 }
 \note{
 The \code{find_peaks} function is adapted from MATLAB code included in
 Prof. Tom O'Haver's \href{https://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm}{Pragmatic Introduction to Signal Processing}.
 }
+\section{Choosing the smoothing window}{
+
+Smoothing trades noise reduction against resolution. Too narrow a window
+fills the peak list with spurious apices from noise-driven sign changes in
+the derivative. Too wide a window merges neighboring peaks into one
+detection. Neither raises an error, and a merge is easier to overlook:
+the merged peak is still fitted and the fit can look reasonable. A merged
+peak shows up as a fitted width well above the rest and a lower \code{r.squared},
+so plot the peak list over the trace rather than reading the table alone.
+
+Widening the window cuts spurious detections by orders of magnitude while
+costing at most the faintest peak or two, so resolution — losing a peak to
+a merge — is the failure mode to design around, not recall. Set
+\code{smooth_window} to roughly the full width at half maximum of a typical peak,
+in timepoints, then narrow it if closely-eluting peaks disappear. Give
+the width in timepoints rather than as a proportion, which follows run length
+rather than peak width: lengthening a gradient widens the window even though
+the peaks have not changed.
+
+\code{min_prominence_snr} measures the noise for you rather than asking for a
+threshold in instrument units, so its cutoff does not depend on signal scale.
+Set \code{smooth_window} first, though. Under-smoothing lets
+noise notch the summit of a small peak, which then registers as two apices
+with a shallow valley between them; \code{find_peaks} measures prominence from
+that interior notch rather than from the foot of the peak, so the peak
+reads as noise-sized and the filter discards it. A tall peak's summit is
+too steep to notch, so the loss falls on the small peaks the filter exists
+to judge. Once the window is wide enough to keep each peak a single apex,
+the filter clears spurious apices at no cost to the real ones.
+
+\strong{Method-specific caveats.} \code{"savgol"} requires a window around the peak
+width, and errors below 7 timepoints rather than silently widening:
+Savitzky-Golay fits a 4th-order polynomial, so a 5-point window is an exact
+fit that returns the signal unchanged, quietly reducing the method to
+\code{"none"}. \code{"mva"} and \code{"tmva"} round the window to the nearest odd integer,
+floored at three (an even-width running mean is not centered on a sample and
+reports the apex one timepoint off).
+}
+
 \examples{
 data(Sa_pr)
 find_peaks(Sa_pr[[1]][,"220"])
 }
 \references{
+Oboril, J., Haas, C.P., Lubbesmeyer, M., Nicholls, R.,
+Gressling, T., Jensen, K.F., Volpin, G., and Hillenbrand, J. 2024. Automated
+processing of chromatograms: a comprehensive python package with a GUI for
+intelligent peak identification and deconvolution in chemical reaction
+analysis. \emph{Digital Discovery} \doi{10.1039/D4DD00214H}. (The noise
+estimate behind \code{min_prominence_snr} is adapted from 'MOCCA2'.)
+
 O'Haver, Tom. Pragmatic Introduction to Signal Processing:
 Applications in scientific measurement. \url{https://terpconnect.umd.edu/~toh/spectrum/}
 (Accessed January, 2022).

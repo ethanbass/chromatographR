@@ -716,6 +716,105 @@ get_peak_coordinates <- function(peak_table, chrom_list=NULL, loc, idx, lambda){
        lambda = get_lambdas(chrom_list)[lambda_idx])
 }
 
+#' Estimate baseline noise
+#'
+#' Estimates the standard deviation of the baseline noise by iterative sigma
+#' clipping, optionally masking out the regions spanned by detected peaks so
+#' that only peak-free timepoints contribute.
+#'
+#' @param y A numeric vector (a chromatographic signal).
+#' @param peaks Optional output of [`find_peaks`] with `bounds = TRUE`. Every
+#' `lower:upper` span is masked before the noise is estimated.
+#' @param k_noise Multiple of the standard deviation at which to clip. Defaults
+#' to `4`.
+#' @param tol Relative convergence tolerance. Defaults to `1e-5`.
+#' @param max_iter Maximum number of clipping iterations. Defaults to `50`.
+#' @param min_points Minimum number of unmasked timepoints required. Below
+#' this, `0` is returned with a warning rather than a number derived from too
+#' little data: a standard deviation from under ten points carries a relative
+#' error above 20%, and the caller treats `0` as "do not filter". Defaults
+#' to `10`.
+#' @return The estimated standard deviation of the noise, in signal units, or
+#' `0` if it cannot be estimated.
+#' @note Adapted from the background noise estimator in the 'MOCCA2' Python
+#' package; see the reference on [`find_peaks`].
+#' @author Ethan Bass
+#' @noRd
+estimate_noise <- function(y, peaks = NULL, k_noise = 4, tol = 1e-5,
+                           max_iter = 50, min_points = 10){
+  z <- y
+  if (!is.null(peaks) && nrow(peaks) > 0){
+    keep <- rep(TRUE, length(y))
+    for (i in seq_nrow(peaks)){
+      keep[peaks$lower[i]:peaks$upper[i]] <- FALSE
+    }
+    n_free <- sum(keep & is.finite(y))
+    if (n_free < min_points)
+      return(skip_noise(sprintf(
+        "detected peaks cover all but %d of %d timepoints", n_free,
+        length(y))))
+    z <- y[keep]
+  }
+  z <- z[is.finite(z)]
+  if (length(z) < 2) return(skip_noise("fewer than two finite timepoints"))
+  if (!is.finite(sd(z)) || sd(z) == 0)
+    return(skip_noise(sprintf(
+      "the %d timepoints left after masking are all identical", length(z))))
+  min_sd <- sd(z) * 0.01
+  sigma_clipped_sd(z, k = k_noise, tol = tol, max_iter = max_iter,
+                   min_sd = min_sd)
+}
+
+#' Calculate apex prominence
+#'
+#' Computes the height of each apex above the higher of its two flanking
+#' minima. Prominence is measured against the *local* surrounding signal, so
+#' unlike raw amplitude it is not inflated by a rising baseline or deflated by
+#' a neighboring peak.
+#'
+#' @param y A numeric vector (a chromatographic signal).
+#' @param peaks Output of [`find_peaks`], including `pos`, `lower` and `upper`.
+#' @return A numeric vector of prominences, one per row of `peaks`.
+#' @author Ethan Bass
+#' @noRd
+get_prominence <- function(y, peaks){
+  vapply(seq_nrow(peaks), function(i){
+    left <- min(y[peaks$lower[i]:peaks$pos[i]], na.rm = TRUE)
+    right <- min(y[peaks$pos[i]:peaks$upper[i]], na.rm = TRUE)
+    y[peaks$pos[i]] - max(left, right)
+  }, numeric(1))
+}
+
+#' Report that the noise could not be estimated
+#'
+#' @param why A clause naming the reason, spliced into the warning.
+#' @return `0`, invisibly to the caller.
+#' @noRd
+skip_noise <- function(why){
+  warning(sprintf(paste0(
+    "The baseline noise could not be estimated: %s.\n\tProminence filtering ",
+    "is skipped for this trace. Widen `smooth_window` so fewer noise apices ",
+    "are detected, or raise `min_amplitude`."), why), immediate. = TRUE)
+  0
+}
+
+#' Round a smoothing window up to an odd integer
+#'
+#' An even-width running mean is not centered on a sample: it creates plateaus
+#' at extrema, which produce two consecutive sign changes in the derivative and
+#' so report an apex one timepoint off. Rounding up to an odd width of at least
+#' three keeps the filter centered.
+#'
+#' @param w A smoothing window, in timepoints.
+#' @return An odd integer of at least `3`.
+#' @author Ethan Bass
+#' @noRd
+odd_window <- function(w){
+  w <- max(round(w), 3)
+  if (w %% 2 == 0) w <- w + 1L
+  w
+}
+
 #' Default operator for `NULL`
 #'
 #' `%||%` entered base R in 4.4.0, but the package supports R >= 4.1.0. The

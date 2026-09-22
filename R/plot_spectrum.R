@@ -465,10 +465,10 @@ plot_spec <- function(y, spectrum_labels = TRUE, ...){
           ylab = 'Absorbance', xlab = 'Wavelength (nm)',
           ylim = c(0, max(y, na.rm = TRUE)*1.2), ...)
   if (spectrum_labels){
-    suppressWarnings(pks <- find_peaks(rowMeans(y), slope_thresh = .00001,
+    suppressWarnings(pks <- find_peaks(rowMeans(y), min_curvature = .00001,
                                        bounds = FALSE, 
                                        smooth_type = "none",
-                                       amp_thresh = .05*max(y)))
+                                       min_amplitude = .05*max(y)))
     if (length(pks) > 0){
       pks <- data.frame(round(as.numeric(rownames(y)[pks]), 0), 
                         apply(y[pks, , drop = FALSE], 1, max),
@@ -514,9 +514,9 @@ ggplot_spec <- function(y, chr, RT, spectrum_labels = TRUE, color="black",
     p <- p + ggplot2::aes(group = .data$sample, color = .data$sample)
   }
   if (spectrum_labels && !("sample" %in% colnames(df))) {
-    suppressWarnings(pks <- find_peaks(df$absorbance, slope_thresh = .00001, bounds = FALSE,
+    suppressWarnings(pks <- find_peaks(df$absorbance, min_curvature = .00001, bounds = FALSE,
                                        smooth_type = "none",
-                                       amp_thresh = .05*max(df$absorbance)))
+                                       min_amplitude = .05*max(df$absorbance)))
     if (length(pks) > 0) {
       p <- p + ggplot2::geom_text(
         data = df[pks,],
@@ -588,9 +588,9 @@ plotly_spec <- function(y, chr, RT, reshape = TRUE, color = "black",
       names(y) <- as.character(df$wavelength)
       
       # Find peaks using the same function as in plot_spec
-      suppressWarnings(pks <- find_peaks(y, slope_thresh = .00001, 
+      suppressWarnings(pks <- find_peaks(y, min_curvature = .00001, 
                                          bounds = FALSE, smooth_type = "none",
-                                         amp_thresh = .05*max(y)))
+                                         min_amplitude = .05*max(y)))
       
       if (length(pks) > 0) {
         # Create annotations for each peak

@@ -22,6 +22,26 @@ by = x)`.
 produced by warping are filled with zeros or returned as `NA`. Defaults to
 `FALSE`, which changes VPdtw behavior.
 
+#### Peak detection
+
+* **Corrected an off-by-one error in `find_peaks` that reported every apex one
+timepoint early.** Retention times from `get_peaks` and `get_peaktable` shift
+accordingly, and peaks whose preceding timepoint had been clipped to zero by
+`preprocess` are now detected.
+* **`plot_spectrum` and `plot_all_spectra` now label the correct spectral
+maxima**, having inherited the same off-by-one error. Reported lambda-max values
+shift by one grid step.
+* **`find_peaks` now rounds the `"mva"` and `"tmva"` smoothing windows up to an
+odd width of at least three points**, which changes which apices are detected
+for these methods.
+* **`find_peaks` now errors when `smooth_type = "savgol"` is given a
+`smooth_window` narrower than seven timepoints**, including at the default,
+rather than silently returning the signal unsmoothed. See `?find_peaks`.
+* **Renamed `find_peaks`'s `slope_thresh` and `amp_thresh` arguments to
+`min_curvature` and `min_amplitude`.** `slope_thresh` thresholded the second
+derivative, not the slope. Both old names still work, with a warning, and keep
+their positions.
+
 #### Peak purity
 
 * `get_purity` now decides which timepoints belong to a peak from the
@@ -144,6 +164,11 @@ remains `"egh"` for now but this may change in a future release.
 * Added support for fitting a local baseline beneath each peak through the
 `baseline` argument in `get_peaks`: `"none"` (default), `"flat"` or `"sloped"`.
 Peak heights and areas are computed above the fitted baseline.
+* Added a `min_prominence_snr` argument to `find_peaks`, filtering apices by
+topographic prominence in multiples of the estimated noise. Unlike
+`min_curvature` and `min_amplitude` this threshold is scale-free, so it
+transfers between datasets. `find_peaks` now also returns a `prominence`
+column.
 
 #### Peak tables and plotting
 
@@ -172,6 +197,11 @@ now skipped below four wavelengths.
 * Fixed input validation in `preprocess` so lists containing non-matrix elements no longer pass validation without error.
 * Fixed `preprocess` function incorrectly truncating chromatograms when outliers are present and `dim1` is not specified.
 * Suppressed spurious "essentially perfect fit" warning from `summary.lm` when computing R² in `fit_peaks`.
+
+#### Peak detection and integration
+
+* **`find_peaks(bounds = TRUE)` now returns its full four-column schema when no
+peaks are detected**, rather than dropping `lower` and `upper`.
 
 #### Peak tables and filtering
 
