@@ -56,10 +56,7 @@
 #' chromatogram need not suit another. Rather than choosing an
 #' estimator on general grounds, fit a baseline and look at it:
 #' `attach_baseline = TRUE` in [`preprocess`] retains the estimate for exactly
-#' that purpose. Measured comparisons against known baselines on simulated
-#' chromatograms, and an account of how far they can be expected to carry over,
-#' are in the *Benchmarking the baseline estimators* article
-#' (\url{https://ethanbass.github.io/chromatographR/articles/baselines.html}).
+#' that purpose.
 #'
 #' A baseline is estimated separately for each wavelength, since the drift
 #' differs across the spectrum.
