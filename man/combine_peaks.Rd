@@ -59,9 +59,6 @@ combine_peaks(pk_tab, tol = 0.02, min_cor = 0.9)
 \code{\link{get_peaks}}
 
 Other utility functions:
-\code{\link[=get_baseline]{get_baseline()}},
-\code{\link[=get_lambdas]{get_lambdas()}},
-\code{\link[=get_times]{get_times()}},
 \code{\link[=merge_peaks]{merge_peaks()}},
 \code{\link[=reshape_chroms]{reshape_chroms()}},
 \code{\link[=reshape_peaktable]{reshape_peaktable()}}

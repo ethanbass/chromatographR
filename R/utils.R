@@ -174,8 +174,7 @@ elementwise.all.equal <- Vectorize(function(x, y, ...){
 #' @param idx Index of chromatogram from which to extract times.
 #' @return Numeric vector of retention times from the chromatogram specified by
 #' `idx`.
-#' @family utility functions
-#' @keywords internal
+#' @family accessors
 #' @examples
 #' data(Sa_warp)
 #' get_times(Sa_warp)
@@ -198,8 +197,7 @@ get_times <- function(x, idx = 1){
 #' 
 #' @param x A list of chromatograms or `peak_table` object.
 #' @return A numeric vector of wavelengths.
-#' @family utility functions
-#' @keywords internal
+#' @family accessors
 #' @examples
 #' data(Sa_warp)
 #' get_lambdas(Sa_warp)
@@ -231,7 +229,7 @@ get_lambdas <- function(x){
 #' [`preprocess`] with `attach_baseline = TRUE`.
 #' @return A matrix of the same dimensions as `x` containing the estimated
 #' baseline, or a list of such matrices if `x` is a list.
-#' @family utility functions
+#' @family accessors
 #' @examples
 #' data(Sa)
 #' pr <- preprocess(Sa[[1]], dim1 = seq(10, 18.66, by = .01),
@@ -253,11 +251,44 @@ get_baseline <- function(x){
 }
 
 #' Get time resolution
-#' @return Returns average gap between time points.
-#' @noRd
-get_time_resolution <- function(chrom_list, idx = 1){
-  ts <- get_times(x = chrom_list, idx = idx)
-  signif(median(diff(ts)))
+#'
+#' Get the sampling interval of a chromatogram: the median gap between
+#' consecutive retention times.
+#'
+#' @param x A list of chromatograms or `peak_table` object.
+#' @param idx Index of chromatogram from which to derive the interval.
+#' @param digits Number of significant digits to round to. A regular time axis
+#' carries floating-point noise in the last digits of `diff`, so the median is
+#' rounded by default.
+#' @param unit Unit for the returned interval: `"min"`, `"s"` or `"ms"`.
+#' Defaults to `NULL`, giving the interval in the units of the chromatogram's
+#' own time axis, which is what [`preprocess`]'s `dim1` expects. Supply
+#' `"min"` to pair with the `time_resolution` arguments of [`plot_chroms`] and
+#' [`reshape_chroms`], which are in minutes whatever the units of `x`. The
+#' units of `x` are read from its `time_unit` attribute, falling back to
+#' minutes when it is absent, as [`plot_chroms`] does.
+#' @return A length-one numeric giving the time between consecutive timepoints,
+#' in `unit` if supplied and otherwise in the units of the chromatogram's time
+#' axis.
+#' @family accessors
+#' @examples
+#' data(Sa_warp)
+#' get_time_resolution(Sa_warp)
+#' @export
+
+get_time_resolution <- function(x, idx = 1, digits = 6, unit = NULL){
+  ts <- get_times(x = x, idx = idx)
+  res <- median(diff(ts))
+  if (!is.null(unit)){
+    unit <- match.arg(unit, c("min", "s", "ms"))
+    axis_unit <- get_time_unit(x, idx = idx, na_value = "min")
+    if (!isTRUE(axis_unit %in% c("min", "s", "ms"))){
+      stop(sprintf("Cannot convert the sampling interval to `%s`: the time unit of `x` (`%s`) is unrecognized.",
+                   unit, axis_unit))
+    }
+    res <- res * time_factor(unit) / time_factor(axis_unit)
+  }
+  signif(res, digits = digits)
 }
 
 #' Format numbers for an error message, one at a time
@@ -336,8 +367,7 @@ plural <- function(n) if (n > 1) "s" else ""
 #' @param x A list of chromatograms or `peak_table` object.
 #' @param idx Index of chromatogram from which to extract times.
 #' @param na_value What to return if `time_unit` attribute is not present.
-#' @return A string specifying the time units for the provided chromatograms.c
-#' @family utility functions
+#' @return A string specifying the time units for the provided chromatograms.
 #' @noRd
 get_time_unit <- function(x, idx = 1, na_value = NA){
   if (inherits(x, "peak_table")){

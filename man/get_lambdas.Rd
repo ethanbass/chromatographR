@@ -20,13 +20,9 @@ data(Sa_warp)
 get_lambdas(Sa_warp)
 }
 \seealso{
-Other utility functions:
-\code{\link[=combine_peaks]{combine_peaks()}},
+Other accessors:
 \code{\link[=get_baseline]{get_baseline()}},
-\code{\link[=get_times]{get_times()}},
-\code{\link[=merge_peaks]{merge_peaks()}},
-\code{\link[=reshape_chroms]{reshape_chroms()}},
-\code{\link[=reshape_peaktable]{reshape_peaktable()}}
+\code{\link[=get_time_resolution]{get_time_resolution()}},
+\code{\link[=get_times]{get_times()}}
 }
-\concept{utility functions}
-\keyword{internal}
+\concept{accessors}

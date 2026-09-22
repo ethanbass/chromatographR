@@ -99,6 +99,8 @@ created by `plot_chroms`.
 * Added `get_spectra` function for extracting spectra from chromatograms. The
 `export_spectrum` argument in `plot_spectrum` and `plot_all_spectra` is
 deprecated in favor of `get_spectra`.
+* Added `get_time_resolution` for reading a chromatogram's sampling interval,
+in the units of its time axis by default or in minutes via `unit`.
 
 #### New generic functions
 

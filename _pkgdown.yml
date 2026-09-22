@@ -32,6 +32,12 @@ reference:
     - mirror_plot
     - scan_chrom
     - starts_with("plot.")
+  - title: "Accessors"
+    contents:
+    - get_times
+    - get_lambdas
+    - get_time_resolution
+    - get_baseline
   - title: "Utility functions"
     contents:
     - combine_peaks

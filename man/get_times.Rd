@@ -23,13 +23,9 @@ data(Sa_warp)
 get_times(Sa_warp)
 }
 \seealso{
-Other utility functions:
-\code{\link[=combine_peaks]{combine_peaks()}},
+Other accessors:
 \code{\link[=get_baseline]{get_baseline()}},
 \code{\link[=get_lambdas]{get_lambdas()}},
-\code{\link[=merge_peaks]{merge_peaks()}},
-\code{\link[=reshape_chroms]{reshape_chroms()}},
-\code{\link[=reshape_peaktable]{reshape_peaktable()}}
+\code{\link[=get_time_resolution]{get_time_resolution()}}
 }
-\concept{utility functions}
-\keyword{internal}
+\concept{accessors}

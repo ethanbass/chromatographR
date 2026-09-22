@@ -241,3 +241,19 @@ test_that("check_duplicated_names works as expected", {
   expect_no_error(check_duplicated_names(c("X","Y")))
   expect_warning(check_duplicated_names(c("X","X"), warn = TRUE))
 })
+
+test_that("get_time_resolution converts to the requested unit", {
+  data(Sa_warp, envir = environment())
+  sec <- Sa_warp
+  for (i in seq_along(sec)){
+    rownames(sec[[i]]) <- as.numeric(rownames(sec[[i]])) * 60
+    attr(sec[[i]], "time_unit") <- "Seconds"
+  }
+  expect_equal(get_time_resolution(sec), 1.2)
+  expect_equal(get_time_resolution(sec, unit = "min"), 0.02)
+  expect_equal(get_time_resolution(sec, unit = "ms"), 1200)
+  expect_equal(get_time_resolution(Sa_warp, unit = "min"),
+               get_time_resolution(Sa_warp))
+  attr(sec[[1]], "time_unit") <- "furlongs"
+  expect_error(get_time_resolution(sec, unit = "min"), "unrecognized")
+})

@@ -32,12 +32,9 @@ pr <- preprocess(Sa[[1]], dim1 = seq(10, 18.66, by = .01),
 bl <- get_baseline(pr)
 }
 \seealso{
-Other utility functions:
-\code{\link[=combine_peaks]{combine_peaks()}},
+Other accessors:
 \code{\link[=get_lambdas]{get_lambdas()}},
-\code{\link[=get_times]{get_times()}},
-\code{\link[=merge_peaks]{merge_peaks()}},
-\code{\link[=reshape_chroms]{reshape_chroms()}},
-\code{\link[=reshape_peaktable]{reshape_peaktable()}}
+\code{\link[=get_time_resolution]{get_time_resolution()}},
+\code{\link[=get_times]{get_times()}}
 }
-\concept{utility functions}
+\concept{accessors}
