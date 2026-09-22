@@ -11,3 +11,9 @@
 ^\.zenodo.json
 ^vignettes/articles$
 ^\.httr-oauth$
+^doc$
+^Meta$
+Rplots\.pdf$
+^dev$
+^\.claude$
+^figure$

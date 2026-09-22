@@ -11,3 +11,9 @@ chromatographR.Rcheck
 .httr-oauth
 CRAN-SUBMISSION
 tests/testthat/Rplots.pdf
+/doc/
+/Meta/
+Rplots.pdf
+figure/
+*.new.svg
+*.tar.gz
