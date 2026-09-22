@@ -160,7 +160,7 @@ plot_spectrum_base <- function(loc, peak_table, chrom_list,
   spec_loc <- if (what == "click") RT else loc
   spec_what <- if (what == "click") "rt" else what
   spectra <- get_spectra(spec_loc, peak_table = peak_table, chrom_list = chrom_list,
-                         idx = chr, lambda = lambda,
+                         idx = chr,
                          scale_spectrum = scale_spectrum, what = spec_what,
                          format = "wide")
   lambda.idx <- get_lambda_idx(lambda, lambdas = wavelengths, y = spectra)
@@ -328,8 +328,10 @@ scan_chrom <- function(chrom_list, idx, lambda,
   wavelengths <- get_lambdas(chrom_list)
   sig <- max(nchar(gsub(".*\\.","",rownames(chrom_list[[1]]))))
 
-  if (missing(lambda))
-    stop("Please specify wavelength (`lambda`) to proceed with scanning.")
+  if (missing(lambda) || identical(lambda, "max"))
+    stop("Please specify a wavelength (`lambda`) to proceed with scanning. ",
+         "`\"max\"` is resolved against an extracted spectrum, so it is not ",
+         "available before one has been selected.")
 
     lambda.idx <- get_lambda_idx(lambda, lambdas = wavelengths, 
                                  allow_max = FALSE)
@@ -391,7 +393,7 @@ plot_all_spectra <- function(loc, peak_table, chrom_list, idx = "all",
   what <- match.arg(what, c("peak", "rt", "idx"))
   check_peaktable(peak_table)
   if (!is.null(peak)){
-    message("The `peak` argument is deprecated. Please us `loc` instead.")
+    message("The `peak` argument is deprecated. Please use `loc` instead.")
     loc <- peak
   }
   if (missing(chrom_list)){

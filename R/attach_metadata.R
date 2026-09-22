@@ -136,11 +136,12 @@ get_reference_spectra <- function(peak_table, chrom_list,
                                                           drop = FALSE])))]
     })
   } else {
-    sp.ref <- sapply(colnames(peak_table$tab), function(pk){
-      try(plot_spectrum(loc = pk, peak_table, chrom_list, plot_trace = FALSE,
-                    plot_spectrum = FALSE, export_spectrum = TRUE,
-                    verbose = FALSE,
-                    scale_spectrum = TRUE, engine = "base")
+    sp.ref <- lapply(colnames(peak_table$tab), function(pk){
+      chr <- check_chr("max", pk, peak_table, chrom_list)
+      tryCatch(
+        get_spectra(pk, peak_table = peak_table, chrom_list = chrom_list,
+                    idx = chr, scale_spectrum = TRUE)[[1]],
+        error = function(e) NA
       )
     })
     sp.ref <- do.call(cbind, sp.ref)

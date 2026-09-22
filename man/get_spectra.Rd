@@ -9,7 +9,6 @@ get_spectra(
   peak_table,
   chrom_list = NULL,
   idx = seq_along(chrom_list),
-  lambda = "max",
   scale_spectrum = FALSE,
   what = c("peak", "rt", "idx"),
   format = c("wide", "long")
@@ -25,9 +24,6 @@ depends on \code{what}.}
 
 \item{idx}{Indices of chromatograms to extract spectra from. Defaults to all
 chromatograms in \code{chrom_list}.}
-
-\item{lambda}{Wavelength at which to extract the spectrum. Use \code{"max"} to
-select the wavelength with the highest absorbance.}
 
 \item{scale_spectrum}{Logical. Whether to normalize absorbance values to
 the range [0, 1]. Defaults to \code{FALSE}.}

@@ -9,8 +9,6 @@
 #' @param chrom_list A list of chromatographic matrices.
 #' @param idx Indices of chromatograms to extract spectra from. Defaults to all
 #' chromatograms in `chrom_list`.
-#' @param lambda Wavelength at which to extract the spectrum. Use `"max"` to
-#' select the wavelength with the highest absorbance.
 #' @param scale_spectrum Logical. Whether to normalize absorbance values to
 #' the range \[0, 1\]. Defaults to `FALSE`.
 #' @param what How to interpret `loc`. One of `"peak"` (look up retention time
@@ -28,9 +26,8 @@
 #' get_spectra("V10", peak_table = pk_tab)
 #' @export
 
-get_spectra <- function(loc, peak_table, chrom_list = NULL, 
+get_spectra <- function(loc, peak_table, chrom_list = NULL,
                         idx = seq_along(chrom_list),
-                        lambda = "max",
                         scale_spectrum = FALSE,
                         what = c("peak", "rt", "idx"),
                         format = c("wide", "long")){
