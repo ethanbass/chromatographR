@@ -58,3 +58,36 @@ test_that("get_peaktable merges distant peaks when hmax is large enough", {
   expect_equal(ncol(pt$tab), 2L)
   expect_true(all(pt$tab > 0))
 })
+
+# ── a non-finite response must not void a cluster's metadata ─────────────────
+
+
+
+
+
+test_that("filter_peaktable rejects min_converged without a converged row", {
+  skip_on_cran()
+  data(pk_tab, envir = environment())
+  if (!"converged" %in% rownames(pk_tab$pk_meta)){
+    expect_error(filter_peaktable(pk_tab, min_converged = 0.5),
+                 "no `converged` row")
+  } else {
+    skip("stored pk_tab already carries a converged row")
+  }
+})
+
+test_that("filter_peaktable matches one peak per requested retention time", {
+  data(pk_tab, envir = environment())
+  rt <- as.numeric(pk_tab$pk_meta["rt", ])
+  one <- filter_peaktable(pk_tab, rts = rt[2], tol = 5)
+  expect_equal(ncol(one$tab), 1)
+  expect_equal(as.numeric(one$pk_meta["rt", ]), rt[2])
+
+  two <- filter_peaktable(pk_tab, rts = rt[c(2, 10)], tol = 5)
+  expect_equal(ncol(two$tab), 2)
+  expect_setequal(as.numeric(two$pk_meta["rt", ]), rt[c(2, 10)])
+
+  expect_warning(none <- filter_peaktable(pk_tab, rts = 99, tol = 0.01),
+                 regexp = "not identified in the peak table")
+  expect_equal(ncol(none$tab), 0)
+})

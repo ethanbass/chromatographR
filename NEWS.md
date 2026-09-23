@@ -185,9 +185,13 @@ no peak is detected. `get_peaktable` gives one column per window. See
 * Two fit-diagnostic columns are now reported by `get_peaks`: `converged`
 (flagging peaks that didn't converge) and `window_limited` (flagging peaks whose
 reported width is at the limit defined by the integration window).
+* Fit diagnostics can now be used for filtering: `filter_peaks` gains `converged` and
+`window_limited` arguments, and `filter_peaktable` gains `min_converged`. All three 
+error on `fit = "raw"`, which reports no fit diagnostics.
 * `get_peaks` now warns when more than a fifth of the peak list is integration
 windows too small to fit, which usually means `find_peaks` is detecting noise.
 Suppressed for `fit = "raw"` and when `windows` is supplied.
+
 
 #### Peak tables and plotting
 

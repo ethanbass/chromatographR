@@ -12,6 +12,7 @@ filter_peaktable(
   min_value,
   max_zeros,
   lambda,
+  min_converged,
   what = c("median", "mean", "max"),
   tol = 0
 )
@@ -36,8 +37,15 @@ across samples).}
 \item{lambda}{Wavelength(s) used to select features in the peak table.
 Only features matching the specified wavelength(s) are retained.}
 
+\item{min_converged}{Minimum proportion of samples in which the feature's
+fit converged, between 0 and 1. In a \code{peak_table}, \code{converged} is aggregated
+across the samples contributing to each feature, so a value of \code{0.8} retains
+features that were properly fitted in at least 80\% of them. Requires a
+\code{converged} row in \code{pk_meta}, so it is unavailable for peak tables built from
+\code{fit = "raw"} peak lists.}
+
 \item{what}{Method used to summarize feature intensity across samples for
-filtering. One of \code{"mean"}, \code{"median"} (default),  or \code{"max"}.}
+filtering. One of \code{"mean"}, \code{"median"} (default), or \code{"max"}.}
 
 \item{tol}{Tolerance for matching of retention times to \code{rts}. A
 feature is considered a match if the absolute difference is ≤ \code{tol}.}
@@ -48,12 +56,13 @@ satisfy the specified criteria. The same feature indices are applied to all
 \code{peak_table} components.
 }
 \description{
-Utility function to filter features (columns) in a \code{peak_table}. Filtering is
+Filters features (columns) in a \code{peak_table}. Filtering is
 applied consistently across all components of the peak table, including the
 intensity matrix (\code{tab}), feature metadata (\code{pk_meta}), and reference spectra
 (if present). Filtering can be based on retention time, wavelength, feature
-intensity summarized across samples (mean, median, or max), and/or feature
-sparsity (i.e., proportion of zero values across samples).
+intensity summarized across samples (mean, median, or max), feature
+sparsity (i.e., proportion of zero values across samples), and/or the
+proportion of samples whose fit converged.
 }
 \examples{
 data(pk_tab)

@@ -405,6 +405,22 @@ test_that("the bound does not disturb a peak that fits comfortably inside it", {
   list(s1 = matrix(y, ncol = 1, dimnames = list(as.character(ts), "220")))
 }
 
+test_that("get_peaks(max_fwhm) and filter_peaks(max_fwhm) select the same peaks", {
+  skip_on_cran()
+  for (dt in c(0.005, 0.01)){
+    cl <- .mk_chrom(dt)
+    all <- get_peaks(cl, lambdas = "220", max_fwhm = Inf, estimate_purity = FALSE,
+                     show_progress = FALSE)
+    for (v in c(0.03, 0.1, 1)){
+      a <- suppressWarnings(get_peaks(cl, lambdas = "220", max_fwhm = v,
+                                      estimate_purity = FALSE,
+                                      show_progress = FALSE))[[1]][[1]]
+      b <- suppressWarnings(filter_peaks(all, max_fwhm = v))[[1]][[1]]
+      expect_equal(nrow(a), nrow(b))
+      expect_equal(a$rt, b$rt)
+    }
+  }
+})
 
 test_that("the max_fwhm default applies no width filtering", {
   skip_on_cran()
@@ -492,6 +508,32 @@ test_that("FWHM is comparable across fits, unlike sd", {
   expect_lt(median(spread("FWHM")), 0.3)
 })
 
+test_that("a raw peak has no fitted sigma and a measured FWHM", {
+  skip_on_cran()
+  # two peaks 0.08 apart with sigma 0.03: the valley between them sits above
+  # half height, so there is no crossing to measure unless a local baseline
+  # brings the window edges down
+  ts <- seq(0, 3, by = 0.005)
+  y <- 1000 * exp(-(ts - 1.4)^2 / (2 * 0.03^2)) +
+    900 * exp(-(ts - 1.48)^2 / (2 * 0.03^2))
+  cl <- list(s1 = matrix(y, ncol = 1, dimnames = list(as.character(ts), "220")))
+  raw <- function(b) suppressWarnings(
+    get_peaks(cl, lambdas = "220", fit = "raw", baseline = b,
+              estimate_purity = FALSE, show_progress = FALSE))[[1]][[1]]
+  none <- raw("none")
+  expect_true(all(is.na(none$sd)))
+  expect_true(all(is.na(none$FWHM)))
+  sloped <- raw("sloped")
+  expect_true(all(is.na(sloped$sd)))
+  expect_true(all(is.finite(sloped$FWHM)))
+  # an unmeasurable width is not grounds for discarding the peak
+  expect_equal(nrow(none), nrow(sloped))
+  none_list <- suppressWarnings(
+    get_peaks(cl, lambdas = "220", fit = "raw", baseline = "none",
+              estimate_purity = FALSE, show_progress = FALSE))
+  expect_equal(nrow(filter_peaks(none_list, max_fwhm = 1e-9)[[1]][[1]]),
+               nrow(none))
+})
 
 test_that("one max_fwhm transfers across every fit", {
   skip_on_cran()
@@ -515,7 +557,42 @@ test_that("max_fwhm is ignored when windows are supplied", {
   expect_equal(nrow(k[[1]][[1]]), 1)
 })
 
+test_that("filter_peaks can filter on converged and window_limited", {
+  skip_on_cran()
+  data(Sa_pr, envir = environment())
+  pks <- suppressWarnings(get_peaks(Sa_pr, lambdas = 210, fit = "egh",
+                                    baseline = "sloped", sd_max = NULL,
+                                    estimate_purity = FALSE, cl = 1,
+                                    show_progress = FALSE))
+  n <- function(p) sum(vapply(p, function(s) nrow(s[["210"]]), numeric(1)))
+  for (col in c("converged", "window_limited")){
+    kept <- do.call(filter_peaks, c(list(pks), setNames(list(TRUE), col)))
+    drop <- do.call(filter_peaks, c(list(pks), setNames(list(FALSE), col)))
+    expect_equal(n(kept) + n(drop), n(pks), info = col)
+    expect_true(all(unlist(lapply(kept, function(s) s[["210"]][[col]])) == 1),
+                info = col)
+    expect_true(all(unlist(lapply(drop, function(s) s[["210"]][[col]])) == 0),
+                info = col)
+  }
+  both <- filter_peaks(pks, converged = TRUE, window_limited = FALSE)
+  expect_lte(n(both), n(filter_peaks(pks, converged = TRUE)))
+  expect_s3_class(both, "peak_list")
 
+  expect_error(filter_peaks(pks, converged = "yes"), "TRUE or FALSE")
+  expect_error(filter_peaks(pks, window_limited = NA), "TRUE or FALSE")
+  expect_error(filter_peaks(pks, converged = c(TRUE, FALSE)), "TRUE or FALSE")
+})
+
+test_that("filter_peaks rejects fit diagnostics for a raw peak list", {
+  skip_on_cran()
+  data(Sa_pr, envir = environment())
+  raw <- suppressWarnings(get_peaks(Sa_pr[1], lambdas = 210, fit = "raw",
+                                    estimate_purity = FALSE, cl = 1,
+                                    show_progress = FALSE))
+  expect_error(filter_peaks(raw, converged = TRUE), "no `converged` column")
+  expect_error(filter_peaks(raw, window_limited = FALSE),
+               "no `window_limited` column")
+})
 
 test_that("bemg rejects a fit whose tail grows away from the apex", {
   skip_on_cran()

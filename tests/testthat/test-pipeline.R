@@ -232,8 +232,8 @@ test_that("filter_peaks works", {
                  regexp = "'min_height' is less than minimum peak height.")
   expect_warning(filter_peaks(pks_egh, min_area=0), 
                  regexp = "'min_area' is less than minimum peak area")
-  expect_warning(filter_peaks(pks_egh, max_sd=Inf), 
-                 regexp = "'max_sd' is greater than maximum")
+  expect_warning(filter_peaks(pks_egh, max_fwhm = Inf),
+                 regexp = "'max_fwhm' is greater than the maximum")
 })
 
 ### test get_peaktable ###

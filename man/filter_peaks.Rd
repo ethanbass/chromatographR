@@ -4,39 +4,76 @@
 \alias{filter_peaks}
 \title{Filter peak lists}
 \usage{
-filter_peaks(peak_list, min_height, min_area, min_sd, max_sd, min_rt, max_rt)
+filter_peaks(
+  peak_list,
+  min_height,
+  min_area,
+  min_sd,
+  max_sd,
+  min_rt,
+  max_rt,
+  min_fwhm,
+  max_fwhm,
+  converged,
+  window_limited
+)
 }
 \arguments{
 \item{peak_list}{A \code{peak_list} object, consisting of a nested list of peak
 tables, where the first level is the sample, and the second level is the
-spectral component. Every component is described by a \code{data.frame} where
-every row represents a peak, and the columns contain information on
-retention time,  peak shape, height, and area.}
+spectral wavelength. Every sample × wavelength component is described by a
+\code{data.frame} where every row represents a peak, and the columns contain
+information on retention time, peak shape, height, and area.}
 
 \item{min_height}{Minimum peak height.}
 
 \item{min_area}{Minimum peak area.}
 
-\item{min_sd}{Minimal standard deviation.}
+\item{min_sd}{The \code{min_sd} argument is deprecated. Please use \code{min_fwhm}
+instead.}
 
-\item{max_sd}{Maximum standard deviation.}
+\item{max_sd}{The \code{max_sd} argument is deprecated. Please use \code{max_fwhm}
+instead.}
 
 \item{min_rt}{Minimum retention time.}
 
 \item{max_rt}{Maximum retention time.}
+
+\item{min_fwhm}{Minimum peak width, as a full width at half maximum, in the
+time units of the peak list. Peaks whose \code{FWHM} could not be measured
+(\code{NA}) are retained.}
+
+\item{max_fwhm}{Maximum peak width, as a full width at half maximum, in the
+time units of the peak list. Expressed in the same units as \code{max_fwhm} in
+\code{\link{get_peaks}}, so the same value transfers between the two. Peaks whose
+\code{FWHM} could not be measured (\code{NA}) are retained.}
+
+\item{converged}{Logical. If \code{TRUE}, retains only peaks whose fit converged;
+if \code{FALSE}, retains only those that did not. A peak has \code{converged == 0}
+either because the optimizer stopped short of convergence or because no
+optimizer ran at all, the latter occurring when the integration window held
+fewer points than the model has parameters. Requires a \code{converged} column, so it
+cannot be used with peak lists made with \code{fit = "raw"}.}
+
+\item{window_limited}{Logical. If \code{FALSE}, drops peaks whose fitted shape
+came to rest on a bound derived from the integration window, meaning the
+window rather than the data determined the reported shape; if \code{TRUE}, retains
+only those. Requires a \code{window_limited} column, so it cannot be used with
+peak lists made with \code{fit = "raw"}.}
 }
 \value{
 A filtered \code{peak_list} object containing only peaks that satisfy the
 specified criteria.
 }
 \description{
-Utility function for filtering peaks from a \code{peak_list} object. Peaks can be
-filtered according to height, area, standard deviation, and/or retention time.
+Filters peaks from a \code{peak_list} object by height, area, width, retention
+time, or fit diagnostics (\code{converged} and \code{window_limited}).
 }
 \examples{
 data(Sa_warp)
 pks <- get_peaks(Sa_warp[1], lambda = "210")
 filter_peaks(pks, min_height = 100)
+filter_peaks(pks, converged = TRUE, window_limited = FALSE)
 }
 \seealso{
 \code{\link{get_peaks}}, \code{\link{filter_peaktable}}
