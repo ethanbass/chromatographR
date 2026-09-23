@@ -22,25 +22,28 @@ by = x)`.
 produced by warping are filled with zeros or returned as `NA`. Defaults to
 `FALSE`, which changes VPdtw behavior.
 
-#### Peak detection
+#### Peak detection and integration
 
-* **Corrected an off-by-one error in `find_peaks` that reported every apex one
-timepoint early.** Retention times from `get_peaks` and `get_peaktable` shift
+* Corrected an off-by-one error in `find_peaks` that reported every apex one
+timepoint early. Retention times from `get_peaks` and `get_peaktable` shift
 accordingly, and peaks whose preceding timepoint had been clipped to zero by
 `preprocess` are now detected.
-* **`plot_spectrum` and `plot_all_spectra` now label the correct spectral
-maxima**, having inherited the same off-by-one error. Reported lambda-max values
+* `plot_spectrum` and `plot_all_spectra` now label the correct spectral
+maxima, having inherited the same off-by-one error. Reported lambda-max values
 shift by one grid step.
-* **`find_peaks` now rounds the `"mva"` and `"tmva"` smoothing windows up to an
-odd width of at least three points**, which changes which apices are detected
+* `find_peaks` now rounds the `"mva"` and `"tmva"` smoothing windows up to an
+odd width of at least three points, which changes which apices are detected
 for these methods.
-* **`find_peaks` now errors when `smooth_type = "savgol"` is given a
-`smooth_window` narrower than seven timepoints**, including at the default,
-rather than silently returning the signal unsmoothed. See `?find_peaks`.
-* **Renamed `find_peaks`'s `slope_thresh` and `amp_thresh` arguments to
-`min_curvature` and `min_amplitude`.** `slope_thresh` thresholded the second
-derivative, not the slope. Both old names still work, with a warning, and keep
-their positions.
+* `find_peaks` now errors when the provided `smooth_window` is narrower 
+than seven timepoints when Savitzky-Golay (`"savgol"`) smoothing is
+selected, rather than silently returning the signal unsmoothed.
+* Renamed `find_peaks`'s `slope_thresh` and `amp_thresh` arguments to
+`min_curvature` and `min_amplitude`. `slope_thresh` was a misnomer
+because the argument thresholded the second derivative, not the slope. 
+For now, the old names still work with a deprecation warning.
+* `get_peaks` and `fit_peaks` no longer filter on peak width by default.
+`sd_max` used to drop peaks with sd > 50 timepoints. Its replacement,
+`max_fwhm`, defaults to no filtering; set it to restore the filter.
 
 #### Peak purity
 
@@ -84,6 +87,9 @@ to functions that define them.
 * Deprecated arguments in `get_peaks` still using dot notation (e.g., `sd.max`).
 Use the snake_case equivalents instead, or `max_fwhm` where the snake_case name
 is itself deprecated below.
+* Deprecated `sd_max` in `get_peaks` and `fit_peaks`, and `min_sd`/`max_sd` in
+`filter_peaks`, in favor of `min_fwhm` and `max_fwhm`. A standard deviation is
+equivalent to peak width only for `fit = "gaussian"`. See `?filter_peaks`.
 * Renamed the Whittaker smoothing penalty passed to `preprocess` and
 `correct_baseline` from `lambda` to `stiffness`, reserving `lambda` for
 the common usage to specify a wavelength used throughout the package.
@@ -174,6 +180,15 @@ and `fit_peaks` via a `windows` argument, quantifying a compound even where
 no peak is detected. `get_peaktable` gives one column per window. See
 `?get_peaks`.
 
+#### Fit diagnostics
+
+* Two fit-diagnostic columns are now reported by `get_peaks`: `converged`
+(flagging peaks that didn't converge) and `window_limited` (flagging peaks whose
+reported width is at the limit defined by the integration window).
+* `get_peaks` now warns when more than a fifth of the peak list is integration
+windows too small to fit, which usually means `find_peaks` is detecting noise.
+Suppressed for `fit = "raw"` and when `windows` is supplied.
+
 #### Peak tables and plotting
 
 * Added support for plotting spectra from multiple chromatograms in `plot_spectrum` by supplying a vector to `idx` (e.g. `idx = c(1, 2, 4)`). Overlaid traces and spectra are color-coded by sample.
@@ -200,12 +215,24 @@ automatically; added an `on_invalid` argument controlling how zero, negative and
 now skipped below four wavelengths.
 * Fixed input validation in `preprocess` so lists containing non-matrix elements no longer pass validation without error.
 * Fixed `preprocess` function incorrectly truncating chromatograms when outliers are present and `dim1` is not specified.
-* Suppressed spurious "essentially perfect fit" warning from `summary.lm` when computing R² in `fit_peaks`.
 
 #### Peak detection and integration
 
-* **`find_peaks(bounds = TRUE)` now returns its full four-column schema when no
-peaks are detected**, rather than dropping `lower` and `upper`.
+* `find_peaks(bounds = TRUE)` now returns its full four-column schema when no
+peaks are detected, rather than dropping `lower` and `upper`.
+* `max_iter` now controls how long the peak fitters run. Previously it was
+ignored, leaving `nls.lm`'s default of `100 * (parameters + 1)` evaluations.
+`"egh"` and `"bemg"` fits may shift slightly.
+* `get_peaks` no longer returns incomplete results when a parallel
+worker dies. `mclapply` reports a crash as `NULL`, which used to reach the
+returned `peak_list` unflagged and fail later in `get_peaktable`. Lost samples
+are now refitted and unrecoverable ones raise an error.
+* `get_peaks` no longer errors when a sample contains no peaks; previously a
+single empty sample failed the whole call. `fit_peaks` now returns an empty
+`data.frame` rather than a one-row matrix of `NA`s.
+* `FWHM` is now computed as `2*sqrt(2*log(2))*sigma` rather than the rounded
+`2.35*sigma`, and a bug in its calculation for raw peak shapes is fixed.
+* Suppressed spurious "essentially perfect fit" warning from `summary.lm` when computing R² in `fit_peaks`.
 
 #### Peak tables and filtering
 

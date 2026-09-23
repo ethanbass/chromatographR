@@ -9,7 +9,8 @@ get_peaks(
   lambdas,
   fit = c("egh", "bemg", "gaussian", "raw"),
   windows = NULL,
-  sd_max = 50,
+  max_fwhm = NULL,
+  sd_max = NULL,
   max_iter = 100,
   time_unit = c("min", "s", "ms"),
   baseline = c("none", "flat", "sloped"),
@@ -25,17 +26,16 @@ get_peaks(
 )
 }
 \arguments{
-\item{chrom_list}{A list of chromatograms in matrix format (timepoints x
+\item{chrom_list}{A list of chromatograms in matrix format (timepoints ×
 wavelengths).}
 
 \item{lambdas}{A character or numeric vector specifying the wavelengths to
-find peaks at. For one-dimensional chromatograms, this argument can be ignored.}
+find peaks at. Omit for one-dimensional chromatograms.}
 
-\item{fit}{What type of fit to use. Current options are bidirectional
-exponentially modified gaussian (\code{"bemg"}), exponential-gaussian
-hybrid (\code{"egh"}), \code{"gaussian"}, or \code{"raw"}. The \code{raw} setting
-performs trapezoidal integration directly on the raw data without fitting a
-model to the data. Defaults to \code{egh}.}
+\item{fit}{Peak model. Options are bidirectional exponentially modified
+Gaussian (\code{"bemg"}), exponential-Gaussian hybrid (\code{"egh"}), \code{"gaussian"},
+or \code{"raw"}. \code{"raw"} integrates the signal directly by trapezoidal
+approximation without fitting a model. Defaults to \code{"egh"}.}
 
 \item{windows}{Optional two-column matrix or \code{data.frame} of start and end
 retention times (or a single pair of times), giving manual integration
@@ -47,9 +47,28 @@ every sample contributes to the same set of peak table columns. Two adjacent
 windows sharing a boundary time act as a vertical drop line: their areas sum
 exactly to the area of their union, which is how a peak is split at a chosen
 time. \code{max_fwhm} is ignored, since the width of each window is chosen by
-the user. Cannot be combined with \code{rts}. Defaults to \code{NULL}.}
+the user. Defaults to \code{NULL}.}
 
-\item{sd_max}{Maximum width (standard deviation) for peaks. Defaults to \code{50}.}
+\item{max_fwhm}{Maximum peak width, as a full width at half maximum, in the
+units set by \code{time_unit}. Peaks wider than \code{max_fwhm} are discarded.
+Expressed in the same units as \code{max_fwhm} in \code{\link{filter_peaks}}, so the same
+value transfers between the two, and, unlike a standard deviation, it is
+comparable across values of \code{fit}. Peaks whose \code{FWHM} could not be measured
+(\code{NA}, see the \code{FWHM} entry under \emph{Value}) are retained. Defaults to
+\code{NULL}, which disables width filtering: a "typical" peak width varies too
+much across instruments and methods for a fixed cutoff to be safe as a
+default. See the section on calibrating these parameters from your own
+data in \code{vignette("chromatographR")} for how to choose a value.
+Ignored if \code{windows} is provided. A warning fires if filtering discards an
+unusually large share of detected peaks.}
+
+\item{sd_max}{The \code{sd_max} argument is deprecated, because it is expressed as
+a standard deviation in timepoints, which is a peak width only for
+\code{fit = "gaussian"}. It is also not expressed in the same units as
+\code{max_fwhm} in \code{\link{filter_peaks}}. Please use \code{max_fwhm} instead. If supplied,
+it is converted to a \code{FWHM} cutoff of \code{2.355 * sd_max * dt} in the units of
+\code{time_unit}, where \code{dt} is the chromatogram's time step. Pass \code{sd_max = NULL}
+to disable width filtering. Ignored if \code{windows} is provided.}
 
 \item{max_iter}{Maximum number of iterations for non-linear least squares
 in \code{\link{fit_peaks}}.}
@@ -58,23 +77,27 @@ in \code{\link{fit_peaks}}.}
 applicable). Options are minutes (\code{"min"}), seconds (\code{"s"}), or
 milliseconds (\code{"ms"}). Defaults to \code{"min"}.}
 
-\item{baseline}{Whether to fit a baseline offset beneath each peak model.
+\item{baseline}{Whether to subtract a local baseline beneath each peak.
 Options are \code{"none"} (no baseline, default), \code{"flat"} (constant offset per
 peak), or \code{"sloped"} (linearly varying offset per peak, useful for gradient
-elution). Not available when \code{fit = "raw"}.}
+elution). For the peak models, the offset is estimated by non-linear least
+squares along with the shape parameters. When \code{fit = "raw"}, it is instead
+read directly off the boundaries of the integration window: \code{"flat"} draws a
+horizontal line at the lower of the two boundary intensities, while
+\code{"sloped"} draws a line between them (valley-to-valley integration).}
 
-\item{estimate_purity}{Logical. Whether to estimate purity or not. Defaults
-to \code{FALSE}. (If \code{TRUE}, this will slow down the function significantly).}
+\item{estimate_purity}{Logical. Whether to estimate purity. Defaults to
+\code{FALSE}. When \code{TRUE}, calls \code{\link{get_purity}} for every peak in every sample,
+at a cost that grows with the number of wavelengths.}
 
-\item{noise_threshold}{Noise threshold. Argument to \code{get_purity}.}
+\item{noise_threshold}{Noise threshold. Input to \code{get_purity}.}
 
 \item{show_progress}{Logical. Whether to show progress bar. Defaults to
 \code{TRUE} if \code{\link[pbapply:pbapply]{pbapply}} is installed.}
 
-\item{cl}{Either an integer specifying the number of cores to use for
-parallel processing or a cluster object created by
-\code{\link[parallel:makeCluster]{makeCluster}}. Defaults to \code{2}. On Windows integer
-values will be ignored.}
+\item{cl}{Number of cores (integer) or a cluster object from
+\code{\link[parallel:makeCluster]{makeCluster}}. Defaults to \code{2}. On Windows,
+integers are ignored.}
 
 \item{collapse}{Logical. Whether to collapse multiple peak lists per sample
 into a single list when multiple wavelengths (\code{lambdas}) are provided.}
@@ -87,23 +110,24 @@ into a single list when multiple wavelengths (\code{lambdas}) are provided.}
 \item{max.iter}{The \code{max.iter} argument is deprecated. Please use \code{max_iter}
 instead.}
 
-\item{\dots}{Additional arguments to \code{\link{find_peaks}}. Arguments provided to
-\code{find_peaks} can be used to fine-tune the peak-finding algorithm. Most
-importantly, the \code{smooth_window} should be increased if features are being
-split into multiple bins. Other arguments that can be used
-here include \code{smooth_type}, \code{slope_thresh}, and \code{amp_thresh}.}
+\item{...}{Additional arguments passed to \code{\link{find_peaks}}. Increase
+\code{smooth_window} if peaks are split across multiple detections. Other
+useful arguments: \code{smooth_type}, \code{min_curvature}, \code{min_amplitude}.}
 }
 \value{
-The result is an S3 object of class \code{peak_list}, containing a
-nested list of data.frames containing information about the peaks fitted for
-each chromatogram at each of wavelengths specified by the \code{lambdas}
-argument. Each row in these data.frames is a peak and the columns contain
-information about various peak parameters:
+An S3 object of class \code{peak_list}: a nested list
+(sample → wavelength) of \code{data.frame}s, one row per peak, with columns:
 \itemize{
 \item \code{rt}: The retention time of the peak maximum.
 \item \code{start}: The retention time where the peak is estimated to begin.
 \item \code{end}: The retention time where the peak is estimated to end.
-\item \code{sd}: The standard deviation (\eqn{\sigma}) of the fitted peak shape.
+\item \code{sd}: The standard deviation (\eqn{\sigma}) of the Gaussian component of
+the fitted peak shape. This is a parameter of the model rather than the width
+of the peak: for \code{"egh"} and \code{"bemg"} the asymmetry of the peak is carried by
+\code{tau} or by \code{tau_left}/\code{tau_right}, so \eqn{\sigma} describes only the core
+of the peak and is not comparable across values of \code{fit}. Use \code{FWHM} to
+compare widths. \code{NA} when \code{fit = "raw"}, which fits no model; the width of
+the integration window is available as \code{end - start}.
 \item \code{tau}: Empirical skewness parameter (in units of time) determining peak
 asymmetry when \code{fit == "egh"}.
 \item \code{tau_right}: Exponential rate constant controlling right-sided tailing
@@ -112,25 +136,45 @@ this parameter has units of 1/time.
 \item \code{tau_left}: Exponential rate constant controlling left-sided tailing
 when \code{fit = "bemg"}. Note that unlike \code{tau} in the EGH model,
 this parameter has units of 1/time.
-\item \code{h}: The \code{height} parameter of the fitted BEMG shape function (only when
-\code{fit = "bemg"}). This is the value of the pure shape at \code{center}, before
-any baseline is added, and is distinct from \code{height}.
+\item \code{h}: The amplitude parameter of the fitted BEMG shape function (only when
+\code{fit = "bemg"}), i.e. the value of the pure shape at \code{center} before any
+baseline is added. Not the same quantity as the \code{height} column.
 \item \code{center}: The center parameter of the fitted BEMG shape function (only
 when \code{fit = "bemg"}). This is the location around which the exponential
 tails are applied. Because BEMG peaks can be asymmetric
 (\verb{tau_right ≠ tau_left}) and a sloped baseline shifts the fitted curve,
 the actual peak maximum (\code{rt}) may differ from \code{center}.
-\item \code{FWHM}: The full-width at half maximum calculated as \eqn{2.355 \sigma}.
+\item \code{FWHM}: The full width at half maximum of the peak. For \code{"gaussian"} this
+is \eqn{2\sqrt{2\ln 2}\,\sigma \approx 2.355 \sigma}; for \code{"egh"} it is the
+closed form \eqn{\sqrt{(\tau\ln 2)^2 + 8\sigma^2\ln 2}} implied by the model
+(Lan & Jorgenson, 2001); and for \code{"bemg"}, which has no closed form, it is
+measured numerically from the fitted shape. For \code{"raw"} it is measured
+directly from the signal above the local \code{baseline}, and is \code{NA} when the
+integration window does not fall below half the height of the peak on both
+sides, which happens for peaks that are fused with a neighbor. Unlike \code{sd},
+\code{FWHM} is comparable across values of \code{fit}.
 \item \code{height}: The height of the peak above the fitted baseline.
 \item \code{area}: The area of the peak above the fitted baseline, estimated by
 trapezoidal approximation.
-\item \code{r.squared}: The coefficient of determination (\eqn{R^2}) of the fitted
-model to the raw data. (\strong{Note}: this value is calculated by fitting a
-linear model of the fitted peak values to the raw data. This approach is
-statistically dubious, since the models are fit using non-linear least
-squares. Nevertheless, it can still be useful as a rough metric for
-"goodness-of-fit").
+\item \code{r.squared}: Coefficient of determination (\eqn{R^2}), calculated by
+linear regression of fitted values to the raw data. Statistically informal
+(the model was fit by nonlinear least squares, not OLS), but useful as a
+fit diagnostic.
 \item \code{purity}: The peak purity as estimated by \code{\link{get_purity}}.
+\item \code{window_limited}: \code{1} if a fitted shape parameter came to rest on a bound
+derived from the integration window, meaning the window rather than the data
+determined the reported shape, and \code{0} otherwise. Not returned when
+\code{fit = "raw"}.
+\item \code{converged}: \code{1} if the nonlinear least squares optimizer reported
+convergence for the final stage of the fit, and \code{0} otherwise. A \code{0} means
+the reported parameters are wherever the optimizer stopped rather than a
+converged fit, so treat the corresponding \code{height} and \code{area} with caution.
+It also covers the case where no optimizer ran at all: a fitting stage whose
+integration window holds fewer points than the stage has parameters is
+skipped, since such a window cannot determine the model, and the reported
+parameters are then the starting estimates rather than a measurement. Both
+are common in peak lists that contain many narrow, low windows.
+Not returned when \code{fit = "raw"}.
 \item \code{floor}: Constant baseline level (only when \code{baseline = "flat"}).
 \item \code{floor_start}: Baseline level at the left edge of the peak window (only
 when \code{baseline = "sloped"}).
@@ -144,35 +188,32 @@ Detects chromatographic peaks, fits peak models, and extracts peak parameters
 at one or more wavelengths.
 }
 \details{
-Peaks are detected by finding zero-crossings in the smoothed first derivative
-of the specified chromatographic traces (using \code{\link{find_peaks}}).
-Peak models are then fit to the detected features using \code{\link{fit_peaks}}
-according to the value of \code{fit}. Available models include the bidirectional
-exponentially modified gaussian (\code{"bemg"}), exponential-gaussian hybrid
-(\code{"egh"}) or \code{"gaussian"}. Peak areas are then calculated using a
-trapezoidal approximation.
+Peaks are detected by \code{\link{find_peaks}} as zero-crossings in the smoothed first
+derivative of each trace, then fitted by \code{\link{fit_peaks}} according to \code{fit}.
+Peak areas are estimated by trapezoidal approximation.
 
-Additional arguments can be provided to \code{find_peaks} to fine-tune
-the peak-finding algorithm. For example, the \code{smooth_window} can be
-increased to reduce splitting of broad peaks into multiple features. Overly
-aggressive smoothing may cause small peaks to be overlooked.
+Pass additional arguments to \code{find_peaks} via \code{...} to adjust detection.
+Increase \code{smooth_window} to reduce splitting of broad peaks; too wide a
+window will merge closely-eluting peaks.
 
-The parameters \code{sd}, \code{FWHM}, \code{tau}, \code{tau_right}, \code{tau_left}, and
-\code{area} are returned in units determined by \code{time_unit}, which defaults to
-\code{minutes}. To compare directly with 'ChemStation' integration results,
-the time units should be changed to seconds.
+\code{sd}, \code{FWHM}, \code{tau}, \code{tau_right}, \code{tau_left}, and \code{area} are in the units
+set by \code{time_unit}, which defaults to minutes. To compare directly with
+ChemStation integration results, set \code{time_unit = "s"}.
+
+\code{rt}, \code{start}, and \code{end} are \emph{not} affected by \code{time_unit}: they are read
+off the chromatogram's own time axis and are always in its units. With
+\code{time_unit = "s"} against a chromatogram indexed in minutes, \code{rt} is in
+minutes while \code{FWHM} is in seconds. \code{max_fwhm} is compared against \code{FWHM}
+and is in the same units.
 }
 \note{
-The bones of this function are adapted from the
-\code{getAllPeaks} function (\url{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R})
-by Ron Wehrens (though the underlying algorithms for finding and integrating
-peaks are not the same.
+Adapted from \code{getAllPeaks} by Ron Wehrens
+(\url{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}); however,
+the underlying algorithms for finding and integrating peaks differ.
 }
 \examples{
-\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 data(Sa_pr)
-pks <- get_peaks(Sa_pr, lambdas = c('210'), sd_max = 50, fit = "egh")
-\dontshow{\}) # examplesIf}
+pks <- get_peaks(Sa_pr, lambdas = c('210'), max_fwhm = 1, fit = "egh")
 }
 \references{
 \itemize{

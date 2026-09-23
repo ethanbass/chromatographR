@@ -196,7 +196,7 @@ pks_gaussian <- get_peaks(dat.pr, lambdas = lam, fit = "gaussian",
                           smooth_type = "none", show_progress = FALSE)
 
 pks_raw <- get_peaks(dat.pr, lambdas = lam, fit = "raw", smooth_type = "savgol",
-                     show_progress = FALSE, sd_max = 100, smooth_window = 3)
+                     show_progress = FALSE, smooth_window = 7)
 
 test_that("get_peaks works", {
   expect_equal(names(pks_egh), names(dat.pr))
