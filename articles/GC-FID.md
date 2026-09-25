@@ -328,8 +328,8 @@ m
 #> POLISTES_SPECIES   3 1.3191e+11 0.12374 9.1912  0.001 ***
 #> STATE              7 1.2344e+11 0.11579 3.6861  0.001 ***
 #> SEX                1 4.1426e+10 0.03886 8.6592  0.001 ***
-#> LAT                1 8.1923e+09 0.00768 1.7124  0.110    
-#> LON                1 1.3227e+10 0.01241 2.7648  0.017 *  
+#> LAT                1 8.1923e+09 0.00768 1.7124  0.120    
+#> LON                1 1.3227e+10 0.01241 2.7648  0.027 *  
 #> Residual         105 5.0233e+11 0.47119                  
 #> Total            118 1.0661e+12 1.00000                  
 #> ---
@@ -570,7 +570,7 @@ Tunnel.” *Journal of Chemical Ecology* 16 (4): 1277–87.
 sessionInfo()
 #> R version 4.6.1 (2026-06-24)
 #> Platform: x86_64-pc-linux-gnu
-#> Running under: Ubuntu 24.04.4 LTS
+#> Running under: Ubuntu 24.04.5 LTS
 #> 
 #> Matrix products: default
 #> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -593,12 +593,12 @@ sessionInfo()
 #> [4] rdryad_1.0.0         chromatographR_0.8.0
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] gtable_0.3.6          xfun_0.60             caTools_1.18.4       
+#>  [1] gtable_0.3.6          xfun_0.61             caTools_1.18.4       
 #>  [4] lattice_0.22-9        generics_0.1.4        vctrs_0.7.3          
 #>  [7] tools_4.6.1           bitops_1.1-0          curl_8.0.0           
 #> [10] parallel_4.6.1        tibble_3.3.1          cluster_2.1.8.2      
 #> [13] pkgconfig_2.0.3       Matrix_1.7-5          data.table_1.18.6.1  
-#> [16] RColorBrewer_1.1-3    S7_0.2.2              readxl_1.5.0         
+#> [16] RColorBrewer_1.1-3    S7_0.2.2              readxl_1.5.0.1       
 #> [19] lifecycle_1.0.5       compiler_4.6.1        farver_2.1.2         
 #> [22] stringr_1.6.0         ptw_1.9-17            RcppDE_0.1.9         
 #> [25] minpack.lm_1.2-4      htmltools_0.5.9       yaml_2.3.12          

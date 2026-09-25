@@ -620,7 +620,7 @@ Package for R.” *Metabolomics* 11 (1): 143–54.
 
     R version 4.6.1 (2026-06-24)
     Platform: x86_64-pc-linux-gnu
-    Running under: Ubuntu 24.04.4 LTS
+    Running under: Ubuntu 24.04.5 LTS
 
     Matrix products: default
     BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -643,13 +643,13 @@ Package for R.” *Metabolomics* 11 (1): 143–54.
     [1] chromatographR_0.8.0 knitr_1.52          
 
     loaded via a namespace (and not attached):
-     [1] gtable_0.3.6          xfun_0.60             bslib_0.12.0         
+     [1] gtable_0.3.6          xfun_0.61             bslib_0.12.0         
      [4] ggplot2_4.0.3         htmlwidgets_1.6.4     caTools_1.18.4       
      [7] lattice_0.22-9        vctrs_0.7.3           tools_4.6.1          
     [10] bitops_1.1-0          generics_0.1.4        tibble_3.3.1         
     [13] pkgconfig_2.0.3       Matrix_1.7-5          data.table_1.18.6.1  
     [16] RColorBrewer_1.1-3    S7_0.2.2              desc_1.4.3           
-    [19] readxl_1.5.0          lifecycle_1.0.5       compiler_4.6.1       
+    [19] readxl_1.5.0.1        lifecycle_1.0.5       compiler_4.6.1       
     [22] farver_2.1.2          stringr_1.6.0         ptw_1.9-17           
     [25] textshaping_1.0.5     RcppDE_0.1.9          minpack.lm_1.2-4     
     [28] htmltools_0.5.9       sass_0.4.10           yaml_2.3.12          
