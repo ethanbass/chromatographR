@@ -12,12 +12,12 @@ trim_peak(x, pos, cutoff = 0.05)
 \item{pos}{A length-3 integer vector \code{c(apex, start, end)} giving the row
 indices of the peak apex, left boundary, and right boundary respectively.}
 
-\item{cutoff}{Proportion of maximum absorbance to use as cutoff. Defaults to
+\item{cutoff}{Proportion of the apex intensity to use as cutoff. Defaults to
 \code{0.05}.}
 }
 \value{
-Returns indices within the peak region (\code{start:end}) where the
-signal exceeds \code{cutoff} times the apex intensity.
+Returns the positions within \code{start:end} (so \code{1} is \code{start}) where
+the signal exceeds \code{cutoff} times the apex intensity.
 }
 \description{
 Trim peak

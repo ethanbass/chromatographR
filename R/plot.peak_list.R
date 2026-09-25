@@ -24,8 +24,21 @@
 #' `FALSE`.
 #' @param cex.font Font size if peaks are numbered. Defaults to `0.5`.
 #' @param y.offset Y offset for peak numbers. Defaults to `25`.
-#' @param plot_purity Logical. If `TRUE`, overlays peak purity traces based on
-#' peak boundaries. Defaults to `FALSE`.
+#' @param plot_purity Whether and how to draw peak purity traces below the
+#' chromatogram. `"none"` (default) draws nothing. `"ratio"` plots the purity
+#' ratio as lollipops on a log scale from 0.01 to 100, clamping values beyond
+#' it: blue for pure (ratio < 1), red for impure, with a dotted reference line
+#' at ratio = 1. `"curves"` draws spectral dissimilarity (1 - r^2) against the
+#' noise threshold on a fixed \[0, 1\] scale. The threshold is a gray dotted
+#' line, and the dissimilarity line is blue where it falls below the threshold
+#' (pure) and red where it exceeds it (impure). `"curves_local"` is the same,
+#' but rescales each peak to its own maximum. `TRUE` maps to `"curves"` and
+#' `FALSE` to `"none"`.
+#' @param purity_args A named list of additional arguments controlling the
+#' purity calculation, e.g. `list(background = "none")`. See [`get_purity`].
+#' Arguments that do not apply to the per-peak purity trace drawn here
+#' (`metric`, `min_run` and `try`) are ignored, so the same list can be passed
+#' to [`get_peaks`] and to this function.
 #' @param res Time resolution for peak fitting. If missing, inferred from 
 #' `chrom_list`.
 #' @return No return value, called for side effects.
@@ -57,7 +70,12 @@
 plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
                            points = FALSE, ticks = FALSE, alpha = 0.5, color = NULL,
                            cex.points = 0.5, numbers = FALSE, cex.font = 0.5, 
-                           y.offset = 25, plot_purity = FALSE, res){
+                           y.offset = 25,
+                           plot_purity = c("none", "ratio", "curves", "curves_local"),
+                           purity_args = list(), res){
+  if (isTRUE(plot_purity))  plot_purity <- "curves"
+  if (isFALSE(plot_purity)) plot_purity <- "none"
+  plot_purity <- match.arg(plot_purity)
   baseline <- attr(x, "baseline")
   if (is.null(baseline)) baseline <- "none"
   time.units <- attributes(x)$time.units
@@ -79,8 +97,18 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
   y <- chrom_list[[idx]][,lambda]
   pks <- data.frame(x[[idx]][[lambda]])
   fit <- attr(x,"fit")
-  plot(new.ts, y, type = 'l', xlab = '', ylab = '', 
-       xaxt = 'n', yaxt = 'n', ...)
+  purity_lim <- NULL
+  plot_args <- list(new.ts, y, type = 'l', xlab = '', ylab = '',
+                    xaxt = 'n', yaxt = 'n', ...)
+  yr <- range(y, na.rm = TRUE)
+  if (plot_purity != "none"){
+    purity_lim <- -0.1 * diff(yr)
+    bands <- 2
+    if (is.null(plot_args$ylim)){
+      plot_args$ylim <- c(min(yr[1], purity_lim * bands), yr[2])
+    }
+  }
+  do.call(plot, plot_args)
   if (points){
     apex_y <- if (baseline == "flat" && !is.null(pks$floor)) {
       pks$height + pks$floor
@@ -138,8 +166,10 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
       )
     })
   }
-  if (plot_purity){
-    plot_peak_purity(x, chrom_list, idx, lambda, new.ts)
+  if (plot_purity != "none"){
+    plot_peak_purity(x, chrom_list, idx, lambda, new.ts, y,
+                     purity_args = purity_args, lim = purity_lim,
+                     purity_display = plot_purity)
   }
 }
 
@@ -254,28 +284,108 @@ draw_peak_ticks <- function(pks, new.ts, y) {
          col = "blue", length = 0)
 }
 
-#' Plot peak purity
-#' Helper for `plot.peak_list`
+## Half-span of the purity band's log scale: ratios from 0.01 to 100 are
+## drawn, anything beyond is clamped to the edge.
+PURITY_LOG_SPAN <- 2
+
+#' Map purity ratios onto the plot
+#' 
+#' The band runs from `0` (the trace's baseline) down to `2 * lim`, with the
+#' reference line at `lim`. A ratio of one lands on the reference line, `100`
+#' or more on `2 * lim`, `0.01` or less on `0`. `lim` is negative, so larger
+#' ratios — worse purity — draw further below the trace. A purity that could
+#' not be computed stays `NA` so `polygon` skips it, matching
+#' `summarize_purity`, which drops non-finite values from the reported number.
 #' @noRd
-plot_peak_purity <- function(x, chrom_list, idx, lambda, new.ts) {
+
+scale_purity_ratio <- function(p, lim){
+  lim * pmin(pmax(1 + log10(p) / PURITY_LOG_SPAN, 0), 2)
+}
+
+#' Plot peak purity
+#'
+#' Helper for `plot.peak_list`. See `plot.peak_list` for display modes.
+#' @noRd
+plot_peak_purity <- function(x, chrom_list, idx, lambda, new.ts, y,
+                             purity_args = list(), lim = NULL,
+                             purity_display = "ratio") {
   peaks <- x[[idx]][[lambda]][, 3:5]
-  
-  p <- apply(peaks, 1, function(pos) {
-    
-    pos <- as.integer(sapply(pos, function(p) which(new.ts %in% p)))
-    
-    pk_indices <- seq(pos[2], pos[3])
-    
-    p <- get_purity_values(chrom_list[[idx]], pos)
-    
-    lim <- -20
-    
-    draw_trapezoid(
-      new.ts[pk_indices],
-      scales::rescale(p, c(0, lim)),
-      color = "black",
-      alpha = 0.6
-    )
-    abline(h = lim, lty = 3, col = "darkgray")
-  })
+  noise_variance <- hoist_noise_variance(chrom_list[[idx]], purity_args)
+  purity_args <- purity_args[setdiff(
+    intersect(names(purity_args), names(formals(get_purity_values))),
+    "noise_variance")]
+  usr <- par("usr")
+  yr  <- usr[3:4]
+  visible <- sum(new.ts >= usr[1] & new.ts <= usr[2])
+  zoom_scale <- (length(new.ts) / max(visible, 1L))^(1/3)
+  do_ratio  <- purity_display == "ratio"
+  do_curves <- purity_display %in% c("curves", "curves_local")
+  global_scale <- purity_display == "curves"
+  drew_ratio_ref  <- FALSE
+  drew_curves_ref <- FALSE
+  invisible(apply(peaks, 1, function(pos) {
+    pos <- match(as.numeric(pos), new.ts)
+    if (anyNA(pos)) return(NULL)
+    p <- do.call(get_purity_values,
+                 c(list(x = chrom_list[[idx]], pos = pos,
+                        noise_variance = noise_variance), purity_args))
+    if (is.null(p)) return(NULL)
+    keep <- attr(p, "keep")
+    if (length(keep) < 2) return(NULL)
+    ts_win <- new.ts[seq(pos[2], pos[3])][keep]
+    if (do_curves) {
+      sim  <- attr(p, "similarity")[keep]
+      thr  <- attr(p, "threshold")[keep]
+      num  <- 1 - sim
+      den  <- 1 - thr
+      scale_max <- if (global_scale) 1 else max(c(num, den), na.rm = TRUE)
+      if (scale_max < .Machine$double.eps) return(NULL)
+      y_num <- 2 * lim * num / scale_max
+      y_den <- 2 * lim * den / scale_max
+      n <- length(ts_win)
+      ok <- which(!is.na(y_num) & !is.na(y_den))
+      for (j in ok[ok < n]) {
+        if ((j + 1L) %in% ok) {
+          pure_seg <- num[j] <= den[j] && num[j + 1L] <= den[j + 1L]
+          polygon(ts_win[c(j, j + 1L, j + 1L, j)],
+                  c(y_num[j], y_num[j + 1L], y_den[j + 1L], y_den[j]),
+                  col = scales::alpha(if (pure_seg) "steelblue" else "firebrick", 0.3),
+                  border = NA)
+        }
+      }
+      line_colors <- ifelse(num <= den,
+                            scales::alpha("steelblue", 0.8),
+                            scales::alpha("firebrick", 0.7))
+      for (j in seq_len(n - 1L)) {
+        if (!is.na(y_num[j]) && !is.na(y_num[j + 1L]))
+          lines(ts_win[j:(j + 1L)], y_num[j:(j + 1L)],
+                col = line_colors[j], lwd = 1)
+      }
+      lines(ts_win, y_den, col = "gray40", lty = 3, lwd = 1.5)
+      if (!drew_curves_ref) {
+        legend("topright",
+               legend = c("Dissimilarity (1\u2212r\u00b2)", "Threshold"),
+               col    = c("steelblue", "gray40"),
+               lty    = c(1, 1), lwd = c(1, 1),
+               bty = "n", cex = 0.7)
+        drew_curves_ref <<- TRUE
+      }
+    }
+    if (do_ratio) {
+      if (!drew_ratio_ref) {
+        abline(h = lim, lty = 3, col = "darkgray")
+        legend("topright",
+               legend = c("Pure (ratio < 1)", "Impure (ratio \u2265 1)"),
+               col    = c(scales::alpha("steelblue", 0.8),
+                          scales::alpha("firebrick",  0.8)),
+               pch = 16, bty = "n", cex = 0.7)
+        drew_ratio_ref <<- TRUE
+      }
+      yvals  <- scale_purity_ratio(p[keep], lim = lim)
+      colors <- ifelse(p[keep] < 1, "steelblue", "firebrick")
+      segments(ts_win, 0, ts_win, yvals, col = "gray70", lwd = 0.8 * zoom_scale)
+      points(ts_win, yvals, pch = 16, cex = 0.6 * zoom_scale,
+             col = scales::alpha(colors, 0.8))
+    }
+  }))
 }

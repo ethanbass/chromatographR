@@ -18,7 +18,8 @@
   numbers = FALSE,
   cex.font = 0.5,
   y.offset = 25,
-  plot_purity = FALSE,
+  plot_purity = c("none", "ratio", "curves", "curves_local"),
+  purity_args = list(),
   res
 )
 }
@@ -54,8 +55,22 @@ color is chosen based on the fitted model type.}
 
 \item{y.offset}{Y offset for peak numbers. Defaults to \code{25}.}
 
-\item{plot_purity}{Logical. If \code{TRUE}, overlays peak purity traces based on
-peak boundaries. Defaults to \code{FALSE}.}
+\item{plot_purity}{Whether and how to draw peak purity traces below the
+chromatogram. \code{"none"} (default) draws nothing. \code{"ratio"} plots the purity
+ratio as lollipops on a log scale from 0.01 to 100, clamping values beyond
+it: blue for pure (ratio < 1), red for impure, with a dotted reference line
+at ratio = 1. \code{"curves"} draws spectral dissimilarity (1 - r^2) against the
+noise threshold on a fixed [0, 1] scale. The threshold is a gray dotted
+line, and the dissimilarity line is blue where it falls below the threshold
+(pure) and red where it exceeds it (impure). \code{"curves_local"} is the same,
+but rescales each peak to its own maximum. \code{TRUE} maps to \code{"curves"} and
+\code{FALSE} to \code{"none"}.}
+
+\item{purity_args}{A named list of additional arguments controlling the
+purity calculation, e.g. \code{list(background = "none")}. See \code{\link{get_purity}}.
+Arguments that do not apply to the per-peak purity trace drawn here
+(\code{metric}, \code{min_run} and \code{try}) are ignored, so the same list can be passed
+to \code{\link{get_peaks}} and to this function.}
 
 \item{res}{Time resolution for peak fitting. If missing, inferred from
 \code{chrom_list}.}

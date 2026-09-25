@@ -15,7 +15,7 @@ get_peaks(
   time_unit = c("min", "s", "ms"),
   baseline = c("none", "flat", "sloped"),
   estimate_purity = FALSE,
-  noise_threshold = 0.001,
+  purity_args = list(),
   show_progress = NULL,
   cl = 2,
   collapse = FALSE,
@@ -90,7 +90,10 @@ horizontal line at the lower of the two boundary intensities, while
 \code{FALSE}. When \code{TRUE}, calls \code{\link{get_purity}} for every peak in every sample,
 at a cost that grows with the number of wavelengths.}
 
-\item{noise_threshold}{Noise threshold. Input to \code{get_purity}.}
+\item{purity_args}{A named list of additional arguments passed to
+\code{\link{get_purity}}, e.g. \code{list(background = "none", metric = "max")}. A
+\code{lambdas} element here selects the wavelengths used to compare spectra, not
+the wavelengths at which peaks are integrated.}
 
 \item{show_progress}{Logical. Whether to show progress bar. Defaults to
 \code{TRUE} if \code{\link[pbapply:pbapply]{pbapply}} is installed.}
@@ -160,7 +163,8 @@ trapezoidal approximation.
 linear regression of fitted values to the raw data. Statistically informal
 (the model was fit by nonlinear least squares, not OLS), but useful as a
 fit diagnostic.
-\item \code{purity}: The peak purity as estimated by \code{\link{get_purity}}.
+\item \code{purity}: The peak purity as estimated by \code{\link{get_purity}}. \code{NA} unless
+\code{estimate_purity = TRUE}.
 \item \code{window_limited}: \code{1} if a fitted shape parameter came to rest on a bound
 derived from the integration window, meaning the window rather than the data
 determined the reported shape, and \code{0} otherwise. Not returned when

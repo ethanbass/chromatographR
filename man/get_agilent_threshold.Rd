@@ -7,10 +7,18 @@
 get_agilent_threshold(
   x,
   pos,
-  weight = 1,
+  noise_inflation = 1,
   noise_variance = NULL,
-  noise_threshold = 0.005,
-  lambdas
+  noise_method = c("quantile", "threshold"),
+  noise_quantile = 0.1,
+  noise_window = NULL,
+  noise_threshold = NULL,
+  max_threshold = 0.99,
+  background = c("linear", "constant", "none"),
+  reference = c("average", "apex"),
+  cutoff = 0.05,
+  lambdas,
+  weight = NULL
 )
 }
 \arguments{
@@ -19,23 +27,52 @@ get_agilent_threshold(
 \item{pos}{A length-3 integer vector \code{c(apex, start, end)} giving the row
 indices of the peak apex, left boundary, and right boundary in \code{x}.}
 
-\item{weight}{Scaling parameter affecting stringency of threshold. Defaults
-to \code{1}.}
+\item{noise_inflation}{Multiplier applied to the noise variance. Defaults to
+\code{1}.}
 
 \item{noise_variance}{Variance of noise.}
 
-\item{noise_threshold}{Threshold to define noise. Highest proportion of
-maximum absorbance. Defaults to \code{0.005}.}
+\item{noise_method}{How to select the timepoints used to estimate the noise
+variance. Either \code{"quantile"} or \code{"threshold"}.}
 
-\item{lambdas}{Wavelengths to include.}
+\item{noise_quantile}{Quantile of maximum absorbance below which timepoints
+are treated as noise.}
+
+\item{noise_window}{Optional range of row indices to use as the noise
+region.}
+
+\item{noise_threshold}{Threshold to define noise. Used only when
+\code{noise_method == "threshold"}, where \code{NULL} (the default) means \code{0.005}.}
+
+\item{max_threshold}{Ceiling on the threshold. Defaults to \code{0.99}.}
+
+\item{background}{How to correct the peak spectra for background
+absorbance. Either \code{"linear"}, \code{"constant"}, or \code{"none"}.}
+
+\item{reference}{Which spectrum to compare against. Either \code{"average"} (the
+default) or \code{"apex"}. See \code{\link{get_purity}}.}
+
+\item{cutoff}{Proportion of the corrected apex height below which
+timepoints are excluded from the average reference spectrum. Defaults to
+\code{0.05}.}
+
+\item{lambdas}{Wavelengths to include. Character values are matched to the
+column names of \code{x}; numeric values are taken as column indices.}
+
+\item{weight}{The \code{weight} argument is deprecated. Please use \code{noise_inflation}
+instead.}
 }
 \value{
-Returns a vector of purity thresholds at each retention time index
-within the peak specified by \code{pos}.
+Returns a vector of purity thresholds, one for each timepoint from
+the start to the end of the peak specified by \code{pos}, or \code{NULL} if the peak
+cannot be assessed.
 }
 \description{
-Intermediate function used in \code{\link{get_purity}} to compute variance-based
-thresholds.
+Computes the threshold used by \code{\link{get_purity}}: the similarity expected
+between a spectrum and the reference if they differed only by noise, the
+product of their reliabilities
+\eqn{(1 - \sigma^2_{noise} / \sigma^2_i)(1 - \sigma^2_{noise} / \sigma^2_{ref})},
+capped at \code{max_threshold}.
 }
 \examples{
 data(Sa_warp)

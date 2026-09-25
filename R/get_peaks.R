@@ -74,7 +74,10 @@
 #' @param estimate_purity Logical. Whether to estimate purity. Defaults to
 #' `FALSE`. When `TRUE`, calls [`get_purity`] for every peak in every sample,
 #' at a cost that grows with the number of wavelengths.
-#' @param noise_threshold Noise threshold. Input to `get_purity`.
+#' @param purity_args A named list of additional arguments passed to
+#' [`get_purity`], e.g. `list(background = "none", metric = "max")`. A
+#' `lambdas` element here selects the wavelengths used to compare spectra, not
+#' the wavelengths at which peaks are integrated.
 #' @param show_progress Logical. Whether to show progress bar. Defaults to 
 #' `TRUE` if [`pbapply`][pbapply::pbapply] is installed.
 #' @param cl Number of cores (integer) or a cluster object from
@@ -137,7 +140,8 @@
 #' linear regression of fitted values to the raw data. Statistically informal
 #' (the model was fit by nonlinear least squares, not OLS), but useful as a
 #' fit diagnostic.
-#' * `purity`: The peak purity as estimated by [`get_purity`].
+#' * `purity`: The peak purity as estimated by [`get_purity`]. `NA` unless
+#' `estimate_purity = TRUE`.
 #' * `window_limited`: `1` if a fitted shape parameter came to rest on a bound
 #' derived from the integration window, meaning the window rather than the data
 #' determined the reported shape, and `0` otherwise. Not returned when
@@ -199,7 +203,7 @@ get_peaks <- function(chrom_list, lambdas,
                       max_fwhm = NULL, sd_max = NULL, max_iter = 1000,
                       time_unit = c("min", "s", "ms"),
                       baseline = c("none", "flat", "sloped"),
-                      estimate_purity = FALSE,  noise_threshold = .001,
+                      estimate_purity = FALSE, purity_args = list(),
                       show_progress = NULL, cl = 2, collapse = FALSE,
                       time.units = NULL, sd.max = NULL, max.iter = NULL, ...){
   check_duplicated_names(names(chrom_list))
@@ -257,10 +261,12 @@ get_peaks <- function(chrom_list, lambdas,
   laplee <- choose_apply_fnc(show_progress, cl = cl)
   
   fit_sample <- function(sample){
-    # `timepoints` and `tdiff` are properties of the chromatogram, not of the
-    # wavelength, so they are derived once per sample
+    # `timepoints`, `tdiff` and the noise variance are properties of the
+    # chromatogram, not of the wavelength, so they are derived once per sample
     timepoints <- get_times(chrom_list, idx = sample)
     tdiff <- get_time_resolution(chrom_list, idx = sample)
+    noise_variance <- if (estimate_purity)
+      hoist_noise_variance(chrom_list[[sample]], purity_args) else NULL
     cutoff <- if (sd_max_supplied){
       if (is.null(sd_max)) NULL else FWHM_CONST * sd_max * tdiff * tfac
     } else max_fwhm
@@ -269,7 +275,8 @@ get_peaks <- function(chrom_list, lambdas,
                        windows = windows,
                        max_iter = max_iter, max_fwhm = NULL,
                        estimate_purity = estimate_purity,
-                       noise_threshold = noise_threshold,
+                       purity_args = purity_args,
+                       noise_variance = noise_variance,
                        baseline = baseline, ...)
       if (nrow(pks) == 0){
         # No peaks in this sample/wavelength.

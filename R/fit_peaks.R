@@ -251,8 +251,12 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' @param max_iter Maximum number of iterations to use in nonlinear least
 #' squares peak-fitting. Defaults to `1000`.
 #' @param estimate_purity Logical. Whether to estimate purity. Defaults
-#' to `TRUE`.
-#' @param noise_threshold Noise threshold. Input to `get_purity`.
+#' to `TRUE`, but is set to `FALSE` when `x` holds a single wavelength.
+#' @param purity_args A named list of additional arguments passed to
+#' [`get_purity`], e.g. `list(background = "none", metric = "max")`.
+#' @param noise_variance Variance of noise, passed to [`get_purity`]. If not
+#' provided, it is estimated once for the whole chromatogram rather than once
+#' per peak.
 #' @param baseline Whether to subtract a local baseline beneath each peak.
 #' Options are `"none"` (no baseline, default), `"flat"` (constant offset), or
 #' `"sloped"` (linearly varying offset). For the peak models, the offset is
@@ -335,7 +339,7 @@ fit_peaks <- function (x, lambda, pos = NULL, windows = NULL,
                        sd_max = NULL,
                        fit = c("egh", "bemg", "gaussian", "raw"),
                        max_iter = 1000, estimate_purity = TRUE,
-                       noise_threshold = .001,
+                       purity_args = list(), noise_variance = NULL,
                        baseline = c("none", "flat", "sloped"), ...){
   lambda.idx <- get_lambda_idx(lambda, get_lambdas(x), allow_max = FALSE)
   y <- x[,lambda.idx]
@@ -420,10 +424,14 @@ fit_peaks <- function (x, lambda, pos = NULL, windows = NULL,
                   "egh" = fitpk_egh,
                   "raw" = fitpk_raw,
                   "bemg" = fitpk_bemg)
+  if (estimate_purity && is.null(noise_variance)){
+    noise_variance <- hoist_noise_variance(x, purity_args)
+  }
   huhn <- data.frame(t(apply(pos, 1, fitpk, x = x,
                              lambda = lambda.idx, max_iter = max_iter,
                              estimate_purity = estimate_purity,
-                             noise_threshold = noise_threshold,
+                             noise_variance = noise_variance,
+                             purity_args = purity_args,
                              baseline = baseline)))
   colnames(huhn) <- tabnames
   huhn <- data.frame(sapply(huhn, as.numeric, simplify = FALSE))
@@ -977,6 +985,14 @@ floor_cols <- function(baseline){
          "sloped" = c("floor_start", "floor_end"))
 }
 
+#' Purity of one peak
+#' @noRd
+peak_purity <- function(x, pos, estimate_purity, noise_variance, purity_args){
+  purity_args[c("x", "pos", "try", "noise_variance")] <- NULL
+  do.call(get_purity, c(list(x = x, pos = pos, try = estimate_purity,
+                             noise_variance = noise_variance), purity_args))
+}
+
 #' Trapezoidal area above a local baseline
 #' @noRd
 integrate_above_baseline <- function(y_fit, peak.loc, floor_val, slope_val){
@@ -1004,8 +1020,8 @@ append_floor_cols <- function(result, baseline, floor_val, slope_val, peak.loc){
 }
 
 fitpk_bemg <- function(x, pos, lambda, max_iter,
-                       estimate_purity = TRUE, noise_threshold = .001,
-                       baseline = "none"){
+                       estimate_purity = TRUE, noise_variance = NULL,
+                       purity_args = list(), baseline = "none"){
   y <- x[,lambda]
   xloc <- pos[[1]]
   peak.loc <- seq.int(pos[2], pos[3])
@@ -1014,8 +1030,7 @@ fitpk_bemg <- function(x, pos, lambda, max_iter,
                                  baseline = baseline)
   )
   r.squared <- suppressWarnings(try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE))
-  purity <- get_purity(x = x, pos = pos, try = estimate_purity,
-                       noise_threshold = noise_threshold)
+  purity <- peak_purity(x, pos, estimate_purity, noise_variance, purity_args)
   bl <- get_local_baseline(m, baseline)
   int <- integrate_above_baseline(m$y, peak.loc, bl$floor, bl$slope)
   y_above <- int$y_above
@@ -1036,8 +1051,8 @@ fitpk_bemg <- function(x, pos, lambda, max_iter,
 #' Fit peak (gaussian)
 #' @noRd
 fitpk_gaussian <- function(x, pos, lambda, max_iter,
-                           estimate_purity = TRUE, noise_threshold = .001,
-                           baseline = "none", ...){
+                           estimate_purity = TRUE, noise_variance = NULL,
+                           purity_args = list(), baseline = "none", ...){
   y <- x[,lambda]
   xloc <- pos[[1]]
   peak.loc <- seq.int(pos[2], pos[3])
@@ -1050,8 +1065,7 @@ fitpk_gaussian <- function(x, pos, lambda, max_iter,
   bl <- get_local_baseline(m, baseline)
   area <- integrate_above_baseline(m$y, peak.loc, bl$floor, bl$slope)$area
   r.squared <- suppressWarnings(try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE))
-  purity <- get_purity(x = x, pos = pos, try = estimate_purity,
-                       noise_threshold = noise_threshold)
+  purity <- peak_purity(x, pos, estimate_purity, noise_variance, purity_args)
   result <- c("rt" = unname(m$center), "start" = pos[2], "end" = pos[3],
     "sd" = unname(m$width), "FWHM" = FWHM_CONST * unname(m$width),
     "height" = unname(m$height), "area" = area,
@@ -1064,8 +1078,8 @@ fitpk_gaussian <- function(x, pos, lambda, max_iter,
 #' Fit peak (exponential-gaussian hybrid)
 #' @noRd
 fitpk_egh <- function(x, pos, lambda, max_iter,
-                      estimate_purity = TRUE, noise_threshold = .001,
-                      baseline = "none"){
+                      estimate_purity = TRUE, noise_variance = NULL,
+                      purity_args = list(), baseline = "none"){
   y <- x[,lambda]
   xloc <- pos[[1]]
   peak.loc <- seq.int(pos[2], pos[3])
@@ -1074,8 +1088,7 @@ fitpk_egh <- function(x, pos, lambda, max_iter,
                                 baseline = baseline)
   )
   r.squared <- suppressWarnings(try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE))
-  purity <- get_purity(x = x, pos = pos, try = estimate_purity,
-                       noise_threshold = noise_threshold)
+  purity <- peak_purity(x, pos, estimate_purity, noise_variance, purity_args)
   bl <- get_local_baseline(m, baseline)
   area <- integrate_above_baseline(m$y, peak.loc, bl$floor, bl$slope)$area
   result <- c("rt" = unname(m$center), "start" = pos[2], "end" = pos[3],
@@ -1091,8 +1104,8 @@ fitpk_egh <- function(x, pos, lambda, max_iter,
 #' Fit peak (raw)
 #' @noRd
 fitpk_raw <- function(x, pos, lambda, max_iter,
-                      estimate_purity = TRUE, noise_threshold = .001,
-                      baseline = "none"){
+                      estimate_purity = TRUE, noise_variance = NULL,
+                      purity_args = list(), baseline = "none"){
   y <- x[,lambda]
   xloc <- pos[1]
   peak.loc <- seq.int(pos[2], pos[3])
@@ -1122,8 +1135,7 @@ fitpk_raw <- function(x, pos, lambda, max_iter,
       signif(get_times(x)[pos[2]], 4), signif(get_times(x)[pos[3]], 4)),
       immediate. = TRUE)
   }
-  purity <- get_purity(x = x, pos = pos, try = estimate_purity,
-                       noise_threshold = noise_threshold)
+  purity <- peak_purity(x, pos, estimate_purity, noise_variance, purity_args)
   result <- c("rt" = pos[1], "start" = pos[2], "end" = pos[3],
     "sd" = NA_real_, "FWHM" = measured_fwhm(int$y_above),
     "height" = y[xloc] - (floor_val + slope_val * (xloc - peak.loc[1])),

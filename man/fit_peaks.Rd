@@ -14,7 +14,8 @@ fit_peaks(
   fit = c("egh", "bemg", "gaussian", "raw"),
   max_iter = 1000,
   estimate_purity = TRUE,
-  noise_threshold = 0.001,
+  purity_args = list(),
+  noise_variance = NULL,
   baseline = c("none", "flat", "sloped"),
   ...
 )
@@ -61,9 +62,14 @@ trapezoidal integration without model fitting. Defaults to \code{"egh"}.}
 squares peak-fitting. Defaults to \code{1000}.}
 
 \item{estimate_purity}{Logical. Whether to estimate purity. Defaults
-to \code{TRUE}.}
+to \code{TRUE}, but is set to \code{FALSE} when \code{x} holds a single wavelength.}
 
-\item{noise_threshold}{Noise threshold. Input to \code{get_purity}.}
+\item{purity_args}{A named list of additional arguments passed to
+\code{\link{get_purity}}, e.g. \code{list(background = "none", metric = "max")}.}
+
+\item{noise_variance}{Variance of noise, passed to \code{\link{get_purity}}. If not
+provided, it is estimated once for the whole chromatogram rather than once
+per peak.}
 
 \item{baseline}{Whether to subtract a local baseline beneath each peak.
 Options are \code{"none"} (no baseline, default), \code{"flat"} (constant offset), or

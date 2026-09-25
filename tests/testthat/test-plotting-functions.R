@@ -440,3 +440,32 @@ test_that("plot.peak_table works", {
                     box_plot = TRUE, var = "trt", verbose = FALSE),
                regexp = "A peak name must be provided")
 })
+
+test_that("purity plot works", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  data(Sa_pr)
+  pks <- get_peaks(Sa_pr[1], lambdas = 210, fit = "egh", estimate_purity = TRUE,
+                   cl = 1, show_progress = FALSE)
+  plot_purity <- function(display){
+    function() plot(pks, chrom_list = Sa_pr, points = TRUE, ticks = TRUE,
+                    lambda = 210, plot_purity = display)
+  }
+  vdiffr::expect_doppelganger("plot_purity", plot_purity(TRUE))
+  vdiffr::expect_doppelganger("plot_purity_ratio", plot_purity("ratio"))
+  vdiffr::expect_doppelganger("plot_purity_curves_local", plot_purity("curves_local"))
+})
+
+test_that("purity_args accepted by get_peaks also work at plot time", {
+  # `get_purity_values`' formals are a strict subset of `get_purity`'s
+  skip_on_cran()
+  data(Sa_pr)
+  pks <- get_peaks(Sa_pr[1], lambdas = 210, cl = 1, show_progress = FALSE)
+  pdf(NULL)
+  on.exit(dev.off())
+  for (pa in list(list(metric = "max"), list(min_run = 5), list(try = TRUE))){
+    expect_no_error(suppressWarnings(
+      plot(pks, chrom_list = Sa_pr, idx = 1, lambda = "210",
+           plot_purity = TRUE, purity_args = pa)))
+  }
+})

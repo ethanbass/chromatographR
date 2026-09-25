@@ -7,12 +7,21 @@
 get_purity(
   x,
   pos,
-  weight = 1,
+  noise_inflation = 1,
   cutoff = 0.05,
   noise_variance = NULL,
-  noise_threshold = 0.01,
+  noise_method = c("quantile", "threshold"),
+  noise_quantile = 0.1,
+  noise_window = NULL,
+  noise_threshold = NULL,
+  max_threshold = 0.99,
+  background = c("linear", "constant", "none"),
+  reference = c("average", "apex"),
+  metric = c("fraction", "max"),
+  min_run = 3,
   lambdas,
-  try = TRUE
+  try = TRUE,
+  weight = NULL
 )
 }
 \arguments{
@@ -21,27 +30,110 @@ get_purity(
 \item{pos}{A length-3 integer vector \code{c(apex, start, end)} giving the row
 indices of the peak apex, left boundary, and right boundary in \code{x}.}
 
-\item{weight}{Weight parameter passed to \code{\link{get_agilent_threshold}}.}
+\item{noise_inflation}{Multiplier applied to the noise variance, whether
+supplied via \code{noise_variance} or estimated. Values above \code{1} treat the noise
+as larger than measured, which loosens the threshold. Defaults to \code{1}.}
 
-\item{cutoff}{Proportion of maximum absorbance to use as cutoff.
-Passed to \code{\link{trim_peak}}. Defaults to \code{0.05}.}
+\item{cutoff}{Timepoints at or below \code{cutoff} times the background-corrected
+apex height are excluded, measured at the wavelength of maximum absorbance at
+the apex. Defaults to \code{0.05}.}
 
-\item{noise_variance}{Variance of noise. Passed to \code{get_agilent_threshold}.}
+\item{noise_variance}{Variance of noise. If provided, it replaces the
+estimate, and the \verb{noise_*} arguments that control estimation are ignored.
+Estimating the noise variance requires a pass over the whole chromatogram,
+so supplying it is much faster when many peaks are assessed.}
 
-\item{noise_threshold}{Threshold to define noise. Highest proportion of
-maximum absorbance. Defaults to \code{0.01}.}
+\item{noise_method}{How to select the timepoints used to estimate the noise
+variance. Either \code{"quantile"} (the default), which takes the timepoints in
+the lowest \code{noise_quantile} of maximum absorbance, or \code{"threshold"}, the
+legacy behavior, which takes timepoints falling below \code{noise_threshold}
+times the largest absorbance in the chromatogram.}
 
-\item{lambdas}{Wavelengths to include in calculations.}
+\item{noise_quantile}{Quantile of maximum absorbance below which timepoints
+are treated as noise. Defaults to \code{0.1}.}
 
-\item{try}{Logical. Whether to estimate the purity or not. Defaults to \code{TRUE}.}
+\item{noise_window}{Optional range of row indices to use as the noise
+region. Takes precedence over \code{noise_method}.}
+
+\item{noise_threshold}{Threshold to define noise, as a proportion of the
+largest absorbance in the chromatogram. Used only when
+\code{noise_method == "threshold"}, where \code{NULL} (the default) means \code{0.005}.}
+
+\item{max_threshold}{Ceiling on the purity threshold. Without it, the
+threshold approaches one for high signal-to-noise peaks, so the tolerated
+dissimilarity approaches zero, and spectral variation that noise cannot
+explain, such as detector non-linearity or a changing solvent composition,
+makes such peaks impure. Corresponds to the user-defined similarity
+threshold in the Agilent ChemStation, where \code{0.99} is a similarity of 990.
+Defaults to \code{0.99}. Set to \code{1} to disable.}
+
+\item{background}{How to correct the peak spectra for background
+absorbance. Either \code{"linear"} (the default), \code{"constant"}, or \code{"none"}.}
+
+\item{reference}{Which spectrum to compare the peak spectra against.
+Either \code{"average"} (the default), the mean of the assessed spectra, or
+\code{"apex"}, the spectrum at the peak apex. The apex spectrum correlates
+perfectly with itself, so it forces a purity ratio of exactly zero at the
+apex of every peak. Stahl recommends the average spectrum for unknown
+impurities.}
+
+\item{metric}{Statistic to summarize the purity ratios. Either
+\code{"fraction"} (the default), the proportion of in-peak timepoints that are
+pure, or \code{"max"}, the largest purity ratio. The run-length rule applies to
+\code{"fraction"} only.}
+
+\item{min_run}{Minimum number of consecutive failing timepoints required to
+count as impure. Defaults to \code{3}.}
+
+\item{lambdas}{Wavelengths to include in calculations. Character values are
+matched to the column names of \code{x}; numeric values are taken as column
+indices. Defaults to all wavelengths.}
+
+\item{try}{Logical. If \code{FALSE}, returns \code{NA} without estimating purity.
+Defaults to \code{TRUE}.}
+
+\item{weight}{The \code{weight} argument is deprecated. Please use \code{noise_inflation}
+instead.}
 }
 \value{
-Returns the mean purity of the peak specified by \code{pos}, defined
-as the proportion of timepoints with purity values below 1.
+Returns the purity of the peak specified by \code{pos}: with
+\code{metric = "fraction"}, the proportion of timepoints above \code{cutoff} not
+counted as impure; with \code{metric = "max"}, the largest purity ratio. Returns
+\code{NA_real_} if the peak cannot be assessed, including when fewer than three
+timepoints lie above \code{cutoff}. An error during the calculation is converted
+to a warning and also returns \code{NA_real_}.
 }
 \description{
 Estimates peak purity by assessing spectral dissimilarity across the peak
 region, following Stahl (2003).
+}
+\details{
+At each timepoint in the peak, the spectrum is compared to a reference
+spectrum, by default the mean of the assessed spectra. The resulting
+dissimilarity (\eqn{1 - r^2}) is divided by the dissimilarity that noise
+alone could explain, one minus the threshold returned by
+\code{\link{get_agilent_threshold}}. A ratio below one means the spectrum is as similar
+to the reference as the noise permits. With the default
+\code{metric = "fraction"}, a timepoint only counts as impure if it belongs to a
+run of at least \code{min_run} consecutive failing timepoints, so isolated
+failures are ignored. Stahl requires a run of three.
+
+Spectra are background-corrected before comparison by subtracting the
+spectra at the peak boundaries, interpolated across the peak
+(\code{background = "linear"}) or averaged (\code{background = "constant"}). Anything
+that changes linearly across the peak is removed with the background,
+including a co-eluting impurity much broader than the peak. If
+\code{\link{preprocess}} has removed the baseline completely, \code{background = "none"}
+avoids this, but any remaining baseline then enters the comparison as part of
+each spectrum.
+
+With the default \code{metric = "fraction"}, pure peaks do not always score
+exactly one, so treat purity below about 0.9, rather than any value below
+one, as a sign of impurity. Wide, tailing and weak peaks fall below 0.9 more
+often than others, even when pure. So do peaks above about 2 AU, whose
+spectra near the apex are distorted by the detector's non-linear response.
+The purity calculation is still being refined, and its values may change in
+future releases.
 }
 \examples{
 data(Sa_warp)

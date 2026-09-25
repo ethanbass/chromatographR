@@ -615,18 +615,6 @@ test_that("plot.peak_list works", {
                regexp = "must match one of the wavelengths in your peak list")
 })
 
-test_that("purity plot works", {
-  skip_on_cran()
-  skip_if_not_installed("vdiffr")
-  pks_egh <- get_peaks(dat.pr, lambdas = lam, fit = "egh", smooth_type = "none",
-                     show_progress = FALSE, estimate_purity = TRUE)
-  plot_purity <- function(){
-    plot(pks_egh, chrom_list = dat.pr, points = TRUE,
-         ticks = TRUE, lambda = 210, plot_purity = TRUE)
-  }
-  vdiffr::expect_doppelganger("plot_purity", plot_purity)
-})
-
 
 test_that("plot.ptw_list works", {
   skip_on_cran()

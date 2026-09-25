@@ -38,6 +38,26 @@ For now, the old names still work with a deprecation warning.
 `sd_max` used to drop peaks with sd > 50 timepoints. Its replacement,
 `max_fwhm`, defaults to no filtering; set it to restore the filter.
 
+#### Peak purity
+
+* Overhauled `get_purity`. Purity values change for every peak. The purity
+ratio is now computed correctly and is far less sensitive to the baseline, to
+the tallest peak in the run, and to isolated noise. Note that `cutoff` now
+applies to the background-corrected trace, so it means a proportion of peak
+height rather than of total absorbance. See `?get_purity`.
+* Added arguments to `get_purity`: `background`, `reference`, `metric`,
+`min_run` and `max_threshold` control the purity calculation, and
+`noise_method`, `noise_quantile` and `noise_window` control noise estimation.
+* Deprecated the `weight` argument to `get_purity` and `get_agilent_threshold`
+in favor of `noise_inflation`.
+* Removed the `noise_threshold` argument from `get_peaks` and `fit_peaks`,
+which had no effect. Pass purity options as `purity_args` instead.
+* `plot.peak_list` now accepts `plot_purity = "curves"` (dissimilarity and
+threshold as color-coded lines on a fixed scale; the default for `TRUE`),
+`"curves_local"` (per-peak-scaled for diagnostic use), and `"ratio"` (log-scaled
+lollipop). Also corrected a rescaling bug where the reference line did not mark
+a ratio of 1. See `?plot.peak_list`.
+
 #### Peak tables and plotting
 
 * Retention times in dimnames are now formatted to a consistent number of
@@ -116,6 +136,14 @@ error on `fit = "raw"`, which reports no fit diagnostics.
 * `get_peaks` now warns when more than a fifth of the peak list is integration
 windows too small to fit, which usually means `find_peaks` is detecting noise.
 Suppressed for `fit = "raw"` and when `windows` is supplied.
+
+#### Peak purity
+
+* Purity estimation in `get_peaks` is now much faster, so it is no longer a
+bottleneck.
+* Purity estimation now warns when a chromatogram appears to be clipped at
+zero, which makes peaks look less pure. Use `zero_floor = FALSE` in
+`preprocess` (the default) and `subtract_blanks`.
 
 ### Bug fixes and other minor changes
 
