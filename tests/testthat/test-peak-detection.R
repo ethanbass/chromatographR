@@ -626,3 +626,26 @@ test_that("find_peaks keeps its column schema when nothing is detected", {
   expect_equal(nrow(p), 0L)
   expect_named(p, c("pos", "lower", "upper", "prominence"))
 })
+
+test_that("fit_peaks rejects a `pos` that is not a find_peaks table", {
+  x <- Sa_pr[[1]]
+  expect_error(fit_peaks(x, lambda = "210", pos = c(50, 100)),
+               regexp = "must be a data.frame with columns")
+})
+
+test_that("fit_peaks refuses `lambda = \"max\"` with a clear message", {
+  expect_error(fit_peaks(Sa_pr[[1]], lambda = "max"),
+               regexp = "must be a specific wavelength")
+})
+
+test_that("get_lambda_idx checks the wavelength of a single-column chromatogram", {
+  expect_error(get_lambda_idx("999", lambdas = 210, allow_max = FALSE),
+               regexp = "could not be found")
+  expect_equal(get_lambda_idx("210", lambdas = 210, allow_max = FALSE), 1)
+  expect_equal(get_lambda_idx("999", lambdas = NA_real_, allow_max = FALSE), 1)
+})
+
+test_that("print.peak_list reports no width filter by default", {
+  pks <- get_peaks(Sa_pr[1], lambdas = "210", show_progress = FALSE)
+  expect_output(print(pks), "max_fwhm: none")
+})

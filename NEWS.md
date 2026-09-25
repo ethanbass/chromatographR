@@ -237,6 +237,8 @@ single empty sample failed the whole call. `fit_peaks` now returns an empty
 * `FWHM` is now computed as `2*sqrt(2*log(2))*sigma` rather than the rounded
 `2.35*sigma`, and a bug in its calculation for raw peak shapes is fixed.
 * Suppressed spurious "essentially perfect fit" warning from `summary.lm` when computing R² in `fit_peaks`.
+* Requesting a wavelength missing from a single-column chromatogram now errors,
+instead of returning the existing column falsely labeled with the requested wavelength.
 
 #### Peak tables and filtering
 

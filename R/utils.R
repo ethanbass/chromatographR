@@ -131,14 +131,14 @@ get_lambda_idx <- function(lambda, lambdas, y, allow_max = TRUE){
     if (allow_max){
       lambda.idx <- which.max(if (is.null(dim(y))) y else rowMeans(y, na.rm = TRUE))
     } else{
-      stop("Wavelength (`lambda`) must be specified for interactive scanning.")
+      stop("`lambda` must be a specific wavelength here; `\"max\"` is not supported.")
     }
+  } else if (length(lambdas) == 1 && is.na(lambdas)){
+    lambda.idx <- 1
   } else{
-    lambda.idx <- ifelse((length(lambdas) == 1), 1,
-                                which(lambdas == as.numeric(lambda))
-    )
+    lambda.idx <- which(lambdas == as.numeric(lambda))
   }
-  if (is.na(lambda.idx) | length(lambda.idx) == 0)
+  if (length(lambda.idx) == 0 || anyNA(lambda.idx))
     stop(sprintf("The specified wavelength (`%s`) could not be found!", lambda))
   lambda.idx
 }

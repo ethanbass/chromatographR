@@ -11,7 +11,7 @@ get_peaks(
   windows = NULL,
   max_fwhm = NULL,
   sd_max = NULL,
-  max_iter = 100,
+  max_iter = 1000,
   time_unit = c("min", "s", "ms"),
   baseline = c("none", "flat", "sloped"),
   estimate_purity = FALSE,
@@ -71,7 +71,7 @@ it is converted to a \code{FWHM} cutoff of \code{2.355 * sd_max * dt} in the uni
 to disable width filtering. Ignored if \code{windows} is provided.}
 
 \item{max_iter}{Maximum number of iterations for non-linear least squares
-in \code{\link{fit_peaks}}.}
+in \code{\link{fit_peaks}}. Defaults to \code{1000}.}
 
 \item{time_unit}{Specifies the units for \code{sd}, \code{FWHM}, \code{area}, and \code{tau} (if
 applicable). Options are minutes (\code{"min"}), seconds (\code{"s"}), or

@@ -63,7 +63,7 @@
 #' to disable width filtering. Ignored if `windows` is provided.
 #' @param sd.max The `sd.max` argument is deprecated. Please use `sd_max` instead.
 #' @param max_iter Maximum number of iterations for non-linear least squares
-#' in [`fit_peaks`].
+#' in [`fit_peaks`]. Defaults to `1000`.
 #' @param max.iter The `max.iter` argument is deprecated. Please use `max_iter` 
 #' instead.
 #' @param time_unit Specifies the units for `sd`, `FWHM`, `area`, and `tau` (if
@@ -196,7 +196,7 @@
 get_peaks <- function(chrom_list, lambdas,
                       fit = c("egh", "bemg", "gaussian", "raw"),
                       windows = NULL,
-                      max_fwhm = NULL, sd_max = NULL, max_iter = 100,
+                      max_fwhm = NULL, sd_max = NULL, max_iter = 1000,
                       time_unit = c("min", "s", "ms"),
                       baseline = c("none", "flat", "sloped"),
                       estimate_purity = FALSE,  noise_threshold = .001,
@@ -535,8 +535,7 @@ print.peak_list <- function(x, ...) {
               else if (!is.null(meta$sd_max))
                 sprintf("%s * %s timepoints (from sd_max)",
                         signif(FWHM_CONST, 4), meta$sd_max)
-              else sprintf("default (%s * %d timepoints)",
-                           signif(FWHM_CONST, 4), SD_MAX_TIMEPOINTS)))
+              else "none"))
   cat(sprintf("Total peaks: %d (mean %s per sample)\n",
               n_peaks, mean_peaks))
   if (!is.na(meta$chrom_list))

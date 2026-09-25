@@ -9,7 +9,7 @@ fit_peaks(
   lambda,
   pos = NULL,
   windows = NULL,
-  max_fwhm = FWHM_CONST * SD_MAX_TIMEPOINTS,
+  max_fwhm = NULL,
   sd_max = NULL,
   fit = c("egh", "bemg", "gaussian", "raw"),
   max_iter = 1000,
@@ -44,7 +44,8 @@ chosen by the user. Cannot be combined with \code{pos}. Defaults to
 
 \item{max_fwhm}{Maximum peak width, as a full width at half maximum, in
 index units. Peaks whose \code{FWHM} could not be measured (\code{NA}) are retained.
-Defaults to \code{2.355 * 50} index units. Ignored if \code{windows} is provided.}
+Defaults to \code{NULL}, which applies no width filter. Ignored if \code{windows} is
+provided.}
 
 \item{sd_max}{The \code{sd_max} argument is deprecated, because a standard
 deviation is not a peak width for any model except \code{"gaussian"}. Please use

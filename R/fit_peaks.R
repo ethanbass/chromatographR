@@ -238,7 +238,8 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' `NULL`.
 #' @param max_fwhm Maximum peak width, as a full width at half maximum, in
 #' index units. Peaks whose `FWHM` could not be measured (`NA`) are retained.
-#' Defaults to `2.355 * 50` index units. Ignored if `windows` is provided.
+#' Defaults to `NULL`, which applies no width filter. Ignored if `windows` is
+#' provided.
 #' @param sd_max The `sd_max` argument is deprecated, because a standard
 #' deviation is not a peak width for any model except `"gaussian"`. Please use
 #' `max_fwhm` instead. If supplied, it is applied as a cutoff on `FWHM` of
@@ -330,13 +331,13 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' @keywords internal
 
 fit_peaks <- function (x, lambda, pos = NULL, windows = NULL,
-                       max_fwhm = FWHM_CONST * SD_MAX_TIMEPOINTS,
+                       max_fwhm = NULL,
                        sd_max = NULL,
                        fit = c("egh", "bemg", "gaussian", "raw"),
                        max_iter = 1000, estimate_purity = TRUE,
                        noise_threshold = .001,
                        baseline = c("none", "flat", "sloped"), ...){
-  lambda.idx <- get_lambda_idx(lambda, get_lambdas(x))
+  lambda.idx <- get_lambda_idx(lambda, get_lambdas(x), allow_max = FALSE)
   y <- x[,lambda.idx]
   # `find_peaks` returns a bare vector of apex positions when `bounds = FALSE`,
   # which cannot be integrated, since every peak model needs a window.
@@ -357,6 +358,11 @@ fit_peaks <- function (x, lambda, pos = NULL, windows = NULL,
   }
   fit <- match.arg(fit, c("egh", "bemg", "gaussian", "raw"))
   baseline <- match.arg(baseline, c("none", "flat", "sloped"))
+  if (!is.null(pos) && !(is.data.frame(pos) &&
+                         all(c("pos", "lower", "upper") %in% names(pos)))){
+    stop("`pos` must be a data.frame with columns `pos`, `lower` and `upper`, ",
+         "as returned by `find_peaks`.")
+  }
   if (!is.null(windows)){
     if (!is.null(pos)){
       stop("Please supply either `windows` or `pos`, not both.")
@@ -888,12 +894,6 @@ UNDERDETERMINED_WARN_FRAC <- 0.2
 ## calibrated; reuses `UNDERDETERMINED_WARN_FRAC`'s threshold since both flag
 ## the same failure shape (peaks silently missing from the output).
 WIDTH_FILTER_WARN_FRAC <- 0.2
-
-## Legacy width cutoff, as a standard deviation in timepoints. `get_peaks` now
-## expresses this limit as a full width at half maximum in time units through
-## `max_fwhm`, but the default is still derived from this so that peak lists are
-## unchanged.
-SD_MAX_TIMEPOINTS <- 50
 
 #' Parameter bounds derived from the integration window
 #'
