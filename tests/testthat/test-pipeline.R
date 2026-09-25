@@ -445,6 +445,33 @@ test_that("combine_peaks choose = 'least_sparse' keeps peak present in most samp
   expect_equal(colnames(res$tab), colnames(res$pk_meta))
 })
 
+test_that("combine_peaks choose = 'least_sparse' counts zero-filled cells as missing", {
+  pk0 <- pk2
+  pk0$tab$V1 <- c(1000, 0, 0)
+  pk0$tab$V2 <- c(1, 2, 3)
+  expect_true("V1" %in% colnames(combine_peaks(pk0, choose = "max",
+                                               verbose = FALSE)$tab))
+  res <- combine_peaks(pk0, choose = "least_sparse", verbose = FALSE)
+  expect_equal(colnames(res$tab), c("V2", "V3"))
+})
+
+test_that("combine_peaks keeps ref_spectra aligned with tab", {
+  res <- combine_peaks(pk_tab, tol = 0.02, verbose = FALSE)
+  expect_lt(ncol(res$tab), ncol(pk_tab$tab))
+  expect_equal(colnames(res$ref_spectra), colnames(res$tab))
+})
+
+test_that("merge_peaks keeps ref_spectra aligned and accepts a matrix tab", {
+  pt <- pk2
+  pt$ref_spectra <- as.data.frame(pt$ref_spectra)
+  res <- merge_peaks(pt, peaks = c("V1", "V2"))
+  expect_equal(colnames(res$ref_spectra), colnames(res$tab))
+  pt$tab <- as.matrix(pt$tab)
+  res <- merge_peaks(pt, peaks = c("V1", "V3"), method = "sum")
+  expect_equal(colnames(res$tab), c("V1", "V2"))
+  expect_equal(unname(res$tab[, "V1"]), c(15, 28, 42))
+})
+
 test_that("combine_peaks choose = 'lambda' keeps preferred wavelength", {
   res <- combine_peaks(pk2, choose = "lambda", lambda = "260", verbose = FALSE)
   expect_true("V2" %in% colnames(res$tab))

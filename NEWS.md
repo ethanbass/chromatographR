@@ -252,6 +252,15 @@ longer excluded by `min_value`.
 * Fixed `subset.peak_table()`, where `sample_meta` was subset on the wrong
 condition.
 * Fixed bug in `normalize_data` causing loss of sample names when normalizing chromatograms.
+* `normalize_data` no longer reports `column` as ambiguous when another
+column's name merely contains it, such as `"V12"` for `"V1"`.
+* `combine_peaks` now removes dropped peaks from the `ref_spectra` element so
+that it stays aligned with `tab`.
+* `combine_peaks(choose = "least_sparse")` now keeps the peak detected in the
+most samples. Previously every candidate tied and the first was kept.
+* `merge_peaks` no longer errors on peak tables built with
+`get_peaktable(out = "matrix")`.
+* `filter_peaktable` now errors when `rts` is combined with `min_rt` or `max_rt`.
 * Fixed error in equation describing spectral clustering in documentation for `get_peaktable`.
 
 #### Plotting

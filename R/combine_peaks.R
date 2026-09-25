@@ -63,8 +63,8 @@ combine_peaks <- function(peak_table, tol = .01, min_cor = 0.9,
   # find columns with a retention time match
   rt_group_count <- colSums(mat)
   candidate_rt_duplicates <- which(rt_group_count > 1)
-  spectral_cor_mat <- suppressWarnings(cor(peak_table$ref_spectra))
-  if (verbose) warnings()
+  spectral_cor_mat <- if (verbose) cor(peak_table$ref_spectra) else
+    suppressWarnings(cor(peak_table$ref_spectra))
   # iterate over columns with retention time match
   # find columns to remove (sub)
   remove_idx <- lapply(candidate_rt_duplicates, function(idx){
@@ -87,7 +87,7 @@ combine_peaks <- function(peak_table, tol = .01, min_cor = 0.9,
       ],
       
       least_sparse = {
-        coverage <- colSums(!is.na(tab_k))
+        coverage <- colSums(tab_k != 0, na.rm = TRUE)
         names(coverage)[which.max(coverage)]
       },
       
@@ -109,8 +109,7 @@ combine_peaks <- function(peak_table, tol = .01, min_cor = 0.9,
   remove_idx <- match(remove_idx, colnames(peak_table$tab))
   
   if (length(remove_idx) > 0) {
-    peak_table$tab <- peak_table$tab[, -remove_idx, drop = FALSE]
-    peak_table$pk_meta <- peak_table$pk_meta[, -remove_idx, drop = FALSE]
+    peak_table <- peak_table[, -remove_idx]
   }
   if (verbose){
     message(paste("Removed "), length(remove_idx), " peaks from peak table.")
@@ -151,16 +150,9 @@ merge_peaks <- function(peak_table, peaks, method = c("max", "sum")){
   sel <- which.max(colMeans(peak_table$tab[, pks.idx, drop=FALSE], na.rm = TRUE))
   sel.idx <- pks.idx[sel]
   sel.name <- colnames(peak_table$tab)[sel.idx]
-  if (method == "max"){
-    peak_table$tab[[sel.idx]] <- do.call(pmax, peak_table$tab[, pks.idx, 
-                                                              drop = FALSE])
-  } else if (method == "sum"){
-    peak_table$tab[[sel.idx]] <- apply(peak_table$tab[,pks.idx], 1, sum)
-  }
-  peak_table$tab <- peak_table$tab[, -pks.idx[-sel], drop = FALSE]
-  peak_table$pk_meta <- peak_table$pk_meta[, -pks.idx[-sel], drop = FALSE]
-  if (inherits(peak_table$ref_spectra, "matrix")){
-    peak_table$ref_spectra <- peak_table$ref_spectra[, -pks.idx[-sel]]
-  }
-  return(peak_table)
+  pks <- as.data.frame(peak_table$tab[, pks.idx, drop = FALSE])
+  peak_table$tab[, sel.idx] <- if (method == "max") do.call(pmax, pks) else
+    rowSums(pks)
+  if (length(pks.idx) > 1) peak_table <- peak_table[, -pks.idx[-sel]]
+  peak_table
 }

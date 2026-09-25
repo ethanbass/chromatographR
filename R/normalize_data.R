@@ -42,8 +42,8 @@ normalize_data <- function(peak_table, column, chrom_list = NULL,
   on_invalid <- match.arg(on_invalid)
   check_peaktable(peak_table)
   if (is.null(by)){
-    found_meta <- any(grepl(column, colnames(peak_table$sample_meta)))
-    found_tab <- any(grepl(column, colnames(peak_table$tab)))
+    found_meta <- column %in% colnames(peak_table$sample_meta)
+    found_tab <- column %in% colnames(peak_table$tab)
     if (found_meta & found_tab){
       stop("Column could not be disambiguated. Please specify `by` argument.")
     }
@@ -51,6 +51,9 @@ normalize_data <- function(peak_table, column, chrom_list = NULL,
       by <- "meta"
     } else if (found_tab){
       by <- "peak"
+    } else {
+      stop(sprintf("The specified column (%s) could not be found.",
+                   sQuote(column)))
     }
   }
   by <- match.arg(by, c("meta", "peak"))

@@ -115,3 +115,32 @@ test_that("filter_peaktable matches one peak per requested retention time", {
                  regexp = "not identified in the peak table")
   expect_equal(ncol(none$tab), 0)
 })
+
+test_that("filter_peaktable rejects `rts` combined with `min_rt`/`max_rt`", {
+  data(pk_tab, envir = environment())
+  rt <- as.numeric(pk_tab$pk_meta["rt", ])
+  expect_error(filter_peaktable(pk_tab, rts = rt[2], min_rt = 10),
+               "not both")
+  expect_error(filter_peaktable(pk_tab, rts = rt[2], max_rt = 10),
+               "not both")
+})
+
+test_that("filter_peaktable keeps ref_spectra aligned with tab", {
+  data(pk_tab, envir = environment())
+  pk_tab$ref_spectra <- as.data.frame(matrix(
+    seq_len(3 * ncol(pk_tab$tab)), 3, dimnames = list(NULL, colnames(pk_tab$tab))))
+  f <- filter_peaktable(pk_tab, min_rt = 12)
+  expect_lt(ncol(f$tab), ncol(pk_tab$tab))
+  expect_equal(colnames(f$ref_spectra), colnames(f$tab))
+})
+
+test_that("filter_peaks retains peaks whose flag is NA", {
+  pks <- structure(list(s = list("220" = data.frame(
+    rt = 1:4, FWHM = 0.1, height = 10, area = 10,
+    converged = c(1, 0, NA, 1), window_limited = c(0, 1, NA, 0)))),
+    class = c("peak_list", "list"))
+  expect_equal(filter_peaks(pks, converged = TRUE)$s[["220"]]$rt, c(1, 3, 4))
+  expect_equal(filter_peaks(pks, converged = FALSE)$s[["220"]]$rt, c(2, 3))
+  expect_equal(filter_peaks(pks, window_limited = FALSE)$s[["220"]]$rt,
+               c(1, 3, 4))
+})

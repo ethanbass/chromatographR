@@ -284,3 +284,12 @@ test_that("get_time_resolution converts to the requested unit", {
   attr(sec[[1]], "time_unit") <- "furlongs"
   expect_error(get_time_resolution(sec, unit = "min"), "unrecognized")
 })
+
+test_that("normalize_data matches `column` exactly when inferring `by`", {
+  data(pk_tab)
+  pk <- pk_tab
+  pk$sample_meta <- data.frame(V1x = 1:4, row.names = rownames(pk$tab))
+  norm <- normalize_data(pk, "V1", on_invalid = "silent")
+  expect_equal(norm$args$normalization_by, "peak")
+  expect_error(normalize_data(pk_tab, "zzz"), "could not be found")
+})

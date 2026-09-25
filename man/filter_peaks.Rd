@@ -52,14 +52,16 @@ time units of the peak list. Expressed in the same units as \code{max_fwhm} in
 if \code{FALSE}, retains only those that did not. A peak has \code{converged == 0}
 either because the optimizer stopped short of convergence or because no
 optimizer ran at all, the latter occurring when the integration window held
-fewer points than the model has parameters. Requires a \code{converged} column, so it
-cannot be used with peak lists made with \code{fit = "raw"}.}
+fewer points than the model has parameters. Requires a \code{converged} column,
+which peak lists made with \code{fit = "raw"} or before chromatographR 0.9.0 lack.
+Peaks whose \code{converged} is \code{NA} are retained.}
 
 \item{window_limited}{Logical. If \code{FALSE}, drops peaks whose fitted shape
-came to rest on a bound derived from the integration window, meaning the
-window rather than the data determined the reported shape; if \code{TRUE}, retains
-only those. Requires a \code{window_limited} column, so it cannot be used with
-peak lists made with \code{fit = "raw"}.}
+hit a limit set by the integration window, meaning the window rather than
+the data determined the reported shape; if \code{TRUE}, retains only those.
+Requires a \code{window_limited} column, which peak lists made with
+\code{fit = "raw"} or before chromatographR 0.9.0 lack. Peaks whose
+\code{window_limited} is \code{NA} are retained.}
 }
 \value{
 A filtered \code{peak_list} object containing only peaks that satisfy the

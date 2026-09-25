@@ -27,13 +27,15 @@
 #' if `FALSE`, retains only those that did not. A peak has `converged == 0`
 #' either because the optimizer stopped short of convergence or because no
 #' optimizer ran at all, the latter occurring when the integration window held
-#' fewer points than the model has parameters. Requires a `converged` column, so it
-#' cannot be used with peak lists made with `fit = "raw"`.
+#' fewer points than the model has parameters. Requires a `converged` column,
+#' which peak lists made with `fit = "raw"` or before chromatographR 0.9.0 lack.
+#' Peaks whose `converged` is `NA` are retained.
 #' @param window_limited Logical. If `FALSE`, drops peaks whose fitted shape
-#' came to rest on a bound derived from the integration window, meaning the
-#' window rather than the data determined the reported shape; if `TRUE`, retains
-#' only those. Requires a `window_limited` column, so it cannot be used with
-#' peak lists made with `fit = "raw"`.
+#' hit a limit set by the integration window, meaning the window rather than
+#' the data determined the reported shape; if `TRUE`, retains only those.
+#' Requires a `window_limited` column, which peak lists made with
+#' `fit = "raw"` or before chromatographR 0.9.0 lack. Peaks whose
+#' `window_limited` is `NA` are retained.
 #' @return A filtered `peak_list` object containing only peaks that satisfy the
 #' specified criteria.
 #' @author Ron Wehrens, Ethan Bass
@@ -129,7 +131,7 @@ check_flag_filter <- function(want, col, x){
   }
   if (!col %in% colnames(x)){
     stop(sprintf(
-      "This peak list has no `%s` column, so it cannot be filtered on. It is reported for the peak models but not for `fit = \"raw\"`, and was added in chromatographR 0.8.0.",
+      "This peak list has no `%s` column, so it cannot be filtered on. It is reported for the peak models but not for `fit = \"raw\"`, and was added in chromatographR 0.9.0.",
       col), call. = FALSE)
   }
   want
@@ -139,7 +141,7 @@ check_flag_filter <- function(want, col, x){
 #' @noRd
 keep_by_flag <- function(comp, col, want){
   if (is.null(want)) return(rep(TRUE, nrow(comp)))
-  !is.na(comp[, col]) & comp[, col] == as.numeric(want)
+  is.na(comp[, col]) | comp[, col] == as.numeric(want)
 }
 
 #' Filter peak table
@@ -149,23 +151,26 @@ keep_by_flag <- function(comp, col, want){
 #' intensity matrix (`tab`), feature metadata (`pk_meta`), and reference spectra
 #' (if present). Filtering can be based on retention time, wavelength, feature
 #' intensity summarized across samples (mean, median, or max), feature
-#' sparsity (i.e., proportion of zero values across samples), and/or the
-#' proportion of samples whose fit converged.
+#' sparsity (i.e., proportion of zero values across samples), and/or fit
+#' convergence.
 #' 
 #' @param peak_table A peak_table object from [`get_peaktable`].
 #' @param rts Vector of retention times used to select features. Values are
 #' mapped to the closest retention times in the peak table. If no 
 #' match is found within `tol`, the value is ignored and a warning is issued.
+#' Cannot be combined with `min_rt` or `max_rt`.
 #' @param min_rt Minimum retention time for features to be retained.
 #' @param max_rt Maximum retention time for features to be retained.
 #' @param min_value Minimum threshold for feature intensity summarized across
 #' samples (using the method specified by `what`).
 #' @param max_zeros Maximum allowed feature sparsity (proportion of zero values 
 #' across samples).
-#' @param min_converged Minimum proportion of samples in which the feature's
-#' fit converged, between 0 and 1. In a `peak_table`, `converged` is aggregated
-#' across the samples contributing to each feature, so a value of `0.8` retains
-#' features that were properly fitted in at least 80% of them. Requires a
+#' @param min_converged Minimum value of the `converged` row of `pk_meta`,
+#' between 0 and 1. That row summarizes `converged` over the peaks in each
+#' feature by the `summarize_by` method given to [`get_peaktable`]: with
+#' `"mean"`, it is the proportion of those peaks whose fit converged, so `0.8`
+#' retains features that converged in at least 80% of them; with the default
+#' `"weighted.mean"`, that proportion is weighted by peak intensity. Requires a
 #' `converged` row in `pk_meta`, so it is unavailable for peak tables built from
 #' `fit = "raw"` peak lists.
 #' @param what Method used to summarize feature intensity across samples for
@@ -173,7 +178,8 @@ keep_by_flag <- function(comp, col, want){
 #' @param lambda Wavelength(s) used to select features in the peak table.
 #' Only features matching the specified wavelength(s) are retained.
 #' @param tol Tolerance for matching of retention times to `rts`. A
-#' feature is considered a match if the absolute difference is ≤ `tol`.
+#' feature is considered a match if the absolute difference is at most `tol`.
+#' Defaults to `0`, which requires an exact match.
 #' @return A filtered `peak_table` containing only features (columns) that
 #' satisfy the specified criteria. The same feature indices are applied to all
 #' `peak_table` components.
@@ -188,6 +194,9 @@ filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value,
                              max_zeros, lambda, min_converged,
                              what = c("median", "mean", "max"), tol = 0){
   check_peaktable(peak_table)
+  if (!missing(rts) && (!missing(min_rt) || !missing(max_rt))){
+    stop("Supply either `rts` or `min_rt`/`max_rt`, not both.", call. = FALSE)
+  }
   if (missing(rts) & missing(min_rt) &
       missing(max_rt) & missing(min_value) & 
       missing(lambda) & missing(max_zeros) & missing(min_converged)) {
@@ -217,7 +226,7 @@ filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value,
     if (missing(min_rt))
       min_rt <- 0
     if (missing(max_rt))
-      max_rt <- peak_table$pk_meta["rt",] + 1
+      max_rt <- Inf
     idx.rt <- which(peak_table$pk_meta["rt",] >= min_rt &
                       peak_table$pk_meta["rt",] <= max_rt)
   } else{idx.rt <- seq_along(peak_table$pk_meta)}
@@ -249,10 +258,5 @@ filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value,
   } else (idx.conv <- seq_along(peak_table$tab))
   idx <- Reduce(intersect, list(idx.rt, idx.val, idx.lambda, idx.zeros,
                                 idx.conv))
-  peak_table$tab <- peak_table$tab[,idx, drop = FALSE]
-  peak_table$pk_meta <- peak_table$pk_meta[, idx, drop = FALSE]
-  if (inherits(peak_table$ref_spectra, c("data.frame", "matrix"))){
-    peak_table$ref_spectra <- peak_table$ref_spectra[, idx, drop = FALSE]
-  }
-  peak_table
+  peak_table[, idx]
 }
