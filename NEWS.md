@@ -219,6 +219,10 @@ automatically; added an `on_invalid` argument controlling how zero, negative and
 now skipped below four wavelengths.
 * Fixed input validation in `preprocess` so lists containing non-matrix elements no longer pass validation without error.
 * Fixed `preprocess` function incorrectly truncating chromatograms when outliers are present and `dim1` is not specified.
+* `preprocess`, `correct_rt` and `get_peaks` now stop with an error when a
+sample fails in parallel (`cl > 1`). Previously they returned `try-error` or
+`NULL` elements, including for samples that had succeeded but were processed
+by the failing worker.
 
 #### Peak detection and integration
 
@@ -227,10 +231,6 @@ peaks are detected, rather than dropping `lower` and `upper`.
 * `max_iter` now controls how long the peak fitters run. Previously it was
 ignored, leaving `nls.lm`'s default of `100 * (parameters + 1)` evaluations.
 `"egh"` and `"bemg"` fits may shift slightly.
-* `get_peaks` no longer returns incomplete results when a parallel
-worker dies. `mclapply` reports a crash as `NULL`, which used to reach the
-returned `peak_list` unflagged and fail later in `get_peaktable`. Lost samples
-are now refitted and unrecoverable ones raise an error.
 * `get_peaks` no longer errors when a sample contains no peaks; previously a
 single empty sample failed the whole call. `fit_peaks` now returns an empty
 `data.frame` rather than a one-row matrix of `NA`s.

@@ -303,8 +303,7 @@ get_peaks <- function(chrom_list, lambdas,
                                               "data_format", "parser"))
     ptable
   }
-  result <- laplee(seq_along(chrom_list), fit_sample)
-  result <- refit_lost_samples(result, fit_sample, laplee, names(chrom_list))
+  result <- laplee(setNames(seq_along(chrom_list), names(chrom_list)), fit_sample)
   names(result) <- names(chrom_list)
   # `result` is either a data.frame per sample (when `collapse`) or a list of
   # data.frames, one per wavelength
@@ -344,44 +343,6 @@ get_peaks <- function(chrom_list, lambdas,
             baseline = baseline,
             intensity_unit = get_metadata_attribute(chrom_list[[1]], "detector_y_unit"),
             class = c("peak_list", "list"))
-}
-
-#' Refit samples whose worker process died
-#'
-#' A forked worker that dies takes its whole chunk of the peak list with it, and
-#' `mclapply` reports the loss only as `NULL` elements, which would otherwise be
-#' returned as samples containing no peaks. Losses are retried through the same
-#' apply function, so a repeat crash stays inside a worker rather than reaching
-#' the caller, and anything still missing is an error rather than silently
-#' absent data.
-#'
-#' @param result The list returned by the parallel apply.
-#' @param fit_sample The per-sample function that produced it.
-#' @param laplee The apply function in use.
-#' @param nms Sample names, for reporting.
-#' @param tries Maximum number of refitting passes.
-#' @return `result`, with lost elements refitted.
-#' @author Ethan Bass
-#' @noRd
-refit_lost_samples <- function(result, fit_sample, laplee, nms, tries = 2L){
-  lost <- function(x) vapply(x, function(e) is.null(e) || inherits(e, "try-error"),
-                             logical(1))
-  for (i in seq_len(tries)){
-    bad <- which(lost(result))
-    if (length(bad) == 0) return(result)
-    warning(sprintf(
-      "%d sample%s returned no result, which usually means a worker process died. Refitting.",
-      length(bad), plural(length(bad))), immediate. = TRUE, call. = FALSE)
-    result[bad] <- laplee(bad, fit_sample)
-  }
-  bad <- which(lost(result))
-  if (length(bad) > 0){
-    stop(sprintf(
-      "%d of %d samples could not be fitted because their worker process died repeatedly: %s.\n  This is a crash inside the optimizer rather than a problem with the data. Try `fit = \"egh\"`, or `cl = 1` to see the underlying error.",
-      length(bad), length(result),
-      paste(head(nms[bad], 10), collapse = ", ")), call. = FALSE)
-  }
-  result
 }
 
 #' Report a peak list dominated by width-filtered peaks

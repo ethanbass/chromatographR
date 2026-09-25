@@ -624,13 +624,39 @@ choose_apply_fnc <- function(show_progress, parallel = NULL, cl = 2){
   if (show_progress){
     check_for_pkg("pbapply")
     pblapply <- pbapply::pblapply
-    fn <- purrr::partial(pblapply, cl = cl)
+    fn <- purrr::partial(parallel_lapply, apply_fn = pblapply, cl = cl)
   } else if (!show_progress && is_not_windows && is.numeric(cl) && cl > 1){
-      fn <- purrr::partial(mclapply, mc.cores = cl)
+      fn <- purrr::partial(parallel_lapply, apply_fn = mclapply, mc.cores = cl)
   } else {
     fn <- lapply
   }
   fn
+}
+
+#' Apply a function in parallel, raising the first failure a worker returned
+#'
+#' `mclapply` returns a worker's error as a `try-error` element and a worker
+#' that died as `NULL`, and every other element scheduled on that worker
+#' shares its fate.
+#' @noRd
+parallel_lapply <- function(X, FUN, ..., apply_fn){
+  out <- apply_fn(X, FUN, ...)
+  errored <- which(vapply(out, inherits, logical(1), "try-error"))
+  if (length(errored) > 0){
+    cnd <- attr(out[[errored[1]]], "condition")
+    stop(if (is.null(cnd)) as.character(out[[errored[1]]]) else conditionMessage(cnd),
+         call. = FALSE)
+  }
+  lost <- which(vapply(out, is.null, logical(1)))
+  if (length(lost) > 0){
+    ids <- if (is.null(names(X))) lost else names(X)[lost]
+    stop(sprintf(paste(
+      "A parallel worker process died, so no result was returned for %s.",
+      "Items handled by the same worker are lost with it. If memory ran out,",
+      "a lower `cl` may help."), paste(head(ids, 10), collapse = ", ")),
+      call. = FALSE)
+  }
+  out
 }
 
 #' Get y bounds

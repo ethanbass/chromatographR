@@ -111,12 +111,12 @@ test_that("get_lambda_idx works as expected", {
   lam <- get_lambda_idx(lambda = 200, lambdas = get_lambdas(x = Sa_pr))
   expect_equal(lam, 1)
   expect_error(get_lambda_idx(lambda=190, lambdas = get_lambdas(x = Sa_pr)), 
-               regexp = "could not be found")
+               regexp = "specified wavelength \\(`190`\\) could not be found")
   expect_error(get_lambda_idx(lambda=400, lambdas = get_lambdas(x = Sa_pr)), 
-               regexp = "could not be found")
+               regexp = "specified wavelength \\(`400`\\) could not be found")
   expect_error(get_lambda_idx(lambda="max", lambdas = get_lambdas(x = Sa_pr),
                               allow_max = FALSE), 
-               regexp = "must be specified for interactive scanning")
+               regexp = "must be a specific wavelength")
 })
 
 test_that("check_for_pkg functions as expected",{
@@ -240,6 +240,33 @@ test_that("check_duplicated_names works as expected", {
   expect_error(check_duplicated_names(c("X","X")))
   expect_no_error(check_duplicated_names(c("X","Y")))
   expect_warning(check_duplicated_names(c("X","X"), warn = TRUE))
+})
+
+test_that("parallel_lapply re-raises a worker's try-error", {
+  as_mclapply <- function(X, FUN) lapply(X, function(x) try(FUN(x), silent = TRUE))
+  fit_sample <- function(i) if (i == 2) stop("wavelength not found") else list()
+  expect_error(parallel_lapply(1:2, fit_sample, apply_fn = as_mclapply),
+               "wavelength not found")
+  expect_equal(parallel_lapply(1:2, function(i) i, apply_fn = as_mclapply),
+               list(1L, 2L))
+})
+
+test_that("parallel_lapply stops when a worker process dies", {
+  skip_on_cran()
+  skip_on_os("windows")
+  die <- function(i) if (i == 2) tools::pskill(Sys.getpid(), tools::SIGKILL) else i
+  expect_error(suppressWarnings(
+    parallel_lapply(c(a = 1, b = 2), die, apply_fn = parallel::mclapply,
+                    mc.cores = 2)),
+    "worker process died, so no result was returned for b\\.")
+})
+
+test_that("get_peaks reports the underlying error from a parallel worker", {
+  skip_on_os("windows")
+  data(Sa_pr)
+  x <- lapply(Sa_pr[1:2], function(m) m[, "210", drop = FALSE])
+  expect_error(get_peaks(x, lambdas = "280", cl = 2, show_progress = FALSE),
+               "wavelength \\(`280`\\) could not be found")
 })
 
 test_that("get_time_resolution converts to the requested unit", {
