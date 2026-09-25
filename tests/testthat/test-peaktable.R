@@ -59,11 +59,35 @@ test_that("get_peaktable merges distant peaks when hmax is large enough", {
   expect_true(all(pt$tab > 0))
 })
 
-# ── a non-finite response must not void a cluster's metadata ─────────────────
+# ── metadata reported by only some peaks must survive summarization ──────────
 
+test_that("weighted.mean summarization keeps metadata that only some peaks report", {
+  skip_on_cran()
+  data(Sa, envir = environment())
+  pks <- suppressWarnings(get_peaks(Sa, lambdas = "210", fit = "raw", cl = 1,
+                                    show_progress = FALSE))
+  fwhm <- unlist(lapply(pks, function(s) s[["210"]]$FWHM))
+  expect_true(any(is.finite(fwhm)))
+  expect_true(any(!is.finite(fwhm)))
 
+  m <- get_peaktable(pks, summarize_by = "weighted.mean")$pk_meta
+  summarized <- as.numeric(m["FWHM", ])
+  kept <- summarized[is.finite(summarized)]
+  expect_gt(length(kept), sum(!is.finite(summarized)))
+  expect_true(all(kept >= min(fwhm, na.rm = TRUE)))
+  expect_true(all(kept <= max(fwhm, na.rm = TRUE)))
 
+  expect_true(all(!is.finite(as.numeric(m["sd", ]))))
+})
 
+test_that("weighted_mean_finite ignores unusable weights and values", {
+  expect_equal(weighted_mean_finite(c(1, 3), c(1, 1)), 2)
+  expect_equal(weighted_mean_finite(c(1, 3), c(1, NaN)), 1)
+  expect_equal(weighted_mean_finite(c(1, NaN), c(1, 5)), 1)
+  expect_equal(weighted_mean_finite(c(2, 4), c(0, 0)), 3)
+  expect_equal(weighted_mean_finite(c(2, 4), c(-1, -1)), 3)
+  expect_identical(weighted_mean_finite(c(NA_real_, NaN), c(1, 1)), NA_real_)
+})
 
 test_that("filter_peaktable rejects min_converged without a converged row", {
   skip_on_cran()

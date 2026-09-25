@@ -129,7 +129,8 @@ importFrom(stats,
   smooth.spline,
   terms,
   uniroot,
-  var
+  var,
+  weighted.mean
 )
 importFrom(utils,
   head,

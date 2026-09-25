@@ -218,7 +218,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
                             tapply(seq_along(pkcenters),
                                    pkcenters.cl, function(i){
                                      vapply(vars.idx, function(v){
-                                       stats::weighted.mean(xx[i, v], w = weights[i])
+                                       weighted_mean_finite(xx[i, v], w = weights[i])
                                      }, numeric(1)) |>
                                        setNames(colnames(xx[, vars.idx]))
                                    }))

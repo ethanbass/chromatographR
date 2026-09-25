@@ -592,6 +592,7 @@ transfer_metadata <- function(new_object, old_object, transfer_class = TRUE,
 #' This function chooses an apply function based on arguments provided by the
 #' user. The options are `lapply`, `pblapply` and `mclapply`.
 #' @importFrom parallel mclapply
+#' @importFrom stats weighted.mean
 #' @return Returns [`pbapply`][pbapply::pbapply] if `progress_bar == TRUE`,
 #' otherwise returns [`lapply`].
 #' @noRd
@@ -927,4 +928,23 @@ format_axis <- function(x){
     if (max(abs(as.numeric(out) - num)) < tol) return(out)
   }
   formatC(num, format = "f", digits = 12)
+}
+
+#' Weighted mean tolerant of non-finite values
+#'
+#' Computes a weighted mean, ignoring elements with a non-finite value or a
+#' non-positive or non-finite weight. Falls back to an unweighted mean of the
+#' finite values when no usable weight remains, and returns `NA_real_` only
+#' when every value is non-finite.
+#'
+#' @param x A numeric vector of values.
+#' @param w A numeric vector of weights, the same length as `x`.
+#' @return A length-one numeric.
+#' @author Ethan Bass
+#' @noRd
+weighted_mean_finite <- function(x, w){
+  usable <- is.finite(x) & is.finite(w) & w > 0
+  if (any(usable)) return(weighted.mean(x[usable], w = w[usable]))
+  finite_x <- is.finite(x)
+  if (any(finite_x)) mean(x[finite_x]) else NA_real_
 }
