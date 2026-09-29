@@ -112,7 +112,7 @@ check_norm_values <- function(vals, sample_names,
   reasons[vals[invalid] == 0]    <- "0"
   
   msg <- sprintf("Invalid normalization values (%s)",
-    paste(sQuote(sample_names[invalid]), reasons, sep = ": ", collapse = "; ")
+    format_list(paste0(sQuote(sample_names[invalid]), ": ", reasons), quote = FALSE)
   )
   switch(on_invalid,
          error  = stop(msg),

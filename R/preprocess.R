@@ -150,7 +150,7 @@ preprocess <- function(X, dim1, dim2,
       if (length(outliers) > 0){
         limits <- limits[,-outliers]
         warning(sprintf("Excluding short chromatograms: %s.", 
-                        paste(sQuote(names(outliers)), collapse = ", ")),
+                        format_list(names(outliers))),
                 immediate. = TRUE)
         X <- X[-outliers]
       }
@@ -169,7 +169,8 @@ preprocess <- function(X, dim1, dim2,
       }
       
       if (length(too_early) > 0) {
-        labeled <- paste0(too_early, " (", sQuote(names(too_early)), ")", collapse = ", ")
+        labeled <- format_list(paste0(too_early, " (", sQuote(names(too_early)), ")"),
+                               quote = FALSE)
         plural <- plural(length(too_early))
         warning(sprintf(paste(
           "No extrapolation allowed. New time axis (dim1) begins at %.2f, before actual data begins.",
@@ -179,7 +180,8 @@ preprocess <- function(X, dim1, dim2,
       }
       
       if (length(too_late) > 0) {
-        labeled <- paste0(too_late, " (", sQuote(names(too_late)), ")", collapse = ", ")
+        labeled <- format_list(paste0(too_late, " (", sQuote(names(too_late)), ")"),
+                               quote = FALSE)
         plural <- plural(length(too_late))
         warning(sprintf(paste(
           "No extrapolation allowed. New time axis (dim1) ends at %.2f, after actual data ends.",
@@ -253,7 +255,7 @@ warn_na_gaps <- function(X, bridge, baseline){
   consequence <- if (baseline == "none") "" else
     ", so the baseline will be fit partly through interpolated data"
   warning(sprintf("Missing values will be bridged by linear interpolation%s.\n\t%s.",
-                  consequence, paste(detail, collapse = ", ")),
+                  consequence, format_list(detail, quote = FALSE)),
           immediate. = TRUE)
   invisible(NULL)
 }

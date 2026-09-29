@@ -236,10 +236,25 @@ test_that("check_norm_values behaves correctly for all on_invalid options", {
   expect_identical(v, rep(NA_real_, 3))
 })
 
+test_that("format_list shows ten items and counts the rest", {
+  expect_equal(format_list(c("a", "b"), quote = FALSE), "a, b")
+  expect_equal(format_list(letters[1:10], quote = FALSE),
+               paste(letters[1:10], collapse = ", "))
+  expect_equal(format_list(letters[1:13], quote = FALSE),
+               paste0(paste(letters[1:10], collapse = ", "), " and 3 more"))
+})
+
 test_that("check_duplicated_names works as expected", {
-  expect_error(check_duplicated_names(c("X","X")))
+  expect_error(check_duplicated_names(c("X","X")),
+               regexp = "Duplicate sample names found")
   expect_no_error(check_duplicated_names(c("X","Y")))
-  expect_warning(check_duplicated_names(c("X","X"), warn = TRUE))
+  expect_warning(check_duplicated_names(c("X","X"), warn = TRUE),
+                 regexp = "Duplicate sample names found")
+  expect_error(check_duplicated_names(c("BLANK", "A", "BLANK", "blank",
+                                        "BLANK", "blank")),
+               regexp = "BLANK (3), blank (2).", fixed = TRUE)
+  expect_error(check_duplicated_names(c("X","X")), regexp = "make.unique",
+               fixed = TRUE)
 })
 
 test_that("parallel_lapply re-raises a worker's try-error", {

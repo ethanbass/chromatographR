@@ -333,7 +333,7 @@ get_peaks <- function(chrom_list, lambdas,
       warning(sprintf(
         "Some windows were dropped because their apex fell on the edge of the chromatogram, in the following sample%s: %s.",
         plural(sum(dropped > 0)),
-        paste(names(dropped)[dropped > 0], collapse = ", ")), immediate. = TRUE)
+        format_list(names(dropped)[dropped > 0], quote = FALSE)), immediate. = TRUE)
     }
     n_negative <- sum(collect("area") < 0, na.rm = TRUE)
     if (n_negative > 0){

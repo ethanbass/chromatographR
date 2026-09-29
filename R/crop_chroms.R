@@ -104,7 +104,7 @@ warn_crop_clamped <- function(before, after, range, arg, which_axis, axes,
   }, character(1))
   warning(sprintf(paste("`%s` extends beyond the available data, so the crop",
                         "was limited to what is present.\n\t%s."),
-                  arg, paste(detail, collapse = ", ")), immediate. = TRUE)
+                  arg, format_list(detail, quote = FALSE)), immediate. = TRUE)
   invisible(NULL)
 }
 
@@ -117,8 +117,8 @@ warn_crop_ragged <- function(out){
                         "first chromatogram will mislabel the others. Align the",
                         "chromatograms before cropping, or choose a range that",
                         "every sample covers identically."),
-                  paste(sprintf("%s (%s)", sample_labels(out), dims),
-                        collapse = ", ")), immediate. = TRUE)
+                  format_list(sprintf("%s (%s)", sample_labels(out), dims),
+                              quote = FALSE)), immediate. = TRUE)
   invisible(NULL)
 }
 

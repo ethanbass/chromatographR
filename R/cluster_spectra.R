@@ -116,7 +116,7 @@ cluster_spectra <- function(peak_table, alpha = 0.05,
   if (length(rm) > 0){
     if (verbose){
       message(paste0("Removing peaks due to bad spectra: ",
-                     paste(sQuote(colnames(spectra)[rm]), collapse=", ")))
+                     format_list(colnames(spectra)[rm])))
     }
     spectra <- spectra[, -rm]
   }

@@ -86,7 +86,7 @@ plot_chroms <- function(x, lambdas, idx, time_resolution = 0.01,
     if (all(is.na(idx))) stop("Chromatogram could not be found. Please check names and try again.")
     if (any(is.na(idx))){
       warning(sprintf("The following chromatograms could not be found: %s",
-                      paste(sQuote(orig_idx[is.na(idx)]), collapse = ", ")))
+                      format_list(orig_idx[is.na(idx)])))
       idx <- idx[!is.na(idx)]
     }
   }

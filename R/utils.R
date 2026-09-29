@@ -682,7 +682,7 @@ parallel_lapply <- function(X, FUN, ..., apply_fn){
     stop(sprintf(paste(
       "A parallel worker process died, so no result was returned for %s.",
       "Items handled by the same worker are lost with it. If memory ran out,",
-      "a lower `cl` may help."), paste(head(ids, 10), collapse = ", ")),
+      "a lower `cl` may help."), format_list(ids, quote = FALSE)),
       call. = FALSE)
   }
   out
@@ -774,19 +774,30 @@ seq_ncol <- function(x){
   seq_len(ncol(x))
 }
 
+#' Format a list of names for a message
+#'
+#' Shows the first `n` and counts the rest, so a long list cannot push the
+#' remainder of a message past `warning.length`.
+#' @noRd
+format_list <- function(x, n = 10, quote = TRUE){
+  x <- if (quote) sQuote(x) else as.character(x)
+  if (length(x) <= n) return(paste(x, collapse = ", "))
+  paste0(paste(x[seq_len(n)], collapse = ", "), " and ", length(x) - n, " more")
+}
+
 #' Check for duplicated names
 #' @noRd
 check_duplicated_names <- function(sample_names, warn = FALSE,
                                    what = "peak_list"){
   if (anyDuplicated(sample_names)) {
     fn <- ifelse(warn, warning, stop)
-    dups <- paste(sample_names[duplicated(sample_names)], collapse = ", ")
-    limit <- getOption("warning.length") - 60
-    if (nchar(dups) > limit) {
-      last_comma <- max(gregexpr(",", substr(dups, 1, limit))[[1]])
-      dups <- paste0(substr(dups, 1, last_comma - 1), ", etc.")
-    }
-    fn("Duplicate sample names found in `", what, "`: ", dups)
+    dup <- unique(sample_names[duplicated(sample_names)])
+    n <- vapply(dup, function(d) sum(sample_names == d), integer(1))
+    dups <- format_list(paste0(dup, " (", n, ")"), quote = FALSE)
+    fn("Duplicate sample names found in `", what, "`: ", dups, ".\n",
+       "Rename them with `names(x) <- make.unique(names(x))`, after deciding ",
+       "what to do with any sample that was run more than once.",
+       call. = FALSE)
   }
 }
 
