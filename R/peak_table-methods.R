@@ -121,6 +121,7 @@ summary.peak_table <- function(object, ...) {
       sd = sd(intensities)
     ),
     time_units = object$args$time_unit,
+    rt_unit = object$args$rt_unit,
     response = object$args$response,
     has_sample_meta = is_attached(object$sample_meta),
     has_ref_spectra = is_attached(object$ref_spectra),
@@ -146,7 +147,9 @@ print.summary.peak_table <- function(x, ...) {
   if (!is.null(x$retention_time)) {
     cat("Retention Time:\n")
     cat("  Range:", paste0("[", round(x$retention_time[1], 2), ", ", 
-                           round(x$retention_time[2], 2), "] min\n"))
+                           round(x$retention_time[2], 2), "]",
+                           if (is.null(x$rt_unit) || is.na(x$rt_unit)) "" else
+                             paste0(" ", x$rt_unit), "\n"))
   }
   cat("  Wavelengths:  ", paste(x$wavelengths, collapse = ", "),
       "\n")

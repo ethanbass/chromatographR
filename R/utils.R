@@ -88,6 +88,26 @@ check_chrom_list <- function(x, chrom_list, verbose = FALSE){
   }
 }
 
+#' Check that peak shape parameters are available for the specified fit
+#'
+#' Verifies that the columns required to compute shape distances for the
+#' specified `fit` are present in a peak table. Returns the required column
+#' names invisibly.
+#' @author Ethan Bass
+#' @noRd
+check_shape_cols <- function(fit, peaks){
+  shape_cols <- switch(fit, gaussian = "sd", egh = c("sd", "tau"),
+                       bemg = c("sd", "tau_right", "tau_left"))
+  missing_cols <- setdiff(shape_cols, colnames(peaks))
+  if (length(missing_cols) > 0){
+    stop(sprintf(
+      "Shape matching with `fit = %s` requires the column%s %s, which could not be found in the supplied `peak_list`.",
+      sQuote(fit), plural(length(missing_cols)),
+      paste(sQuote(missing_cols), collapse = ", ")))
+  }
+  invisible(shape_cols)
+}
+
 #' Get retention index
 #'
 #' Matches retention times to the nearest positions on a sorted time axis.
@@ -434,6 +454,15 @@ time_factor <- function(time_unit = c("min", "s", "ms")){
   switch(time_unit, "min" = 1, "s" = 60, "ms" = 60*1000)
 }
 
+#' Multiplier from minutes to the units of a retention-time axis
+#'
+#' An unrecorded unit is taken to be minutes.
+#' @noRd
+rt_factor <- function(unit){
+  if (is.null(unit) || is.na(unit)) return(1)
+  time_factor(unit)
+}
+
 #' Plural suffix
 #' @noRd
 plural <- function(n) if (n > 1) "s" else ""
@@ -747,7 +776,8 @@ seq_ncol <- function(x){
 
 #' Check for duplicated names
 #' @noRd
-check_duplicated_names <- function(sample_names, warn = FALSE){
+check_duplicated_names <- function(sample_names, warn = FALSE,
+                                   what = "peak_list"){
   if (anyDuplicated(sample_names)) {
     fn <- ifelse(warn, warning, stop)
     dups <- paste(sample_names[duplicated(sample_names)], collapse = ", ")
@@ -756,7 +786,7 @@ check_duplicated_names <- function(sample_names, warn = FALSE){
       last_comma <- max(gregexpr(",", substr(dups, 1, limit))[[1]])
       dups <- paste0(substr(dups, 1, last_comma - 1), ", etc.")
     }
-    fn("Duplicate sample names found in peak_list: ", dups)
+    fn("Duplicate sample names found in `", what, "`: ", dups)
   }
 }
 

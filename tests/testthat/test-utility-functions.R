@@ -293,3 +293,76 @@ test_that("normalize_data matches `column` exactly when inferring `by`", {
   expect_equal(norm$args$normalization_by, "peak")
   expect_error(normalize_data(pk_tab, "zzz"), "could not be found")
 })
+
+test_that("get_peaktable rejects objects it has no method for", {
+  expect_error(get_peaktable("nonsense"),
+               regexp = "No get_peaktable method for object of class character")
+  expect_error(get_peaktable(1:3),
+               regexp = "No get_peaktable method for object of class integer")
+})
+
+test_that("get_peaktable accepts a peak list that has lost its class", {
+  data(Sa_pr)
+  pks <- get_peaks(Sa_pr, lambdas = 210, cl = 1, show_progress = FALSE)
+  bare <- lapply(pks, function(s) lapply(s, subset, height > 100))
+  expect_false(inherits(bare, "peak_list"))
+  expect_s3_class(get_peaktable(bare), "peak_table")
+})
+
+test_that("pad_zeros and strip_zeros round-trip", {
+  x <- matrix(seq_len(12), ncol = 3)
+  for (side in c("both", "left", "right")){
+    padded <- pad_zeros(x, n_zeros = 2, side = side)
+    n_added <- if (side == "both") 4 else 2
+    expect_equal(nrow(padded), nrow(x) + n_added, info = side)
+    expect_equal(strip_zeros(padded, n_zeros = 2, side = side), x, info = side)
+  }
+  # a vector is promoted to a one-column matrix
+  padded_vec <- pad_zeros(1:4, n_zeros = 1, side = "left")
+  expect_equal(dim(padded_vec), c(5L, 1L))
+  expect_equal(padded_vec[1, 1], 0)
+})
+
+test_that("predict.ptw matches the method it overrides in ptw", {
+  skip_on_cran()
+  # `chromatographR` registers its own `predict.ptw`, overwriting `ptw`'s. The
+  # two must agree, or loading the package silently changes `ptw`'s behavior.
+  data(Sa_pr)
+  ptw_predict <- getS3method("predict", "ptw", envir = asNamespace("ptw"))
+  tr <- t(sapply(Sa_pr, function(x) x[, "210"]))
+  colnames(tr) <- rownames(Sa_pr[[1]])
+  pw_global <- ptw::ptw(ref = tr[3, , drop = FALSE], samp = tr[1:2, ],
+                        warp.type = "global")
+  pw_indiv  <- ptw::ptw(ref = tr[3, , drop = FALSE], samp = tr[1:2, ],
+                        warp.type = "individual")
+
+  for (pw in list(global = pw_global, individual = pw_indiv)){
+    # response, with and without `newdata`
+    expect_equal(predict(pw), ptw_predict(pw))
+    expect_equal(predict(pw, newdata = tr[1:2, ]),
+                 ptw_predict(pw, newdata = tr[1:2, ]))
+    # a bare vector is promoted to a one-row matrix
+    expect_equal(predict(pw, newdata = tr[1, ]),
+                 ptw_predict(pw, newdata = tr[1, ]))
+    # corrected times, with and without `newdata` and `RTref`
+    expect_equal(predict(pw, what = "time"), ptw_predict(pw, what = "time"))
+    expect_equal(predict(pw, what = "time", newdata = c(12, 14, 16)),
+                 ptw_predict(pw, what = "time", newdata = c(12, 14, 16)))
+    expect_equal(predict(pw, what = "time", RTref = as.numeric(colnames(tr))),
+                 ptw_predict(pw, what = "time",
+                             RTref = as.numeric(colnames(tr))))
+    expect_error(predict(pw, what = "nonsense"),
+                 regexp = "'arg' should be one of")
+  }
+  # `warp.type = "individual"` needs one warp function per row of `newdata`
+  expect_error(predict(pw_indiv, newdata = tr[1:3, ]),
+               regexp = "Incorrect number of rows in newdata")
+  # the row-count guard only covers `warp.type = "individual"`; a global warp
+  # is recycled to `nrow(object$sample)` rows, so a mismatched `newdata`
+  # fails downstream instead. `ptw`'s own method does the same, so this is
+  # inherited rather than introduced here.
+  expect_error(predict(pw_global, newdata = tr[1:3, ]),
+               regexp = "subscript out of bounds")
+  expect_error(ptw_predict(pw_global, newdata = tr[1:3, ]),
+               regexp = "subscript out of bounds")
+})

@@ -2,9 +2,13 @@
 % Please edit documentation in R/get_peaktable.R
 \name{get_peaktable}
 \alias{get_peaktable}
+\alias{get_peaktable.default}
+\alias{get_peaktable.matched_peak_list}
 \title{Convert peak lists into an aligned peak table}
 \usage{
-get_peaktable(
+get_peaktable(peak_list, ...)
+
+\method{get_peaktable}{default}(
   peak_list,
   chrom_list,
   response = c("area", "height"),
@@ -18,15 +22,26 @@ get_peaktable(
   sigma.r = 0.5,
   deepSplit = FALSE,
   verbose = FALSE,
-  out = c("data.frame", "matrix")
+  out = c("data.frame", "matrix"),
+  ...
+)
+
+\method{get_peaktable}{matched_peak_list}(
+  peak_list,
+  pks,
+  response = c("area", "height"),
+  rt_tol = 0.01,
+  na.fill = 0,
+  out = c("data.frame", "matrix"),
+  verbose = FALSE,
+  ...
 )
 }
 \arguments{
-\item{peak_list}{A \code{peak_list} object created by \code{\link{get_peaks}}, containing a
-nested list of features, where the first level is the sample, and the second
-level is the spectral wavelength. Every sample × wavelength component is
-described by a \code{data.frame} with a row for each peak and columns containing
-information on various peak parameters.}
+\item{peak_list}{A \code{peak_list} object created by \code{\link{get_peaks}}, or a
+\code{matched_peak_list} created by \code{\link{match_peaks}}.}
+
+\item{...}{Additional arguments (currently unused).}
 
 \item{chrom_list}{A list of chromatographic matrices. Only required when
 \code{clust = "sp.rt"}.}
@@ -39,8 +54,16 @@ information on various peak parameters.}
 otherwise specified, the \code{rt.cor} column will be used by default if it
 exists in the provided \code{peak_list}.}
 
-\item{hmax}{Height at which the complete linkage dendrogram will be cut. Can
-be interpreted as the maximal intercluster retention time difference. Ignored
+\item{hmax}{Height at which the clustering tree is cut. With \code{clust = "rt"},
+peaks are clustered by complete linkage on retention time, so \code{hmax} is the
+largest retention time difference allowed between any two peaks in the same
+cluster, in retention time units. With \code{clust = "sp.rt"}, peaks are clustered
+by average linkage on the dissimilarity \eqn{1 - S_{ij}}, which runs from 0
+to 1, and \code{hmax} is the maximum tree height passed to
+\code{\link[dynamicTreeCut:cutreeDynamicTree]{cutreeDynamicTree}}; clusters may be
+split below it (see \code{deepSplit}). There, the default of \code{0.2} lets peaks with
+identical spectra sit about \code{0.67 * sigma.t} apart, a third of the mean
+\code{end - start} at the default \code{sigma.t}. Ignored
 for peak lists produced by \code{get_peaks(windows = )}, since those peaks are
 grouped by integration window instead of being clustered.}
 
@@ -53,59 +76,66 @@ the cluster and uses its metadata directly).}
 \item{plot_it}{Logical. If \code{TRUE}, for every component a strip plot will be
 shown indicating the clustering.}
 
-\item{ask}{Logical. Ask before showing new plot? Defaults to \code{TRUE}.}
+\item{ask}{Logical. Ask before showing new plot? Defaults to \code{plot_it}.}
 
 \item{clust}{Specify whether to perform hierarchical clustering based on
 spectral similarity and retention time (\code{sp.rt}) or retention time alone
 (\code{rt}). Defaults to \code{rt}. Ignored for peak lists produced by
 \code{get_peaks(windows = )}, which are grouped by window.}
 
-\item{sigma.t}{Width of Gaussian kernel for retention time similarity.
-Controls weight given to retention time when \code{"sp.rt"} is selected.}
+\item{sigma.t}{Width of Gaussian kernel for retention time similarity, in
+retention time units. Controls the weight given to retention time when
+\code{clust = "sp.rt"}. Defaults to half the mean \code{end - start} across all peaks.}
 
 \item{sigma.r}{Width of Gaussian kernel for spectral similarity. Controls
-weight given to spectral correlation if \code{"sp.rt"} is selected.}
+the weight given to spectral correlation when \code{clust = "sp.rt"}. Defaults
+to \code{0.5}.}
 
-\item{deepSplit}{Logical. Controls sensitivity to cluster splitting. If
-\code{TRUE}, function will return a larger number of smaller clusters. For
-additional information, see \code{\link[dynamicTreeCut:cutreeDynamic]{cutreeDynamic}}.}
+\item{deepSplit}{Logical. Controls sensitivity to cluster splitting when
+\code{clust = "sp.rt"}. If \code{TRUE}, returns a larger number of smaller clusters.
+Defaults to \code{FALSE}. For additional information, see
+\code{\link[dynamicTreeCut:cutreeDynamicTree]{cutreeDynamicTree}}.}
 
-\item{verbose}{Logical. Whether to print warning when combining peaks into
-single time window. Defaults to \code{FALSE}.}
+\item{verbose}{Logical. Whether to warn when two peaks from the same sample
+fall in the same cluster. Defaults to \code{FALSE}.}
 
 \item{out}{Output format: \code{data.frame} (default) or \code{matrix}.}
+
+\item{pks}{A \code{peak_list} object from \code{\link{get_peaks}}.
+Required when \code{peak_list} is a \code{matched_peak_list}. Used to
+retrieve per-peak intensities and metadata.}
+
+\item{rt_tol}{Numeric. Maximum allowed deviation (in retention-time units)
+when joining matched peak RTs back to the corresponding row in \code{pks}.
+Defaults to \code{0.01}.}
 
 \item{na.fill}{Value used to fill cells where no peak was matched in a given
 sample. Defaults to \code{0}. Only used by the \code{matched_peak_list}
 method.}
-
-\item{...}{Additional arguments (currently unused).}
 }
 \value{
-The function returns an S3 \code{\link{peak_table}} object, containing the
-following elements:
+An S3 \code{\link{peak_table}} object, containing the following elements:
 \itemize{
-\item \code{tab}: The peak table itself — a \code{data.frame} of intensities in a
-sample × peak configuration.
+\item \code{tab}: The peak table itself — a \code{data.frame} (or \code{matrix}, per \code{out}) of
+intensities in a sample × peak configuration.
 \item \code{pk_meta}: A \code{data.frame} containing peak metadata (e.g., the spectral
 component, peak number, and average retention time), summarized across all
 peaks in each cluster according to \code{summarize_by}.
-\item \code{sample_meta}: A \code{data.frame} of sample metadata. Must be added using
+\item \code{sample_meta}: A \code{data.frame} of sample metadata. \code{NA} until added with
 \code{\link{attach_metadata}}.
 \item \code{instrument_meta}: A \code{data.frame} of instrumental metadata transferred
 automatically from the chromatograms.
-\item \code{ref_spectra}: A \code{data.frame} of reference spectra (in a wavelength ×
-peak configuration). Must be added using \code{\link{attach_ref_spectra}}.
-\item \code{args}: A vector of arguments given to \code{\link{get_peaktable}} to
-generate the peak table.
+\item \code{ref_spectra}: A matrix of reference spectra (in a wavelength × peak
+configuration). \code{NA} until added with \code{\link{attach_ref_spectra}}.
+\item \code{args}: A list of the arguments given to \code{\link{get_peaktable}} to generate
+the peak table.
 }
 }
 \description{
 Converts a \code{peak_list} object containing peaks from multiple samples into
 an aligned peak table by clustering peaks across samples according to
-retention time and (optionally) spectral similarity. Clusters are defined
-by cutting a complete-linkage dendrogram at height \code{hmax}, which can be
-understood as the maximal allowed clustering distance.
+retention time and (optionally) spectral similarity. The tree is cut at
+height \code{hmax}, whose meaning depends on \code{clust} (see \code{hmax}).
 }
 \details{
 By default, clustering is performed on retention times alone (when
@@ -123,35 +153,38 @@ where \eqn{c_{ij}} is the spectral correlation between spectra \eqn{i} and
 contributions of retention time and spectral similarity, respectively (see
 \code{sigma.t} and \code{sigma.r}).
 
-If two peaks from the same sample are assigned to the same cluster, a warning
-message is printed to the console. These warnings are often benign but may
-also indicate that \code{hmax} is too large. Reducing \code{hmax} may prevent excessive
-clustering, although overly small values may instead lead to splitting of
-peaks across multiple clusters. Filtering low-intensity peaks prior to
-clustering may also help reduce these warnings.
+When two peaks from the same sample fall in the same cluster, only the more
+intense one enters the peak table, with a warning if \code{verbose = TRUE}. Such
+warnings are often benign, but they can also mean \code{hmax} is too large. Lowering \code{hmax} merges fewer peaks, at the
+cost of splitting some across multiple clusters; filtering low-intensity
+peaks before clustering reduces the warnings without that trade-off.
 
 Once clusters are formed, peak metadata are summarized within each cluster
-according to \code{summarize_by}. By default (\code{"weighted.mean"}), peak metadata
-are averaged using peak intensity as weights, reducing the influence of small
-peaks which are more likely to represent noise. Alternatively, the \code{"max"}
-argument selects the metadata associated with the most intense peak in each
-cluster.
+according to \code{summarize_by}, by default weighting each peak by its
+intensity, which reduces the influence of small peaks.
 }
 \note{
 Peak lists produced by \code{get_peaks(windows = )} are grouped by
-integration window rather than clustered by retention time. This gives one
-peak table column per window, in the order the windows were given, with
-every sample contributing to each.
+integration window rather than clustered by retention time, including after
+\code{\link{correct_peaks}}. This gives one peak table column per window, in order of
+retention time, with every sample contributing to each.
 
 This function is adapted from the \code{getPeakTable} function in the alsace
 package by Ron Wehrens: \url{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}.
+
+When \code{peak_list} is a \code{matched_peak_list}, the columns of
+the returned \code{\link{peak_table}} are defined by the reference
+sample's peaks at the wavelength used by \code{\link{match_peaks}}; other wavelengths
+in \code{pks} are ignored. Peaks absent from the reference sample will not
+appear as columns regardless of their prevalence in other samples. Choose a
+reference with a rich peak profile. To discover peaks across all samples,
+call \code{get_peaktable} on the \code{peak_list} itself, which clusters peaks
+across every sample.
 }
 \examples{
-\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 data(Sa_pr)
 pks <- get_peaks(Sa_pr, lambdas = c('210'))
 get_peaktable(pks, response = "area")
-\dontshow{\}) # examplesIf}
 }
 \references{
 \itemize{

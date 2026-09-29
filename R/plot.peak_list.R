@@ -173,6 +173,214 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
   }
 }
 
+#' Plot matched peak pairs
+#'
+#' Shows how peaks in each sample were matched to the reference by
+#' [`match_peaks`].
+#'
+#' With `type = "ladder"` (the default), each sample gets one row, with
+#' retention time on the x-axis. Dotted vertical lines mark the reference
+#' peaks, and a short tick marks each one in every row. A matched sample peak
+#' is drawn as a point filled by its spectral correlation with the reference
+#' peak, joined to the reference tick by a horizontal bar, so the length and
+#' direction of the bar show the retention time shift. A tick without a bar is
+#' a reference peak left unmatched in that sample, and an open circle is a
+#' sample peak left unmatched. Where a bar would overlap another bar or run
+#' through an unmatched peak, it is lifted slightly above its row.
+#'
+#' With `type = "scatter"`, each sample gets its own panel, plotting every
+#' candidate pair (a pair within the retention time window and above the
+#' spectral cutoff) at its reference and sample retention times, so retention
+#' time drift shows as distance from the \eqn{y = x} diagonal. Candidate pairs
+#' are colored by spectral correlation, matched pairs are outlined in black,
+#' and unmatched peaks are marked on the axes.
+#'
+#' @importFrom grDevices hcl.colors
+#' @importFrom graphics layout image axis box rect mtext lines points rug legend abline segments lcm grconvertX grconvertY
+#' @param x A `matched_peak_list` object from [`match_peaks`].
+#' @param idx Integer or character vector of sample indices or names to plot.
+#'   Defaults to all non-reference samples.
+#' @param type Plot type, either `"ladder"` (default) or `"scatter"`. See
+#'   *Details*.
+#' @param ... Additional arguments passed to [`plot`][graphics::plot] for
+#'   `type = "ladder"`, such as `xlim` to zoom in on part of the run.
+#' @return Invisibly returns `x`.
+#' @author Ethan Bass
+#' @seealso [`match_peaks`], [`get_peaktable`]
+#' @rdname plot.matched_peak_list
+#' @family visualization functions
+#' @export
+plot.matched_peak_list <- function(x, idx = NULL, type = c("ladder", "scatter"),
+                                   ...) {
+  type <- match.arg(type)
+  ref_idx <- reference_position(x)
+  if (is.null(idx)) idx <- seq_along(x)[-ref_idx]
+  if (is.character(idx)) idx <- match(idx, names(x))
+  zlim <- c(attr(x, "spectral_cutoff"), 1)
+  pal <- hcl.colors(100, "viridis")
+  cor_col <- function(r){
+    if (diff(zlim) == 0) return(rep(pal[100], length(r)))
+    pal[pmax(1L, pmin(100L, as.integer((r - zlim[1]) / diff(zlim) * 99) + 1L))]
+  }
+  view <- if (type == "ladder") plot_matched_ladder else plot_matched_scatter
+  view(x, idx, attr(x, "rt_ref"), names(x)[ref_idx], cor_col, pal, zlim, ...)
+  invisible(x)
+}
+
+#' Ladder view for `plot.matched_peak_list`
+#' @noRd
+plot_matched_ladder <- function(x, idx, rt_ref, ref_name, cor_col, pal, zlim,
+                                xlim = NULL, ylim = NULL, xlab = NULL,
+                                ylab = "", ...){
+  old_par <- colorbar_layout()
+  on.exit(par(old_par))
+  par(mar = c(5, 6, 4, 2))
+  y <- rev(seq_along(idx))
+  xlim <- xlim %||%
+    range(c(rt_ref, unlist(lapply(x[idx], `[[`, "rt_samp"))), na.rm = TRUE)
+  ylim <- ylim %||% c(0.5, length(idx) + 0.5)
+  xlab <- xlab %||% sprintf("Retention time (reference: %s)", ref_name)
+  plot(NA, xlim = xlim, ylim = ylim, yaxt = "n", ylab = ylab, xlab = xlab, ...)
+  axis(2, at = y, labels = names(x)[idx], las = 1, tick = FALSE)
+  shade <- y[c(FALSE, TRUE)]
+  if (length(shade) > 0){
+    rect(par("usr")[1], shade - 0.5, par("usr")[2], shade + 0.5,
+         col = "gray96", border = NA)
+  }
+  abline(v = rt_ref, col = "gray85", lty = 3)
+  in_y <- function(inches) diff(grconvertY(c(0, inches), "inches", "user"))
+  dot_radius <- 0.375 * 1.3 * par("cex") * par("ps") / 72
+  tick_half <- in_y(0.5625 * dot_radius)
+  lane_step <- in_y(2 * dot_radius)
+  pad <- diff(grconvertX(c(0, dot_radius), "inches", "user"))
+  empty <- list(matched_rows = integer(0), matched_cols = integer(0),
+                rt_samp = numeric(0), cor_scores = numeric(0))
+  for (k in seq_along(idx)){
+    m <- x[[idx[k]]] %||% empty
+    mr <- m$matched_rows
+    mc <- m$matched_cols
+    un_ref <- rt_ref[!seq_along(rt_ref) %in% mr]
+    un_samp <- m$rt_samp[!seq_along(m$rt_samp) %in% mc]
+    lane <- pack_lanes(pmin(rt_ref[mr], m$rt_samp[mc]),
+                       pmax(rt_ref[mr], m$rt_samp[mc]), pad,
+                       obstacles = c(un_ref, un_samp))
+    yl <- y[k] + lane * lane_step
+    tick_y <- rep(y[k], length(rt_ref))
+    tick_y[mr] <- yl
+    segments(rt_ref, tick_y - tick_half, rt_ref, tick_y + tick_half,
+             col = "gray45")
+    segments(rt_ref[mr], yl, m$rt_samp[mc], yl, col = "gray30", lwd = 1.5)
+    points(un_samp, rep(y[k], length(un_samp)), pch = 1, col = "gray55",
+           cex = 0.8)
+    points(m$rt_samp[mc], yl, pch = 21, bg = cor_col(m$cor_scores), cex = 1.3)
+  }
+  draw_colorbar(pal, zlim)
+}
+
+#' Scatter view for `plot.matched_peak_list`
+#' @noRd
+plot_matched_scatter <- function(x, idx, rt_ref, ref_name, cor_col, pal, zlim,
+                                 ...){
+  rt_window <- attr(x, "rt_window")
+  for (i in idx){
+    m <- x[[i]]
+    if (is.null(m)){
+      message(sprintf("Skipping '%s': no matches.", names(x)[i]))
+      next
+    }
+    old_par <- colorbar_layout()
+    par(mar = c(5, 4, 4, 2))
+    rt_samp <- m$rt_samp
+    pairs <- which(!is.na(m$cor_matrix), arr.ind = TRUE)
+    rt_range <- range(c(rt_ref, rt_samp))
+    plot(rt_range, rt_range, type = "n", xlim = rt_range, ylim = rt_range,
+         xlab = paste("Reference RT:", ref_name),
+         ylab = paste("Sample RT:", names(x)[i]))
+    abline(0, 1, lty = 2, col = "gray50")
+    if (!is.null(rt_window)){
+      abline(rt_window, 1, lty = 3, col = "gray70")
+      abline(-rt_window, 1, lty = 3, col = "gray70")
+    }
+    points(rt_ref[pairs[, 2]], rt_samp[pairs[, 1]],
+           col = cor_col(m$cor_matrix[pairs]), pch = 19, cex = 0.9)
+    points(rt_ref[m$matched_rows], rt_samp[m$matched_cols],
+           pch = 21, cex = 1.4, col = "black", bg = NA, lwd = 1.5)
+    rug(rt_ref[setdiff(seq_along(rt_ref), m$matched_rows)], side = 1,
+        col = "gray40", lwd = 1.5)
+    rug(rt_samp[setdiff(seq_along(rt_samp), m$matched_cols)], side = 2,
+        col = "gray40", lwd = 1.5)
+    draw_colorbar(pal, zlim)
+    par(old_par)
+  }
+}
+
+#' Assign overlapping intervals to lanes
+#'
+#' Each interval goes in the first lane (0, then 1, -1, 2, -2, ...) where it
+#' clears the previous interval in that lane by `pad`. Lane 0 is also refused
+#' when an obstacle falls strictly inside the interval.
+#' @param lo,hi Interval ends.
+#' @param pad Minimum gap between intervals sharing a lane.
+#' @param obstacles Positions that intervals in lane 0 must not contain.
+#' @return An integer lane for each interval.
+#' @noRd
+pack_lanes <- function(lo, hi, pad, obstacles = numeric(0)){
+  lanes <- c(0L, 1L, -1L, 2L, -2L, 3L, -3L)
+  last_end <- rep(-Inf, length(lanes))
+  lane <- integer(length(lo))
+  for (i in order(lo)){
+    inside <- any(obstacles > lo[i] & obstacles < hi[i])
+    free <- which(last_end < lo[i] - pad & !(lanes == 0L & inside))[1]
+    if (is.na(free)) free <- 1L
+    lane[i] <- lanes[free]
+    last_end[free] <- hi[i]
+  }
+  lane
+}
+
+#' @noRd
+colorbar_layout <- function() {
+  old_par <- par(no.readonly = TRUE)
+  layout(matrix(c(1, 2), ncol = 2), widths = c(1, lcm(2.5)))
+  old_par
+}
+
+#' @noRd
+draw_colorbar <- function(colors, zlim, label = "Correlation") {
+  par(mar = c(2, 0, 2, 3.5))
+  plot(0, 0, type = "n", xlim = c(0, 1), ylim = c(0, 1),
+       axes = FALSE, xlab = "", ylab = "")
+  legend_height <- 0.6
+  y_start <- (1 - legend_height) / 2
+  y_end   <- y_start + legend_height
+  y_vals  <- seq(y_start, y_end, length.out = length(colors) + 1)
+  rect(0, y_vals[-length(y_vals)], 1, y_vals[-1], col = colors, border = NA)
+  ticks <- colorbar_ticks(zlim)
+  tick_pos <- if (diff(zlim) == 0) (y_start + y_end) / 2 else
+    y_start + (ticks - zlim[1]) / diff(zlim) * legend_height
+  axis(4, at = tick_pos, labels = format(ticks, trim = TRUE), las = 1,
+       lwd = 0, lwd.ticks = 0.75, tcl = -0.15, mgp = c(3, 0.3, 0),
+       cex.axis = 0.8)
+  text(0.5, y_end + 0.04, label, adj = c(0.5, 0), xpd = NA)
+}
+
+#' Round tick values inside `zlim`, in steps of 1, 2, 2.5 or 5 times a power of 10
+#' @param zlim Range of the color scale.
+#' @param n Target number of ticks.
+#' @return Numeric vector of tick values.
+#' @noRd
+colorbar_ticks <- function(zlim, n = 5) {
+  if (diff(zlim) == 0) return(zlim[1])
+  mag <- 10^floor(log10(diff(zlim) / n) + 1e-9)
+  steps <- c(1, 2, 2.5, 5, 10) * mag
+  eps <- steps * 1e-9
+  counts <- floor((zlim[2] + eps) / steps) - ceiling((zlim[1] - eps) / steps) + 1
+  i <- which.min(abs(counts - n))
+  step <- steps[i]
+  eps <- eps[i]
+  seq(ceiling((zlim[1] - eps) / step), floor((zlim[2] + eps) / step)) * step
+}
+
 #' Draw trapezoid
 #' @noRd
 draw_trapezoid <- function(peak.loc, yvals, color, alpha, floor = 0){

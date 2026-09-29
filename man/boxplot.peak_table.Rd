@@ -37,6 +37,7 @@ boxplot(pk_tab, formula=V11 ~ trt)
 \seealso{
 Other visualization functions:
 \code{\link[=mirror_plot]{mirror_plot()}},
+\code{\link[=plot.matched_peak_list]{plot.matched_peak_list()}},
 \code{\link[=plot.peak_list]{plot.peak_list()}},
 \code{\link[=plot.peak_table]{plot.peak_table()}},
 \code{\link[=plot_all_spectra]{plot_all_spectra()}},

@@ -81,6 +81,7 @@ mirror_plot(pk_tab,lambdas = c("210","260"), var = "trt", mirror = TRUE,
 \seealso{
 Other visualization functions:
 \code{\link[=boxplot.peak_table]{boxplot.peak_table()}},
+\code{\link[=plot.matched_peak_list]{plot.matched_peak_list()}},
 \code{\link[=plot.peak_list]{plot.peak_list()}},
 \code{\link[=plot.peak_table]{plot.peak_table()}},
 \code{\link[=plot_all_spectra]{plot_all_spectra()}},

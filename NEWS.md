@@ -15,6 +15,25 @@ estimators. `maxI` can no longer be given positionally.
 increasing. A named `by`, `length.out`, or `along.with` element gets an
 informative error pointing at `seq()`.
 
+#### Retention time correction
+
+* Inverted the meaning of `correct_rt`'s `penalty` argument for
+`alg = "vpdtw"`, so a higher value now allows less warping. The default
+changed from `5` to `0.2`; to convert an explicit value, take its reciprocal.
+Values above `1` now warn.
+* `correct_rt`'s `trwdth` is now a width in minutes, not a count of timepoints.
+Multiply an old value by the sampling interval in minutes to convert it; a value
+wider than the chromatogram now errors.
+* `correct_rt` now passes `trwdth` to `ptw`, which previously ignored it.
+The default of `0.2` matches `ptw`'s own `20` timepoints at `dt = 0.01`.
+* `max_shift` defaults to `1` and `dilation_span` to `0.3`, so VPdtw alignments
+change. See `?correct_rt`.
+* `correct_rt` and `correct_rt_group` now error when samples' time axes differ
+by a sampling interval or more. Previously they warped such samples by timepoint
+index. Interpolate onto a common grid with `preprocess(dim1 = ...)` first.
+* `correct_rt` and `correct_rt_group` now error on duplicate sample names, as
+`get_peaks` already did.
+
 #### Peak detection and integration
 
 * Corrected an off-by-one error in `find_peaks` that reported every apex one
@@ -78,6 +97,8 @@ equivalent to peak width only for `fit = "gaussian"`. See `?filter_peaks`.
 `correct_baseline` from `lambda` to `stiffness`, reserving `lambda` for
 the common usage to specify a wavelength used throughout the package.
 * Removed the `lambda` argument from `get_spectra`, which had no effect.
+* Renamed `correct_rt`'s `maxshift` to `max_shift`, now in minutes. `maxshift`
+still works, read as a count of timepoints as before, with a warning.
 
 ### New features
 
@@ -94,8 +115,16 @@ baseline retained by `preprocess` or `correct_baseline` when
 retention times (`rt_range`) and/or wavelengths (`lambda_range`). Cropping is
 pure subsetting, so values and dimnames pass through unchanged, unlike
 `preprocess(dim1 = )`, which interpolates onto a new axis.
+* Added `match_peaks` function for matching peaks across chromatograms using
+spectral correlation, retention time proximity and/or peak shape similarity. The
+resulting `matched_peak_list` can be passed to `correct_rt` for landmark-based
+PTW or to `get_peaktable`.
 * Added `get_time_resolution` for reading a chromatogram's sampling interval,
 in the units of its time axis by default or in minutes via `unit`.
+
+#### New generic functions
+
+* Converted `get_peaktable` to an S3 generic. The default method keeps the original behavior, including for unclassed lists. The new `get_peaktable.matched_peak_list` method builds a peak table directly from matched peak pairs.
 
 #### Baseline correction
 
@@ -112,6 +141,18 @@ It is dropped by any transform that invalidates it (`correct_rt`,
 * Baseline estimators now require a complete trace, raising an informative error
 when the signal contains missing or non-finite values rather than failing
 obscurely or silently splicing the two sides of a gap together.
+
+#### Retention time correction
+
+* Added new landmark parametric time warping algorithm (`alg = "lptw"`) to
+`correct_rt`, fitting a warping polynomial to matched peak positions rather than
+to full signals, which helps when signals are complex or noisy. A
+`regularization` argument pulls the fit toward the identity; useful values run
+roughly `0`-`10` and it defaults to `0`.
+* Added a `dilation_span` argument to `correct_rt`: the width, in minutes, of
+the moving-maximum window used to build the `"vpdtw"` penalty, previously
+hardcoded to 350 timepoints. A span wide enough to make the penalty constant
+now warns.
 
 #### Peak detection and integration
 
@@ -156,6 +197,16 @@ now skipped below four wavelengths.
 sample fails in parallel (`cl > 1`). Previously they returned `try-error` or
 `NULL` elements, including for samples that had succeeded but were processed
 by the failing worker.
+
+#### Retention time correction
+
+* `correct_rt(alg = "vpdtw")` now reproduces the alignment VPdtw fitted.
+Previously samples could remain misaligned when the warp extended past the end
+of the reference.
+* `correct_rt` no longer misplaces peaks when `n_zeros > 0`.
+* `correct_rt(models = ...)` now matches models to samples by name. Previously
+models were applied by position, so reordering `chrom_list` warped each sample
+with another sample's model.
 
 #### Peak detection and integration
 

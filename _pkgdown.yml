@@ -18,6 +18,7 @@ reference:
     - correct_rt_group
     - correct_peaks
     - get_peaks
+    - match_peaks
     - get_peaktable
     - get_spectra
     - attach_metadata
@@ -60,6 +61,7 @@ reference:
     - summary.peak_table
     - "[.peak_table"
     - "[.peak_list"
+    - "[.matched_peak_list"
     - dim.peak_table
     - head.peak_table
     - tail.peak_table

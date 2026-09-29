@@ -11,22 +11,26 @@ correct_rt_group(
   reference = "best",
   reference_group = NULL,
   init.coef = c(0, 1, 0),
-  n.traces = NULL,
+  n_traces = NULL,
   fill_zeros = FALSE,
-  n.zeros = 0,
+  n_zeros = 0,
   scale = FALSE,
-  trwdth = 200,
+  trwdth = 0.2,
   plot_it = FALSE,
-  penalty = 5,
-  maxshift = 50,
+  penalty = NULL,
+  max_shift = 1,
   verbose = getOption("verbose"),
   show_progress = NULL,
   cl = 2,
-  ...
+  ...,
+  n.traces = NULL,
+  n.zeros = NULL,
+  maxshift = NULL
 )
 }
 \arguments{
-\item{chrom_list}{A list of chromatograms in matrix format.}
+\item{chrom_list}{A list of chromatograms in matrix format, sharing a common
+time axis (see \code{\link{preprocess}}).}
 
 \item{lambdas}{A character or numeric vector specifying the wavelengths to
 use for alignment.}
@@ -38,52 +42,74 @@ length as \code{chrom_list} and may be named (matching \code{names(chrom_list)})
 positional. All samples must have a group assignment; \code{NA} values will
 trigger an error.}
 
-\item{reference}{Index or name of the group average to use as the alignment
-reference. Defaults to \code{"best"}, which selects the reference
-automatically using \code{\link[ptw:bestref]{bestref}} applied to the group averages.}
+\item{reference}{Index or name of a sample in \code{chrom_list} whose group will
+be used as the alignment reference. Defaults to \code{"best"}, which selects the
+reference group automatically using \code{\link[ptw:bestref]{bestref}} applied to the
+group averages.}
 
 \item{reference_group}{Name of the group to use as the reference group. If
 supplied, overrides \code{reference}. Defaults to \code{NULL}.}
 
-\item{init.coef}{Starting values for the optimization.}
+\item{init.coef}{Starting values for the optimization. Named to match the
+argument of the same name in \code{\link[ptw:ptw]{ptw}}, which receives it. For
+\code{alg = "lptw"}, only its length is used, setting the degree of the warping
+polynomial.}
 
-\item{n.traces}{Number of traces to use.}
+\item{n_traces}{Number of wavelengths to warp by, chosen from \code{lambdas} (or
+from all wavelengths if \code{lambdas} is missing) by the CODA criterion in
+\code{\link[ptw:select.traces]{select.traces}}. Defaults to \code{NULL}, which uses every
+wavelength in \code{lambdas}.}
 
 \item{fill_zeros}{Logical. If \code{TRUE}, out-of-bounds regions produced by
 warping are filled with zeros; otherwise they are returned as \code{NA} (default).}
 
-\item{n.zeros}{Number of zeros to add for padding chromatograms at the edges.}
+\item{n_zeros}{Number of zeros to pad onto each end of the chromatograms
+before fitting. Only used when \code{alg = "ptw"}.}
 
-\item{scale}{Logical. If \code{TRUE}, scale chromatograms before warping.}
+\item{scale}{Logical. If \code{TRUE}, rescale each chromatogram to the range
+[0, 1] before warping. The returned corrected values stay rescaled.}
 
-\item{trwdth}{Argument to \code{\link[ptw:ptw]{ptw}}. Width of the triangle in
-the WCC criterion. Defaults to \code{200}.}
+\item{trwdth}{Width of the triangle in the weighted cross-correlation (WCC)
+criterion, passed to
+\code{\link[ptw:ptw]{ptw}}. Defaults to \code{0.2}, which matches the default of \code{20}
+timepoints in \code{\link[ptw:ptw]{ptw}} itself on a chromatogram sampled every
+\code{0.01} minutes. Roughly a peak width is a reasonable choice.}
 
 \item{plot_it}{Logical. Whether to plot alignment. Defaults to \code{FALSE}.}
 
-\item{penalty}{The divisor used to calculate the penalty for
-\code{\link[VPdtw:VPdtw]{VPdtw}}. The warping penalty is calculated by dividing the
-\code{\link[VPdtw:dilation]{dilation}} by this number. Thus, a higher number will
-produce a lower penalty and be more permissive, while a lower number will
-produce a higher penalty and allow less warping. Defaults to \code{5}.}
+\item{penalty}{Unused. \code{correct_rt_group} warps with \code{"ptw"} only, so the
+\code{"vpdtw"} penalty has no effect here.}
 
-\item{maxshift}{Integer. Maximum allowable shift for \code{VPdtw} warping.
-Defaults to \code{50}.}
+\item{max_shift}{Unused. \code{correct_rt_group} warps with \code{"ptw"} only, so the
+\code{"vpdtw"} shift limit has no effect here.}
 
-\item{verbose}{Logical. Whether to print verbose output.}
+\item{verbose}{Logical. Whether to print a progress message as the warping
+models are fit and applied. Defaults to \code{getOption("verbose")}.}
 
 \item{show_progress}{Logical. Whether to show progress bar. Defaults to
-\code{TRUE} if \code{\link[pbapply:pbapply]{pbapply}} is installed. Currently works
-only for \code{ptw} alignments.}
+\code{TRUE} if \code{\link[pbapply:pbapply]{pbapply}} is installed. Has no effect when
+\code{alg = "vpdtw"}.}
 
 \item{cl}{Either an integer specifying the number of cores to use for
 parallel processing or a cluster object created by
 \code{\link[parallel:makeCluster]{makeCluster}}. Defaults to \code{2}. On Windows systems,
-integer values will be ignored.}
+integers are ignored. Has no effect when \code{alg = "vpdtw"}.}
 
-\item{...}{Optional additional arguments to \code{ptw}. The only argument that
-cannot be changed is \code{warp.type} which is hard-coded to \code{"global"} to permit
-warping on multiple wavelengths.}
+\item{...}{For \code{alg = "ptw"}, optional additional arguments passed to
+\code{\link[ptw:ptw]{ptw}}. The only argument that cannot be changed is \code{warp.type},
+which is hard-coded to \code{"global"} to permit warping on multiple wavelengths.
+For \code{alg = "lptw"}, optional arguments passed to \code{fit_penalized_warp}:
+\code{penalty_scale} (per-coefficient penalty multipliers) and \code{min_peaks}
+(minimum matched peaks required to fit the polynomial). Its \code{penalty}
+argument is set by \code{regularization} rather than through \code{...}.}
+
+\item{n.traces}{The \code{n.traces} argument is deprecated. Please use \code{n_traces}
+instead.}
+
+\item{n.zeros}{The \code{n.zeros} argument is deprecated. Please use \code{n_zeros}
+instead.}
+
+\item{maxshift}{Deprecated and unused. See \code{max_shift}.}
 }
 \value{
 A list of warped chromatogram matrices in the same order as
@@ -95,18 +121,14 @@ Aligns chromatograms using parametric time warping (\code{"ptw"}), as
 implemented in \code{\link[ptw:ptw]{ptw}}, with warping functions estimated
 from within-group averages. This is useful when samples fall into batches
 with shared retention time shifts, or when individual samples contain peaks
-absent in other groups that would otherwise confound alignment. In addition
-to potentially being more accurate, this should also be faster than computing
-warping functions individually on each sample.
+absent in other groups that would otherwise confound alignment. One warp is
+fit per group rather than one per sample, so the cost of warping falls
+roughly in proportion to the number of groups.
 }
 \examples{
-\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
-\dontrun{
 data(Sa_pr)
 groups <- c("a", "a", "b", "b")
 warp <- correct_rt_group(chrom_list = Sa_pr, lambdas = 210, groups = groups)
-}
-\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{correct_rt}}, \code{\link[ptw:ptw]{ptw}}

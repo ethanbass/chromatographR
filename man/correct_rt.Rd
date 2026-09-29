@@ -9,108 +9,202 @@ correct_rt(
   lambdas,
   models = NULL,
   reference = "best",
-  alg = c("ptw", "vpdtw"),
+  alg = c("ptw", "lptw", "vpdtw"),
+  peaks = NULL,
   what = c("corrected.values", "models"),
   init.coef = c(0, 1, 0),
-  n.traces = NULL,
+  n_traces = NULL,
   fill_zeros = FALSE,
-  n.zeros = 0,
+  n_zeros = 0,
   scale = FALSE,
-  trwdth = 200,
+  trwdth = 0.2,
   plot_it = FALSE,
-  penalty = 5,
-  maxshift = 50,
+  penalty = 0.2,
+  max_shift = 1,
+  dilation_span = 0.3,
+  rt_window = 0.3,
+  spectral_cutoff = 0.95,
+  regularization = 0,
   verbose = getOption("verbose"),
   show_progress = NULL,
   cl = 2,
-  ...
+  ...,
+  n.traces = NULL,
+  n.zeros = NULL,
+  maxshift = NULL
 )
 }
 \arguments{
-\item{chrom_list}{List of chromatograms in matrix format.}
+\item{chrom_list}{List of chromatograms in matrix format, sharing a common
+time axis (see \code{\link{preprocess}}).}
 
 \item{lambdas}{A character or numeric vector specifying the wavelengths to
-use for alignment. Only one wavelength should be specified for VPdtw warping.
-For one-dimensional chromatograms, this argument can be ignored.}
+use for alignment. \code{"vpdtw"} and \code{"lptw"} accept only a single wavelength
+and raise an error otherwise. For one-dimensional chromatograms, this
+argument can be omitted.}
 
 \item{models}{List of models to warp by. The models provided here (if any)
-must match the algorithm selected in \code{alg}.}
+must match the algorithm selected in \code{alg}, and are matched to the samples of
+\code{chrom_list} by name.}
 
-\item{reference}{Index of the sample to be used as the reference. If no
-reference is specified, the reference will be chosen algorithmically from a
-similarity matrix of the supplied chromatograms using the
-\code{\link[ptw:bestref]{bestref}} function from \code{ptw}.}
+\item{reference}{Index or name of the sample to be used as the reference.
+Fitted models record it by name. If not specified, chosen by
+\code{\link[ptw:bestref]{bestref}} from a similarity matrix of the chromatograms.}
 
 \item{alg}{Alignment algorithm to use: parametric time warping (\code{"ptw"}),
-or variable penalty dynamic time warping (\code{"vpdtw"}).}
+landmark parametric time warping (\code{"lptw"}), or variable penalty dynamic time
+warping (\code{"vpdtw"}).}
+
+\item{peaks}{A peak list object from \code{\link{get_peaks}} or a \code{matched_peak_list}
+object from \code{\link{match_peaks}}. If a \code{matched_peak_list} is provided, peak
+matching will be skipped. Only used when \code{alg = "lptw"}.}
 
 \item{what}{Output type: either the \code{"corrected.values"} (useful for
 visual inspection and downstream analysis) or the warping \code{"models"}
 (for further programmatic use).}
 
-\item{init.coef}{Starting values for the optimization.}
+\item{init.coef}{Starting values for the optimization. Named to match the
+argument of the same name in \code{\link[ptw:ptw]{ptw}}, which receives it. For
+\code{alg = "lptw"}, only its length is used, setting the degree of the warping
+polynomial.}
 
-\item{n.traces}{Number of traces to use.}
+\item{n_traces}{Number of wavelengths to warp by, chosen from \code{lambdas} (or
+from all wavelengths if \code{lambdas} is missing) by the CODA criterion in
+\code{\link[ptw:select.traces]{select.traces}}. Defaults to \code{NULL}, which uses every
+wavelength in \code{lambdas}.}
 
 \item{fill_zeros}{Logical. If \code{TRUE}, out-of-bounds regions produced by
 warping are filled with zeros; otherwise they are returned as \code{NA} (default).}
 
-\item{n.zeros}{Number of zeros to add for padding chromatograms at the edges.}
+\item{n_zeros}{Number of zeros to pad onto each end of the chromatograms
+before fitting. Only used when \code{alg = "ptw"}.}
 
-\item{scale}{Logical. If \code{TRUE}, scale chromatograms before warping.}
+\item{scale}{Logical. If \code{TRUE}, rescale each chromatogram to the range
+[0, 1] before warping. The returned corrected values stay rescaled.}
 
-\item{trwdth}{Argument to \code{\link[ptw:ptw]{ptw}}. Width of the triangle in
-the WCC criterion. Defaults to \code{200}.}
+\item{trwdth}{Width of the triangle in the weighted cross-correlation (WCC)
+criterion, passed to
+\code{\link[ptw:ptw]{ptw}}. Defaults to \code{0.2}, which matches the default of \code{20}
+timepoints in \code{\link[ptw:ptw]{ptw}} itself on a chromatogram sampled every
+\code{0.01} minutes. Roughly a peak width is a reasonable choice.}
 
 \item{plot_it}{Logical. Whether to plot alignment. Defaults to \code{FALSE}.}
 
-\item{penalty}{The divisor used to calculate the penalty for
-\code{\link[VPdtw:VPdtw]{VPdtw}}. The warping penalty is calculated by dividing the
-\code{\link[VPdtw:dilation]{dilation}} by this number. Thus, a higher number will
-produce a lower penalty and be more permissive, while a lower number will
-produce a higher penalty and allow less warping. Defaults to \code{5}.}
+\item{penalty}{Numeric >= 0. Strength of the penalty against warping
+for \code{alg = "vpdtw"}: the constant of proportionality in
+\eqn{\lambda \propto} \code{\link[VPdtw:dilation]{dilation}}\code{(reference)} over a
+\code{dilation_span}-wide window, as recommended by Clifford and Stone (2012).
+\strong{A higher
+number allows less warping}; \code{0} applies no penalty at all. Defaults to
+\code{0.2}. In chromatographR <= 0.8.0 \code{penalty} was a \emph{divisor}, so use the
+reciprocal of an old value. Values above \code{1} raise a warning, since they are
+more likely to be old divisors than deliberate choices.}
 
-\item{maxshift}{Integer. Maximum allowable shift for \code{VPdtw} warping.
-Defaults to \code{50}.}
+\item{max_shift}{Maximum allowable shift for \code{VPdtw} warping, in minutes.
+Set it from the retention time drift you actually expect; the default of \code{1}
+allows a minute of drift. Although \code{max_shift} is a time, \code{VPdtw} itself
+works on the index axis, so the \code{shift} element of the returned models is
+reported in timepoints.}
 
-\item{verbose}{Logical. Whether to print verbose output.}
+\item{dilation_span}{Width of the moving-maximum window used to build the
+\code{"vpdtw"} penalty. The penalty at each point is the largest reference
+intensity within \code{dilation_span} either side of it, computed by
+\code{\link[VPdtw:dilation]{dilation}} after conversion to timepoints. Smaller
+values track individual peaks more closely, allowing more warping in the
+baseline between them. Larger values approach a constant penalty, which
+becomes exactly constant once \code{dilation_span} exceeds the distance between
+the tallest peak of the reference and the furthest end of the chromatogram.
+Defaults to \code{0.3}, around a couple of peak widths on the example data.}
+
+\item{rt_window}{Numeric. Argument to \code{\link{match_peaks}}. Maximum allowed
+difference in retention time, in minutes, between a reference and sample
+peak to be considered a candidate match. Defaults to \code{0.3}.}
+
+\item{spectral_cutoff}{Numeric. Argument to \code{\link{match_peaks}}. Minimum
+spectral correlation for a candidate peak pair to be retained. Defaults to
+\code{0.95}.}
+
+\item{regularization}{Numeric >= 0. Strength of the penalty against warping
+for \code{alg = "lptw"}: a dimensionless weight pulling the warp toward the
+identity warp, passed as \code{penalty} to \code{fit_penalized_warp}. \strong{A higher
+number allows less warping}; \code{0} (the default) applies no penalty at all.
+\code{1} weights a unit of squared warp displacement equally against a unit of
+squared peak-position mismatch, and around \code{2.4} halves the applied warp, so
+useful values run roughly \code{0}-\code{10}. Unbounded above, approaching the identity
+warp asymptotically.}
+
+\item{verbose}{Logical. Whether to print a progress message as the warping
+models are fit and applied. Defaults to \code{getOption("verbose")}.}
 
 \item{show_progress}{Logical. Whether to show progress bar. Defaults to
-\code{TRUE} if \code{\link[pbapply:pbapply]{pbapply}} is installed. Currently works
-only for \code{ptw} alignments.}
+\code{TRUE} if \code{\link[pbapply:pbapply]{pbapply}} is installed. Has no effect when
+\code{alg = "vpdtw"}.}
 
 \item{cl}{Either an integer specifying the number of cores to use for
 parallel processing or a cluster object created by
 \code{\link[parallel:makeCluster]{makeCluster}}. Defaults to \code{2}. On Windows systems,
-integer values will be ignored.}
+integers are ignored. Has no effect when \code{alg = "vpdtw"}.}
 
-\item{...}{Optional additional arguments to \code{ptw}. The only argument that
-cannot be changed is \code{warp.type} which is hard-coded to \code{"global"} to permit
-warping on multiple wavelengths.}
+\item{...}{For \code{alg = "ptw"}, optional additional arguments passed to
+\code{\link[ptw:ptw]{ptw}}. The only argument that cannot be changed is \code{warp.type},
+which is hard-coded to \code{"global"} to permit warping on multiple wavelengths.
+For \code{alg = "lptw"}, optional arguments passed to \code{fit_penalized_warp}:
+\code{penalty_scale} (per-coefficient penalty multipliers) and \code{min_peaks}
+(minimum matched peaks required to fit the polynomial). Its \code{penalty}
+argument is set by \code{regularization} rather than through \code{...}.}
+
+\item{n.traces}{The \code{n.traces} argument is deprecated. Please use \code{n_traces}
+instead.}
+
+\item{n.zeros}{The \code{n.zeros} argument is deprecated. Please use \code{n_zeros}
+instead.}
+
+\item{maxshift}{The \code{maxshift} argument is deprecated. Please use
+\code{max_shift}, which is in minutes. \code{maxshift} is read as a count of
+timepoints, as in chromatographR 0.8.0, and converted.}
 }
 \value{
 A list of warping models or a list of warped absorbance profiles,
-according to the value of the \code{what} argument.
+according to the value of the \code{what} argument. With \code{alg = "vpdtw"}, the
+warped chromatograms share a new time axis, which can be longer than the
+input. \code{lptw_list} models returned when \code{alg = "lptw"} are not compatible
+with \code{\link{correct_peaks}}.
 }
 \description{
-Chromatograms are aligned using either parametric time warping (\code{"ptw"}),
-as implemented in \code{\link[ptw:ptw]{ptw}} or variable penalty dynamic time warping
-(\code{"vpdtw"}), as implemented in \code{\link[VPdtw:VPdtw]{VPdtw}}.
+Chromatograms are aligned using one of three algorithms, according to the
+value of \code{alg}: parametric time warping (\code{"ptw"}), as implemented in
+\code{\link[ptw:ptw]{ptw}}; variable penalty dynamic time warping (\code{"vpdtw"}), as
+implemented in \code{\link[VPdtw:VPdtw]{VPdtw}}; or landmark parametric time warping
+(\code{"lptw"}), which fits the warping polynomial directly to matched peak
+positions rather than full chromatographic signals.
 }
 \details{
 Some arguments are specific to particular warping functions. For example
-the \code{init.coef} and \code{n.traces} arguments apply only to \code{"ptw"} warping, while
-\code{penalty} and \code{maxshift} apply only to  \code{"vpdtw"} warping.
+\code{n_traces} applies only to \code{"ptw"} warping;
+\code{penalty}, \code{max_shift}, and \code{dilation_span} apply only to \code{"vpdtw"} warping;
+and \code{peaks}, \code{rt_window}, \code{spectral_cutoff}, and \code{regularization} apply only
+to \code{"lptw"} warping.
+
+\code{trwdth}, \code{max_shift} and \code{dilation_span} are widths along the time axis,
+given in minutes whatever the time unit of \code{chrom_list}, and rounded
+internally to a whole number of timepoints. \code{trwdth} was a count of
+timepoints up to chromatographR 0.8.0; multiply an old value by the sampling
+interval in minutes to convert it. A width wider than the chromatogram itself
+is rejected with an error, since it is almost certainly a stale timepoint
+count. \code{max_shift} replaces \code{maxshift}, which is still accepted as a count of
+timepoints.
+
+\code{regularization} (\code{"lptw"}) and \code{penalty} (\code{"vpdtw"}) are not comparable:
+both are dimensionless and higher means less warping, but they are on
+unrelated scales.
 }
 \note{
 Adapted from the \code{correctRT} function in the alsace package by Ron
 Wehrens (\url{https://github.com/rwehrens/alsace/blob/master/R/correctRT.R}).
 }
 \examples{
-\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 data(Sa_pr)
 warp <- correct_rt(chrom_list = Sa_pr, lambdas=210)
-\dontshow{\}) # examplesIf}
 }
 \references{
 \itemize{

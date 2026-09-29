@@ -120,18 +120,118 @@ test_that("correct_rt works with VPdtw", {
 test_that("VPdtw plot displays correctly", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
+  data(Sa_pr)
   vpdtw_alignment <- function(){
-    warp <- correct_rt(dat.pr, lambdas = "210", alg = "vpdtw", plot_it = TRUE,
+    warp <- correct_rt(Sa_pr, lambdas = "210", alg = "vpdtw", plot_it = TRUE,
                        show_progress = FALSE)
   }
   vdiffr::expect_doppelganger("vpdtw_alignment", vpdtw_alignment)
+})
+### test correct_rt_group ###
+
+# `Sa_pr` has 4 samples, so it can be split into two groups of two.
+cl_grp <- Sa_pr
+for (i in seq_along(cl_grp)) attr(cl_grp[[i]], "batch") <- c("a", "a", "b", "b")[i]
+grp_vec <- c("a", "a", "b", "b")
+
+warp_grp <- correct_rt_group(cl_grp, lambdas = 210, groups = grp_vec,
+                             show_progress = FALSE)
+
+test_that("correct_rt_group warps every sample with its group's model", {
+  skip_on_cran()
+  expect_type(warp_grp, "list")
+  # output order follows `chrom_list`, not the group loop
+  expect_equal(names(warp_grp), names(cl_grp))
+  expect_equal(dim(warp_grp[[1]]), dim(cl_grp[[1]]))
+  expect_equal(dimnames(warp_grp[[1]]), dimnames(cl_grp[[1]]))
+  # samples in the same group share a warp, so their models agree; the two
+  # groups' warps differ from each other
+  models <- correct_rt(chrom_list = cl_grp, lambdas = 210, alg = "ptw",
+                       what = "models", show_progress = FALSE)
+  expect_false(identical(warp_grp, correct_rt(cl_grp, models = models,
+                                              show_progress = FALSE)))
+})
+
+test_that("correct_rt_group accepts all three forms of `groups`", {
+  skip_on_cran()
+  # metadata attribute: this branch previously never coerced to a factor, so
+  # `levels()` was NULL and the group loop iterated over nothing
+  expect_equal(correct_rt_group(cl_grp, lambdas = 210, groups = "batch",
+                                show_progress = FALSE),
+               warp_grp)
+  # a named vector is matched to `names(chrom_list)` rather than used
+  # positionally, so a scrambled order gives the same answer
+  grp_named <- setNames(grp_vec[c(3, 1, 2, 4)], names(cl_grp)[c(3, 1, 2, 4)])
+  expect_equal(correct_rt_group(cl_grp, lambdas = 210, groups = grp_named,
+                                show_progress = FALSE),
+               warp_grp)
+})
+
+test_that("correct_rt_group resolves the reference group", {
+  skip_on_cran()
+  # `reference_group` and a `reference` sample in that group agree
+  warp_b <- correct_rt_group(cl_grp, lambdas = 210, groups = grp_vec,
+                             reference_group = "b", show_progress = FALSE)
+  expect_equal(names(warp_b), names(cl_grp))
+  expect_equal(correct_rt_group(cl_grp, lambdas = 210, groups = grp_vec,
+                                reference = 3, show_progress = FALSE),
+               warp_b)
+  expect_equal(correct_rt_group(cl_grp, lambdas = 210, groups = grp_vec,
+                                reference = names(cl_grp)[3],
+                                show_progress = FALSE),
+               warp_b)
+  # `reference = "best"` (the default) delegates selection to `ptw::bestref`
+  msgs <- capture_messages(
+    invisible(correct_rt_group(cl_grp, lambdas = 210, groups = grp_vec,
+                               verbose = TRUE, show_progress = FALSE)))
+  expect_match(msgs, "Computing within-group averages", all = FALSE)
+  expect_match(msgs, "Selected chromatogram 1 as best reference", all = FALSE)
+  expect_match(msgs, "Applying group warp models", all = FALSE)
+})
+
+test_that("correct_rt_group errors on unusable group assignments", {
+  skip_on_cran()
+  expect_error(correct_rt_group(cl_grp, lambdas = 210, groups = c("a", "b"),
+                                show_progress = FALSE),
+               regexp = "Length of `groups` must match")
+  expect_error(correct_rt_group(cl_grp, lambdas = 210,
+                                groups = c("a", "a", "b", NA),
+                                show_progress = FALSE),
+               regexp = "All samples must have a group assignment")
+  # an attribute missing everywhere yields a list of NULLs, which the guard
+  # must catch rather than passing on an empty factor
+  expect_error(correct_rt_group(Sa_pr, lambdas = 210, groups = "batch",
+                                show_progress = FALSE),
+               regexp = "Metadata attribute 'batch' not found on all")
+  cl_partial <- cl_grp
+  attr(cl_partial[[4]], "batch") <- NULL
+  expect_error(correct_rt_group(cl_partial, lambdas = 210, groups = "batch",
+                                show_progress = FALSE),
+               regexp = "not found on all chromatograms. Missing for")
+})
+
+test_that("correct_rt_group errors on an unresolvable reference", {
+  skip_on_cran()
+  # these all used to reach `correct_rt` as `integer(0)` and fail there with
+  # "argument is of length zero"
+  expect_error(correct_rt_group(cl_grp, lambdas = 210, groups = grp_vec,
+                                reference_group = "zzz",
+                                show_progress = FALSE),
+               regexp = "does not match any group. Valid groups are: 'a', 'b'")
+  expect_error(correct_rt_group(cl_grp, lambdas = 210, groups = grp_vec,
+                                reference = "zzz", show_progress = FALSE),
+               regexp = "does not match any sample in `chrom_list`")
+  expect_error(correct_rt_group(cl_grp, lambdas = 210, groups = grp_vec,
+                                reference = 99, show_progress = FALSE),
+               regexp = "does not match any sample in `chrom_list`")
 })
 
 test_that("PTW plot displays correctly", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
+  data(Sa_pr)
   ptw_alignment <- function(){
-    warp <- correct_rt(dat.pr, lambdas = "210", alg = "ptw", 
+    warp <- correct_rt(Sa_pr, lambdas = "210", alg = "ptw",
                        plot_it = TRUE, show_progress = FALSE)
   }
   vdiffr::expect_doppelganger("ptw_alignment", ptw_alignment)
@@ -198,6 +298,9 @@ pks_gaussian <- get_peaks(dat.pr, lambdas = lam, fit = "gaussian",
 pks_raw <- get_peaks(dat.pr, lambdas = lam, fit = "raw", smooth_type = "savgol",
                      show_progress = FALSE, smooth_window = 7)
 
+matched <- match_peaks(pks_egh, chrom_list = dat.pr, lambda = "210",
+                       verbose = FALSE)
+
 test_that("get_peaks works", {
   expect_equal(names(pks_egh), names(dat.pr))
   expect_equal(names(pks_gaussian), names(dat.pr))
@@ -236,6 +339,277 @@ test_that("filter_peaks works", {
                  regexp = "'max_fwhm' is greater than the maximum")
 })
 
+### test match_peaks and lptw ###
+
+test_that("match_peaks works", {
+  expect_s3_class(matched, "matched_peak_list")
+  expect_equal(names(matched), names(dat.pr))
+  expect_equal(attr(matched, "reference"), names(dat.pr)[1])
+  expect_false(is.null(matched[[1]]))
+})
+
+test_that("match_peaks errors correctly", {
+  expect_error(match_peaks(pks_egh, chrom_list = dat.pr),
+               regexp = "wavelength")
+  expect_error(match_peaks(pks_egh, chrom_list = dat.pr[1], lambda = "210"),
+               regexp = "do not match")
+  expect_error(match_peaks(pks_egh, chrom_list = dat.pr, lambda = "210",
+                           fit = "nonsense"),
+               regexp = "'arg' should be one of")
+  expect_error(match_peaks(pks_raw, chrom_list = dat.pr, lambda = "210",
+                           shape_cutoff = 1),
+               regexp = "Peak shape parameters are not fit")
+})
+
+test_that("match_peaks honors the `fit` argument", {
+  skip_on_cran()
+  # `fit` must not be silently overwritten by the peak_list's `fit` attribute.
+  # A gaussian peak list has no `tau` column, so requesting the egh shape
+  # distance should fail. If `fit` were ignored, this would succeed.
+  expect_error(match_peaks(pks_gaussian, chrom_list = dat.pr, lambda = "210",
+                           fit = "egh", shape_cutoff = 1),
+               regexp = "tau")
+  # The reverse override is legitimate: the gaussian shape distance depends
+  # only on `sd`, which an egh peak list has.
+  matched_gauss <- match_peaks(pks_egh, chrom_list = dat.pr, lambda = "210",
+                               fit = "gaussian", shape_cutoff = 5,
+                               verbose = FALSE)
+  expect_s3_class(matched_gauss, "matched_peak_list")
+  expect_equal(names(matched_gauss), names(dat.pr))
+})
+
+test_that("match_peaks skips samples containing no peaks", {
+  skip_on_cran()
+  # A blank sample among real ones. Previously this crashed in `colnames<-`,
+  # because `do.call(cbind, list())` returns NULL when a sample has no peaks.
+  pks_blank <- pks_egh
+  pks_blank[[2]][["210"]] <- pks_blank[[2]][["210"]][0, , drop = FALSE]
+  expect_warning(m <- match_peaks(pks_blank, chrom_list = dat.pr,
+                                  lambda = "210", verbose = FALSE),
+                 regexp = "No peaks found for sample 2")
+  # the blank sample keeps its slot, so names stay aligned with the peak list
+  expect_equal(length(m), length(dat.pr))
+  expect_equal(names(m), names(pks_blank))
+  expect_null(m[[2]])
+  expect_false(is.null(m[[1]]))
+  # and the consumers of a `matched_peak_list` tolerate the NULL element
+  pt <- get_peaktable(m, pks = pks_blank, na.fill = NA)
+  expect_s3_class(pt, "peak_table")
+  expect_true(all(is.na(pt$tab[2, ])))
+  expect_equal(names(correct_rt(dat.pr, lambdas = "210", alg = "lptw",
+                                peaks = m, show_progress = FALSE)),
+               names(dat.pr))
+})
+
+test_that("match_peaks errors when the reference contains no peaks", {
+  skip_on_cran()
+  pks_blank_ref <- pks_egh
+  pks_blank_ref[[1]][["210"]] <- pks_blank_ref[[1]][["210"]][0, , drop = FALSE]
+  expect_error(match_peaks(pks_blank_ref, chrom_list = dat.pr, lambda = "210",
+                           reference = 1, verbose = FALSE),
+               regexp = "No peaks were found in the reference sample")
+})
+
+### match_peaks: argument defaults and scoring ###
+
+# `Sa_pr` rather than `dat.pr` so that `chrom_list` auto-derivation can be
+# tested: `get_chrom_list` resolves the stored name with `get()`, which only
+# reaches the search path, not a chrom_list defined inside a test file.
+pks_sa_pr <- get_peaks(Sa_pr, lambdas = "210", fit = "egh",
+                       smooth_type = "none", show_progress = FALSE)
+
+test_that("match_peaks derives `chrom_list` and `lambda` when not supplied", {
+  skip_on_cran()
+  # a single-wavelength peak list needs no `lambda`, and `chrom_list` can be
+  # recovered from the peak list's `chrom_list` attribute
+  expect_equal(attr(pks_sa_pr, "chrom_list"), "Sa_pr")
+  m <- match_peaks(pks_sa_pr, verbose = FALSE)
+  expect_s3_class(m, "matched_peak_list")
+  expect_equal(names(m), names(Sa_pr))
+  expect_equal(attr(m, "lambda"), "210")
+  # and the result is the same as supplying both explicitly
+  expect_equal(m, match_peaks(pks_sa_pr, chrom_list = Sa_pr, verbose = FALSE))
+})
+
+test_that("match_peaks selects the best reference when `reference = 'best'`", {
+  skip_on_cran()
+  msgs <- capture_messages(
+    m <- match_peaks(pks_sa_pr, chrom_list = Sa_pr, lambda = "210",
+                     reference = "best", verbose = TRUE))
+  expect_match(msgs, "Selected chromatogram 3 as best reference", all = FALSE)
+  expect_match(msgs, "Comparing '119' against reference \\('122'\\)",
+               all = FALSE)
+  # `ptw::bestref` picks sample 3 here, so this is not just the default of 1
+  expect_equal(attr(m, "reference"), "122")
+  expect_equal(attr(m, "rt_ref"), pks_sa_pr[[3]][["210"]]$rt)
+})
+
+# A two-peak case where RT proximity and peak shape disagree. The reference has
+# a narrow peak at 12.00 and a wide one at 12.10; the sample has a wide peak at
+# 12.02 and a narrow one at 12.08. RT alone pairs 12.00-12.02 and 12.10-12.08;
+# shape alone pairs them across. `spectral_cutoff = 0` keeps the spectral mask
+# from being the binding constraint.
+make_shape_conflict <- function(){
+  pks <- function(rt, sd, tau, tau_left, tau_right){
+    data.frame(rt = rt, start = rt - .1, end = rt + .1, sd = sd, tau = tau,
+               tau_left = tau_left, tau_right = tau_right, height = 100,
+               area = 10)
+  }
+  pl <- pks_egh
+  pl[[1]] <- list("210" = pks(c(12.00, 12.10), c(0.05, 0.30), c(0.01, 0.06),
+                              c(0.01, 0.06), c(0.02, 0.07)))
+  pl[[2]] <- list("210" = pks(c(12.02, 12.08), c(0.30, 0.05), c(0.06, 0.01),
+                              c(0.06, 0.01), c(0.07, 0.02)))
+  pl
+}
+
+test_that("`shape_weight` redirects matching from RT proximity to peak shape", {
+  skip_on_cran()
+  pl <- make_shape_conflict()
+  for (f in c("gaussian", "egh", "bemg")){
+    m0 <- match_peaks(pl, chrom_list = dat.pr, lambda = "210", fit = f,
+                      spectral_cutoff = 0, shape_weight = 0, verbose = FALSE)
+    m1 <- match_peaks(pl, chrom_list = dat.pr, lambda = "210", fit = f,
+                      spectral_cutoff = 0, shape_weight = 1, verbose = FALSE)
+    pair0 <- m0[[2]]$matches[order(m0[[2]]$matches[, "rt_ref"]), ]
+    pair1 <- m1[[2]]$matches[order(m1[[2]]$matches[, "rt_ref"]), ]
+    # RT-driven: each reference peak takes its nearest sample peak
+    expect_equal(pair0[, "rt_samp"], c(12.02, 12.08), info = f,
+                 ignore_attr = TRUE)
+    # shape-driven: the pairing crosses over
+    expect_equal(pair1[, "rt_samp"], c(12.08, 12.02), info = f,
+                 ignore_attr = TRUE)
+  }
+})
+
+test_that("match_peaks errors when `fit` can be neither found nor inferred", {
+  skip_on_cran()
+  pks_nofit <- pks_egh
+  attr(pks_nofit, "fit") <- NULL
+  expect_error(match_peaks(pks_nofit, chrom_list = dat.pr, lambda = "210",
+                           verbose = FALSE),
+               regexp = "Please specify `fit` to proceed")
+})
+
+test_that("match_peaks skips samples where no candidate pair survives", {
+  skip_on_cran()
+  # peaks are present in both samples, but an impossibly tight RT window
+  # leaves no candidate pair for the non-reference sample
+  expect_warning(m <- match_peaks(pks_egh, chrom_list = dat.pr,
+                                  lambda = "210", rt_window = 1e-6,
+                                  verbose = FALSE),
+                 regexp = "No peaks matched for sample 2")
+  expect_null(m[[2]])
+  # the reference still matches itself
+  expect_false(is.null(m[[1]]))
+})
+
+test_that("`shape_cutoff` prunes shape-mismatched candidate pairs", {
+  skip_on_cran()
+  pl <- make_shape_conflict()
+  args <- list(pl, chrom_list = dat.pr, lambda = "210", fit = "gaussian",
+               spectral_cutoff = 0, verbose = FALSE)
+  m_open <- do.call(match_peaks, args)
+  m_cut  <- do.call(match_peaks, c(args, shape_cutoff = 0.5))
+  # all 4 pairs are candidates without a cutoff; the 2 shape-mismatched pairs
+  # (distance 1.43) are dropped by a cutoff of 0.5
+  expect_equal(sum(!is.na(m_open[[2]]$cor_matrix)), 4)
+  expect_equal(sum(!is.na(m_cut[[2]]$cor_matrix)), 2)
+  expect_equal(m_cut[[2]]$matches[order(m_cut[[2]]$matches[, "rt_ref"]),
+                                  "rt_samp"],
+               c(12.08, 12.02), ignore_attr = TRUE)
+})
+
+### plot.matched_peak_list ###
+
+test_that("plot.matched_peak_list returns its input invisibly for every type", {
+  skip_on_cran()
+  pdf(NULL)
+  on.exit(dev.off())
+  for (ty in c("ladder", "scatter")){
+    expect_equal(plot(matched, type = ty), matched, info = ty)
+  }
+  # `idx` accepts sample names as well as positions
+  expect_equal(plot(matched, idx = "121"), matched)
+  # `xlim` reaches the ladder's plot rather than clashing with its default
+  expect_equal(plot(matched, xlim = c(12, 14)), matched)
+  expect_error(plot(matched, type = "heatmap"),
+               regexp = "'arg' should be one of")
+})
+
+test_that("pack_lanes lifts only bars that collide", {
+  # disjoint bars stay on the row
+  expect_equal(pack_lanes(c(1, 3), c(2, 4), pad = 0.1), c(0L, 0L))
+  # an overlapping bar moves up a lane
+  expect_equal(pack_lanes(c(1, 1.5), c(2, 2.5), pad = 0.1), c(0L, 1L))
+  # a bar running through an unmatched peak moves up, one ending beside it stays
+  expect_equal(pack_lanes(c(1, 3), c(2, 4), pad = 0.1, obstacles = c(1.5, 4.05)),
+               c(1L, 0L))
+})
+
+test_that("plot.matched_peak_list skips samples with no matches", {
+  skip_on_cran()
+  pks_blank <- pks_egh
+  pks_blank[[2]][["210"]] <- pks_blank[[2]][["210"]][0, , drop = FALSE]
+  m <- suppressWarnings(match_peaks(pks_blank, chrom_list = dat.pr,
+                                    lambda = "210", verbose = FALSE))
+  expect_null(m[[2]])
+  pdf(NULL)
+  on.exit(dev.off())
+  expect_message(plot(m, idx = 2, type = "scatter"),
+                 regexp = "Skipping '121': no matches")
+  # the ladder draws the empty sample as a row of unmatched reference peaks
+  expect_equal(plot(m), m)
+})
+
+test_that("match_peaks plots the matches when `plot_it = TRUE`", {
+  skip_on_cran()
+  pdf(NULL)
+  on.exit(dev.off())
+  m <- match_peaks(pks_egh, chrom_list = dat.pr, lambda = "210",
+                   plot_it = TRUE, verbose = FALSE)
+  expect_s3_class(m, "matched_peak_list")
+  expect_equal(m, matched)
+})
+
+test_that("plot.matched_peak_list draws the documented plot types", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  data(Sa_pr)
+  pks <- get_peaks(Sa_pr, lambdas = "210", cl = 1, show_progress = FALSE)
+  matched <- match_peaks(pks, chrom_list = Sa_pr, lambda = "210", verbose = FALSE)
+  vdiffr::expect_doppelganger("plot_matched_peak_list_ladder",
+                              function() plot(matched))
+  vdiffr::expect_doppelganger("plot_matched_peak_list_ladder_zoom",
+                              function() plot(matched, xlim = c(15.6, 17.4)))
+  vdiffr::expect_doppelganger("plot_matched_peak_list_scatter",
+                              function() plot(matched, idx = 2, type = "scatter"))
+})
+
+test_that("correct_rt works with lptw given a peak_list", {
+  skip_on_cran()
+  warp_lptw <- correct_rt(dat.pr, lambdas = "210", alg = "lptw",
+                           peaks = pks_egh, show_progress = FALSE)
+  expect_equal(names(warp_lptw), names(dat.pr))
+  expect_equal(colnames(warp_lptw[[1]]), colnames(dat.pr[[1]]), ignore_attr = TRUE)
+})
+
+test_that("correct_rt returns lptw_list models", {
+  skip_on_cran()
+  models_lptw <- correct_rt(dat.pr, lambdas = "210", alg = "lptw",
+                              peaks = matched, what = "models",
+                              show_progress = FALSE)
+  expect_s3_class(models_lptw, "lptw_list")
+})
+
+test_that("correct_rt errors when reference conflicts with matched_peak_list", {
+  expect_error(
+    correct_rt(dat.pr, lambdas = "210", alg = "lptw", peaks = matched,
+               reference = 2, show_progress = FALSE),
+    regexp = "differs from the reference stored"
+  )
+})
+
 ### test get_peaktable ###
 
 pk_tab <- get_peaktable(peak_list = pks_egh, chrom_list = dat.pr)
@@ -248,6 +622,21 @@ test_that("get_peaktable works", {
   expect_equal(class(pk_tab$tab), "data.frame")
   expect_equal(class(pk_tab$pk_meta), "data.frame")
   expect_equal(class(pk_tab$args), "list")
+})
+
+test_that("get_peaktable works with matched_peak_list", {
+  skip_on_cran()
+  pt <- get_peaktable(matched, pks = pks_egh)
+  expect_s3_class(pt, "peak_table")
+  expect_equal(rownames(pt$tab), names(dat.pr))
+  expect_equal(colnames(pt$tab), colnames(pt$pk_meta))
+  expect_true(all(pt$tab[1, ] > 0))
+  expect_true(all(pt$pk_meta["lambda", ] == "210"))
+})
+
+test_that("get_peaktable.matched_peak_list errors correctly", {
+  expect_error(get_peaktable(matched), regexp = "pks")
+  expect_error(get_peaktable(matched, pks = list()), regexp = "peak_list")
 })
 
 test_that("correct_peaks works", {
@@ -614,7 +1003,6 @@ test_that("plot.peak_list works", {
   expect_error(plot(pks_egh, chrom_list = dat.pr, lambda = 190),
                regexp = "must match one of the wavelengths in your peak list")
 })
-
 
 test_that("plot.ptw_list works", {
   skip_on_cran()

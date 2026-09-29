@@ -8,9 +8,8 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' 
 #' Converts a `peak_list` object containing peaks from multiple samples into
 #' an aligned peak table by clustering peaks across samples according to
-#' retention time and (optionally) spectral similarity. Clusters are defined 
-#' by cutting a complete-linkage dendrogram at height `hmax`, which can be 
-#' understood as the maximal allowed clustering distance.
+#' retention time and (optionally) spectral similarity. The tree is cut at
+#' height `hmax`, whose meaning depends on `clust` (see `hmax`).
 #' 
 #' By default, clustering is performed on retention times alone (when 
 #' `clust = "rt"`). Alternatively, clustering can also incorporate information 
@@ -27,19 +26,15 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' contributions of retention time and spectral similarity, respectively (see
 #' `sigma.t` and `sigma.r`).
 #' 
-#' If two peaks from the same sample are assigned to the same cluster, a warning
-#' message is printed to the console. These warnings are often benign but may
-#' also indicate that `hmax` is too large. Reducing `hmax` may prevent excessive
-#' clustering, although overly small values may instead lead to splitting of 
-#' peaks across multiple clusters. Filtering low-intensity peaks prior to
-#' clustering may also help reduce these warnings. 
+#' When two peaks from the same sample fall in the same cluster, only the more
+#' intense one enters the peak table, with a warning if `verbose = TRUE`. Such
+#' warnings are often benign, but they can also mean `hmax` is too large. Lowering `hmax` merges fewer peaks, at the
+#' cost of splitting some across multiple clusters; filtering low-intensity
+#' peaks before clustering reduces the warnings without that trade-off. 
 #' 
 #' Once clusters are formed, peak metadata are summarized within each cluster
-#' according to `summarize_by`. By default (`"weighted.mean"`), peak metadata 
-#' are averaged using peak intensity as weights, reducing the influence of small
-#' peaks which are more likely to represent noise. Alternatively, the `"max"`
-#' argument selects the metadata associated with the most intense peak in each
-#' cluster. 
+#' according to `summarize_by`, by default weighting each peak by its
+#' intensity, which reduces the influence of small peaks.
 #' 
 #' @name get_peaktable
 #' @aliases get_peaktable
@@ -50,11 +45,8 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' @importFrom grDevices colorRampPalette 
 #' @importFrom scales rescale
 #' @importFrom graphics par
-#' @param peak_list A `peak_list` object created by [`get_peaks`], containing a
-#' nested list of features, where the first level is the sample, and the second 
-#' level is the spectral wavelength. Every sample × wavelength component is 
-#' described by a `data.frame` with a row for each peak and columns containing 
-#' information on various peak parameters.
+#' @param peak_list A `peak_list` object created by [`get_peaks`], or a
+#' `matched_peak_list` created by [`match_peaks`].
 #' @param chrom_list A list of chromatographic matrices. Only required when
 #' `clust = "sp.rt"`.
 #' @param response Peak intensity measure: either `"area"` (default) or 
@@ -63,8 +55,16 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' (`rt.cor` column) or raw retention times (`rt` column). Unless
 #' otherwise specified, the `rt.cor` column will be used by default if it 
 #' exists in the provided `peak_list`.
-#' @param hmax Height at which the complete linkage dendrogram will be cut. Can
-#' be interpreted as the maximal intercluster retention time difference. Ignored
+#' @param hmax Height at which the clustering tree is cut. With `clust = "rt"`,
+#' peaks are clustered by complete linkage on retention time, so `hmax` is the
+#' largest retention time difference allowed between any two peaks in the same
+#' cluster, in retention time units. With `clust = "sp.rt"`, peaks are clustered
+#' by average linkage on the dissimilarity \eqn{1 - S_{ij}}, which runs from 0
+#' to 1, and `hmax` is the maximum tree height passed to
+#' [`cutreeDynamicTree`][dynamicTreeCut::cutreeDynamicTree]; clusters may be
+#' split below it (see `deepSplit`). There, the default of `0.2` lets peaks with
+#' identical spectra sit about `0.67 * sigma.t` apart, a third of the mean
+#' `end - start` at the default `sigma.t`. Ignored
 #' for peak lists produced by `get_peaks(windows = )`, since those peaks are
 #' grouped by integration window instead of being clustered.
 #' @param summarize_by How to summarize peak metadata within each cluster.
@@ -74,45 +74,47 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' the cluster and uses its metadata directly).
 #' @param plot_it Logical. If `TRUE`, for every component a strip plot will be
 #' shown indicating the clustering.
-#' @param ask Logical. Ask before showing new plot? Defaults to `TRUE`.
+#' @param ask Logical. Ask before showing new plot? Defaults to `plot_it`.
 #' @param clust Specify whether to perform hierarchical clustering based on
 #' spectral similarity and retention time (`sp.rt`) or retention time alone
 #' (`rt`). Defaults to `rt`. Ignored for peak lists produced by
 #' `get_peaks(windows = )`, which are grouped by window.
-#' @param sigma.t Width of Gaussian kernel for retention time similarity.
-#' Controls weight given to retention time when `"sp.rt"` is selected.
+#' @param sigma.t Width of Gaussian kernel for retention time similarity, in
+#' retention time units. Controls the weight given to retention time when
+#' `clust = "sp.rt"`. Defaults to half the mean `end - start` across all peaks.
 #' @param sigma.r Width of Gaussian kernel for spectral similarity. Controls
-#' weight given to spectral correlation if `"sp.rt"` is selected.
-#' @param deepSplit Logical. Controls sensitivity to cluster splitting. If
-#' `TRUE`, function will return a larger number of smaller clusters. For
-#' additional information, see [`cutreeDynamic`][dynamicTreeCut::cutreeDynamic].
-#' @param verbose Logical. Whether to print warning when combining peaks into 
-#' single time window. Defaults to `FALSE`.
+#' the weight given to spectral correlation when `clust = "sp.rt"`. Defaults
+#' to `0.5`.
+#' @param deepSplit Logical. Controls sensitivity to cluster splitting when
+#' `clust = "sp.rt"`. If `TRUE`, returns a larger number of smaller clusters.
+#' Defaults to `FALSE`. For additional information, see
+#' [`cutreeDynamicTree`][dynamicTreeCut::cutreeDynamicTree].
+#' @param verbose Logical. Whether to warn when two peaks from the same sample
+#' fall in the same cluster. Defaults to `FALSE`.
 #' @param out Output format: `data.frame` (default) or `matrix`.
 #' @param na.fill Value used to fill cells where no peak was matched in a given
 #'   sample. Defaults to `0`. Only used by the `matched_peak_list`
 #'   method.
 #' @param ... Additional arguments (currently unused).
-#' @return The function returns an S3 [`peak_table`] object, containing the
-#' following elements:
-#' * `tab`: The peak table itself — a `data.frame` of intensities in a
-#' sample × peak configuration.
+#' @return An S3 [`peak_table`] object, containing the following elements:
+#' * `tab`: The peak table itself — a `data.frame` (or `matrix`, per `out`) of
+#' intensities in a sample × peak configuration.
 #' * `pk_meta`: A `data.frame` containing peak metadata (e.g., the spectral
 #' component, peak number, and average retention time), summarized across all
 #' peaks in each cluster according to `summarize_by`.
-#' * `sample_meta`: A `data.frame` of sample metadata. Must be added using
+#' * `sample_meta`: A `data.frame` of sample metadata. `NA` until added with
 #' [`attach_metadata`].
 #' * `instrument_meta`: A `data.frame` of instrumental metadata transferred
 #' automatically from the chromatograms.
-#' * `ref_spectra`: A `data.frame` of reference spectra (in a wavelength × 
-#' peak configuration). Must be added using [`attach_ref_spectra`].
-#' * `args`: A vector of arguments given to [`get_peaktable`] to 
-#' generate the peak table.
+#' * `ref_spectra`: A matrix of reference spectra (in a wavelength × peak
+#' configuration). `NA` until added with [`attach_ref_spectra`].
+#' * `args`: A list of the arguments given to [`get_peaktable`] to generate
+#' the peak table.
 #' @author Ethan Bass
 #' @note Peak lists produced by `get_peaks(windows = )` are grouped by
-#' integration window rather than clustered by retention time. This gives one
-#' peak table column per window, in the order the windows were given, with
-#' every sample contributing to each.
+#' integration window rather than clustered by retention time, including after
+#' [`correct_peaks`]. This gives one peak table column per window, in order of
+#' retention time, with every sample contributing to each.
 #' @note This function is adapted from the `getPeakTable` function in the alsace
 #' package by Ron Wehrens: <https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R>.
 #' @md
@@ -124,21 +126,29 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' * Wehrens, R., Carvalho, E., Fraser, P.D. 2015. Metabolite profiling in
 #' LC–DAD using multivariate curve resolution: the alsace package for R. 
 #' *Metabolomics* 11:143-154. \doi{10.1007/s11306-014-0683-5}.
-#' @examplesIf interactive()
+#' @examples
 #' data(Sa_pr)
 #' pks <- get_peaks(Sa_pr, lambdas = c('210'))
 #' get_peaktable(pks, response = "area")
 #' @seealso [`peak_table-class`], [`attach_ref_spectra`], [`attach_metadata`]
-#' @export get_peaktable
+#' @export
+get_peaktable <- function(peak_list, ...) UseMethod("get_peaktable")
 
-get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
+#' @rdname get_peaktable
+#' @method get_peaktable default
+#' @export
+get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "height"),
                           use.cor = NULL, hmax = 0.2, 
                           summarize_by = c("weighted.mean", "median", "mean", "max"),
                           plot_it = FALSE, ask = plot_it, 
                           clust = c("rt", "sp.rt"), 
                           sigma.t = NULL, sigma.r = 0.5,
                           deepSplit = FALSE, verbose = FALSE,
-                          out = c('data.frame', 'matrix')){
+                          out = c('data.frame', 'matrix'), ...){
+  if (...length()) stop("unused argument(s): ", paste(...names(), collapse = ", "))
+  if (!is.list(peak_list))
+    stop("No get_peaktable method for object of class ",
+         paste(class(peak_list), collapse = "/"), ".")
   response <- match.arg(response, c("area", "height"))
   clust <- match.arg(clust, c("rt", "sp.rt"))
   out <- match.arg(out, c('data.frame', 'matrix'))
@@ -151,7 +161,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
   start <- ifelse(use.cor, "start.cor", "start")
   end <- ifelse(use.cor, "end.cor", "end")
   check_duplicated_names(names(peak_list))
-  windows <- if (use.cor) NULL else attr(peak_list, "windows")
+  windows <- attr(peak_list, "windows")
   if (clust == "sp.rt" && is.null(windows)){
     if (missing(chrom_list)){
       chrom_list <- get_chrom_list(peak_list)
@@ -177,8 +187,8 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
     if (length(pkcenters) < 2) 
       return(NULL)
     if (!is.null(windows)){
-      dist_to_window <- outer(xx[[start]], windows[, 1], function(a, b) abs(a - b)) +
-                        outer(xx[[end]], windows[, 2], function(a, b) abs(a - b))
+      dist_to_window <- outer(xx[["start"]], windows[, 1], function(a, b) abs(a - b)) +
+                        outer(xx[["end"]], windows[, 2], function(a, b) abs(a - b))
       win_idx <- apply(dist_to_window, 1, which.min)
       pkcenters.cl <- match(win_idx, sort(unique(win_idx)))
     } else if (clust == 'rt'){
@@ -209,7 +219,7 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
       sing <- which(pkcenters.cl == 0)
       pkcenters.cl[sing] <- max(pkcenters.cl) + seq_along(sing)
     }
-    vars <- c(rt, start, end, "sd", "width", "tau", "FWHM", "r.squared", "purity")
+    vars <- c(rt, start, end, PEAK_META_COLS)
     vars <- vars[vars %in% colnames(xx)]
     vars.idx <- match(vars, colnames(xx))
     if (summarize_by == "weighted.mean"){
@@ -271,16 +281,8 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
     }
     return(list(Iinfo, metaInfo))
   }
-  as.structure <- switch(out, "data.frame" = as.data.frame,
-             "matrix" = as.matrix)
   result <- lapply(seq_len(ncomp), clusterPeaks, peak_list)
-  result <- list(tab = as.structure(t(do.call("rbind", lapply(result,    
-                                                        function(x) x[[1]])))),
-                 pk_meta = as.structure(t(do.call("rbind", lapply(result, 
-                                                        function(x) x[[2]])))),
-                 sample_meta = NA,
-                 instrument_meta = chromConverter::extract_metadata(peak_list),
-                 ref_spectra = NA,
+  new_peak_table(result, out, peak_list,
                  args = list(peak_list = deparse(substitute(peak_list)),
                         chrom_list = attr(peak_list, "chrom_list"),
                         lambdas = list(names(peak_list[[1]])),
@@ -297,11 +299,148 @@ get_peaktable <- function(peak_list, chrom_list, response = c("area", "height"),
                         normalization_by = NA,
                         summarized_by = summarize_by,
                         time_unit = get_metadata_attribute(peak_list, "time_unit"),
+                        rt_unit = get_time_unit(peak_list),
                         intensity_unit = get_metadata_attribute(peak_list, "intensity_unit")
                         ))
-  class(result) <- c("peak_table", "list")
-  attr(result, "pk_args") <- attr(peak_list,"meta")
-  result
+}
+
+#' @rdname get_peaktable
+#' @param pks A `peak_list` object from [`get_peaks`].
+#'   Required when `peak_list` is a `matched_peak_list`. Used to
+#'   retrieve per-peak intensities and metadata.
+#' @param rt_tol Numeric. Maximum allowed deviation (in retention-time units)
+#'   when joining matched peak RTs back to the corresponding row in `pks`.
+#'   Defaults to `0.01`.
+#' @note When `peak_list` is a `matched_peak_list`, the columns of
+#'   the returned [`peak_table`] are defined by the reference
+#'   sample's peaks at the wavelength used by [`match_peaks`]; other wavelengths
+#'   in `pks` are ignored. Peaks absent from the reference sample will not
+#'   appear as columns regardless of their prevalence in other samples. Choose a
+#'   reference with a rich peak profile. To discover peaks across all samples,
+#'   call `get_peaktable` on the `peak_list` itself, which clusters peaks
+#'   across every sample.
+#' @method get_peaktable matched_peak_list
+#' @export
+get_peaktable.matched_peak_list <- function(peak_list, pks,
+                                            response = c("area", "height"),
+                                            rt_tol = 0.01,
+                                            na.fill = 0,
+                                            out = c("data.frame", "matrix"),
+                                            verbose = FALSE, ...) {
+  if (...length()) stop("unused argument(s): ", paste(...names(), collapse = ", "))
+  matched  <- peak_list
+  response <- match.arg(response, c("area", "height"))
+  out      <- match.arg(out, c("data.frame", "matrix"))
+
+  if (missing(pks))
+    stop("Please supply the original peak_list from get_peaks() as 'pks'.")
+  if (!inherits(pks, "peak_list"))
+    stop("'pks' must be a 'peak_list' object.")
+  if (!identical(names(matched), names(pks)))
+    stop("Sample names of 'peak_list' and 'pks' must match.")
+
+  ref_idx      <- reference_position(matched)
+  ref_name     <- names(pks)[ref_idx]
+  lambdas      <- attr(matched, "lambda")
+  sample_names <- names(pks)
+
+  process_lambda <- function(lam) {
+    ref_pks <- pks[[ref_idx]][[lam]]
+    ref_pks <- ref_pks[!is.na(ref_pks$rt), , drop = FALSE]
+    if (nrow(ref_pks) == 0) return(NULL)
+
+    n_ref      <- nrow(ref_pks)
+    rt_ref_all <- ref_pks$rt
+    Imat <- matrix(na.fill, nrow = length(sample_names), ncol = n_ref,
+                   dimnames = list(sample_names, NULL))
+
+    ref_vals <- ref_pks[, response]
+    ref_vals[!is.finite(ref_vals) | ref_vals < 0] <- na.fill
+    Imat[ref_idx, ] <- ref_vals
+
+    for (samp_i in seq_along(sample_names)[-ref_idx]) {
+      samp_name <- sample_names[samp_i]
+      m <- matched[[samp_name]]
+      if (is.null(m) || nrow(m$matches) == 0) next
+
+      samp_pks <- pks[[samp_name]][[lam]]
+      samp_pks <- samp_pks[!is.na(samp_pks$rt), , drop = FALSE]
+      if (nrow(samp_pks) == 0) next
+
+      col_d <- abs(outer(m$matches[, "rt_ref"], rt_ref_all, "-"))
+      row_d <- abs(outer(m$matches[, "rt_samp"], samp_pks$rt, "-"))
+      col_idx <- max.col(-col_d, "first")
+      row_idx <- max.col(-row_d, "first")
+      k <- seq_len(nrow(m$matches))
+      vals <- samp_pks[[response]][row_idx]
+      ok <- col_d[cbind(k, col_idx)] <= rt_tol &
+        row_d[cbind(k, row_idx)] <= rt_tol &
+        is.finite(vals) & vals >= 0
+
+      Imat[cbind(rep(samp_i, sum(ok)), col_idx[ok])] <- vals[ok]
+      n_assigned <- sum(ok)
+
+      if (verbose) {
+        n_drop <- n_ref - n_assigned
+        message(sprintf("  %s [%s]: %d/%d reference peaks matched%s",
+                        samp_name, lam, n_assigned, n_ref,
+                        if (n_drop > 0) sprintf(" (%d dropped)", n_drop) else ""))
+      }
+    }
+
+    present <- c("rt", "start", "end", PEAK_META_COLS)
+    present <- present[present %in% colnames(ref_pks)]
+    metaInfo <- cbind(
+      lambda = rep(suppressWarnings(as.numeric(lam)), n_ref),
+      peak   = seq_len(n_ref),
+      round(ref_pks[, present, drop = FALSE], 2)
+    )
+    rownames(metaInfo) <- NULL
+    list(t(Imat), metaInfo)
+  }
+
+  result <- Filter(Negate(is.null), lapply(lambdas, process_lambda))
+  if (length(result) == 0)
+    stop("No peaks found in reference sample across any wavelength.")
+
+  new_peak_table(
+    result, out, pks,
+    args = list(
+      peak_list        = deparse(substitute(peak_list)),
+      pks              = deparse(substitute(pks)),
+      chrom_list       = attr(pks, "chrom_list"),
+      lambdas          = list(lambdas),
+      reference        = ref_idx,
+      reference_sample = ref_name,
+      response         = response,
+      rt_tol           = rt_tol,
+      reference_spectra = NA,
+      metadata_path    = NA,
+      normalized       = FALSE,
+      normalization_by = NA,
+      time_unit        = get_metadata_attribute(pks, "time_unit"),
+      rt_unit          = get_time_unit(pks),
+      intensity_unit   = get_metadata_attribute(pks, "intensity_unit")
+    ))
+}
+
+#' Assemble a peak table
+#'
+#' Shared by the `peak_list` and `matched_peak_list` methods so the object
+#' layout is defined once. Each method supplies its own `args`, which is
+#' recorded verbatim.
+#' @noRd
+new_peak_table <- function(result, out, source, args){
+  as.structure <- switch(out, "data.frame" = as.data.frame, "matrix" = as.matrix)
+  pull <- function(k) as.structure(t(do.call("rbind", lapply(result, `[[`, k))))
+  structure(
+    list(tab = pull(1), pk_meta = pull(2),
+         sample_meta = NA,
+         instrument_meta = chromConverter::extract_metadata(source),
+         ref_spectra = NA,
+         args = args),
+    class = c("peak_table", "list"),
+    pk_args = attr(source, "meta"))
 }
 
 #' Reshape peaktable

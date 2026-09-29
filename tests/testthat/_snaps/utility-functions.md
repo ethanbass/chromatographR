@@ -11,7 +11,7 @@
         Peaks:   65 
       
       Retention Time:
-        Range: [10.02, 18.5] min
+        Range: [10.02, 18.5]
         Wavelengths:   210, 260 
       
       Intensity:

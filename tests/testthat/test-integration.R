@@ -514,3 +514,22 @@ test_that("get_peaktable falls back to retention time clustering without `window
   expect_null(attr(pks, "windows"))
   expect_s3_class(get_peaktable(pks), "peak_table")
 })
+
+test_that("get_peaktable still groups by window after retention time correction", {
+  skip_on_cran()
+  a <- make_chrom_from_y(c(rep(0, 99), 1000, rep(0, 100), 500, rep(0, 100)))
+  b <- make_chrom_from_y(c(rep(0, 39), 1000, rep(0, 120), 500, rep(0, 140)))
+  w <- rbind(c(1, 150), c(150, 301))
+  pks <- get_peaks(list(a = a$mat, b = b$mat), lambdas = "220", windows = w,
+                   fit = "raw", cl = 1, show_progress = FALSE)
+  for (s in c("a", "b")){
+    for (col in c("rt", "start", "end")){
+      pks[[s]][["220"]][[paste0(col, ".cor")]] <- pks[[s]][["220"]][[col]] +
+        if (s == "a") 0.5 else -0.5
+    }
+  }
+  pt <- get_peaktable(pks)
+  expect_true(pt$args$use.cor)
+  expect_equal(ncol(pt$tab), nrow(w))
+  expect_true(all(pt$tab > 0))
+})

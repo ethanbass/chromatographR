@@ -144,3 +144,54 @@ test_that("filter_peaks retains peaks whose flag is NA", {
   expect_equal(filter_peaks(pks, window_limited = FALSE)$s[["220"]]$rt,
                c(1, 3, 4))
 })
+
+test_that("get_peaktable carries window_limited through to pk_meta", {
+  skip_on_cran()
+  data(Sa_pr, envir = environment())
+  pks <- suppressWarnings(get_peaks(Sa_pr, lambdas = 210, fit = "egh",
+                                    estimate_purity = FALSE, cl = 1,
+                                    show_progress = FALSE))
+  expect_true("window_limited" %in% colnames(pks[[1]][[1]]))
+  expect_true(all(pks[[1]][[1]]$window_limited %in% c(0, 1)))
+  expect_true("converged" %in% colnames(pks[[1]][[1]]))
+  expect_true(all(pks[[1]][[1]]$converged %in% c(0, 1)))
+  pt <- suppressWarnings(get_peaktable(pks))
+  expect_true("window_limited" %in% rownames(pt$pk_meta))
+  expect_true("converged" %in% rownames(pt$pk_meta))
+  v <- pt$pk_meta["window_limited", ]
+  expect_true(all(v >= 0 & v <= 1, na.rm = TRUE))
+})
+
+test_that("filter_peaktable can filter on min_converged", {
+  skip_on_cran()
+  data(Sa_pr, envir = environment())
+  pks <- suppressWarnings(get_peaks(Sa_pr, lambdas = 210, fit = "egh",
+                                    baseline = "sloped", sd_max = NULL,
+                                    estimate_purity = FALSE, cl = 1,
+                                    show_progress = FALSE))
+  pt <- suppressWarnings(get_peaktable(pks))
+  cv <- as.numeric(pt$pk_meta["converged", ])
+  for (th in c(0, 0.8, 1)){
+    f <- suppressWarnings(filter_peaktable(pt, min_converged = th))
+    expect_equal(ncol(f$tab), sum(cv >= th), info = paste("th =", th))
+    expect_equal(ncol(f$pk_meta), ncol(f$tab), info = paste("th =", th))
+    expect_s3_class(f, "peak_table")
+  }
+  expect_lte(ncol(suppressWarnings(
+    filter_peaktable(pt, min_converged = 1))$tab), ncol(pt$tab))
+
+  for (bad in list(1.5, -0.1, "x", NA, c(0.5, 0.6))){
+    expect_error(filter_peaktable(pt, min_converged = bad),
+                 "between 0 and 1")
+  }
+})
+
+test_that("summary of a peak table reports the retention time unit", {
+  cl <- lapply(.cl, function(m) structure(m, time_unit = "Minutes"))
+  pks <- get_peaks(cl, lambdas = "220", fit = "gaussian", smooth_type = "none",
+                   estimate_purity = FALSE, show_progress = FALSE)
+  pt <- get_peaktable(pks)
+  expect_equal(pt$args$rt_unit, "min")
+  expect_output(print(summary(pt)), "\\] min")
+  expect_output(print(summary(get_peaktable(.pks))), "\\]\n")
+})

@@ -122,37 +122,37 @@ Reassuringly, the peak areas and heights estimated by chromatographR are very si
 
 ### Alignment of chromatograms
 
-We can align chromatograms by species using variable dynamic time warping. 
+We can align chromatograms by species using variable penalty dynamic time warping.
 
 ```{r single_species_alignments}
 warp_dominula <- suppressWarnings(correct_rt(dat.pr[species_idx$dominula], 
                                             alg = "vpdtw", 
                                             what = "corrected.values", 
                                             plot_it = TRUE, verbose = TRUE, 
-                                            penalty = 1, maxshift = 100))
+                                            penalty = 1, max_shift = 0.5))
 
 warp_metricus <- suppressWarnings(correct_rt(dat.pr[species_idx$metricus], 
                                             alg = "vpdtw", 
                                             what = "corrected.values", 
                                             plot_it = FALSE, verbose = FALSE, 
-                                            penalty = 2, maxshift = 100))
+                                            penalty = 0.5, max_shift = 0.5))
 
 warp_exclamans <- suppressWarnings(correct_rt(dat.pr[species_idx$exclamans],
                                              alg = "vpdtw",
                                              what = "corrected.values", 
                                              plot_it = FALSE, verbose = FALSE, 
-                                             penalty = 2, maxshift = 200))
+                                             penalty = 0.5, max_shift = 1))
 
 warp_fuscatus <- suppressWarnings(correct_rt(dat.pr[species_idx$fuscatus],
                             alg = "vpdtw", what = "corrected.values",
                             plot_it = FALSE, verbose = FALSE, 
-                            penalty = 2, maxshift = 200))
+                            penalty = 0.5, max_shift = 1))
 ```
 
 ```{r multi_species_alignment}
 warp_all <- suppressWarnings(correct_rt(dat.pr[-1], alg = "vpdtw",
                        what = "corrected.values", plot_it = FALSE,
-                       verbose = FALSE, penalty = 2, maxshift = 200))
+                       verbose = FALSE, penalty = 0.5, max_shift = 1))
 ```
 
 As a sanity check, we can compare the single species alignments for each species to the multi-species alignment of the corresponding chromatograms.
