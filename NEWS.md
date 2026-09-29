@@ -6,6 +6,13 @@
 
 * `preprocess` no longer clamps negative values to zero by default. Set the
 new `zero_floor = TRUE` for bit-identical previous output.
+* `subtract_blanks` no longer clamps negative values to zero by default. Set
+`zero_floor = TRUE` for the previous output; it now warns when it zeroes more
+than 5% of a sample.
+* `subtract_blanks` now matches blanks to samples by retention time,
+interpolating across differing grids. Previously a blank of another length
+errored, and one of equal length was subtracted row by row, even when its times
+were offset.
 * Deprecated `preprocess`'s `remove.time.baseline` argument in favor of
 `baseline = "none"`.
 * `maxI` now follows `...` in `preprocess`'s signature, so it must be named in
@@ -187,8 +194,8 @@ Suppressed for `fit = "raw"` and when `windows` is supplied.
 * Purity estimation in `get_peaks` is now much faster, so it is no longer a
 bottleneck.
 * Purity estimation now warns when a chromatogram appears to be clipped at
-zero, which makes peaks look less pure. Use `zero_floor = FALSE` in
-`preprocess` (the default) and `subtract_blanks`.
+zero, which makes peaks look less pure. Use `zero_floor = FALSE`, the default
+in both `preprocess` and `subtract_blanks`.
 
 ### Bug fixes and other minor changes
 

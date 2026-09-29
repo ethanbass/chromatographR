@@ -9,7 +9,7 @@ subtract_blanks(
   pattern = NULL,
   blank_id,
   method = c("mean", "nearest", "preceding"),
-  zero_floor = TRUE
+  zero_floor = FALSE
 )
 }
 \arguments{
@@ -26,20 +26,33 @@ that are blanks. Ignored if \code{pattern} is supplied.}
 \item{method}{How to select the blank to subtract for each sample:
 \code{"mean"} subtracts the elementwise mean of all blanks from every
 sample; \code{"nearest"} subtracts the blank closest in run order
-(list position); \code{"preceding"} subtracts the closest blank
-occurring at or before the sample in run order.}
+(list position), taking the earlier one when two are equally close;
+\code{"preceding"} subtracts the closest blank occurring before the sample
+in run order, and raises an error if a sample has none.}
 
-\item{zero_floor}{Logical. If \code{TRUE} (default), values below zero after
-subtraction are set to zero.}
+\item{zero_floor}{Logical. If \code{TRUE}, values below zero after subtraction
+are set to zero, with a warning if this affects more than 5\% of a sample's
+values. Defaults to \code{FALSE}: a blank that matches the samples' baseline
+leaves them scattered around zero, and flooring would discard that
+signal before baseline correction.}
 }
 \value{
 A \code{chrom_list} with blank-subtracted samples. Blanks
-themselves are removed from the returned list.
+themselves are removed from the returned list, and so is any
+\code{"baseline"} attribute on the samples.
 }
 \description{
 Subtracts a blank chromatogram from each sample in a \code{chrom_list},
 using either the mean of all blanks, the nearest blank in run order,
 or the most recent preceding blank.
+}
+\details{
+Blanks recorded on a different time grid from a sample (for
+example, one or two points longer or shorter) are linearly interpolated
+onto the sample's retention times before subtraction. Where the sample
+runs past either end of the blank, the blank's first or last value is
+carried forward, with a warning if this spans more than 5 time points.
+Blanks and samples must share the same wavelengths.
 }
 \examples{
 data(Sa_warp)
