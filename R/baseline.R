@@ -3,74 +3,91 @@
 #' Reference for the baseline estimators available through the `baseline`
 #' argument of [`preprocess`] and [`correct_baseline`].
 #'
-#' @section Baseline estimators:
-#' Four estimators are available. Which performs best on a given chromatogram is an empirical question that
-#' depends on the noise, the drift, and how crowded the trace is, and is not
-#' one this page can settle for your data.
+#' @details
+#' A baseline is estimated separately for each wavelength, since the drift
+#' differs across the spectrum. Which estimator performs best depends on the
+#' noise, the drift, and how crowded the trace is, and a smoothing parameter
+#' that suits one chromatogram need not suit another. Rather than choosing on
+#' general grounds, fit a baseline and look at it: set `attach_baseline = TRUE`
+#' in [`preprocess`] or [`correct_baseline`] and plot the estimate with
+#' [`plot_baseline`], as in the examples below.\if{html}{\out{<style>td {padding: 0.3em 1.5em 0.3em 0;} td + td {text-align: center;}</style>}}
 #'
-#' * `"als"` (the default) is asymmetric least squares, as implemented by
+#' | Estimator | Parameters (defaults) | Asymmetry | Overshoots | Scope |
+#' |:---|:---:|:---:|:---:|:---:|
+#' | `"als"` (default) | `stiffness` (`1e7`)\ifelse{html}{\out{<br>}}{, }`p` (`0.001`) | fixed | yes | global |
+#' | `"arpls"` | `stiffness` (`1e7`) | adaptive | yes | global |
+#' | `"aspls"` | `stiffness` (`1e9`)\ifelse{html}{\out{<br>}}{, }`k` (`0.5`) | adaptive | yes | global |
+#' | `"snip"` | `m` (required) | fixed | no | local |
+#'
+#' * `"als"` is asymmetric least squares, as implemented by
 #' [`asysm`][ptw::asysm]. A Whittaker smoother is fit to the signal with
 #' residuals above the fit weighted by `p` and residuals below it by `1 - p`.
 #' `p` is fixed for the whole trace, so the asymmetry is set in advance rather
 #' than taken from the data.
-
+#'
 #' * `"arpls"` is asymmetrically reweighted penalized least squares (Baek et
 #' al. 2015). It uses the same Whittaker solve, but replaces the fixed `p` with
-#' weights recomputed at each iteration from the mean and standard deviation of
-#' the negative residuals, so the asymmetry follows the trace. That also gives
-#' it a failure mode on very clean traces: as the noise falls, the standard
-#' deviation the weights are scaled by collapses, the weighting becomes a hard
-#' one-sided clamp, and the fit can no longer be pulled up to follow a steep
-#' drift, detaching from the trace where the drift is steepest. This is a
-#' property of the published method rather than of this implementation —
-#' `pybaselines` reproduces it — and `"aspls"` does not share it.
-
+#' weights computed at each iteration from the mean and standard deviation of
+#' the negative residuals, so the asymmetry follows the trace. On very clean
+#' traces it can fail to follow steep drift, and the baseline falls below the
+#' trace where the drift is steepest.
+#'
 #' * `"aspls"` is adaptive smoothness parameter penalized least squares (Zhang
 #' et al. 2020). It keeps the re-weighting and additionally scales the penalty
 #' at each timepoint by the normalized absolute residual, so the fit is
 #' stiffest where residuals are largest and most flexible where they are
 #' smallest. Since that scaling is at most one, it lowers the effective
-#' penalty: the useful `stiffness` range sits about 100x above the other two,
-#' and a value carried over from `"als"` or `"arpls"` will under-smooth.
-
+#' penalty. Accordingly, the default `stiffness` is set 100 times higher than
+#' the other two estimators and a value tuned for `"als"` or `"arpls"` will
+#' under-smooth. The best conversion varies by trace, so retune `stiffness` 
+#' rather than rescaling it.
+#'
 #' * `"snip"` is Statistics-sensitive Non-linear Iterative Peak-clipping
-#' (Ryan et al. 1988), an iterated minimum filter applied in log-log space.
-#' Two of its properties follow from its construction rather than from any
-#' measurement: the estimate can never exceed the signal, so the corrected
-#' trace is non-negative; and each point depends only on the `2m + 1` window
-#' around it, so a distortion in one part of the trace cannot propagate along
-#' it the way it can through a global solve. Unlike the others it has no
-#' default width and requires `m`.
+#' (Ryan et al. 1988). Its baseline follows variation broader than its
+#' `2m + 1` timepoint window and passes beneath narrower features, such as
+#' peaks. Two of its properties follow from its construction: the estimate can never exceed the
+#' signal, so the corrected trace is non-negative; and each point depends only
+#' on the `2m + 1` window around it, so a distortion in one part of the trace
+#' cannot propagate along it the way it can through a global solve.
 #'
-#' One difference between them is directional rather than quantitative, and
-#' follows from the loss functions. `"als"` and `"snip"` are both one-sided:
-#' the first weights positive residuals down by a fixed factor, the second
-#' cannot exceed the signal at all. Both therefore tend to fit below the center
-#' of the noise, which leaves the corrected trace biased high. That offset is
-#' absolute, so it matters in proportion to the size of the peak it sits under.
-#' `"arpls"` and `"aspls"` take their asymmetry from the residuals instead, so
-#' they have no fixed offset of this kind. How large any of this is in practice
-#' is a property of the chromatogram, not of the estimator.
+#' `"als"` and `"snip"` are both one-sided: the first weights positive
+#' residuals down by a fixed factor, the second cannot exceed the signal at
+#' all. Both therefore fit below the center of the noise, which leaves the
+#' corrected trace biased high. The bias is a constant offset in signal units,
+#' so it inflates small peaks proportionally more than large ones. `"arpls"`
+#' and `"aspls"` take their asymmetry from the residuals instead and fit closer
+#' to the center of the noise.
 #'
-#' All four depend on their smoothing parameter, and a value that suits one
-#' chromatogram need not suit another. Rather than choosing an
-#' estimator on general grounds, fit a baseline and look at it:
-#' `attach_baseline = TRUE` in [`preprocess`] retains the estimate for exactly
-#' that purpose.
+#' @section Parameters:
+#' Parameters are passed to the estimator through the `...` of [`preprocess`]
+#' or [`correct_baseline`].
 #'
-#' A baseline is estimated separately for each wavelength, since the drift
-#' differs across the spectrum.
+#' * `stiffness` (`"als"`, `"arpls"`, `"aspls"`) is the smoothing penalty.
+#' Larger values give a stiffer, smoother baseline. It acts between adjacent
+#' timepoints, so the same value spans a different stretch of time on a
+#' differently sampled trace; retune it if you change the sampling interval.
+#' The defaults are starting points, not calibrated optima.
+#' * `p` (`"als"`) is the weight given to points above the fit, and `1 - p`
+#' the weight given to points below it. At the default of `0.001`, points
+#' above the fit, which are mostly peaks, barely pull on it.
+#' * `k` (`"aspls"`) sets the steepness of the weighting curve. Larger values
+#' switch more abruptly between points treated as baseline and points treated
+#' as peak.
+#' * `m` (`"snip"`) is the half-width of the clipping window, in timepoints.
+#' It has no default: the window has to be wider than the peaks it clips,
+#' which depends on your chromatography.
 #'
 #' @section Acknowledgment:
 #' The `"aspls"` implementation follows `pybaselines` (Erb 2025) at two points
 #' that Zhang et al. leave open: the default asymmetric coefficient `k` is
-#' `0.5` rather than the `2` printed in the paper, and the adaptive penalty is
-#' applied by left-multiplying the second-difference matrix by `diag(alpha)`,
-#' an ordering the paper's notation does not settle.
+#' `0.5` rather than the `2` printed in the paper, and the second-difference
+#' matrix is left-multiplied by the diagonal matrix of per-timepoint penalty
+#' scalings, an ordering the paper's notation does not settle.
 #'
 #' @name baseline_estimators
 #' @author Ethan Bass
-#' @seealso [`preprocess`], [`correct_baseline`], [`get_baseline`]
+#' @seealso [`preprocess`], [`correct_baseline`], [`plot_baseline`],
+#' [`get_baseline`]
 #' @references
 #' * Baek, S.-J., Park, A., Ahn, Y.-J., and Choo, J. 2015. Baseline correction
 #' using asymmetrically reweighted penalized least squares smoothing.
@@ -87,6 +104,19 @@
 #' * Erb, D. 2025. *pybaselines: A Python library of algorithms for the
 #' baseline correction of experimental data*.
 #' \doi{10.5281/zenodo.5608581}.
+#' @examples \donttest{
+#' data(Sa)
+#' als <- preprocess(Sa[1], dim1 = seq(10, 18, by = .01),
+#'                   dim2 = seq(200, 318, by = 2), attach_baseline = TRUE,
+#'                   show_progress = FALSE, cl = 1)
+#' snip <- preprocess(Sa[1], dim1 = seq(10, 18, by = .01),
+#'                    dim2 = seq(200, 318, by = 2), baseline = "snip", m = 50,
+#'                    attach_baseline = TRUE, show_progress = FALSE, cl = 1)
+#' plot_baseline(als, lambda = 210, annotate = FALSE)
+#' plot_baseline(snip, lambda = 210, col = "blue", add = TRUE)
+#' legend("topright", legend = c("als", "snip"), col = c("red", "blue"),
+#'        lwd = 2)
+#' }
 #' @md
 NULL
 
@@ -102,14 +132,10 @@ NULL
 #' @author Ethan Bass
 #' @noRd
 effective_baseline_param <- function(baseline, dots = list(), dt = NA_real_){
+  if (baseline == "snip" && is.null(dots[["m"]])) return(NULL)
   nm <- if (baseline == "snip") "m" else "stiffness"
-  param <- if (nm %in% names(dots)){
-    setNames(as.numeric(dots[[nm]]), nm)
-  } else if (baseline != "snip"){
-    setNames(default_stiffness(baseline), nm)
-  } else NULL
-  if (is.null(param)) return(NULL)
-  structure(param, method = baseline, dt = dt)
+  param <- dots[[nm]] %||% default_stiffness(baseline)
+  structure(setNames(as.numeric(param), nm), method = baseline, dt = dt)
 }
 
 #' Default smoothing penalty
@@ -129,8 +155,8 @@ baseline_fn <- function(baseline){
 }
 
 #' @noRd
-als_baseline <- function(y, stiffness = 1e7, p = 0.001, eps = 1e-8,
-                         maxit = 25){
+als_baseline <- function(y, stiffness = DEFAULT_STIFFNESS, p = 0.001,
+                         eps = 1e-8, maxit = 25){
   ptw::asysm(y, lambda = stiffness, p = p, eps = eps, maxit = maxit)
 }
 
@@ -195,8 +221,6 @@ estimate_baseline <- function(y, baseline = c("als", "arpls", "aspls", "snip"),
       stop("`baseline = \"snip\"` requires `m`, the filter half-width in ",
            "timepoints. It has no default: the window has to be wider than ",
            "the peaks it clips, which depends on your chromatography.")
-  } else if (is.null(dots$stiffness)){
-    dots$stiffness <- default_stiffness(baseline)
   }
   do.call(baseline_fn(baseline), c(list(y), dots))
 }
@@ -232,7 +256,8 @@ estimate_baseline <- function(y, baseline = c("als", "arpls", "aspls", "snip"),
 #' correction using asymmetrically reweighted penalized least squares smoothing.
 #' *Analyst* 140:250-257. \doi{10.1039/C4AN01061B}.
 #' @noRd
-arpls_baseline <- function(y, stiffness = 1e7, tol = 1e-6, maxit = 50){
+arpls_baseline <- function(y, stiffness = DEFAULT_STIFFNESS, tol = 1e-6,
+                           maxit = 50){
   w <- rep(1, length(y))
   z <- y
   for (i in seq_len(maxit)){
@@ -265,8 +290,8 @@ arpls_baseline <- function(y, stiffness = 1e7, tol = 1e-6, maxit = 50){
 #' must not bend into a peak.
 #'
 #' Weights use the asPLS logistic `w <- 1 / (1 + exp(k * (d - s) / s))`, where
-#' `s` is the standard deviation of the negative residuals. Note that this is
-#' centered on `s` rather than arPLS's `-m + 2 * s`, so it is a distinct
+#' `s` is the standard deviation of the negative residuals. Because it is
+#' centered on `s` rather than arPLS's `-m + 2 * s`, it is a distinct
 #' weighting, not just a reparameterization.
 #'
 #' Dividing that system through by `stiffness * alpha` gives
@@ -275,8 +300,7 @@ arpls_baseline <- function(y, stiffness = 1e7, tol = 1e-6, maxit = 50){
 #' `lambda = 1` with weights `w / (stiffness * alpha)`. Using that identity
 #' keeps the whole solve in `ptw`'s compiled banded code, which avoids a sparse
 #' solve and an additional dependency. `alpha` is floored at `alpha_min` so the
-#' reciprocal
-#' stays finite where a residual is exactly zero.
+#' reciprocal stays finite where a residual is exactly zero.
 #'
 #' @param y A numeric vector (a chromatographic signal).
 #' @param stiffness Smoothing penalty (the \eqn{\lambda} of the Whittaker
@@ -301,8 +325,8 @@ arpls_baseline <- function(y, stiffness = 1e7, tol = 1e-6, maxit = 50){
 #' adaptive smoothness parameter penalized least squares method. *Spectroscopy
 #' Letters* 53:222-233. \doi{10.1080/00387010.2020.1730908}.
 #' @noRd
-aspls_baseline <- function(y, stiffness = 1e9, k = 0.5, tol = 1e-3, maxit = 100,
-                           alpha_min = 1e-9){
+aspls_baseline <- function(y, stiffness = ASPLS_DEFAULT_STIFFNESS, k = 0.5,
+                           tol = 1e-3, maxit = 100, alpha_min = 1e-9){
   n <- length(y)
   w <- rep(1, n)
   alpha <- rep(1, n)

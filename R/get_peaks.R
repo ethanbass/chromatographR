@@ -311,7 +311,7 @@ get_peaks <- function(chrom_list, lambdas,
     attr(ptable, "n_width_after") <- n_width_after
     ptable <- transfer_metadata(ptable, chrom_list[[sample]],
                                 exclude = c('names','row.names','dim',
-                                              'dimnames', "format_out", 
+                                              'dimnames', 'baseline', "format_out",
                                               "data_format", "parser"))
     ptable
   }

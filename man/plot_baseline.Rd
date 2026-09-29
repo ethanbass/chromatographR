@@ -18,8 +18,8 @@ plot_baseline(
 )
 }
 \arguments{
-\item{x}{A matrix with an attached \code{"baseline"}, or a list of such matrices,
-as returned by \code{\link{preprocess}} or \code{\link{correct_baseline}} with
+\item{x}{A matrix or vector with an attached \code{"baseline"}, or a list of such
+matrices, as returned by \code{\link{preprocess}} or \code{\link{correct_baseline}} with
 \code{attach_baseline = TRUE}.}
 
 \item{lambda}{Wavelength to plot, as a string or number. Optional for a
@@ -29,10 +29,9 @@ single-wavelength chromatogram.}
 Defaults to \code{1}.}
 
 \item{zoom}{Logical. Whether to scale the y axis to the baseline, letting
-the peaks run off the top of the panel. A baseline is usually a small
-fraction of the signal, so at full scale it is pressed against the axis and
-the failure mode worth looking for — the estimate bending up into a peak —
-is not visible. Defaults to \code{TRUE}; set \code{FALSE} to see the whole trace.}
+the peaks run off the top of the panel. At full scale the baseline is
+usually pressed against the axis, which hides the estimate bending up into a peak.
+Defaults to \code{TRUE}; set \code{FALSE} to see the whole trace.}
 
 \item{col, lty, lwd}{Graphical parameters for the baseline itself. The trace
 beneath it is always drawn in gray.}
@@ -42,8 +41,8 @@ rather than starting a new one, for comparing two estimates on the same
 trace. The title and annotation are drawn only by the first call, and \code{...}
 is ignored. Defaults to \code{FALSE}.}
 
-\item{annotate}{Logical. Whether to annotate the plot with the estimator and
-its smoothing parameter. Set \code{FALSE} when overlaying two estimates with
+\item{annotate}{Logical. Whether to annotate the plot with the estimator,
+its smoothing parameter and the sampling interval. Set \code{FALSE} when overlaying two estimates with
 \code{add}, since a single annotation cannot describe both; label them with
 \code{\link[graphics:legend]{legend}} instead. Defaults to \code{TRUE}.}
 
@@ -58,12 +57,12 @@ device.
 }
 \description{
 Plots the baseline retained by \code{\link{preprocess}} or \code{\link{correct_baseline}} over
-the trace it was estimated from, annotated with the smoothing parameter that
-produced it.
+the trace it was estimated from, annotated with the estimator, smoothing
+parameter and sampling interval that produced it.
 }
 \details{
-Only simple diagnostic plots using base graphics are supported currently.
-For more complex plots, the baseline can be extracted using \code{\link{get_baseline}}.
+The plot uses base graphics. For other plots, extract the baseline with
+\code{\link{get_baseline}}.
 }
 \examples{
 \donttest{

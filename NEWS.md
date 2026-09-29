@@ -225,6 +225,19 @@ with metadata and one column per selected peak.
 * `preprocess` no longer fails on chromatograms with a few discontinuous wavelengths ---
 `smooth.spline` requires at least four unique values, so spectral smoothing is
 now skipped below four wavelengths.
+* `preprocess` now rejects a single-valued `dim1` or `dim2` when interpolating
+onto it, instead of failing later with an opaque `dimnames` error.
+* `preprocess` now reads the time unit after unwrapping nested input, so
+`outlier_cutoff` is scaled correctly for chromatograms supplied as
+`list(dad = <matrix>)`.
+* `preprocess` now ignores missing values when rescaling to `maxI`.
+* Spectral smoothing in `preprocess` now accounts for the actual spacing of the
+wavelength axis rather than treating the columns as evenly spaced. Results are
+unchanged for evenly spaced grids, including all of the bundled data.
+* Corrected the documented units of `outlier_cutoff` in `preprocess`, which is
+expressed in minutes.
+* Corrected the documented order of operations in `preprocess`: the code
+interpolates first, then smooths spectrally, then baselines.
 * `preprocess`, `correct_rt` and `get_peaks` now stop with an error when a
 sample fails in parallel (`cl > 1`). Previously they returned `try-error` or
 `NULL` elements, including for samples that had succeeded but were processed

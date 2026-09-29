@@ -1,8 +1,7 @@
 #' Correct baseline along the time axis
 #'
-#' Estimates and subtracts a baseline from each chromatogram in a `chrom_list`,
-#' along the time axis, using any of the available baseline estimators (see
-#' [`baseline_estimators`]).
+#' Estimates a baseline along the time axis of each chromatogram and subtracts
+#' it, using any of the estimators described in [`baseline_estimators`].
 #'
 #' @details Unlike [`preprocess`], this function only subtracts the baseline; it
 #' does not interpolate, smooth, or rescale.
@@ -24,19 +23,18 @@
 #' each wavelength, so it is the same size as the data and retaining it
 #' doubles memory use.
 #' @param zero_floor Logical. Whether to clip negative values in the corrected
-#' data to zero. Defaults to `FALSE`. Clipping rectifies the noise, destroying
-#' the symmetric below-baseline residual that diagnostics of over-fitting rely
-#' on, so it is off by default. It can be useful with `baseline = "als"`, which
-#' can overshoot the signal; `"snip"` cannot overshoot by construction, so
-#' clipping is never needed there. Note that [`subtract_blanks`] also has a
-#' `zero_floor` argument, but it defaults to `TRUE`, since a negative value
-#' there means the blank exceeded the sample rather than that an estimator
-#' overshot.
+#' data to zero. Defaults to `FALSE`, because clipping also removes the
+#' negative dips that show where a baseline was over-subtracted. It can be
+#' useful with `baseline = "als"`, which can overshoot the signal; `"snip"`
+#' cannot overshoot by construction, so clipping is never needed there. The
+#' `zero_floor` argument of [`subtract_blanks`], by contrast, defaults to
+#' `TRUE`, since a negative value there means the blank exceeded the sample
+#' rather than that an estimator overshot.
 #' @param cl Either an integer specifying the number of cores to use for
 #' parallel processing or a cluster object created by
-#' [`makeCluster`][parallel::makeCluster]. Defaults to `2`. On Windows integer
-#' values are ignored.
-#' @param show_progress Logical. Whether to show progress bar. Defaults to
+#' [`makeCluster`][parallel::makeCluster]. Defaults to `2`. On Windows,
+#' integer values are ignored.
+#' @param show_progress Logical. Whether to show a progress bar. Defaults to
 #' `TRUE` if [`pbapply`][pbapply::pbapply] is installed.
 #' @param ... Additional arguments to the selected `baseline` estimator: e.g.
 #' `stiffness` and `p` for `"als"` ([`asysm`][ptw::asysm]), `stiffness` for
@@ -81,8 +79,6 @@ correct_baseline <- function(x,
 correct_baseline_matrix <- function(x, baseline,
                                     attach_baseline = FALSE,
                                     zero_floor = FALSE, ...){
-  if (!is.matrix(x))
-    stop("x should be a matrix!")
   corrected <- subtract_baseline(x, baseline = baseline,
                                         dt = axis_dt(rownames(x)),
                                  attach_baseline = attach_baseline, ...)

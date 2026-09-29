@@ -13,8 +13,8 @@
 #' [`baseline_estimators`].
 #' 
 #' @details
-#' Note that the operations are applied in the order given above: interpolation
-#' first, then spectral smoothing, then baseline correction. Because the
+#' The operations are applied in the order given above: interpolation first,
+#' then spectral smoothing, then baseline correction. Because the
 #' baseline is estimated after the time axis is interpolated, `stiffness` is
 #' tied to whichever `dim1` grid was chosen: the penalty applies on the index
 #' axis, so the same value gives a different baseline on a differently sampled
@@ -25,17 +25,19 @@
 #' @param X A numeric matrix (time × wavelength) or a list of such matrices.
 #' Row names must correspond to time points and column names to wavelengths.
 #' @param dim1 Numeric vector specifying the target time grid, usually built
-#' with [`seq`]. The data will be interpolated onto these time points. The
-#' range of the new values should not exceed the range of the original time
-#' points, and the values must be strictly increasing. Note that writing
-#' `c(from, to, by = x)` in place of `seq(from, to, by = x)` yields a
-#' three-element vector rather than a sequence; this is detected and raises an
-#' error.
+#' with [`seq`]. The data will be interpolated onto these time points, which
+#' must be strictly increasing. Chromatograms that do not cover the whole of
+#' `dim1` are dropped with a warning. Writing `c(from, to, by = x)` in place of
+#' `seq(from, to, by = x)` yields a three-element vector rather than a
+#' sequence, so it raises an error. If `dim1` is omitted, the grid runs in
+#' steps of `0.01` (in the time units of the data) across the range shared by
+#' all chromatograms.
 #' @param dim2 Numeric vector specifying the target wavelength grid, usually
-#' built with [`seq`]. The data will be interpolated onto these wavelengths.
-#' The range of the new values should not exceed the range of the original
-#' wavelengths, and the values must be strictly increasing (unless
-#' `interpolate_cols = FALSE`, in which case `dim2` is ignored).
+#' built with [`seq`]. The data will be interpolated onto these wavelengths,
+#' which must be strictly increasing and lie within the range of the original
+#' wavelengths; otherwise an error is raised. Ignored when
+#' `interpolate_cols = FALSE`. If omitted, the existing wavelengths are
+#' kept.
 #' @param remove.time.baseline The `remove.time.baseline` argument is
 #' deprecated. Please use `baseline = "none"` instead.
 #' @param baseline Baseline estimator to use along the time axis. Either
@@ -46,25 +48,27 @@
 #' (`"snip"`), or `"none"` to skip baseline correction along the time axis
 #' altogether. See [`baseline_estimators`] for a description of each.
 #' @param attach_baseline Logical. Whether to retain the estimated baseline
-#' alongside the corrected data as a `"baseline"` attribute. The smoothing
-#' parameter that produced it is always recorded, as a `"baseline_param"`
-#' attribute, whether or not the baseline itself is kept. The baseline is 
-#' subtracted either way; this argument only controls whether the estimate is
+#' alongside the corrected data as a `"baseline"` attribute. The parameter
+#' that produced it (`stiffness`, or `m` for `"snip"`) is always recorded, as a
+#' `"baseline_param"` attribute, whether or not the baseline itself is kept.
+#' The baseline is subtracted either way; this argument only controls whether the estimate is
 #' kept for inspection. Defaults to `FALSE`: the baseline is estimated
 #' separately for each wavelength, so it is the same size as the data and
-#' retaining it roughly doubles memory use. Adding the attribute back to the returned data recovers the
-#' uncorrected matrix only when `zero_floor = FALSE` and `maxI` is unset:
+#' retaining it roughly doubles memory use. Adding the attribute back to the
+#' returned data recovers the uncorrected matrix only when `zero_floor = FALSE`
+#' and `maxI` is unset:
 #' clipping alters the data without altering the stored estimate, and `maxI`
 #' rescales both by a factor derived from the clipped data.
 #' @param zero_floor Logical. Whether to clip negative values in the
-#' corrected data to zero. Defaults to `FALSE`. Clipping rectifies the noise,
-#' destroying the symmetric below-baseline residual that diagnostics of
-#' over-fitting rely on, so it is off by default.
+#' corrected data to zero. Defaults to `FALSE`. Clipping discards the half of
+#' the noise that falls below zero, which hides the negative dips that show
+#' where a baseline was over-subtracted, so it is turned off by default.
 #' @param smooth_spectra Logical, indicating whether smoothing should be done along
-#' the spectral axis, according to [`smooth.spline`]. Defaults to `TRUE`.
+#' the spectral axis, according to [`smooth.spline`]. Skipped for data with
+#' fewer than four wavelengths. Defaults to `TRUE`.
 #' @param spec.smooth The `spec.smooth` argument is deprecated. Please use
 #' `smooth_spectra` instead.
-#' @param maxI If supplied, all values are rescaled so that the maximum
+#' @param maxI If supplied, each chromatogram is rescaled so that its maximum
 #' intensity equals `maxI`.
 #' @param interpolate_rows Logical. Whether to interpolate along the time axis 
 #' (`dim1`). Defaults to `TRUE`.
@@ -78,16 +82,14 @@
 #' `TRUE` if [`pbapply`][pbapply::pbapply] is installed.
 #' @param outlier_cutoff Threshold (in minutes) for excluding chromatograms
 #' that end earlier than expected. Samples ending more than this value before
-#' the median end time are removed. The value is converted into the time unit
-#' of the data, so it is always expressed in minutes regardless of how the
-#' chromatograms are stored. Defaults to `5/60`, i.e. 5 seconds. Only applies
-#' when `dim1` is not specified.
+#' the median end time are removed with a warning. The value is always in
+#' minutes, whatever time unit the chromatograms are stored in. Defaults to
+#' `5/60`, i.e. 5 seconds. Only applies when `dim1` is not specified.
 #' @param ... Additional arguments to the selected `baseline` estimator: e.g.
 #' `stiffness` and `p` for `"als"` ([`asysm`][ptw::asysm]), `stiffness` for
-#' `"arpls"`, `stiffness` and `k` for `"aspls"`, or `m` for `"snip"`. Note that
-#' `maxI` follows `...` in the signature and so must be named in
-#' full: otherwise R's partial matching would bind `m` 
-#' to `maxI` instead of passing them through to the estimator.
+#' `"arpls"`, `stiffness` and `k` for `"aspls"`, or `m` (required) for `"snip"`. Because
+#' `maxI` follows `...` in the signature, it must be named in full: an
+#' abbreviation such as `max` is passed to the estimator, which rejects it.
 #' @return The function returns the preprocessed data matrix (or list of 
 #' matrices), with row names and column names indicating the time points and 
 #' wavelengths, respectively.
@@ -210,9 +212,6 @@ preprocess <- function(X, dim1, dim2,
   X <- laplee(X, FUN = preprocess_matrix,
                           dim1 = dim1,
                           dim2 = dim2,
-                          dim1_names = if (interpolate_rows) format_axis(dim1),
-                          dim2_names = if (interpolate_cols) format_axis(dim2),
-                          dt = if (interpolate_rows) axis_dt(dim1),
                           baseline = baseline,
                           attach_baseline = attach_baseline,
                           zero_floor = zero_floor,
@@ -269,9 +268,11 @@ subtract_baseline <- function(X, baseline,
   dim(bl) <- dim(X)
   # the baseline is the same size as the data, so it is not worth keeping alive
   # for the rest of the call when nobody will read it
+  param <- effective_baseline_param(baseline, bl_args, dt = dt)
+  if (attach_baseline && !is.null(param)) attr(param, "attached") <- TRUE
   list(x = structure(X - bl, baseline = NULL),
        baseline = if (attach_baseline) bl else NULL,
-       param = effective_baseline_param(baseline, bl_args, dt = dt))
+       param = param)
 }
 
 #' @noRd
@@ -285,10 +286,7 @@ preprocess_matrix <- function(X,
                               interpolate_rows = TRUE,
                               interpolate_cols = TRUE,
                               ...,
-                              maxI = NULL,
-                              dim1_names = NULL,
-                              dim2_names = NULL,
-                              dt = NULL) {
+                              maxI = NULL) {
   if (!is.matrix(X))
     stop("X should be a matrix!")
   metadata <- attributes(X)
@@ -322,7 +320,7 @@ preprocess_matrix <- function(X,
     # subtracting the estimate explicitly is bit-identical to the previous
     # implementation while making the baseline available to keep.
     corrected <- subtract_baseline(X, baseline = baseline,
-                                            dt = dt %||% axis_dt(dim1),
+                                            dt = axis_dt(dim1),
                                    attach_baseline = attach_baseline, ...)
     X <- corrected$x
     bl <- corrected$baseline
@@ -339,8 +337,8 @@ preprocess_matrix <- function(X,
     if (attach_baseline) bl <- scale_factor * bl
   }
   dimnames(X) <- list(
-    dim1_names %||% (if (interpolate_rows) format_axis(dim1) else dim1),
-    dim2_names %||% (if (interpolate_cols) format_axis(dim2) else dim2))
+    if (interpolate_rows) format_axis(dim1) else dim1,
+    if (interpolate_cols) format_axis(dim2) else dim2)
   attributes(X) <- c(attributes(X), metadata)
   if (attach_baseline){
     dimnames(bl) <- dimnames(X)

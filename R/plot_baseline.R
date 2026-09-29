@@ -1,33 +1,32 @@
 #' Plot an estimated baseline
 #'
 #' Plots the baseline retained by [`preprocess`] or [`correct_baseline`] over
-#' the trace it was estimated from, annotated with the smoothing parameter that
-#' produced it.
+#' the trace it was estimated from, annotated with the estimator, smoothing
+#' parameter and sampling interval that produced it.
 #'
-#' Only simple diagnostic plots using base graphics are supported currently. 
-#' For more complex plots, the baseline can be extracted using [`get_baseline`].
+#' The plot uses base graphics. For other plots, extract the baseline with
+#' [`get_baseline`].
 #'
 #' @importFrom graphics lines mtext
-#' @param x A matrix with an attached `"baseline"`, or a list of such matrices,
-#' as returned by [`preprocess`] or [`correct_baseline`] with
+#' @param x A matrix or vector with an attached `"baseline"`, or a list of such
+#' matrices, as returned by [`preprocess`] or [`correct_baseline`] with
 #' `attach_baseline = TRUE`.
 #' @param lambda Wavelength to plot, as a string or number. Optional for a
 #' single-wavelength chromatogram.
 #' @param idx Index or name of the chromatogram to plot, if `x` is a list.
 #' Defaults to `1`.
 #' @param zoom Logical. Whether to scale the y axis to the baseline, letting
-#' the peaks run off the top of the panel. A baseline is usually a small
-#' fraction of the signal, so at full scale it is pressed against the axis and
-#' the failure mode worth looking for — the estimate bending up into a peak —
-#' is not visible. Defaults to `TRUE`; set `FALSE` to see the whole trace.
+#' the peaks run off the top of the panel. At full scale the baseline is
+#' usually pressed against the axis, which hides the estimate bending up into a peak.
+#' Defaults to `TRUE`; set `FALSE` to see the whole trace.
 #' @param col,lty,lwd Graphical parameters for the baseline itself. The trace
 #' beneath it is always drawn in gray.
 #' @param add Logical. Whether to draw the baseline over an existing plot
 #' rather than starting a new one, for comparing two estimates on the same
 #' trace. The title and annotation are drawn only by the first call, and `...`
 #' is ignored. Defaults to `FALSE`.
-#' @param annotate Logical. Whether to annotate the plot with the estimator and
-#' its smoothing parameter. Set `FALSE` when overlaying two estimates with
+#' @param annotate Logical. Whether to annotate the plot with the estimator,
+#' its smoothing parameter and the sampling interval. Set `FALSE` when overlaying two estimates with
 #' `add`, since a single annotation cannot describe both; label them with
 #' [`legend`][graphics::legend] instead. Defaults to `TRUE`.
 #' @param ... Additional arguments to [`plot`][graphics::plot.default], which
@@ -53,9 +52,12 @@ plot_baseline <- function(x, lambda = NULL, idx = 1, zoom = TRUE,
   samp <- if (inherits(x, "list")) names(x)[[if (is.character(idx))
     match(idx, names(x)) else idx]] else NULL
   if (inherits(x, "list")) x <- x[[idx]]
-  bl <- get_baseline(x)
+  param <- attr(x, "baseline_param", exact = TRUE)
+  xlab <- add_unit("Time", list(x), idx = 1)
+  bl <- as.matrix(get_baseline(x))
+  if (is.null(dim(x))) x <- as.matrix(x)
   lambdas <- colnames(x)
-  if (ncol(x) == 1){
+  if (ncol(x) == 1 && (is.null(lambda) || is.null(lambdas))){
     j <- 1L
   } else if (is.null(lambda)){
     stop("`lambda` must be supplied for multi-wavelength chromatograms.")
@@ -69,19 +71,18 @@ plot_baseline <- function(x, lambda = NULL, idx = 1, zoom = TRUE,
     else samp %||% wl %||% ""
   if (add){
     lines(tt, bl[, j], col = col, lty = lty, lwd = lwd)
-    return(invisible(baseline_param_label(
-      attr(x, "baseline_param", exact = TRUE))))
+    return(invisible(baseline_param_label(param)))
   }
   dots <- list(...)
   defaults <- list(type = "l", col = "darkgray", main = main,
-                   xlab = add_unit("Time", list(x), idx = 1),
+                   xlab = xlab,
                    ylab = "Absorbance")
   if (zoom)
     defaults$ylim <- range(bl[, j]) + c(-0.1, 1) * diff(range(bl[, j]))
   defaults <- defaults[setdiff(names(defaults), names(dots))]
   do.call(plot, c(list(tt, y), defaults, dots))
   lines(tt, bl[, j], col = col, lty = lty, lwd = lwd)
-  label <- baseline_param_label(attr(x, "baseline_param", exact = TRUE))
+  label <- baseline_param_label(param)
   if (annotate && !is.null(label))
     mtext(label, side = 3, line = 0.25, cex = 0.85)
   invisible(label)

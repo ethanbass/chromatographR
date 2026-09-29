@@ -7,73 +7,105 @@
 Reference for the baseline estimators available through the \code{baseline}
 argument of \code{\link{preprocess}} and \code{\link{correct_baseline}}.
 }
-\section{Baseline estimators}{
+\details{
+A baseline is estimated separately for each wavelength, since the drift
+differs across the spectrum. Which estimator performs best depends on the
+noise, the drift, and how crowded the trace is, and a smoothing parameter
+that suits one chromatogram need not suit another. Rather than choosing on
+general grounds, fit a baseline and look at it: set \code{attach_baseline = TRUE}
+in \code{\link{preprocess}} or \code{\link{correct_baseline}} and plot the estimate with
+\code{\link{plot_baseline}}, as in the examples below.\if{html}{\out{<style>td {padding: 0.3em 1.5em 0.3em 0;} td + td {text-align: center;}</style>}}\tabular{lcccc}{
+   Estimator \tab Parameters (defaults) \tab Asymmetry \tab Overshoots \tab Scope \cr
+   \code{"als"} (default) \tab \code{stiffness} (\code{1e7})\ifelse{html}{\out{<br>}}{, }\code{p} (\code{0.001}) \tab fixed \tab yes \tab global \cr
+   \code{"arpls"} \tab \code{stiffness} (\code{1e7}) \tab adaptive \tab yes \tab global \cr
+   \code{"aspls"} \tab \code{stiffness} (\code{1e9})\ifelse{html}{\out{<br>}}{, }\code{k} (\code{0.5}) \tab adaptive \tab yes \tab global \cr
+   \code{"snip"} \tab \code{m} (required) \tab fixed \tab no \tab local \cr
+}
 
-Four estimators are available. Which performs best on a given chromatogram is an empirical question that
-depends on the noise, the drift, and how crowded the trace is, and is not
-one this page can settle for your data.
 \itemize{
-\item \code{"als"} (the default) is asymmetric least squares, as implemented by
+\item \code{"als"} is asymmetric least squares, as implemented by
 \code{\link[ptw:asysm]{asysm}}. A Whittaker smoother is fit to the signal with
 residuals above the fit weighted by \code{p} and residuals below it by \code{1 - p}.
 \code{p} is fixed for the whole trace, so the asymmetry is set in advance rather
 than taken from the data.
 \item \code{"arpls"} is asymmetrically reweighted penalized least squares (Baek et
 al. 2015). It uses the same Whittaker solve, but replaces the fixed \code{p} with
-weights recomputed at each iteration from the mean and standard deviation of
-the negative residuals, so the asymmetry follows the trace. That also gives
-it a failure mode on very clean traces: as the noise falls, the standard
-deviation the weights are scaled by collapses, the weighting becomes a hard
-one-sided clamp, and the fit can no longer be pulled up to follow a steep
-drift, detaching from the trace where the drift is steepest. This is a
-property of the published method rather than of this implementation —
-\code{pybaselines} reproduces it — and \code{"aspls"} does not share it.
+weights computed at each iteration from the mean and standard deviation of
+the negative residuals, so the asymmetry follows the trace. On very clean
+traces it can fail to follow steep drift, and the baseline falls below the
+trace where the drift is steepest.
 \item \code{"aspls"} is adaptive smoothness parameter penalized least squares (Zhang
 et al. 2020). It keeps the re-weighting and additionally scales the penalty
 at each timepoint by the normalized absolute residual, so the fit is
 stiffest where residuals are largest and most flexible where they are
 smallest. Since that scaling is at most one, it lowers the effective
-penalty: the useful \code{stiffness} range sits about 100x above the other two,
-and a value carried over from \code{"als"} or \code{"arpls"} will under-smooth.
+penalty. Accordingly, the default \code{stiffness} is set 100 times higher than
+the other two estimators and a value tuned for \code{"als"} or \code{"arpls"} will
+under-smooth. The best conversion varies by trace, so retune \code{stiffness}
+rather than rescaling it.
 \item \code{"snip"} is Statistics-sensitive Non-linear Iterative Peak-clipping
-(Ryan et al. 1988), an iterated minimum filter applied in log-log space.
-Two of its properties follow from its construction rather than from any
-measurement: the estimate can never exceed the signal, so the corrected
-trace is non-negative; and each point depends only on the \verb{2m + 1} window
-around it, so a distortion in one part of the trace cannot propagate along
-it the way it can through a global solve. Unlike the others it has no
-default width and requires \code{m}.
+(Ryan et al. 1988). Its baseline follows variation broader than its
+\verb{2m + 1} timepoint window and passes beneath narrower features, such as
+peaks. Two of its properties follow from its construction: the estimate can never exceed the
+signal, so the corrected trace is non-negative; and each point depends only
+on the \verb{2m + 1} window around it, so a distortion in one part of the trace
+cannot propagate along it the way it can through a global solve.
 }
 
-One difference between them is directional rather than quantitative, and
-follows from the loss functions. \code{"als"} and \code{"snip"} are both one-sided:
-the first weights positive residuals down by a fixed factor, the second
-cannot exceed the signal at all. Both therefore tend to fit below the center
-of the noise, which leaves the corrected trace biased high. That offset is
-absolute, so it matters in proportion to the size of the peak it sits under.
-\code{"arpls"} and \code{"aspls"} take their asymmetry from the residuals instead, so
-they have no fixed offset of this kind. How large any of this is in practice
-is a property of the chromatogram, not of the estimator.
+\code{"als"} and \code{"snip"} are both one-sided: the first weights positive
+residuals down by a fixed factor, the second cannot exceed the signal at
+all. Both therefore fit below the center of the noise, which leaves the
+corrected trace biased high. The bias is a constant offset in signal units,
+so it inflates small peaks proportionally more than large ones. \code{"arpls"}
+and \code{"aspls"} take their asymmetry from the residuals instead and fit closer
+to the center of the noise.
+}
+\section{Parameters}{
 
-All four depend on their smoothing parameter, and a value that suits one
-chromatogram need not suit another. Rather than choosing an
-estimator on general grounds, fit a baseline and look at it:
-\code{attach_baseline = TRUE} in \code{\link{preprocess}} retains the estimate for exactly
-that purpose.
-
-A baseline is estimated separately for each wavelength, since the drift
-differs across the spectrum.
+Parameters are passed to the estimator through the \code{...} of \code{\link{preprocess}}
+or \code{\link{correct_baseline}}.
+\itemize{
+\item \code{stiffness} (\code{"als"}, \code{"arpls"}, \code{"aspls"}) is the smoothing penalty.
+Larger values give a stiffer, smoother baseline. It acts between adjacent
+timepoints, so the same value spans a different stretch of time on a
+differently sampled trace; retune it if you change the sampling interval.
+The defaults are starting points, not calibrated optima.
+\item \code{p} (\code{"als"}) is the weight given to points above the fit, and \code{1 - p}
+the weight given to points below it. At the default of \code{0.001}, points
+above the fit, which are mostly peaks, barely pull on it.
+\item \code{k} (\code{"aspls"}) sets the steepness of the weighting curve. Larger values
+switch more abruptly between points treated as baseline and points treated
+as peak.
+\item \code{m} (\code{"snip"}) is the half-width of the clipping window, in timepoints.
+It has no default: the window has to be wider than the peaks it clips,
+which depends on your chromatography.
+}
 }
 
 \section{Acknowledgment}{
 
 The \code{"aspls"} implementation follows \code{pybaselines} (Erb 2025) at two points
 that Zhang et al. leave open: the default asymmetric coefficient \code{k} is
-\code{0.5} rather than the \code{2} printed in the paper, and the adaptive penalty is
-applied by left-multiplying the second-difference matrix by \code{diag(alpha)},
-an ordering the paper's notation does not settle.
+\code{0.5} rather than the \code{2} printed in the paper, and the second-difference
+matrix is left-multiplied by the diagonal matrix of per-timepoint penalty
+scalings, an ordering the paper's notation does not settle.
 }
 
+\examples{
+\donttest{
+data(Sa)
+als <- preprocess(Sa[1], dim1 = seq(10, 18, by = .01),
+                  dim2 = seq(200, 318, by = 2), attach_baseline = TRUE,
+                  show_progress = FALSE, cl = 1)
+snip <- preprocess(Sa[1], dim1 = seq(10, 18, by = .01),
+                   dim2 = seq(200, 318, by = 2), baseline = "snip", m = 50,
+                   attach_baseline = TRUE, show_progress = FALSE, cl = 1)
+plot_baseline(als, lambda = 210, annotate = FALSE)
+plot_baseline(snip, lambda = 210, col = "blue", add = TRUE)
+legend("topright", legend = c("als", "snip"), col = c("red", "blue"),
+       lwd = 2)
+}
+}
 \references{
 \itemize{
 \item Baek, S.-J., Park, A., Ahn, Y.-J., and Choo, J. 2015. Baseline correction
@@ -94,7 +126,8 @@ baseline correction of experimental data}.
 }
 }
 \seealso{
-\code{\link{preprocess}}, \code{\link{correct_baseline}}, \code{\link{get_baseline}}
+\code{\link{preprocess}}, \code{\link{correct_baseline}}, \code{\link{plot_baseline}},
+\code{\link{get_baseline}}
 }
 \author{
 Ethan Bass

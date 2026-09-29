@@ -110,3 +110,17 @@ test_that("correct_baseline accepts a bare numeric vector", {
   expect_null(names(correct_baseline(unname(y), cl = 1,
                                      show_progress = FALSE)))
 })
+
+test_that("get_baseline explains a baseline discarded by a later step", {
+  skip_on_cran()
+  data(Sa)
+  x <- preprocess(Sa[1], dim1 = seq(10, 18.6, by = 0.01),
+                  dim2 = seq(200, 318, by = 2), attach_baseline = TRUE,
+                  cl = 1, show_progress = FALSE)
+  y <- x[[1]]
+  attr(y, "baseline") <- NULL
+  expect_error(get_baseline(y), regexp = "discarded by a later step")
+
+  pks <- get_peaks(x, lambdas = "210", show_progress = FALSE)
+  expect_null(attr(pks[[1]], "baseline", exact = TRUE))
+})

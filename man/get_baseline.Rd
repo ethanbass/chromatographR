@@ -8,22 +8,22 @@ get_baseline(x)
 }
 \arguments{
 \item{x}{A chromatogram, or a list of chromatograms, returned by
-\code{\link{preprocess}} with \code{attach_baseline = TRUE}.}
+\code{\link{preprocess}} or \code{\link{correct_baseline}} with \code{attach_baseline = TRUE}.}
 }
 \value{
 A matrix of the same dimensions as \code{x} containing the estimated
 baseline, or a list of such matrices if \code{x} is a list.
 }
 \description{
-Retrieves the baseline estimated by \code{\link{preprocess}} from a chromatogram, or a
-list of chromatograms, preprocessed with \code{attach_baseline = TRUE}. This
-function does not estimate a baseline itself; to compute one, see the
-\code{baseline} argument of \code{\link{preprocess}} or \code{\link{correct_baseline}}.
+Retrieves the baseline retained by \code{\link{preprocess}} or \code{\link{correct_baseline}}
+when called with \code{attach_baseline = TRUE}. This function does not estimate
+a baseline itself.
 }
 \details{
-The baseline is indexed by the time axis, so it is deliberately dropped by
-any transform that resamples the signal (\code{\link{correct_rt}} and
-\code{\link{subtract_blanks}}). Call this before aligning, or re-run \code{\link{preprocess}}.
+The baseline is dropped by \code{\link{correct_rt}}, which warps the signal along the
+time axis, and by \code{\link{subtract_blanks}}, after which it no longer describes
+the signal. Retrieve it before either step. \code{\link{crop_chroms}} keeps it,
+cropped to match.
 }
 \examples{
 data(Sa)

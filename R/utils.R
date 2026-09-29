@@ -284,17 +284,17 @@ get_lambdas <- function(x){
 
 #' Retrieve estimated baseline
 #'
-#' Retrieves the baseline estimated by [`preprocess`] from a chromatogram, or a
-#' list of chromatograms, preprocessed with `attach_baseline = TRUE`. This
-#' function does not estimate a baseline itself; to compute one, see the
-#' `baseline` argument of [`preprocess`] or [`correct_baseline`].
+#' Retrieves the baseline retained by [`preprocess`] or [`correct_baseline`]
+#' when called with `attach_baseline = TRUE`. This function does not estimate
+#' a baseline itself.
 #'
-#' The baseline is indexed by the time axis, so it is deliberately dropped by
-#' any transform that resamples the signal ([`correct_rt`] and
-#' [`subtract_blanks`]). Call this before aligning, or re-run [`preprocess`].
+#' The baseline is dropped by [`correct_rt`], which warps the signal along the
+#' time axis, and by [`subtract_blanks`], after which it no longer describes
+#' the signal. Retrieve it before either step. [`crop_chroms`] keeps it,
+#' cropped to match.
 #'
 #' @param x A chromatogram, or a list of chromatograms, returned by
-#' [`preprocess`] with `attach_baseline = TRUE`.
+#' [`preprocess`] or [`correct_baseline`] with `attach_baseline = TRUE`.
 #' @return A matrix of the same dimensions as `x` containing the estimated
 #' baseline, or a list of such matrices if `x` is a list.
 #' @family accessors
@@ -312,9 +312,14 @@ get_baseline <- function(x){
     return(out)
   }
   bl <- attr(x, "baseline", exact = TRUE)
-  if (is.null(bl))
+  if (is.null(bl)){
+    if (isTRUE(attr(attr(x, "baseline_param", exact = TRUE), "attached")))
+      stop("No baseline found. It was discarded by a later step that changes ",
+           "the signal or its time axis, such as `correct_rt` or ",
+           "`subtract_blanks`.")
     stop("No baseline found. `preprocess` and `correct_baseline` retain the ",
          "estimated baseline only when called with `attach_baseline = TRUE`.")
+  }
   bl
 }
 
@@ -1047,10 +1052,11 @@ format_axis <- function(x){
   num <- suppressWarnings(as.numeric(x))
   if (!all(is.finite(num))) return(as.character(x))
   gaps <- diff(sort(unique(num)))
-  tol <- min(gaps) / 1000
+  tol <- if (length(gaps)) min(gaps) / 1000 else max(abs(num), 1) * 1e-9
+  u <- unique(num)
   for (digits in 0:12){
-    out <- formatC(num, format = "f", digits = digits)
-    if (max(abs(as.numeric(out) - num)) < tol) return(out)
+    if (max(abs(round(u, digits) - u)) < tol)
+      return(formatC(num, format = "f", digits = digits))
   }
   formatC(num, format = "f", digits = 12)
 }

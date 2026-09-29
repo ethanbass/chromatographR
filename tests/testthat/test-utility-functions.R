@@ -415,3 +415,10 @@ test_that("predict.ptw matches the method it overrides in ptw", {
   expect_error(ptw_predict(pw_global, newdata = tr[1:3, ]),
                regexp = "subscript out of bounds")
 })
+
+test_that("format_axis keeps the precision of a single value", {
+  # `min(numeric(0))` returned Inf, which passed `digits = 0` immediately
+  expect_equal(format_axis(10.09), "10.09")
+  expect_equal(format_axis(c(10.09, 10.09)), c("10.09", "10.09"))
+  expect_no_warning(format_axis(10.09))
+})

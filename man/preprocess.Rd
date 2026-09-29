@@ -28,18 +28,20 @@ preprocess(
 Row names must correspond to time points and column names to wavelengths.}
 
 \item{dim1}{Numeric vector specifying the target time grid, usually built
-with \code{\link{seq}}. The data will be interpolated onto these time points. The
-range of the new values should not exceed the range of the original time
-points, and the values must be strictly increasing. Note that writing
-\code{c(from, to, by = x)} in place of \code{seq(from, to, by = x)} yields a
-three-element vector rather than a sequence; this is detected and raises an
-error.}
+with \code{\link{seq}}. The data will be interpolated onto these time points, which
+must be strictly increasing. Chromatograms that do not cover the whole of
+\code{dim1} are dropped with a warning. Writing \code{c(from, to, by = x)} in place of
+\code{seq(from, to, by = x)} yields a three-element vector rather than a
+sequence, so it raises an error. If \code{dim1} is omitted, the grid runs in
+steps of \code{0.01} (in the time units of the data) across the range shared by
+all chromatograms.}
 
 \item{dim2}{Numeric vector specifying the target wavelength grid, usually
-built with \code{\link{seq}}. The data will be interpolated onto these wavelengths.
-The range of the new values should not exceed the range of the original
-wavelengths, and the values must be strictly increasing (unless
-\code{interpolate_cols = FALSE}, in which case \code{dim2} is ignored).}
+built with \code{\link{seq}}. The data will be interpolated onto these wavelengths,
+which must be strictly increasing and lie within the range of the original
+wavelengths; otherwise an error is raised. Ignored when
+\code{interpolate_cols = FALSE}. If omitted, the existing wavelengths are
+kept.}
 
 \item{remove.time.baseline}{The \code{remove.time.baseline} argument is
 deprecated. Please use \code{baseline = "none"} instead.}
@@ -53,24 +55,26 @@ asymmetric least squares (\code{"als"}, the default, via
 altogether. See \code{\link{baseline_estimators}} for a description of each.}
 
 \item{attach_baseline}{Logical. Whether to retain the estimated baseline
-alongside the corrected data as a \code{"baseline"} attribute. The smoothing
-parameter that produced it is always recorded, as a \code{"baseline_param"}
-attribute, whether or not the baseline itself is kept. The baseline is
-subtracted either way; this argument only controls whether the estimate is
+alongside the corrected data as a \code{"baseline"} attribute. The parameter
+that produced it (\code{stiffness}, or \code{m} for \code{"snip"}) is always recorded, as a
+\code{"baseline_param"} attribute, whether or not the baseline itself is kept.
+The baseline is subtracted either way; this argument only controls whether the estimate is
 kept for inspection. Defaults to \code{FALSE}: the baseline is estimated
 separately for each wavelength, so it is the same size as the data and
-retaining it roughly doubles memory use. Adding the attribute back to the returned data recovers the
-uncorrected matrix only when \code{zero_floor = FALSE} and \code{maxI} is unset:
+retaining it roughly doubles memory use. Adding the attribute back to the
+returned data recovers the uncorrected matrix only when \code{zero_floor = FALSE}
+and \code{maxI} is unset:
 clipping alters the data without altering the stored estimate, and \code{maxI}
 rescales both by a factor derived from the clipped data.}
 
 \item{zero_floor}{Logical. Whether to clip negative values in the
-corrected data to zero. Defaults to \code{FALSE}. Clipping rectifies the noise,
-destroying the symmetric below-baseline residual that diagnostics of
-over-fitting rely on, so it is off by default.}
+corrected data to zero. Defaults to \code{FALSE}. Clipping discards the half of
+the noise that falls below zero, which hides the negative dips that show
+where a baseline was over-subtracted, so it is turned off by default.}
 
 \item{smooth_spectra}{Logical, indicating whether smoothing should be done along
-the spectral axis, according to \code{\link{smooth.spline}}. Defaults to \code{TRUE}.}
+the spectral axis, according to \code{\link{smooth.spline}}. Skipped for data with
+fewer than four wavelengths. Defaults to \code{TRUE}.}
 
 \item{interpolate_rows}{Logical. Whether to interpolate along the time axis
 (\code{dim1}). Defaults to \code{TRUE}.}
@@ -88,19 +92,17 @@ values will be ignored.}
 
 \item{outlier_cutoff}{Threshold (in minutes) for excluding chromatograms
 that end earlier than expected. Samples ending more than this value before
-the median end time are removed. The value is converted into the time unit
-of the data, so it is always expressed in minutes regardless of how the
-chromatograms are stored. Defaults to \code{5/60}, i.e. 5 seconds. Only applies
-when \code{dim1} is not specified.}
+the median end time are removed with a warning. The value is always in
+minutes, whatever time unit the chromatograms are stored in. Defaults to
+\code{5/60}, i.e. 5 seconds. Only applies when \code{dim1} is not specified.}
 
 \item{...}{Additional arguments to the selected \code{baseline} estimator: e.g.
 \code{stiffness} and \code{p} for \code{"als"} (\code{\link[ptw:asysm]{asysm}}), \code{stiffness} for
-\code{"arpls"}, \code{stiffness} and \code{k} for \code{"aspls"}, or \code{m} for \code{"snip"}. Note that
-\code{maxI} follows \code{...} in the signature and so must be named in
-full: otherwise R's partial matching would bind \code{m}
-to \code{maxI} instead of passing them through to the estimator.}
+\code{"arpls"}, \code{stiffness} and \code{k} for \code{"aspls"}, or \code{m} (required) for \code{"snip"}. Because
+\code{maxI} follows \code{...} in the signature, it must be named in full: an
+abbreviation such as \code{max} is passed to the estimator, which rejects it.}
 
-\item{maxI}{If supplied, all values are rescaled so that the maximum
+\item{maxI}{If supplied, each chromatogram is rescaled so that its maximum
 intensity equals \code{maxI}.}
 
 \item{spec.smooth}{The \code{spec.smooth} argument is deprecated. Please use
@@ -125,8 +127,8 @@ through \code{baseline}, and \code{baseline = "none"} skips the step; see
 \code{\link{baseline_estimators}}.
 }
 \details{
-Note that the operations are applied in the order given above: interpolation
-first, then spectral smoothing, then baseline correction. Because the
+The operations are applied in the order given above: interpolation first,
+then spectral smoothing, then baseline correction. Because the
 baseline is estimated after the time axis is interpolated, \code{stiffness} is
 tied to whichever \code{dim1} grid was chosen: the penalty applies on the index
 axis, so the same value gives a different baseline on a differently sampled

@@ -35,21 +35,20 @@ each wavelength, so it is the same size as the data and retaining it
 doubles memory use.}
 
 \item{zero_floor}{Logical. Whether to clip negative values in the corrected
-data to zero. Defaults to \code{FALSE}. Clipping rectifies the noise, destroying
-the symmetric below-baseline residual that diagnostics of over-fitting rely
-on, so it is off by default. It can be useful with \code{baseline = "als"}, which
-can overshoot the signal; \code{"snip"} cannot overshoot by construction, so
-clipping is never needed there. Note that \code{\link{subtract_blanks}} also has a
-\code{zero_floor} argument, but it defaults to \code{TRUE}, since a negative value
-there means the blank exceeded the sample rather than that an estimator
-overshot.}
+data to zero. Defaults to \code{FALSE}, because clipping also removes the
+negative dips that show where a baseline was over-subtracted. It can be
+useful with \code{baseline = "als"}, which can overshoot the signal; \code{"snip"}
+cannot overshoot by construction, so clipping is never needed there. The
+\code{zero_floor} argument of \code{\link{subtract_blanks}}, by contrast, defaults to
+\code{TRUE}, since a negative value there means the blank exceeded the sample
+rather than that an estimator overshot.}
 
 \item{cl}{Either an integer specifying the number of cores to use for
 parallel processing or a cluster object created by
-\code{\link[parallel:makeCluster]{makeCluster}}. Defaults to \code{2}. On Windows integer
-values are ignored.}
+\code{\link[parallel:makeCluster]{makeCluster}}. Defaults to \code{2}. On Windows,
+integer values are ignored.}
 
-\item{show_progress}{Logical. Whether to show progress bar. Defaults to
+\item{show_progress}{Logical. Whether to show a progress bar. Defaults to
 \code{TRUE} if \code{\link[pbapply:pbapply]{pbapply}} is installed.}
 
 \item{...}{Additional arguments to the selected \code{baseline} estimator: e.g.
@@ -61,9 +60,8 @@ The baseline-corrected data, in the same shape as \code{x}, with row and
 column names (or, for a vector, names) unchanged.
 }
 \description{
-Estimates and subtracts a baseline from each chromatogram in a \code{chrom_list},
-along the time axis, using any of the available baseline estimators (see
-\code{\link{baseline_estimators}}).
+Estimates a baseline along the time axis of each chromatogram and subtracts
+it, using any of the estimators described in \code{\link{baseline_estimators}}.
 }
 \details{
 Unlike \code{\link{preprocess}}, this function only subtracts the baseline; it

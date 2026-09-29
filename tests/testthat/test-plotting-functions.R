@@ -469,3 +469,62 @@ test_that("purity_args accepted by get_peaks also work at plot time", {
            plot_purity = TRUE, purity_args = pa)))
   }
 })
+
+test_that("plot_baseline draws the attached baseline", {
+  skip_on_cran()
+  data(Sa)
+  args <- list(dim1 = seq(10, 12, by = .01), dim2 = seq(200, 318, by = 12),
+               show_progress = FALSE, cl = 1)
+  x <- do.call(preprocess, c(list(Sa[1]), args, baseline = "snip", m = 10,
+                             attach_baseline = TRUE))
+  expect_silent(plot_baseline(x, lambda = 212))
+  expect_silent(plot_baseline(x[[1]], lambda = 212))
+  expect_error(plot_baseline(x), "must be supplied")
+  bare <- do.call(preprocess, c(list(Sa[1]), args))
+  expect_error(plot_baseline(bare, lambda = 212), "No baseline found")
+})
+
+test_that("plot_baseline annotates the smoothing parameter it was given", {
+  expect_equal(baseline_param_label(c(m = 9)), "m = 9")
+  expect_equal(baseline_param_label(structure(c(m = 9), method = "snip")),
+               "snip, m = 9")
+  expect_equal(baseline_param_label(
+    structure(c(stiffness = 18738.87), method = "arpls")),
+    "arpls, stiffness = 18739")
+  expect_null(baseline_param_label(NULL))
+})
+
+test_that("plot_baseline renders", {
+  skip_if_not_installed("vdiffr")
+  tt <- seq(0, 30, by = 0.05)
+  bl <- 50 + 30 * exp(tt / 12)
+  y <- bl + 1000 * dnorm(tt, 10, 0.4) + 60 * dnorm(tt, 20, 0.4)
+  x <- matrix(y - bl, ncol = 1, dimnames = list(tt, "210"))
+  attr(x, "baseline") <- matrix(bl, ncol = 1, dimnames = dimnames(x))
+  attr(x, "baseline_param") <- structure(c(stiffness = 18738.87),
+                                         method = "arpls")
+  vdiffr::expect_doppelganger("plot-baseline", function() plot_baseline(x))
+})
+
+test_that("plot_baseline yields its defaults to `...` and returns its label", {
+  tt <- seq(0, 30, by = 0.01)
+  bl <- 50 + 30 * exp(tt / 12)
+  x <- matrix(1000 * dnorm(tt, 10, 0.4), ncol = 1, dimnames = list(tt, "210"))
+  attr(x, "baseline") <- matrix(bl, ncol = 1, dimnames = dimnames(x))
+  attr(x, "baseline_param") <- structure(c(stiffness = 18738.87),
+                                         method = "arpls", dt = 0.01)
+  pdf(NULL)
+  on.exit(dev.off())
+  for (arg in list(list(main = "mine"), list(xlab = "t"), list(ylab = "A"),
+                   list(ylim = c(0, 60)), list(col = "blue")))
+    expect_no_error(do.call(plot_baseline, c(list(x), arg)))
+  expect_equal(plot_baseline(x), "arpls, stiffness = 18739, dt = 0.01")
+  expect_equal(plot_baseline(x, add = TRUE), plot_baseline(x))
+})
+
+test_that("plot_baseline accepts a vector with an attached baseline", {
+  data(Sa_pr)
+  x <- correct_baseline(Sa_pr[[1]][, "210"], attach_baseline = TRUE)
+  pdf(NULL); on.exit(dev.off())
+  expect_match(plot_baseline(x), "als")
+})
