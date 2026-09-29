@@ -273,7 +273,8 @@ instead of returning the existing column falsely labeled with the requested wave
 * `fit = "bemg"` no longer silently returns its starting values when a peak's
 integration window spans about 700 timepoints or more.
 * `fit = "bemg"` now rejects fits whose tail grows away from the apex, which
-inflated the reported area. Such peaks are flagged `converged = FALSE`.
+inflated the reported area. Such peaks are refitted, and flagged
+`converged = FALSE` if the refit also fails.
 
 #### Peak tables and filtering
 

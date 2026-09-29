@@ -601,13 +601,31 @@ test_that("bemg rejects a fit whose tail grows away from the apex", {
   set.seed(1)
   x <- seq(0, 2, length.out = 60)
   y <- 200 * exp(-(x - 2.4)^2 / (2 * 0.5^2)) + rnorm(60, sd = 0.5)
+  first <- suppressWarnings(fit_bemg_once(x, y, NULL, NULL, NULL, NULL, NULL,
+                                          NULL, "none", 1000, FALSE))
+  expect_false(first$converged)
   m <- suppressWarnings(fit_bemg(x, y, baseline = "none"))
   expect_gte(unname(m$a), 0)
   expect_gte(unname(m$b), 0)
-  expect_false(m$converged)
 
   # the rejection is what makes the width measurable
   expect_true(is.finite(bemg_fwhm(m)))
+})
+
+test_that("bemg recovers a peak whose first fit cannot start", {
+  skip_on_cran()
+  y <- Sa_pr[["119"]][, "210"]
+  ts <- get_times(Sa_pr, idx = 1)
+  x <- which(ts >= 15.28 - 1e-9 & ts <= 15.58 + 1e-9)
+  apex <- x[which.max(y[x])]
+  first <- suppressWarnings(fit_bemg_once(x, y[x], apex, NULL, NULL, NULL,
+                                          y[apex], NULL, "none", 1000, FALSE))
+  expect_false(first$converged)
+  expect_true(is.finite(sum(first$residual^2)))
+  m <- suppressWarnings(fit_bemg(x, y[x], start.center = apex,
+                                 start.height = y[apex]))
+  expect_true(m$converged)
+  expect_equal(max(m$y), unname(y[apex]), tolerance = 0.05)
 })
 
 test_that("reject_growing_tail passes through a well behaved fit", {

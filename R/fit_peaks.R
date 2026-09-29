@@ -499,7 +499,8 @@ fit_gaussian <- function(x, y, start.center = NULL,
                          start.width = NULL, start.height = NULL,
                          start.floor = NULL, baseline = "none",
                          max_iter = 1000){
-  st <- fit_starts(x, y, start.center, start.width, start.height)
+  st <- fit_starts(x, y, start.center, start.width, start.height, baseline)
+  y_shape <- st$y
   start.center <- st$center
   start.width <- st$width
   start.height <- st$height
@@ -512,26 +513,21 @@ fit_gaussian <- function(x, y, start.center = NULL,
   starts <- list("center" = start.center, "width" = start.width, "height" = start.height)
 
   # Stage 1: shape only
-  nlsAns <- skip_underdetermined(length(x), 3) %||%
-    try(minpack.lm::nlsLM(y ~ gaussian(x, center, width, height),
-                       start = starts, control = controlList,
-                       lower = shape_lower, upper = shape_upper), silent = TRUE)
+  nlsAns <- try_nls_lm(y_shape ~ gaussian(x, center, width, height),
+                       n = length(x), start = starts, control = controlList,
+                       lower = shape_lower, upper = shape_upper)
   nls_stage1 <- nlsAns
-
-  upper_floor <- max(min(y), 0)
 
   # Stage 2: add constant floor
   if (baseline != "none") {
     if (!inherits(nlsAns, "try-error")) starts <- as.list(coef(nlsAns))
-    if (is.null(start.floor)) start.floor <- 0
+    if (is.null(start.floor)) start.floor <- st$offset
     starts <- c(starts, "floor" = start.floor)
-    nlsAns <- skip_underdetermined(length(x), 4) %||%
-      try(minpack.lm::nlsLM(
+    nlsAns <- try_nls_lm(
       y ~ gaussian(x, center, width, height, floor),
-      start = starts, control = controlList,
+      n = length(x), start = starts, control = controlList,
       lower = c(shape_lower, floor = 0),
-      upper = c(shape_upper, floor = upper_floor)
-    ), silent = TRUE)
+      upper = c(shape_upper, floor = st$upper_floor))
   }
   nls_stage2 <- nlsAns
 
@@ -544,13 +540,11 @@ fit_gaussian <- function(x, y, start.center = NULL,
                       coef(nlsAns)[c("center", "width", "height")]
                     else c(center = start.center, width = start.width, height = start.height)),
             floor_s = f0, floor_e = f0)
-    nlsAns <- skip_underdetermined(length(x), 5) %||%
-      try(minpack.lm::nlsLM(
+    nlsAns <- try_nls_lm(
       y ~ gaussian(x, center, width, height, floor_s, (floor_e - floor_s) / peak_width),
-      start = s3, control = controlList,
+      n = length(x), start = s3, control = controlList,
       lower = c(shape_lower, floor_s = 0, floor_e = 0),
-      upper = c(shape_upper, floor_s = Inf, floor_e = Inf)
-    ), silent = TRUE)
+      upper = c(shape_upper, floor_s = Inf, floor_e = Inf))
   }
 
   if (inherits(nlsAns, "try-error")) {
@@ -602,7 +596,6 @@ egh <- function(x, center, width, height, tau, floor = 0, slope = 0){
   return(result + floor + slope * (x - x[1]))
 }
 
-
 #' Fit exponential-gaussian hybrid peak
 #' @importFrom stats coef fitted lm quantile residuals
 #' @noRd
@@ -612,7 +605,8 @@ fit_egh <- function(x1, y1, start.center = NULL, start.width = NULL,
 
   if (is.null(start.tau))    start.tau    <- 0
 
-  st <- fit_starts(x1, y1, start.center, start.width, start.height)
+  st <- fit_starts(x1, y1, start.center, start.width, start.height, baseline)
+  y_shape <- st$y
   start.center <- st$center
   start.width <- st$width
   start.height <- st$height
@@ -626,26 +620,21 @@ fit_egh <- function(x1, y1, start.center = NULL, start.width = NULL,
                  "height" = start.height, "tau" = start.tau)
 
   # Stage 1: shape only
-  nlsAns <- skip_underdetermined(length(x1), 4) %||%
-    try(minpack.lm::nlsLM(y1 ~ egh(x1, center, width, height, tau),
-                      start = starts, control = controlList,
-                      lower = shape_lower, upper = shape_upper), silent = TRUE)
+  nlsAns <- try_nls_lm(y_shape ~ egh(x1, center, width, height, tau),
+                       n = length(x1), start = starts, control = controlList,
+                       lower = shape_lower, upper = shape_upper)
   nls_stage1 <- nlsAns
-
-  upper_floor <- max(min(y1), 0)
 
   # Stage 2: add constant floor
   if (baseline != "none") {
     if (!inherits(nlsAns, "try-error")) starts <- as.list(coef(nlsAns))
-    if (is.null(start.floor)) start.floor <- 0
+    if (is.null(start.floor)) start.floor <- st$offset
     starts <- c(starts, "floor" = start.floor)
-    nlsAns <- skip_underdetermined(length(x1), 5) %||%
-      try(minpack.lm::nlsLM(
+    nlsAns <- try_nls_lm(
       y1 ~ egh(x1, center, width, height, tau, floor),
-      start = starts, control = controlList,
+      n = length(x1), start = starts, control = controlList,
       lower = c(shape_lower, floor = 0),
-      upper = c(shape_upper, floor = upper_floor)
-    ), silent = TRUE)
+      upper = c(shape_upper, floor = st$upper_floor))
   }
   nls_stage2 <- nlsAns
 
@@ -658,13 +647,11 @@ fit_egh <- function(x1, y1, start.center = NULL, start.width = NULL,
                     else c(center = start.center, width = start.width,
                            height = start.height, tau = start.tau)),
             floor_s = f0, floor_e = f0)
-    nlsAns <- skip_underdetermined(length(x1), 6) %||%
-      try(minpack.lm::nlsLM(
+    nlsAns <- try_nls_lm(
       y1 ~ egh(x1, center, width, height, tau, floor_s, (floor_e - floor_s) / peak_width),
-      start = s3, control = controlList,
+      n = length(x1), start = s3, control = controlList,
       lower = c(shape_lower, floor_s = 0, floor_e = 0),
-      upper = c(shape_upper, floor_s = Inf, floor_e = Inf)
-    ), silent = TRUE)
+      upper = c(shape_upper, floor_s = Inf, floor_e = Inf))
   }
 
   if (inherits(nlsAns, "try-error")) {
@@ -711,6 +698,18 @@ fit_egh <- function(x1, y1, start.center = NULL, start.width = NULL,
 ## 2 * sqrt(2 * log(2)). Previously hard-coded as the rounded 2.35 while the
 ## documentation stated 2.355.
 FWHM_CONST <- 2 * sqrt(2 * log(2))
+
+#' Starting value for a flat peak floor
+#'
+#' Just below the lowest point in the window, by a fixed fraction of the
+#' window's amplitude.
+#' @noRd
+floor_start <- function(y){
+  lowest <- max(min(y), 0)
+  max(0, lowest - FLOOR_START_FRAC * (max(y) - lowest))
+}
+
+FLOOR_START_FRAC <- 0.02
 
 #' Full width at half maximum of an exponential-gaussian hybrid
 #' @noRd
@@ -798,7 +797,7 @@ is_window_limited <- function(out, lower, upper, tol = 1e-6){
     on_bound(upper[names(upper) != "height"])
 }
 
-#' A skipped fit, in the shape of a failed one
+#' Fit one stage of a peak model, skipping an underdetermined window
 #'
 #' `minpack.lm::nls.lm` writes out of bounds when given fewer observations than
 #' parameters, which corrupts the heap and eventually segfaults. Such a window
@@ -806,15 +805,20 @@ is_window_limited <- function(out, lower, upper, tol = 1e-6){
 #' failure, letting the caller fall back as it would for any fit that did not
 #' converge.
 #'
+#' @param formula,start,lower,upper,control Passed to [minpack.lm::nlsLM()].
 #' @param n Number of observations.
-#' @param p Number of parameters.
-#' @return A `try-error` if the fit must be skipped, otherwise `NULL`.
+#' @return The fitted model, or a `try-error` if the fit failed or was skipped.
 #' @author Ethan Bass
 #' @noRd
-skip_underdetermined <- function(n, p){
-  if (n >= p) return(NULL)
-  structure(sprintf("Error : window of %d points cannot determine %d parameters\n", n, p),
-            class = "try-error")
+try_nls_lm <- function(formula, n, start, lower, upper, control){
+  p <- length(start)
+  if (n < p)
+    return(structure(sprintf(
+      "Error : window of %d points cannot determine %d parameters\n", n, p),
+      class = "try-error"))
+  try(minpack.lm::nlsLM(formula, data = environment(formula), start = start,
+                        control = control, lower = lower, upper = upper),
+      silent = TRUE)
 }
 
 #' Reject a bi-exponential fit whose tail grows away from the apex
@@ -950,20 +954,26 @@ clamp_start <- function(v, lo, hi){
 #' scaled by the abscissa spacing, then clamped into the window bounds along
 #' with the center. Models with a tail parameter append its bounds to `lower`
 #' and `upper` themselves, in the position the parameter occupies in `start`,
-#' since `nlsLM` matches bounds by position rather than by name.
+#' since `nlsLM` matches bounds by position rather than by name. With a
+#' baseline, `y` and `start.height` are first shifted down by the starting
+#' floor, returned as `offset`, and the shifted `y` is returned for fitting.
 #' @noRd
-fit_starts <- function(x, y, start.center, start.width, start.height,
-                       height_mult = NULL){
+fit_starts <-function(x, y, start.center, start.width, start.height,
+                       baseline = "none", height_mult = NULL){
+  upper_floor <- max(min(y), 0)
+  offset <- if (baseline == "none") 0 else floor_start(y)
+  y <- y - offset
+  if (!is.null(start.height)) start.height <- start.height - offset
   who.max <- which.max(y)
   if (is.null(start.center)) start.center <- x[who.max]
   if (is.null(start.height)) start.height <- y[who.max]
   if (is.null(start.width))
     start.width <- sum(y > (start.height / 2)) / 2 * x_spacing(x)
   bnd <- fit_window_bounds(x)
-  list(center = clamp_start(start.center, bnd$center_min, bnd$center_max),
-       width = clamp_start(abs(start.width), 0, bnd$width_max),
-       height = start.height,
-       span = bnd$span,
+  list(center = unname(clamp_start(start.center, bnd$center_min, bnd$center_max)),
+       width = unname(clamp_start(abs(start.width), 0, bnd$width_max)),
+       height = unname(start.height),
+       span = bnd$span, y = y, offset = offset, upper_floor = upper_floor,
        lower = c(center = bnd$center_min, width = 0, height = -Inf),
        upper = c(center = bnd$center_max, width = bnd$width_max,
                  height = if (is.null(height_mult)) Inf
@@ -1170,7 +1180,6 @@ fitpk_raw <- function(x, pos, lambda, max_iter,
   append_floor_cols(result, baseline, floor_val, slope_val, peak.loc)
 }
 
-
 #' Savitsky Golay Smoothing ported from pracma
 #' @author Hans W. Borchers
 #' @param T Vector of signals to be filtered
@@ -1240,24 +1249,64 @@ bemg <- function(x, center, width, height, a, b, floor = 0, slope = 0) {
   return(floor + slope * (x - x[1]) + height * 0.5 * (tau_left + tau_right))
 }
 
+#' Bi-Exponentially Modified Gaussian with `height` as its value at `center`
+#' @noRd
+bemg_at_center <- function(x, center, width, height, a, b, floor = 0,
+                           slope = 0) {
+  height * bemg(x, center, width, 1, a, b) /
+    bemg(center, center, width, 1, a, b) + floor + slope * (x - x[1])
+}
+
 #' Fit Bi-Exponentially Modified Gaussian peak
+#'
+#' Refits with `bemg_at_center()` when the first fit does not converge, and
+#' keeps whichever fit has the lower residual sum of squares.
 #' @importFrom stats coef fitted quantile residuals
 #' @noRd
 fit_bemg <- function(x1, y1, start.center = NULL, start.width = NULL,
                      start.a = NULL, start.b = NULL, start.height = NULL,
                      start.floor = NULL, baseline = "none", max_iter = 1000) {
+  fit <- function(height_at_center)
+    fit_bemg_once(x1, y1, start.center, start.width, start.a, start.b,
+                  start.height, start.floor, baseline, max_iter,
+                  height_at_center)
+  rss <- function(f){
+    r <- sum(f$residual^2)
+    if (is.finite(r)) r else Inf
+  }
+  m <- fit(FALSE)
+  if (m$converged) return(m)
+  alt <- fit(TRUE)
+  if (rss(alt) < rss(m)) alt else m
+}
+
+#' One fit of a Bi-Exponentially Modified Gaussian peak
+#' @param height_at_center If `TRUE`, fit `bemg_at_center()` and convert its
+#'   `height` back to that of `bemg()` for output.
+#' @noRd
+fit_bemg_once <- function(x1, y1, start.center, start.width, start.a, start.b,
+                          start.height, start.floor, baseline, max_iter,
+                          height_at_center) {
 
   if (is.null(start.a))      start.a      <- 1.0
   if (is.null(start.b))      start.b      <- 1.0
 
-  st <- fit_starts(x1, y1, start.center, start.width, start.height,
+  st <- fit_starts(x1, y1, start.center, start.width, start.height, baseline,
                    height_mult = 5)
+  y_shape <- st$y
   start.center <- st$center
   start.width <- st$width
   start.height <- st$height
   peak_width <- st$span
   shape_lower <- c(st$lower, a = -Inf, b = -Inf)
   shape_upper <- c(st$upper, a = Inf, b = Inf)
+  model <- if (height_at_center) bemg_at_center else bemg
+  as_bemg <- function(cf){
+    if (height_at_center)
+      cf["height"] <- cf["height"] /
+        bemg(cf["center"], cf["center"], cf["width"], 1, cf["a"], cf["b"])
+    cf
+  }
 
   controlList <- minpack.lm::nls.lm.control(maxiter = max_iter,
                                            maxfev = 10 * max_iter)
@@ -1265,28 +1314,23 @@ fit_bemg <- function(x1, y1, start.center = NULL, start.width = NULL,
                  height = start.height, a = start.a, b = start.b)
 
   # Stage 1: shape only
-  nlsAns <- skip_underdetermined(length(x1), 5) %||%
-    try(minpack.lm::nlsLM(
-    y1 ~ bemg(x1, center, width, height, a, b),
-    start = starts, control = controlList,
-    lower = shape_lower, upper = shape_upper), silent = TRUE)
+  nlsAns <- try_nls_lm(
+    y_shape ~ model(x1, center, width, height, a, b),
+    n = length(x1), start = starts, control = controlList,
+    lower = shape_lower, upper = shape_upper)
   nlsAns <- reject_growing_tail(nlsAns)
   nls_stage1 <- nlsAns
-
-  upper_floor <- max(min(y1), 0)
 
   # Stage 2: add constant floor
   if (baseline != "none") {
     if (!inherits(nlsAns, "try-error")) starts <- as.list(coef(nlsAns))
-    if (is.null(start.floor)) start.floor <- 0
+    if (is.null(start.floor)) start.floor <- st$offset
     starts <- c(starts, floor = start.floor)
-    nlsAns <- skip_underdetermined(length(x1), 6) %||%
-      try(minpack.lm::nlsLM(
-      y1 ~ bemg(x1, center, width, height, a, b, floor),
-      start = starts, control = controlList,
+    nlsAns <- try_nls_lm(
+      y1 ~ model(x1, center, width, height, a, b, floor),
+      n = length(x1), start = starts, control = controlList,
       lower = c(shape_lower, floor = 0),
-      upper = c(shape_upper, floor = upper_floor)
-    ), silent = TRUE)
+      upper = c(shape_upper, floor = st$upper_floor))
   }
   nlsAns <- reject_growing_tail(nlsAns)
   nls_stage2 <- nlsAns
@@ -1300,19 +1344,17 @@ fit_bemg <- function(x1, y1, start.center = NULL, start.width = NULL,
                     else c(center = start.center, width = start.width,
                            height = start.height, a = start.a, b = start.b)),
             floor_s = f0, floor_e = f0)
-    nlsAns <- skip_underdetermined(length(x1), 7) %||%
-      try(minpack.lm::nlsLM(
-      y1 ~ bemg(x1, center, width, height, a, b, floor_s, (floor_e - floor_s) / peak_width),
-      start = s3, control = controlList,
+    nlsAns <- try_nls_lm(
+      y1 ~ model(x1, center, width, height, a, b, floor_s, (floor_e - floor_s) / peak_width),
+      n = length(x1), start = s3, control = controlList,
       lower = c(shape_lower, floor_s = 0, floor_e = 0),
-      upper = c(shape_upper, floor_s = Inf, floor_e = Inf)
-    ), silent = TRUE)
+      upper = c(shape_upper, floor_s = Inf, floor_e = Inf))
   }
 
   nlsAns <- reject_growing_tail(nlsAns)
   if (inherits(nlsAns, "try-error")) {
     if (baseline == "sloped" && !inherits(nls_stage2, "try-error")) {
-      fb <- coef(nls_stage2)
+      fb <- as_bemg(coef(nls_stage2))
       floorAns <- unname(fb["floor"]); slopeAns <- 0
       yAns <- bemg(x1, fb["center"], fb["width"], fb["height"],
                    fb["a"], fb["b"], floorAns, slopeAns)
@@ -1320,7 +1362,7 @@ fit_bemg <- function(x1, y1, start.center = NULL, start.width = NULL,
                   height = fb["height"], a = fb["a"], b = fb["b"],
                   y = yAns, residual = y1 - yAns)
     } else if (!inherits(nls_stage1, "try-error")) {
-      fb <- coef(nls_stage1)
+      fb <- as_bemg(coef(nls_stage1))
       floorAns <- if (baseline != "none") start.floor else 0; slopeAns <- 0
       yAns <- bemg(x1, fb["center"], fb["width"], fb["height"],
                    fb["a"], fb["b"], floorAns, slopeAns)
@@ -1329,14 +1371,16 @@ fit_bemg <- function(x1, y1, start.center = NULL, start.width = NULL,
                   y = yAns, residual = y1 - yAns)
     } else {
       floorAns <- if (baseline != "none") start.floor else 0; slopeAns <- 0
-      yAns <- bemg(x1, start.center, start.width, start.height,
-                   start.a, start.b, floorAns, slopeAns)
-      out <- list(center = start.center, width = start.width,
-                  height = start.height, a = start.a, b = start.b,
+      fb <- as_bemg(c(center = start.center, width = start.width,
+                      height = start.height, a = start.a, b = start.b))
+      yAns <- bemg(x1, fb["center"], fb["width"], fb["height"],
+                   fb["a"], fb["b"], floorAns, slopeAns)
+      out <- list(center = fb["center"], width = fb["width"],
+                  height = fb["height"], a = fb["a"], b = fb["b"],
                   y = yAns, residual = y1 - yAns)
     }
   } else {
-    coefs <- coef(nlsAns)
+    coefs <- as_bemg(coef(nlsAns))
     out <- list(center = coefs["center"], width = coefs["width"],
                 height = coefs["height"], a = coefs["a"], b = coefs["b"],
                 y = fitted(nlsAns), residual = residuals(nlsAns))

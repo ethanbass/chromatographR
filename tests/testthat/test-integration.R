@@ -205,23 +205,24 @@ test_that("egh and bemg return start values for an unfittable window", {
   w <- rbind(c(1, length(y)))
 
   for (b in c("none", "flat", "sloped")){
+    floor0 <- if (b == "none") 0 else floor_start(y)
     pks <- suppressWarnings(
-      fit_peaks(p$mat, lambda = "220", windows = w, fit = "egh", baseline = b,
-                max_fwhm = NULL, estimate_purity = FALSE))
+      fit_peaks(p$mat, lambda = "220", windows = w, fit = "egh",
+                baseline = b, max_fwhm = NULL, estimate_purity = FALSE))
     expect_equal(pks$rt,     start_center, info = b)
     expect_equal(pks$sd,     start_width,  info = b)
-    expect_equal(pks$height, start_height, info = b)
+    expect_equal(pks$height, start_height - floor0, info = b)
     # tau starts at 0, so the fallback peak is a plain Gaussian
     expect_equal(pks$tau, 0, info = b)
 
     pks <- suppressWarnings(
-      fit_peaks(p$mat, lambda = "220", windows = w, fit = "bemg", baseline = b,
-                max_fwhm = NULL, estimate_purity = FALSE))
+      fit_peaks(p$mat, lambda = "220", windows = w, fit = "bemg",
+                baseline = b, max_fwhm = NULL, estimate_purity = FALSE))
     expect_equal(pks$rt,     start_center, info = b)
     expect_equal(pks$sd,     start_width,  info = b)
     # `h` is the amplitude parameter, which is what starts at the window
     # maximum; `height` is read off the evaluated curve and so is lower
-    expect_equal(pks$h, start_height, info = b)
+    expect_equal(pks$h, start_height - floor0, info = b)
     expect_lt(pks$height, pks$h)
     # `a` and `b` both start at 1
     expect_equal(pks$tau_left,  1, info = b)
@@ -229,16 +230,16 @@ test_that("egh and bemg return start values for an unfittable window", {
     # no optimizer ran on a three-point window, so nothing converged
     expect_equal(pks$converged, 0, info = b)
   }
-  # and the floor terms are the start value of 0, not a fitted value
+  # and the floor terms are their start value, not a fitted value
   pks_flat <- suppressWarnings(
     fit_peaks(p$mat, lambda = "220", windows = w, fit = "egh",
               baseline = "flat", max_fwhm = NULL, estimate_purity = FALSE))
-  expect_equal(pks_flat$floor, 0)
+  expect_equal(pks_flat$floor, floor_start(y))
   pks_sloped <- suppressWarnings(
     fit_peaks(p$mat, lambda = "220", windows = w, fit = "egh",
               baseline = "sloped", max_fwhm = NULL, estimate_purity = FALSE))
-  expect_equal(pks_sloped$floor_start, 0)
-  expect_equal(pks_sloped$floor_end, 0)
+  expect_equal(pks_sloped$floor_start, floor_start(y))
+  expect_equal(pks_sloped$floor_end, floor_start(y))
 })
 
 test_that("egh and bemg fall back to start values when nlsLM errors", {
@@ -532,4 +533,21 @@ test_that("get_peaktable still groups by window after retention time correction"
   expect_true(pt$args$use.cor)
   expect_equal(ncol(pt$tab), nrow(w))
   expect_true(all(pt$tab > 0))
+})
+
+test_that("a small peak on a large flat baseline keeps its area", {
+  skip_on_cran()
+  set.seed(1)
+  noise <- rnorm(41, sd = 0.05)
+  peak <- 5 * exp(-(seq_len(41) - 21)^2 / (2 * 3^2))
+  pos <- data.frame(pos = 21, lower = 13, upper = 29)
+  for (f in BASELINE_FITS) for (offset in c(50, 500)){
+    mat <- matrix(offset + peak + noise, ncol = 1,
+                  dimnames = list(as.character(seq_len(41)), "220"))
+    pks <- fit_peaks(mat, lambda = "220", pos = pos, fit = f,
+                     baseline = "flat", estimate_purity = FALSE)
+    expect_equal(pks$area, 5 * 3 * sqrt(2 * pi), tolerance = 0.05,
+                 info = paste(f, offset))
+    expect_equal(pks$floor, offset, tolerance = 0.01, info = paste(f, offset))
+  }
 })
