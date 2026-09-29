@@ -2,9 +2,15 @@
 % Please edit documentation in R/correct_peaks.R
 \name{correct_peaks}
 \alias{correct_peaks}
-\title{Correct peak positions according to a PTW warping model}
+\title{Correct peak positions according to a warping model}
 \usage{
-correct_peaks(peak_list, mod_list, chrom_list, match_names = TRUE)
+correct_peaks(
+  peak_list,
+  mod_list,
+  chrom_list,
+  match_names = TRUE,
+  chrom_list_aligned = NULL
+)
 }
 \arguments{
 \item{peak_list}{A \code{peak_list} object created by \code{\link{get_peaks}}, containing a
@@ -14,38 +20,52 @@ by a matrix where each row corresponds to a feature, and the columns contain
 information on that feature (e.g., retention time, peak width (FWHM), height,
 area, etc.)}
 
-\item{mod_list}{A list of \code{ptw} models.}
+\item{mod_list}{Warping models, as returned by \code{\link{correct_rt}} with
+\code{what = "models"}: a \code{ptw_list}, an \code{lptw_list}, or a \code{VPdtw} object.
+Corrected times are on the time axis of the chromatograms \code{correct_rt}
+returns, which for \code{"vpdtw"} extends beyond the reference at either end.}
 
-\item{chrom_list}{List of chromatograms from which the \code{ptw} models are
-derived.}
+\item{chrom_list}{List of chromatograms from which the models are derived.
+If omitted, it is retrieved using the name stored in \code{mod_list}, which only
+\code{ptw_list} objects record.}
 
-\item{match_names}{Logical. Whether to actively match the names of the
-\code{peak_list} to the list of models (\code{mod_list}). Defaults to \code{TRUE}.}
+\item{match_names}{Logical. If \code{TRUE} (default), models are matched to the
+samples of \code{peak_list} by name when both are named; otherwise by position.}
+
+\item{chrom_list_aligned}{Optional aligned chromatograms, as returned by
+\code{\link{correct_rt}} with \code{what = "corrected.values"}. Only its name is recorded,
+so the object must still exist under that name when it is used.}
 }
 \value{
 The input list of peak tables is returned with extra columns
 containing the corrected retention times.
 }
 \description{
-Corrects retention time differences in \code{peak_list} using parametric time
-warping as implemented in the \code{\link[ptw:ptw]{ptw}} package.
+Corrects retention time differences in \code{peak_list} using warping models
+fitted by \code{\link{correct_rt}} with any of its algorithms.
 }
 \details{
 Once an appropriate warping model has been established, corrected retention
-times can be predicted for each peak. These are stored in a separate column
-in the list of peak tables.
+times can be predicted for each peak. These are stored in an \code{rt.cor}
+column, alongside \code{start.cor} and \code{end.cor} when the peak tables have
+\code{start} and \code{end} columns.
+
+The corrected times refer to the aligned time axis, so functions that later
+read spectra or traces at those times need the aligned chromatograms. The
+returned peak list stores the warping models for this purpose, and
+\code{\link{get_peaktable}} carries them into the peak table, where they are
+re-applied to the unaligned chromatograms when needed. To use a particular
+aligned object instead, pass it as \code{chrom_list_aligned}.
 }
 \note{
 This function is adapted from the \code{correctPeaks} function in the alsace
 package by Ron Wehrens: \url{https://github.com/rwehrens/alsace/blob/master/R/correctPeaks.R}.
 }
 \examples{
-\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 data(Sa_pr)
 warp <- correct_rt(chrom_list = Sa_pr, lambdas = 210, what = "models")
 pks <- get_peaks(Sa_pr, lambda = "210")
 correct_peaks(pks, mod_list = warp, chrom_list = Sa_pr)
-\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{correct_rt}}

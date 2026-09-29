@@ -296,9 +296,10 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
     return(list(Iinfo, metaInfo))
   }
   result <- lapply(seq_len(ncomp), clusterPeaks, peak_list)
-  new_peak_table(result, out, peak_list,
+  pt <- new_peak_table(result, out, peak_list,
                  args = list(peak_list = deparse(substitute(peak_list)),
                         chrom_list = attr(peak_list, "chrom_list"),
+                        chrom_list_aligned = attr(peak_list, "chrom_list_aligned") %||% NA,
                         lambdas = list(names(peak_list[[1]])),
                         response = response,
                         use.cor = use.cor,
@@ -316,6 +317,8 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
                         rt_unit = get_time_unit(peak_list),
                         intensity_unit = get_metadata_attribute(peak_list, "intensity_unit")
                         ))
+  attr(pt, "warp_models") <- attr(peak_list, "warp_models")
+  pt
 }
 
 #' @rdname get_peaktable

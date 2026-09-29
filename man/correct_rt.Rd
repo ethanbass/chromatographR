@@ -171,8 +171,7 @@ timepoints, as in chromatographR 0.8.0, and converted.}
 A list of warping models or a list of warped absorbance profiles,
 according to the value of the \code{what} argument. With \code{alg = "vpdtw"}, the
 warped chromatograms share a new time axis, which can be longer than the
-input. \code{lptw_list} models returned when \code{alg = "lptw"} are not compatible
-with \code{\link{correct_peaks}}.
+input.
 }
 \description{
 Chromatograms are aligned using one of three algorithms, according to the

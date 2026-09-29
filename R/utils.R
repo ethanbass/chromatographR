@@ -12,33 +12,71 @@ check_peaktable <- function(peak_table){
 
 #' Retrieve chrom_list from peak_table object and check properties
 #' @param peak_table Peak table object
+#' @param aligned Whether to return chromatograms on the aligned time axis.
+#' Defaults to `TRUE` for a `peak_table` built from corrected retention times.
 #' @author Ethan Bass
 #' @noRd
-get_chrom_list <- function(x, chrom_list = NULL, verbose = FALSE){
+get_chrom_list <- function(x, chrom_list = NULL, verbose = FALSE,
+                           aligned = inherits(x, "peak_table") &&
+                             isTRUE(x$args$use.cor)){
   if (is.null(chrom_list)){
     if (inherits(x, "peak_table")){
       string <- x$args[["chrom_list"]]
     } else if (inherits(x, "peak_list") | inherits(x, "ptw_list")){
       string <- attr(x, "chrom_list")
     }
-    if (grepl("\\[*\\]", string)){
-      subsetted <- TRUE
-      idx <- extract_idx(string)
-      string <- gsub("\\[\\[?(.*?)\\]?\\]", "", string)
-    } else {
-      subsetted <- FALSE
-    }
-    chrom_list <- try(get(string))
-    if (inherits(chrom_list, "try-error")){
-      stop("Chromatograms not found! Please make sure the appropriate chrom_list
-             object has been loaded")
-    }
-    if (subsetted){
-      chrom_list <- chrom_list[idx]
-    }
+    chrom_list <- if (aligned) get_aligned_chrom_list(x, string)
+                  else lookup_chrom_list(string)
   }
   check_chrom_list(x, chrom_list, verbose = verbose)
   chrom_list
+}
+
+#' Look up a chrom_list by its recorded name
+#' @noRd
+lookup_chrom_list <- function(string){
+  if (grepl("\\[*\\]", string)){
+    subsetted <- TRUE
+    idx <- extract_idx(string)
+    string <- gsub("\\[\\[?(.*?)\\]?\\]", "", string)
+  } else {
+    subsetted <- FALSE
+  }
+  chrom_list <- try(get(string))
+  if (inherits(chrom_list, "try-error")){
+    stop("Chromatograms not found! Please make sure the appropriate chrom_list
+             object has been loaded")
+  }
+  if (subsetted){
+    chrom_list <- chrom_list[idx]
+  }
+  chrom_list
+}
+
+#' Get the chromatograms matching corrected retention times
+#'
+#' Uses the aligned chromatograms recorded by [`correct_peaks`] if there are
+#' any; otherwise re-applies the stored warping models to the unaligned
+#' chromatograms.
+#' @noRd
+get_aligned_chrom_list <- function(x, string){
+  aligned_name <- x$args[["chrom_list_aligned"]]
+  if (!is.null(aligned_name) && !is.na(aligned_name))
+    return(lookup_chrom_list(aligned_name))
+  models <- attr(x, "warp_models")
+  raw <- lookup_chrom_list(string)
+  if (is.null(models)){
+    warning(sprintf(paste0(
+      "This peak table uses corrected retention times, but records neither ",
+      "warping models nor aligned chromatograms, so spectra and traces are ",
+      "read from the unaligned `%s`. Rebuild the peak list with ",
+      "`correct_peaks`, or pass the aligned chromatograms as `chrom_list`."),
+      string), call. = FALSE)
+    return(raw)
+  }
+  alg <- if (inherits(models, "VPdtw")) "vpdtw"
+         else if (inherits(models, "lptw_list")) "lptw" else "ptw"
+  correct_rt(raw, models = models, alg = alg, show_progress = FALSE, cl = 1)
 }
 
 #' Extracts idx from string

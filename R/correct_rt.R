@@ -138,8 +138,7 @@
 #' @return A list of warping models or a list of warped absorbance profiles,
 #' according to the value of the `what` argument. With `alg = "vpdtw"`, the
 #' warped chromatograms share a new time axis, which can be longer than the
-#' input. `lptw_list` models returned when `alg = "lptw"` are not compatible
-#' with [`correct_peaks`].
+#' input.
 #' @author Ethan Bass
 #' @note Adapted from the `correctRT` function in the alsace package by Ron 
 #' Wehrens (<https://github.com/rwehrens/alsace/blob/master/R/correctRT.R>).
@@ -875,7 +874,8 @@ fit_penalized_warp <- function(ref_i, samp_i,
 #' @param maxshift Deprecated and unused. See `max_shift`.
 #' @param what What to return: `"corrected.values"` (the default) for the
 #' warped chromatograms, or `"models"` for a `ptw_list` holding each sample's
-#' group warp, which can be passed to [`correct_rt`] via `models`.
+#' group warp, which can be passed to [`correct_peaks`] or to [`correct_rt`]
+#' via `models`.
 #' @inheritParams correct_rt
 #' @return If `what = "corrected.values"`, a list of warped chromatogram
 #' matrices in the same order as `chrom_list`, with each sample warped using

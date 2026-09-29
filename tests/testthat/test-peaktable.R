@@ -233,3 +233,84 @@ test_that("hmax, sigma_t and combine_peaks' tol are minutes whatever the time un
   expect_lt(length(merged), ncol(tm$tab))
   expect_equal(colnames(combine_peaks(ts, tol = 0.3, min_cor = 0)$tab), merged)
 })
+
+# ── corrected retention times resolve to aligned chromatograms ────────────────
+
+.aligned_fixture <- function(alg = "ptw") {
+  models <- suppressWarnings(correct_rt(Sa_pr, lambdas = 210, alg = alg,
+                                        what = "models", show_progress = FALSE))
+  warped <- suppressWarnings(correct_rt(Sa_pr, models = models, alg = alg,
+                                        lambdas = 210, show_progress = FALSE))
+  pks <- suppressWarnings(get_peaks(Sa_pr, lambdas = 210, show_progress = FALSE))
+  list(models = models, warped = warped, pks = pks)
+}
+
+test_that("a peak table from corrected times rebuilds the aligned chromatograms", {
+  skip_on_cran()
+  for (alg in c("ptw", "vpdtw")) {
+    f <- .aligned_fixture(alg)
+    pt <- get_peaktable(correct_peaks(f$pks, f$models, Sa_pr))
+    expect_true(pt$args$use.cor)
+    expect_equal(unclass(get_chrom_list(pt)), unclass(f$warped),
+                 ignore_attr = TRUE)
+  }
+})
+
+test_that("stored ptw models keep only the warp", {
+  skip_on_cran()
+  f <- .aligned_fixture("ptw")
+  pt <- get_peaktable(correct_peaks(f$pks, f$models, Sa_pr))
+  stored <- attr(pt, "warp_models")
+  expect_s3_class(stored, "ptw_list")
+  expect_setequal(names(stored[[1]]), c("warp.coef", "mode"))
+})
+
+test_that("stored VPdtw models keep only the warp", {
+  skip_on_cran()
+  f <- .aligned_fixture("vpdtw")
+  pt <- get_peaktable(correct_peaks(f$pks, f$models, Sa_pr))
+  stored <- attr(pt, "warp_models")
+  expect_s3_class(stored, "VPdtw")
+  expect_setequal(names(stored), c("xVals", "shift", "samples", "n_timepoints"))
+  expect_equal(attr(stored, "reference"), attr(f$models, "reference"))
+  expect_equal(attr(stored, "parameters"), attr(f$models, "parameters"))
+})
+
+test_that("a table of some samples rebuilds them from models fitted to all", {
+  skip_on_cran()
+  f <- .aligned_fixture("ptw")
+  pks <- suppressWarnings(get_peaks(Sa_pr[1:2], lambdas = 210,
+                                    show_progress = FALSE))
+  pt <- get_peaktable(correct_peaks(pks, f$models, Sa_pr))
+  expect_equal(unclass(get_chrom_list(pt)), unclass(f$warped[1:2]),
+               ignore_attr = TRUE)
+})
+
+test_that("a named aligned chrom_list takes precedence over the models", {
+  skip_on_cran()
+  f <- .aligned_fixture("ptw")
+  assign("aligned_test_chroms", f$warped, envir = globalenv())
+  withr::defer(rm("aligned_test_chroms", envir = globalenv()))
+  cp <- correct_peaks(f$pks, f$models, Sa_pr,
+                      chrom_list_aligned = aligned_test_chroms)
+  pt <- get_peaktable(cp)
+  expect_equal(pt$args$chrom_list_aligned, "aligned_test_chroms")
+  attr(pt, "warp_models") <- NULL
+  expect_identical(get_chrom_list(pt), f$warped)
+})
+
+test_that("uncorrected times resolve to the unaligned chromatograms", {
+  skip_on_cran()
+  f <- .aligned_fixture("ptw")
+  pt <- get_peaktable(correct_peaks(f$pks, f$models, Sa_pr), use.cor = FALSE)
+  expect_identical(get_chrom_list(pt), Sa_pr)
+})
+
+test_that("corrected times without models or aligned chromatograms warn", {
+  skip_on_cran()
+  f <- .aligned_fixture("ptw")
+  pt <- get_peaktable(correct_peaks(f$pks, f$models, Sa_pr))
+  attr(pt, "warp_models") <- NULL
+  expect_warning(out <- get_chrom_list(pt), "unaligned `Sa_pr`")
+  expect_identical(out, Sa_pr)
+})

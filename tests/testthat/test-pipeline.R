@@ -177,6 +177,9 @@ test_that("correct_rt_group returns per-sample group models", {
   expect_false(isTRUE(all.equal(mods[[1]]$warp.coef, mods[[3]]$warp.coef)))
   expect_equal(correct_rt(cl_grp, models = mods, show_progress = FALSE),
                warp_grp, ignore_attr = TRUE)
+  pks <- get_peaks(cl_grp, lambdas = 210, show_progress = FALSE)
+  pks_cor <- correct_peaks(pks, mods, chrom_list = cl_grp)
+  expect_true("rt.cor" %in% colnames(pks_cor[[1]][[1]]))
 })
 
 test_that("correct_rt_group resolves the reference group", {

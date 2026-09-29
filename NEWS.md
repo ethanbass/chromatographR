@@ -165,7 +165,11 @@ the moving-maximum window used to build the `"vpdtw"` penalty, previously
 hardcoded to 350 timepoints. A span wide enough to make the penalty constant
 now warns.
 * `correct_rt_group` can now return its warping models, one per sample, with
-`what = "models"`, which `correct_rt(models = )` can re-apply.
+`what = "models"`, for use with `correct_peaks`.
+* `correct_peaks` now accepts `"lptw"` and `"vpdtw"` models from `correct_rt`,
+not only `"ptw"`. For these, `chrom_list` must be supplied.
+* Added a `chrom_list_aligned` argument to `correct_peaks`, naming aligned
+chromatograms for later spectrum and trace lookups.
 
 #### Peak detection and integration
 
@@ -219,9 +223,15 @@ user. Each distinct warning is raised once, naming the samples that raised it.
 Previously samples could remain misaligned when the warp extended past the end
 of the reference.
 * `correct_rt` no longer misplaces peaks when `n_zeros > 0`.
+* `correct_peaks` no longer errors on models fitted by `correct_rt` with
+`scale = TRUE` or `n_zeros > 0` when `chrom_list` is omitted, and now gives a
+clear error for samples with no warping model and for peak lists built with
+`collapse = TRUE`.
 * `correct_rt(models = ...)` now matches models to samples by name. Previously
 models were applied by position, so reordering `chrom_list` warped each sample
 with another sample's model.
+* `correct_peaks` now replaces the corrected times of an already corrected peak
+list. Previously it added a second set, and `get_peaktable` kept using the first.
 
 #### Peak detection and integration
 
@@ -252,6 +262,9 @@ inflated the reported area. Such peaks are flagged `converged = FALSE`.
 
 #### Peak tables and filtering
 
+* Peak tables built from `correct_peaks` output now read spectra and traces
+from aligned chromatograms, rebuilt from the stored warping models. Previously
+they were read from the unaligned data at aligned times. See `?correct_peaks`.
 * `normalize_data` no longer reports `column` as ambiguous when another
 column's name merely contains it, such as `"V12"` for `"V1"`.
 * `combine_peaks` now removes dropped peaks from the `ref_spectra` element so

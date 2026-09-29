@@ -631,6 +631,32 @@ test_that("correct_rt applies VPdtw's own warp to every sample", {
   expect_equal(c(warped[[1]][rows, ]), c(Sa_pr[[1]]))
 })
 
+test_that("correct_peaks places peaks where lptw and vpdtw warping puts them", {
+  skip_on_cran()
+  data(Sa_pr)
+  pks <- get_peaks(Sa_pr, lambdas = "210", show_progress = FALSE, cl = 1)
+  dt <- get_time_resolution(Sa_pr)
+  for (alg in c("lptw", "vpdtw")){
+    mods <- suppressWarnings(
+      correct_rt(Sa_pr, lambdas = "210", alg = alg, reference = 1,
+                 what = "models", show_progress = FALSE, cl = 1))
+    warped <- correct_rt(Sa_pr, models = mods, alg = alg, lambdas = "210",
+                         reference = 1, show_progress = FALSE, cl = 1)
+    cor_pks <- correct_peaks(pks, mods, chrom_list = Sa_pr)
+    expect_equal(cor_pks[[1]][["210"]]$rt.cor, cor_pks[[1]][["210"]]$rt)
+    pks_warped <- get_peaks(warped, lambdas = "210", show_progress = FALSE,
+                            cl = 1)
+    tab <- cor_pks[[2]][["210"]]
+    tab <- tab[tab$height > stats::median(tab$height), ]
+    if (alg == "vpdtw") expect_false(anyNA(tab$rt.cor))
+    offset <- vapply(stats::na.omit(tab$rt.cor), function(rt){
+      min(abs(pks_warped[[2]][["210"]]$rt - rt))
+    }, numeric(1))
+    expect_lte(stats::median(offset), dt)
+  }
+  expect_error(correct_peaks(pks, mods), "supply `chrom_list`")
+})
+
 test_that("correct_rt raises a worker's error when run in parallel", {
   skip_on_cran()
   data(Sa_pr)
@@ -669,6 +695,32 @@ test_that("fitted models are applied to samples by name", {
                regexp = "No warping model for sample")
 })
 
+test_that("the reference is stored by name but may be given by index", {
+  skip_on_cran()
+  data(Sa_pr)
+  mods <- correct_rt(Sa_pr, lambdas = "210", reference = 2, what = "models",
+                     cl = 1, show_progress = FALSE)
+  expect_equal(attr(mods, "reference"), names(Sa_pr)[2])
+  expect_no_error(correct_rt(Sa_pr, models = mods, lambdas = "210",
+                             reference = 2, cl = 1, show_progress = FALSE))
+  expect_no_error(correct_rt(Sa_pr, models = mods, lambdas = "210",
+                             reference = names(Sa_pr)[2], cl = 1,
+                             show_progress = FALSE))
+  expect_error(correct_rt(Sa_pr, models = mods, lambdas = "210",
+                          reference = 3, cl = 1, show_progress = FALSE),
+               regexp = "differs from the")
+  old_style <- structure(mods, reference = 2)
+  expect_no_error(correct_rt(Sa_pr, models = old_style, lambdas = "210",
+                             reference = 2, cl = 1, show_progress = FALSE))
+  pks <- get_peaks(Sa_pr, lambdas = "210", cl = 1, show_progress = FALSE)
+  expect_warning(
+    vp <- correct_rt(Sa_pr, lambdas = "210", alg = "vpdtw", reference = 2,
+                     what = "models", cl = 1, show_progress = FALSE),
+    "three quarters of maxshift")
+  expect_equal(correct_peaks(pks, vp, chrom_list = rev(Sa_pr))[[1]][["210"]]$rt.cor,
+               correct_peaks(pks, vp, chrom_list = Sa_pr)[[1]][["210"]]$rt.cor)
+})
+
 test_that("warping rejects duplicate sample names", {
   skip_on_cran()
   data(Sa_pr)
@@ -683,6 +735,35 @@ test_that("warping rejects duplicate sample names", {
                regexp = "Duplicate sample names found in `chrom_list`")
 })
 
+test_that("reference conflicts and missing models are reported by sample name", {
+  skip_on_cran()
+  data(Sa_pr)
+  pks <- get_peaks(Sa_pr, lambdas = "210", cl = 1, show_progress = FALSE)
+  mp <- match_peaks(pks, chrom_list = Sa_pr, reference = 2)
+  expect_error(correct_rt(Sa_pr[4:1], lambdas = "210", alg = "lptw",
+                          peaks = mp, reference = 2, cl = 1,
+                          show_progress = FALSE),
+               regexp = "matched_peak_list` \\(121\\)")
+  mods <- correct_rt(Sa_pr, lambdas = "210", reference = 1, what = "models",
+                     cl = 1, show_progress = FALSE)
+  expect_error(correct_peaks(pks, mods[1:3], chrom_list = Sa_pr),
+               regexp = "No warping model for sample\\(s\\) .458")
+})
+
+test_that("VPdtw models are not applied to chromatograms of another length", {
+  skip_on_cran()
+  data(Sa_pr)
+  m <- correct_rt(Sa_pr, lambdas = "210", alg = "vpdtw", what = "models",
+                  show_progress = FALSE)
+  short <- lapply(Sa_pr, function(x) x[-(1:40), , drop = FALSE])
+  expect_error(correct_rt(short, alg = "vpdtw", models = m,
+                          show_progress = FALSE),
+               regexp = "fitted to chromatograms of 434 timepoints")
+  pks <- get_peaks(short, lambdas = "210")
+  expect_error(correct_peaks(pks, m, short),
+               regexp = "fitted to chromatograms of 434 timepoints")
+})
+
 test_that("fitted VPdtw models re-apply to multi-wavelength data without `lambdas`", {
   skip_on_cran()
   data(Sa_pr)
@@ -690,4 +771,42 @@ test_that("fitted VPdtw models re-apply to multi-wavelength data without `lambda
                   show_progress = FALSE)
   warped <- correct_rt(Sa_pr, alg = "vpdtw", models = m, show_progress = FALSE)
   expect_equal(colnames(warped[[1]]), colnames(Sa_pr[[1]]))
+})
+
+test_that("correct_peaks matches an unnamed peak_list to models by position", {
+  skip_on_cran()
+  data(Sa_pr)
+  m <- correct_rt(Sa_pr, lambdas = "210", alg = "vpdtw", what = "models",
+                  show_progress = FALSE)
+  pks <- get_peaks(Sa_pr, lambdas = "210")
+  unnamed <- structure(unname(pks), class = class(pks))
+  expect_length(correct_peaks(unnamed, m, unname(Sa_pr)), length(Sa_pr))
+  expect_error(correct_peaks(unnamed[-1], m, unname(Sa_pr)),
+               regexp = "4 warping models for 3 samples")
+})
+
+test_that("correcting peaks again replaces the earlier correction", {
+  skip_on_cran()
+  data(Sa_pr)
+  s <- convert_time_units(Sa_pr, time_unit = "s")
+  m_ptw <- correct_rt(s, lambdas = "210", alg = "ptw", what = "models",
+                      show_progress = FALSE)
+  m_vpdtw <- correct_rt(s, lambdas = "210", alg = "vpdtw", what = "models",
+                        show_progress = FALSE)
+  pks <- get_peaks(s, lambdas = "210", show_progress = FALSE, cl = 1)
+  twice <- correct_peaks(correct_peaks(pks, m_ptw, s), m_vpdtw, s)
+  once <- correct_peaks(pks, m_vpdtw, s)
+  expect_equal(sum(colnames(twice[[1]][["210"]]) == "rt.cor"), 1L)
+  expect_equal(twice[[1]][["210"]]$rt.cor, once[[1]][["210"]]$rt.cor)
+  expect_equal(get_peaktable(twice)$args$rt_unit, "s")
+})
+
+test_that("correct_peaks rejects collapsed peak lists", {
+  skip_on_cran()
+  data(Sa_pr)
+  m <- correct_rt(Sa_pr, lambdas = "210", alg = "ptw", what = "models",
+                  show_progress = FALSE)
+  pks <- get_peaks(Sa_pr, lambdas = "210", collapse = TRUE,
+                   show_progress = FALSE, cl = 1)
+  expect_error(correct_peaks(pks, m, Sa_pr), regexp = "collapse = TRUE")
 })

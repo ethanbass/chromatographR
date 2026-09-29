@@ -23,8 +23,8 @@ returns the warped sample.}
 a matrix of warped responses or corrected retention times.
 }
 \description{
-Predict method for objects of class \code{ptw}. Reproduced from the \code{\link[ptw:ptw]{ptw}}
-package as the original is not exported.
+Predict method for objects of class \code{ptw}. Reproduced from the ptw package,
+which does not export the original.
 }
 \author{
 Ron Wehrens

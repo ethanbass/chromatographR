@@ -98,7 +98,8 @@ integers are ignored. Has no effect when \code{alg = "vpdtw"}.}
 
 \item{what}{What to return: \code{"corrected.values"} (the default) for the
 warped chromatograms, or \code{"models"} for a \code{ptw_list} holding each sample's
-group warp, which can be passed to \code{\link{correct_rt}} via \code{models}.}
+group warp, which can be passed to \code{\link{correct_peaks}} or to \code{\link{correct_rt}}
+via \code{models}.}
 
 \item{...}{For \code{alg = "ptw"}, optional additional arguments passed to
 \code{\link[ptw:ptw]{ptw}}. The only argument that cannot be changed is \code{warp.type},
