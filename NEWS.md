@@ -47,6 +47,11 @@ index. Interpolate onto a common grid with `preprocess(dim1 = ...)` first.
 timepoint early. Retention times from `get_peaks` and `get_peaktable` shift
 accordingly, and peaks whose preceding timepoint had been clipped to zero by
 `preprocess` are now detected.
+* Fitted retention times now fall between timepoints. `fit = "gaussian"` and
+`"egh"` truncated them to the preceding timepoint, up to one timepoint early,
+and `"bemg"` used its highest sampled point, which also understated `height`.
+`correct_peaks` no longer rounds `rt.cor` for ptw or lptw models. Match `rt`
+to the time axis with a tolerance, not `==` or `match()`.
 * `plot_spectrum` and `plot_all_spectra` now label the correct spectral
 maxima, having inherited the same off-by-one error. Reported lambda-max values
 shift by one grid step.

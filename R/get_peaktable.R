@@ -216,7 +216,7 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
       ts <- as.numeric(rownames(chrom_list[[1]]))
       sp <- sapply(seq_along(pkcenters), function(i){
         rescale(t(chrom_list[[file.idx[i]]][
-          which(elementwise.all.equal(ts, pkcenters[i])),]))
+          get_retention_idx(pkcenters[i], ts, clamp = TRUE),]))
       }, simplify = TRUE)
       cor.spec <- cor(sp, method = "pearson")
       rt.diff <- abs(outer(unlist(pkcenters), unlist(pkcenters), FUN="-"))

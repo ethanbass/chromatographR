@@ -681,3 +681,16 @@ test_that("get_peaks reports widths and areas in `time_unit` whatever the axis u
   expect_equal(attr(get_peaks(s, lambdas = "210", show_progress = FALSE, cl = 1),
                     "time_unit"), "s")
 })
+
+test_that("fitted retention times are not snapped to the time grid", {
+  skip_on_cran()
+  ts <- seq(10, 12, by = 0.02)
+  y <- 100 * exp(-(ts - 11.013)^2 / (2 * 0.05^2))
+  chrom <- list(s = matrix(y, ncol = 1,
+                           dimnames = list(format(ts, nsmall = 2), "210")))
+  for (f in c("gaussian", "egh", "bemg")){
+    rt <- suppressWarnings(get_peaks(chrom, lambdas = 210, fit = f, cl = 1,
+                                     show_progress = FALSE))[[1]][["210"]]$rt
+    expect_equal(rt, 11.013, tolerance = 1e-5, info = f)
+  }
+})

@@ -532,7 +532,7 @@ plot_peak_purity <- function(x, chrom_list, idx, lambda, new.ts, y,
   drew_ratio_ref  <- FALSE
   drew_curves_ref <- FALSE
   invisible(apply(peaks, 1, function(pos) {
-    pos <- match(as.numeric(pos), new.ts)
+    pos <- get_retention_idx(as.numeric(pos), new.ts, clamp = TRUE)
     if (anyNA(pos)) return(NULL)
     p <- do.call(get_purity_values,
                  c(list(x = chrom_list[[idx]], pos = pos,

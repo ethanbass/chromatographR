@@ -449,7 +449,8 @@ convert_indices_to_times <- function(x, timepoints, tdiff, tfac){
   x[, idx_cols] <- sapply(idx_cols, function(j){
     i <- x[, j]
     i[i < 1 | i > length(timepoints)] <- NA_integer_
-    timepoints[i]
+    if (length(timepoints) < 2) return(timepoints[i])
+    approx(seq_along(timepoints), timepoints, xout = i)$y
   })
   x[, c('sd', 'FWHM', 'area')] <- x[, c('sd', 'FWHM', 'area')] * tdiff * tfac
   if (!is.null(x$tau)){

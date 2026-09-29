@@ -181,15 +181,12 @@ predict.ptw <- function (object, newdata, what = c("response", "time"),
         RTref <- as.numeric(colnames(object$ref))
       }
     }
-    if (missing(newdata)){
-      newdata <- RTref
-      newdataIndices <- seq_len(length(RTref))
-    } else{
-      newdataIndices <- round((newdata - min(RTref)) * 
-                                (length(RTref) - 1)/diff(range(RTref)) + 1)
-    }
+    newdataIndices <- if (missing(newdata)) seq_along(RTref) else
+      approx(RTref, seq_along(RTref), xout = newdata)$y
     t(sapply(seq_len(nrow(correctedTime)), function(i){
-      approx(RTref, NULL, correctedTime[i, newdataIndices])$y
+      warped <- approx(seq_len(ncol(correctedTime)), correctedTime[i, ],
+                       xout = newdataIndices)$y
+      approx(RTref, NULL, warped)$y
       }))
   })
 }

@@ -1042,17 +1042,37 @@ fitpk_bemg <- function(x, pos, lambda, max_iter,
   int <- integrate_above_baseline(m$y, peak.loc, bl$floor, bl$slope)
   y_above <- int$y_above
   area <- int$area
-  apex_idx <- which.max(y_above)
-  rt_val <- if (length(apex_idx) == 1L) peak.loc[apex_idx] else unname(round(m$center))
-  result <- c("rt" = rt_val, "start" = pos[[2]], "end" = pos[[3]],
+  apex <- bemg_apex(m, peak.loc, which.max(y_above))
+  result <- c("rt" = apex[["rt"]], "start" = pos[[2]], "end" = pos[[3]],
     "sd" = unname(m$width), "tau_right" = unname(m$b), "tau_left" = unname(m$a),
     "h" = unname(m$height), "center" = unname(round(m$center)),
     "FWHM" = bemg_fwhm(m),
-    "height" = unname(max(y_above)),
+    "height" = apex[["height"]],
     "area" = area, "r.squared" = unname(r.squared),
     purity = purity, "window_limited" = as.numeric(m$window_limited),
     "converged" = as.numeric(m$converged))
   append_floor_cols(result, baseline, bl$floor, bl$slope, peak.loc)
+}
+
+#' Apex of a fitted bi-exponentially modified Gaussian
+#'
+#' Maximises the fitted shape between the timepoints either side of its highest
+#' sampled point, so the apex can fall between timepoints.
+#' @param apex_idx Position of the highest fitted value in `peak.loc`.
+#' @return A named vector: `rt` (in timepoints) and `height` above the baseline.
+#' @noRd
+bemg_apex <- function(m, peak.loc, apex_idx){
+  if (length(apex_idx) != 1L)
+    return(c(rt = unname(round(m$center)), height = NA_real_))
+  shape <- function(t) bemg(t, m$center, m$width, m$height, m$a, m$b)
+  grid_apex <- c(rt = peak.loc[apex_idx], height = unname(shape(peak.loc[apex_idx])))
+  lims <- peak.loc[c(max(apex_idx - 1L, 1L), min(apex_idx + 1L, length(peak.loc)))]
+  if (lims[1] == lims[2]) return(grid_apex)
+  opt <- try(optimize(shape, lims, maximum = TRUE), silent = TRUE)
+  if (inherits(opt, "try-error") || !is.finite(opt$objective) ||
+      opt$objective < grid_apex[["height"]])
+    return(grid_apex)
+  c(rt = opt$maximum, height = unname(opt$objective))
 }
 
 #' Fit peak (gaussian)
