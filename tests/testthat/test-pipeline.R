@@ -865,12 +865,11 @@ test_that("combine_peaks keeps ref_spectra aligned with tab", {
   expect_equal(colnames(res$ref_spectra), colnames(res$tab))
 })
 
-test_that("merge_peaks keeps ref_spectra aligned and accepts a matrix tab", {
+test_that("merge_peaks keeps ref_spectra aligned", {
   pt <- pk2
   pt$ref_spectra <- as.data.frame(pt$ref_spectra)
   res <- merge_peaks(pt, peaks = c("V1", "V2"))
   expect_equal(colnames(res$ref_spectra), colnames(res$tab))
-  pt$tab <- as.matrix(pt$tab)
   res <- merge_peaks(pt, peaks = c("V1", "V3"), method = "sum")
   expect_equal(colnames(res$tab), c("V1", "V2"))
   expect_equal(unname(res$tab[, "V1"]), c(15, 28, 42))

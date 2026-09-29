@@ -196,6 +196,11 @@ test_that("summary of a peak table reports the retention time unit", {
   expect_output(print(summary(get_peaktable(.pks))), "\\]\n")
 })
 
+test_that("get_peaktable rejects misspelled arguments", {
+  skip_on_cran()
+  expect_error(get_peaktable(.pks, hmx = 1.0), regexp = "unused argument.*hmx")
+})
+
 test_that("hmax, sigma_t and combine_peaks' tol are minutes whatever the time unit", {
   skip_on_cran()
   data(Sa_pr)
@@ -313,4 +318,38 @@ test_that("corrected times without models or aligned chromatograms warn", {
   attr(pt, "warp_models") <- NULL
   expect_warning(out <- get_chrom_list(pt), "unaligned `Sa_pr`")
   expect_identical(out, Sa_pr)
+})
+
+test_that("corrected peak tables store corrected times in the rt rows", {
+  skip_on_cran()
+  f <- .aligned_fixture("ptw")
+  cp <- correct_peaks(f$pks, f$models, Sa_pr)
+  pt <- get_peaktable(cp)
+  raw <- get_peaktable(cp, use.cor = FALSE)
+  expect_equal(rownames(pt$pk_meta), rownames(raw$pk_meta))
+  expect_false(isTRUE(all.equal(pt$pk_meta["rt", ], raw$pk_meta["rt", ])))
+  aligned <- get_chrom_list(pt)
+  win <- get_retention_idx(unlist(pt$pk_meta[c("start", "end"), "V2"]),
+                           get_times(aligned))
+  coords <- get_peak_coordinates(pt, aligned, loc = "V2", idx = "max",
+                                 lambda = "210")
+  expect_equal(coords$coordinates[[2]],
+               max(aligned[[which.max(pt$tab$V2)]][win[1]:win[2], "210"]))
+  long <- reshape_peaktable(pt, peaks = "V2")
+  expect_equal(colnames(long), c("peak", "sample", "lambda", "rt", "area"))
+  expect_equal(unique(long$rt), pt$pk_meta["rt", "V2"])
+})
+
+test_that("filtering a table of corrected peaks does not add rows", {
+  skip_on_cran()
+  data(Sa_pr)
+  pks <- get_peaks(Sa_pr, lambdas = "210", cl = 1, show_progress = FALSE)
+  mods <- correct_rt(Sa_pr, lambdas = "210", reference = 1, what = "models",
+                     cl = 1, show_progress = FALSE)
+  pt <- get_peaktable(correct_peaks(pks, mods, chrom_list = Sa_pr),
+                      chrom_list = Sa_pr)
+  filtered <- filter_peaktable(pt, min_rt = 11, max_rt = 13)
+  expect_equal(rownames(filtered$pk_meta), rownames(pt$pk_meta))
+  rt_cor <- unlist(filtered$pk_meta["rt", ])
+  expect_true(all(rt_cor >= 11 & rt_cor <= 13))
 })

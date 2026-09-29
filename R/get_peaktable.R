@@ -54,7 +54,9 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' @param use.cor Logical. Indicates whether to use corrected retention times
 #' (`rt.cor` column) or raw retention times (`rt` column). Unless
 #' otherwise specified, the `rt.cor` column will be used by default if it 
-#' exists in the provided `peak_list`.
+#' exists in the provided `peak_list`. Either way, they are stored in the `rt`,
+#' `start` and `end` rows of `pk_meta`, and `args$use.cor` records which were
+#' used.
 #' @param hmax Height at which the clustering tree is cut. With `clust = "rt"`,
 #' peaks are clustered by complete linkage on retention time, so `hmax` is the
 #' largest retention time difference allowed between any two peaks in the same
@@ -96,14 +98,15 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' [`cutreeDynamicTree`][dynamicTreeCut::cutreeDynamicTree].
 #' @param verbose Logical. Whether to warn when two peaks from the same sample
 #' fall in the same cluster. Defaults to `FALSE`.
-#' @param out Output format: `data.frame` (default) or `matrix`.
 #' @param na.fill Value used to fill cells where no peak was matched in a given
 #'   sample. Defaults to `0`. Only used by the `matched_peak_list`
 #'   method.
 #' @param ... Additional arguments (currently unused).
 #' @return An S3 [`peak_table`] object, containing the following elements:
-#' * `tab`: The peak table itself — a `data.frame` (or `matrix`, per `out`) of
-#' intensities in a sample × peak configuration.
+#' * `tab`: The peak table itself — a `data.frame` of
+#' intensities in a sample × peak configuration. A peak that was not found in a
+#' sample, or whose response is negative or missing, is recorded as `0`
+#' (`na.fill` for a `matched_peak_list`).
 #' * `pk_meta`: A `data.frame` containing peak metadata (e.g., the spectral
 #' component, peak number, and average retention time), summarized across all
 #' peaks in each cluster according to `summarize_by`.
@@ -149,7 +152,7 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
                           clust = c("rt", "sp.rt"), 
                           sigma_t = NULL, sigma_r = 0.5,
                           deepSplit = FALSE, verbose = FALSE,
-                          out = c('data.frame', 'matrix'), ...,
+                          ...,
                           sigma.t = NULL, sigma.r = NULL){
   if (...length()) stop("unused argument(s): ", paste(...names(), collapse = ", "))
   sigma_r <- resolve_deprecated(sigma.r, sigma_r)
@@ -165,7 +168,6 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
          paste(class(peak_list), collapse = "/"), ".")
   response <- match.arg(response, c("area", "height"))
   clust <- match.arg(clust, c("rt", "sp.rt"))
-  out <- match.arg(out, c('data.frame', 'matrix'))
   summarize_by <- match.arg(summarize_by, choices = c("weighted.mean", 
                                                       "median", "mean", "max"))
   if (is.null(use.cor)){
@@ -259,12 +261,13 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
     }
     ncl <- length(cl.centers[, rt])
     pkcenters.cl <- order(order(cl.centers[, rt]))[pkcenters.cl]
-    cl.centers <- cl.centers[order(cl.centers[, rt]),]
+    cl.centers <- cl.centers[order(cl.centers[, rt]), , drop = FALSE]
     metaInfo <- cbind(lambda = rep(suppressWarnings(
       as.numeric(names(peak_list[[1]])[comp])), ncl),
                       peak = 1:ncl, 
-                      round(cl.centers, 2)
+                      cl.centers
                       )
+    if (use.cor) colnames(metaInfo) <- sub("\\.cor$", "", colnames(metaInfo))
     rownames(metaInfo) <- NULL
     if (plot_it){
       mycols <- myPalette(nrow(cl.centers))
@@ -296,7 +299,7 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
     return(list(Iinfo, metaInfo))
   }
   result <- lapply(seq_len(ncomp), clusterPeaks, peak_list)
-  pt <- new_peak_table(result, out, peak_list,
+  pt <- new_peak_table(result, peak_list,
                  args = list(peak_list = deparse(substitute(peak_list)),
                         chrom_list = attr(peak_list, "chrom_list"),
                         chrom_list_aligned = attr(peak_list, "chrom_list_aligned") %||% NA,
@@ -342,12 +345,10 @@ get_peaktable.matched_peak_list <- function(peak_list, pks,
                                             response = c("area", "height"),
                                             rt_tol = 0.01,
                                             na.fill = 0,
-                                            out = c("data.frame", "matrix"),
                                             verbose = FALSE, ...) {
   if (...length()) stop("unused argument(s): ", paste(...names(), collapse = ", "))
   matched  <- peak_list
   response <- match.arg(response, c("area", "height"))
-  out      <- match.arg(out, c("data.frame", "matrix"))
 
   if (missing(pks))
     stop("Please supply the original peak_list from get_peaks() as 'pks'.")
@@ -410,7 +411,7 @@ get_peaktable.matched_peak_list <- function(peak_list, pks,
     metaInfo <- cbind(
       lambda = rep(suppressWarnings(as.numeric(lam)), n_ref),
       peak   = seq_len(n_ref),
-      round(ref_pks[, present, drop = FALSE], 2)
+      ref_pks[, present, drop = FALSE]
     )
     rownames(metaInfo) <- NULL
     list(t(Imat), metaInfo)
@@ -421,7 +422,7 @@ get_peaktable.matched_peak_list <- function(peak_list, pks,
     stop("No peaks found in reference sample across any wavelength.")
 
   new_peak_table(
-    result, out, pks,
+    result, pks,
     args = list(
       peak_list        = deparse(substitute(peak_list)),
       pks              = deparse(substitute(pks)),
@@ -447,9 +448,8 @@ get_peaktable.matched_peak_list <- function(peak_list, pks,
 #' layout is defined once. Each method supplies its own `args`, which is
 #' recorded verbatim.
 #' @noRd
-new_peak_table <- function(result, out, source, args){
-  as.structure <- switch(out, "data.frame" = as.data.frame, "matrix" = as.matrix)
-  pull <- function(k) as.structure(t(do.call("rbind", lapply(result, `[[`, k))))
+new_peak_table <- function(result, source, args){
+  pull <- function(k) as.data.frame(t(do.call("rbind", lapply(result, `[[`, k))))
   structure(
     list(tab = pull(1), pk_meta = pull(2),
          sample_meta = NA,
@@ -462,7 +462,8 @@ new_peak_table <- function(result, out, source, args){
 
 #' Reshape peaktable
 #' 
-#' Reshapes peak table from wide to long format
+#' Reshapes a peak table to long format, or to a wide data.frame with the
+#' selected peaks alongside sample metadata.
 #' @name reshape_peaktable
 #' @importFrom stats reshape
 #' @param x A `peak_table` object.
@@ -471,23 +472,31 @@ new_peak_table <- function(result, out, source, args){
 #' place of the original peak names.
 #' @param metadata A character vector specifying the metadata fields to include.
 #' @param fixed_levels Logical. Whether to fix factor levels of features in the
-#' order provided. Defaults to `TRUE`.
-#' @return A data.frame containing the information for the specified peaks in
-#' long format.
+#' order provided. Defaults to `TRUE`. Ignored when `format = "wide"`.
+#' @param format Either `"long"` (the default), with one row per sample and
+#' peak, or `"wide"`, with one row per sample and one column per peak.
+#' @return A data.frame containing the information for the specified peaks. In
+#' long format it has columns `sample`, `peak`, `lambda`, `rt`, the response and
+#' any metadata; in wide format, `sample`, any metadata, then one column per
+#' peak.
 #' @author Ethan Bass
 #' @family utility functions
 #' @examples
 #' data(pk_tab)
 #' reshape_peaktable(pk_tab, peaks = c("V10", "V15"))
+#' reshape_peaktable(pk_tab, peaks = c(a = "V10", b = "V15"), format = "wide")
 #' @export
-reshape_peaktable <- function(x, peaks, metadata, fixed_levels = TRUE){
+reshape_peaktable <- function(x, peaks, metadata, fixed_levels = TRUE,
+                              format = c("long", "wide")){
+  format <- match.arg(format)
   if (!missing(peaks)){
     if (is.numeric(peaks)){
       peaks <- colnames(x$tab)[peaks]
     }
     df <- x$tab[, match(peaks, colnames(x$tab)), drop = FALSE]
     if (!is.null(names(peaks))){
-      colnames(df) <- names(peaks)
+      x$pk_meta <- x$pk_meta[, match(peaks, colnames(x$pk_meta)), drop = FALSE]
+      colnames(df) <- colnames(x$pk_meta) <- names(peaks)
       peaks <- colnames(df)
     }
   } else {
@@ -496,6 +505,12 @@ reshape_peaktable <- function(x, peaks, metadata, fixed_levels = TRUE){
   if (!missing(metadata)){
     meta_idx <- which(colnames(x$sample_meta) %in% metadata)
     x$sample_meta <- x$sample_meta[, meta_idx, drop = FALSE]
+  }
+  if (format == "wide"){
+    meta <- if (!is.null(dim(x$sample_meta))) x$sample_meta
+            else data.frame(row.names = seq_len(nrow(df)))
+    return(data.frame(sample = rownames(df), meta, df, row.names = NULL,
+                      check.names = FALSE))
   }
   xx <- reshape(as.data.frame(chr = rownames(df), df), direction = "long",
                 varying = list(seq_len(ncol(df))), v.names = x$args[["response"]],

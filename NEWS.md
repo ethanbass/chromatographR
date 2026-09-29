@@ -97,6 +97,11 @@ old names need updating (`x["10.10", ]` rather than `x["10.1", ]`).
 * `get_peaktable`'s `hmax` and `sigma_t`, and `combine_peaks`'s `tol`, are now
 in minutes whatever the time unit of the data. Results change only for
 chromatograms whose times are not in minutes.
+* Removed `get_peaktable`'s `out` argument, so peak tables are always
+data.frames. Use `as.matrix(pt$tab)` for a matrix.
+* Peak tables built from corrected peaks now name the `pk_meta` rows `rt`,
+`start` and `end`, not `rt.cor`, `start.cor` and `end.cor`, and so does
+`reshape_peaktable`. `args$use.cor` records which times were used.
 
 #### Other renamed and deprecated arguments
 
@@ -208,6 +213,11 @@ bottleneck.
 zero, which makes peaks look less pure. Use `zero_floor = FALSE`, the default
 in both `preprocess` and `subtract_blanks`.
 
+#### Peak tables and plotting
+
+* Added `format = "wide"` to `reshape_peaktable`, returning one row per sample
+with metadata and one column per selected peak.
+
 ### Bug fixes and other minor changes
 
 #### Preprocessing and baseline correction
@@ -276,9 +286,15 @@ column's name merely contains it, such as `"V12"` for `"V1"`.
 that it stays aligned with `tab`.
 * `combine_peaks(choose = "least_sparse")` now keeps the peak detected in the
 most samples. Previously every candidate tied and the first was kept.
-* `merge_peaks` no longer errors on peak tables built with
-`get_peaktable(out = "matrix")`.
 * `filter_peaktable` now errors when `rts` is combined with `min_rt` or `max_rt`.
+* `get_peaktable` no longer spreads `pk_meta` across several columns when all
+peaks at a wavelength fall in one cluster.
+* `get_peaktable` no longer rounds `pk_meta` to two decimal places, which moved
+retention times by up to 0.005 minutes and set small `tau` values to zero.
+* `reshape_peaktable` now keeps `lambda` and `rt` when peaks are renamed with a
+named `peaks` vector. Previously both were `NA`.
+* `filter_peaktable` no longer appends a spurious `rt` row to `pk_meta` when
+filtering a table built from corrected peaks.
 
 #### Documentation and packaging
 

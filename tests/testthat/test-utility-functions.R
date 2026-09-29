@@ -138,6 +138,18 @@ test_that("reshape_peaktable works as expected",{
   pktab_long <- reshape_peaktable(pk_tab, peaks = c("V51","V60"), metadata = "trt")
   expect_equal(ncol(pktab_long), 5 + 1)
   expect_equal(nrow(pktab_long), nrow(pk_tab)*2)
+
+  pktab_named <- reshape_peaktable(pk_tab, peaks = c(a = "V51", b = "V60"))
+  expect_equal(levels(pktab_named$peak), c("a", "b"))
+  expect_equal(unique(pktab_named$rt[pktab_named$peak == "b"]),
+               pk_tab$pk_meta["rt", "V60"])
+
+  pktab_wide <- reshape_peaktable(pk_tab, peaks = c(a = "V51", b = "V60"),
+                                  metadata = "trt", format = "wide")
+  expect_equal(colnames(pktab_wide), c("sample", "trt", "a", "b"))
+  expect_equal(pktab_wide$sample, rownames(pk_tab$tab))
+  expect_equal(pktab_wide$b, pk_tab$tab$V60)
+  expect_equal(pktab_wide$trt, pk_tab$sample_meta$trt)
 })
 
 test_that("reshape_chroms works as expected", {

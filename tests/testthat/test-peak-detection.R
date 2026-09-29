@@ -694,3 +694,13 @@ test_that("fitted retention times are not snapped to the time grid", {
     expect_equal(rt, 11.013, tolerance = 1e-5, info = f)
   }
 })
+
+test_that("a single cluster keeps a well-formed pk_meta", {
+  skip_on_cran()
+  pk <- filter_peaks(get_peaks(Sa_pr, lambdas = "220", show_progress = FALSE,
+                               cl = 1), min_rt = 11.55, max_rt = 11.7)
+  pt <- get_peaktable(pk)
+  expect_equal(ncol(pt$tab), 1L)
+  expect_equal(ncol(pt$pk_meta), 1L)
+  expect_true(all(c("lambda", "rt", "start", "end") %in% rownames(pt$pk_meta)))
+})

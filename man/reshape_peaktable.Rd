@@ -4,7 +4,13 @@
 \alias{reshape_peaktable}
 \title{Reshape peaktable}
 \usage{
-reshape_peaktable(x, peaks, metadata, fixed_levels = TRUE)
+reshape_peaktable(
+  x,
+  peaks,
+  metadata,
+  fixed_levels = TRUE,
+  format = c("long", "wide")
+)
 }
 \arguments{
 \item{x}{A \code{peak_table} object.}
@@ -16,18 +22,25 @@ place of the original peak names.}
 \item{metadata}{A character vector specifying the metadata fields to include.}
 
 \item{fixed_levels}{Logical. Whether to fix factor levels of features in the
-order provided. Defaults to \code{TRUE}.}
+order provided. Defaults to \code{TRUE}. Ignored when \code{format = "wide"}.}
+
+\item{format}{Either \code{"long"} (the default), with one row per sample and
+peak, or \code{"wide"}, with one row per sample and one column per peak.}
 }
 \value{
-A data.frame containing the information for the specified peaks in
-long format.
+A data.frame containing the information for the specified peaks. In
+long format it has columns \code{sample}, \code{peak}, \code{lambda}, \code{rt}, the response and
+any metadata; in wide format, \code{sample}, any metadata, then one column per
+peak.
 }
 \description{
-Reshapes peak table from wide to long format
+Reshapes a peak table to long format, or to a wide data.frame with the
+selected peaks alongside sample metadata.
 }
 \examples{
 data(pk_tab)
 reshape_peaktable(pk_tab, peaks = c("V10", "V15"))
+reshape_peaktable(pk_tab, peaks = c(a = "V10", b = "V15"), format = "wide")
 }
 \seealso{
 Other utility functions:

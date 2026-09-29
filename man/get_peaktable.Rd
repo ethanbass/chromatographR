@@ -22,7 +22,6 @@ get_peaktable(peak_list, ...)
   sigma_r = 0.5,
   deepSplit = FALSE,
   verbose = FALSE,
-  out = c("data.frame", "matrix"),
   ...,
   sigma.t = NULL,
   sigma.r = NULL
@@ -34,7 +33,6 @@ get_peaktable(peak_list, ...)
   response = c("area", "height"),
   rt_tol = 0.01,
   na.fill = 0,
-  out = c("data.frame", "matrix"),
   verbose = FALSE,
   ...
 )
@@ -54,7 +52,9 @@ get_peaktable(peak_list, ...)
 \item{use.cor}{Logical. Indicates whether to use corrected retention times
 (\code{rt.cor} column) or raw retention times (\code{rt} column). Unless
 otherwise specified, the \code{rt.cor} column will be used by default if it
-exists in the provided \code{peak_list}.}
+exists in the provided \code{peak_list}. Either way, they are stored in the \code{rt},
+\code{start} and \code{end} rows of \code{pk_meta}, and \code{args$use.cor} records which were
+used.}
 
 \item{hmax}{Height at which the clustering tree is cut. With \code{clust = "rt"},
 peaks are clustered by complete linkage on retention time, so \code{hmax} is the
@@ -101,8 +101,6 @@ Defaults to \code{FALSE}. For additional information, see
 \item{verbose}{Logical. Whether to warn when two peaks from the same sample
 fall in the same cluster. Defaults to \code{FALSE}.}
 
-\item{out}{Output format: \code{data.frame} (default) or \code{matrix}.}
-
 \item{sigma.t}{The \code{sigma.t} argument is deprecated. Please use \code{sigma_t},
 which is in minutes. \code{sigma.t} is read in the units of the retention times,
 as before.}
@@ -125,8 +123,10 @@ method.}
 \value{
 An S3 \code{\link{peak_table}} object, containing the following elements:
 \itemize{
-\item \code{tab}: The peak table itself — a \code{data.frame} (or \code{matrix}, per \code{out}) of
-intensities in a sample × peak configuration.
+\item \code{tab}: The peak table itself — a \code{data.frame} of
+intensities in a sample × peak configuration. A peak that was not found in a
+sample, or whose response is negative or missing, is recorded as \code{0}
+(\code{na.fill} for a \code{matched_peak_list}).
 \item \code{pk_meta}: A \code{data.frame} containing peak metadata (e.g., the spectral
 component, peak number, and average retention time), summarized across all
 peaks in each cluster according to \code{summarize_by}.
