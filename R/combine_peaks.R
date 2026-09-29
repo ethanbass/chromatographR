@@ -9,7 +9,7 @@
 #' @name combine_peaks
 #' @param peak_table Peak table from [`get_peaktable`].
 #' @param tol Tolerance for matching retention times (maximum retention time
-#' difference). Defaults to `0.01`.
+#' difference), in minutes. Defaults to `0.01`.
 #' @param min_cor Minimum spectral correlation to confirm a match. Defaults to 
 #' `0.9`.
 #' @param min.cor The `min.cor` argument is deprecated. Please use `min_cor`
@@ -59,7 +59,8 @@ combine_peaks <- function(peak_table, tol = .01, min_cor = 0.9,
   compare_rts <- function(rt1, rt2, tol){
     abs(rt1 - rt2) < tol
   }
-  mat <- outer(RTs, RTs, compare_rts, tol = tol)
+  mat <- outer(RTs, RTs, compare_rts,
+               tol = tol * rt_factor(peak_table$args$rt_unit))
   # find columns with a retention time match
   rt_group_count <- colSums(mat)
   candidate_rt_duplicates <- which(rt_group_count > 1)

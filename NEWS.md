@@ -82,14 +82,18 @@ a ratio of 1. See `?plot.peak_list`.
 * Retention times in dimnames are now formatted to a consistent number of
 decimal places, so an interpolated time axis is no longer ragged. Lookups by the
 old names need updating (`x["10.10", ]` rather than `x["10.1", ]`).
+* `get_peaktable`'s `hmax` and `sigma_t`, and `combine_peaks`'s `tol`, are now
+in minutes whatever the time unit of the data. Results change only for
+chromatograms whose times are not in minutes.
 
 #### Other renamed and deprecated arguments
 
-* Renamed the remaining dot-separated argument names to snake_case:
-`spec.smooth` to `smooth_spectra`, `min.cor` to `min_cor`, and
-`n.traces`/`n.zeros` to `n_traces`/`n_zeros`. The old names still work, with a
-warning. `init.coef` and `max.only` are retained, since they are passed through
-to functions that define them.
+* Renamed dot-separated argument names to snake_case:
+`spec.smooth` to `smooth_spectra`, `min.cor` to `min_cor`,
+`n.traces`/`n.zeros` to `n_traces`/`n_zeros`, and `sigma.t`/`sigma.r` to
+`sigma_t`/`sigma_r`. The old names still work, with a warning. `init.coef` and
+`max.only` are retained, since they are passed through to functions that
+define them.
 * Deprecated `sd_max` in `get_peaks` and `fit_peaks`, and `min_sd`/`max_sd` in
 `filter_peaks`, in favor of `min_fwhm` and `max_fwhm`. A standard deviation is
 equivalent to peak width only for `fit = "gaussian"`. See `?filter_peaks`.

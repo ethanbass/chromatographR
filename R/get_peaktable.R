@@ -24,7 +24,7 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' where \eqn{c_{ij}} is the spectral correlation between spectra \eqn{i} and 
 #' \eqn{j}, and \eqn{\sigma_t} and \eqn{\sigma_r} control the relative 
 #' contributions of retention time and spectral similarity, respectively (see
-#' `sigma.t` and `sigma.r`).
+#' `sigma_t` and `sigma_r`).
 #' 
 #' When two peaks from the same sample fall in the same cluster, only the more
 #' intense one enters the peak table, with a warning if `verbose = TRUE`. Such
@@ -58,13 +58,13 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' @param hmax Height at which the clustering tree is cut. With `clust = "rt"`,
 #' peaks are clustered by complete linkage on retention time, so `hmax` is the
 #' largest retention time difference allowed between any two peaks in the same
-#' cluster, in retention time units. With `clust = "sp.rt"`, peaks are clustered
+#' cluster, in minutes. With `clust = "sp.rt"`, peaks are clustered
 #' by average linkage on the dissimilarity \eqn{1 - S_{ij}}, which runs from 0
 #' to 1, and `hmax` is the maximum tree height passed to
 #' [`cutreeDynamicTree`][dynamicTreeCut::cutreeDynamicTree]; clusters may be
 #' split below it (see `deepSplit`). There, the default of `0.2` lets peaks with
-#' identical spectra sit about `0.67 * sigma.t` apart, a third of the mean
-#' `end - start` at the default `sigma.t`. Ignored
+#' identical spectra sit about `0.67 * sigma_t` apart, a third of the mean
+#' `end - start` at the default `sigma_t`. Ignored
 #' for peak lists produced by `get_peaks(windows = )`, since those peaks are
 #' grouped by integration window instead of being clustered.
 #' @param summarize_by How to summarize peak metadata within each cluster.
@@ -79,12 +79,17 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' spectral similarity and retention time (`sp.rt`) or retention time alone
 #' (`rt`). Defaults to `rt`. Ignored for peak lists produced by
 #' `get_peaks(windows = )`, which are grouped by window.
-#' @param sigma.t Width of Gaussian kernel for retention time similarity, in
-#' retention time units. Controls the weight given to retention time when
+#' @param sigma_t Width of Gaussian kernel for retention time similarity, in
+#' minutes. Controls the weight given to retention time when
 #' `clust = "sp.rt"`. Defaults to half the mean `end - start` across all peaks.
-#' @param sigma.r Width of Gaussian kernel for spectral similarity. Controls
+#' @param sigma_r Width of Gaussian kernel for spectral similarity. Controls
 #' the weight given to spectral correlation when `clust = "sp.rt"`. Defaults
 #' to `0.5`.
+#' @param sigma.t The `sigma.t` argument is deprecated. Please use `sigma_t`,
+#' which is in minutes. `sigma.t` is read in the units of the retention times,
+#' as before.
+#' @param sigma.r The `sigma.r` argument is deprecated. Please use `sigma_r`
+#' instead.
 #' @param deepSplit Logical. Controls sensitivity to cluster splitting when
 #' `clust = "sp.rt"`. If `TRUE`, returns a larger number of smaller clusters.
 #' Defaults to `FALSE`. For additional information, see
@@ -142,10 +147,19 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
                           summarize_by = c("weighted.mean", "median", "mean", "max"),
                           plot_it = FALSE, ask = plot_it, 
                           clust = c("rt", "sp.rt"), 
-                          sigma.t = NULL, sigma.r = 0.5,
+                          sigma_t = NULL, sigma_r = 0.5,
                           deepSplit = FALSE, verbose = FALSE,
-                          out = c('data.frame', 'matrix'), ...){
+                          out = c('data.frame', 'matrix'), ...,
+                          sigma.t = NULL, sigma.r = NULL){
   if (...length()) stop("unused argument(s): ", paste(...names(), collapse = ", "))
+  sigma_r <- resolve_deprecated(sigma.r, sigma_r)
+  rtf <- rt_factor(get_time_unit(peak_list))
+  if (!is.null(sigma.t)){
+    warning(paste("The `sigma.t` argument is deprecated. Please use `sigma_t`,",
+                  "which is in minutes. `sigma.t` is read in the units of the",
+                  "retention times, as before."), immediate. = TRUE)
+    sigma_t <- sigma.t / rtf
+  }
   if (!is.list(peak_list))
     stop("No get_peaktable method for object of class ",
          paste(class(peak_list), collapse = "/"), ".")
@@ -193,12 +207,12 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
       pkcenters.cl <- match(win_idx, sort(unique(win_idx)))
     } else if (clust == 'rt'){
       pkcenters.hcl <- fastcluster::hclust(dist(pkcenters), method = "complete")
-      pkcenters.cl <- cutree(pkcenters.hcl, h = hmax)
+      pkcenters.cl <- cutree(pkcenters.hcl, h = hmax * rtf)
     } else if (clust == 'sp.rt'){
-        if (is.null(sigma.t)){
-          sigma.t <- 0.5 * mean(do.call(rbind, unlist(pkLst, recursive = FALSE))$end - 
-                               do.call(rbind, unlist(pkLst, recursive = FALSE))$start)
-        }
+        sigma_t_rt <- if (is.null(sigma_t)){
+          0.5 * mean(do.call(rbind, unlist(pkLst, recursive = FALSE))$end -
+                       do.call(rbind, unlist(pkLst, recursive = FALSE))$start)
+        } else sigma_t * rtf
       ts <- as.numeric(rownames(chrom_list[[1]]))
       sp <- sapply(seq_along(pkcenters), function(i){
         rescale(t(chrom_list[[file.idx[i]]][
@@ -206,8 +220,8 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
       }, simplify = TRUE)
       cor.spec <- cor(sp, method = "pearson")
       rt.diff <- abs(outer(unlist(pkcenters), unlist(pkcenters), FUN="-"))
-      sim.spec <- exp((-(1 - cor.spec)^2)/(2*sigma.r^2))
-      sim.time <- exp(-(rt.diff^2)/(2*sigma.t^2))
+      sim.spec <- exp((-(1 - cor.spec)^2)/(2*sigma_r^2))
+      sim.time <- exp(-(rt.diff^2)/(2*sigma_t_rt^2))
       S <- sim.spec*sim.time
       D <- 1 - S
       linkage <- "average"
@@ -290,8 +304,8 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
                         use.cor = use.cor,
                         hmax = hmax,
                         clust = clust,
-                        sigma.t = sigma.t,
-                        sigma.r = sigma.r,
+                        sigma_t = sigma_t,
+                        sigma_r = sigma_r,
                         deepSplit = deepSplit,
                         reference_spectra = NA,
                         metadata_path = NA,

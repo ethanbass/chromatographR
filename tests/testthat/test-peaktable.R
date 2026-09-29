@@ -195,3 +195,41 @@ test_that("summary of a peak table reports the retention time unit", {
   expect_output(print(summary(pt)), "\\] min")
   expect_output(print(summary(get_peaktable(.pks))), "\\]\n")
 })
+
+test_that("hmax, sigma_t and combine_peaks' tol are minutes whatever the time unit", {
+  skip_on_cran()
+  data(Sa_pr)
+  to_seconds <- function(pks){
+    for (i in seq_along(pks)){
+      for (l in names(pks[[i]]))
+        pks[[i]][[l]][c("rt", "start", "end")] <- pks[[i]][[l]][c("rt", "start", "end")] * 60
+      attr(pks[[i]], "time_unit") <- "s"
+    }
+    pks
+  }
+  pm <- get_peaks(Sa_pr, lambdas = "210", show_progress = FALSE, cl = 1)
+  ps <- to_seconds(pm)
+  withr::local_seed(1)
+  jittered <- pm
+  for (i in seq_along(jittered))
+    jittered[[i]][["210"]]$rt <- jittered[[i]][["210"]]$rt +
+      runif(nrow(jittered[[i]][["210"]]), 0, 1e-4)
+  expect_equal(unname(as.matrix(get_peaktable(to_seconds(jittered))$tab)),
+               unname(as.matrix(get_peaktable(jittered)$tab)))
+  sp_m <- get_peaktable(pm, chrom_list = Sa_pr, clust = "sp.rt", sigma_t = 0.1)
+  sp_s <- get_peaktable(ps, chrom_list = convert_time_units(Sa_pr, "s"),
+                        clust = "sp.rt", sigma_t = 0.1)
+  expect_equal(ncol(sp_s$tab), ncol(sp_m$tab))
+  expect_warning(
+    old <- get_peaktable(ps, chrom_list = convert_time_units(Sa_pr, "s"),
+                         clust = "sp.rt", sigma.t = 6),
+    "`sigma.t` argument is deprecated")
+  expect_equal(old$tab, sp_s$tab)
+  tm <- attach_ref_spectra(get_peaktable(pm), chrom_list = Sa_pr)
+  ts <- tm
+  ts$pk_meta["rt", ] <- as.numeric(tm$pk_meta["rt", ]) * 60
+  ts$args$rt_unit <- "s"
+  merged <- colnames(combine_peaks(tm, tol = 0.3, min_cor = 0)$tab)
+  expect_lt(length(merged), ncol(tm$tab))
+  expect_equal(colnames(combine_peaks(ts, tol = 0.3, min_cor = 0)$tab), merged)
+})

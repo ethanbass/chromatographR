@@ -18,12 +18,14 @@ get_peaktable(peak_list, ...)
   plot_it = FALSE,
   ask = plot_it,
   clust = c("rt", "sp.rt"),
-  sigma.t = NULL,
-  sigma.r = 0.5,
+  sigma_t = NULL,
+  sigma_r = 0.5,
   deepSplit = FALSE,
   verbose = FALSE,
   out = c("data.frame", "matrix"),
-  ...
+  ...,
+  sigma.t = NULL,
+  sigma.r = NULL
 )
 
 \method{get_peaktable}{matched_peak_list}(
@@ -57,13 +59,13 @@ exists in the provided \code{peak_list}.}
 \item{hmax}{Height at which the clustering tree is cut. With \code{clust = "rt"},
 peaks are clustered by complete linkage on retention time, so \code{hmax} is the
 largest retention time difference allowed between any two peaks in the same
-cluster, in retention time units. With \code{clust = "sp.rt"}, peaks are clustered
+cluster, in minutes. With \code{clust = "sp.rt"}, peaks are clustered
 by average linkage on the dissimilarity \eqn{1 - S_{ij}}, which runs from 0
 to 1, and \code{hmax} is the maximum tree height passed to
 \code{\link[dynamicTreeCut:cutreeDynamicTree]{cutreeDynamicTree}}; clusters may be
 split below it (see \code{deepSplit}). There, the default of \code{0.2} lets peaks with
-identical spectra sit about \code{0.67 * sigma.t} apart, a third of the mean
-\code{end - start} at the default \code{sigma.t}. Ignored
+identical spectra sit about \code{0.67 * sigma_t} apart, a third of the mean
+\code{end - start} at the default \code{sigma_t}. Ignored
 for peak lists produced by \code{get_peaks(windows = )}, since those peaks are
 grouped by integration window instead of being clustered.}
 
@@ -83,11 +85,11 @@ spectral similarity and retention time (\code{sp.rt}) or retention time alone
 (\code{rt}). Defaults to \code{rt}. Ignored for peak lists produced by
 \code{get_peaks(windows = )}, which are grouped by window.}
 
-\item{sigma.t}{Width of Gaussian kernel for retention time similarity, in
-retention time units. Controls the weight given to retention time when
+\item{sigma_t}{Width of Gaussian kernel for retention time similarity, in
+minutes. Controls the weight given to retention time when
 \code{clust = "sp.rt"}. Defaults to half the mean \code{end - start} across all peaks.}
 
-\item{sigma.r}{Width of Gaussian kernel for spectral similarity. Controls
+\item{sigma_r}{Width of Gaussian kernel for spectral similarity. Controls
 the weight given to spectral correlation when \code{clust = "sp.rt"}. Defaults
 to \code{0.5}.}
 
@@ -100,6 +102,13 @@ Defaults to \code{FALSE}. For additional information, see
 fall in the same cluster. Defaults to \code{FALSE}.}
 
 \item{out}{Output format: \code{data.frame} (default) or \code{matrix}.}
+
+\item{sigma.t}{The \code{sigma.t} argument is deprecated. Please use \code{sigma_t},
+which is in minutes. \code{sigma.t} is read in the units of the retention times,
+as before.}
+
+\item{sigma.r}{The \code{sigma.r} argument is deprecated. Please use \code{sigma_r}
+instead.}
 
 \item{pks}{A \code{peak_list} object from \code{\link{get_peaks}}.
 Required when \code{peak_list} is a \code{matched_peak_list}. Used to
@@ -151,7 +160,7 @@ S_{ij} =
 where \eqn{c_{ij}} is the spectral correlation between spectra \eqn{i} and
 \eqn{j}, and \eqn{\sigma_t} and \eqn{\sigma_r} control the relative
 contributions of retention time and spectral similarity, respectively (see
-\code{sigma.t} and \code{sigma.r}).
+\code{sigma_t} and \code{sigma_r}).
 
 When two peaks from the same sample fall in the same cluster, only the more
 intense one enters the peak table, with a warning if \code{verbose = TRUE}. Such
