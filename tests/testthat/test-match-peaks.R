@@ -42,6 +42,8 @@ test_that("match_peaks accepts the reference by name", {
   expect_no_error(plot(mp, xlab = "RT", ylim = c(0, 5)))
   expect_error(match_peaks(pks, chrom_list = Sa_pr, reference = "nope"),
                regexp = "not a sample")
+  expect_error(match_peaks(pks, chrom_list = Sa_pr, reference = 9),
+               regexp = "not a sample")
 })
 
 test_that("subsetting a matched_peak_list keeps its reference sample", {
@@ -101,6 +103,20 @@ test_that("the stored reference follows the samples when chrom_list is reordered
                regexp = "is not in `chrom_list`")
 })
 
+test_that("peaks are matched by sample name, not position", {
+  skip_on_cran()
+  data(Sa_pr)
+  pks <- get_peaks(Sa_pr, lambdas = 210, cl = 1, show_progress = FALSE)
+  shuffled <- pks[c(2, 1, 3, 4)]
+  expect_equal(match_peaks(shuffled, chrom_list = Sa_pr, reference = 1)[names(Sa_pr)],
+               match_peaks(pks, chrom_list = Sa_pr, reference = 2)[names(Sa_pr)],
+               ignore_attr = TRUE)
+  fit <- function(peaks)
+    correct_rt(Sa_pr, lambdas = 210, alg = "lptw", peaks = peaks, reference = 1,
+               cl = 1, show_progress = FALSE, what = "models")
+  expect_equal(fit(shuffled), fit(pks))
+})
+
 test_that("an unusable reference value is filled with `na.fill`", {
   skip_on_cran()
   data(Sa_pr)
@@ -143,4 +159,20 @@ test_that("rt_window is minutes whatever the time unit", {
     function(m) nrow(m$matches), numeric(1))
   expect_equal(n_matched(ps, convert_time_units(Sa_pr, time_unit = "s")),
                n_matched(pm, Sa_pr))
+})
+
+test_that("matched retention times map to rows on an unevenly spaced axis", {
+  skip_on_cran()
+  data(Sa_pr)
+  gap <- lapply(Sa_pr, function(x) transfer_metadata(x[-(150:160), , drop = FALSE], x))
+  pks <- suppressWarnings(get_peaks(gap, lambdas = 210, cl = 1,
+                                    show_progress = FALSE))
+  m <- suppressWarnings(match_peaks(pks, chrom_list = gap, reference = 1,
+                                    lambda = 210))[[2]]
+  times <- get_times(gap, 2)
+  after <- m$matches[, "rt_samp"] > times[150]
+  expect_gt(sum(after), 0)
+  expect_lt(max(abs(m$samp_i[after, "rt"] -
+                      get_retention_idx(m$matches[after, "rt_samp"], times))),
+            0.5)
 })

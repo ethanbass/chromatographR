@@ -275,6 +275,15 @@ test_that("retention time correction requires a common time axis", {
                              show_progress = FALSE))
 })
 
+test_that("the time axis error names a few samples and keeps its advice", {
+  m <- function(t) matrix(1, nrow = length(t), ncol = 1,
+                          dimnames = list(t, "210"))
+  x <- c(list(ref = m(1:10)),
+         stats::setNames(lapply(1:12, function(i) m(1:10 + 5)), paste0("s", 1:12)))
+  expect_error(check_common_time_axis(x),
+               regexp = ".s10. and 2 more differ from .ref..*preprocess\\(dim1")
+})
+
 test_that("stale timepoint counts are rejected rather than read as times", {
   skip_on_cran()
   data(Sa_pr)
@@ -306,6 +315,10 @@ test_that("the default max_shift is narrowed to fit a short chromatogram", {
   expect_error(correct_rt(short, lambdas = "210", alg = "vpdtw", reference = 1,
                           max_shift = 1),
                regexp = "`max_shift = 1` is wider than the chromatogram")
+  fit <- function(maxshift) suppressWarnings(
+    correct_rt(short, lambdas = "210", alg = "vpdtw", reference = 1,
+               what = "models", maxshift = maxshift))
+  expect_equal(fit(maxshift = 5000)$shift, fit(maxshift = NULL)$shift)
 })
 
 test_that("the deprecated `maxshift` is read as a count of timepoints", {
@@ -314,10 +327,11 @@ test_that("the deprecated `maxshift` is read as a count of timepoints", {
   fit <- function(...) suppressWarnings(
     correct_rt(Sa_pr, lambdas = "210", alg = "vpdtw", reference = 1,
                what = "models", show_progress = FALSE, ...))
-  expect_warning(
+  w <- capture_warnings(
     correct_rt(Sa_pr, lambdas = "210", alg = "vpdtw", reference = 1,
-               what = "models", show_progress = FALSE, maxshift = 25),
-    "`maxshift = 25` was read as a count of timepoints, i.e. `max_shift = 0.5`")
+               what = "models", show_progress = FALSE, maxshift = 25))
+  expect_match(w, "`maxshift = 25` was read as a count of timepoints, i.e. `max_shift = 0.5`",
+               fixed = TRUE, all = FALSE)
   expect_equal(fit(maxshift = 25)$shift, fit(max_shift = 0.5)$shift)
 })
 
@@ -583,6 +597,26 @@ test_that("lptw falls back to the identity warp when a fit reverses direction", 
   expect_equal(unname(warped[[2]]), unname(Sa_pr[[2]]))
 })
 
+test_that("ptw falls back to the identity warp when a fit reverses direction", {
+  skip_on_cran()
+  data(Sa_pr)
+  real_ptw <- ptw::ptw
+  local_mocked_bindings(ptw = function(...){
+    pw <- real_ptw(...)
+    pw$warp.coef[1, ] <- c(0, 1.5, -0.003)
+    pw
+  }, .package = "ptw")
+  w <- capture_warnings(
+    mods <- correct_rt(Sa_pr, lambdas = "210", reference = 1, what = "models",
+                       show_progress = FALSE, cl = 1))
+  expect_match(w, "The fitted warp reverses direction")
+  expect_setequal(sub(":.*", "", w), paste("Sample", names(Sa_pr)))
+  expect_equal(mods[[2]]$warp.coef[1, ], c(0, 1, 0))
+  expect_equal(mods[[2]]$warped.sample, mods[[2]]$sample)
+  warped <- correct_rt(Sa_pr, models = mods, show_progress = FALSE, cl = 1)
+  expect_equal(unname(warped[[2]]), unname(Sa_pr[[2]]))
+})
+
 test_that("correct_rt applies VPdtw's own warp to every sample", {
   data(Sa_pr)
   mods <- correct_rt(Sa_pr, lambdas = "210", alg = "vpdtw", reference = 1,
@@ -632,7 +666,7 @@ test_that("fitted models are applied to samples by name", {
                      what = "models", cl = 1, show_progress = FALSE)
   expect_error(correct_rt(Sa_pr, models = mods, lambdas = "210", cl = 1,
                           show_progress = FALSE),
-               regexp = "no warp for sample")
+               regexp = "No warping model for sample")
 })
 
 test_that("warping rejects duplicate sample names", {

@@ -22,6 +22,7 @@ correct_rt_group(
   verbose = getOption("verbose"),
   show_progress = NULL,
   cl = 2,
+  what = c("corrected.values", "models"),
   ...,
   n.traces = NULL,
   n.zeros = NULL,
@@ -95,6 +96,10 @@ parallel processing or a cluster object created by
 \code{\link[parallel:makeCluster]{makeCluster}}. Defaults to \code{2}. On Windows systems,
 integers are ignored. Has no effect when \code{alg = "vpdtw"}.}
 
+\item{what}{What to return: \code{"corrected.values"} (the default) for the
+warped chromatograms, or \code{"models"} for a \code{ptw_list} holding each sample's
+group warp, which can be passed to \code{\link{correct_rt}} via \code{models}.}
+
 \item{...}{For \code{alg = "ptw"}, optional additional arguments passed to
 \code{\link[ptw:ptw]{ptw}}. The only argument that cannot be changed is \code{warp.type},
 which is hard-coded to \code{"global"} to permit warping on multiple wavelengths.
@@ -112,9 +117,11 @@ instead.}
 \item{maxshift}{Deprecated and unused. See \code{max_shift}.}
 }
 \value{
-A list of warped chromatogram matrices in the same order as
-\code{chrom_list}, with each sample warped using the warp coefficients
-estimated from its group average.
+If \code{what = "corrected.values"}, a list of warped chromatogram
+matrices in the same order as \code{chrom_list}, with each sample warped using
+the warp coefficients estimated from its group average. If
+\code{what = "models"}, a \code{ptw_list} with one model per sample, in the same
+order.
 }
 \description{
 Aligns chromatograms using parametric time warping (\code{"ptw"}), as

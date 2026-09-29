@@ -47,7 +47,11 @@
 #' warping (`"vpdtw"`).
 #' @param peaks A peak list object from [`get_peaks`] or a `matched_peak_list`
 #' object from [`match_peaks`]. If a `matched_peak_list` is provided, peak
-#' matching will be skipped. Only used when `alg = "lptw"`.
+#' matching will be skipped. Only used when `alg = "lptw"`. If `NULL`, peaks
+#' are found with [`get_peaks`] at its default settings and matched without
+#' regard to peak shape. To use a different peak model, pass a peak list from
+#' `get_peaks(fit = ...)`; to match on peak shape as well, pass the output of
+#' [`match_peaks`] with `shape_weight` or `shape_cutoff` set.
 #' @param what Output type: either the `"corrected.values"` (useful for
 #' visual inspection and downstream analysis) or the warping `"models"`
 #' (for further programmatic use).
@@ -181,7 +185,6 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
   chrom_list_name <- deparse(substitute(chrom_list))
   n_traces <- resolve_deprecated(n.traces, n_traces)
   n_zeros <- resolve_deprecated(n.zeros, n_zeros)
-  default_shift <- missing(max_shift) && is.null(maxshift)
   if (!is.null(maxshift))
     max_shift <- resolve_maxshift(maxshift, chrom_list)
   what <- match.arg(what, c("corrected.values", "models"))
@@ -221,10 +224,11 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
     chrom_list <- lapply(chrom_list, scales::rescale)
   }
   chrom_list_og <- chrom_list
-  if (n_zeros > 0){
+  if (n_zeros > 0 && alg == "ptw" && is.null(models)){
     chrom_list <- lapply(chrom_list, function(x){
       x_p <- pad_zeros(x, n_zeros = n_zeros, side = "both")
-      transfer_metadata(x_p, x)
+      transfer_metadata(x_p, x, exclude = c('names', 'row.names', 'dim',
+                                            'dimnames', 'baseline'))
     })
   }
   needs_reference <- (is.null(models) || alg == "vpdtw") &&
@@ -262,12 +266,8 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
               allmats.t[,, ii], selected.traces = traces, init.coef = init.coef,
               warp.type = "global", trwdth = trwdth_pts, ...)
           if (nrow(pw$reference) == 1){
-            colnames(pw$reference) <- times
-            colnames(pw$sample) <- times
-            colnames(pw$warped.sample) <- times
-            rownames(pw$reference) <- lambdas
-            rownames(pw$sample) <- lambdas
-            rownames(pw$warped.sample) <- lambdas
+            for (el in c("reference", "sample", "warped.sample"))
+              dimnames(pw[[el]]) <- list(lambdas, times)
           }
           if (n_zeros > 0){
             pw$warp.coef[1, ] <- shift_warp_coef(pw$warp.coef[1, ], n_zeros)
@@ -283,11 +283,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
                             reference = reference_label(reference, names(chrom_list)),
                             init.coef = init.coef,
                             n_traces = n_traces, n_zeros = n_zeros, scale = scale,
-                            trwdth = trwdth, penalty = penalty,
-                            max_shift = max_shift, class = "ptw_list")
-        if (plot_it){
-          plot(models)
-        }
+                            trwdth = trwdth, class = "ptw_list")
       } else if (alg == "lptw"){
         if (inherits(peaks, "matched_peak_list")) {
           matched <- align_matches(peaks, chrom_list)
@@ -309,10 +305,11 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
             peaks <- get_peaks(chrom_list_og, lambdas = lambdas)
           }
           matched <- match_peaks(peaks, chrom_list = chrom_list_og,
-                                 reference = reference, lambda = lambdas,
-                                 rt_window = rt_window,
+                                 reference = reference_label(reference, names(chrom_list_og)),
+                                 lambda = lambdas, rt_window = rt_window,
                                  spectral_cutoff = spectral_cutoff,
                                  verbose = verbose)
+          matched <- align_matches(matched, chrom_list_og)
         }
         identity_coef <- identity_warp(length(init.coef))
         models <- laplee(matched, function(m) {
@@ -320,36 +317,33 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
             return(list(warp.coef = matrix(identity_coef, nrow = 1),
                         mode = "forward"))
           w <- (m$cor_scores %||% 1) * pmin(m$ref_i[, "I"], m$samp_i[, "I"])
-          warnings <- character(0)
-          coef <- withCallingHandlers(
-            fit_penalized_warp(
-              ref_i = m$ref_i, samp_i = m$samp_i,
-              weights = w, init.coef = init.coef, penalty = regularization, ...
-            ),
-            warning = function(cond){
-              warnings <<- c(warnings, conditionMessage(cond))
-              invokeRestart("muffleWarning")
-            })
-          list(warp.coef = matrix(coef, nrow = 1), mode = "forward",
-               warnings = warnings)
+          coef <- fit_penalized_warp(
+            ref_i = m$ref_i, samp_i = m$samp_i,
+            weights = w, init.coef = init.coef, penalty = regularization, ...
+          )
+          list(warp.coef = matrix(coef, nrow = 1), mode = "forward")
         })
-        for (i in seq_along(models)){
-          tp <- seq_len(nrow(chrom_list_og[[i]]))
-          if (is.unsorted(ptw::warp.time(tp, models[[i]]$warp.coef[1, ]))){
-            models[[i]]$warp.coef[1, ] <- identity_coef
-            models[[i]]$warnings <- c(models[[i]]$warnings, paste(
-              "The fitted warp reverses direction within the chromatogram.",
-              "Returning identity warp. Try a lower-degree `init.coef` or a",
-              "higher `regularization`."))
-          }
-          for (msg in models[[i]]$warnings)
-            warning(sprintf("Sample %s: %s", names(chrom_list)[i] %||% i, msg),
-                    call. = FALSE)
-          models[[i]]$warnings <- NULL
-        }
         names(models) <- names(chrom_list)
         models <- structure(models, class = "lptw_list",
                             reference = reference_label(reference, names(chrom_list)))
+      }
+      for (i in seq_along(models)){
+        tp <- seq_len(nrow(chrom_list_og[[i]]))
+        if (is.unsorted(ptw::warp.time(tp, models[[i]]$warp.coef[1, ]))){
+          models[[i]]$warp.coef[1, ] <- identity_warp(ncol(models[[i]]$warp.coef))
+          if (alg == "ptw"){
+            models[[i]]$warp.fun[1, ] <- tp
+            models[[i]]$warped.sample <- models[[i]]$sample
+          }
+          warning(sprintf(
+            "Sample %s: The fitted warp reverses direction within the chromatogram. Returning identity warp. Try a lower-degree `init.coef`%s.",
+            names(chrom_list)[i] %||% i,
+            if (alg == "lptw") " or a higher `regularization`" else ""),
+            call. = FALSE)
+        }
+      }
+      if (plot_it && alg == "ptw"){
+        plot(models)
       }
     }
     if (what == "corrected.values"){
@@ -361,7 +355,9 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
                              fill_zeros = fill_zeros, mode = mod$mode)
         rownames(x) <- rownames(chrom_list_og[[ii]])
         colnames(x) <- colnames(chrom_list_og[[ii]])
-        transfer_metadata(x, chrom_list_og[[ii]])
+        transfer_metadata(x, chrom_list_og[[ii]],
+                          exclude = c('names', 'row.names', 'dim', 'dimnames',
+                                      'baseline'))
       })
       result <- structure(result, warped = TRUE, warping_args = args)
       names(result) <- names(chrom_list)
@@ -379,7 +375,8 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
                                  idx = reference, clamp = missing(dilation_span))
       check_dilation_span(span_pts, chrom_list_og)
       maxshift_pts <- time_to_points(max_shift, "max_shift", chrom_list_og,
-                                     idx = reference, clamp = default_shift)
+                                     idx = reference,
+                                     clamp = missing(max_shift) || !is.null(maxshift))
       allmats <- sapply(chrom_list_og, function(x) x[, lambdas, drop = FALSE])
       penalty <- VPdtw::dilation(allmats[,reference], span_pts) * penalty
       models <- VPdtw::VPdtw(query = allmats, reference = allmats[, reference],
@@ -421,7 +418,7 @@ check_common_time_axis <- function(chrom_list){
       "correction, but %s %s %s from %s by a sampling interval or more. ",
       "Interpolate them onto a common grid with `preprocess(dim1 = ...)`."),
       if (length(bad) == 1) "sample" else "samples",
-      paste(sQuote(ids[bad]), collapse = ", "),
+      format_list(ids[bad]),
       if (length(bad) == 1) "differs" else "differ",
       sQuote(ids[1])), call. = FALSE)
   }
@@ -490,7 +487,7 @@ time_to_points <- function(value, name, chrom_list, idx = 1, clamp = FALSE){
   span <- diff(range(times))
   if (value > span && clamp)
     value <- span
-  if (value > span)
+  else if (value > span)
     stop(sprintf(paste0(
       "`%s = %s` is wider than the chromatogram itself, which spans %s ",
       "minutes.\n",
@@ -609,14 +606,14 @@ model_positions <- function(models, chrom_list){
   if (!is.null(model_names) && !is.null(names(chrom_list))){
     pos <- match(names(chrom_list), model_names)
     if (anyNA(pos))
-      stop("The supplied `models` have no warp for sample(s) ",
-           paste(sQuote(names(chrom_list)[is.na(pos)]), collapse = ", "), ".",
+      stop("No warping model for sample(s) ",
+           format_list(names(chrom_list)[is.na(pos)]), ".",
            call. = FALSE)
     return(pos)
   }
   if (n_models != length(chrom_list))
-    stop("The supplied `models` warp ", n_models, " samples, but `chrom_list` ",
-         "has ", length(chrom_list), ".", call. = FALSE)
+    stop("There are ", n_models, " warping models for ", length(chrom_list),
+         " samples.", call. = FALSE)
   seq_along(chrom_list)
 }
 
@@ -631,24 +628,34 @@ check_vpdtw_length <- function(models, chrom_list){
       "The supplied `models` were fitted to chromatograms of %d timepoints, ",
       "but %s %s a different number."), n,
       if (sum(bad) == 1) "sample" else "samples",
-      paste(sQuote(ids[bad]), collapse = ", ")), call. = FALSE)
+      format_list(ids[bad])), call. = FALSE)
   }
   invisible(chrom_list)
+}
+
+#' Source rows, model positions and reference axis shared by the VPdtw warps
+#' @noRd
+vpdtw_setup <- function(models, chrom_list, reference){
+  check_vpdtw_length(models, chrom_list)
+  ref_idx <- reference_axis_idx(reference, chrom_list)
+  list(src = models$xVals - models$shift,
+       pos = model_positions(models, chrom_list),
+       ref_times = get_times(chrom_list, idx = ref_idx),
+       ref_dt = get_time_resolution(chrom_list, idx = ref_idx))
 }
 
 #' Apply VPdtw
 #' @noRd
 apply_vpdtw <- function(chrom_list, models, reference, args = NULL, 
                         fill_zeros = FALSE) {
-  check_vpdtw_length(models, chrom_list)
-  src <- models$xVals - models$shift
-  pos <- model_positions(models, chrom_list)
-  new_rownames <- format_axis(vpdtw_times(
-    chrom_list, models$xVals, reference_axis_idx(reference, chrom_list)))
+  s <- vpdtw_setup(models, chrom_list, reference)
+  new_rownames <- format_axis(vpdtw_times(models$xVals, s$ref_times, s$ref_dt))
   result <- lapply(seq_along(chrom_list), function(ii) {
-    x <- warp_sample_vpdtw(chrom_list[[ii]], src[, pos[ii]])
+    x <- warp_sample_vpdtw(chrom_list[[ii]], s$src[, s$pos[ii]])
     rownames(x) <- new_rownames
-    transfer_metadata(x, chrom_list[[ii]])
+    transfer_metadata(x, chrom_list[[ii]],
+                      exclude = c('names', 'row.names', 'dim', 'dimnames',
+                                  'baseline'))
   })
   names(result) <- names(chrom_list)
   
@@ -661,10 +668,9 @@ apply_vpdtw <- function(chrom_list, models, reference, args = NULL,
 #' Time axis of the VPdtw target grid
 #' @param x Positions on the target grid, in the index units of `xVals`, where
 #'   `1` to `n` are the rows of the reference.
+#' @param times,dt Retention times and sampling interval of the reference.
 #' @noRd
-vpdtw_times <- function(chrom_list, x, reference){
-  times <- get_times(chrom_list, idx = reference)
-  dt <- get_time_resolution(chrom_list, idx = reference)
+vpdtw_times <- function(x, times, dt){
   n <- length(times)
   inside <- pmin(pmax(x, 1), n)
   approx(seq_len(n), times, xout = inside)$y + (x - inside) * dt
@@ -675,17 +681,17 @@ vpdtw_times <- function(chrom_list, x, reference){
 #'   own axis and returning them on the target axis of `apply_vpdtw`.
 #' @noRd
 vpdtw_to_ref <- function(models, chrom_list, reference){
-  check_vpdtw_length(models, chrom_list)
-  src <- models$xVals - models$shift
-  pos <- model_positions(models, chrom_list)
-  ref_idx <- reference_axis_idx(reference, chrom_list)
+  s <- vpdtw_setup(models, chrom_list, reference)
   lapply(seq_along(chrom_list), function(ii){
     times <- get_times(chrom_list, idx = ii)
-    ok <- !is.na(src[, pos[ii]])
+    src <- s$src[, s$pos[ii]]
+    ok <- !is.na(src)
+    src_ok <- src[ok]
+    xv_ok <- models$xVals[ok]
     function(rt){
       j <- approx(times, seq_along(times), xout = rt)$y
-      x <- approx(src[ok, pos[ii]], models$xVals[ok], xout = j, ties = mean)$y
-      vpdtw_times(chrom_list, x, ref_idx)
+      x <- approx(src_ok, xv_ok, xout = j, ties = mean)$y
+      vpdtw_times(x, s$ref_times, s$ref_dt)
     }
   })
 }
@@ -712,7 +718,7 @@ align_matches <- function(matched, chrom_list){
     missing_names <- setdiff(names(chrom_list), names(matched))
     if (length(missing_names))
       stop("The `matched_peak_list` has no entry for sample(s) ",
-           paste(missing_names, collapse = ", "), ".")
+           format_list(missing_names, quote = FALSE), ".")
     ref <- attr(matched, "reference")
     if (!is.null(ref) && !ref %in% names(chrom_list))
       stop("The reference sample of the `matched_peak_list` (", ref,
@@ -867,10 +873,15 @@ fit_penalized_warp <- function(ref_i, samp_i,
 #' @param max_shift Unused. `correct_rt_group` warps with `"ptw"` only, so the
 #' `"vpdtw"` shift limit has no effect here.
 #' @param maxshift Deprecated and unused. See `max_shift`.
+#' @param what What to return: `"corrected.values"` (the default) for the
+#' warped chromatograms, or `"models"` for a `ptw_list` holding each sample's
+#' group warp, which can be passed to [`correct_rt`] via `models`.
 #' @inheritParams correct_rt
-#' @return A list of warped chromatogram matrices in the same order as
-#' `chrom_list`, with each sample warped using the warp coefficients
-#' estimated from its group average.
+#' @return If `what = "corrected.values"`, a list of warped chromatogram
+#' matrices in the same order as `chrom_list`, with each sample warped using
+#' the warp coefficients estimated from its group average. If
+#' `what = "models"`, a `ptw_list` with one model per sample, in the same
+#' order.
 #' @author Ethan Bass
 #' @seealso [`correct_rt`], [`ptw`][ptw::ptw]
 #' @examples
@@ -887,11 +898,13 @@ correct_rt_group <- function(chrom_list, lambdas, groups, reference = 'best',
                              trwdth = 0.2, plot_it = FALSE, penalty = NULL, 
                              max_shift = 1, verbose = getOption("verbose"),
                              show_progress = NULL, cl = 2,
+                             what = c("corrected.values", "models"),
                              ..., n.traces = NULL, n.zeros = NULL,
                              maxshift = NULL) {
+  what <- match.arg(what)
+  chrom_list_name <- deparse(substitute(chrom_list))
   n_traces <- resolve_deprecated(n.traces, n_traces)
   n_zeros <- resolve_deprecated(n.zeros, n_zeros)
-  max_shift <- resolve_deprecated(maxshift, max_shift)
   check_duplicated_names(names(chrom_list), what = "chrom_list")
   check_common_time_axis(chrom_list)
   if (length(groups) == 1 && is.character(groups)) {
@@ -901,10 +914,10 @@ correct_rt_group <- function(chrom_list, lambdas, groups, reference = 'best',
                      logical(1))
     if (any(absent)) {
       stop(sprintf(
-        "Metadata attribute '%s' not found on all chromatograms. Missing for:\n%s",
+        "Metadata attribute '%s' not found on all chromatograms. Missing for: %s.",
         groups,
-        paste(sprintf("         %d (%s)", which(absent),
-                      sQuote(names(chrom_list)[absent])), collapse = ", \n")))
+        format_list(sprintf("%d (%s)", which(absent),
+                            sQuote(names(chrom_list)[absent])), quote = FALSE)))
     }
     groups_vec <- unlist(groups_vec)
   } else {
@@ -922,11 +935,10 @@ correct_rt_group <- function(chrom_list, lambdas, groups, reference = 'best',
   if (any(is.na(groups_vec))) {
     na_idx <- which(is.na(groups_vec))
     na_samples <- names(groups_vec)[na_idx]
-    stop(sprintf("All samples must have a group assignment. NA%s found for:\n%s",
+    stop(sprintf("All samples must have a group assignment. NA%s found for: %s.",
                  plural(length(na_idx)),
-                 paste(
-                   sprintf("         %d (%s)", na_idx, sQuote(na_samples)),
-                   collapse = ", \n")))
+                 format_list(sprintf("%d (%s)", na_idx, sQuote(na_samples)),
+                             quote = FALSE)))
   }
   
   group_levels <- levels(groups_vec)
@@ -976,13 +988,19 @@ correct_rt_group <- function(chrom_list, lambdas, groups, reference = 'best',
     scale       = scale,
     trwdth      = trwdth,
     plot_it     = plot_it,
-    penalty     = penalty,
-    max_shift   = max_shift,
     verbose     = verbose,
     show_progress = show_progress,
     cl          = cl,
     ...
   )
+  if (what == "models"){
+    a <- attributes(group_models)
+    models <- unclass(group_models)[as.character(groups_vec)]
+    a$names <- names(chrom_list)
+    a$chrom_list <- chrom_list_name
+    attributes(models) <- a
+    return(models)
+  }
   laplee <- choose_apply_fnc(show_progress, cl = cl)
   if (verbose) message("Applying group warp models to individual chromatograms.")
   result <- laplee(group_levels, function(g) {
@@ -1111,6 +1129,9 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = 1,
   if (is.null(chrom_list)){
     chrom_list <- get_chrom_list(peak_list)
   }
+  if (!is.null(names(chrom_list)) &&
+      setequal(names(chrom_list), names(peak_list)))
+    chrom_list <- chrom_list[names(peak_list)]
   rt_window_rt <- rt_window * rt_factor(get_time_unit(peak_list))
   if (is.null(lambda)){
     if (length(peak_list[[1]]) == 1){
@@ -1124,9 +1145,10 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = 1,
   if (identical(reference, "best")) {
     reference <- resolve_best_reference(stack_chroms(chrom_list, lambda_idx),
                                         isTRUE(verbose))
-  } else if (is.character(reference)) {
-    ref_idx <- match(reference, names(peak_list))
-    if (length(reference) != 1 || is.na(ref_idx))
+  } else {
+    ref_idx <- if (is.character(reference)) match(reference, names(peak_list))
+               else reference
+    if (length(reference) != 1 || !isTRUE(ref_idx %in% seq_along(peak_list)))
       stop(sprintf("`reference` %s is not a sample in `peak_list`.",
                    sQuote(paste(reference, collapse = ", "))))
     reference <- ref_idx
@@ -1158,8 +1180,6 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = 1,
     }
     shape_cols <- check_shape_cols(fit, pks_ref)
   }
-  time_res <- get_time_resolution(chrom_list, reference)
-  t_start <- get_times(chrom_list, reference)[1]
 
   spectra_at <- function(rts, i){
     m <- t(chrom_list[[i]][get_retention_idx(rts, get_times(chrom_list, i)), ,
@@ -1205,13 +1225,8 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = 1,
     rt_dist_matrix <- abs(outer(rt_samp, rt_ref, "-"))
     rt_mask <- rt_dist_matrix <= rt_window_rt
 
-    shape_dist_matrix <- NULL
-    if (use_shape) {
-      shape_dist_matrix <- shape_distance(pks_samp, pks_ref, shape_cols)
-      shape_mask <- if (!is.null(shape_cutoff)) shape_dist_matrix <= shape_cutoff else TRUE
-    } else {
-      shape_mask <- TRUE
-    }
+    shape_dist_matrix <- if (use_shape) shape_distance(pks_samp, pks_ref, shape_cols)
+    shape_mask <- if (!is.null(shape_cutoff)) shape_dist_matrix <= shape_cutoff else TRUE
 
     combined_mask <- spectral_mask & shape_mask & rt_mask
     cor_matrix[!combined_mask] <- NA
@@ -1226,12 +1241,14 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = 1,
     if (rt_weight > 0)
       score_matrix <- score_matrix * (1 - rt_weight * rt_dist_matrix / rt_window_rt)
     if (shape_weight > 0 && !is.null(shape_dist_matrix)) {
-      norm <- if (!is.null(shape_cutoff)) shape_cutoff else max(shape_dist_matrix, na.rm = TRUE)
+      norm <- shape_cutoff %||% max(shape_dist_matrix, na.rm = TRUE)
       if (norm > 0)
         score_matrix <- score_matrix * (1 - shape_weight * pmin(shape_dist_matrix / norm, 1))
     }
 
     pairs <- which(!is.na(cor_matrix), arr.ind = TRUE)
+    candidates <- cbind(samp = pairs[, 1], ref = pairs[, 2],
+                        cor = cor_matrix[pairs])
     pairs <- pairs[order(score_matrix[pairs], decreasing = TRUE), , drop = FALSE]
     used_ref <- logical(length(rt_ref))
     used_samp <- logical(length(rt_samp))
@@ -1256,18 +1273,19 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = 1,
                      rt_samp = unname(rt_samp[matched_cols]))
     pair_idx      <- cbind(matched_cols, matched_rows)
     cor_scores    <- cor_matrix[pair_idx]
-    combined_scores <- if (rt_weight > 0 || shape_weight > 0)
-      score_matrix[pair_idx] else NULL
 
-    to_idx <- function(rt) (rt - t_start) / time_res + 1
-    ref_i  <- cbind(rt = to_idx(matches[, "rt_ref"]),
+    to_idx <- function(rt, i){
+      times <- get_times(chrom_list, i)
+      approx(times, seq_along(times), xout = rt)$y
+    }
+    ref_i  <- cbind(rt = to_idx(matches[, "rt_ref"], reference),
                     I  = pks_ref$height[matched_rows])
-    samp_i <- cbind(rt = to_idx(matches[, "rt_samp"]),
+    samp_i <- cbind(rt = to_idx(matches[, "rt_samp"], idx),
                     I  = pks_samp$height[matched_cols])
 
     list(matches = matches, ref_i = ref_i, samp_i = samp_i,
-         cor_scores = cor_scores, combined_scores = combined_scores,
-         rt_samp = rt_samp, cor_matrix = cor_matrix,
+         cor_scores = cor_scores,
+         rt_samp = rt_samp, candidates = candidates,
          matched_rows = matched_rows, matched_cols = matched_cols)
   })
 
@@ -1336,6 +1354,5 @@ shape_distance <- function(p1, p2, cols){
 #' @method [ matched_peak_list
 #' @export
 `[.matched_peak_list` <- function(x, i, j, ..., drop = FALSE) {
-  transfer_metadata(.subset(x, i), x,
-                    exclude = c('names', 'row.names', 'dim', 'dimnames'))
+  transfer_metadata(.subset(x, i), x)
 }

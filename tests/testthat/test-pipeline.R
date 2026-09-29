@@ -167,6 +167,18 @@ test_that("correct_rt_group accepts all three forms of `groups`", {
                warp_grp)
 })
 
+test_that("correct_rt_group returns per-sample group models", {
+  skip_on_cran()
+  mods <- correct_rt_group(cl_grp, lambdas = 210, groups = grp_vec,
+                           what = "models", show_progress = FALSE)
+  expect_s3_class(mods, "ptw_list")
+  expect_equal(names(mods), names(cl_grp))
+  expect_equal(mods[[1]]$warp.coef, mods[[2]]$warp.coef)
+  expect_false(isTRUE(all.equal(mods[[1]]$warp.coef, mods[[3]]$warp.coef)))
+  expect_equal(correct_rt(cl_grp, models = mods, show_progress = FALSE),
+               warp_grp, ignore_attr = TRUE)
+})
+
 test_that("correct_rt_group resolves the reference group", {
   skip_on_cran()
   # `reference_group` and a `reference` sample in that group agree
@@ -513,8 +525,8 @@ test_that("`shape_cutoff` prunes shape-mismatched candidate pairs", {
   m_cut  <- do.call(match_peaks, c(args, shape_cutoff = 0.5))
   # all 4 pairs are candidates without a cutoff; the 2 shape-mismatched pairs
   # (distance 1.43) are dropped by a cutoff of 0.5
-  expect_equal(sum(!is.na(m_open[[2]]$cor_matrix)), 4)
-  expect_equal(sum(!is.na(m_cut[[2]]$cor_matrix)), 2)
+  expect_equal(nrow(m_open[[2]]$candidates), 4)
+  expect_equal(nrow(m_cut[[2]]$candidates), 2)
   expect_equal(m_cut[[2]]$matches[order(m_cut[[2]]$matches[, "rt_ref"]),
                                   "rt_samp"],
                c(12.08, 12.02), ignore_attr = TRUE)

@@ -291,7 +291,7 @@ plot_matched_scatter <- function(x, idx, rt_ref, ref_name, cor_col, pal, zlim,
     old_par <- colorbar_layout()
     par(mar = c(5, 4, 4, 2))
     rt_samp <- m$rt_samp
-    pairs <- which(!is.na(m$cor_matrix), arr.ind = TRUE)
+    cand <- m$candidates
     rt_range <- range(c(rt_ref, rt_samp))
     plot(rt_range, rt_range, type = "n", xlim = rt_range, ylim = rt_range,
          xlab = paste("Reference RT:", ref_name),
@@ -301,8 +301,8 @@ plot_matched_scatter <- function(x, idx, rt_ref, ref_name, cor_col, pal, zlim,
       abline(rt_window, 1, lty = 3, col = "gray70")
       abline(-rt_window, 1, lty = 3, col = "gray70")
     }
-    points(rt_ref[pairs[, 2]], rt_samp[pairs[, 1]],
-           col = cor_col(m$cor_matrix[pairs]), pch = 19, cex = 0.9)
+    points(rt_ref[cand[, "ref"]], rt_samp[cand[, "samp"]],
+           col = cor_col(cand[, "cor"]), pch = 19, cex = 0.9)
     points(rt_ref[m$matched_rows], rt_samp[m$matched_cols],
            pch = 21, cex = 1.4, col = "black", bg = NA, lwd = 1.5)
     rug(rt_ref[setdiff(seq_along(rt_ref), m$matched_rows)], side = 1,

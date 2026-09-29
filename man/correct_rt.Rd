@@ -57,7 +57,11 @@ warping (\code{"vpdtw"}).}
 
 \item{peaks}{A peak list object from \code{\link{get_peaks}} or a \code{matched_peak_list}
 object from \code{\link{match_peaks}}. If a \code{matched_peak_list} is provided, peak
-matching will be skipped. Only used when \code{alg = "lptw"}.}
+matching will be skipped. Only used when \code{alg = "lptw"}. If \code{NULL}, peaks
+are found with \code{\link{get_peaks}} at its default settings and matched without
+regard to peak shape. To use a different peak model, pass a peak list from
+\code{get_peaks(fit = ...)}; to match on peak shape as well, pass the output of
+\code{\link{match_peaks}} with \code{shape_weight} or \code{shape_cutoff} set.}
 
 \item{what}{Output type: either the \code{"corrected.values"} (useful for
 visual inspection and downstream analysis) or the warping \code{"models"}

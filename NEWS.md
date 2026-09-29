@@ -164,6 +164,8 @@ roughly `0`-`10` and it defaults to `0`.
 the moving-maximum window used to build the `"vpdtw"` penalty, previously
 hardcoded to 350 timepoints. A span wide enough to make the penalty constant
 now warns.
+* `correct_rt_group` can now return its warping models, one per sample, with
+`what = "models"`, which `correct_rt(models = )` can re-apply.
 
 #### Peak detection and integration
 
