@@ -208,6 +208,8 @@ now skipped below four wavelengths.
 sample fails in parallel (`cl > 1`). Previously they returned `try-error` or
 `NULL` elements, including for samples that had succeeded but were processed
 by the failing worker.
+* Warnings raised while processing samples in parallel (`cl > 1`) now reach the
+user. Each distinct warning is raised once, naming the samples that raised it.
 
 #### Retention time correction
 

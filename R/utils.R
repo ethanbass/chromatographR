@@ -579,18 +579,6 @@ as_chrom_list <- function(x, arg = "X"){
   list(chrom_list = x, return_matrix = return_matrix, class = x_class)
 }
 
-#' Re-emit baseline warnings stashed by the per-matrix workers
-#' @noRd
-flush_baseline_warnings <- function(x){
-  bl_warnings <- unique(unlist(lapply(x, attr, "baseline_warnings")))
-  x <- lapply(x, function(xx){
-    attr(xx, "baseline_warnings") <- NULL
-    xx
-  })
-  for (w in bl_warnings) warning(w, call. = FALSE, immediate. = TRUE)
-  x
-}
-
 #' Transfer metadata
 #' Transfers metadata attributes between objects.
 #' @details
@@ -657,7 +645,7 @@ choose_apply_fnc <- function(show_progress, parallel = NULL, cl = 2){
   } else if (!show_progress && is_not_windows && is.numeric(cl) && cl > 1){
       fn <- purrr::partial(parallel_lapply, apply_fn = mclapply, mc.cores = cl)
   } else {
-    fn <- lapply
+    fn <- purrr::partial(parallel_lapply, apply_fn = lapply)
   }
   fn
 }
@@ -666,10 +654,17 @@ choose_apply_fnc <- function(show_progress, parallel = NULL, cl = 2){
 #'
 #' `mclapply` returns a worker's error as a `try-error` element and a worker
 #' that died as `NULL`, and every other element scheduled on that worker
-#' shares its fate.
+#' shares its fate. Warnings are re-raised once per distinct message, naming
+#' the elements of `X` that raised it.
 #' @noRd
 parallel_lapply <- function(X, FUN, ..., apply_fn){
-  out <- apply_fn(X, FUN, ...)
+  out <- withCallingHandlers(
+    apply_fn(X, collect_warnings, .f = FUN, ...),
+    warning = function(cond){
+      if (grepl("encountered errors in user code|resulted in an error",
+                conditionMessage(cond)))
+        invokeRestart("muffleWarning")
+    })
   errored <- which(vapply(out, inherits, logical(1), "try-error"))
   if (length(errored) > 0){
     cnd <- attr(out[[errored[1]]], "condition")
@@ -685,7 +680,32 @@ parallel_lapply <- function(X, FUN, ..., apply_fn){
       "a lower `cl` may help."), format_list(ids, quote = FALSE)),
       call. = FALSE)
   }
-  out
+  replay_warnings(lapply(out, `[[`, "warnings"), names(X))
+  lapply(out, `[[`, "value")
+}
+
+#' Run `.f` on one element, returning its value and the warnings it raised
+#' @noRd
+collect_warnings <- function(x, ..., .f){
+  warnings <- character(0)
+  value <- withCallingHandlers(.f(x, ...), warning = function(cond){
+    warnings <<- c(warnings, conditionMessage(cond))
+    invokeRestart("muffleWarning")
+  })
+  list(value = value, warnings = unique(warnings))
+}
+
+#' Raise each distinct warning once, naming the samples that raised it
+#' @noRd
+replay_warnings <- function(warnings, ids){
+  for (msg in unique(unlist(warnings))){
+    if (!is.null(ids)){
+      who <- ids[vapply(warnings, function(w) msg %in% w, logical(1))]
+      msg <- sprintf("Sample%s %s: %s", plural(length(who)),
+                     format_list(who, quote = FALSE), msg)
+    }
+    warning(msg, call. = FALSE, immediate. = TRUE)
+  }
 }
 
 #' Get y bounds

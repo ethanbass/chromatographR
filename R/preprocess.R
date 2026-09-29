@@ -220,7 +220,6 @@ preprocess <- function(X, dim1, dim2,
                           interpolate_rows = interpolate_rows,
                           interpolate_cols = interpolate_cols,
                           ...)
-  X <- flush_baseline_warnings(X)
   if (prep$return_matrix){
     X[[1]]
   } else{
@@ -265,22 +264,14 @@ subtract_baseline <- function(X, baseline,
                               dt = NA_real_, attach_baseline = TRUE,
                               ...){
   bl_args <- list(...)
-  warnings <- character(0)
-  bl <- withCallingHandlers(
-    apply(X, 2, function(y)
-      do.call(estimate_baseline,
-              c(list(y, baseline = baseline, dt = dt), bl_args))),
-    warning = function(w){
-      warnings <<- c(warnings, conditionMessage(w))
-      invokeRestart("muffleWarning")
-    })
+  bl <- apply(X, 2, function(y)
+    do.call(estimate_baseline, c(list(y, baseline = baseline, dt = dt), bl_args)))
   dim(bl) <- dim(X)
   # the baseline is the same size as the data, so it is not worth keeping alive
   # for the rest of the call when nobody will read it
-  list(x = structure(X - bl, baseline = NULL, baseline_warnings = NULL),
+  list(x = structure(X - bl, baseline = NULL),
        baseline = if (attach_baseline) bl else NULL,
-       param = effective_baseline_param(baseline, bl_args, dt = dt),
-       warnings = warnings)
+       param = effective_baseline_param(baseline, bl_args, dt = dt))
 }
 
 #' @noRd
@@ -302,7 +293,7 @@ preprocess_matrix <- function(X,
     stop("X should be a matrix!")
   metadata <- attributes(X)
   metadata[c("dimnames", "names", "row.names", "dim", "class", "levels",
-             "baseline", "baseline_param", "baseline_warnings")] <- NULL
+             "baseline", "baseline_param")] <- NULL
   if (interpolate_rows){
     if (length(tpoints <- as.numeric(rownames(X))) == 0)
       tpoints <- seq_nrow(X)
@@ -336,10 +327,8 @@ preprocess_matrix <- function(X,
     X <- corrected$x
     bl <- corrected$baseline
     bl_param <- corrected$param
-    bl_warnings <- corrected$warnings
   } else {
     bl_param <- NULL
-    bl_warnings <- character(0)
   }
   if (zero_floor && min(X, na.rm = TRUE) < 0){
     X[X < 0] <- 0
@@ -358,7 +347,5 @@ preprocess_matrix <- function(X,
     attr(X, "baseline") <- bl
   }
   if (!is.null(bl_param)) attr(X, "baseline_param") <- bl_param
-  if (length(bl_warnings) > 0)
-    attr(X, "baseline_warnings") <- unique(bl_warnings)
   X
 }

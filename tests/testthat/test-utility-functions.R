@@ -16,12 +16,13 @@ test_that("choose_apply_fnc works as expected", {
   fn <- choose_apply_fnc(show_progress = TRUE)
   expect_equal(class(fn), c("purrr_function_partial", "function"))
   
-  fn <- choose_apply_fnc(show_progress = FALSE, parallel = FALSE)
-  expect_equal(fn, lapply)
-  fn <- choose_apply_fnc(show_progress = FALSE, cl = 1)
-  expect_equal(fn, lapply)
-  fn <- choose_apply_fnc(show_progress = FALSE, cl = NULL)
-  expect_equal(fn, lapply)
+  for (fn in list(choose_apply_fnc(show_progress = FALSE, parallel = FALSE),
+                  choose_apply_fnc(show_progress = FALSE, cl = 1),
+                  choose_apply_fnc(show_progress = FALSE, cl = NULL))){
+    expect_warning(expect_equal(fn(c(a = 1, b = 4), function(x){
+      warning("w"); sqrt(x)
+    }), list(a = 1, b = 2)), "Samples a, b: w")
+  }
 })
 
 test_that("choose apply_fnc works as expected on unix/linux", {
@@ -258,12 +259,33 @@ test_that("check_duplicated_names works as expected", {
 })
 
 test_that("parallel_lapply re-raises a worker's try-error", {
-  as_mclapply <- function(X, FUN) lapply(X, function(x) try(FUN(x), silent = TRUE))
+  as_mclapply <- function(X, FUN, ...)
+    lapply(X, function(x) try(FUN(x, ...), silent = TRUE))
   fit_sample <- function(i) if (i == 2) stop("wavelength not found") else list()
   expect_error(parallel_lapply(1:2, fit_sample, apply_fn = as_mclapply),
                "wavelength not found")
   expect_equal(parallel_lapply(1:2, function(i) i, apply_fn = as_mclapply),
                list(1L, 2L))
+})
+
+test_that("parallel_lapply re-raises each worker warning once, naming its samples", {
+  skip_on_cran()
+  skip_on_os("windows")
+  f <- function(i){
+    warning("shared")
+    if (i == 2) warning("only b")
+    i
+  }
+  w <- character(0)
+  out <- withCallingHandlers(
+    parallel_lapply(c(a = 1, b = 2, c = 3), f, apply_fn = parallel::mclapply,
+                    mc.cores = 2),
+    warning = function(cond){
+      w <<- c(w, conditionMessage(cond))
+      invokeRestart("muffleWarning")
+    })
+  expect_equal(out, list(a = 1, b = 2, c = 3))
+  expect_equal(w, c("Samples a, b, c: shared", "Sample b: only b"))
 })
 
 test_that("parallel_lapply stops when a worker process dies", {

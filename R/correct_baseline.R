@@ -69,7 +69,6 @@ correct_baseline <- function(x,
                 attach_baseline = attach_baseline,
                 zero_floor = zero_floor,
                 ...)
-  out <- flush_baseline_warnings(out)
   if (prep$return_matrix){
     if (vector_in) undim_trace(out[[1]]) else out[[1]]
   } else{
@@ -97,8 +96,6 @@ correct_baseline_matrix <- function(x, baseline,
     attr(out, "baseline") <- bl
   }
   if (!is.null(corrected$param)) attr(out, "baseline_param") <- corrected$param
-  if (length(corrected$warnings) > 0)
-    attr(out, "baseline_warnings") <- unique(corrected$warnings)
   out
 }
 

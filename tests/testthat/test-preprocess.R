@@ -336,9 +336,6 @@ test_that("warnings raised per-column survive the default parallel path", {
                  dim2 = seq(200, 318, by = 6), maxit = 1,
                  show_progress = FALSE, cl = cl),
       regexp = "did not reach convergence", info = cl)
-  p <- preprocess(Sa[1], dim1 = seq(10, 18.66, by = .01),
-                  dim2 = seq(200, 318, by = 2), show_progress = FALSE)
-  expect_null(attr(p[[1]], "baseline_warnings"))
 })
 
 test_that("warping drops the baseline attribute and keeps fixed-width times", {
@@ -577,11 +574,6 @@ test_that("correct_baseline surfaces per-column warnings like preprocess", {
     expect_warning(correct_baseline(x, baseline = "als", maxit = 1,
                                     show_progress = FALSE, cl = cl),
                    regexp = "did not reach convergence", info = cl)
-  expect_null(attr(suppressWarnings(
-    correct_baseline(x, baseline = "als", maxit = 1, show_progress = FALSE,
-                     cl = 1))[[1]], "baseline_warnings"))
-  expect_null(attr(correct_baseline(x, show_progress = FALSE, cl = 1)[[1]],
-                   "baseline_warnings"))
 })
 
 test_that("correct_baseline refuses an incomplete trace and offers no `none`", {
