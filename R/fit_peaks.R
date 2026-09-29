@@ -197,6 +197,13 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 
     hi <- findInterval(p, p4) + 1L
     bu <- ifelse(hi > length(p4), length(y), p4[pmin(hi, length(p4))])
+    na <- which(is.na(y))
+    if (length(na)){
+      k <- findInterval(p, na)
+      bl <- pmax(bl, ifelse(k == 0L, 1L, na[pmax(k, 1L)] + 1L))
+      bu <- pmin(bu, ifelse(k >= length(na), length(y),
+                            na[pmin(k + 1L, length(na))] - 1L))
+    }
     p <- data.frame(pos = p, lower = bl, upper = bu)
     p$prominence <- get_prominence(y, p)
     if (nrow(p) > 0 && min_prominence_snr > 0){

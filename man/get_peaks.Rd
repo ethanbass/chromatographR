@@ -12,7 +12,7 @@ get_peaks(
   max_fwhm = NULL,
   sd_max = NULL,
   max_iter = 1000,
-  time_unit = c("min", "s", "ms"),
+  time_unit = NULL,
   baseline = c("none", "flat", "sloped"),
   estimate_purity = FALSE,
   purity_args = list(),
@@ -75,7 +75,10 @@ in \code{\link{fit_peaks}}. Defaults to \code{1000}.}
 
 \item{time_unit}{Specifies the units for \code{sd}, \code{FWHM}, \code{area}, and \code{tau} (if
 applicable). Options are minutes (\code{"min"}), seconds (\code{"s"}), or
-milliseconds (\code{"ms"}). Defaults to \code{"min"}.}
+milliseconds (\code{"ms"}). Defaults to the time unit of \code{chrom_list} (minutes if
+none is recorded), so that every column shares one unit. \code{rt}, \code{start} and
+\code{end} are not converted: they are always in the units of the chromatogram's
+own time axis.}
 
 \item{baseline}{Whether to subtract a local baseline beneath each peak.
 Options are \code{"none"} (no baseline, default), \code{"flat"} (constant offset per

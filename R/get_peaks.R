@@ -67,8 +67,11 @@
 #' @param max.iter The `max.iter` argument is deprecated. Please use `max_iter` 
 #' instead.
 #' @param time_unit Specifies the units for `sd`, `FWHM`, `area`, and `tau` (if
-#' applicable). Options are minutes (`"min"`), seconds (`"s"`), or 
-#' milliseconds (`"ms"`). Defaults to `"min"`.
+#' applicable). Options are minutes (`"min"`), seconds (`"s"`), or
+#' milliseconds (`"ms"`). Defaults to the time unit of `chrom_list` (minutes if
+#' none is recorded), so that every column shares one unit. `rt`, `start` and
+#' `end` are not converted: they are always in the units of the chromatogram's
+#' own time axis.
 #' @param time.units The `time.units` argument is deprecated. Please use 
 #' `time_unit` instead.
 #' @param estimate_purity Logical. Whether to estimate purity. Defaults to
@@ -201,7 +204,7 @@ get_peaks <- function(chrom_list, lambdas,
                       fit = c("egh", "bemg", "gaussian", "raw"),
                       windows = NULL,
                       max_fwhm = NULL, sd_max = NULL, max_iter = 1000,
-                      time_unit = c("min", "s", "ms"),
+                      time_unit = NULL,
                       baseline = c("none", "flat", "sloped"),
                       estimate_purity = FALSE, purity_args = list(),
                       show_progress = NULL, cl = 2, collapse = FALSE,
@@ -226,8 +229,10 @@ get_peaks <- function(chrom_list, lambdas,
               "`filter_peaks`.", immediate. = TRUE)
   }
   time_unit <- resolve_deprecated(time.units, time_unit)
-  time_unit <- match.arg(time_unit, c("min", "s", "ms"))
-  tfac <- time_factor(time_unit)
+  axis_unit <- get_time_unit(chrom_list, na_value = "min")
+  if (!axis_unit %in% c("min", "s", "ms")) axis_unit <- "min"
+  time_unit <- match.arg(time_unit %||% axis_unit, c("min", "s", "ms"))
+  tfac <- time_factor(time_unit) / time_factor(axis_unit)
   fit_is_default <- missing(fit)
   fit <- match.arg(fit, c("egh", "bemg", "gaussian", "raw"))
   baseline <- match.arg(baseline, c("none", "flat", "sloped"))

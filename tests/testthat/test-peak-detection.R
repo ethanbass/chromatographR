@@ -649,3 +649,35 @@ test_that("print.peak_list reports no width filter by default", {
   pks <- get_peaks(Sa_pr[1], lambdas = "210", show_progress = FALSE)
   expect_output(print(pks), "max_fwhm: none")
 })
+
+test_that("find_peaks keeps peak windows clear of missing values at the ends", {
+  skip_on_cran()
+  y <- make_gaussian_signal(n = 301, centers = c(40, 270), widths = c(8, 8),
+                            heights = c(1000, 1000))
+  y[1:20] <- NA
+  y[281:301] <- NA
+  p <- find_peaks(y, smooth_type = "none")
+  expect_equal(nrow(p), 2L)
+  expect_equal(p$lower[1], 21)
+  expect_equal(p$upper[2], 280)
+  x <- matrix(y, ncol = 1, dimnames = list(seq_along(y) / 10, "210"))
+  expect_no_warning(pks <- fit_peaks(x, lambda = "210"))
+  expect_false(anyNA(pks$area))
+})
+
+test_that("get_peaks reports widths and areas in `time_unit` whatever the axis unit", {
+  skip_on_cran()
+  data(Sa_pr)
+  s <- convert_time_units(Sa_pr[1], time_unit = "s")
+  first <- function(x, u) get_peaks(x, lambdas = "210", time_unit = u,
+                                    show_progress = FALSE, cl = 1)[[1]][["210"]][1, ]
+  ref <- first(Sa_pr[1], "min")
+  for (u in c("min", "s")){
+    p <- first(s, u)
+    f <- time_factor(u)
+    expect_equal(p$area, ref$area * f, tolerance = 1e-3, info = u)
+    expect_equal(p$sd, ref$sd * f, tolerance = 1e-3, info = u)
+  }
+  expect_equal(attr(get_peaks(s, lambdas = "210", show_progress = FALSE, cl = 1),
+                    "time_unit"), "s")
+})

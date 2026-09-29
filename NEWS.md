@@ -214,6 +214,12 @@ with another sample's model.
 
 #### Peak detection and integration
 
+* `get_peaks` no longer inflates the areas of peaks bordering missing values,
+such as the padded ends of chromatograms aligned by `correct_rt(alg = "vpdtw")`,
+which could be several times too large.
+* `get_peaks` now converts `sd`, `FWHM`, `tau` and `area` correctly when the
+time axis is not in minutes. `time_unit` now defaults to the chromatogram's own
+unit, so default output is unchanged.
 * `find_peaks(bounds = TRUE)` now returns its full four-column schema when no
 peaks are detected, rather than dropping `lower` and `upper`.
 * `max_iter` now controls how long the peak fitters run. Previously it was
