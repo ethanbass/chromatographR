@@ -23,7 +23,7 @@
 #' @examples
 #' data(pk_tab)
 #' data(Sa_warp)
-#' get_spectra("V10", peak_table = pk_tab)
+#' get_spectra("V8", peak_table = pk_tab)
 #' @export
 
 get_spectra <- function(loc, peak_table, chrom_list = NULL,

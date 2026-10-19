@@ -1157,7 +1157,7 @@ test_that("merge_peaks does not depend on the order of `peaks`", {
   pt <- pk_tab
   # make the first peak win in one sample, so the merge differs from either
   # column on its own
-  pr <- colnames(pt$tab)[c(10, 11)]
+  pr <- colnames(pt$tab)[c(8, 9)]
   pt$tab[[pr[1]]][1] <- pt$tab[[pr[2]]][1] * 3
   for (method in c("max", "sum")){
     expected <- if (method == "max"){

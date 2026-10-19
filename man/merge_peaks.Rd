@@ -28,7 +28,7 @@ merged by summing their values.
 }
 \examples{
 data(pk_tab)
-pk_tab <- merge_peaks(peak_table = pk_tab, peaks = c("V10","V11"))
+pk_tab <- merge_peaks(peak_table = pk_tab, peaks = c("V8","V9"))
 }
 \seealso{
 Other utility functions:

@@ -83,19 +83,19 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
   data(pk_tab)
   data(Sa_warp)
   # single trace with inset spectrum
-  plot_spectrum_inset("V15", peak_table = pk_tab)
+  plot_spectrum_inset("V13", peak_table = pk_tab)
 
   # multiple traces, inset in the center
-  plot_spectrum_inset("V15", peak_table = pk_tab, idx=c(1:4),
+  plot_spectrum_inset("V13", peak_table = pk_tab, idx=c(1:4),
   position = "top")
 
   # manual inset placement
-  plot_spectrum_inset("V15", peak_table = pk_tab,
+  plot_spectrum_inset("V13", peak_table = pk_tab,
                       position = c(0.6, 0.3),
                       inset_width = 0.35, inset_height = 0.25)
 
   # multiple peaks with a list of positions
-  plot_spectrum_inset(c("V15", "V26"), peak_table = pk_tab,
+  plot_spectrum_inset(c("V13", "V25"), peak_table = pk_tab,
                       position = list(c(0.3, 0.5), c(0.65, 0.3)),
                       inset_width = 0.3, inset_height = 0.3)#'
                       }

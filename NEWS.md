@@ -113,6 +113,11 @@ data.frames. Use `as.matrix(pt$tab)` for a matrix.
 `reshape_peaktable`. Check `args$use_corrected_rt` to see which times were
 used.
 
+#### Example data
+
+* Regenerated the example datasets: `Sa_pr` and `Sa_warp` are no longer clipped at
+zero, and most `pk_tab` peak names have shifted; for example, `V13` is now `V11`.
+
 #### Other renamed and deprecated arguments
 
 * Renamed dot-separated argument names to snake_case:

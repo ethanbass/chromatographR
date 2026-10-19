@@ -616,8 +616,8 @@ new_peak_table <- function(result, source, args){
 #' @family utility functions
 #' @examples
 #' data(pk_tab)
-#' reshape_peaktable(pk_tab, peaks = c("V10", "V15"))
-#' reshape_peaktable(pk_tab, peaks = c(a = "V10", b = "V15"), format = "wide")
+#' reshape_peaktable(pk_tab, peaks = c("V8", "V13"))
+#' reshape_peaktable(pk_tab, peaks = c(a = "V8", b = "V13"), format = "wide")
 #' @export
 reshape_peaktable <- function(x, peaks, metadata, fixed_levels = TRUE,
                               format = c("long", "wide")){

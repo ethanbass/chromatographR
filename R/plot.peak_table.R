@@ -118,7 +118,7 @@ plot.peak_table <- function(x, loc, chrom_list = NULL, what = "peak",
 #' path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
 #' meta <- read.csv(path)
 #' pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
-#' boxplot(pk_tab, formula=V11 ~ trt)
+#' boxplot(pk_tab, formula=V9 ~ trt)
 #' @family visualization functions
 #' @export
 

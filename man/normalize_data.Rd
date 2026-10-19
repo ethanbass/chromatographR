@@ -52,7 +52,7 @@ pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
 norm <- normalize_data(pk_tab, "mass", what = "peak_table")
 
 # normalize by internal standard
-norm <- normalize_data(pk_tab, column = "V16", by = "peak")
+norm <- normalize_data(pk_tab, column = "V14", by = "peak")
 }
 \seealso{
 \code{\link{get_peaktable}}, \code{\link{attach_metadata}}

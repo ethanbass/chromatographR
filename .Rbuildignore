@@ -17,3 +17,4 @@ Rplots\.pdf$
 ^dev$
 ^\.claude$
 ^figure$
+^data-raw$

@@ -46,5 +46,5 @@ chromatograms in a \code{chrom_list}.
 \examples{
 data(pk_tab)
 data(Sa_warp)
-get_spectra("V10", peak_table = pk_tab)
+get_spectra("V8", peak_table = pk_tab)
 }

@@ -70,7 +70,7 @@
 #' pk_tab <- get_peaktable(pks)
 #' oldpar <- par(no.readonly = TRUE)
 #' par(mfrow = c(2, 1))
-#' plot_spectrum(loc = "V10", peak_table = pk_tab, what = "peak")
+#' plot_spectrum(loc = "V8", peak_table = pk_tab, what = "peak")
 #' par(oldpar)
 #' @family visualization functions
 #' @export plot_spectrum
@@ -379,7 +379,7 @@ scan_chrom <- function(chrom_list, idx, lambda,
 #' data(Sa_warp)
 #' pks <- get_peaks(Sa_warp, lambda = "220")
 #' pk_tab <- get_peaktable(pks)
-#' plot_all_spectra(peak = "V13", peak_table = pk_tab, overlapping = TRUE)
+#' plot_all_spectra(loc = "V11", peak_table = pk_tab, overlapping = TRUE)
 #' @family visualization functions
 #' @export
 
@@ -783,19 +783,19 @@ ggplot_trace <- function(chrom_list, chr, lambda.idx, line.idx = NULL){
 #'   data(pk_tab)
 #'   data(Sa_warp)
 #'   # single trace with inset spectrum
-#'   plot_spectrum_inset("V15", peak_table = pk_tab)
+#'   plot_spectrum_inset("V13", peak_table = pk_tab)
 #'
 #'   # multiple traces, inset in the center
-#'   plot_spectrum_inset("V15", peak_table = pk_tab, idx=c(1:4),
+#'   plot_spectrum_inset("V13", peak_table = pk_tab, idx=c(1:4),
 #'   position = "top")
 #'
 #'   # manual inset placement
-#'   plot_spectrum_inset("V15", peak_table = pk_tab,
+#'   plot_spectrum_inset("V13", peak_table = pk_tab,
 #'                       position = c(0.6, 0.3),
 #'                       inset_width = 0.35, inset_height = 0.25)
 #'
 #'   # multiple peaks with a list of positions
-#'   plot_spectrum_inset(c("V15", "V26"), peak_table = pk_tab,
+#'   plot_spectrum_inset(c("V13", "V25"), peak_table = pk_tab,
 #'                       position = list(c(0.3, 0.5), c(0.65, 0.3)),
 #'                       inset_width = 0.3, inset_height = 0.3)#'
 #'                       }

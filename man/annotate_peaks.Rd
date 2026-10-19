@@ -72,7 +72,7 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
   data(Sa_warp)
   data(pk_tab)
   plot_chroms(Sa_warp, lambdas = 210, engine = "ggplot") |>
-    annotate_peaks(c(C1="V9", C2="V11", C3="V17"), peak_table = pk_tab)
+    annotate_peaks(c(C1="V7", C2="V9", C3="V15"), peak_table = pk_tab)
   plot_chroms(Sa_warp, lambdas = 210, engine = "ggplot") |>
     annotate_peaks(c(C1 = 12.18, C2 = 12.70))
 }

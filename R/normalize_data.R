@@ -32,7 +32,7 @@
 #' norm <- normalize_data(pk_tab, "mass", what = "peak_table")
 #' 
 #' # normalize by internal standard
-#' norm <- normalize_data(pk_tab, column = "V16", by = "peak")
+#' norm <- normalize_data(pk_tab, column = "V14", by = "peak")
 #' @export normalize_data
 
 normalize_data <- function(peak_table, column, chrom_list = NULL,

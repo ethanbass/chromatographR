@@ -32,7 +32,7 @@ data(pk_tab)
 path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
 meta <- read.csv(path)
 pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
-boxplot(pk_tab, formula=V11 ~ trt)
+boxplot(pk_tab, formula=V9 ~ trt)
 }
 \seealso{
 Other visualization functions:

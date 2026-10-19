@@ -83,7 +83,7 @@ device.
 data(Sa_warp)
 pks <- get_peaks(Sa_warp, lambda = "220")
 pk_tab <- get_peaktable(pks)
-plot_all_spectra(peak = "V13", peak_table = pk_tab, overlapping = TRUE)
+plot_all_spectra(loc = "V11", peak_table = pk_tab, overlapping = TRUE)
 \dontshow{\}) # examplesIf}
 }
 \seealso{

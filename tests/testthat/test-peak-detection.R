@@ -159,12 +159,12 @@ test_that("a peak returned for a target is not reported missing", {
   skip_on_cran()
   data(Sa_warp)
   expect_no_warning(
-    pks <- get_peaks(Sa_warp[1], lambdas = 210, fit = "gaussian", targets = 18.44,
+    pks <- get_peaks(Sa_warp[1], lambdas = 210, fit = "gaussian", targets = 18.42,
                      tol = 0.01, cl = 1, show_progress = FALSE))
   expect_equal(nrow(pks[[1]][["210"]]), 1L)
   pdf(NULL)
   on.exit(dev.off())
-  expect_no_error(plot(pks, targets = 18.44, tol = 0.01))
+  expect_no_error(plot(pks, targets = 18.42, tol = 0.01))
   expect_warning(get_peaks(Sa_pr, lambdas = 210, targets = c(11.36, 11.37),
                            tol = c(0.05, 0.001), cl = 1,
                            show_progress = FALSE),

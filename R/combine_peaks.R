@@ -136,7 +136,7 @@ combine_peaks <- function(peak_table, tol = .01, min_cor = 0.9,
 #' @author Ethan Bass
 #' @examples
 #' data(pk_tab)
-#' pk_tab <- merge_peaks(peak_table = pk_tab, peaks = c("V10","V11"))
+#' pk_tab <- merge_peaks(peak_table = pk_tab, peaks = c("V8","V9"))
 #' @family utility functions
 #' @export
 

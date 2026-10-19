@@ -4,18 +4,18 @@ test_that("plot_all_spectra works", {
   skip_if_not_installed("vdiffr")
   data(pk_tab); data(Sa_warp)
   plot_spectra_scaled <- function(){
-    plot_all_spectra("V13", peak_table = pk_tab, chrom_list = Sa_warp, 
+    plot_all_spectra("V11", peak_table = pk_tab, chrom_list = Sa_warp, 
                      export = TRUE, overlapping = TRUE, scale = TRUE)
   }
   vdiffr::expect_doppelganger("plot_spectra_scaled", plot_spectra_scaled)
   
   plot_spectra_raw <- function(){
-    plot_all_spectra("V13", peak_table = pk_tab, chrom_list = Sa_warp, 
+    plot_all_spectra("V11", peak_table = pk_tab, chrom_list = Sa_warp, 
                      export = TRUE, overlapping = TRUE, scale = FALSE)
   }
   vdiffr::expect_doppelganger("plot_spectra_raw", plot_spectra_raw)
   
-  x <- plot_all_spectra("V13", peak_table = pk_tab, chrom_list = Sa_warp, 
+  x <- plot_all_spectra("V11", peak_table = pk_tab, chrom_list = Sa_warp, 
                         export = TRUE, overlapping = TRUE, scale = TRUE)
   expect_equal(class(x), "data.frame")
   expect_equal(rownames(x), as.character(get_lambdas(Sa_warp)))
@@ -27,7 +27,7 @@ test_that("plot_all_spectra works with ggplot2", {
   skip_if_not_installed("vdiffr")
   data(pk_tab); data(Sa_warp)
   plot_spectra <- function(){
-    print(plot_all_spectra("V13", peak_table = pk_tab, chrom_list = Sa_warp,
+    print(plot_all_spectra("V11", peak_table = pk_tab, chrom_list = Sa_warp,
                            export_spectrum = FALSE, overlapping = TRUE,
                            engine = "ggplot2"))
   }
@@ -37,7 +37,7 @@ test_that("plot_all_spectra works with ggplot2", {
 test_that("plot_all_spectra ggplot2 has correct wavelengths on x-axis", {
   skip_if_not_installed("ggplot2")
   data(pk_tab); data(Sa_warp)
-  p <- plot_all_spectra("V13", peak_table = pk_tab, chrom_list = Sa_warp,
+  p <- plot_all_spectra("V11", peak_table = pk_tab, chrom_list = Sa_warp,
                         export_spectrum = FALSE, engine = "ggplot2")
   expect_s3_class(p, "gg")
   expect_equal(sort(unique(p$data$wavelength)), sort(get_lambdas(Sa_warp)))
@@ -54,7 +54,7 @@ test_that("plot_spectrum works", {
   }
   vdiffr::expect_doppelganger(title = "plot_spectrum", plot_spec)
   
-  x <- plot_spectrum(loc = "V15", peak_table = pk_tab, chrom_list = Sa_warp, 
+  x <- plot_spectrum(loc = "V13", peak_table = pk_tab, chrom_list = Sa_warp, 
                      export_spectrum = TRUE, what = "peak", idx = 1, 
                      verbose = FALSE)
   expect_equal(rownames(x), as.character(get_lambdas(Sa_warp)))
@@ -64,7 +64,7 @@ test_that("plot_spectrum works", {
 
 test_that("plot_spectrum works", {
   data(pk_tab); data(Sa_warp)
-  x <- plot_spectrum(loc = "V14", peak_table = pk_tab, chrom_list = Sa_warp, 
+  x <- plot_spectrum(loc = "V12", peak_table = pk_tab, chrom_list = Sa_warp, 
                      export_spectrum = TRUE, what = "peak", idx = 1, 
                      verbose = FALSE)
   expect_equal(rownames(x), as.character(get_lambdas(Sa_warp)))
@@ -124,7 +124,7 @@ test_that("plot_spectrum works", {
 
 test_that("get_spectra returns correct structure (wide format)", {
   data(pk_tab); data(Sa_warp)
-  x <- get_spectra("V14", peak_table = pk_tab, chrom_list = Sa_warp, what = "peak")
+  x <- get_spectra("V12", peak_table = pk_tab, chrom_list = Sa_warp, what = "peak")
   expect_equal(class(x), "data.frame")
   expect_equal(rownames(x), as.character(get_lambdas(Sa_warp)))
   expect_equal(ncol(x), length(Sa_warp))
@@ -147,7 +147,7 @@ test_that("get_spectra works with what = 'idx'", {
 
 test_that("get_spectra format = 'long' returns correct columns", {
   data(pk_tab); data(Sa_warp)
-  x <- get_spectra("V14", peak_table = pk_tab, chrom_list = Sa_warp,
+  x <- get_spectra("V12", peak_table = pk_tab, chrom_list = Sa_warp,
                    what = "peak", format = "long")
   expect_equal(class(x), "data.frame")
   expect_equal(colnames(x), c("wavelength", "absorbance", "sample", "rt"))
@@ -228,7 +228,7 @@ test_that("plot_spectrum_inset works correctly", {
   data(Sa_warp)
   data(pk_tab)
   plot_inset <- function(){
-    print(plot_spectrum_inset(c(Unk1 = "V9", Unk2 = "V15", Unk3 = "V26"), idx=c(1:3),
+    print(plot_spectrum_inset(c(Unk1 = "V7", Unk2 = "V13", Unk3 = "V25"), idx=c(1:3),
                               peak_table = pk_tab, chrom_list = Sa_warp,
                               scale_spectrum = FALSE,
                               position = list(c(0.35, 0.7), c(0.45, 0.4),
@@ -248,13 +248,13 @@ test_that("annotate_peaks works correctly", {
   data(pk_tab)
   annotated_chrom <- function(){
     p <- plot_chroms(Sa_warp, lambdas = 210, engine = "ggplot")
-    print(annotate_peaks(p, loc = c(A = "V9", B = "V15", C = "V26"), 
+    print(annotate_peaks(p, loc = c(A = "V7", B = "V13", C = "V25"), 
                    peak_table = pk_tab, vjust=-1))
   }
   vdiffr::expect_doppelganger("annotated_chrom",
                               annotated_chrom)
   p <- plot_chroms(Sa_warp, lambdas = 210)
-  expect_error(annotate_peaks(p, "V9", peak_table = pk_tab), 
+  expect_error(annotate_peaks(p, "V7", peak_table = pk_tab), 
                regexp = c("Please supply a ggplot"))
 })
 
@@ -404,12 +404,12 @@ test_that("boxplot works as expected", {
   pk_tab <- attach_metadata(pk_tab, metadata = meta, column = "vial")
   
   boxplot1 <- function(){
-    boxplot(pk_tab, V11 ~ trt)
+    boxplot(pk_tab, V9 ~ trt)
   }
   vdiffr::expect_doppelganger("boxplot1", boxplot1)
   
   boxplot2 <- function(){
-    boxplot(pk_tab, V11~trt, las=2)
+    boxplot(pk_tab, V9~trt, las=2)
   }
   vdiffr::expect_doppelganger("boxplot2", boxplot2)
 })
@@ -449,11 +449,11 @@ test_that("plot.peak_table works", {
   
   plot_peak_table <- function(){
     par(mfrow=c(3, 1))
-    plot(pk_tab, loc = "V9", chrom_list = Sa_warp, box_plot = TRUE,
+    plot(pk_tab, loc = "V7", chrom_list = Sa_warp, box_plot = TRUE,
          vars = "trt", verbose = FALSE, spectrum_labels = TRUE)
   }
   vdiffr::expect_doppelganger("plot.peak_table", plot_peak_table)
-  expect_error(plot(pk_tab, chrom_list = Sa_warp, loc = "V13", idx = 1,
+  expect_error(plot(pk_tab, chrom_list = Sa_warp, loc = "V11", idx = 1,
                     lambda = "210",  box_plot = TRUE, verbose = FALSE),
                regexp="Must provide independent variable")
   expect_error(plot(pk_tab, chrom_list = Sa_warp, loc = "15", what = "rt",
