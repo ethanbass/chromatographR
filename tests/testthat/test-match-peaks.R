@@ -514,34 +514,6 @@ test_that("a spectral_cutoff column of NA uses the default cutoff", {
                "must be numeric")
 })
 
-test_that("a consensus spectrum replaces an overlapped reference spectrum", {
-  times <- seq(0, 5, by = 0.005)
-  wl <- seq(200, 300, by = 5)
-  target <- exp(-(wl - 230)^2 / (2 * 15^2))
-  interferent <- exp(-(wl - 280)^2 / (2 * 10^2))
-  run <- function(h, contaminate){
-    y <- h * exp(-(times - 2.5)^2 / (2 * 0.02^2))
-    x <- outer(y, target) + if (contaminate) outer(0.8 * y, interferent) else 0
-    withr::with_seed(h, x <- x + matrix(rnorm(length(x), sd = 0.2), nrow(x)))
-    dimnames(x) <- list(times, wl)
-    x
-  }
-  x <- list(r1 = run(100, TRUE), r2 = run(90, FALSE), r3 = run(80, FALSE), r4 = run(70, FALSE))
-  pks <- get_peaks(x, lambdas = "230", fit = "gaussian", show_progress = FALSE, cl = 1)
-  tg <- data.frame(name = "a", rt = 2.5, tol = 0.05)
-  own <- match_peaks(pks, chrom_list = x, reference = "r1", spectral_cutoff = -1)
-  con <- match_peaks(pks, chrom_list = x, reference = "r1", spectral_cutoff = -1, consensus_spectra = TRUE)
-  cor_at <- function(m, s) m[[s]]$cor_scores[which.min(abs(m[[s]]$matches[, "rt_ref"] - 2.5))]
-  k <- which.min(abs(attr(con, "rt_ref") - 2.5))
-  expect_null(attr(own, "consensus_spectra"))
-  expect_true(all(vapply(names(x)[-1], function(s) cor_at(con, s) > cor_at(own, s), logical(1))))
-  own_spectrum <- x$r1[which.min(abs(times - 2.5)), ]
-  expect_gt(cor(attr(con, "consensus_spectra")[, k], target), cor(own_spectrum, target) + 0.2)
-  expect_equal(attr(con, "consensus_n")[k], 4)
-  expect_equal(match_peaks(pks, chrom_list = x, targets = tg, spectral_cutoff = -1, consensus_spectra = FALSE),
-               match_peaks(pks, chrom_list = x, targets = tg, spectral_cutoff = -1))
-})
-
 noise_test_runs <- function(heights, spectra, seed){
   times <- seq(0, 4, by = 0.01)
   wl <- seq(200, 300, by = 5)
@@ -794,20 +766,20 @@ test_that("spectral_nulls matches a direct projection of the noise spectra", {
   Ys <- matrix(rnorm(40 * p), 40)
   Yr <- matrix(rnorm(31 * p), 31)
   R <- cbind(exp(-(1:p - 6)^2 / 8), exp(-(1:p - 10)^2 / 4), NA)
-  direct <- function(r, scale){
+  direct <- function(r){
     qx <- qr(cbind(w, r * w))
     rs <- qr.resid(qx, t(Ys) * w)
-    rr <- qr.resid(qx, t(Yr) * w) * scale
+    rr <- qr.resid(qx, t(Yr) * w)
     n <- max(ncol(rs), ncol(rr))
     i_s <- rep_len(seq_len(ncol(rs)), n)
     i_r <- (seq_len(n) - 1 + ncol(rr) %/% 2) %% ncol(rr) + 1
     c(colSums(rs^2)[i_s], colSums(rr^2)[i_r],
       colSums(rs[, i_s] * rr[, i_r]))
   }
-  out <- spectral_nulls(R, Ys, Yr, w, scale = c(1, 0.3, 1))
+  out <- spectral_nulls(R, Ys, Yr, w)
   for (k in 1:2){
     expect_equal(c(out[[k]]$q_samp, out[[k]]$q_ref, out[[k]]$q_cross),
-                 direct(R[, k], c(1, 0.3)[k]), tolerance = 1e-10)
+                 direct(R[, k]), tolerance = 1e-10)
   }
   expect_null(out[[3]])
 })

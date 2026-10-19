@@ -1091,16 +1091,6 @@ strip_zeros <- function(x, n_zeros, side = "both") {
 #' neighbor's tail. It also adds noise, and where a boundary lies on a
 #' neighboring peak it subtracts part of that peak's spectrum.
 #'
-#' @section Consensus spectra:
-#' With `consensus_spectra = TRUE`, peaks are matched once against the
-#' reference sample. Each reference peak's consensus is then the average of its
-#' matched spectra, each scaled to its height at `lambda` and weighted by the
-#' squared ratio of that height to the sample's noise, and the peaks are
-#' matched again against the consensus. Averaging reduces the influence of
-#' noise, or of an overlapping peak, in any one sample's spectrum, including the
-#' reference's. The consensus describes what was matched, so it cannot show
-#' that a target is the intended compound.
-#'
 #' @section Testing spectra against noise:
 #' With `spectral_test = "noise"`, each candidate pair is tested rather than
 #' thresholded. The sample spectrum is fitted as an offset plus a multiple of
@@ -1125,9 +1115,7 @@ strip_zeros <- function(x, n_zeros, side = "both") {
 #' absolute deviation of its timepoints outside every peak taller than 3 times
 #' the noise, found by iterating from the estimate given by its point-to-point
 #' differences, `mad(diff(y)) / sqrt(2)` (von Neumann 1941; Donoho and
-#' Johnstone 1994). With `consensus_spectra = TRUE`, the consensus is treated
-#' as carrying the reference sample's noise, reduced by the square root of the
-#' total weight of the spectra averaged into it.
+#' Johnstone 1994).
 #'
 #' The test cannot tell compounds apart near the noise level, where every
 #' spectrum is consistent with every other; decide whether a small peak is
@@ -1177,11 +1165,6 @@ strip_zeros <- function(x, n_zeros, side = "both") {
 #'   times (`rt.cor`) from [`correct_peaks`] rather than raw ones (`rt`), both
 #'   between peaks and against `targets`. Defaults to `NULL`, which uses
 #'   corrected times when every sample has them.
-#' @param consensus_spectra Logical. Whether to compare sample spectra with a
-#'   consensus spectrum for each reference peak, built from a first round of
-#'   matches, rather than with the reference sample's own. See *Consensus
-#'   spectra*.
-#'   Defaults to `FALSE`.
 #' @param spectral_test How a candidate pair's spectra are compared:
 #'   `"cutoff"` (the default) requires their correlation to be at least
 #'   `spectral_cutoff`; `"noise"` tests whether they could be the same spectrum
@@ -1229,7 +1212,7 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
                         lambda = NULL, rt_window = 0.3, spectral_cutoff = 0.95,
                         background_correction = c("none", "linear"),
                         rt_weight = 0.15,
-                        use_corrected_rt = NULL, consensus_spectra = FALSE,
+                        use_corrected_rt = NULL,
                         spectral_test = c("cutoff", "noise"), alpha = 0.01,
                         plot_it = FALSE,
                         verbose = getOption("verbose")) {
@@ -1282,7 +1265,6 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
                     background_correction = background_correction,
                     rt_weight = rt_weight,
                     use_corrected_rt = use_corrected_rt,
-                    consensus_spectra = consensus_spectra,
                     spectral_test = spectral_test, alpha = alpha, plot_it = plot_it,
                     verbose = verbose))
       return(structure(setNames(out, names(by_lambda)),
@@ -1423,14 +1405,13 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
                    plural(sum(n_rows < min_rows)),
                    format_list(names(chrom_list)[n_rows < min_rows])),
            call. = FALSE)
-    ref_noise <- list(Y = noise_models[[reference]]$Y,
-                      scale = rep(1, length(rt_ref)))
-  } else ref_noise <- NULL
+    ref_Y <- noise_models[[reference]]$Y
+  }
 
   sample_indices <- seq_along(chrom_list)
   names_peaks <- names(peak_list)
-  match_one <- function(idx, spectra_ref, ref_noise, announce = verbose) {
-    if (announce){
+  matches_list <- lapply(sample_indices, function(idx) {
+    if (verbose){
       message(sprintf("Comparing %s against reference (%s)",
                       sQuote(names_peaks[idx]), sQuote(names_peaks[reference])))
     }
@@ -1457,8 +1438,7 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
         w <- noise_models[[idx]]$w
         ks <- unique(cand[cutoff_ref[cand[, 2]] > 0, 2])
         nulls <- setNames(spectral_nulls(spectra_ref[, ks, drop = FALSE],
-                                         noise_models[[idx]]$Y, ref_noise$Y, w,
-                                         ref_noise$scale[ks]), ks)
+                                         noise_models[[idx]]$Y, ref_Y, w), ks)
         for (q in seq_len(nrow(cand))) {
           k <- cand[q, 2]
           p_matrix[cand[q, 1], k] <- spectral_p(spectra_samp[, cand[q, 1]],
@@ -1530,41 +1510,7 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
                 matched_rows = matched_rows, matched_cols = matched_cols)
     if (!is.null(p_matrix)) out$spectral_p <- p_matrix[pair_idx]
     out
-  }
-  first <- if (consensus_spectra && use_spectra) suppressWarnings else identity
-  matches_list <- first(lapply(sample_indices, match_one, spectra_ref = spectra_ref,
-                               ref_noise = ref_noise))
-  consensus_n <- NULL
-  if (consensus_spectra && use_spectra) {
-    num <- matrix(0, nrow(spectra_ref), ncol(spectra_ref))
-    den <- consensus_n <- numeric(ncol(spectra_ref))
-    for (idx in sample_indices) {
-      m <- matches_list[[idx]]
-      if (is.null(m)) next
-      sigma2 <- trace_noise(chrom_list[[idx]][, lambda_idx], get_times(chrom_list, idx),
-                            pks_flat[[idx]])^2
-      if (!is.finite(sigma2) || sigma2 <= 0) next
-      p <- pks_flat[[idx]]
-      p <- p[!is.na(p$rt), , drop = FALSE]
-      sp <- spectra_at(p[m$matched_cols, , drop = FALSE], idx)
-      h <- sp[match(lambda_idx, colnames(chrom_list[[idx]])), ]
-      ok <- is.finite(h) & h > 0 & colSums(!is.finite(sp)) == 0
-      j <- m$matched_rows[ok]
-      num[, j] <- num[, j] + sweep(sp[, ok, drop = FALSE], 2, h[ok] / sigma2, "*")
-      den[j] <- den[j] + h[ok]^2 / sigma2
-      consensus_n[j] <- consensus_n[j] + 1
-    }
-    has <- den > 0
-    spectra_ref[, has] <- sweep(num[, has, drop = FALSE], 2, den[has], "/")
-    rownames(spectra_ref) <- colnames(chrom_list[[reference]])
-    if (noise_test) {
-      sigma_ref <- trace_noise(chrom_list[[reference]][, lambda_idx],
-                               get_times(chrom_list, reference), pks_flat[[reference]])
-      ref_noise$scale[has] <- 1 / (sigma_ref * sqrt(den[has]))
-    }
-    matches_list <- lapply(sample_indices, match_one, spectra_ref = spectra_ref,
-                           ref_noise = ref_noise, announce = FALSE)
-  }
+  })
 
   names(matches_list) <- names_peaks
   result <- structure(matches_list, reference = names_peaks[reference],
@@ -1573,8 +1519,6 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
                       background_correction = background_correction,
                       rt_window = rt_window_rt,
                       reference_targets = reference_targets,
-                      consensus_spectra = if (!is.null(consensus_n)) spectra_ref,
-                      consensus_n = consensus_n,
                       spectral_test = if (noise_test) spectral_test,
                       alpha = if (noise_test) alpha,
                       class = "matched_peak_list")
@@ -1806,12 +1750,10 @@ spectral_noise_model <- function(x, times, peaks){
 #' @param R Reference spectra, one per column.
 #' @param Ys,Yr Noise spectra (rows) of the sample and reference.
 #' @param w Weight per wavelength, the reciprocal of the sample's noise.
-#' @param scale Factor applied to the reference noise for each reference
-#'   spectrum.
 #' @return A list with one element per column of `R`, `NULL` where the fit is
 #'   degenerate.
 #' @noRd
-spectral_nulls <- function(R, Ys, Yr, w, scale = rep(1, ncol(R))){
+spectral_nulls <- function(R, Ys, Yr, w){
   n <- max(nrow(Ys), nrow(Yr))
   i_s <- rep_len(seq_len(nrow(Ys)), n)
   i_r <- (seq_len(n) - 1 + nrow(Yr) %/% 2) %% nrow(Yr) + 1
@@ -1835,8 +1777,8 @@ spectral_nulls <- function(R, Ys, Yr, w, scale = rep(1, ncol(R))){
       (rr2[k] * g1 * h1 - wr[k] * (g1 * h2 + g2 * h1) + ww * g2 * h2) / det
     list(qx = qx, rc2 = rr2[k] - wr[k]^2 / ww,
          q_samp = ss - proj(ws, bs[, k], ws, bs[, k]),
-         q_ref = scale[k]^2 * (rr - proj(wz, br[, k], wz, br[, k])),
-         q_cross = scale[k] * (sr - proj(ws, bs[, k], wz, br[, k])))
+         q_ref = rr - proj(wz, br[, k], wz, br[, k]),
+         q_cross = sr - proj(ws, bs[, k], wz, br[, k]))
   })
 }
 
@@ -1953,8 +1895,7 @@ print.matched_peak_list <- function(x, ...){
                 sprintf("spectral_cutoff: %s", attr(x, "spectral_cutoff")),
                 sprintf("background correction: %s", attr(x, "background_correction")),
                 if (!is.null(attr(x, "spectral_test")))
-                  sprintf("spectral test: noise (alpha %s)", attr(x, "alpha")),
-                if (!is.null(attr(x, "consensus_spectra"))) "consensus spectra")
+                  sprintf("spectral test: noise (alpha %s)", attr(x, "alpha")))
   cat(paste(settings, collapse = " | "), "\n", sep = "")
   others <- setdiff(names(x), ref)
   n <- vapply(others, function(s) if (is.null(x[[s]])) 0L else nrow(x[[s]]$matches),

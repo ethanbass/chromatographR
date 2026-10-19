@@ -15,7 +15,6 @@ match_peaks(
   background_correction = c("none", "linear"),
   rt_weight = 0.15,
   use_corrected_rt = NULL,
-  consensus_spectra = FALSE,
   spectral_test = c("cutoff", "noise"),
   alpha = 0.01,
   plot_it = FALSE,
@@ -69,12 +68,6 @@ zero. Defaults to \code{0.15}.}
 times (\code{rt.cor}) from \code{\link{correct_peaks}} rather than raw ones (\code{rt}), both
 between peaks and against \code{targets}. Defaults to \code{NULL}, which uses
 corrected times when every sample has them.}
-
-\item{consensus_spectra}{Logical. Whether to compare sample spectra with a
-consensus spectrum for each reference peak, built from a first round of
-matches, rather than with the reference sample's own. See \emph{Consensus
-spectra}.
-Defaults to \code{FALSE}.}
 
 \item{spectral_test}{How a candidate pair's spectra are compared:
 \code{"cutoff"} (the default) requires their correlation to be at least
@@ -141,18 +134,6 @@ neighbor's tail. It also adds noise, and where a boundary lies on a
 neighboring peak it subtracts part of that peak's spectrum.
 }
 
-\section{Consensus spectra}{
-
-With \code{consensus_spectra = TRUE}, peaks are matched once against the
-reference sample. Each reference peak's consensus is then the average of its
-matched spectra, each scaled to its height at \code{lambda} and weighted by the
-squared ratio of that height to the sample's noise, and the peaks are
-matched again against the consensus. Averaging reduces the influence of
-noise, or of an overlapping peak, in any one sample's spectrum, including the
-reference's. The consensus describes what was matched, so it cannot show
-that a target is the intended compound.
-}
-
 \section{Testing spectra against noise}{
 
 With \code{spectral_test = "noise"}, each candidate pair is tested rather than
@@ -178,9 +159,7 @@ spectra still stand out from the rest. A trace's noise is the scaled median
 absolute deviation of its timepoints outside every peak taller than 3 times
 the noise, found by iterating from the estimate given by its point-to-point
 differences, \code{mad(diff(y)) / sqrt(2)} (von Neumann 1941; Donoho and
-Johnstone 1994). With \code{consensus_spectra = TRUE}, the consensus is treated
-as carrying the reference sample's noise, reduced by the square root of the
-total weight of the spectra averaged into it.
+Johnstone 1994).
 
 The test cannot tell compounds apart near the noise level, where every
 spectrum is consistent with every other; decide whether a small peak is
