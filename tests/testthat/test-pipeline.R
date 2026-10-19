@@ -321,15 +321,14 @@ test_that("plot_chroms works to plot alignments with ggplot", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
   skip_if_not_installed("ggplot2")
-  alignment_ggp <- function(){
-    plot_chroms(warp, lambdas="210", engine="ggplot", show_legend = TRUE)
-  }
+  data(Sa_warp)
+  alignment_ggp <- plot_chroms(Sa_warp, lambdas = "210", engine = "ggplot",
+                               show_legend = TRUE)
   vdiffr::expect_doppelganger("alignment_ggp", alignment_ggp)
   
-  alignment_ggp_zoom <- function(){
-    plot_chroms(warp, lambdas = "210", engine = "ggplot", show_legend = FALSE,
-                xlim = c(12.5, 15), ylim = c(0, 550))
-  }
+  alignment_ggp_zoom <- plot_chroms(Sa_warp, lambdas = "210", engine = "ggplot",
+                                    show_legend = FALSE, xlim = c(12.5, 15),
+                                    ylim = c(0, 550))
   suppressWarnings(vdiffr::expect_doppelganger("alignment_ggp_zoom",
                                                alignment_ggp_zoom))
 })
@@ -1104,15 +1103,15 @@ test_that("plot.ptw_list works with ggplot", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
   skip_if_not_installed("ggplot2")
-  plot_ptw_list_traces_ggplot <- function(){
-    suppressWarnings(plot(warping.models, what = "traces", engine = "ggplot"))
-  }
+  data(Sa_pr)
+  warping.models <- correct_rt(Sa_pr, lambdas = c("210", "260", "318"),
+                               what = "models", show_progress = FALSE)
+  plot_ptw_list_traces_ggplot <- suppressWarnings(plot(warping.models, what = "traces",
+                                                       engine = "ggplot"))
   vdiffr::expect_doppelganger(title = "plot_ptw_list_traces_ggplot", 
                               fig = plot_ptw_list_traces_ggplot)
   
-  plot_ptw_list_heatmap_ggplot <- function(){
-    plot(warping.models, what = "heatmap", engine = "ggplot")
-  }
+  plot_ptw_list_heatmap_ggplot <- plot(warping.models, what = "heatmap", engine = "ggplot")
   vdiffr::expect_doppelganger(title = "plot_ptw_list_heatmap_ggplot",
                               fig = plot_ptw_list_heatmap_ggplot)
 })
