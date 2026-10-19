@@ -316,10 +316,10 @@ MIN_WINDOW_PER_FWHM <- 1 / 3
 #' which is not the width of the peak unless `fit = "gaussian"`. `NA` when
 #' `fit = "raw"`.
 #' * `tau`: Exponential decay constant (only when `fit = "egh"`).
-#' * `tau_right`: Exponential decay constant for right side of peak (only when
-#' `fit = "bemg"`).
-#' * `tau_left`: Exponential decay constant for left side of peak (only when
-#' `fit = "bemg"`).
+#' * `tau_right`: Time constant of the exponential tail on the right side of
+#' the peak, the reciprocal of its fitted rate (only when `fit = "bemg"`).
+#' * `tau_left`: Time constant of the exponential tail on the left side of the
+#' peak, the reciprocal of its fitted rate (only when `fit = "bemg"`).
 #' * `h`: The amplitude parameter of the fitted BEMG shape function. It scales
 #' the shape but is neither its value at `center` nor the peak `height` (only
 #' when `fit = "bemg"`).
@@ -350,9 +350,9 @@ MIN_WINDOW_PER_FWHM <- 1 / 3
 #' * `floor_end`: Baseline level at the right edge of the peak window (only
 #' when `baseline = "sloped"`).
 #' The table is in index units rather than retention times: `rt`, `start`,
-#' `end` and `center` are index positions; `sd`, `FWHM` and `tau` are widths on
-#' the index scale; `area` is integrated over the index axis; and `tau_right`
-#' and `tau_left` are in inverse index units. [`get_peaks`] converts them to the chromatogram's time axis.
+#' `end` and `center` are index positions; `sd`, `FWHM`, `tau`, `tau_right` and
+#' `tau_left` are widths on the index scale; and `area` is integrated over the
+#' index axis. [`get_peaks`] converts them to the chromatogram's time axis.
 #' @note The loop over peaks in `fit_peaks` is adapted from the `fitpeaks`
 #' function in Ron Wehrens' [alsace](https://github.com/rwehrens/alsace)
 #' package. The Gaussian peak shape and the interface of the internal fitting
@@ -1081,7 +1081,7 @@ fitpk_bemg <- function(x, pos, lambda, max_iter,
   area <- int$area
   apex <- bemg_apex(m, peak.loc, which.max(y_above))
   result <- c("rt" = apex[["rt"]], "start" = pos[[2]], "end" = pos[[3]],
-    "sd" = unname(m$width), "tau_right" = unname(m$b), "tau_left" = unname(m$a),
+    "sd" = unname(m$width), "tau_right" = 1 / unname(m$b), "tau_left" = 1 / unname(m$a),
     "h" = unname(m$height), "center" = unname(round(m$center)),
     "FWHM" = bemg_fwhm(m),
     "height" = apex[["height"]],

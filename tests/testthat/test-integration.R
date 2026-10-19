@@ -209,6 +209,23 @@ test_that("sloped baseline fit subtracts a linear ramp and recovers the Gaussian
   }
 })
 
+test_that("bemg reports tail time constants in time_unit", {
+  skip_on_cran()
+  times <- seq(0, 10, by = 0.01)
+  lam <- 1 / 0.2
+  y <- 50 * lam * exp(lam * (4 - times) + lam^2 * 0.05^2 / 2) *
+    pnorm((times - 4 - lam * 0.05^2) / 0.05)
+  x <- list(s1 = matrix(y, ncol = 1, dimnames = list(times, "220")))
+  fit_in <- function(u) get_peaks(x, lambdas = "220", fit = "bemg", time_unit = u,
+                                  cl = 1, show_progress = FALSE)[[1]][["220"]]
+  m <- fit_in("min")
+  s <- fit_in("s")
+  expect_equal(m$tau_right, 0.2, tolerance = 0.05)
+  expect_lt(m$tau_left, 0.01)
+  expect_equal(s$tau_right, 60 * m$tau_right)
+  expect_equal(s$tau_left, 60 * m$tau_left)
+})
+
 # ── nlsLM failure fallbacks ───────────────────────────────────────────────────
 
 test_that("egh and bemg return start values for an unfittable window", {

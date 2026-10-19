@@ -43,6 +43,9 @@ index. Interpolate onto a common grid with `preprocess(dim1 = ...)` first.
 
 #### Peak detection and integration
 
+* `fit = "bemg"` now reports `tau_left` and `tau_right` as tail time constants
+in `time_unit`, so a larger value means a longer tail. In 0.8.0 they were rates
+(1/time), with left and right swapped.
 * Corrected an off-by-one error in `find_peaks` that reported every apex one
 timepoint early. Retention times from `get_peaks` and `get_peaktable` shift
 accordingly, and peaks whose preceding timepoint had been clipped to zero by
@@ -289,8 +292,6 @@ single empty sample failed the whole call. `fit_peaks` now returns an empty
 `2.35*sigma`.
 * Requesting a wavelength missing from a single-column chromatogram now errors,
 instead of returning the existing column falsely labeled with the requested wavelength.
-* `fit = "bemg"` now reports its tail parameters under the correct names;
-`tau_right` and `tau_left` were swapped. Other fitted values are unchanged.
 * `fit = "bemg"` no longer silently returns its starting values when a peak's
 integration window spans about 700 timepoints or more.
 * `fit = "bemg"` now rejects fits whose tail grows away from the apex, which

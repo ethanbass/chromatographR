@@ -497,8 +497,9 @@ bemg_from_peak <- function(x, peak, tfac = 1, ...) {
     center = center_val,
     width  = peak$sd * tfac,
     height = peak$h,
-    a      = peak$tau_right * tfac,
-    b      = peak$tau_left * tfac,
+    # `a`/`b` are rates, the reciprocals of the reported time constants
+    a      = 1 / (peak$tau_left * tfac),
+    b      = 1 / (peak$tau_right * tfac),
     floor  = floor_val,
     slope  = slope_val
   )

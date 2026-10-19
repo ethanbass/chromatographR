@@ -80,8 +80,8 @@
 #' in [`fit_peaks`]. Defaults to `1000`.
 #' @param max.iter The `max.iter` argument is deprecated. Please use `max_iter` 
 #' instead.
-#' @param time_unit Units for `sd`, `FWHM`, `tau`, `area` and `max_fwhm`;
-#' `tau_right` and `tau_left` are in the reciprocal units. Options are minutes
+#' @param time_unit Units for `sd`, `FWHM`, `tau`, `tau_right`, `tau_left`,
+#' `area` and `max_fwhm`. Options are minutes
 #' (`"min"`), seconds (`"s"`), or milliseconds (`"ms"`). Defaults to the time
 #' unit of `chrom_list` (minutes if none is recorded), so that every column
 #' shares one unit. Set `"s"` to compare areas with ChemStation integration
@@ -133,10 +133,12 @@
 #' the integration window is available as `end - start`.
 #' * `tau`: Empirical skewness parameter (in units of time) determining peak
 #' asymmetry when `fit == "egh"`.
-#' * `tau_right`: Exponential rate constant controlling right-sided tailing
-#' when `fit = "bemg"`. Unlike `tau` in the EGH model, it has units of 1/time.
-#' * `tau_left`: Exponential rate constant controlling left-sided tailing
-#' when `fit = "bemg"`. Unlike `tau` in the EGH model, it has units of 1/time.
+#' * `tau_right`: Time constant (in units of time) of the exponential tail on
+#' the right side of the peak when `fit = "bemg"`. A larger value gives a
+#' longer tail, and a value near 0 means no tail on that side.
+#' * `tau_left`: Time constant (in units of time) of the exponential tail on
+#' the left side of the peak when `fit = "bemg"`. A larger value gives a
+#' longer tail, and a value near 0 means no tail on that side.
 #' * `h`: The amplitude parameter of the fitted BEMG shape function (only when
 #' `fit = "bemg"`). It scales the shape but is not its value at `center`, so
 #' use the `height` column for the height of the peak.
@@ -529,12 +531,8 @@ convert_indices_to_times <- function(x, timepoints, tdiff, tfac){
     approx(seq_along(timepoints), timepoints, xout = i)$y
   })
   x[, c('sd', 'FWHM', 'area')] <- x[, c('sd', 'FWHM', 'area')] * tdiff * tfac
-  if (!is.null(x$tau)){
-    x[, c('tau')] <- x[, c('tau')] * tdiff * tfac
-  } 
-  if (!is.null(x$tau_right)){
-    x[, c('tau_right', 'tau_left')] <- x[, c('tau_right', 'tau_left')] / (tdiff * tfac)
-  } 
+  tau_cols <- intersect(c('tau', 'tau_right', 'tau_left'), colnames(x))
+  x[, tau_cols] <- x[, tau_cols] * tdiff * tfac
   x
 }
 

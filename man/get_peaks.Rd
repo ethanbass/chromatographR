@@ -108,8 +108,8 @@ provided.}
 \item{max_iter}{Maximum number of iterations for non-linear least squares
 in \code{\link{fit_peaks}}. Defaults to \code{1000}.}
 
-\item{time_unit}{Units for \code{sd}, \code{FWHM}, \code{tau}, \code{area} and \code{max_fwhm};
-\code{tau_right} and \code{tau_left} are in the reciprocal units. Options are minutes
+\item{time_unit}{Units for \code{sd}, \code{FWHM}, \code{tau}, \code{tau_right}, \code{tau_left},
+\code{area} and \code{max_fwhm}. Options are minutes
 (\code{"min"}), seconds (\code{"s"}), or milliseconds (\code{"ms"}). Defaults to the time
 unit of \code{chrom_list} (minutes if none is recorded), so that every column
 shares one unit. Set \code{"s"} to compare areas with ChemStation integration
@@ -177,10 +177,12 @@ compare widths. \code{NA} when \code{fit = "raw"}, which fits no model; the widt
 the integration window is available as \code{end - start}.
 \item \code{tau}: Empirical skewness parameter (in units of time) determining peak
 asymmetry when \code{fit == "egh"}.
-\item \code{tau_right}: Exponential rate constant controlling right-sided tailing
-when \code{fit = "bemg"}. Unlike \code{tau} in the EGH model, it has units of 1/time.
-\item \code{tau_left}: Exponential rate constant controlling left-sided tailing
-when \code{fit = "bemg"}. Unlike \code{tau} in the EGH model, it has units of 1/time.
+\item \code{tau_right}: Time constant (in units of time) of the exponential tail on
+the right side of the peak when \code{fit = "bemg"}. A larger value gives a
+longer tail, and a value near 0 means no tail on that side.
+\item \code{tau_left}: Time constant (in units of time) of the exponential tail on
+the left side of the peak when \code{fit = "bemg"}. A larger value gives a
+longer tail, and a value near 0 means no tail on that side.
 \item \code{h}: The amplitude parameter of the fitted BEMG shape function (only when
 \code{fit = "bemg"}). It scales the shape but is not its value at \code{center}, so
 use the \code{height} column for the height of the peak.

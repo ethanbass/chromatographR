@@ -86,10 +86,10 @@ A \code{data.frame} with one row per peak and the following columns:
 which is not the width of the peak unless \code{fit = "gaussian"}. \code{NA} when
 \code{fit = "raw"}.
 \item \code{tau}: Exponential decay constant (only when \code{fit = "egh"}).
-\item \code{tau_right}: Exponential decay constant for right side of peak (only when
-\code{fit = "bemg"}).
-\item \code{tau_left}: Exponential decay constant for left side of peak (only when
-\code{fit = "bemg"}).
+\item \code{tau_right}: Time constant of the exponential tail on the right side of
+the peak, the reciprocal of its fitted rate (only when \code{fit = "bemg"}).
+\item \code{tau_left}: Time constant of the exponential tail on the left side of the
+peak, the reciprocal of its fitted rate (only when \code{fit = "bemg"}).
 \item \code{h}: The amplitude parameter of the fitted BEMG shape function. It scales
 the shape but is neither its value at \code{center} nor the peak \code{height} (only
 when \code{fit = "bemg"}).
@@ -120,9 +120,9 @@ when \code{baseline = "sloped"}).
 \item \code{floor_end}: Baseline level at the right edge of the peak window (only
 when \code{baseline = "sloped"}).
 The table is in index units rather than retention times: \code{rt}, \code{start},
-\code{end} and \code{center} are index positions; \code{sd}, \code{FWHM} and \code{tau} are widths on
-the index scale; \code{area} is integrated over the index axis; and \code{tau_right}
-and \code{tau_left} are in inverse index units. \code{\link{get_peaks}} converts them to the chromatogram's time axis.
+\code{end} and \code{center} are index positions; \code{sd}, \code{FWHM}, \code{tau}, \code{tau_right} and
+\code{tau_left} are widths on the index scale; and \code{area} is integrated over the
+index axis. \code{\link{get_peaks}} converts them to the chromatogram's time axis.
 }
 }
 \description{
