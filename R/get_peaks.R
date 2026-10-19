@@ -568,7 +568,7 @@ print.peak_list <- function(x, ...) {
   meta <- attributes(x)
   n_samples <- length(x)
   lambdas <- paste(meta$lambdas, collapse = ", ")
-  n_peaks <- sum(sapply(x, function(s) sum(sapply(s, nrow))))
+  n_peaks <- sum(vapply(x, function(s) sum(vapply(s, NROW, numeric(1))), numeric(1)))
   mean_peaks <- round(n_peaks / n_samples)
   
   cat(sprintf("A peak_list with %d samples and %d wavelength(s) (%s nm)\n",

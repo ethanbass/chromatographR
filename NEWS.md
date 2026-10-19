@@ -293,6 +293,8 @@ ignored, leaving `nls.lm`'s default of `100 * (parameters + 1)` evaluations.
 * `get_peaks` no longer errors when a sample contains no peaks; previously a
 single empty sample failed the whole call. `fit_peaks` now returns an empty
 `data.frame` rather than a one-row matrix of `NA`s.
+* Printing a `peak_list` no longer errors when a sample has no peaks at any
+wavelength, as in peak lists read by `chromConverter::read_peaklist`.
 * `FWHM` is now computed as `2*sqrt(2*log(2))*sigma` rather than the rounded
 `2.35*sigma`.
 * Requesting a wavelength missing from a single-column chromatogram now errors,

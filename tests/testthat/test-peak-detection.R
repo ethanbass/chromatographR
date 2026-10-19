@@ -1143,6 +1143,13 @@ test_that("print.peak_list reports no width filter by default", {
   expect_output(print(pks), "max_fwhm: none")
 })
 
+test_that("print.peak_list counts a sample with no peaks as zero", {
+  pks <- get_peaks(Sa_pr[1:2], lambdas = "210", show_progress = FALSE)
+  n <- nrow(pks[[1]][["210"]])
+  pks[[2]] <- structure(list(), names = character(0))
+  expect_output(print(pks), sprintf("Total peaks: %d", n))
+})
+
 test_that("get_peaks reports widths and areas in `time_unit` whatever the axis unit", {
   skip_on_cran()
   data(Sa_pr)
