@@ -1,19 +1,20 @@
 #' Normalize peak table or chromatograms
 #' 
-#' Normalizes peak table or list of chromatograms by a column in the sample
-#' metadata or in the peak table. For normalization by sample metadata, the 
-#' metadata must first be attached to the `peak_table` using [`attach_metadata`].
+#' Divides each sample in a peak table or list of chromatograms by its value in
+#' a column of the sample metadata or of the peak table. For normalization by
+#' sample metadata, the metadata must first be attached to the `peak_table`
+#' using [`attach_metadata`].
 #' 
 #' @param peak_table A `peak_table` object.
 #' @param column The name of the column to be used for normalization.
-#' @param chrom_list List of chromatograms for normalization. The samples must
-#' be in same order as the `peak_table`. If omitted, the function will attempt to
-#' find it automatically using the pointer from the `peak_table`.
+#' @param chrom_list List of chromatograms for normalization. Its names must
+#' match the sample names of the `peak_table`, in the same order. If omitted,
+#' it is retrieved using the name stored in the `peak_table`.
 #' @param what Output type to return: either `"peak_table"` (default) or 
 #' `"chrom_list"`.
-#' @param by Whether to normalize by a column in sample metadata (`meta`) or by
-#' a column in the peak table (`peak`). By default, this parameter is inferred 
-#' based on the `column` name.
+#' @param by Whether to normalize by a column in sample metadata (`"meta"`) or
+#' by a column in the peak table (`"peak"`). By default, it is inferred from
+#' where `column` is found, and an error is raised if it is found in both.
 #' @param on_invalid How to handle invalid normalization values (i.e. zero,
 #' negative, or `NA` values). One of `"warn"` (the default), `"silent"`, or 
 #' `"error"`. Invalid values are replaced with `NA` unless `"error"` is chosen. 

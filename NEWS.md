@@ -325,17 +325,23 @@ wavelength, as in peak lists read by `chromConverter::read_peaklist`.
 `2.35*sigma`.
 * Requesting a wavelength missing from a single-column chromatogram now errors,
 instead of returning the existing column falsely labeled with the requested wavelength.
-* `fit = "bemg"` no longer silently returns its starting values when a peak's
-integration window spans about 700 timepoints or more.
+* `fit = "bemg"` no longer returns its starting values in place of a fit when a
+peak's integration window spans about 700 timepoints or more.
 * `fit = "bemg"` now rejects fits whose tail grows away from the apex, which
 inflated the reported area. Such peaks are refitted, and flagged
 `converged = FALSE` if the refit also fails.
 
 #### Peak tables and filtering
 
+* `get_peaktable` no longer spreads `pk_meta` across several columns when all
+peaks at a wavelength fall in one cluster.
+* `get_peaktable` no longer rounds `pk_meta` to two decimal places, which moved
+retention times by up to 0.005 minutes and set small `tau` values to zero.
 * Peak tables built from `correct_peaks` output now read spectra and traces
 from aligned chromatograms, rebuilt from the stored warping models. Previously
 they were read from the unaligned data at aligned times. See `?correct_peaks`.
+* `filter_peaktable` no longer appends a spurious `rt` row to `pk_meta` when
+filtering a table built from corrected peaks.
 * `normalize_data` no longer reports `column` as ambiguous when another
 column's name merely contains it, such as `"V12"` for `"V1"`.
 * `combine_peaks` now removes dropped peaks from the `ref_spectra` element so
@@ -343,14 +349,8 @@ that it stays aligned with `tab`.
 * `combine_peaks(choose = "least_sparse")` now keeps the peak detected in the
 most samples. Previously every candidate tied and the first was kept.
 * `filter_peaktable` now errors when `rts` is combined with `min_rt` or `max_rt`.
-* `get_peaktable` no longer spreads `pk_meta` across several columns when all
-peaks at a wavelength fall in one cluster.
-* `get_peaktable` no longer rounds `pk_meta` to two decimal places, which moved
-retention times by up to 0.005 minutes and set small `tau` values to zero.
 * `reshape_peaktable` now keeps `lambda` and `rt` when peaks are renamed with a
 named `peaks` vector. Previously both were `NA`.
-* `filter_peaktable` no longer appends a spurious `rt` row to `pk_meta` when
-filtering a table built from corrected peaks.
 * `reshape_peaktable` now errors on `metadata` columns it cannot find, which
 were previously dropped, and gives clear errors for unattached metadata or
 unknown `peaks`.

@@ -106,8 +106,8 @@ spectral correlation for a candidate peak pair to be retained. Defaults to
 
 \item{regularization}{Numeric >= 0. Strength of the penalty against warping
 for \code{alg = "lptw"}: a dimensionless weight pulling the warp toward the
-identity warp, passed as \code{penalty} to \code{fit_penalized_warp}. \strong{A higher
-number allows less warping}; \code{0} (the default) applies no penalty at all.
+identity warp, passed as \code{penalty} to \code{fit_penalized_warp}. A higher
+number allows less warping; \code{0} (the default) applies no penalty at all.
 \code{1} weights a unit of squared warp displacement equally against a unit of
 squared peak-position mismatch, and around \code{2.4} halves the applied warp, so
 useful values run roughly \code{0}-\code{10}. Unbounded above, approaching the identity

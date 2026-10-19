@@ -15,15 +15,15 @@ write_peaktable(
 \arguments{
 \item{peak_table}{Peak table object from \code{\link{get_peaktable}}.}
 
-\item{path}{Path to write file.}
+\item{path}{Path to an existing directory in which to write the files.}
 
 \item{filename}{File name. Defaults to \code{"peak_table"}.}
 
-\item{format}{File format to export. Either \code{csv} or \code{xlsx}.}
+\item{format}{File format to export. Either \code{"csv"} (default) or \code{"xlsx"}.}
 
 \item{what}{Which elements of the \code{peak_table} to export. One or more of
 \code{"tab"}, \code{"pk_meta"}, \code{"sample_meta"}, \code{"instrument_meta"},
-\code{"ref_spectra"}, and \code{"args"}.}
+\code{"ref_spectra"}, and \code{"args"}. Defaults to all six.}
 }
 \value{
 No return value. The function is called for its side effects.
@@ -33,8 +33,10 @@ Exports peak table in \code{csv} or \code{xlsx} format.
 }
 \section{Side effects}{
 
-Exports peak_table object as \code{.csv} or \code{.xlsx} file according to the value
-of the \code{format} argument.
+With \code{format = "csv"}, writes one file per element of \code{what}, named
+\verb{<filename>-<element>.csv}. With \code{format = "xlsx"}, writes a single
+\verb{<filename>.xlsx} workbook with one sheet per element. Requires the
+openxlsx package.
 }
 
 \examples{

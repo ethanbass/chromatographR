@@ -7,19 +7,20 @@
 get_time_resolution(x, idx = 1, digits = 6, unit = NULL)
 }
 \arguments{
-\item{x}{A list of chromatograms or \code{peak_table} object.}
+\item{x}{A chromatogram, a list of chromatograms, or a \code{peak_table} object.}
 
-\item{idx}{Index of chromatogram from which to derive the interval.}
+\item{idx}{Index of the chromatogram from which to derive the interval, if
+\code{x} is a list or \code{peak_table}. Defaults to \code{1}.}
 
-\item{digits}{Number of significant digits to round to. A regular time axis
-carries floating-point noise in the last digits of \code{diff}, so the median is
-rounded by default.}
+\item{digits}{Number of significant digits to round to. Defaults to \code{6},
+because a regular time axis carries floating-point noise in the last digits
+of \code{diff}.}
 
 \item{unit}{Unit for the returned interval: \code{"min"}, \code{"s"} or \code{"ms"}.
 Defaults to \code{NULL}, giving the interval in the units of the chromatogram's
 own time axis, which is what \code{\link{preprocess}}'s \code{dim1} expects. Supply
 \code{"min"} to pair with the \code{time_resolution} arguments of \code{\link{plot_chroms}} and
-\code{\link{reshape_chroms}}, which are in minutes whatever the units of \code{x}. The
+\code{\link{reshape_chroms}}, which are in minutes, regardless of the units of \code{x}. The
 units of \code{x} are read from its \code{time_unit} attribute, falling back to
 minutes when it is absent, as \code{\link{plot_chroms}} does.}
 }

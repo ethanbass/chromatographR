@@ -3,8 +3,8 @@
 #' Identifies groups of duplicate peaks in a peak table and retains a single
 #' representative peak from each group. Peaks are considered duplicates when
 #' their retention times differ by less than `tol` and their spectral
-#' correlation exceeds `min_cor`. This is useful for collapsing peaks that were
-#' integrated at more than one wavelength or chromatographic component.
+#' correlation exceeds `min_cor`. Use it to collapse a compound that was
+#' integrated at more than one wavelength into a single feature.
 #' 
 #' @name combine_peaks
 #' @param peak_table Peak table from [`get_peaktable`].
@@ -20,8 +20,10 @@
 #' and `"lambda"` retains peaks matching the preferred wavelength(s).
 #' @param lambda Character vector of preferred wavelength(s) to retain when
 #' `choose = "lambda"`. The function keeps the duplicate peak whose integration
-#' wavelength matches one of the supplied values. An error is thrown if none of
-#' the supplied values match any peak in the peak table.
+#' wavelength matches one of the supplied values; if several match, it keeps the
+#' first in the peak table, whatever the order of `lambda`. A group with no
+#' match falls back to `choose = "max"`. An error is thrown if none of the
+#' supplied values match any peak in the peak table.
 #' @param verbose Logical. Whether to print status to the console.
 #' @return A peak table derived from the original, but with columns corresponding
 #' to duplicate peaks combined according to the specified criteria.
@@ -122,15 +124,16 @@ combine_peaks <- function(peak_table, tol = .01, min_cor = 0.9,
 #' 
 #' Combines split peaks into a single column of the peak table.
 #' 
-#' Merges the specified peaks in peak table, by selecting the largest value from 
-#' each column if `method` is `"max"`. If `method` is `"sum"`, peaks will be 
-#' merged by summing their values.
+#' In each sample, `method = "max"` keeps the largest of the specified peaks
+#' and `method = "sum"` adds them. The result replaces the peak with the
+#' highest mean across samples, whose metadata is retained; the other peaks
+#' are removed.
 #'
 #' @name merge_peaks
 #' @param peak_table A `peak_table` object from [`get_peaktable`].
 #' @param peaks A vector specifying the names or indices of peaks to be merged.
-#' @param method Method to merge peaks. Either `max` to select the largest
-#' peak from each sample or `sum` to add the peaks together.
+#' @param method Method to merge peaks. Either `"max"` to select the largest
+#' peak from each sample or `"sum"` to add the peaks together.
 #' @return A peak table similar to the input peak table, but where the specified
 #' columns are combined. 
 #' @author Ethan Bass

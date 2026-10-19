@@ -14,7 +14,7 @@
 #' to `"lptw"` warping.
 #'
 #' `trwdth`, `max_shift` and `dilation_span` are widths along the time axis,
-#' given in minutes whatever the time unit of `chrom_list`, and rounded
+#' given in minutes, regardless of the time unit of `chrom_list`, and rounded
 #' internally to a whole number of timepoints. `trwdth` was a count of
 #' timepoints up to chromatographR 0.8.0; multiply an old value by the sampling
 #' interval in minutes to convert it. A width wider than the chromatogram itself
@@ -85,11 +85,10 @@
 #' for `alg = "vpdtw"`: the constant of proportionality in
 #' \eqn{\lambda \propto} [`dilation`][VPdtw::dilation]`(reference)` over a
 #' `dilation_span`-wide window, as recommended by Clifford and Stone (2012).
-#' **A higher
-#' number allows less warping**; `0` applies no penalty at all. Defaults to
-#' `0.2`. In chromatographR <= 0.8.0 `penalty` was a *divisor*, so use the
-#' reciprocal of an old value. Values above `1` raise a warning, since they are
-#' more likely to be old divisors than deliberate choices.
+#' A higher number allows less warping; `0` applies no penalty at all.
+#' Defaults to `0.2`. In chromatographR <= 0.8.0 `penalty` was a divisor, so use
+#' the reciprocal of an old value. Values above `1` raise a warning, since they
+#' are more likely to be old divisors than deliberate choices.
 #' @param dilation_span Width of the moving-maximum window used to build the
 #' `"vpdtw"` penalty. The penalty at each point is the largest reference
 #' intensity within `dilation_span` either side of it, computed by
@@ -115,8 +114,8 @@
 #' `0.95`.
 #' @param regularization Numeric >= 0. Strength of the penalty against warping
 #' for `alg = "lptw"`: a dimensionless weight pulling the warp toward the
-#' identity warp, passed as `penalty` to `fit_penalized_warp`. **A higher
-#' number allows less warping**; `0` (the default) applies no penalty at all.
+#' identity warp, passed as `penalty` to `fit_penalized_warp`. A higher
+#' number allows less warping; `0` (the default) applies no penalty at all.
 #' `1` weights a unit of squared warp displacement equally against a unit of
 #' squared peak-position mismatch, and around `2.4` halves the applied warp, so
 #' useful values run roughly `0`-`10`. Unbounded above, approaching the identity
@@ -1769,7 +1768,7 @@ spectral_noise_model <- function(x, times, peaks){
 #' tested against itself is not paired with the same timepoint, and each pair's
 #' squared residuals and their cross product are kept, so that `spectral_p()`
 #' can form the residual of `e_s - a * e_r` for any `a`. The residuals are
-#' found from dot products with the two columns of the fit, `w` and `r * w`,
+#' found from dot products with the two columns of the fit, `w` and `w * r`,
 #' so one matrix product covers every reference spectrum.
 #' @param R Reference spectra, one per column.
 #' @param Ys,Yr Noise spectra (rows) of the sample and reference.

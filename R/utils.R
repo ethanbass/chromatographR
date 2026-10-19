@@ -366,7 +366,7 @@ check_idx <- function(idx, chrom_list){
 #' @param lambdas lambdas to be matched
 #' @param y Signal as numeric vector.
 #' @param allow_max Logical. Whether to return lambda at maximum signal intensity
-#' of vector `y`. Defaults to `TRUE.`
+#' of vector `y`. Defaults to `TRUE`.
 #' @author Ethan Bass
 #' @noRd
 get_lambda_idx <- function(lambda, lambdas, y, allow_max = TRUE){
@@ -414,10 +414,12 @@ check_chr <- function(chr, loc = NULL, peak_table, chrom_list, allow_max = TRUE)
 
 #' Get retention times
 #' 
-#' Get retention times from a list of chromatograms or a `peak_table` object.
+#' Get retention times from a chromatogram, a list of chromatograms, or a
+#' `peak_table` object.
 #' 
-#' @param x A list of chromatograms or `peak_table` object.
-#' @param idx Index of chromatogram from which to extract times.
+#' @param x A chromatogram, a list of chromatograms, or a `peak_table` object.
+#' @param idx Index of the chromatogram from which to extract times, if `x` is
+#' a list or `peak_table`. Defaults to `1`.
 #' @return Numeric vector of retention times from the chromatogram specified by
 #' `idx`.
 #' @family accessors
@@ -508,16 +510,17 @@ get_baseline <- function(x){
 #' Get the sampling interval of a chromatogram: the median gap between
 #' consecutive retention times.
 #'
-#' @param x A list of chromatograms or `peak_table` object.
-#' @param idx Index of chromatogram from which to derive the interval.
-#' @param digits Number of significant digits to round to. A regular time axis
-#' carries floating-point noise in the last digits of `diff`, so the median is
-#' rounded by default.
+#' @param x A chromatogram, a list of chromatograms, or a `peak_table` object.
+#' @param idx Index of the chromatogram from which to derive the interval, if
+#' `x` is a list or `peak_table`. Defaults to `1`.
+#' @param digits Number of significant digits to round to. Defaults to `6`,
+#' because a regular time axis carries floating-point noise in the last digits
+#' of `diff`.
 #' @param unit Unit for the returned interval: `"min"`, `"s"` or `"ms"`.
 #' Defaults to `NULL`, giving the interval in the units of the chromatogram's
 #' own time axis, which is what [`preprocess`]'s `dim1` expects. Supply
 #' `"min"` to pair with the `time_resolution` arguments of [`plot_chroms`] and
-#' [`reshape_chroms`], which are in minutes whatever the units of `x`. The
+#' [`reshape_chroms`], which are in minutes, regardless of the units of `x`. The
 #' units of `x` are read from its `time_unit` attribute, falling back to
 #' minutes when it is absent, as [`plot_chroms`] does.
 #' @return A length-one numeric giving the time between consecutive timepoints,
@@ -678,7 +681,7 @@ convert_time_units <- function(chrom_list, time_unit = c("min", "s", "ms")){
 #' Check for suggested package
 #' 
 #' This function checks for a suggested package and returns an error if the 
-#' package is not installed (if `return_boolean` is `FALSE.` Otherwise, it 
+#' package is not installed (if `return_boolean` is `FALSE`). Otherwise, it 
 #' returns a boolean value.
 #' 
 #' @noRd
@@ -804,8 +807,9 @@ transfer_metadata <- function(new_object, old_object, transfer_class = TRUE,
 #' user. The options are `lapply`, `pblapply` and `mclapply`.
 #' @importFrom parallel mclapply
 #' @importFrom stats weighted.mean
-#' @return Returns [`pbapply`][pbapply::pbapply] if `progress_bar == TRUE`,
-#' otherwise returns [`lapply`].
+#' @return [`pblapply`][pbapply::pblapply] if `show_progress` is `TRUE`,
+#' otherwise [`mclapply`][parallel::mclapply] when `cl` is an integer above
+#' one on a non-Windows system, otherwise [`lapply`].
 #' @noRd
 choose_apply_fnc <- function(show_progress, parallel = NULL, cl = 2){
   pbapply_installed <- check_for_pkg("pbapply", return_boolean = TRUE)
@@ -1102,8 +1106,9 @@ get_prominence <- function(y, peaks){
 #'
 #' An even-width running mean is not centered on a sample: it creates plateaus
 #' at extrema, which produce two consecutive sign changes in the derivative and
-#' so report an apex one timepoint off. Rounding up to an odd width of at least
-#' three keeps the filter centered.
+#' so report an apex one timepoint off. Rounding up to an odd width keeps the
+#' filter centered, and the floor of three stops a window that rounds to one
+#' from doing no smoothing at all.
 #'
 #' @param w A smoothing window, in timepoints.
 #' @return An odd integer of at least `3`.
@@ -1118,8 +1123,8 @@ odd_window <- function(w){
 #' Default operator for `NULL`
 #'
 #' `%||%` entered base R in 4.4.0, but the package supports R >= 4.1.0. The
-#' right-hand side must stay lazy, since every call site pairs it with
-#' `skip_underdetermined` to avoid an expensive fit.
+#' right-hand side must stay lazy, since call sites rely on it to skip
+#' expensive work.
 #' @noRd
 `%||%` <- function(x, y) if (is.null(x)) y else x
 

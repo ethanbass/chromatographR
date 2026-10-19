@@ -30,8 +30,10 @@ and \code{"lambda"} retains peaks matching the preferred wavelength(s).}
 
 \item{lambda}{Character vector of preferred wavelength(s) to retain when
 \code{choose = "lambda"}. The function keeps the duplicate peak whose integration
-wavelength matches one of the supplied values. An error is thrown if none of
-the supplied values match any peak in the peak table.}
+wavelength matches one of the supplied values; if several match, it keeps the
+first in the peak table, whatever the order of \code{lambda}. A group with no
+match falls back to \code{choose = "max"}. An error is thrown if none of the
+supplied values match any peak in the peak table.}
 
 \item{verbose}{Logical. Whether to print status to the console.}
 
@@ -46,8 +48,8 @@ to duplicate peaks combined according to the specified criteria.
 Identifies groups of duplicate peaks in a peak table and retains a single
 representative peak from each group. Peaks are considered duplicates when
 their retention times differ by less than \code{tol} and their spectral
-correlation exceeds \code{min_cor}. This is useful for collapsing peaks that were
-integrated at more than one wavelength or chromatographic component.
+correlation exceeds \code{min_cor}. Use it to collapse a compound that was
+integrated at more than one wavelength into a single feature.
 }
 \examples{
 data(pk_tab)

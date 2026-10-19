@@ -7,16 +7,18 @@
 get_times(x, idx = 1)
 }
 \arguments{
-\item{x}{A list of chromatograms or \code{peak_table} object.}
+\item{x}{A chromatogram, a list of chromatograms, or a \code{peak_table} object.}
 
-\item{idx}{Index of chromatogram from which to extract times.}
+\item{idx}{Index of the chromatogram from which to extract times, if \code{x} is
+a list or \code{peak_table}. Defaults to \code{1}.}
 }
 \value{
 Numeric vector of retention times from the chromatogram specified by
 \code{idx}.
 }
 \description{
-Get retention times from a list of chromatograms or a \code{peak_table} object.
+Get retention times from a chromatogram, a list of chromatograms, or a
+\code{peak_table} object.
 }
 \examples{
 data(Sa_warp)

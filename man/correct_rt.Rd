@@ -101,11 +101,10 @@ timepoints in \code{\link[ptw:ptw]{ptw}} itself on a chromatogram sampled every
 for \code{alg = "vpdtw"}: the constant of proportionality in
 \eqn{\lambda \propto} \code{\link[VPdtw:dilation]{dilation}}\code{(reference)} over a
 \code{dilation_span}-wide window, as recommended by Clifford and Stone (2012).
-\strong{A higher
-number allows less warping}; \code{0} applies no penalty at all. Defaults to
-\code{0.2}. In chromatographR <= 0.8.0 \code{penalty} was a \emph{divisor}, so use the
-reciprocal of an old value. Values above \code{1} raise a warning, since they are
-more likely to be old divisors than deliberate choices.}
+A higher number allows less warping; \code{0} applies no penalty at all.
+Defaults to \code{0.2}. In chromatographR <= 0.8.0 \code{penalty} was a divisor, so use
+the reciprocal of an old value. Values above \code{1} raise a warning, since they
+are more likely to be old divisors than deliberate choices.}
 
 \item{max_shift}{Maximum allowable shift for \code{VPdtw} warping, in minutes.
 Set it from the retention time drift you actually expect; the default of \code{1}
@@ -133,8 +132,8 @@ spectral correlation for a candidate peak pair to be retained. Defaults to
 
 \item{regularization}{Numeric >= 0. Strength of the penalty against warping
 for \code{alg = "lptw"}: a dimensionless weight pulling the warp toward the
-identity warp, passed as \code{penalty} to \code{fit_penalized_warp}. \strong{A higher
-number allows less warping}; \code{0} (the default) applies no penalty at all.
+identity warp, passed as \code{penalty} to \code{fit_penalized_warp}. A higher
+number allows less warping; \code{0} (the default) applies no penalty at all.
 \code{1} weights a unit of squared warp displacement equally against a unit of
 squared peak-position mismatch, and around \code{2.4} halves the applied warp, so
 useful values run roughly \code{0}-\code{10}. Unbounded above, approaching the identity
@@ -192,7 +191,7 @@ and \code{peaks}, \code{rt_window}, \code{spectral_cutoff}, and \code{regulariza
 to \code{"lptw"} warping.
 
 \code{trwdth}, \code{max_shift} and \code{dilation_span} are widths along the time axis,
-given in minutes whatever the time unit of \code{chrom_list}, and rounded
+given in minutes, regardless of the time unit of \code{chrom_list}, and rounded
 internally to a whole number of timepoints. \code{trwdth} was a count of
 timepoints up to chromatographR 0.8.0; multiply an old value by the sampling
 interval in minutes to convert it. A width wider than the chromatogram itself

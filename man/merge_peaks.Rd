@@ -11,8 +11,8 @@ merge_peaks(peak_table, peaks, method = c("max", "sum"))
 
 \item{peaks}{A vector specifying the names or indices of peaks to be merged.}
 
-\item{method}{Method to merge peaks. Either \code{max} to select the largest
-peak from each sample or \code{sum} to add the peaks together.}
+\item{method}{Method to merge peaks. Either \code{"max"} to select the largest
+peak from each sample or \code{"sum"} to add the peaks together.}
 }
 \value{
 A peak table similar to the input peak table, but where the specified
@@ -22,9 +22,10 @@ columns are combined.
 Combines split peaks into a single column of the peak table.
 }
 \details{
-Merges the specified peaks in peak table, by selecting the largest value from
-each column if \code{method} is \code{"max"}. If \code{method} is \code{"sum"}, peaks will be
-merged by summing their values.
+In each sample, \code{method = "max"} keeps the largest of the specified peaks
+and \code{method = "sum"} adds them. The result replaces the peak with the
+highest mean across samples, whose metadata is retained; the other peaks
+are removed.
 }
 \examples{
 data(pk_tab)

@@ -1,4 +1,4 @@
-#' Return first or last parts of a `peak_table`.
+#' Return first or last parts of a `peak_table`
 #'
 #' Returns the first or last parts of the `peak_table` object.
 #'
@@ -61,7 +61,7 @@ row.names.peak_table <- function(x, ...){
 #' @param x A [`peak_table`] object.
 #' @param subset Logical expression indicating rows (samples) to keep from
 #' `peak_table`; missing values are taken as `FALSE`.
-#' @param select Logical expression indicating columns (peaks) to select from
+#' @param select Expression indicating columns (peaks) to select from
 #' `peak_table`.
 #' @param drop Logical. Passed to indexing operator.
 #' @param ... Additional arguments (placeholder).
@@ -89,10 +89,10 @@ subset.peak_table <- function(x, subset, select, drop = FALSE, ...){
   x
 }
 
-#' Summarize Peak Table
+#' Summarize peak table
 #' 
-#' Prints basic statistics about `peak_table` to the console (e.g., the 
-#' number of peaks, wavelengths, range of intensities, etc).
+#' Computes basic statistics about a `peak_table` (e.g., the number of peaks,
+#' wavelengths, range of intensities), which print as a formatted summary.
 #' 
 #' @param object A [`peak_table`] object.
 #' @param ... Additional arguments (currently unused).
@@ -174,7 +174,7 @@ print.summary.peak_table <- function(x, ...) {
 #' Print peak table
 #' @param x A [`peak_table`] object.
 #' @param ... Additional arguments to [`print`].
-#' @return Prints and invisible returns the `tab` element from the supplied 
+#' @return Prints and invisibly returns the `tab` element from the supplied
 #' `peak_table`.
 #' @keywords internal
 #' @export
@@ -196,7 +196,7 @@ print.peak_table <- function(x, ...){
 #' @param i Row indices (samples) to subset.
 #' @param j Column indices (peaks) to subset.
 #' @param ... Additional arguments (ignored).
-#' @param drop Passed to the `[ `indexing operator.
+#' @param drop Passed to the `[` indexing operator.
 #' @return A `peak_table` object.
 #' @author Ethan Bass
 #' @method [ peak_table

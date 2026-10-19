@@ -18,16 +18,16 @@ normalize_data(
 
 \item{column}{The name of the column to be used for normalization.}
 
-\item{chrom_list}{List of chromatograms for normalization. The samples must
-be in same order as the \code{peak_table}. If omitted, the function will attempt to
-find it automatically using the pointer from the \code{peak_table}.}
+\item{chrom_list}{List of chromatograms for normalization. Its names must
+match the sample names of the \code{peak_table}, in the same order. If omitted,
+it is retrieved using the name stored in the \code{peak_table}.}
 
 \item{what}{Output type to return: either \code{"peak_table"} (default) or
 \code{"chrom_list"}.}
 
-\item{by}{Whether to normalize by a column in sample metadata (\code{meta}) or by
-a column in the peak table (\code{peak}). By default, this parameter is inferred
-based on the \code{column} name.}
+\item{by}{Whether to normalize by a column in sample metadata (\code{"meta"}) or
+by a column in the peak table (\code{"peak"}). By default, it is inferred from
+where \code{column} is found, and an error is raised if it is found in both.}
 
 \item{on_invalid}{How to handle invalid normalization values (i.e. zero,
 negative, or \code{NA} values). One of \code{"warn"} (the default), \code{"silent"}, or
@@ -38,9 +38,10 @@ Either a normalized \code{peak_table} object or a normalized \code{chrom_list},
 depending on the value of \code{what}.
 }
 \description{
-Normalizes peak table or list of chromatograms by a column in the sample
-metadata or in the peak table. For normalization by sample metadata, the
-metadata must first be attached to the \code{peak_table} using \code{\link{attach_metadata}}.
+Divides each sample in a peak table or list of chromatograms by its value in
+a column of the sample metadata or of the peak table. For normalization by
+sample metadata, the metadata must first be attached to the \code{peak_table}
+using \code{\link{attach_metadata}}.
 }
 \examples{
 data(pk_tab)

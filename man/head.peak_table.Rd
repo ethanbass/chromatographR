@@ -3,7 +3,7 @@
 \name{head.peak_table}
 \alias{head.peak_table}
 \alias{tail.peak_table}
-\title{Return first or last parts of a \code{peak_table}.}
+\title{Return first or last parts of a \code{peak_table}}
 \usage{
 \method{head}{peak_table}(x, ...)
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/peak_table-methods.R
 \name{summary.peak_table}
 \alias{summary.peak_table}
-\title{Summarize Peak Table}
+\title{Summarize peak table}
 \usage{
 \method{summary}{peak_table}(object, ...)
 }
@@ -15,8 +15,8 @@
 A list containing basic information about the supplied \code{peak_table}.
 }
 \description{
-Prints basic statistics about \code{peak_table} to the console (e.g., the
-number of peaks, wavelengths, range of intensities, etc).
+Computes basic statistics about a \code{peak_table} (e.g., the number of peaks,
+wavelengths, range of intensities), which print as a formatted summary.
 }
 \author{
 Ethan Bass

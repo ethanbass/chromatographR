@@ -3,17 +3,19 @@
 #' Exports peak table in `csv` or `xlsx` format.
 #' 
 #' @param peak_table Peak table object from [`get_peaktable`].
-#' @param path Path to write file.
+#' @param path Path to an existing directory in which to write the files.
 #' @param filename File name. Defaults to `"peak_table"`.
-#' @param format File format to export. Either `csv` or `xlsx`.
+#' @param format File format to export. Either `"csv"` (default) or `"xlsx"`.
 #' @param what Which elements of the `peak_table` to export. One or more of
 #' `"tab"`, `"pk_meta"`, `"sample_meta"`, `"instrument_meta"`,
-#' `"ref_spectra"`, and `"args"`.
+#' `"ref_spectra"`, and `"args"`. Defaults to all six.
 #' @importFrom utils write.csv
 #' @return No return value. The function is called for its side effects.
 #' @section Side effects:
-#' Exports peak_table object as `.csv` or `.xlsx` file according to the value
-#' of the `format` argument.
+#' With `format = "csv"`, writes one file per element of `what`, named
+#' `<filename>-<element>.csv`. With `format = "xlsx"`, writes a single
+#' `<filename>.xlsx` workbook with one sheet per element. Requires the
+#' openxlsx package.
 #' @examples \donttest{
 #' data(pk_tab)
 #' path_out = tempdir()

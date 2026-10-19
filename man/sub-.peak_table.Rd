@@ -15,7 +15,7 @@
 
 \item{...}{Additional arguments (ignored).}
 
-\item{drop}{Passed to the \verb{[ }indexing operator.}
+\item{drop}{Passed to the \code{[} indexing operator.}
 }
 \value{
 A \code{peak_table} object.

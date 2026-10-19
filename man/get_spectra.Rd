@@ -20,7 +20,8 @@ depends on \code{what}.}
 
 \item{peak_table}{A \code{peak_table} object. Required if \code{what == "peak"}.}
 
-\item{chrom_list}{A list of chromatographic matrices.}
+\item{chrom_list}{A list of chromatographic matrices. If \code{NULL}, the list is
+found through the pointer in \code{peak_table}.}
 
 \item{idx}{Indices of chromatograms to extract spectra from. Defaults to all
 chromatograms in \code{chrom_list}.}
@@ -30,14 +31,14 @@ the range [0, 1]. Defaults to \code{FALSE}.}
 
 \item{what}{How to interpret \code{loc}. One of \code{"peak"} (look up retention time
 from \code{peak_table}), \code{"rt"} (treat \code{loc} as a retention time directly), or
-\code{"idx"} (treat \code{loc} as a row index).}
+\code{"idx"} (treat \code{loc} as a row index). Defaults to \code{"peak"}.}
 
 \item{format}{One of \code{"wide"} or \code{"long"}. In wide format, wavelengths are
 rows and each column is a sample. In long format, columns are \code{wavelength},
 \code{absorbance}, \code{sample}, and \code{rt}. Defaults to \code{"wide"}.}
 }
 \value{
-A \code{data.frame} in the format specified by \code{format}.
+Returns a \code{data.frame} in the format specified by \code{format}.
 }
 \description{
 Extracts the UV-VIS spectrum at a specified retention time from one or more
