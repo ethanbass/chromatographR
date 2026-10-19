@@ -182,9 +182,9 @@ either caused an obscure error or had its two sides spliced together.
 
 #### Retention time correction
 
-* Added landmark parametric time warping (`alg = "lptw"`) to `correct_rt`,
-which fits the warp to matched peak positions rather than whole signals. See
-`?correct_rt`.
+* Added landmark parametric time warping (`alg = "lptw"`) to `correct_rt` and
+`correct_rt_group`, which fits the warp to matched peak positions rather than
+whole signals. See `?correct_rt`.
 * Added a `dilation_span` argument to `correct_rt`: the width, in minutes, of
 the moving-maximum window used to build the `"vpdtw"` penalty, previously
 hardcoded to 350 timepoints. A span wide enough to make the penalty constant

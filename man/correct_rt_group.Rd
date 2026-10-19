@@ -10,6 +10,7 @@ correct_rt_group(
   groups,
   reference = "best",
   reference_group = NULL,
+  alg = c("ptw", "lptw"),
   init.coef = c(0, 1, 0),
   n_traces = NULL,
   fill_zeros = FALSE,
@@ -19,6 +20,9 @@ correct_rt_group(
   plot_it = FALSE,
   penalty = NULL,
   max_shift = 1,
+  rt_window = 0.3,
+  spectral_cutoff = 0.95,
+  regularization = 0,
   verbose = getOption("verbose"),
   show_progress = NULL,
   cl = 2,
@@ -50,6 +54,9 @@ group averages.}
 
 \item{reference_group}{Name of the group to use as the reference group. If
 supplied, overrides \code{reference}. Defaults to \code{NULL}.}
+
+\item{alg}{Alignment algorithm to use: parametric time warping (\code{"ptw"},
+the default) or landmark parametric time warping (\code{"lptw"}).}
 
 \item{init.coef}{Starting values for the optimization. Named to match the
 argument of the same name in \code{\link[ptw:ptw]{ptw}}, which receives it. For
@@ -83,11 +90,28 @@ timepoints in \code{\link[ptw:ptw]{ptw}} itself on a chromatogram sampled every
 
 \item{plot_it}{Logical. Whether to plot alignment. Defaults to \code{FALSE}.}
 
-\item{penalty}{Unused. \code{correct_rt_group} warps with \code{"ptw"} only, so the
+\item{penalty}{Unused. \code{correct_rt_group} does not support \code{"vpdtw"}, so the
 \code{"vpdtw"} penalty has no effect here.}
 
-\item{max_shift}{Unused. \code{correct_rt_group} warps with \code{"ptw"} only, so the
-\code{"vpdtw"} shift limit has no effect here.}
+\item{max_shift}{Unused. \code{correct_rt_group} does not support \code{"vpdtw"}, so
+the \code{"vpdtw"} shift limit has no effect here.}
+
+\item{rt_window}{Numeric. Argument to \code{\link{match_peaks}}. Maximum allowed
+difference in retention time, in minutes, between a reference and sample
+peak to be considered a candidate match. Defaults to \code{0.3}.}
+
+\item{spectral_cutoff}{Numeric. Argument to \code{\link{match_peaks}}. Minimum
+spectral correlation for a candidate peak pair to be retained. Defaults to
+\code{0.95}.}
+
+\item{regularization}{Numeric >= 0. Strength of the penalty against warping
+for \code{alg = "lptw"}: a dimensionless weight pulling the warp toward the
+identity warp, passed as \code{penalty} to \code{fit_penalized_warp}. \strong{A higher
+number allows less warping}; \code{0} (the default) applies no penalty at all.
+\code{1} weights a unit of squared warp displacement equally against a unit of
+squared peak-position mismatch, and around \code{2.4} halves the applied warp, so
+useful values run roughly \code{0}-\code{10}. Unbounded above, approaching the identity
+warp asymptotically.}
 
 \item{verbose}{Logical. Whether to print a progress message as the warping
 models are fit and applied. Defaults to \code{getOption("verbose")}.}
@@ -102,9 +126,9 @@ parallel processing or a cluster object created by
 integers are ignored. Has no effect when \code{alg = "vpdtw"}.}
 
 \item{what}{What to return: \code{"corrected.values"} (the default) for the
-warped chromatograms, or \code{"models"} for a \code{ptw_list} holding each sample's
-group warp, which can be passed to \code{\link{correct_peaks}} or to \code{\link{correct_rt}}
-via \code{models}.}
+warped chromatograms, or \code{"models"} for a \code{ptw_list} or \code{lptw_list} holding
+each sample's group warp, which can be passed to \code{\link{correct_peaks}} or to
+\code{\link{correct_rt}} via \code{models}.}
 
 \item{...}{For \code{alg = "ptw"}, optional additional arguments passed to
 \code{\link[ptw:ptw]{ptw}}. The only argument that cannot be changed is \code{warp.type},
@@ -126,17 +150,24 @@ instead.}
 If \code{what = "corrected.values"}, a list of warped chromatogram
 matrices in the same order as \code{chrom_list}, with each sample warped using
 the warp coefficients estimated from its group average. If
-\code{what = "models"}, a \code{ptw_list} with one model per sample, in the same
-order.
+\code{what = "models"}, a \code{ptw_list} (\code{alg = "ptw"}) or \code{lptw_list}
+(\code{alg = "lptw"}) with one model per sample, in the same order.
 }
 \description{
 Aligns chromatograms using parametric time warping (\code{"ptw"}), as
-implemented in \code{\link[ptw:ptw]{ptw}}, with warping functions estimated
-from within-group averages. This is useful when samples fall into batches
-with shared retention time shifts, or when individual samples contain peaks
-absent in other groups that would otherwise confound alignment. One warp is
-fit per group rather than one per sample, so the cost of warping falls
-roughly in proportion to the number of groups.
+implemented in \code{\link[ptw:ptw]{ptw}}, or landmark parametric time warping
+(\code{"lptw"}), with warping functions estimated from within-group averages.
+This is useful when samples fall into batches with shared retention time
+shifts, or when individual samples contain peaks absent in other groups that
+would otherwise confound alignment. One warp is fit per group rather than one
+per sample, so the cost of warping falls roughly in proportion to the number
+of groups.
+}
+\details{
+With \code{alg = "lptw"}, peaks are found in each group average by \code{\link{get_peaks}}
+at its default settings and matched to the peaks of the reference group's
+average, so landmarks come from the averaged signal rather than from
+individual samples.
 }
 \examples{
 data(Sa_pr)

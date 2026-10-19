@@ -182,6 +182,43 @@ test_that("correct_rt_group returns per-sample group models", {
   expect_true("rt.cor" %in% colnames(pks_cor[[1]][[1]]))
 })
 
+test_that("correct_rt_group fits lptw warps on the group averages", {
+  skip_on_cran()
+  mods <- correct_rt_group(cl_grp, lambdas = 210, groups = grp_vec, alg = "lptw",
+                           what = "models", show_progress = FALSE)
+  expect_s3_class(mods, "lptw_list")
+  expect_equal(names(mods), names(cl_grp))
+  expect_equal(mods[[1]]$warp.coef, mods[[2]]$warp.coef)
+  expect_false(isTRUE(all.equal(mods[[1]]$warp.coef, mods[[3]]$warp.coef)))
+  avg <- lapply(list(a = cl_grp[1:2], b = cl_grp[3:4]), function(g){
+    m <- Reduce("+", lapply(g, as.matrix)) / length(g)
+    dimnames(m) <- dimnames(g[[1]])
+    m
+  })
+  direct <- correct_rt(avg, lambdas = 210, alg = "lptw", what = "models",
+                       reference = attr(mods, "reference"), show_progress = FALSE)
+  expect_equal(mods[[3]]$warp.coef, direct[["b"]]$warp.coef)
+  warped <- correct_rt_group(cl_grp, lambdas = 210, groups = grp_vec,
+                             alg = "lptw", show_progress = FALSE)
+  expect_equal(correct_rt(cl_grp, models = mods, alg = "lptw",
+                          show_progress = FALSE),
+               warped, ignore_attr = TRUE)
+  regularized <- correct_rt_group(cl_grp, lambdas = 210, groups = grp_vec,
+                                  alg = "lptw", regularization = 5,
+                                  what = "models", show_progress = FALSE)
+  expect_false(isTRUE(all.equal(regularized[[3]]$warp.coef,
+                                mods[[3]]$warp.coef)))
+  pks <- get_peaks(cl_grp, lambdas = 210, show_progress = FALSE)
+  expect_true("rt.cor" %in% colnames(
+    correct_peaks(pks, mods, chrom_list = cl_grp)[[3]][[1]]))
+})
+
+test_that("correct_rt_group rejects vpdtw", {
+  expect_error(correct_rt_group(cl_grp, lambdas = 210, groups = grp_vec,
+                                alg = "vpdtw", show_progress = FALSE),
+               regexp = "should be one of")
+})
+
 test_that("correct_rt_group resolves the reference group", {
   skip_on_cran()
   # `reference_group` and a `reference` sample in that group agree

@@ -850,12 +850,18 @@ fit_penalized_warp <- function(ref_i, samp_i,
 #' Correct retention time with group-based warping
 #'
 #' Aligns chromatograms using parametric time warping (`"ptw"`), as
-#' implemented in [`ptw`][ptw::ptw], with warping functions estimated
-#' from within-group averages. This is useful when samples fall into batches
-#' with shared retention time shifts, or when individual samples contain peaks
-#' absent in other groups that would otherwise confound alignment. One warp is
-#' fit per group rather than one per sample, so the cost of warping falls
-#' roughly in proportion to the number of groups.
+#' implemented in [`ptw`][ptw::ptw], or landmark parametric time warping
+#' (`"lptw"`), with warping functions estimated from within-group averages.
+#' This is useful when samples fall into batches with shared retention time
+#' shifts, or when individual samples contain peaks absent in other groups that
+#' would otherwise confound alignment. One warp is fit per group rather than one
+#' per sample, so the cost of warping falls roughly in proportion to the number
+#' of groups.
+#'
+#' With `alg = "lptw"`, peaks are found in each group average by [`get_peaks`]
+#' at its default settings and matched to the peaks of the reference group's
+#' average, so landmarks come from the averaged signal rather than from
+#' individual samples.
 #'
 #' @aliases correct_rt_group
 #' @import ptw
@@ -875,21 +881,23 @@ fit_penalized_warp <- function(ref_i, samp_i,
 #' group averages.
 #' @param reference_group Name of the group to use as the reference group. If
 #' supplied, overrides `reference`. Defaults to `NULL`.
-#' @param penalty Unused. `correct_rt_group` warps with `"ptw"` only, so the
+#' @param alg Alignment algorithm to use: parametric time warping (`"ptw"`,
+#' the default) or landmark parametric time warping (`"lptw"`).
+#' @param penalty Unused. `correct_rt_group` does not support `"vpdtw"`, so the
 #' `"vpdtw"` penalty has no effect here.
-#' @param max_shift Unused. `correct_rt_group` warps with `"ptw"` only, so the
-#' `"vpdtw"` shift limit has no effect here.
+#' @param max_shift Unused. `correct_rt_group` does not support `"vpdtw"`, so
+#' the `"vpdtw"` shift limit has no effect here.
 #' @param maxshift Deprecated and unused. See `max_shift`.
 #' @param what What to return: `"corrected.values"` (the default) for the
-#' warped chromatograms, or `"models"` for a `ptw_list` holding each sample's
-#' group warp, which can be passed to [`correct_peaks`] or to [`correct_rt`]
-#' via `models`.
+#' warped chromatograms, or `"models"` for a `ptw_list` or `lptw_list` holding
+#' each sample's group warp, which can be passed to [`correct_peaks`] or to
+#' [`correct_rt`] via `models`.
 #' @inheritParams correct_rt
 #' @return If `what = "corrected.values"`, a list of warped chromatogram
 #' matrices in the same order as `chrom_list`, with each sample warped using
 #' the warp coefficients estimated from its group average. If
-#' `what = "models"`, a `ptw_list` with one model per sample, in the same
-#' order.
+#' `what = "models"`, a `ptw_list` (`alg = "ptw"`) or `lptw_list`
+#' (`alg = "lptw"`) with one model per sample, in the same order.
 #' @author Ethan Bass
 #' @seealso [`correct_rt`], [`ptw`][ptw::ptw]
 #' @examples
@@ -900,16 +908,19 @@ fit_penalized_warp <- function(ref_i, samp_i,
 #' @export
 
 correct_rt_group <- function(chrom_list, lambdas, groups, reference = 'best',
-                             reference_group = NULL,
+                             reference_group = NULL, alg = c("ptw", "lptw"),
                              init.coef = c(0, 1, 0), n_traces = NULL,
                              fill_zeros = FALSE, n_zeros = 0, scale = FALSE, 
                              trwdth = 0.2, plot_it = FALSE, penalty = NULL, 
-                             max_shift = 1, verbose = getOption("verbose"),
+                             max_shift = 1, rt_window = 0.3,
+                             spectral_cutoff = 0.95, regularization = 0,
+                             verbose = getOption("verbose"),
                              show_progress = NULL, cl = 2,
                              what = c("corrected.values", "models"),
                              ..., n.traces = NULL, n.zeros = NULL,
                              maxshift = NULL) {
   what <- match.arg(what)
+  alg <- match.arg(alg)
   chrom_list_name <- deparse(substitute(chrom_list))
   n_traces <- resolve_deprecated(n.traces, n_traces)
   n_zeros <- resolve_deprecated(n.zeros, n_zeros)
@@ -983,12 +994,13 @@ correct_rt_group <- function(chrom_list, lambdas, groups, reference = 'best',
     }
   }
   
-  if (verbose) message("Fitting PTW warp models on group averages.")
+  if (verbose)
+    message(sprintf("Fitting %s warp models on group averages.", toupper(alg)))
   group_models <- correct_rt(
     chrom_list  = group_avg_list,
     lambdas     = lambdas,
     reference   = reference,
-    alg         = "ptw",
+    alg         = alg,
     what        = "models",
     init.coef   = init.coef,
     n_traces    = n_traces,
@@ -996,6 +1008,9 @@ correct_rt_group <- function(chrom_list, lambdas, groups, reference = 'best',
     scale       = scale,
     trwdth      = trwdth,
     plot_it     = plot_it,
+    rt_window   = rt_window,
+    spectral_cutoff = spectral_cutoff,
+    regularization = regularization,
     verbose     = verbose,
     show_progress = show_progress,
     cl          = cl,
@@ -1020,8 +1035,8 @@ correct_rt_group <- function(chrom_list, lambdas, groups, reference = 'best',
       models      = structure(setNames(rep(group_models[g],
                                                   length(member_list)),
                                               names(member_list)),
-                              class = "ptw_list"),
-      alg         = "ptw",
+                              class = oldClass(group_models)),
+      alg         = alg,
       what        = "corrected.values",
       init.coef   = init.coef,
       n_zeros     = n_zeros,
