@@ -21,7 +21,7 @@ test_that("choose_apply_fnc works as expected", {
                   choose_apply_fnc(show_progress = FALSE, cl = NULL))){
     expect_warning(expect_equal(fn(c(a = 1, b = 4), function(x){
       warning("w"); sqrt(x)
-    }), list(a = 1, b = 2)), "Samples a, b: w")
+    }), list(a = 1, b = 2)), "All samples: w")
   }
 })
 
@@ -346,7 +346,7 @@ test_that("parallel_lapply re-raises each worker warning once, naming its sample
       invokeRestart("muffleWarning")
     })
   expect_equal(out, list(a = 1, b = 2, c = 3))
-  expect_equal(w, c("Samples a, b, c: shared", "Sample b: only b"))
+  expect_equal(w, c("All samples: shared", "Sample b: only b"))
 })
 
 test_that("parallel_lapply stops when a worker process dies", {

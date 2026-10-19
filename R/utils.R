@@ -904,8 +904,10 @@ replay_warnings <- function(warnings, ids){
   for (msg in unique(unlist(warnings))){
     if (!is.null(ids)){
       who <- ids[vapply(warnings, function(w) msg %in% w, logical(1))]
-      msg <- sprintf("Sample%s %s: %s", plural(length(who)),
-                     format_list(who, quote = FALSE), msg)
+      msg <- if (length(ids) > 1 && length(who) == length(ids))
+        paste0("All samples: ", msg) else
+        sprintf("Sample%s %s: %s", plural(length(who)),
+                format_list(who, quote = FALSE), msg)
     }
     warning(msg, call. = FALSE, immediate. = TRUE)
   }
