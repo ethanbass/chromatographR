@@ -626,6 +626,16 @@ rt_factor <- function(unit){
   time_factor(unit)
 }
 
+#' Indices retained when thinning a time axis
+#'
+#' `time_resolution` must already be expressed in the units of `times`.
+#' @noRd
+thin_idx <- function(times, time_resolution){
+  if (is.null(time_resolution)) return(seq_along(times))
+  time_diff <- mean(diff(head(times, 10)))
+  seq(1, length(times), by = max(1, round(time_resolution / time_diff)))
+}
+
 #' Plural suffix
 #' @noRd
 plural <- function(n) if (n > 1) "s" else ""

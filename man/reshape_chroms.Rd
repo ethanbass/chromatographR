@@ -8,6 +8,7 @@ reshape_chroms(
   x,
   idx,
   time_resolution = NULL,
+  time_unit = NULL,
   sample_var = "sample",
   lambdas = NULL,
   rts = NULL,
@@ -17,16 +18,24 @@ reshape_chroms(
 \arguments{
 \item{x}{A list of chromatographic matrices in wide format.}
 
-\item{idx}{Indices of chromatograms to convert.}
+\item{idx}{Indices of chromatograms to convert. Defaults to all of them.}
 
-\item{time_resolution}{Time resolution used when reshaping. Can be used
-to subsample the time axis. Defaults to full resolution.}
+\item{time_resolution}{Desired temporal resolution, in minutes, regardless of the
+time unit of \code{x}, matching \code{\link{plot_chroms}}. Subsamples the time axis to
+approximately this interval. Defaults to \code{NULL}, which keeps the full
+resolution.}
 
-\item{sample_var}{Name of the new column containing sample identifiers}
+\item{time_unit}{Time units of the provided chromatograms: either \code{"min"},
+\code{"s"}, or \code{"ms"}. Used only to interpret \code{time_resolution}. Defaults to
+\code{NULL}, in which case the unit is taken from the \code{time_unit} attribute of the
+chromatograms, falling back to \code{"min"}.}
 
-\item{lambdas}{Wavelength(s) to include.}
+\item{sample_var}{Name of the new column containing sample identifiers.}
 
-\item{rts}{Retention times to include.}
+\item{lambdas}{Wavelength(s) to include. Defaults to all wavelengths.}
+
+\item{rts}{Retention times to include, each matched to the nearest time
+point. Defaults to all retention times.}
 
 \item{transfer_metadata}{Logical. If \code{TRUE}, metadata attributes are
 transferred to the output. Defaults to \code{FALSE}.}
@@ -38,10 +47,6 @@ and a sample identifier column specified by \code{sample_var}.
 \description{
 Converts a list of chromatographic matrices into a single long-format
 data frame with one row per sample × retention time × wavelength combination.
-}
-\details{
-Each row corresponds to a single measurement of signal intensity at
-a given retention time and wavelength for a specific sample.
 }
 \examples{
 data(Sa_warp)

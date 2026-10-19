@@ -109,6 +109,9 @@ old names need updating (`x["10.10", ]` rather than `x["10.1", ]`).
 * `get_peaktable`'s `hmax` and `sigma_t`, and `combine_peaks`'s `tol`, are now
 in minutes, regardless of the time unit of the data. Results change only for
 chromatograms whose times are not in minutes.
+* `reshape_chroms` now reads `time_resolution` in minutes, matching
+`plot_chroms`. Previously it was in the units of the time axis, so divide old
+values by 60 for chromatograms in seconds.
 * Removed `get_peaktable`'s `out` argument, so peak tables are always
 data.frames. Use `as.matrix(pt$tab)` for a matrix.
 * Peak tables built from corrected peaks now name the `pk_meta` rows `rt`,
@@ -337,6 +340,18 @@ retention times by up to 0.005 minutes and set small `tau` values to zero.
 named `peaks` vector. Previously both were `NA`.
 * `filter_peaktable` no longer appends a spurious `rt` row to `pk_meta` when
 filtering a table built from corrected peaks.
+
+#### Plotting
+
+* `plot_chroms` no longer errors on single-wavelength chromatograms under the
+`"ggplot"` and `"plotly"` engines. A wavelength given in `lambdas` for such data
+must now match the column name. Previously it was ignored.
+* `plot_chroms` and `reshape_chroms` no longer fail with
+`invalid '(to - from)/by'` when the sampling interval is more than twice the
+requested `time_resolution`.
+* `reshape_chroms` no longer errors when `lambdas` is left at its `NULL`
+default, which now returns every wavelength, or when `sample_var` is not
+`"sample"`.
 
 #### Documentation and packaging
 

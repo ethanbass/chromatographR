@@ -270,6 +270,12 @@ test_that("plot_chroms plots an element of nested chromatograms", {
   flat <- plot_chroms(Sa_warp, lambdas = 210, engine = "ggplot")
   expect_equal(plot_chroms(nested, lambdas = 210, engine = "ggplot")$data,
                flat$data)
+  expect_equal(plot_chroms(nested, engine = "ggplot",
+                           what = c("instrument", "pressure"))$data$absorbance,
+               flat$data$absorbance)
+  expect_equal(plot_chroms(nested, engine = "ggplot",
+                           what = "instrument: pressure")$data$absorbance,
+               flat$data$absorbance)
   expect_error(plot_chroms(nested, what = "instrument:flow"),
                "`what = \"instrument:flow\"` was not found")
   colon_named <- lapply(nested, function(el) c(el, list("dad:raw" = el$dad)))
@@ -335,7 +341,7 @@ test_that("plot_chroms_heatmap works to plot alignments with ggplot", {
   suppressWarnings(vdiffr::expect_doppelganger("alignment_ggplot_heatmap_zoom",
                                                alignment_ggplot_heatmap_zoom))
   expect_error(plot_chroms_heatmap(Sa_warp), 
-               regexp = 'argument "lambdas" is missing')
+               regexp = "`lambdas` must be supplied")
   expect_error(plot_chroms_heatmap(pk_tab$tab, lambdas = 210), 
                regexp = "Please supply a list of chromatograms.")
 })
@@ -520,6 +526,90 @@ test_that("plot.peak_list rejects a peak table passed as `chrom_list`", {
   expect_error(plot(pks, chrom_list = pk_tab), regexp = "not a `peak_table`")
 })
 
+test_that("plot_chroms checks a supplied wavelength on single-column data", {
+  data(Sa_pr)
+  x <- lapply(Sa_pr[1:2], function(m) m[, "210", drop = FALSE])
+  pdf(NULL); on.exit(dev.off())
+  expect_error(plot_chroms(x, lambdas = "280"), "could not be found")
+  expect_error(plot_chroms_heatmap(x, lambdas = "280"), "could not be found")
+  expect_no_error(plot_chroms(x, lambdas = "210"))
+  expect_no_error(plot_chroms(x))
+  bl <- correct_baseline(x[[1]], attach_baseline = TRUE)
+  expect_error(plot_baseline(bl, lambda = "280"), "could not be found")
+  expect_no_error(plot_baseline(bl, lambda = "210"))
+  colnames(x[[1]]) <- colnames(x[[2]]) <- "intensity"
+  expect_no_error(plot_chroms(x, lambdas = "280"))
+})
+
+test_that("plot_chroms does not thin below the data's own resolution", {
+  skip_on_cran()
+  data(Sa_pr)
+  pdf(NULL)
+  on.exit(dev.off())
+  expect_silent(plot_chroms(Sa_pr, lambdas = 210))
+  expect_silent(plot_chroms(Sa_pr, lambdas = 210, time_resolution = 0.005))
+  expect_silent(plot_chroms(Sa_pr, lambdas = 210, time_resolution = 0.001))
+  coarse <- lapply(Sa_pr, function(x){
+    y <- x[seq(1, nrow(x), by = 3), , drop = FALSE]
+    rownames(y) <- as.character(seq(10, by = 0.06, length.out = nrow(y)))
+    y
+  })
+  expect_silent(plot_chroms(coarse, lambdas = 210))
+  tiny <- lapply(Sa_pr, function(x) x[1:5, , drop = FALSE])
+  expect_silent(plot_chroms(tiny, lambdas = 210))
+  expect_silent(plot_chroms(Sa_pr, lambdas = 210, time_resolution = 0.5))
+})
+
+test_that("plot_chroms works across dilation_span values for vpdtw output", {
+  skip_on_cran()
+  data(Sa_pr)
+  pdf(NULL)
+  on.exit(dev.off())
+  for (sp in c(5, 2, 0.6, 0.3, 0.12)){
+    warp <- suppressWarnings(
+      correct_rt(Sa_pr, lambdas = 210, alg = "vpdtw", dilation_span = sp,
+                 show_progress = FALSE))
+    expect_silent(plot_chroms(warp, lambdas = 210))
+  }
+})
+
+test_that("reshape_chroms defaults to every wavelength", {
+  skip_on_cran()
+  data(Sa_pr)
+  all_lambdas <- reshape_chroms(Sa_pr)
+  expect_equal(nrow(all_lambdas),
+               nrow(Sa_pr[[1]]) * ncol(Sa_pr[[1]]) * length(Sa_pr))
+  expect_equal(length(unique(all_lambdas$lambda)), ncol(Sa_pr[[1]]))
+  expect_equal(reshape_chroms(Sa_pr, lambdas = NULL), all_lambdas)
+  one <- reshape_chroms(Sa_pr, lambdas = 210)
+  expect_equal(nrow(one), nrow(Sa_pr[[1]]) * length(Sa_pr))
+  coarse <- lapply(Sa_pr, function(x){
+    y <- x[seq(1, nrow(x), by = 3), , drop = FALSE]
+    rownames(y) <- as.character(seq(10, by = 0.06, length.out = nrow(y)))
+    y
+  })
+  expect_equal(nrow(reshape_chroms(coarse, lambdas = 210,
+                                   time_resolution = 0.01)),
+               nrow(coarse[[1]]) * length(coarse))
+})
+
+test_that("plot_chroms works on one-dimensional chromatograms in every engine", {
+  skip_on_cran()
+  data(Sa_warp)
+  x1 <- structure(lapply(Sa_warp, function(m) m[, "210", drop = FALSE]),
+                  names = names(Sa_warp))
+  expect_no_error(plot_chroms(x1))
+  expect_no_error(plot_chroms(x1, engine = "ggplot"))
+  check_for_pkg("plotly")
+  expect_no_error(plot_chroms(x1, engine = "plotly"))
+})
+
+test_that("plot_chroms asks for lambdas on multi-wavelength data", {
+  data(Sa_warp)
+  expect_error(plot_chroms(Sa_warp, engine = "ggplot"),
+               regexp = "`lambdas` must be supplied")
+})
+
 test_that("purity_args accepted by get_peaks also work at plot time", {
   # `get_purity_values`' formals are a strict subset of `get_purity`'s
   skip_on_cran()
@@ -592,6 +682,17 @@ test_that("plot_baseline accepts a vector with an attached baseline", {
   pdf(NULL); on.exit(dev.off())
   expect_match(plot_baseline(x), "als")
 })
+test_that("annotate_peaks labels peaks on a single-wavelength plot", {
+  skip_on_cran()
+  skip_if_not_installed("ggplot2")
+  data(Sa_pr)
+  one <- lapply(Sa_pr, function(m) m[, "210", drop = FALSE])
+  pt <- get_peaktable(get_peaks(one, lambdas = 210, cl = 1, show_progress = FALSE))
+  expect_s3_class(annotate_peaks(plot_chroms(one, engine = "ggplot"),
+                                 colnames(pt$tab)[3], peak_table = pt,
+                                 chrom_list = one), "ggplot")
+})
+
 test_that("annotate_peaks reads `tol` in minutes on a seconds axis", {
   skip_on_cran()
   skip_if_not_installed("ggplot2")

@@ -3,16 +3,21 @@
 #' Converts a list of chromatographic matrices into a single long-format
 #' data frame with one row per sample × retention time × wavelength combination.
 #'
-#' @details Each row corresponds to a single measurement of signal intensity at
-#' a given retention time and wavelength for a specific sample.
 #' @name reshape_chroms
 #' @param x A list of chromatographic matrices in wide format.
-#' @param idx Indices of chromatograms to convert.
-#' @param time_resolution Time resolution used when reshaping. Can be used
-#' to subsample the time axis. Defaults to full resolution.
-#' @param sample_var Name of the new column containing sample identifiers
-#' @param lambdas Wavelength(s) to include.
-#' @param rts Retention times to include.
+#' @param idx Indices of chromatograms to convert. Defaults to all of them.
+#' @param time_resolution Desired temporal resolution, in minutes, regardless of the
+#' time unit of `x`, matching [`plot_chroms`]. Subsamples the time axis to
+#' approximately this interval. Defaults to `NULL`, which keeps the full
+#' resolution.
+#' @param time_unit Time units of the provided chromatograms: either `"min"`,
+#' `"s"`, or `"ms"`. Used only to interpret `time_resolution`. Defaults to
+#' `NULL`, in which case the unit is taken from the `time_unit` attribute of the
+#' chromatograms, falling back to `"min"`.
+#' @param sample_var Name of the new column containing sample identifiers.
+#' @param lambdas Wavelength(s) to include. Defaults to all wavelengths.
+#' @param rts Retention times to include, each matched to the nearest time
+#' point. Defaults to all retention times.
 #' @param transfer_metadata Logical. If `TRUE`, metadata attributes are
 #' transferred to the output. Defaults to `FALSE`.
 #' @return A data frame in long format with columns `rt`, `lambda`, `absorbance`,
@@ -24,14 +29,19 @@
 #' reshape_chroms(Sa_warp, lambdas = 210)
 #' @export
 
-reshape_chroms <- function(x, idx, time_resolution = NULL,  
+reshape_chroms <- function(x, idx, time_resolution = NULL,
+                           time_unit = NULL,
                            sample_var = "sample", lambdas = NULL, rts = NULL, 
                            transfer_metadata = FALSE){
+  if (!is.null(time_resolution)){
+    if (is.null(time_unit)) time_unit <- get_time_unit(x, na_value = "min")
+    time_resolution <- time_resolution * time_factor(time_unit)
+  }
   if (missing(idx)){
     idx <- seq_along(x)
   }
-  if (missing(lambdas)){
-    lambdas <- colnames(x[[1]])
+  if (is.null(lambdas)){
+    lambdas.idx <- seq_ncol(x[[1]])
   } else{
     lambdas.idx <- sapply(lambdas, function(lambda){
       get_lambda_idx(lambda, lambdas = get_lambdas(x),
@@ -46,7 +56,7 @@ reshape_chroms <- function(x, idx, time_resolution = NULL,
     xx
   })
   df <- do.call(rbind, dat)
-  df$sample <- as.factor(df$sample)
+  df[[sample_var]] <- as.factor(df[[sample_var]])
   df
 }
 
@@ -74,11 +84,7 @@ reshape_chrom <- function(x, time_resolution = NULL, lambdas = NULL, rts = NULL,
     xx <- xx[rts.idx, , drop = FALSE]
   }
   if (!is.null(time_resolution)){
-    times <- get_times(xx)
-    time_diff <- mean(diff(times[1:10]))
-    thin_factor <- round(time_resolution / time_diff)
-    keep_idx <- seq(1, length(times), by = thin_factor)
-    xx <- xx[keep_idx, , drop = FALSE]
+    xx <- xx[thin_idx(get_times(xx), time_resolution), , drop = FALSE]
   }
   data <- data.frame(
     rt = as.numeric(rep(rownames(xx), ncol(xx))),

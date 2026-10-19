@@ -13,7 +13,8 @@
 #' or a `peak_table` containing a pointer to a list of chromatograms accessible
 #' in the current environment.
 #' @param lambdas A character or numeric vector specifying the wavelengths to 
-#' plot. Ignored for one-dimensional chromatograms.
+#' plot. Required for multi-wavelength chromatograms and optional for
+#' one-dimensional ones, where a supplied wavelength must match the column name.
 #' @param idx A vector representing the names or numerical indices of the 
 #' chromatograms to plot.
 #' @param time_resolution Desired temporal resolution for plotting (in minutes).
@@ -64,7 +65,7 @@
 #' @family visualization functions
 #' @export
 
-plot_chroms <- function(x, lambdas, idx, time_resolution = 0.01,
+plot_chroms <- function(x, lambdas = NULL, idx, time_resolution = 0.01,
                         time_unit = NULL,
                         xlim = NULL, ylim = NULL, 
                         xlab = "", ylab = "Absorbance",
@@ -83,8 +84,7 @@ plot_chroms <- function(x, lambdas, idx, time_resolution = 0.01,
     time_unit <- get_time_unit(x, na_value = "min")
   }
   time_unit <- match.arg(time_unit, c("min", "s", "ms"))
-  tfac <- switch(time_unit, "min" = 1, "s" = 60, "ms" = 60*1000)
-  time_resolution <- tfac*time_resolution
+  tfac <- time_factor(time_unit)
   if (missing(idx)){
     idx <- seq_along(x)
   }
@@ -98,8 +98,10 @@ plot_chroms <- function(x, lambdas, idx, time_resolution = 0.01,
       idx <- idx[!is.na(idx)]
     }
   }
-  if (ncol(x[[1]]) == 1){
+  if (is.null(lambdas) && ncol(x[[1]]) == 1){
     lambdas.idx <- 1
+  } else if (is.null(lambdas)){
+    stop("`lambdas` must be supplied for multi-wavelength chromatograms.")
   } else {
     lambdas.idx <- sapply(lambdas, function(lambda){
       get_lambda_idx(lambda, lambdas = get_lambdas(x),
@@ -124,9 +126,7 @@ plot_chroms <- function(x, lambdas, idx, time_resolution = 0.01,
     box()
     for (i in seq_along(idx)){
       times <- get_times(x, idx = idx[i])
-      time_diff <- mean(diff(times[1:10]))
-      thin_factor <- round(time_resolution/time_diff)
-      keep_idx <- seq(1, length(times), by = thin_factor)
+      keep_idx <- thin_idx(times, time_resolution * tfac)
       matplot(times[keep_idx], x[[idx[i]]][keep_idx, lambdas.idx], type = 'l',
               add = TRUE, col = i, lwd = linewidth, ...)
     }
@@ -134,8 +134,9 @@ plot_chroms <- function(x, lambdas, idx, time_resolution = 0.01,
       legend(x = legend_position, legend = names(x)[idx], 
              fill = seq_along(x[idx]))
   } else {
-    xx <- reshape_chroms(x, idx = idx, lambdas = lambdas, 
-                         time_resolution = time_resolution)
+    xx <- reshape_chroms(x, idx = idx, lambdas = lambdas,
+                         time_resolution = time_resolution,
+                         time_unit = time_unit)
     if (engine == "ggplot"){
       check_for_pkg("ggplot2")
       .data <- ggplot2::.data
@@ -218,6 +219,9 @@ position_plotly_legend <- function(pos){
 #' @importFrom grDevices grey hcl.colors
 #' @importFrom graphics image layout mtext rect
 #' @inheritParams plot_chroms
+#' @param lambdas A single wavelength to plot. Required for multi-wavelength
+#' chromatograms and optional for one-dimensional ones, where a supplied
+#' wavelength must match the column name.
 #' @param show_legend Logical. Whether to display legend or not. Defaults to
 #' `TRUE`.
 #' @param show_ylabs Logical. Whether to show y labels. Defaults to `FALSE`.
@@ -232,7 +236,7 @@ position_plotly_legend <- function(pos){
 #' plot_chroms_heatmap(Sa_warp, lambdas = 210)
 #' @family visualization functions
 #' @export
-plot_chroms_heatmap <- function(x, idx = NULL, lambdas, 
+plot_chroms_heatmap <- function(x, idx = NULL, lambdas = NULL, 
                                 engine = c("base", "ggplot", "plotly"),
                                 show_legend = TRUE, xlim = NULL,
                                 legend_position = "topright", title = "", 
@@ -245,10 +249,18 @@ plot_chroms_heatmap <- function(x, idx = NULL, lambdas,
     stop("Please supply a list of chromatograms.")
   }
   engine <- match.arg(engine, c("base", "ggplot", "plotly"))
-  if (ncol(x[[1]]) == 1){
+  if (is.null(lambdas) && ncol(x[[1]]) == 1){
     lambdas.idx <- 1
+  } else if (is.null(lambdas)){
+    stop("`lambdas` must be supplied for multi-wavelength chromatograms.")
   } else {
-    lambdas.idx <- get_lambda_idx(lambdas, lambdas = get_lambdas(x))
+    if (length(lambdas) > 1){
+      stop(sprintf(
+        "`plot_chroms_heatmap` displays one wavelength at a time, but `lambdas` has %d.",
+        length(lambdas)))
+    }
+    lambdas.idx <- get_lambda_idx(lambdas, lambdas = get_lambdas(x),
+                                  allow_max = FALSE)
   }
   fn <- switch(engine, base = plot_chroms_heatmap_base,
                ggplot = plot_chroms_heatmap_ggplot,

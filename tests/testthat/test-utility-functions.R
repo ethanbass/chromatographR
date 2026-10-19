@@ -270,6 +270,46 @@ test_that("check_duplicated_names works as expected", {
                fixed = TRUE)
 })
 
+.tr_chrom <- function(unit, ts){
+  m <- matrix(sin(seq_along(ts)), ncol = 1,
+              dimnames = list(as.character(ts), "220"))
+  attr(m, "time_unit") <- unit
+  list(a = m)
+}
+
+test_that("reshape_chroms interprets time_resolution in minutes, not data units", {
+  skip_on_cran()
+  ts <- seq(0, 180, by = 0.3)
+  d <- reshape_chroms(.tr_chrom("s", ts), time_resolution = 0.01)
+  expect_equal(nrow(d), ceiling(length(ts) / 2))
+  d2 <- reshape_chroms(.tr_chrom("s", ts), time_resolution = 0.01,
+                       time_unit = "min")
+  expect_equal(nrow(d2), length(ts))
+})
+
+test_that("reshape_chroms is unchanged on a minute axis and without time_resolution", {
+  skip_on_cran()
+  ts <- seq(0, 3, by = 0.005)
+  cl <- .tr_chrom("min", ts)
+  expect_equal(nrow(reshape_chroms(cl, time_resolution = 0.01)),
+               ceiling(length(ts) / 2))
+  expect_equal(nrow(reshape_chroms(cl)), length(ts))
+})
+
+test_that("reshape_chroms and plot_chroms thin a seconds axis identically", {
+  skip_on_cran()
+  skip_if_not_installed("ggplot2")
+  ts <- seq(0, 180, by = 0.3)
+  cl <- .tr_chrom("s", ts)
+  tfac <- 60
+  expected <- max(1, round((0.01 * tfac) / mean(diff(head(ts, 10)))))
+  d <- reshape_chroms(cl, time_resolution = 0.01)
+  expect_equal(median(diff(sort(unique(d$rt)))), expected * 0.3)
+  p <- plot_chroms(cl, lambdas = 220, engine = "ggplot", time_resolution = 0.01)
+  expect_equal(median(diff(sort(unique(p$data$rt)))), expected * 0.3)
+  expect_equal(nrow(p$data), nrow(d))
+})
+
 test_that("parallel_lapply re-raises a worker's try-error", {
   as_mclapply <- function(X, FUN, ...)
     lapply(X, function(x) try(FUN(x, ...), silent = TRUE))
@@ -332,6 +372,13 @@ test_that("get_time_resolution converts to the requested unit", {
                get_time_resolution(Sa_warp))
   attr(sec[[1]], "time_unit") <- "furlongs"
   expect_error(get_time_resolution(sec, unit = "min"), "unrecognized")
+})
+
+test_that("reshape_chroms accepts a custom sample_var", {
+  data(Sa_pr)
+  df <- reshape_chroms(Sa_pr, lambdas = 210, sample_var = "id")
+  expect_true(is.factor(df$id))
+  expect_equal(levels(df$id), names(Sa_pr))
 })
 
 test_that("normalize_data matches `column` exactly when inferring `by`", {

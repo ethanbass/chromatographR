@@ -6,7 +6,7 @@
 \usage{
 plot_chroms(
   x,
-  lambdas,
+  lambdas = NULL,
   idx,
   time_resolution = 0.01,
   time_unit = NULL,
@@ -29,7 +29,8 @@ or a \code{peak_table} containing a pointer to a list of chromatograms accessibl
 in the current environment.}
 
 \item{lambdas}{A character or numeric vector specifying the wavelengths to
-plot. Ignored for one-dimensional chromatograms.}
+plot. Required for multi-wavelength chromatograms and optional for
+one-dimensional ones, where a supplied wavelength must match the column name.}
 
 \item{idx}{A vector representing the names or numerical indices of the
 chromatograms to plot.}

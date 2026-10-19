@@ -7,7 +7,7 @@
 plot_chroms_heatmap(
   x,
   idx = NULL,
-  lambdas,
+  lambdas = NULL,
   engine = c("base", "ggplot", "plotly"),
   show_legend = TRUE,
   xlim = NULL,
@@ -24,8 +24,9 @@ in the current environment.}
 \item{idx}{A vector representing the names or numerical indices of the
 chromatograms to plot.}
 
-\item{lambdas}{A character or numeric vector specifying the wavelengths to
-plot. Ignored for one-dimensional chromatograms.}
+\item{lambdas}{A single wavelength to plot. Required for multi-wavelength
+chromatograms and optional for one-dimensional ones, where a supplied
+wavelength must match the column name.}
 
 \item{engine}{Plotting backend to use. One of \code{\link[graphics:matplot]{"base"}},
 \code{\link[ggplot2:ggplot2-package]{"ggplot"}}, or \code{\link[plotly:plotly]{"plotly"}}.}
