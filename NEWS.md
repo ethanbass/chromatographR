@@ -170,6 +170,8 @@ spectral correlation and retention time proximity. The resulting
 `get_peaktable`. See `?targeted_analysis` for matching to a table of targets.
 * Added `get_time_resolution` for reading a chromatogram's sampling interval,
 in the units of its time axis by default or in minutes via `unit`.
+* Added `plot_chrom_contour` for plotting one chromatogram across retention
+time and wavelength, on a compressed color scale by default.
 
 #### New generic functions
 

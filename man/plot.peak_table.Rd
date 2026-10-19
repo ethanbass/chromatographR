@@ -115,6 +115,7 @@ Other visualization functions:
 \code{\link[=plot.matched_peak_list]{plot.matched_peak_list()}},
 \code{\link[=plot.peak_list]{plot.peak_list()}},
 \code{\link[=plot_all_spectra]{plot_all_spectra()}},
+\code{\link[=plot_chrom_contour]{plot_chrom_contour()}},
 \code{\link[=plot_chroms]{plot_chroms()}},
 \code{\link[=plot_chroms_heatmap]{plot_chroms_heatmap()}},
 \code{\link[=plot_spectrum]{plot_spectrum()}},

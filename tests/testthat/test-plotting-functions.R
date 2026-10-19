@@ -924,6 +924,51 @@ test_that("plot_baseline accepts a vector with an attached baseline", {
   pdf(NULL); on.exit(dev.off())
   expect_match(plot_baseline(x), "als")
 })
+test_that("plot_chrom_contour draws one sample across wavelengths", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  data(Sa_pr)
+  vdiffr::expect_doppelganger("chrom_contour",
+                              function() plot_chrom_contour(Sa_pr, idx = 1))
+  vdiffr::expect_doppelganger("chrom_contour_linear_zoom", function()
+    plot_chrom_contour(Sa_pr, idx = names(Sa_pr)[2], xlim = c(12, 13),
+                       ylim = c(200, 260), scale = "linear"))
+})
+
+test_that("plot_chrom_contour rejects input it cannot draw", {
+  data(Sa_pr)
+  expect_error(plot_chrom_contour(Sa_pr, idx = 1:2), "one chromatogram at a time")
+  expect_error(plot_chrom_contour(Sa_pr, idx = "bad_name"),
+               "Chromatogram could not be found")
+  one_lambda <- lapply(Sa_pr, function(x) x[, "210", drop = FALSE])
+  expect_error(plot_chrom_contour(one_lambda), "multi-wavelength")
+  expect_error(plot_chrom_contour(Sa_pr, xlim = c(12, 12.001)),
+               "at least two points")
+})
+
+test_that("a shared `zlim` puts contour plots on one color scale", {
+  data(Sa_pr)
+  drawn <- list()
+  local_mocked_bindings(
+    image = function(x, y, z, zlim, ...){
+      drawn[[length(drawn) + 1]] <<- list(z = z, zlim = zlim)
+      plot.new()
+    },
+    draw_colorbar = function(...) NULL)
+  pdf(NULL)
+  withr::defer(dev.off())
+  plot_chrom_contour(Sa_pr, idx = 1, zlim = c(0, 100))
+  plot_chrom_contour(Sa_pr, idx = 2, zlim = c(0, 100))
+  plot_chrom_contour(Sa_pr, idx = 1, zlim = c(0, 100), scale = "linear")
+  expect_equal(drawn[[1]]$zlim, drawn[[2]]$zlim)
+  expect_equal(drawn[[1]]$zlim, asinh(c(0, 100)))
+  expect_true(all(drawn[[1]]$z >= drawn[[1]]$zlim[1] &
+                    drawn[[1]]$z <= drawn[[1]]$zlim[2]))
+  expect_equal(range(drawn[[3]]$z), c(0, 100))
+  expect_error(plot_chrom_contour(Sa_pr, zlim = c(100, 0)), "increasing order")
+  expect_error(plot_chrom_contour(Sa_pr, zlim = 100), "increasing order")
+})
+
 test_that("annotate_peaks labels peaks on a single-wavelength plot", {
   skip_on_cran()
   skip_if_not_installed("ggplot2")

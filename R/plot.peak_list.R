@@ -404,7 +404,8 @@ colorbar_layout <- function() {
 }
 
 #' @noRd
-draw_colorbar <- function(colors, zlim, label = "Correlation") {
+draw_colorbar <- function(colors, zlim, label = "Correlation",
+                          tick_labels = function(ticks) format(ticks, trim = TRUE)) {
   par(mar = c(2, 0, 2, 3.5))
   plot(0, 0, type = "n", xlim = c(0, 1), ylim = c(0, 1),
        axes = FALSE, xlab = "", ylab = "")
@@ -416,7 +417,7 @@ draw_colorbar <- function(colors, zlim, label = "Correlation") {
   ticks <- colorbar_ticks(zlim)
   tick_pos <- if (diff(zlim) == 0) (y_start + y_end) / 2 else
     y_start + (ticks - zlim[1]) / diff(zlim) * legend_height
-  axis(4, at = tick_pos, labels = format(ticks, trim = TRUE), las = 1,
+  axis(4, at = tick_pos, labels = tick_labels(ticks), las = 1,
        lwd = 0, lwd.ticks = 0.75, tcl = -0.15, mgp = c(3, 0.3, 0),
        cex.axis = 0.8)
   text(0.5, y_end + 0.04, label, adj = c(0.5, 0), xpd = NA)

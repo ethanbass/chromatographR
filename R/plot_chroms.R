@@ -487,6 +487,120 @@ plot_chroms_heatmap_plotly <- function(chrom_list, lambdas.idx = 1, idx = NULL,
   return(p)
 }
 
+#' Plot a chromatogram as a contour plot
+#'
+#' Plots a single multi-wavelength chromatogram as an image, with retention
+#' time on the x axis, wavelength on the y axis, and color encoding absorbance.
+#'
+#' With `scale = "asinh"` (the default), color follows `asinh(x / s)`, where
+#' `s` is 1/100 of the largest absolute value in the plotted region, or in
+#' `zlim` when it is given. The scale is linear near zero and logarithmic
+#' above `s`, so peaks up to about 100 times smaller than the tallest one stay
+#' visible. The color bar is labeled in absorbance units.
+#'
+#' By default each plot is scaled to its own data, so colors cannot be
+#' compared between plots. Pass the same `zlim` to every plot to put them on
+#' one scale (see examples).
+#'
+#' @importFrom grDevices hcl.colors
+#' @importFrom graphics image
+#' @inheritParams plot_chroms
+#' @param idx Name or numerical index of the chromatogram to plot. Defaults
+#' to the first.
+#' @param xlim Range of retention times to plot.
+#' @param ylim Range of wavelengths to plot.
+#' @param scale Color scale: `"asinh"` (the default) or `"linear"`.
+#' @param zlim Range of absorbance values spanned by the color scale. Values
+#' outside it are drawn in the end colors. Defaults to the range of the
+#' plotted region.
+#' @param show_legend Logical. Whether to display a color bar. Defaults to
+#' `TRUE`.
+#' @param title Title for plot. Defaults to the name of the chromatogram;
+#' `""` omits it.
+#' @param ylab Y label. Defaults to `"Wavelength"`.
+#' @param ... Additional arguments to [graphics::image()], e.g.
+#' `useRaster = TRUE` to speed up rendering of large chromatograms on a
+#' regular grid.
+#' @return No return value.
+#' @section Side effects:
+#' The plot is rendered to the active graphics device.
+#' @author Ethan Bass
+#' @examples
+#' data(Sa_pr)
+#' plot_chrom_contour(Sa_pr, idx = 1)
+#'
+#' # one color scale for every sample
+#' zlim <- range(unlist(Sa_pr))
+#' plot_chrom_contour(Sa_pr, idx = 1, zlim = zlim)
+#' plot_chrom_contour(Sa_pr, idx = 2, zlim = zlim)
+#'
+#' # the same, zoomed in
+#' zoomed <- crop_chroms(Sa_pr, rt_range = c(12, 13))
+#' plot_chrom_contour(zoomed, idx = 1, zlim = range(unlist(zoomed)))
+#' @family visualization functions
+#' @export
+plot_chrom_contour <- function(x, idx = 1, xlim = NULL, ylim = NULL,
+                               scale = c("asinh", "linear"), zlim = NULL,
+                               show_legend = TRUE, title = NULL, xlab = "",
+                               ylab = "Wavelength", ...){
+  if (inherits(x, "peak_table")){
+    x <- get_chrom_list(x)
+  }
+  x <- unnest_chrom_list(x)
+  if (!inherits(x, c("list", "chrom_list"))){
+    stop("Please supply a list of chromatograms.")
+  }
+  scale <- match.arg(scale, c("asinh", "linear"))
+  check_zlim(zlim)
+  if (length(idx) != 1){
+    stop("`plot_chrom_contour` displays one chromatogram at a time, but `idx` has ",
+         length(idx), " elements.")
+  }
+  if (is.character(idx) && !(idx %in% names(x))){
+    stop("Chromatogram could not be found. Please check names and try again.")
+  }
+  m <- x[[idx]]
+  title <- title %||% if (is.character(idx)) idx else names(x)[idx] %||% ""
+  if (ncol(m) < 2){
+    stop("A contour plot needs a multi-wavelength chromatogram.")
+  }
+  times <- get_times(x, idx = idx)
+  lambdas <- as.numeric(colnames(m))
+  xlim <- xlim %||% range(times)
+  ylim <- ylim %||% range(lambdas)
+  rows <- times >= xlim[1] & times <= xlim[2]
+  cols <- lambdas >= ylim[1] & lambdas <= ylim[2]
+  if (sum(rows) < 2 || sum(cols) < 2){
+    stop("`xlim` and `ylim` must each span at least two points.")
+  }
+  z <- m[rows, cols, drop = FALSE]
+  zlim <- zlim %||% range(z, na.rm = TRUE)
+  z <- pmin(pmax(z, zlim[1]), zlim[2])
+  tick_labels <- function(ticks) format(ticks, trim = TRUE)
+  if (scale == "asinh"){
+    s <- max(abs(zlim)) / 100
+    if (s > 0){
+      z <- asinh(z / s)
+      zlim <- asinh(zlim / s)
+      tick_labels <- function(ticks) as.character(signif(s * sinh(ticks), 2))
+    }
+  }
+  pal <- hcl.colors(100, "viridis")
+  if (show_legend){
+    old_par <- colorbar_layout()
+    on.exit(par(old_par), add = TRUE)
+    par(mar = c(5, 4, 4, 2))
+  }
+  image(times[rows], lambdas[cols], z, col = pal, zlim = zlim,
+        xlab = xlab, ylab = ylab, main = title, ...)
+  box()
+  if (show_legend){
+    draw_colorbar(pal, zlim = zlim, label = "Absorbance",
+                  tick_labels = tick_labels)
+  }
+  invisible(NULL)
+}
+
 #' Annotate peaks on a chromatogram
 #'
 #' Adds text labels to peaks on a chromatogram plot produced by

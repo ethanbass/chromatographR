@@ -83,6 +83,7 @@ Other visualization functions:
 \code{\link[=plot.peak_list]{plot.peak_list()}},
 \code{\link[=plot.peak_table]{plot.peak_table()}},
 \code{\link[=plot_all_spectra]{plot_all_spectra()}},
+\code{\link[=plot_chrom_contour]{plot_chrom_contour()}},
 \code{\link[=plot_chroms]{plot_chroms()}},
 \code{\link[=plot_spectrum]{plot_spectrum()}},
 \code{\link[=scan_chrom]{scan_chrom()}}
