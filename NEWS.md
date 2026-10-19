@@ -179,6 +179,8 @@ estimator: `"als"` (the default), `"arpls"`, `"aspls"` or `"snip"`. See
 * Added an `attach_baseline` argument to `preprocess`, keeping the estimated
 baseline as an attribute for inspection. It is removed by `correct_rt` and
 `subtract_blanks`, whose output it would no longer match.
+* Added reference-wavelength subtraction to `preprocess`: `reference_wavelengths`
+removes an offset shared by every wavelength before the baseline is estimated.
 * Baseline estimators now require a complete trace, and give an informative
 error when the signal contains missing or non-finite values. Previously a gap
 either caused an obscure error or had its two sides spliced together.

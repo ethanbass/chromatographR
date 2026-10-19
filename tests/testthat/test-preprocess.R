@@ -775,3 +775,37 @@ test_that("an interpolation grid must be strictly increasing", {
                            interpolate_cols = FALSE, baseline = "none",
                            cl = 1, show_progress = FALSE))
 })
+
+test_that("reference_wavelengths removes an offset shared by every wavelength", {
+  tt <- seq(0, 10, by = 0.02)
+  wl <- seq(200, 400, by = 4)
+  offset <- -1500 * plogis((tt - 4) / 0.3)
+  pk <- 800 * dnorm(tt, 6, 0.1)
+  spec <- ifelse(wl < 300, 1, 0)
+  x <- outer(pk, spec) + offset + outer(rep(1, length(tt)),
+                                         ifelse(wl >= 360, wl - 380, 0))
+  dimnames(x) <- list(tt, wl)
+  out <- preprocess(x, baseline = "none", smooth_spectra = FALSE,
+                    interpolate_rows = FALSE, interpolate_cols = FALSE,
+                    reference_wavelengths = c(360, 400))
+  expect_equal(unname(out[, "228"]), pk, tolerance = 1e-10)
+  expect_equal(unname(out[, "380"]), rep(0, length(tt)), tolerance = 1e-10)
+  expect_equal(unname(out[, "400"]), rep(20, length(tt)), tolerance = 1e-10)
+  narrow <- preprocess(x, dim2 = seq(200, 300, by = 4), baseline = "none",
+                       smooth_spectra = FALSE, interpolate_rows = FALSE,
+                       reference_wavelengths = c(360, 400))
+  expect_equal(unname(narrow[, "228"]), pk, tolerance = 1e-10)
+  x[100, "380"] <- NA
+  gappy <- preprocess(x, baseline = "none", smooth_spectra = FALSE,
+                      interpolate_rows = FALSE, interpolate_cols = FALSE,
+                      reference_wavelengths = c(360, 400))
+  expect_equal(sum(is.na(gappy)), 1)
+  expect_equal(unname(gappy[100, "228"]), pk[100], tolerance = 1e-10)
+  expect_error(preprocess(x, baseline = "none", interpolate_rows = FALSE,
+                          interpolate_cols = FALSE,
+                          reference_wavelengths = c(500, 600)),
+               regexp = "No wavelengths fall within")
+  expect_error(preprocess(x, baseline = "none",
+                          reference_wavelengths = c(400, 360)),
+               regexp = "must be increasing")
+})

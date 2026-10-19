@@ -1,9 +1,10 @@
 #' Preprocess time/wavelength data
 #' 
 #' Standard preprocessing of time × wavelength response matrices
-#' (e.g. HPLC-DAD/UV data), consisting of: (i) optional interpolation in either
-#' dimension for dimensionality reduction, (ii) optional smoothing along the
-#' spectral axis, and (iii) optional baseline correction along the time axis.
+#' (e.g. HPLC-DAD/UV data), consisting of: (i) optional subtraction of a
+#' reference band of wavelengths, (ii) optional interpolation in either
+#' dimension for dimensionality reduction, (iii) optional smoothing along the
+#' spectral axis, and (iv) optional baseline correction along the time axis.
 #' For densely sampled data (e.g., UV-VIS spectra), the size of the matrix can
 #' be reduced by interpolation. By default, the data are smoothed along the
 #' spectral axis using cubic smoothing splines ([`smooth.spline`]), then
@@ -13,8 +14,9 @@
 #' [`baseline_estimators`].
 #' 
 #' @details
-#' The operations are applied in the order given above: interpolation first,
-#' then spectral smoothing, then baseline correction. Because the
+#' The operations are applied in the order given above: reference subtraction
+#' first, on the original wavelengths, then interpolation, then spectral
+#' smoothing, then baseline correction. Because the
 #' baseline is estimated after the time axis is interpolated, `stiffness` is
 #' tied to whichever `dim1` grid was chosen: the penalty applies on the index
 #' axis, so the same value gives a different baseline on a differently sampled
@@ -56,13 +58,21 @@
 #' separately for each wavelength, so it is the same size as the data and
 #' retaining it roughly doubles memory use. Adding the attribute back to the
 #' returned data recovers the uncorrected matrix only when `zero_floor = FALSE`
-#' and `maxI` is unset:
-#' clipping alters the data without altering the stored estimate, and `maxI`
-#' rescales both by a factor derived from the clipped data.
+#' and `maxI` and `reference_wavelengths` are unset:
+#' clipping alters the data without altering the stored estimate, `maxI`
+#' rescales both by a factor derived from the clipped data, and the subtracted
+#' reference band is not stored.
 #' @param zero_floor Logical. Whether to clip negative values in the
 #' corrected data to zero. Defaults to `FALSE`. Clipping discards the half of
 #' the noise that falls below zero, which hides the negative dips that show
 #' where a baseline was over-subtracted, so it is turned off by default.
+#' @param reference_wavelengths Numeric vector of length 2 giving a band of
+#' wavelengths, `c(from, to)`, whose mean is subtracted from every wavelength
+#' at each time point, like the reference wavelength of a diode-array
+#' detector. This removes offsets shared by all wavelengths, such as lamp
+#' drift or refractive-index effects, before the baseline is estimated. Choose
+#' a band where nothing in the samples absorbs. Either bound may be `NA` to
+#' leave that side open. Defaults to `NULL` (no subtraction).
 #' @param smooth_spectra Logical, indicating whether smoothing should be done along
 #' the spectral axis, according to [`smooth.spline`]. Skipped for data with
 #' fewer than four wavelengths. Defaults to `TRUE`.
@@ -114,6 +124,7 @@ preprocess <- function(X, dim1, dim2,
                        attach_baseline = FALSE,
                        zero_floor = FALSE,
                        smooth_spectra = TRUE,
+                       reference_wavelengths = NULL,
                        interpolate_rows = TRUE,
                        interpolate_cols = TRUE,
                        cl = 2, show_progress = NULL,
@@ -133,6 +144,10 @@ preprocess <- function(X, dim1, dim2,
   if (ncol(X[[1]]) == 1){
     interpolate_cols <- FALSE
   }
+  reference_wavelengths <- check_crop_range(reference_wavelengths,
+                                            "reference_wavelengths")
+  if (!is.null(reference_wavelengths) && ncol(X[[1]]) == 1)
+    stop("`reference_wavelengths` needs more than one wavelength.")
   # the order check applies only to an axis that is actually interpolated: a
   # supplied `dim2` is ignored when `interpolate_cols = FALSE`, and a scalar is
   # legitimate there
@@ -216,6 +231,7 @@ preprocess <- function(X, dim1, dim2,
                           attach_baseline = attach_baseline,
                           zero_floor = zero_floor,
                           smooth_spectra = smooth_spectra, maxI = maxI,
+                          reference_wavelengths = reference_wavelengths,
                           interpolate_rows = interpolate_rows,
                           interpolate_cols = interpolate_cols,
                           ...)
@@ -283,6 +299,7 @@ preprocess_matrix <- function(X,
                               attach_baseline = FALSE,
                               zero_floor = FALSE,
                               smooth_spectra = TRUE,
+                              reference_wavelengths = NULL,
                               interpolate_rows = TRUE,
                               interpolate_cols = TRUE,
                               ...,
@@ -292,6 +309,14 @@ preprocess_matrix <- function(X,
   metadata <- attributes(X)
   metadata[c("dimnames", "names", "row.names", "dim", "class", "levels",
              "estimated_baseline", "baseline_param")] <- NULL
+  if (!is.null(reference_wavelengths)){
+    in_band <- which(as.numeric(colnames(X)) >= reference_wavelengths[1] &
+                       as.numeric(colnames(X)) <= reference_wavelengths[2])
+    if (length(in_band) == 0)
+      stop(sprintf("No wavelengths fall within `reference_wavelengths` (%s to %s).",
+                   format(reference_wavelengths[1]), format(reference_wavelengths[2])))
+    X <- X - rowMeans(X[, in_band, drop = FALSE], na.rm = TRUE)
+  }
   if (interpolate_rows){
     if (length(tpoints <- as.numeric(rownames(X))) == 0)
       tpoints <- seq_nrow(X)

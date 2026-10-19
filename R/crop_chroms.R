@@ -88,8 +88,8 @@ sample_labels <- function(x){
 warn_crop_clamped <- function(before, after, range, arg, which_axis, axes,
                               axis_fn, unlabeled = FALSE){
   if (is.null(range)) return(invisible(NULL))
-  lo <- if (is.na(range[1])) -Inf else range[1]
-  hi <- if (is.na(range[2])) Inf else range[2]
+  lo <- range[1]
+  hi <- range[2]
   vals <- lapply(axes, `[[`, which_axis)
   hit <- which(vapply(vals, function(v){
     (is.finite(lo) && lo < min(v)) || (is.finite(hi) && hi > max(v))
@@ -132,7 +132,8 @@ check_crop_range <- function(range, arg){
   if (!anyNA(range) && range[1] > range[2])
     stop(sprintf("`%s` must be increasing, but %s is greater than %s.", arg,
                  format(range[1]), format(range[2])))
-  range
+  c(if (is.na(range[1])) -Inf else range[1],
+    if (is.na(range[2])) Inf else range[2])
 }
 
 #' @noRd
@@ -141,9 +142,7 @@ crop_axis_idx <- function(vals, range, arg, what, n){
   if (length(vals) == 0 || anyNA(vals))
     stop(sprintf("Cannot crop by `%s` because the %s could not be read from ",
                  arg, what), "the dimnames.")
-  lo <- if (is.na(range[1])) -Inf else range[1]
-  hi <- if (is.na(range[2])) Inf else range[2]
-  keep <- which(vals >= lo & vals <= hi)
+  keep <- which(vals >= range[1] & vals <= range[2])
   if (length(keep) == 0)
     stop(sprintf("`%s` does not overlap the data, which spans [%s, %s].", arg,
                  format(min(vals)), format(max(vals))))
@@ -153,8 +152,6 @@ crop_axis_idx <- function(vals, range, arg, what, n){
 #' @noRd
 crop_matrix <- function(x, rt_range = NULL, lambda_range = NULL,
                         axis = list()){
-  if (!is.matrix(x))
-    stop("x should be a matrix!")
   ri <- crop_axis_idx(axis$rt, rt_range, "rt_range", "retention times",
                       n = nrow(x))
   ci <- crop_axis_idx(axis$lambda, lambda_range, "lambda_range", "wavelengths",
