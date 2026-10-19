@@ -268,6 +268,9 @@ position_plotly_legend <- function(pos){
 #' @param xlim Range of retention times to plot.
 #' @param legend_position Position of legend. Defaults to `"topright"`. Cannot
 #' be repositioned when using the `base` plotting engine.
+#' @param zlim Range of intensities spanned by the color scale. Values outside
+#' it are drawn in the end colors. Defaults to the range within `xlim`. Pass
+#' the same `zlim` to several plots to put them on one scale.
 #' @param lambdas A single wavelength to plot. Required for multi-wavelength
 #' chromatograms and optional for one-dimensional ones, where a supplied
 #' wavelength must match the column name.
@@ -283,11 +286,15 @@ position_plotly_legend <- function(pos){
 #' @examples 
 #' data(Sa_warp)
 #' plot_chroms_heatmap(Sa_warp, lambdas = 210)
+#'
+#' # zoomed in, on the color scale of the whole run
+#' zlim <- range(sapply(Sa_warp, function(m) m[, "210"]), na.rm = TRUE)
+#' plot_chroms_heatmap(Sa_warp, lambdas = 210, xlim = c(13, 15), zlim = zlim)
 #' @family visualization functions
 #' @export
 plot_chroms_heatmap <- function(x, idx = NULL, lambdas = NULL, 
                                 engine = c("base", "ggplot", "plotly"),
-                                show_legend = TRUE, xlim = NULL,
+                                show_legend = TRUE, xlim = NULL, zlim = NULL,
                                 legend_position = "topright", title = "", 
                                 show_ylabs = FALSE) {
   if (inherits(x, "peak_table")){
@@ -298,6 +305,7 @@ plot_chroms_heatmap <- function(x, idx = NULL, lambdas = NULL,
     stop("Please supply a list of chromatograms.")
   }
   engine <- match.arg(engine, c("base", "ggplot", "plotly"))
+  check_zlim(zlim)
   if (is.null(lambdas) && ncol(x[[1]]) == 1){
     lambdas.idx <- 1
   } else if (is.null(lambdas)){
@@ -315,9 +323,27 @@ plot_chroms_heatmap <- function(x, idx = NULL, lambdas = NULL,
                ggplot = plot_chroms_heatmap_ggplot,
                plotly = plot_chroms_heatmap_plotly)
   fn(chrom_list = x, lambdas.idx = lambdas.idx, idx = idx,
-     show_legend = show_legend, xlim = xlim,
+     show_legend = show_legend, xlim = xlim, zlim = zlim,
      legend_position = legend_position, title = title, 
      show_ylabs = show_ylabs)
+}
+
+#' Check a color-scale range
+#' @noRd
+check_zlim <- function(zlim){
+  if (!is.null(zlim) && (!is.numeric(zlim) || length(zlim) != 2 ||
+                         !all(is.finite(zlim)) || zlim[1] >= zlim[2])){
+    stop("`zlim` must be two finite numbers in increasing order.")
+  }
+  invisible(zlim)
+}
+
+#' Color-scale range of a heatmap: `zlim` if given, else the plotted window
+#' @noRd
+heatmap_zlim <- function(x, times, xlim, zlim){
+  if (!is.null(zlim)) return(zlim)
+  if (!is.null(xlim)) x <- x[times >= xlim[1] & times <= xlim[2], , drop = FALSE]
+  range(x, na.rm = TRUE)
 }
 
 #' Plot chromatograms as heatmap using base graphics
@@ -326,7 +352,7 @@ plot_chroms_heatmap <- function(x, idx = NULL, lambdas = NULL,
 #' @noRd
 plot_chroms_heatmap_base <- function(chrom_list, lambdas.idx = 1, idx = NULL,
                                      title = "", xlim = NULL, show_legend = TRUE,
-                                     show_ylabs = FALSE, ...){
+                                     show_ylabs = FALSE, zlim = NULL, ...){
   viridis_base <- hcl.colors(100, "viridis")
   if (is.null(idx)) idx <- seq_along(chrom_list)
   if (inherits(chrom_list, "list")){
@@ -340,9 +366,8 @@ plot_chroms_heatmap_base <- function(chrom_list, lambdas.idx = 1, idx = NULL,
     xlim <- c(head(get_times(chrom_list), 1), tail(get_times(chrom_list), 1))
   }
   if (show_legend){
-    old_par <- par(no.readonly = TRUE)
-    layout(matrix(c(1, 2), ncol = 2), widths = c(8, 1))
-    par(mar = c(5, 4, 4, 1))  # c(bottom, left, top, right)
+    old_par <- colorbar_layout()
+    par(mar = c(5, 4, 4, 2))  # c(bottom, left, top, right)
   }
   plot(xlim, c(0.8, ncol(x) + 0.2), type = "n", 
        xlab = "", ylab = "Sample", main = title, 
@@ -354,39 +379,17 @@ plot_chroms_heatmap_base <- function(chrom_list, lambdas.idx = 1, idx = NULL,
        xlim[2] + 1000, ncol(x) + 1000, 
        col = bgcol)
   times <- seq(xlim[1], xlim[2], by = get_time_resolution(chrom_list))
-  image(times, seq_len(ncol(x)), 
-        x[seq(which.min(abs(get_times(chrom_list) - head(times, 1))),
-              which.min(abs(get_times(chrom_list) - tail(times, 1)))),], 
-        col = viridis_base, add = TRUE)
+  zlim <- heatmap_zlim(x, get_times(chrom_list), xlim, zlim)
+  z <- x[seq(which.min(abs(get_times(chrom_list) - head(times, 1))),
+             which.min(abs(get_times(chrom_list) - tail(times, 1)))), ]
+  image(times, seq_len(ncol(x)), pmin(pmax(z, zlim[1]), zlim[2]),
+        col = viridis_base, add = TRUE, zlim = zlim)
   if (show_ylabs){
     axis(2, at = seq_len(ncol(x)), labels = colnames(x))
   }
   box()
   if (show_legend){
-    par(mar = c(5, 0, 4, 3))  # reset margins
-    
-    plot(0, 0, type = "n", xlim = c(0, 1), 
-         ylim = c(0, 1), axes = FALSE, xlab = "", ylab = "")
-    
-    legend_height <- 0.6
-    y_start <- (1 - legend_height) / 2
-    y_end <- y_start + legend_height
-    
-    # Generate scaled values for the legend
-    n_colors <- length(viridis_base)
-    y_vals <- seq(y_start, y_end, length.out = n_colors + 1)
-    
-    # Draw the rectangles
-    for (i in 1:n_colors) {
-      rect(0, y_vals[i], 1, y_vals[i + 1], col = viridis_base[i], border = NA)
-    }
-    
-    # Add axis labels that correspond to data values
-    data_range <- range(x[xlim[1]:xlim[2],], na.rm = TRUE)
-    tick_vals <- seq(y_start, y_end, length.out = 5)
-    tick_labels <- round(seq(data_range[1], data_range[2], length.out = 5) / 100) * 100
-    axis(4, at = tick_vals, labels = tick_labels, las = 1, lwd = 0, hadj = 0.2)
-    mtext("Intensity", side = 3, line = 1, padj = 5.2, adj = .1)
+    draw_colorbar(viridis_base, zlim = zlim, label = "Intensity")
     par(old_par)
   }
 }
@@ -395,7 +398,7 @@ plot_chroms_heatmap_base <- function(chrom_list, lambdas.idx = 1, idx = NULL,
 #' @author Ethan Bass
 #' @noRd
 plot_chroms_heatmap_ggplot <- function(chrom_list, lambdas.idx = 1, idx = NULL,
-                                       show_legend = TRUE, xlim = NULL,
+                                       show_legend = TRUE, xlim = NULL, zlim = NULL,
                                        legend_position = "topright", title = "",
                                        show_ylabs = FALSE){
   check_for_pkg("ggplot2")
@@ -413,7 +416,8 @@ plot_chroms_heatmap_ggplot <- function(chrom_list, lambdas.idx = 1, idx = NULL,
   p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$Index, y = .data$Sample, 
                                         fill = .data$Intensity)) +
     ggplot2::geom_raster() +
-    ggplot2::scale_fill_viridis_c() +
+    ggplot2::scale_fill_viridis_c(limits = heatmap_zlim(x, get_times(x), xlim, zlim),
+                                  oob = scales::squish) +
     ggplot2::labs(x = "", y = "Sample", 
                   title = title) +
     ggplot2::theme_minimal() +
@@ -437,7 +441,7 @@ plot_chroms_heatmap_ggplot <- function(chrom_list, lambdas.idx = 1, idx = NULL,
 #' @author Ethan Bass
 #' @noRd
 plot_chroms_heatmap_plotly <- function(chrom_list, lambdas.idx = 1, idx = NULL,
-                                       show_legend = TRUE, xlim = NULL,
+                                       show_legend = TRUE, xlim = NULL, zlim = NULL,
                                        legend_position = "topright", title = "",
                                        show_ylabs = FALSE) {
   check_for_pkg("plotly")
@@ -450,11 +454,12 @@ plot_chroms_heatmap_plotly <- function(chrom_list, lambdas.idx = 1, idx = NULL,
   # Format data for plotly
   x_vals <- get_times(x)
   y_vals <- colnames(x)
-  
+  zl <- heatmap_zlim(x, x_vals, xlim, zlim)
   p <- plotly::plot_ly(
     x = x_vals,
     y = y_vals,
     z = t(x), 
+    zmin = zl[1], zmax = zl[2],
     type = "heatmap") |>
     plotly::layout(
       title = title,

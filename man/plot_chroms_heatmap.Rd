@@ -11,6 +11,7 @@ plot_chroms_heatmap(
   engine = c("base", "ggplot", "plotly"),
   show_legend = TRUE,
   xlim = NULL,
+  zlim = NULL,
   legend_position = "topright",
   title = "",
   show_ylabs = FALSE
@@ -35,6 +36,10 @@ wavelength must match the column name.}
 \code{TRUE}.}
 
 \item{xlim}{Range of retention times to plot.}
+
+\item{zlim}{Range of intensities spanned by the color scale. Values outside
+it are drawn in the end colors. Defaults to the range within \code{xlim}. Pass
+the same \code{zlim} to several plots to put them on one scale.}
 
 \item{legend_position}{Position of legend. Defaults to \code{"topright"}. Cannot
 be repositioned when using the \code{base} plotting engine.}
@@ -65,6 +70,10 @@ If \code{engine == "base"}, the plot is rendered to the active graphics device.
 \examples{
 data(Sa_warp)
 plot_chroms_heatmap(Sa_warp, lambdas = 210)
+
+# zoomed in, on the color scale of the whole run
+zlim <- range(sapply(Sa_warp, function(m) m[, "210"]), na.rm = TRUE)
+plot_chroms_heatmap(Sa_warp, lambdas = 210, xlim = c(13, 15), zlim = zlim)
 }
 \seealso{
 Other visualization functions:

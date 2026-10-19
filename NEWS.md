@@ -246,6 +246,10 @@ in on the peaks near given retention times, rescaling both axes to the
 selected window.
 * Added a `what` argument to `plot_chroms` for plotting one element of nested
 chromatograms from `read_chroms`, such as `"dad"` or a pump pressure trace.
+* Added a `zlim` argument to `plot_chroms_heatmap`, fixing the range of its
+color scale so that several plots can share one scale. By default the scale now
+spans the plotted window in every engine; previously the `"ggplot"` and
+`"plotly"` engines used the whole run when `xlim` was set.
 * Added `format = "wide"` to `reshape_peaktable`, returning one row per sample
 with metadata and one column per selected peak.
 * `annotate_peaks` now accepts retention times through the `loc` argument,
@@ -376,6 +380,9 @@ default, which now returns every wavelength, or when `sample_var` is not
 `"sample"`.
 * `plot_chroms` now draws each wavelength as a separate line under the
 `"ggplot"` and `"plotly"` engines, instead of joining them into one.
+* `plot_chroms_heatmap(engine = "base")` now labels its color bar with the
+range of the plotted colors. Previously the labels came from the wrong rows and
+were rounded to the nearest 100, so they could all read 0.
 
 #### Documentation and packaging
 

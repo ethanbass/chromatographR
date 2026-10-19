@@ -373,6 +373,35 @@ test_that("plot_chroms handles unrecognized character idx", {
 # run the following line to activate plotly tests:
 # Sys.setenv("VISUAL_TESTS" = "true")
 
+test_that("plot_chroms_heatmap scales colors to the plotted window unless zlim is given", {
+  skip_if_not_installed("ggplot2")
+  data(Sa_warp)
+  x <- sapply(Sa_warp, function(m) m[, "210"])
+  times <- get_times(Sa_warp)
+  win <- range(x[times >= 13 & times <= 15, ], na.rm = TRUE)
+  zoomed <- plot_chroms_heatmap(Sa_warp, lambdas = 210, xlim = c(13, 15),
+                                engine = "ggplot")
+  expect_equal(zoomed$scales$get_scales("fill")$limits, win)
+  fixed <- plot_chroms_heatmap(Sa_warp, lambdas = 210, xlim = c(13, 15),
+                               zlim = c(0, 1000), engine = "ggplot")
+  expect_equal(fixed$scales$get_scales("fill")$limits, c(0, 1000))
+  seen <- NULL
+  local_mocked_bindings(draw_colorbar = function(colors, zlim, ...) seen <<- zlim)
+  pdf(NULL)
+  on.exit(dev.off(), add = TRUE)
+  plot_chroms_heatmap(Sa_warp, lambdas = 210, xlim = c(13, 15))
+  expect_equal(seen, win)
+  plot_chroms_heatmap(Sa_warp, lambdas = 210, zlim = c(0, 100))
+  expect_equal(seen, c(0, 100))
+  skip_if_not_installed("plotly")
+  built <- plotly::plotly_build(plot_chroms_heatmap(Sa_warp, lambdas = 210,
+                                                    xlim = c(13, 15),
+                                                    engine = "plotly"))
+  expect_equal(c(built$x$data[[1]]$zmin, built$x$data[[1]]$zmax), win)
+  expect_error(plot_chroms_heatmap(Sa_warp, lambdas = 210, zlim = c(5, 1)),
+               "increasing order")
+})
+
 test_that("plot_chroms_heatmap works with plotly", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
