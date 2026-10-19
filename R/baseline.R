@@ -409,33 +409,6 @@ snip_baseline <- function(y, m){
   bl[(m + 1):(m + n)]
 }
 
-#' Standard deviation by iterative sigma clipping
-#' @param z A numeric vector.
-#' @param k Multiple of the standard deviation at which to clip.
-#' @param tol Relative convergence tolerance.
-#' @param max_iter Maximum number of iterations.
-#' @param min_sd Value returned when the clipped standard deviation collapses
-#' to (or below) it.
-#' @return The clipped standard deviation.
-#' @author Ethan Bass
-#' @noRd
-sigma_clipped_sd <- function(z, k = 4, tol = 1e-5, max_iter = 50, min_sd = 0){
-  z <- z[is.finite(z)]
-  if (length(z) < 2) return(min_sd)
-  # `sd` is measured about the mean, so the clip has to be centered too:
-  # clipping about zero collapses to `min_sd` on any trace with an offset
-  z <- z - median(z)
-  old <- 0
-  for (i in seq_len(max_iter)){
-    s <- sd(z)
-    if (!is.finite(s) || s <= min_sd) return(min_sd)
-    if (abs(old - s) / s < tol) return(s)
-    z <- pmin(pmax(z, -k * s), k * s)
-    old <- s
-  }
-  sd(z)
-}
-
 ## These defaults are grid-dependent: the penalty applies on the index axis, so
 ## the same value spans a different amount of time on a differently sampled
 ## run. They are starting points, not calibrated optima.

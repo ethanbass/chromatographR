@@ -614,7 +614,7 @@ test_that("raising min_prominence_snr drops the lowest-prominence apices first",
   data(Sa_pr)
   y <- Sa_pr[[1]][, "210"]
   levels <- c(0, 1, 2, 4, 8, 16)
-  sets <- lapply(levels, function(k) find_peaks(y, min_prominence_snr = k))
+  sets <- lapply(levels, function(k) find_peaks(y, smooth_window = 5, min_prominence_snr = k))
   # monotonically fewer peaks, and each set nested in the looser one
   expect_true(all(diff(vapply(sets, nrow, integer(1))) <= 0))
   for (i in seq_len(length(sets) - 1))
@@ -658,6 +658,38 @@ test_that("min_prominence_snr requires bounds = TRUE", {
   expect_type(find_peaks(c(0, 1, 5, 1, 0), bounds = FALSE), "integer")
 })
 
+
+test_that("the prominence filter is calibrated on correlated noise", {
+  set.seed(1)
+  n <- 2000
+  kern <- dnorm(-8:8, sd = 2)
+  noise <- as.numeric(stats::filter(rnorm(n + 16), kern / sum(kern), sides = 2))[9:(n + 8)]
+  noise <- noise / sd(noise)
+  rt <- seq(100, 1900, length.out = 10)
+  height <- exp(seq(log(5), log(300), length.out = 10))
+  sd_peak <- 20 / 2.355
+  y <- noise + rowSums(sapply(seq_along(rt), function(i)
+    height[i] * exp(-0.5 * ((seq_len(n) - rt[i]) / sd_peak)^2)))
+  p <- find_peaks(y, smooth_window = 10, min_prominence_snr = 4)
+  spurious <- sum(vapply(p$pos, function(x) min(abs(x - rt)) > 10, logical(1)))
+  expect_lte(spurious, 2)
+  expect_gte(nrow(p) - spurious, 9)
+})
+
+test_that("find_peaks warns when smooth_window is too narrow for the prominence filter", {
+  set.seed(1)
+  n <- 2000
+  main <- seq(100, 1850, length.out = 12)
+  rt <- c(main, main + 16)
+  height <- c(exp(seq(log(20), log(300), length.out = 12)), 0.35 * exp(seq(log(20), log(300), length.out = 12)))
+  sd_peak <- 20 / 2.355
+  y <- rnorm(n) + rowSums(sapply(seq_along(rt), function(i)
+    height[i] * exp(-0.5 * ((seq_len(n) - rt[i]) / sd_peak)^2)))
+  expect_warning(find_peaks(y, smooth_window = 2, min_prominence_snr = 3),
+                 regexp = "under a third of the typical peak width")
+  expect_no_warning(find_peaks(y, smooth_window = 10, min_prominence_snr = 3))
+  expect_no_warning(find_peaks(y, smooth_window = 2))
+})
 
 # ── exponentially modified Gaussians must not overflow ───────────────────────
 

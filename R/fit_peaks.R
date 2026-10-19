@@ -7,33 +7,10 @@
 #' baseline noise (`min_prominence_snr`).
 #' 
 #' @details
-#' Preprocess with [`preprocess`] before peak detection: high chromatographic
-#' resolution can cause peak splitting. Increase `smooth_window` or reduce
-#' time-axis resolution via the `dim1` argument to [`preprocess`].
-#'
-#' Three filters remove small or spurious peaks after detection:
-#' `min_curvature`, `min_amplitude`, and `min_prominence_snr`. All three are
-#' off by default (`0`) and can be combined.
-#'
-#' `min_curvature` and `min_amplitude` are in absolute instrument units, so a
-#' usable value must be chosen for each dataset. `min_prominence_snr` measures
-#' each peak against the noise instead. A peak's prominence is its height above
-#' the higher of the two valleys bounding it — equal to its height when the peak
-#' stands alone, but less when a neighboring peak elevates one valley. The noise
-#' is a single number for the whole chromatogram: `find_peaks` masks every
-#' detected peak, then takes the standard deviation of what remains by iterative
-#' sigma clipping. `min_prominence_snr = 4` keeps a peak that rises four noise
-#' standard deviations above its own valleys, regardless of signal scale. The
-#' prominence is local; the noise is not — every peak uses the same estimate.
-#'
-#' Because the unmasked timepoints include baseline drift, the estimated
-#' standard deviation can reflect drift rather than noise, so
-#' `min_prominence_snr` is only meaningful on baseline-corrected data.
-#' Estimation also requires some timepoints to survive masking: too narrow a
-#' `smooth_window` leaves hundreds of noise-driven apices whose boundaries tile
-#' the whole trace, in which case the noise cannot be estimated and the filter
-#' is skipped with a warning. See *Choosing the smoothing window* for guidance
-#' on when to use it.
+#' How many peaks are detected depends mostly on `smooth_window` (see
+#' *Choosing the smoothing window*). Three filters, `min_curvature`,
+#' `min_amplitude` and `min_prominence_snr`, can then remove small or spurious
+#' peaks (see *Filtering peaks*).
 #' 
 #' @section Choosing the smoothing window:
 #' Peaks are detected where the first derivative of the signal changes from
@@ -59,16 +36,12 @@
 #' rate, so if you change the time grid with `preprocess(dim1 = )`, the
 #' `smooth_window` should be scaled accordingly.
 #'
-#' `min_prominence_snr` measures the noise for you rather than asking for a
-#' threshold in instrument units, so its cutoff does not depend on signal scale.
-#' Set `smooth_window` first, though. Under-smoothing lets
-#' noise notch the summit of a small peak, which then registers as two apices
-#' with a shallow valley between them; `find_peaks` measures prominence from
-#' that interior notch rather than from the foot of the peak, so the peak
-#' reads as noise-sized and the filter discards it. A tall peak's summit is
-#' too steep to notch, so the loss falls on the small peaks the filter exists
-#' to judge. Once the window is wide enough to keep each peak a single apex,
-#' the filter clears spurious apices at no cost to the real ones.
+#' Under-smoothing also undermines `min_prominence_snr`. It can split a small
+#' peak into two apices, each measured from the shallow valley between them, so
+#' the filter discards both as noise and the peak is lost. Set the smoothing
+#' window wide enough to avoid splitting peaks before applying prominence
+#' filtering. `find_peaks` warns when `smooth_window` is under a third of the
+#' typical peak width.
 #'
 #' **Method-specific caveats.** `"savgol"` requires a window around the peak
 #' width, and errors below 7 timepoints rather than silently widening:
@@ -77,6 +50,26 @@
 #' `"none"`. `"mva"` and `"tmva"` round the window to the nearest odd integer,
 #' floored at three (an even-width running mean is not centered on a sample and
 #' reports the apex one timepoint off).
+#'
+#' @section Filtering peaks:
+#' The curvature and amplitude filters (`min_curvature` and `min_amplitude`)
+#' are in absolute instrument units, so a usable value must be chosen for each
+#' dataset. The prominence filter (`min_prominence_snr`) instead measures each
+#' peak against the noise. A peak's prominence is its height above
+#' the higher of the two valleys on either side of it. For an isolated peak this
+#' is its full height; when a neighboring peak raises one of the valleys, it is
+#' less. The noise is estimated iteratively across the whole chromatogram.
+#' Starting with a rough estimate from the change in signal between adjacent
+#' timepoints, `find_peaks` excludes every peak whose apex is more than three
+#' times the current estimate above the median of the remaining timepoints,
+#' then re-estimates the noise as the scaled median absolute deviation of the
+#' remaining timepoints. This process is repeated until the estimate changes
+#' by less than 0.5%. `min_prominence_snr = 4` keeps peaks with prominence
+#' exceeding 4x the estimated noise standard deviation.
+#'
+#' Because the remaining timepoints include baseline drift, the estimated
+#' standard deviation can reflect drift rather than noise, so
+#' `min_prominence_snr` is only meaningful on baseline-corrected data.
 #'
 #' @importFrom caTools runmean
 #' @importFrom minpack.lm nlsLM
@@ -97,12 +90,10 @@
 #' @param min_amplitude Minimum peak amplitude, as the intensity of the
 #' unsmoothed signal at the apex. Larger values exclude smaller peaks. Defaults
 #' to `0`.
-#' @param min_prominence_snr Minimum peak prominence, expressed as a multiple
-#' of the baseline noise standard deviation. Unlike `min_curvature` and
-#' `min_amplitude`, this threshold is scale-free and transfers between datasets.
-#' Requires `bounds = TRUE`, since the noise estimate masks peak regions using
-#' the peak boundaries. Only meaningful on baseline-corrected data (see
-#' *Details*). Defaults to `0`, which applies no filtering.
+#' @param min_prominence_snr Minimum peak prominence, as a multiple of the
+#' noise standard deviation. Requires `bounds = TRUE`. Only meaningful on
+#' baseline-corrected data (see *Filtering peaks*). Defaults to `0`, which
+#' applies no filtering.
 #' @param bounds Logical. If `TRUE` (default), includes peak boundaries in a
 #' `data.frame`.
 #' @param slope_thresh The `slope_thresh` argument is deprecated. Please use
@@ -122,14 +113,7 @@
 #' data(Sa_pr)
 #' find_peaks(Sa_pr[[1]][,"220"])
 #' @seealso [`fit_peaks`], [`get_peaks`]
-#' @references Oboril, J., Haas, C.P., Lubbesmeyer, M., Nicholls, R.,
-#' Gressling, T., Jensen, K.F., Volpin, G., and Hillenbrand, J. 2024. Automated
-#' processing of chromatograms: a comprehensive python package with a GUI for
-#' intelligent peak identification and deconvolution in chemical reaction
-#' analysis. *Digital Discovery* \doi{10.1039/D4DD00214H}. (The noise
-#' estimate behind `min_prominence_snr` is adapted from 'MOCCA2'.)
-#'
-#' O'Haver, Tom. Pragmatic Introduction to Signal Processing:
+#' @references O'Haver, Tom. Pragmatic Introduction to Signal Processing:
 #' Applications in scientific measurement. <https://terpconnect.umd.edu/~toh/spectrum/>
 #' (Accessed January, 2022).
 #' @export find_peaks
@@ -208,15 +192,69 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
     p <- data.frame(pos = p, lower = bl, upper = bu)
     p$prominence <- get_prominence(y, p)
     if (nrow(p) > 0 && min_prominence_snr > 0){
-      noise <- estimate_noise(y, p)
-      if (noise > 0){
-        p <- p[p$prominence > min_prominence_snr * noise, , drop = FALSE]
+      nl <- trace_noise_level(y, seq_along(y),
+                              data.frame(start = p$lower, end = p$upper),
+                              apex = y[p$pos])
+      if (nl$sigma > 0){
+        warn_narrow_window(y, nl, if (smooth_type == "none") 1 else smooth_window)
+        p <- p[p$prominence > min_prominence_snr * nl$sigma, , drop = FALSE]
         rownames(p) <- NULL
+      } else {
+        warning("The baseline noise could not be estimated, so prominence ",
+                "filtering is skipped for this trace.", call. = FALSE)
       }
     }
   }
   p
 }
+
+#' Median full width at half maximum of the peaks in a trace, in timepoints
+#'
+#' Measured on each run of timepoints more than `TRACE_NOISE_K` noise standard
+#' deviations above the level whose maximum exceeds `PEAK_WIDTH_MIN_SNR` of
+#' them, so noise that splits a summit into several apices does not shorten
+#' it.
+#' @param y A trace.
+#' @param nl The output of `trace_noise_level` for `y`.
+#' @return The median width, or `NA` if no run is tall enough.
+#' @noRd
+median_peak_fwhm <- function(y, nl){
+  z <- y - nl$centre
+  runs <- rle(!is.na(z) & z > TRACE_NOISE_K * nl$sigma)
+  ends <- cumsum(runs$lengths)
+  starts <- ends - runs$lengths + 1
+  widths <- unlist(lapply(which(runs$values), function(q){
+    zi <- z[starts[q]:ends[q]]
+    m <- which.max(zi)
+    if (zi[m] < PEAK_WIDTH_MIN_SNR * nl$sigma) return(NULL)
+    above <- zi >= zi[m] / 2
+    lo <- m
+    while (lo > 1 && above[lo - 1]) lo <- lo - 1
+    hi <- m
+    while (hi < length(zi) && above[hi + 1]) hi <- hi + 1
+    hi - lo + 1
+  }))
+  if (length(widths)) median(widths) else NA_real_
+}
+
+#' Warn when the smoothing window is too narrow for prominence filtering
+#' @param y A trace.
+#' @param nl The output of `trace_noise_level` for `y`.
+#' @param window The smoothing window, in timepoints.
+#' @noRd
+warn_narrow_window <- function(y, nl, window){
+  fwhm <- median_peak_fwhm(y, nl)
+  if (is.finite(fwhm) && window < fwhm * MIN_WINDOW_PER_FWHM)
+    warning(sprintf(paste0(
+      "`smooth_window` (%s timepoints) is under a third of the typical peak ",
+      "width. Noise can split a peak's summit into apices of low prominence, ",
+      "which `min_prominence_snr` then removes along with the peak. Set ",
+      "`smooth_window` to about a third of the peaks' FWHM, in timepoints."),
+      signif(window, 3)), call. = FALSE)
+}
+
+PEAK_WIDTH_MIN_SNR <- 12
+MIN_WINDOW_PER_FWHM <- 1 / 3
 
 #' Fit chromatographic peaks
 #' 

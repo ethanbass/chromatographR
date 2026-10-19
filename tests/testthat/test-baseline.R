@@ -11,21 +11,6 @@ sim_offset_chrom <- function(dt = 0.01, seed = 1, drift = TRUE){
   list(t = tt, b = b, y = b + pk + rnorm(length(tt)))
 }
 
-test_that("sigma_clipped_sd is invariant to a DC offset", {
-  set.seed(1)
-  z <- rnorm(1000)
-  expect_equal(sigma_clipped_sd(z + 10), sigma_clipped_sd(z))
-  expect_equal(sigma_clipped_sd(z + 1e4), sigma_clipped_sd(z))
-  # and it still measures the scale it is given
-  expect_equal(sigma_clipped_sd(z * 5), sigma_clipped_sd(z) * 5)
-})
-
-test_that("estimate_noise survives a detector offset", {
-  y <- sim_offset_chrom()$y
-  expect_equal(estimate_noise(y + 100), estimate_noise(y))
-  expect_gt(estimate_noise(y), 0)
-})
-
 test_that("the prominence SNR filter is not disabled by an offset", {
   # clipping about zero collapsed the noise estimate, which silently switched
   # `min_prominence_snr` off on any trace with a baseline offset.

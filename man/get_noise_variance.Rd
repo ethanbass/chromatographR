@@ -42,8 +42,8 @@ peak purity calculations.
 The variance is measured across wavelengths, not across time, since
 that is the quantity the purity threshold compares against the variance of
 each spectrum. It is therefore not directly comparable to the temporal noise
-estimate returned by \code{estimate_noise}, and the two diverge on data that has
-been smoothed along the wavelength axis by \code{\link{preprocess}}.
+estimate used by \code{\link{find_peaks}} and \code{\link{match_peaks}}, and the two diverge on
+data that has been smoothed along the wavelength axis by \code{\link{preprocess}}.
 }
 \author{
 Ethan Bass
