@@ -78,7 +78,7 @@ normalize_data <- function(peak_table, column, chrom_list = NULL,
     return(peak_table)
   } else if (what == "chrom_list"){
     if (is.null(chrom_list)){
-      chrom_list <- get_chrom_list(peak_table)
+      chrom_list <- get_chrom_list(peak_table, aligned = FALSE)
     } else {
       chrom_list <- get_chrom_list(peak_table, chrom_list)
     }

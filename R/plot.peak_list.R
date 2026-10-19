@@ -106,7 +106,7 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
   tfac <- switch(time.units, "min" = 1, "s" = 1/60, "ms" = 1/60000, 1)
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(x)
-  }
+  } else check_chrom_list_class(chrom_list)
   axis_unit <- get_time_unit(chrom_list, idx = idx, na_value = "min")
   if (is.null(lambda)){
     lambda <- names(x[[1]])[1]

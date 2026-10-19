@@ -73,20 +73,23 @@ test_that("plot_spectrum works", {
   
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = Sa_warp, 
                              what = "click"), 
-               regexp = "Chromatogram must be specified")
+               regexp = "specify a chromatogram with `idx`")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = Sa_warp, 
                              what="click", idx = 1), 
                regexp = "specify a wavelength")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = Sa_warp, 
                              what="rt", lambda="210"),
-               regexp = "Please supply argument")
+               regexp = "Please supply argument to `loc`")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = Sa_warp, 
-                             what="rt", idx = 1), regexp = "Please supply argument")
+                             what="rt", idx = 1), regexp = "Please supply argument to `loc`")
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = Sa_warp, 
-                             what="rt"), regexp = "Chromatogram must be specified")
+                             what="rt"), regexp = "specify a chromatogram with `idx`")
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = Sa_warp, 
-                             what="rt"), regexp = "Chromatogram must be specified")
-  expect_error(plot_spectrum(loc = 12, chrom_list = pk_tab, what = "rt", idx = 1))
+                             what="rt"), regexp = "specify a chromatogram with `idx`")
+  expect_error(plot_spectrum(loc = 12, chrom_list = pk_tab, what = "rt", idx = 1),
+               regexp = "must be a list of chromatograms or a single chromatogram matrix, not a `peak_table`")
+  expect_error(attach_ref_spectra(pk_tab, chrom_list = pk_tab),
+               regexp = "not a `peak_table`")
   expect_error(plot_spectrum(loc = 12, what="rt", idx = 1), 
                regexp = "Must provide either a peak_table or a chrom_list")
   expect_error(plot_spectrum(loc = 12, chrom_list = Sa_warp, what="peak", idx = 1),
@@ -96,7 +99,7 @@ test_that("plot_spectrum works", {
   
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = Sa_warp,
                              what = "click", engine = "plotly"),
-               regexp = "Chromatogram must be specified")
+               regexp = "specify a chromatogram with `idx`")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = Sa_warp,
                              what = "click", idx = 1, engine = "plotly"),
                regexp = "does not currently support clicking")
@@ -106,19 +109,19 @@ test_that("plot_spectrum works", {
                regexp = "does not currently support clicking")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = Sa_warp,
                              what = "click",lambda = "210", engine = "plotly"),
-               regexp = "Chromatogram must be specified")
+               regexp = "specify a chromatogram with `idx`")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = Sa_warp,
                              what = "rt", lambda="210", engine="plotly"),
-               regexp = "Please supply argument")
+               regexp = "Please supply argument to `loc`")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = Sa_warp,
                              what = "rt", idx = 1, engine = "plotly"),
-               regexp = "Please supply argument")
+               regexp = "Please supply argument to `loc`")
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = Sa_warp,
                              what = "rt", engine = "plotly"), 
-               regexp = "Chromatogram must be specified")
+               regexp = "specify a chromatogram with `idx`")
   expect_error(plot_spectrum(loc=12, peak_table = pk_tab, chrom_list = Sa_warp,
                              what = "rt", engine = "plotly"), 
-               regexp = "Chromatogram must be specified")
+               regexp = "specify a chromatogram with `idx`")
 })
 
 
@@ -475,6 +478,12 @@ test_that("purity plot works", {
   vdiffr::expect_doppelganger("plot_purity", plot_purity(TRUE))
   vdiffr::expect_doppelganger("plot_purity_ratio", plot_purity("ratio"))
   vdiffr::expect_doppelganger("plot_purity_curves_local", plot_purity("curves_local"))
+})
+
+test_that("plot.peak_list rejects a peak table passed as `chrom_list`", {
+  data(Sa_pr); data(pk_tab)
+  pks <- get_peaks(Sa_pr[1], lambdas = 210, show_progress = FALSE)
+  expect_error(plot(pks, chrom_list = pk_tab), regexp = "not a `peak_table`")
 })
 
 test_that("purity_args accepted by get_peaks also work at plot time", {

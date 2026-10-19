@@ -91,9 +91,6 @@ plot_spectrum <- function(loc = NULL, peak_table, chrom_list = NULL,
   if (!missing(peak_table))
     check_peaktable(peak_table)
   chrom_list <- get_chrom_list(if (missing(peak_table)) NULL else peak_table, chrom_list)
-  if (!(inherits(chrom_list, c("chrom_list", "list", "matrix"))))
-    stop("The provided `chrom_list` does not appear to be valid.
-                            ......Please check `chrom_list` argument")
   if (is.matrix(chrom_list)){
     chrom_list <- list(chrom_list)
     idx <- 1
@@ -106,7 +103,9 @@ plot_spectrum <- function(loc = NULL, peak_table, chrom_list = NULL,
     stop("Spectral data is unidimensional.")
   if (what %in% c("rt", "idx", "click")){
     if (identical(idx, "max"))
-      stop("Chromatogram must be specified for scan function.")
+      stop(sprintf(paste0("Please specify a chromatogram with `idx` when ",
+                          "`what = \"%s\"`. `idx = \"max\"` is available only ",
+                          "when `what = \"peak\"`."), what))
     if (is.null(chrom_list))
       stop("List of chromatograms must be provided for scan function.")
   } else if (what == "peak"){

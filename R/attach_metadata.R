@@ -118,9 +118,7 @@ get_reference_spectra <- function(peak_table, chrom_list,
   check_peaktable(peak_table)
   if (!inherits(peak_table, "peak_table"))
     stop("Provided peak_table object must be a `peak_table` object.")
-  if (missing(chrom_list)){
-    chrom_list <- get_chrom_list(peak_table)
-  } else get_chrom_list(peak_table, chrom_list)
+  chrom_list <- get_chrom_list(peak_table, if (!missing(chrom_list)) chrom_list)
   ref <- match.arg(ref, c("max.cor", "max.int"))
   X <- colnames(peak_table$tab)
   if (ref == "max.cor"){

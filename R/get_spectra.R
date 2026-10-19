@@ -36,9 +36,6 @@ get_spectra <- function(loc, peak_table, chrom_list = NULL,
   if (!missing(peak_table))
     check_peaktable(peak_table)
   chrom_list <- get_chrom_list(if (missing(peak_table)) NULL else peak_table, chrom_list)
-  if (!(inherits(chrom_list, c("chrom_list", "list", "matrix"))))
-    stop("The provided `chrom_list` does not appear to be valid. 
-                          Please check `chrom_list` argument.")
   what <- match.arg(what)
   format <- match.arg(format)
   new.ts <- get_times(chrom_list, idx = idx[1])
@@ -46,7 +43,7 @@ get_spectra <- function(loc, peak_table, chrom_list = NULL,
   sig <- max(nchar(gsub(".*\\.","",rownames(chrom_list[[1]]))))
   
   if (what == "peak"){
-    if (is.null(peak_table))
+    if (missing(peak_table))
       stop("A `peak_table` must be provided when `what == 'peak'`.")
     RT <- round(as.numeric(peak_table$pk_meta["rt", loc]), sig)
   } else if (what == "rt"){

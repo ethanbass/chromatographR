@@ -109,6 +109,7 @@ extract_idx <- function(string, chrom_names){
 #' Check that chrom_list is matching a peak table or peak list.
 #' @noRd
 check_chrom_list <- function(x, chrom_list, verbose = FALSE){
+  check_chrom_list_class(chrom_list)
   if (inherits(x, "peak_table")){
     if (length(chrom_list) != nrow(x$tab)){
       stop("Dimensions of chrom_list and peak_table do not match.")
@@ -124,6 +125,15 @@ check_chrom_list <- function(x, chrom_list, verbose = FALSE){
         warning("Names of chromatograms do not match peak_list")
     }
   }
+}
+
+#' @noRd
+check_chrom_list_class <- function(chrom_list){
+  if (inherits(chrom_list, "peak_table") ||
+      !inherits(chrom_list, c("chrom_list", "list", "matrix")))
+    stop(sprintf(paste("`chrom_list` must be a list of chromatograms or a",
+                       "single chromatogram matrix, not a `%s`."),
+                 class(chrom_list)[1]), call. = FALSE)
 }
 
 #' Select detected peaks by target retention time
@@ -320,7 +330,8 @@ check_chr <- function(chr, loc = NULL, peak_table, chrom_list, allow_max = TRUE)
         chr <- which.max(peak_table$tab[, loc])
       }
     } else{
-      stop("Chromatogram must be specified for scan function.")
+      stop(paste0("Please specify a chromatogram with `idx`. `idx = \"max\"` ",
+                  "is available only in `plot_spectrum(what = \"peak\")`."))
     }
   }
   if (is.character(chr)){
