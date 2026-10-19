@@ -74,6 +74,11 @@ specified criteria.
 Filters peaks from a \code{peak_list} object by height, area, width, retention
 time, or fit diagnostics (\code{converged} and \code{window_limited}).
 }
+\note{
+The structure of \code{filter_peaks} is adapted from the \code{filterPeaks}
+function in Ron Wehrens' \href{https://github.com/rwehrens/alsace}{alsace}
+package.
+}
 \examples{
 data(Sa_warp)
 pks <- get_peaks(Sa_warp[1], lambda = "210")

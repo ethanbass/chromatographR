@@ -124,7 +124,7 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' configuration). `NA` until added with [`attach_ref_spectra`].
 #' * `args`: A list of the arguments given to [`get_peaktable`] to generate
 #' the peak table.
-#' @author Ethan Bass
+#' @author Ron Wehrens, Ethan Bass
 #' @note Peak lists produced by `get_peaks(windows = )` are grouped by
 #' integration window rather than clustered by retention time, including after
 #' [`correct_peaks`]. This gives one peak table column per window, in order of

@@ -314,10 +314,11 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' `end` and `center` are index positions; `sd`, `FWHM` and `tau` are widths on
 #' the index scale; `area` is integrated over the index axis; and `tau_right`
 #' and `tau_left` are in inverse index units. [`get_peaks`] converts them to the chromatogram's time axis.
-#' @note The `fit_peaks` function is adapted from Dr. Robert Morrison's
-#' [DuffyTools](https://github.com/robertdouglasmorrison/DuffyTools) package
-#' as well as code published in Ron Wehrens' [alsace](
-#' https://github.com/rwehrens/alsace) package.
+#' @note The loop over peaks in `fit_peaks` is adapted from the `fitpeaks`
+#' function in Ron Wehrens' [alsace](https://github.com/rwehrens/alsace)
+#' package. The Gaussian peak shape and the interface of the internal fitting
+#' functions are adapted from Robert Morrison's
+#' [DuffyTools](https://github.com/robertdouglasmorrison/DuffyTools) package.
 #' @author Ethan Bass
 #' @examples
 #' data(Sa_pr)

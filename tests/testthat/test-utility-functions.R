@@ -381,48 +381,29 @@ test_that("pad_zeros and strip_zeros round-trip", {
   expect_equal(padded_vec[1, 1], 0)
 })
 
-test_that("predict.ptw matches the method it overrides in ptw", {
+test_that("warp_times_ptw matches ptw on timepoints and interpolates between", {
   skip_on_cran()
-  # `chromatographR` registers its own `predict.ptw`, overwriting `ptw`'s. The
-  # two must agree, or loading the package silently changes `ptw`'s behavior.
   data(Sa_pr)
   ptw_predict <- getS3method("predict", "ptw", envir = asNamespace("ptw"))
+  expect_identical(environment(getS3method("predict", "ptw")),
+                   asNamespace("ptw"))
   tr <- t(sapply(Sa_pr, function(x) x[, "210"]))
-  colnames(tr) <- rownames(Sa_pr[[1]])
+  ref_times <- as.numeric(rownames(Sa_pr[[1]]))
+  colnames(tr) <- ref_times
   pw_global <- ptw::ptw(ref = tr[3, , drop = FALSE], samp = tr[1:2, ],
                         warp.type = "global")
   pw_indiv  <- ptw::ptw(ref = tr[3, , drop = FALSE], samp = tr[1:2, ],
                         warp.type = "individual")
-
+  on_grid <- ref_times[c(200, 400, 600)]
   for (pw in list(global = pw_global, individual = pw_indiv)){
-    # response, with and without `newdata`
-    expect_equal(predict(pw), ptw_predict(pw))
-    expect_equal(predict(pw, newdata = tr[1:2, ]),
-                 ptw_predict(pw, newdata = tr[1:2, ]))
-    # a bare vector is promoted to a one-row matrix
-    expect_equal(predict(pw, newdata = tr[1, ]),
-                 ptw_predict(pw, newdata = tr[1, ]))
-    # corrected times, with and without `newdata` and `RTref`
-    expect_equal(predict(pw, what = "time"), ptw_predict(pw, what = "time"))
-    expect_equal(predict(pw, what = "time", newdata = c(12, 14, 16)),
-                 ptw_predict(pw, what = "time", newdata = c(12, 14, 16)))
-    expect_equal(predict(pw, what = "time", RTref = as.numeric(colnames(tr))),
-                 ptw_predict(pw, what = "time",
-                             RTref = as.numeric(colnames(tr))))
-    expect_error(predict(pw, what = "nonsense"),
-                 regexp = "'arg' should be one of")
+    expect_equal(warp_times_ptw(pw, on_grid, ref_times),
+                 ptw_predict(pw, what = "time", newdata = on_grid,
+                             RTref = ref_times))
+    lo <- warp_times_ptw(pw, ref_times[400], ref_times)
+    hi <- warp_times_ptw(pw, ref_times[401], ref_times)
+    mid <- warp_times_ptw(pw, mean(ref_times[400:401]), ref_times)
+    expect_true(all(mid > pmin(lo, hi) & mid < pmax(lo, hi)))
   }
-  # `warp.type = "individual"` needs one warp function per row of `newdata`
-  expect_error(predict(pw_indiv, newdata = tr[1:3, ]),
-               regexp = "Incorrect number of rows in newdata")
-  # the row-count guard only covers `warp.type = "individual"`; a global warp
-  # is recycled to `nrow(object$sample)` rows, so a mismatched `newdata`
-  # fails downstream instead. `ptw`'s own method does the same, so this is
-  # inherited rather than introduced here.
-  expect_error(predict(pw_global, newdata = tr[1:3, ]),
-               regexp = "subscript out of bounds")
-  expect_error(ptw_predict(pw_global, newdata = tr[1:3, ]),
-               regexp = "subscript out of bounds")
 })
 
 test_that("format_axis keeps the precision of a single value", {

@@ -15,7 +15,6 @@
 #' re-applied to the unaligned chromatograms when needed. To use a particular
 #' aligned object instead, pass it as `chrom_list_aligned`.
 #' 
-#' @importFrom stats predict
 #' @param peak_list A `peak_list` object created by [`get_peaks`], containing a 
 #' nested list of peak tables where the first level is the sample,
 #' and the second level is the spectral wavelength. Every wavelength is described
@@ -103,7 +102,7 @@ warp_maps <- function(mod_list, chrom_list){
                                             mod$warp.coef[1, ]), nrow = 1)
     if (length(ref_times) != length(mod$warp.fun))
       stop("Dimensions of the warping models and chromatograms do not match.")
-    function(rt) c(predict.ptw(mod, rt, what = "time", RTref = ref_times))
+    function(rt) c(warp_times_ptw(mod, rt, ref_times))
   })
 }
 
@@ -125,68 +124,23 @@ strip_models <- function(mod_list){
   transfer_metadata(stripped, mod_list)
 }
 
-#' Predict PTW
-#' 
-#' Predict method for objects of class `ptw`. Reproduced from the ptw package,
-#' which does not export the original.
+#' Map retention times through a ptw warping model
 #'
-#' @param object an object of class `ptw`.
-#' @param newdata an optional matrix of new data to predict. If missing,
-#'   returns the warped sample.
-#' @param what character string specifying whether to return the warped
-#'   `"response"` or corrected `"time"`. Defaults to `"response"`.
-#' @param RTref optional numeric vector of reference retention times.
-#' @param ... additional arguments (currently ignored).
-#'
-#' @return a matrix of warped responses or corrected retention times.
-#'
-#' @author Ron Wehrens
-#' @keywords internal
-#' @exportS3Method
-predict.ptw <- function (object, newdata, what = c("response", "time"), 
-                         RTref = NULL, 
-                         ...){
-  what <- match.arg(what)
-  switch(what, response = {
-    if (missing(newdata)) return(object$warped.sample)
-    if (!is.matrix(newdata)) newdata <- matrix(newdata, nrow = 1)
-    if (object$warp.type == "individual" & nrow(newdata) > 
-        1 & nrow(newdata) != nrow(object$warp.fun))
-      stop("Incorrect number of rows in newdata")
-    if (object$warp.type == "individual") {
-      WF <- object$warp.fun
-    } else{
-      WF <- matrix(object$warp.fun, nrow(object$sample), 
-                   ncol(object$warp.fun), byrow = TRUE)
-    }
-    if (object$mode == "backward") {
-      t(sapply(seq_len(nrow(newdata)), function(i){
-        approx(x = seq_len(ncol(newdata)), y = newdata[i, ], xout = WF[i, ])$y
-        }))
-    } else{
-      t(sapply(seq_len(nrow(newdata)), function(i){
-        approx(x = WF[i,], y = newdata[i, ], xout = seq_len(ncol(newdata)))$y
-      }))
-    }
-  }, time = {
-    correctedTime <- switch(object$mode, 
-                            backward = -sweep(object$warp.fun, 2, 2 * 
-                                                (seq_len(ncol(object$ref))), 
-                                              FUN = "-"),
-                            object$warp.fun)
-    if (is.null(RTref)) {
-      if (is.null(colnames(object$ref))) {
-        RTref <- seq_len(ncol(object$ref))
-      } else {
-        RTref <- as.numeric(colnames(object$ref))
-      }
-    }
-    newdataIndices <- if (missing(newdata)) seq_along(RTref) else
-      approx(RTref, seq_along(RTref), xout = newdata)$y
-    t(sapply(seq_len(nrow(correctedTime)), function(i){
-      warped <- approx(seq_len(ncol(correctedTime)), correctedTime[i, ],
-                       xout = newdataIndices)$y
-      approx(RTref, NULL, warped)$y
-      }))
-  })
+#' Adapted from the `"time"` branch of `predict.ptw` in the ptw package,
+#' modified to interpolate between timepoints rather than round to them.
+#' @param mod A `ptw` object with a `warp.fun`.
+#' @param times Retention times to map.
+#' @param ref_times Retention times of the reference chromatogram.
+#' @return A matrix of corrected times, one row per warping function.
+#' @author Ron Wehrens, Ethan Bass
+#' @noRd
+warp_times_ptw <- function(mod, times, ref_times){
+  corrected <- if (identical(mod$mode, "backward")){
+    -sweep(mod$warp.fun, 2, 2 * seq_len(ncol(mod$warp.fun)), FUN = "-")
+  } else mod$warp.fun
+  idx <- approx(ref_times, seq_along(ref_times), xout = times)$y
+  t(sapply(seq_len(nrow(corrected)), function(i){
+    warped <- approx(seq_len(ncol(corrected)), corrected[i, ], xout = idx)$y
+    approx(ref_times, NULL, warped)$y
+  }))
 }

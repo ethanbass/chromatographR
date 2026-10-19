@@ -227,5 +227,5 @@ LC–DAD using multivariate curve resolution: the alsace package for R.
 \code{\link[=peak_table-class]{peak_table}}, \code{\link{attach_ref_spectra}}, \code{\link{attach_metadata}}
 }
 \author{
-Ethan Bass
+Ron Wehrens, Ethan Bass
 }

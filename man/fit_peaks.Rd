@@ -133,9 +133,11 @@ or exponential-Gaussian hybrid functions. The area under each fitted curve is
 estimated using trapezoidal approximation.
 }
 \note{
-The \code{fit_peaks} function is adapted from Dr. Robert Morrison's
-\href{https://github.com/robertdouglasmorrison/DuffyTools}{DuffyTools} package
-as well as code published in Ron Wehrens' \href{https://github.com/rwehrens/alsace}{alsace} package.
+The loop over peaks in \code{fit_peaks} is adapted from the \code{fitpeaks}
+function in Ron Wehrens' \href{https://github.com/rwehrens/alsace}{alsace}
+package. The Gaussian peak shape and the interface of the internal fitting
+functions are adapted from Robert Morrison's
+\href{https://github.com/robertdouglasmorrison/DuffyTools}{DuffyTools} package.
 }
 \examples{
 data(Sa_pr)

@@ -3,10 +3,12 @@ Package: chromatographR
 Title: Chromatographic Data Analysis Toolkit
 Version: 0.9.0
 Authors@R: c(
-    person("Ethan", "Bass", , "ethanbass@gmail.com", role = c("aut", "cre"),
+    person("Ethan", "Bass", , "ethanbass@gmail.com", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0002-6175-6739")),
     person(c("Hans","W"), "Borchers", role = c("ctb", "cph"),
-            comment = c("Author of savgol and pinv functions bundled from pracma"))
+            comment = c("Author of savgol and pinv functions bundled from pracma")),
+    person("Ron", "Wehrens", role = c("ctb", "cph"),
+           comment = c("Author of code adapted from alsace and ptw"))
     )
 Maintainer: Ethan Bass <ethanbass@gmail.com>
 Description: Tools for high-throughput analysis of HPLC-DAD/UV

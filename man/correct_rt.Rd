@@ -200,8 +200,9 @@ both are dimensionless and higher means less warping, but they are on
 unrelated scales.
 }
 \note{
-Adapted from the \code{correctRT} function in the alsace package by Ron
-Wehrens (\url{https://github.com/rwehrens/alsace/blob/master/R/correctRT.R}).
+The PTW branch of \code{correct_rt} is adapted from the \code{correctRT}
+function in Ron Wehrens' \href{https://github.com/rwehrens/alsace}{alsace}
+package.
 }
 \examples{
 data(Sa_pr)

@@ -42,6 +42,9 @@
 #' @return A filtered `peak_list` object containing only peaks that satisfy the
 #' specified criteria.
 #' @author Ron Wehrens, Ethan Bass
+#' @note The structure of `filter_peaks` is adapted from the `filterPeaks`
+#' function in Ron Wehrens' [alsace](https://github.com/rwehrens/alsace)
+#' package.
 #' @seealso [`get_peaks`], [`filter_peaktable`]
 #' @examples
 #' data(Sa_warp)

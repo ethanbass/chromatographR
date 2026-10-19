@@ -138,8 +138,9 @@
 #' warped chromatograms share a new time axis, which can be longer than the
 #' input.
 #' @author Ethan Bass
-#' @note Adapted from the `correctRT` function in the alsace package by Ron 
-#' Wehrens (<https://github.com/rwehrens/alsace/blob/master/R/correctRT.R>).
+#' @note The PTW branch of `correct_rt` is adapted from the `correctRT`
+#' function in Ron Wehrens' [alsace](https://github.com/rwehrens/alsace)
+#' package.
 #' @seealso [`correct_rt_group`], [`correct_peaks`], [`ptw`][ptw::ptw], 
 #' [`VPdtw`][VPdtw::VPdtw]
 #' @references 
