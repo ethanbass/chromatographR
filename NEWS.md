@@ -118,6 +118,9 @@ data.frames. Use `as.matrix(pt$tab)` for a matrix.
 `start` and `end` rather than `rt.cor`, `start.cor` and `end.cor`, and so does
 `reshape_peaktable`. Check `args$use_corrected_rt` to see which times were
 used.
+* `attach_metadata` now adds to an existing `sample_meta`, replacing only the
+columns of the same name. Previously it replaced the whole table. To do that
+now, set `peak_table$sample_meta <- NA` first.
 
 #### Example data
 
@@ -248,6 +251,9 @@ with metadata and one column per selected peak.
 * `annotate_peaks` now accepts retention times through the `loc` argument,
 labeling the highest point within `tol` of each supplied retention time
 without requiring a peak table. See `?annotate_peaks`.
+* `get_peaktable` now fills `sample_meta` with any fields added to the
+chromatograms with `chromConverter::add_metadata` (chromConverter 0.11.0 or
+later).
 
 ### Bug fixes and other minor changes
 

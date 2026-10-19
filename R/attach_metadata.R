@@ -1,13 +1,18 @@
-#' Attaches sample metadata to a `peak_table` object by matching sample names
+#' Attach sample metadata to a `peak_table`
 #' 
-#' Metadata is provided as a `data.frame`, with one column containing sample
-#' identifiers matching the row names of `peak_table$tab`.
+#' Matches rows of `metadata` to samples by name and stores them in the
+#' `sample_meta` slot, in the same order as the rows of `peak_table$tab`.
+#' Samples missing from `metadata` get `NA` values, with a warning. Columns
+#' already in `sample_meta`, such as fields added to the chromatograms with
+#' `chromConverter::add_metadata()` (chromConverter 0.11.0 or later), are kept
+#' unless `metadata` replaces them.
+#' To replace `sample_meta` entirely, set `peak_table$sample_meta <- NA` first.
 #' 
 #' @aliases attach_metadata
 #' @param peak_table A `peak_table` object created by [`get_peaktable`].
-#' @param metadata A `data.frame` of sample metadata.
-#' @param column Name of the column in `metadata` containing sample identifiers.
-#' Must match the row names of `peak_table$tab`.
+#' @param metadata A `data.frame` (or tibble) of sample metadata.
+#' @param column Name of the column in `metadata` containing sample identifiers,
+#' which must be unique and match the row names of `peak_table$tab`.
 #' @return A `peak_table` object with metadata stored in the `sample_meta` slot.
 #' @author Ethan Bass
 #' @seealso [`get_peaktable`], [`normalize_data`]
@@ -41,6 +46,10 @@ attach_metadata <- function(peak_table, metadata, column){
     warning("The supplied metadata does not include all samples.")
   meta <- keep_order(meta, merge, y = metadata, all.x = TRUE, all.y = FALSE,
                      sort = FALSE, by = column)
+  if (is_attached(peak_table$sample_meta)){
+    old <- peak_table$sample_meta
+    meta <- cbind(meta, old[, setdiff(colnames(old), colnames(meta)), drop = FALSE])
+  }
   peak_table$sample_meta <- meta
   return(peak_table)
 }

@@ -146,11 +146,15 @@ sample, or whose response is negative, is recorded as \code{0} (\code{na.fill} f
 \code{matched_peak_list}). A peak whose model failed, which
 \code{get_peaks(targets = )} keeps with a missing \code{height} and \code{area}, is
 recorded as \code{NA}.
-\item \code{pk_meta}: A \code{data.frame} containing peak metadata (e.g., the spectral
-component, peak number, and average retention time), summarized across all
-peaks in each cluster according to \code{summarize_by}.
-\item \code{sample_meta}: A \code{data.frame} of sample metadata. \code{NA} until added with
-\code{\link{attach_metadata}}.
+\item \code{pk_meta}: A \code{data.frame} of peak metadata, one column per peak. Its rows
+are the wavelength (\code{lambda}), the peak number (\code{peak}), and whichever of the
+peak list's \code{rt}, \code{start}, \code{end}, \code{sd}, \code{tau}, \code{FWHM}, \code{r.squared}, \code{purity},
+\code{window_limited} and \code{converged} columns it has, each summarized across the
+peaks in that column according to \code{summarize_by}. See the Value section of
+\code{\link{get_peaks}} for their meanings.
+\item \code{sample_meta}: A \code{data.frame} of sample metadata: the fields added to the
+chromatograms with \code{chromConverter::add_metadata()} (chromConverter 0.11.0
+or later), and any attached with \code{\link{attach_metadata}}. \code{NA} if there are none.
 \item \code{instrument_meta}: A \code{data.frame} of instrumental metadata transferred
 automatically from the chromatograms.
 \item \code{ref_spectra}: A matrix of reference spectra (in a wavelength × peak

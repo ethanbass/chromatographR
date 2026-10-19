@@ -23,6 +23,25 @@
 .pks <- get_peaks(.cl, lambdas = "220", fit = "gaussian", smooth_type = "none",
                   estimate_purity = FALSE, show_progress = FALSE)
 
+test_that("get_peaktable carries metadata added to the chromatograms", {
+  cl <- .cl
+  attr(cl$s1, "dose") <- 1
+  attr(cl$s2, "dose") <- 2
+  attr(cl$s1, "added_metadata") <- attr(cl$s2, "added_metadata") <- "dose"
+  pks <- get_peaks(cl, lambdas = "220", fit = "gaussian", smooth_type = "none",
+                   estimate_purity = FALSE, show_progress = FALSE)
+  pt <- get_peaktable(pks)
+  expect_equal(pt$sample_meta$name, rownames(pt$tab))
+  expect_equal(pt$sample_meta$dose, c(1, 2))
+
+  pt <- attach_metadata(pt, data.frame(id = c("s2", "s1"), site = c("b", "a")),
+                        column = "id")
+  expect_equal(pt$sample_meta$site, c("a", "b"))
+  expect_equal(pt$sample_meta$dose, c(1, 2))
+
+  expect_false(is.data.frame(get_peaktable(.pks)$sample_meta))
+})
+
 # ── hmax = 0.2: nearby peaks merge, distant peaks stay separate ───────────────
 
 test_that("get_peaktable clusters nearby peaks into one column and separates distant peaks", {

@@ -2,24 +2,29 @@
 % Please edit documentation in R/attach_metadata.R
 \name{attach_metadata}
 \alias{attach_metadata}
-\title{Attaches sample metadata to a \code{peak_table} object by matching sample names}
+\title{Attach sample metadata to a \code{peak_table}}
 \usage{
 attach_metadata(peak_table, metadata, column)
 }
 \arguments{
 \item{peak_table}{A \code{peak_table} object created by \code{\link{get_peaktable}}.}
 
-\item{metadata}{A \code{data.frame} of sample metadata.}
+\item{metadata}{A \code{data.frame} (or tibble) of sample metadata.}
 
-\item{column}{Name of the column in \code{metadata} containing sample identifiers.
-Must match the row names of \code{peak_table$tab}.}
+\item{column}{Name of the column in \code{metadata} containing sample identifiers,
+which must be unique and match the row names of \code{peak_table$tab}.}
 }
 \value{
 A \code{peak_table} object with metadata stored in the \code{sample_meta} slot.
 }
 \description{
-Metadata is provided as a \code{data.frame}, with one column containing sample
-identifiers matching the row names of \code{peak_table$tab}.
+Matches rows of \code{metadata} to samples by name and stores them in the
+\code{sample_meta} slot, in the same order as the rows of \code{peak_table$tab}.
+Samples missing from \code{metadata} get \code{NA} values, with a warning. Columns
+already in \code{sample_meta}, such as fields added to the chromatograms with
+\code{chromConverter::add_metadata()} (chromConverter 0.11.0 or later), are kept
+unless \code{metadata} replaces them.
+To replace \code{sample_meta} entirely, set \code{peak_table$sample_meta <- NA} first.
 }
 \examples{
 data(pk_tab)

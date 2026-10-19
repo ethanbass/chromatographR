@@ -113,11 +113,15 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' `matched_peak_list`). A peak whose model failed, which
 #' `get_peaks(targets = )` keeps with a missing `height` and `area`, is
 #' recorded as `NA`.
-#' * `pk_meta`: A `data.frame` containing peak metadata (e.g., the spectral
-#' component, peak number, and average retention time), summarized across all
-#' peaks in each cluster according to `summarize_by`.
-#' * `sample_meta`: A `data.frame` of sample metadata. `NA` until added with
-#' [`attach_metadata`].
+#' * `pk_meta`: A `data.frame` of peak metadata, one column per peak. Its rows
+#' are the wavelength (`lambda`), the peak number (`peak`), and whichever of the
+#' peak list's `rt`, `start`, `end`, `sd`, `tau`, `FWHM`, `r.squared`, `purity`,
+#' `window_limited` and `converged` columns it has, each summarized across the
+#' peaks in that column according to `summarize_by`. See the Value section of
+#' [`get_peaks`] for their meanings.
+#' * `sample_meta`: A `data.frame` of sample metadata: the fields added to the
+#' chromatograms with `chromConverter::add_metadata()` (chromConverter 0.11.0
+#' or later), and any attached with [`attach_metadata`]. `NA` if there are none.
 #' * `instrument_meta`: A `data.frame` of instrumental metadata transferred
 #' automatically from the chromatograms.
 #' * `ref_spectra`: A matrix of reference spectra (in a wavelength × peak
@@ -583,9 +587,11 @@ target_ids <- function(targets, lambdas){
 #' @noRd
 new_peak_table <- function(result, source, args){
   pull <- function(k) as.data.frame(t(do.call("rbind", lapply(result, `[[`, k))))
+  added <- unique(unlist(lapply(source, attr, "added_metadata", exact = TRUE)))
   structure(
     list(tab = pull(1), pk_meta = pull(2),
-         sample_meta = NA,
+         sample_meta = if (length(added))
+           chromConverter::extract_metadata(source, what = added) else NA,
          instrument_meta = chromConverter::extract_metadata(source),
          ref_spectra = NA,
          args = args),

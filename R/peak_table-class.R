@@ -9,17 +9,19 @@
 #'
 #' @section Components:
 #' A `peak_table` object contains the following elements:
-#' * `tab`: The peak table itself — a `data.frame` of intensities in a
-#' sample × peak configuration.
-#' * `pk_meta`: A `data.frame` containing peak meta-data (e.g., the spectral
-#' component, peak number, and average retention time).
-#' * `sample_meta`: A `data.frame` of sample meta-data. Must be added using
-#' [`attach_metadata`].
+#' * `tab`: The peak table itself — a `data.frame` of
+#' intensities in a sample × peak configuration.
+#' * `pk_meta`: A `data.frame` containing peak metadata (e.g., the spectral
+#' component, peak number, and summarized retention time). See
+#' [`get_peaktable`] for its rows.
+#' * `sample_meta`: A `data.frame` of sample metadata: the fields added to the
+#' chromatograms with `chromConverter::add_metadata()` (chromConverter 0.11.0
+#' or later), and any attached with [`attach_metadata`]. `NA` if there are none.
 #' * `instrument_meta`: A `data.frame` of instrumental metadata transferred
 #' automatically from the chromatograms.
-#' * `ref_spectra`: A `data.frame` of reference spectra (in a wavelength × peak
-#' configuration). Must be added using [`attach_ref_spectra`].
-#' * `args`: A vector of arguments given to [`get_peaktable`] to generate
+#' * `ref_spectra`: A matrix of reference spectra (in a wavelength × peak
+#' configuration). `NA` until added with [`attach_ref_spectra`].
+#' * `args`: A list of the arguments given to [`get_peaktable`] to generate
 #' the peak table.
 #'
 #' @section Methods:
@@ -33,7 +35,7 @@
 #' - [summary.peak_table()]
 #' - \code{\link{[.peak_table}}
 #'
-#' @seealso [get_peaktable()] for creating peak_table objects
+#' @seealso [get_peaktable()] for creating `peak_table` objects
 #'
 #' @examples
 #' # See get_peaktable() for creation examples
