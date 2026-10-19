@@ -676,6 +676,21 @@ test_that("plot_baseline yields its defaults to `...` and returns its label", {
   expect_equal(plot_baseline(x, add = TRUE), plot_baseline(x))
 })
 
+test_that("plot_chroms draws one line per sample and wavelength", {
+  skip_if_not_installed("ggplot2")
+  data(Sa_pr)
+  p <- plot_chroms(Sa_pr, idx = 1:2, lambdas = c(210, 260), engine = "ggplot")
+  expect_equal(length(unique(ggplot2::layer_data(p)$group)), 4)
+})
+
+test_that("plot_chroms plotly splits traces by wavelength", {
+  skip_if_not_installed("plotly")
+  data(Sa_pr)
+  p <- plotly::plotly_build(plot_chroms(Sa_pr, idx = 1:2, lambdas = c(210, 260),
+                                        engine = "plotly"))
+  expect_length(p$x$data, 4)
+})
+
 test_that("plot_baseline accepts a vector with an attached baseline", {
   data(Sa_pr)
   x <- correct_baseline(Sa_pr[[1]][, "210"], attach_baseline = TRUE)

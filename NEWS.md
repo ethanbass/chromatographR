@@ -366,6 +366,8 @@ requested `time_resolution`.
 * `reshape_chroms` no longer errors when `lambdas` is left at its `NULL`
 default, which now returns every wavelength, or when `sample_var` is not
 `"sample"`.
+* `plot_chroms` now draws each wavelength as a separate line under the
+`"ggplot"` and `"plotly"` engines, instead of joining them into one.
 
 #### Documentation and packaging
 

@@ -141,7 +141,9 @@ plot_chroms <- function(x, lambdas = NULL, idx, time_resolution = 0.01,
       check_for_pkg("ggplot2")
       .data <- ggplot2::.data
       p <- ggplot2::ggplot(xx, ggplot2::aes(x = .data$rt, y = .data$absorbance,
-                                        color = .data$sample)) +
+                                        color = .data$sample,
+                                        group = interaction(.data$sample,
+                                                            .data$lambda))) +
         ggplot2::geom_line(linewidth = linewidth*0.5, na.rm = TRUE, ...) +
         ggplot2::ylab(ylab) + 
         ggplot2::xlab(xlab) + 
@@ -164,18 +166,25 @@ plot_chroms <- function(x, lambdas = NULL, idx, time_resolution = 0.01,
     } else if (engine == "plotly"){
       check_for_pkg("plotly")
       plotly_colors <- if (nlevels(xx$sample) == 1) "black" else NULL
-      p <- plotly::plot_ly(data = xx, x = ~rt, y = ~absorbance, color = ~sample,
-                           type = 'scatter', mode = 'lines', 
-                           colors = plotly_colors,
-                           line = list(width = linewidth, ...))
+      lams <- unique(xx$lambda)
+      p <- plotly::plot_ly(colors = plotly_colors)
+      for (l in lams){
+        p <- plotly::add_lines(p, data = xx[xx$lambda %in% l, ], x = ~rt,
+                               y = ~absorbance, color = ~sample,
+                               legendgroup = ~sample,
+                               showlegend = identical(l, lams[1]),
+                               line = list(width = linewidth, ...))
+      }
       p <-  plotly::layout(p, xaxis = list(title = xlab),
                            yaxis = list(title = ylab),
                            title = title
       )
       if (!show_legend){
         p <- plotly::hide_legend(p)
-      } else if (legend_position != "topright"){
-        p <- plotly::layout(p, legend = position_plotly_legend(legend_position))
+      } else {
+        pos <- if (legend_position != "topright")
+          position_plotly_legend(legend_position)
+        p <- plotly::layout(p, legend = c(list(tracegroupgap = 0), pos))
       }
       if (zoom_x){
         p <- plotly::layout(p, xaxis = list(range = xlim))
