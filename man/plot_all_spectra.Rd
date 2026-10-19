@@ -90,6 +90,7 @@ plot_all_spectra(loc = "V11", peak_table = pk_tab, overlapping = TRUE)
 Other visualization functions:
 \code{\link[=boxplot.peak_table]{boxplot.peak_table()}},
 \code{\link[=mirror_plot]{mirror_plot()}},
+\code{\link[=plot.chrom_list]{plot.chrom_list()}},
 \code{\link[=plot.matched_peak_list]{plot.matched_peak_list()}},
 \code{\link[=plot.peak_list]{plot.peak_list()}},
 \code{\link[=plot.peak_table]{plot.peak_table()}},

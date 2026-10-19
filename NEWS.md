@@ -176,6 +176,8 @@ time and wavelength, on a compressed color scale by default.
 #### New generic functions
 
 * Converted `get_peaktable` to an S3 generic. The default method keeps the original behavior, including for unclassed lists. The new `get_peaktable.matched_peak_list` method builds a peak table directly from matched peak pairs.
+* Added a `plot` method for `chrom_list` objects from `read_chroms`, drawing
+traces, a heatmap or a contour plot according to `type`.
 
 #### Baseline correction
 

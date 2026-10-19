@@ -969,6 +969,18 @@ test_that("a shared `zlim` puts contour plots on one color scale", {
   expect_error(plot_chrom_contour(Sa_pr, zlim = 100), "increasing order")
 })
 
+test_that("plot.chrom_list dispatches on `type`", {
+  skip_if_not_installed("ggplot2")
+  data(Sa_pr)
+  cl <- structure(Sa_pr, class = c("chrom_list", "list"))
+  expect_equal(plot(cl, lambdas = 210, engine = "ggplot")$data,
+               plot_chroms(Sa_pr, lambdas = 210, engine = "ggplot")$data)
+  expect_equal(plot(cl, type = "heatmap", lambdas = 210, engine = "ggplot")$data,
+               plot_chroms_heatmap(Sa_pr, lambdas = 210, engine = "ggplot")$data)
+  local_mocked_bindings(plot_chrom_contour = function(x, idx) idx)
+  expect_equal(plot(cl, type = "contour", idx = 3), 3)
+})
+
 test_that("annotate_peaks labels peaks on a single-wavelength plot", {
   skip_on_cran()
   skip_if_not_installed("ggplot2")
@@ -1000,4 +1012,22 @@ test_that("plot.peak_list zooms on a targets data.frame", {
   pdf(NULL)
   on.exit(dev.off(), add = TRUE)
   expect_no_error(plot(pm, chrom_list = Sa_pr, targets = data.frame(rt = 12.07)))
+})
+
+test_that("plots unwrap nested chrom_lists to their dad element", {
+  skip_on_cran()
+  data(Sa_pr)
+  nested <- structure(lapply(Sa_pr, function(m) list(dad = m, pump = m[, 1, drop = FALSE])),
+                      class = c("chrom_list", "list"))
+  pdf(NULL)
+  on.exit(dev.off(), add = TRUE)
+  expect_no_error(plot(nested, lambdas = 210))
+  expect_no_error(plot(nested, type = "heatmap", lambdas = 210))
+  expect_no_error(plot(nested, type = "contour", idx = 1))
+  expect_no_error(plot_chroms(Sa_pr, lambdas = 210, what = "dad"))
+  expect_no_error(plot_spectrum(loc = 12, chrom_list = nested, what = "rt",
+                                idx = 1, plot_trace = FALSE, verbose = FALSE))
+  no_dad <- lapply(Sa_pr, function(m) list(uv = m))
+  expect_error(plot_chroms_heatmap(no_dad, lambdas = 210),
+               "`what = \"dad\"` was not found. Elements available: 'uv'")
 })

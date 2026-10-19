@@ -601,6 +601,38 @@ plot_chrom_contour <- function(x, idx = 1, xlim = NULL, ylim = NULL,
   invisible(NULL)
 }
 
+#' Plot a list of chromatograms
+#'
+#' Plots a `chrom_list`, as returned by [chromConverter::read_chroms()], as
+#' traces ([plot_chroms()]), a heatmap of samples ([plot_chroms_heatmap()]),
+#' or a contour plot of one sample ([plot_chrom_contour()]). If each sample
+#' holds several elements, the `"dad"` element is plotted, or for
+#' `type = "traces"` the one named by `what`.
+#'
+#' @param x A `chrom_list` object.
+#' @param type Type of plot: `"traces"` (the default), `"heatmap"`, or
+#' `"contour"`.
+#' @param ... Arguments to the plotting function selected by `type`. `lambdas`
+#' names the traces to plot for `"traces"`, and a single wavelength for
+#' `"heatmap"`; `idx` selects samples for `"traces"` and `"heatmap"`, and one
+#' sample for `"contour"`.
+#' @return The value returned by the selected plotting function.
+#' @author Ethan Bass
+#' @examples
+#' data(Sa_pr)
+#' class(Sa_pr) <- c("chrom_list", "list")
+#' plot(Sa_pr, lambdas = 210)
+#' plot(Sa_pr, type = "heatmap", lambdas = 210)
+#' plot(Sa_pr, type = "contour", idx = 1)
+#' @family visualization functions
+#' @export
+plot.chrom_list <- function(x, type = c("traces", "heatmap", "contour"), ...){
+  type <- match.arg(type, c("traces", "heatmap", "contour"))
+  fn <- switch(type, traces = plot_chroms, heatmap = plot_chroms_heatmap,
+               contour = plot_chrom_contour)
+  fn(x, ...)
+}
+
 #' Annotate peaks on a chromatogram
 #'
 #' Adds text labels to peaks on a chromatogram plot produced by
