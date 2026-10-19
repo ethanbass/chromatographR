@@ -101,6 +101,7 @@ importFrom(graphics,
   rect,
   rug,
   segments,
+  strwidth,
   text,
   title
 )

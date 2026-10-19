@@ -35,7 +35,11 @@
 #' @param linewidth Line width. Defaults to `1`.
 #' @param show_legend Logical. Whether to display legend or not. Defaults to 
 #' `FALSE`.
-#' @param legend_position Position of legend. Defaults to `"topright"`
+#' @param legend_position Position of legend. Defaults to `"topright"`. For
+#' `engine = "base"`, a top or bottom keyword spreads the entries over columns
+#' and, unless `ylim` is given, widens the y-range so the legend clears the
+#' traces. For `engine = "ggplot"`, any value accepted by the `legend.position`
+#' argument of [ggplot2::theme()]; the default leaves ggplot2's own placement.
 #' @param title Title for plot.
 #' @param ... Additional arguments to plotting function specified by `engine`.
 #' @param what Which element to plot when each chromatogram in `x` is itself a
@@ -119,6 +123,10 @@ plot_chroms <- function(x, lambdas = NULL, idx, time_resolution = 0.01,
     ylim <- get_y_bounds(x, idx, lambdas.idx, xlim = if (zoom_x) xlim)
   }
   if (engine == "base"){
+    if (show_legend){
+      band <- legend_band(names(x)[idx], legend_position, ylim)
+      if (!zoom_y) ylim <- band$ylim
+    }
     plot.new()
     plot.window(xlim = xlim, ylim = ylim)
     title(main = title, xlab = xlab, ylab = ylab)
@@ -133,7 +141,7 @@ plot_chroms <- function(x, lambdas = NULL, idx, time_resolution = 0.01,
     }
     if (show_legend)
       legend(x = legend_position, legend = names(x)[idx], 
-             fill = seq_along(x[idx]))
+             fill = seq_along(x[idx]), ncol = band$ncol, cex = band$cex)
   } else {
     xx <- reshape_chroms(x, idx = idx, lambdas = lambdas,
                          time_resolution = time_resolution,
@@ -201,6 +209,34 @@ plot_chroms <- function(x, lambdas = NULL, idx, time_resolution = 0.01,
   }
 }
 
+#' Lay out a top or bottom legend so it clears the traces
+#'
+#' Spreads the entries over as many columns as fit across the plot region and
+#' widens `ylim` by a band tall enough for the resulting rows, shrinking the
+#' text when the band would exceed half the plot and widening the band if it
+#' still does not fit, so a keyword
+#' legend at the top or bottom sits beside the data rather than on it. Other
+#' positions come back as a single column with `ylim` unchanged.
+#' @importFrom graphics strwidth
+#' @noRd
+legend_band <- function(labels, position, ylim, cex = 1){
+  if (!is.character(position) || !grepl("^(top|bottom)", position))
+    return(list(ncol = 1L, ylim = ylim, cex = cex))
+  pin <- par("pin")
+  for (size in cex * c(1, 0.9, 0.8, 0.7)){
+    entry <- max(strwidth(labels, "inches", cex = size)) +
+      4 * strwidth("M", "inches", cex = size)
+    ncol <- max(1L, min(length(labels), floor(pin[1] / entry)))
+    rows <- ceiling(length(labels) / ncol)
+    frac <- (rows + 1.3) * par("csi") * size / pin[2]
+    if (frac <= 0.5) break
+  }
+  frac <- min(0.8, frac)
+  pad <- diff(ylim) * frac / (1 - frac)
+  ylim <- if (startsWith(position, "top")) ylim + c(0, pad) else ylim - c(pad, 0)
+  list(ncol = ncol, ylim = ylim, cex = size)
+}
+
 #' Position plotly legend
 #' @author Ethan Bass
 #' @noRd
@@ -230,6 +266,8 @@ position_plotly_legend <- function(pos){
 #' @importFrom graphics image layout mtext rect
 #' @inheritParams plot_chroms
 #' @param xlim Range of retention times to plot.
+#' @param legend_position Position of legend. Defaults to `"topright"`. Cannot
+#' be repositioned when using the `base` plotting engine.
 #' @param lambdas A single wavelength to plot. Required for multi-wavelength
 #' chromatograms and optional for one-dimensional ones, where a supplied
 #' wavelength must match the column name.

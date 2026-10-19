@@ -359,6 +359,9 @@ unknown `peaks`.
 
 * `plot_chroms(engine = "base")` now extends the y axis below zero when the
 traces do. Previously it always started at 0, cutting off negative values.
+* The base-engine legend in `plot_chroms` no longer covers the traces at a top
+or bottom `legend_position`, including the default `"topright"`; unless `ylim`
+is set, the y axis extends to make room.
 * `plot_chroms` now fits the y axis to the traces within `xlim` when `ylim` is
 not given, under the `"base"` and `"plotly"` engines. Previously it spanned the
 whole run.

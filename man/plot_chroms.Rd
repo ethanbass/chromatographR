@@ -62,7 +62,11 @@ then fitted to the traces within this range.}
 \item{show_legend}{Logical. Whether to display legend or not. Defaults to
 \code{FALSE}.}
 
-\item{legend_position}{Position of legend. Defaults to \code{"topright"}}
+\item{legend_position}{Position of legend. Defaults to \code{"topright"}. For
+\code{engine = "base"}, a top or bottom keyword spreads the entries over columns
+and, unless \code{ylim} is given, widens the y-range so the legend clears the
+traces. For \code{engine = "ggplot"}, any value accepted by the \code{legend.position}
+argument of \code{\link[ggplot2:theme]{ggplot2::theme()}}; the default leaves ggplot2's own placement.}
 
 \item{title}{Title for plot.}
 

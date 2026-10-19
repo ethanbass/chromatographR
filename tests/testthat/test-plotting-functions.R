@@ -390,6 +390,41 @@ test_that("plot_chroms_heatmap works with plotly", {
   expect_doppelganger_plotly(name = "heatmap_plotly_zoom", p = p2)
 })
 
+test_that("a top or bottom base legend gets its own band above or below the traces", {
+  pdf(NULL); on.exit(dev.off())
+  labels <- c("119", "121", "122", "458")
+
+  top <- legend_band(labels, "topright", c(0, 100))
+  expect_equal(top$ylim[1], 0)
+  expect_gt(top$ylim[2], 100)
+  expect_equal(top$ncol, 4)
+
+  bottom <- legend_band(labels, "bottom", c(0, 100))
+  expect_lt(bottom$ylim[1], 0)
+  expect_equal(bottom$ylim[2], 100)
+
+  expect_equal(legend_band(labels, "right", c(0, 100)),
+               list(ncol = 1L, ylim = c(0, 100), cex = 1))
+
+  data(Sa_pr)
+  plot_chroms(Sa_pr, lambdas = "210", show_legend = TRUE)
+  r <- legend("topright", legend = names(Sa_pr), fill = 1:4, ncol = 4,
+              plot = FALSE)$rect
+  expect_gt(r$top - r$h, max(sapply(Sa_pr, function(m) max(m[, "210"]))))
+})
+
+test_that("a legend too tall for a small panel shrinks to fit its band", {
+  pdf(NULL, width = 5, height = 5); on.exit(dev.off())
+  par(mfrow = c(2, 1)); plot.new()
+  labels <- c("460", "464", "467", "228", "224", "230", "406", "450", "385", "355")
+  band <- legend_band(labels, "topright", c(0, 100))
+  expect_lt(band$cex, 1)
+  plot.window(xlim = c(0, 1), ylim = band$ylim)
+  r <- legend("topright", legend = labels, fill = seq_along(labels), ncol = band$ncol,
+              cex = band$cex, plot = FALSE)$rect
+  expect_gt(r$top - r$h, 100)
+})
+
 test_that("plot_chroms fits the y axis to the traces within xlim", {
   data(Sa_pr)
   lam <- which(colnames(Sa_pr[[1]]) == "210")

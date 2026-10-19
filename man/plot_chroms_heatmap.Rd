@@ -36,7 +36,8 @@ wavelength must match the column name.}
 
 \item{xlim}{Range of retention times to plot.}
 
-\item{legend_position}{Position of legend. Defaults to \code{"topright"}}
+\item{legend_position}{Position of legend. Defaults to \code{"topright"}. Cannot
+be repositioned when using the \code{base} plotting engine.}
 
 \item{title}{Title for plot.}
 
