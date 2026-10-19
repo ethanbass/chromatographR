@@ -26,7 +26,10 @@
 \arguments{
 \item{x}{The peak table (output from \code{\link{get_peaktable}}).}
 
-\item{loc}{A vector specifying the peak(s) or retention time(s) to plot.}
+\item{loc}{A vector specifying the peak(s) or retention time(s) to plot.
+If missing when \code{what = "peak"}, you are prompted for a peak name. When a
+value is returned (see below), only the first element of \code{loc} is used, with
+a warning.}
 
 \item{chrom_list}{A list of chromatograms in matrix format (timepoints ×
 wavelengths). If no argument is provided here, the function will try to find
@@ -37,13 +40,12 @@ information for a certain peak, \code{rt} to scan by retention time,
 \code{idx} to scan by numeric index, or \code{click} to manually select
 retention time by clicking on the chromatogram. Defaults to \code{"peak"} mode.}
 
-\item{idx}{Numerical index of chromatogram you wish to plot; "max" to
-plot the chromatogram with the largest signal; or "all" to plot spectra
-for all chromatograms.}
+\item{idx}{Numerical index of chromatogram you wish to plot; \code{"max"}
+(default) to plot the chromatogram with the largest value for the peak in
+the peak table; or \code{"all"} to plot spectra for all chromatograms.}
 
-\item{lambda}{The wavelength you wish to plot the trace at (if \code{plot_trace}
-is \code{TRUE}). Otherwise, the wavelength to be used for the determination
-of signal abundance.}
+\item{lambda}{The wavelength at which to plot the trace. \code{"max"} (default)
+selects the wavelength at which the spectrum at \code{loc} is highest.}
 
 \item{plot_spectrum}{Logical. If \code{TRUE}, plots the spectrum of the chosen
 peak. Defaults to \code{TRUE}.}
@@ -54,7 +56,8 @@ lambda. Defaults to \code{TRUE}.}
 \item{box_plot}{Logical. If \code{TRUE}, plots box plot using categories
 defined by \code{vars}.}
 
-\item{vars}{Independent variables for boxplot. Righthand side of formula.}
+\item{vars}{Character vector of column names in the sample metadata,
+used as the right-hand side of the boxplot formula.}
 
 \item{spectrum_labels}{Logical. If \code{TRUE}, plots labels on maxima in spectral
 plot. Defaults to \code{TRUE}.}
@@ -80,8 +83,8 @@ is the spelling the other plotting functions take.}
 \itemize{
 \item If \code{export_spectrum = FALSE} (default), a \code{plotly} or \code{ggplot} object, or
 nothing if \code{engine == "base"}.
-\item If \code{export_spectrum = TRUE}, invisibly returns the spectrum as a
-\code{data.frame} with wavelengths as rows and a single column per sample encoding absorbance at each
+\item If \code{export_spectrum = TRUE}, the spectrum as a \code{data.frame} with
+wavelengths as rows and one column per sample giving absorbance at each
 wavelength (normalized if \code{scale_spectrum = TRUE}).
 }
 }
@@ -94,14 +97,11 @@ column in the peak table represents a single compound. It also draws simple
 box plots of the distribution of a peak against variables defined in sample
 metadata.
 
-When \code{plot_trace} is \code{TRUE}, plots the chromatographic trace of the
-specified chromatogram (\code{idx}), at the specified wavelength
-(\code{lambda}) with a dotted red line to indicate the retention time given
-by \code{loc}. The trace is a single column from the chromatographic matrix. When
-\code{plot_spectrum} is \code{TRUE}, plots the spectrum for the specified
-chromatogram at the specified retention time. The spectrum represents a single
-row from the chromatographic matrix. When \code{box_plot} is \code{TRUE}, produces a
-\code{\link{boxplot}} from the specified peak with groups defined by the \code{vars} argument.
+When \code{plot_trace} is \code{TRUE}, plots the trace of chromatogram \code{idx} at
+wavelength \code{lambda}, with a dotted red line at the retention time given by
+\code{loc}. When \code{plot_spectrum} is \code{TRUE}, plots the spectrum of the same
+chromatogram at that retention time. When \code{box_plot} is \code{TRUE}, draws a
+\code{\link{boxplot}} of the peak with groups defined by \code{vars}.
 }
 \section{Side effects}{
 

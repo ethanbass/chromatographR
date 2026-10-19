@@ -7,14 +7,11 @@
 #' box plots of the distribution of a peak against variables defined in sample
 #' metadata.
 #' 
-#' When `plot_trace` is `TRUE`, plots the chromatographic trace of the 
-#' specified chromatogram (`idx`), at the specified wavelength 
-#' (`lambda`) with a dotted red line to indicate the retention time given 
-#' by `loc`. The trace is a single column from the chromatographic matrix. When
-#' `plot_spectrum` is `TRUE`, plots the spectrum for the specified 
-#' chromatogram at the specified retention time. The spectrum represents a single 
-#' row from the chromatographic matrix. When `box_plot` is `TRUE`, produces a 
-#' [`boxplot`] from the specified peak with groups defined by the `vars` argument.
+#' When `plot_trace` is `TRUE`, plots the trace of chromatogram `idx` at
+#' wavelength `lambda`, with a dotted red line at the retention time given by
+#' `loc`. When `plot_spectrum` is `TRUE`, plots the spectrum of the same
+#' chromatogram at that retention time. When `box_plot` is `TRUE`, draws a
+#' [`boxplot`] of the peak with groups defined by `vars`.
 #' 
 #' @importFrom scales rescale
 #' @importFrom graphics identify title text boxplot
@@ -22,15 +19,18 @@
 #' @inheritParams plot_spectrum
 #' @param x The peak table (output from [`get_peaktable`]).
 #' @param loc A vector specifying the peak(s) or retention time(s) to plot.
-#' @param idx Numerical index of chromatogram you wish to plot; "max" to
-#' plot the chromatogram with the largest signal; or "all" to plot spectra
-#' for all chromatograms.
-#' @param lambda The wavelength you wish to plot the trace at (if `plot_trace`
-#' is `TRUE`). Otherwise, the wavelength to be used for the determination
-#' of signal abundance.
+#' If missing when `what = "peak"`, you are prompted for a peak name. When a
+#' value is returned (see below), only the first element of `loc` is used, with
+#' a warning.
+#' @param idx Numerical index of chromatogram you wish to plot; `"max"`
+#' (default) to plot the chromatogram with the largest value for the peak in
+#' the peak table; or `"all"` to plot spectra for all chromatograms.
+#' @param lambda The wavelength at which to plot the trace. `"max"` (default)
+#' selects the wavelength at which the spectrum at `loc` is highest.
 #' @param box_plot Logical. If `TRUE`, plots box plot using categories
 #' defined by `vars`.
-#' @param vars Independent variables for boxplot. Righthand side of formula.
+#' @param vars Character vector of column names in the sample metadata,
+#' used as the right-hand side of the boxplot formula.
 #' @param verbose Logical. If `TRUE` (default), prints the index and name of
 #' each chromatogram plotted, with its retention time, wavelength and
 #' absorbance.
@@ -38,8 +38,8 @@
 #' @return
 #' * If `export_spectrum = FALSE` (default), a `plotly` or `ggplot` object, or
 #' nothing if `engine == "base"`.
-#' * If `export_spectrum = TRUE`, invisibly returns the spectrum as a
-#' `data.frame` with wavelengths as rows and a single column per sample encoding absorbance at each
+#' * If `export_spectrum = TRUE`, the spectrum as a `data.frame` with
+#' wavelengths as rows and one column per sample giving absorbance at each
 #' wavelength (normalized if `scale_spectrum = TRUE`).
 #' @section Side effects:
 #' If `engine == "base"`, plots are rendered to the active graphics device.
@@ -63,6 +63,13 @@ plot.peak_table <- function(x, loc, chrom_list = NULL, what = "peak",
     if (!all(loc %in% colnames(x$tab)))
       stop("Peak(s) not found.")
   }
+  if (length(loc) > 1 && (export_spectrum || engine != "base")){
+    warning("Only the first element of `loc` is used when a value is returned.")
+    loc <- loc[1]
+  }
+  out <- NULL
+  if (plot_spectrum | plot_trace)
+    chrom_list <- get_chrom_list(x, chrom_list)
   for (loc in loc){
     if (plot_spectrum | plot_trace){
       if (identical(idx, "all")){
@@ -84,7 +91,7 @@ plot.peak_table <- function(x, loc, chrom_list = NULL, what = "peak",
         stop("Attach metadata to `peak_table` to make a boxplot.")
       }
       if (is.null(vars)){
-        stop("Must provide independent variable(s) (`var`) to make a boxplot.")
+        stop("Must provide independent variable(s) (`vars`) to make a boxplot.")
       }
       if (what != "peak"){
         stop("A peak name must be provided to `loc` to make a boxplot.")
@@ -142,11 +149,10 @@ boxplot.peak_table <- function(x, formula, ...){
 #' 
 #' Plots chromatograms as a mirror plot.
 #'
-#' Compares two treatments defined by `var`, or by `var` together with `subset`
-#' when `var` has more than two levels. Exactly two levels can be compared.
+#' Compares the chromatograms in two groups, defined by the levels of `var`.
 #' When `mirror` is `TRUE` both are drawn in one panel, with the second
 #' inverted below the axis; when it is `FALSE` they are drawn in two stacked
-#' panes.
+#' panels.
 #'
 #' @importFrom graphics matplot legend plot.new plot.window par
 #' @importFrom utils head tail
@@ -154,19 +160,22 @@ boxplot.peak_table <- function(x, formula, ...){
 #' @param chrom_list A list of chromatograms in matrix format (timepoints ×
 #' wavelengths). If no argument is provided here, the function will try to find the
 #' `chrom_list` object used to create the `peak_table`.
-#' @param lambdas The wavelength you wish to plot the traces at.
-#' @param var Variable to index chromatograms.
-#' @param subset Character vector specifying levels to use (if more than two
-#' levels are present in `var`).
+#' @param lambdas The wavelength(s) at which to plot the traces. Required for
+#' multi-wavelength chromatograms; ignored for one-dimensional chromatograms.
+#' @param var Name of the column in the sample metadata that defines the
+#' two groups.
+#' @param subset Character vector of the two levels of `var` to compare.
+#' Required if `var` has more than two levels.
 #' @param print_legend Logical. Whether to print legend. Defaults to `TRUE`.
 #' @param legend_txt Character vector containing labels for legend.
-#' @param legend_pos Legend position.
+#' @param legend_pos Legend position, used only when `mirror = FALSE`. The
+#' mirror layout always places the legends at the top and bottom right.
 #' @param legend_size Legend size (`cex` argument). Default is `1`.
 #' @param mirror Logical. Whether to plot as mirror or stacked plots.
 #' Defaults to `TRUE`.
 #' @param xlim Numerical vector specifying limits for x axis.
 #' @param ylim Numerical vector specifying limits for y axis.
-#' @param ... Additional arguments to `matplot` function.
+#' @param ... Additional arguments to [`matplot`].
 #' @return No return value, called for side effects.
 #' @section Side effects:
 #' Plots are rendered to the active graphics device.
@@ -188,7 +197,7 @@ mirror_plot <- function(x, chrom_list, lambdas = NULL, var, subset = NULL,
                         xlim = NULL, ylim = NULL, ...){
   check_peaktable(x)
   meta <- x$sample_meta
-  if (!exists("var"))
+  if (missing(var))
     stop("Must provide independent variable or variables for mirror plot.")
   if (!is.data.frame(meta)){
     stop("Sample metadata must be attached to peak table to make mirror plot.")
@@ -196,14 +205,12 @@ mirror_plot <- function(x, chrom_list, lambdas = NULL, var, subset = NULL,
   if (!(var %in% colnames(meta))){
     stop(paste0("`", var, "`", " could not be found in sample metadata."))
   }
-  if (missing(chrom_list)){
-    chrom_list <- get_chrom_list(x)
-  } else {
-    get_chrom_list(x, chrom_list)
-  }
+  chrom_list <- get_chrom_list(x, if (!missing(chrom_list)) chrom_list)
   new.ts <- round(as.numeric(rownames(chrom_list[[1]])), 2)
   if (ncol(chrom_list[[1]]) == 1){
     lambdas.idx <- 1
+  } else if (is.null(lambdas)){
+    stop("`lambdas` must be supplied for multi-wavelength chromatograms.")
   } else {
     lambdas.idx <- sapply(lambdas, function(lambda){
       get_lambda_idx(lambda, lambdas = get_lambdas(chrom_list),
@@ -220,11 +227,6 @@ mirror_plot <- function(x, chrom_list, lambdas = NULL, var, subset = NULL,
     }
   }
   if (is.null(subset)){
-    if (nlevels(fac) > 2){
-      warning(paste0("Selecting first two levels of ", sQuote(var)),
-      ". To choose different levels, use the `subset` argument 
-        to specify the desired levels.")
-    }
     trt1 <- levels(fac)[1]
     trt2 <- levels(fac)[2]
   } else {

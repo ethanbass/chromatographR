@@ -53,6 +53,20 @@ test_that("plot_all_spectra scans by rt or idx without a peak table", {
                "outside the bounds")
 })
 
+test_that("an omitted or NULL chrom_list is looked up from the peak table", {
+  skip_on_cran()
+  data(pk_tab); data(Sa_warp)
+  expected <- plot_all_spectra("V11", pk_tab, Sa_warp, plot_spectrum = FALSE,
+                               verbose = FALSE)
+  expect_equal(plot_all_spectra("V11", pk_tab, NULL, plot_spectrum = FALSE,
+                                verbose = FALSE),
+               expected)
+  expect_equal(plot(pk_tab, loc = "V11", idx = "all", plot_spectrum = FALSE,
+                    export_spectrum = TRUE, verbose = FALSE), expected)
+  expect_equal(attach_ref_spectra(pk_tab, chrom_list = NULL)$ref_spectra,
+               attach_ref_spectra(pk_tab, chrom_list = Sa_warp)$ref_spectra)
+})
+
 test_that("plot_all_spectra works with ggplot2", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
@@ -587,9 +601,12 @@ test_that("mirror_plot works", {
                 var = "trt", legend_size = 2, mirror = FALSE)
   }
   vdiffr::expect_doppelganger("mirror2", mirror2)
-  expect_error(mirror_plot(pk_tab, chrom_list = Sa_warp), regexp = 'argument "var" is missing')
+  expect_error(mirror_plot(pk_tab, chrom_list = Sa_warp),
+               regexp = "Must provide independent variable")
+  expect_error(mirror_plot(pk_tab, chrom_list = Sa_warp, var = "trt"),
+               regexp = "`lambdas` must be supplied")
   expect_error(mirror_plot(pk_tab, chrom_list = Sa_warp, var = "invalid_variable"), 
-               regexp = "could not be found")
+               regexp = "could not be found in sample metadata")
 })
 
 test_that("plot.peak_table works", {
@@ -819,6 +836,25 @@ test_that("plot.ptw_list heatmap uses the requested wavelength", {
                                       engine = "plotly"))$x$data
   expect_equal(c(panels[[1]]$zmin, panels[[1]]$zmax),
                c(panels[[2]]$zmin, panels[[2]]$zmax))
+})
+
+test_that("plot.peak_table warns when only the first loc is returned", {
+  data(pk_tab); data(Sa_warp)
+  expect_warning(
+    x <- plot(pk_tab, loc = c("V7", "V10"), chrom_list = Sa_warp,
+              plot_spectrum = FALSE, plot_trace = FALSE, export_spectrum = TRUE),
+    "Only the first element")
+  expect_null(plot(pk_tab, loc = "V7", chrom_list = Sa_warp,
+                   plot_spectrum = FALSE, plot_trace = FALSE, engine = "ggplot"))
+})
+
+test_that("plot.peak_table names `vars` when it is missing for a boxplot", {
+  data(pk_tab); data(Sa_warp)
+  path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
+  pk_tab <- attach_metadata(pk_tab, metadata = read.csv(path), column = "vial")
+  expect_error(plot(pk_tab, loc = "V7", chrom_list = Sa_warp,
+                    plot_spectrum = FALSE, plot_trace = FALSE, box_plot = TRUE),
+               "`vars`")
 })
 
 test_that("plot_baseline accepts a vector with an attached baseline", {

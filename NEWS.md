@@ -363,6 +363,10 @@ unknown `peaks`.
 
 * `plot_all_spectra` now names the returned spectra when `idx` gives sample
 names, and errors on names not in `chrom_list`.
+* `plot.peak_table(idx = "all")` no longer errors when `chrom_list` is omitted,
+and `attach_ref_spectra`, `mirror_plot` and `get_peaktable(clust = "sp")` now
+treat `chrom_list = NULL` as omitted. Omitting `lambdas` for multi-wavelength
+data in `mirror_plot` now gives a clear error.
 * `plot_all_spectra(what = "rt")` and `what = "idx"` no longer require a
 `peak_table`, and a `loc` outside every chromatogram now gives a clear error.
 * `plot_chroms(engine = "base")` now extends the y axis below zero when the
@@ -391,6 +395,8 @@ were rounded to the nearest 100, so they could all read 0.
 both panels on one color scale. Previously it always used the first wavelength,
 the base engine showed only the warped panel, and the other engines' legend
 matched only the raw panel.
+* `plot.peak_table` now warns when several `loc` are given but only the first
+is returned.
 
 #### Documentation and packaging
 

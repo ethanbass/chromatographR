@@ -27,18 +27,21 @@ mirror_plot(
 wavelengths). If no argument is provided here, the function will try to find the
 \code{chrom_list} object used to create the \code{peak_table}.}
 
-\item{lambdas}{The wavelength you wish to plot the traces at.}
+\item{lambdas}{The wavelength(s) at which to plot the traces. Required for
+multi-wavelength chromatograms; ignored for one-dimensional chromatograms.}
 
-\item{var}{Variable to index chromatograms.}
+\item{var}{Name of the column in the sample metadata that defines the
+two groups.}
 
-\item{subset}{Character vector specifying levels to use (if more than two
-levels are present in \code{var}).}
+\item{subset}{Character vector of the two levels of \code{var} to compare.
+Required if \code{var} has more than two levels.}
 
 \item{print_legend}{Logical. Whether to print legend. Defaults to \code{TRUE}.}
 
 \item{legend_txt}{Character vector containing labels for legend.}
 
-\item{legend_pos}{Legend position.}
+\item{legend_pos}{Legend position, used only when \code{mirror = FALSE}. The
+mirror layout always places the legends at the top and bottom right.}
 
 \item{legend_size}{Legend size (\code{cex} argument). Default is \code{1}.}
 
@@ -49,7 +52,7 @@ Defaults to \code{TRUE}.}
 
 \item{ylim}{Numerical vector specifying limits for y axis.}
 
-\item{...}{Additional arguments to \code{matplot} function.}
+\item{...}{Additional arguments to \code{\link{matplot}}.}
 }
 \value{
 No return value, called for side effects.
@@ -58,11 +61,10 @@ No return value, called for side effects.
 Plots chromatograms as a mirror plot.
 }
 \details{
-Compares two treatments defined by \code{var}, or by \code{var} together with \code{subset}
-when \code{var} has more than two levels. Exactly two levels can be compared.
+Compares the chromatograms in two groups, defined by the levels of \code{var}.
 When \code{mirror} is \code{TRUE} both are drawn in one panel, with the second
 inverted below the axis; when it is \code{FALSE} they are drawn in two stacked
-panes.
+panels.
 }
 \section{Side effects}{
 
