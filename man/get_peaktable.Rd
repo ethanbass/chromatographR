@@ -133,8 +133,8 @@ An S3 \code{\link{peak_table}} object, containing the following elements:
 intensities in a sample × peak configuration. A peak that was not found in a
 sample, or whose response is negative, is recorded as \code{0} (\code{na.fill} for a
 \code{matched_peak_list}). A peak whose model failed, which
-\code{get_peaks(windows = )} and \code{get_peaks(targets = )} keep with a missing \code{height}
-and \code{area}, is recorded as \code{NA}.
+\code{get_peaks(targets = )} keeps with a missing \code{height} and \code{area}, is
+recorded as \code{NA}.
 \item \code{pk_meta}: A \code{data.frame} containing peak metadata (e.g., the spectral
 component, peak number, and average retention time), summarized across all
 peaks in each cluster according to \code{summarize_by}.

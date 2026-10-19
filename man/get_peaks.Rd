@@ -40,23 +40,15 @@ find peaks at. Omit for one-dimensional chromatograms, or when \code{targets} ha
 \item{fit}{Peak model. Options are bidirectional exponentially modified
 Gaussian (\code{"bemg"}), exponential-Gaussian hybrid (\code{"egh"}), \code{"gaussian"},
 or \code{"raw"}. \code{"raw"} integrates the signal directly by trapezoidal
-approximation without fitting a model. Defaults to \code{"egh"}.}
+approximation without fitting a model. Defaults to \code{"egh"}, or to \code{"raw"}
+when \code{windows} is provided, which allows no other value.}
 
 \item{windows}{Optional two-column matrix or \code{data.frame} of start and end
 retention times (or a single pair of times), giving manual integration
-windows that are applied to every chromatogram. If provided, peak detection
-is skipped and one peak is returned for every window in every sample,
-whether or not a peak is detectable there, except that a window whose
-maximum falls on the first or last timepoint of a chromatogram is dropped
-with a warning. A window whose peak model fails is kept, with \code{height} and
-\code{area} set to \code{NA} and \code{converged} to \code{0}. This lets you quantify a compound in samples where it is
-not detected, and gives every sample the same set of peak table columns.
-With \code{fit = "raw"} and \code{baseline = "none"}, two adjacent windows sharing a
-boundary time act as a vertical drop line: their areas sum exactly to the
-area of their union, so a peak can be split at a chosen time. The peak
-models and the other baselines are fit to each window separately, so their
-areas do not sum to the area of the union. \code{max_fwhm} is ignored. Cannot be
-combined with \code{targets}. Defaults to \code{NULL}.}
+windows applied to every chromatogram. If provided, peak detection is
+skipped and each window is integrated in every sample. Requires
+\code{fit = "raw"}, and \code{max_fwhm} is ignored. Cannot be combined with
+\code{targets}. Defaults to \code{NULL}. See \emph{Manual integration windows}.}
 
 \item{targets}{Target retention times, as a numeric vector or a table of
 targets (see \code{\link{targeted_analysis}}). If provided, only peaks with an apex
@@ -253,6 +245,20 @@ Adapted from \code{getAllPeaks} by Ron Wehrens
 (\url{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}); however,
 the underlying algorithms for finding and integrating peaks differ.
 }
+\section{Manual integration windows}{
+
+Manual windows integrate every sample over the same retention-time ranges,
+so each compound is measured the same way in every sample, and every sample
+gets the same set of peak table columns. The raw signal in each window is
+integrated whether or not a peak is detected there, so a window with no peak
+gets an area near zero. With \code{baseline = "none"}, two adjacent windows
+sharing a boundary time act as a vertical drop line: their areas sum exactly
+to the area of their union, so a peak can be split at a chosen time. The
+\code{"flat"} and \code{"sloped"} baselines are drawn within each window separately, so
+their areas do not sum to that of the union. To fit peak models at known
+retention times, use \code{targets} instead.
+}
+
 \examples{
 data(Sa_pr)
 pks <- get_peaks(Sa_pr, lambdas = c('210'), max_fwhm = 1, fit = "egh")

@@ -498,17 +498,33 @@ test_that("get_peaks applies `windows` to every sample and feeds get_peaktable",
   expect_equal(unname(unlist(pt$pk_meta["end", ])), w[, 2])
 })
 
-test_that("get_peaks points at `fit = \"raw\"` when `windows` is used with the default fit", {
+test_that("`windows` integrates raw and rejects a peak model", {
   skip_on_cran()
   p <- make_gaussian_chrom()
   cl <- list(a = p$mat)
   w <- rbind(c(1, p$n))
-  expect_message(get_peaks(cl, lambdas = "220", windows = w, cl = 1,
-                           show_progress = FALSE),
-                 'fit = "raw"')
-  expect_message(get_peaks(cl, lambdas = "220", windows = w, fit = "raw", cl = 1,
-                           show_progress = FALSE),
-                 regexp = NA)
+  default <- get_peaks(cl, lambdas = "220", windows = w, cl = 1,
+                       show_progress = FALSE)
+  raw <- get_peaks(cl, lambdas = "220", windows = w, fit = "raw", cl = 1,
+                   show_progress = FALSE)
+  expect_identical(default, raw)
+  expect_error(get_peaks(cl, lambdas = "220", windows = w, fit = "gaussian",
+                         cl = 1, show_progress = FALSE),
+               "use `targets`")
+})
+
+test_that("a window whose highest point is the first timepoint is still integrated", {
+  skip_on_cran()
+  p <- make_gaussian_chrom()
+  m <- p$mat
+  m[, 1] <- m[, 1] + 50 * exp(-(seq_len(p$n) - 1) / 5)
+  times <- as.numeric(rownames(m))
+  expect_no_warning(
+    pks <- get_peaks(list(a = m), lambdas = "220", windows = rbind(times[c(1, 20)]),
+                     cl = 1, show_progress = FALSE)$a[["220"]])
+  expect_equal(nrow(pks), 1L)
+  expect_equal(pks$rt, times[1])
+  expect_gt(pks$area, 0)
 })
 
 test_that("get_peaks validates `windows` and rejects it alongside `targets`", {
@@ -520,16 +536,6 @@ test_that("get_peaks validates `windows` and rejects it alongside `targets`", {
   expect_error(get_peaks(cl, lambdas = "220", windows = rbind(c(1, p$n + 100)),
                          fit = "raw", cl = 1, show_progress = FALSE),
                "outside the bounds")
-})
-
-test_that("`windows` works with a peak model as well as raw integration", {
-  skip_on_cran()
-  p <- make_gaussian_chrom()
-  pks <- get_peaks(list(a = p$mat), lambdas = "220", windows = rbind(c(1, p$n)),
-                   fit = "gaussian", cl = 1, show_progress = FALSE)$a[["220"]]
-  expect_equal(nrow(pks), 1L)
-  expect_equal(pks$area, p$true_area, tolerance = 0.01)
-  expect_equal(pks$rt, p$center, tolerance = 0.01)
 })
 
 test_that("get_peaktable groups by window rather than by apex retention time", {

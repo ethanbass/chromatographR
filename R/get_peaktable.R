@@ -111,8 +111,8 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' intensities in a sample × peak configuration. A peak that was not found in a
 #' sample, or whose response is negative, is recorded as `0` (`na.fill` for a
 #' `matched_peak_list`). A peak whose model failed, which
-#' `get_peaks(windows = )` and `get_peaks(targets = )` keep with a missing `height`
-#' and `area`, is recorded as `NA`.
+#' `get_peaks(targets = )` keeps with a missing `height` and `area`, is
+#' recorded as `NA`.
 #' * `pk_meta`: A `data.frame` containing peak metadata (e.g., the spectral
 #' component, peak number, and average retention time), summarized across all
 #' peaks in each cluster according to `summarize_by`.

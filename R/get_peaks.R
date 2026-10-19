@@ -18,22 +18,14 @@
 #' @param fit Peak model. Options are bidirectional exponentially modified
 #' Gaussian (`"bemg"`), exponential-Gaussian hybrid (`"egh"`), `"gaussian"`,
 #' or `"raw"`. `"raw"` integrates the signal directly by trapezoidal
-#' approximation without fitting a model. Defaults to `"egh"`.
+#' approximation without fitting a model. Defaults to `"egh"`, or to `"raw"`
+#' when `windows` is provided, which allows no other value.
 #' @param windows Optional two-column matrix or `data.frame` of start and end
 #' retention times (or a single pair of times), giving manual integration
-#' windows that are applied to every chromatogram. If provided, peak detection
-#' is skipped and one peak is returned for every window in every sample,
-#' whether or not a peak is detectable there, except that a window whose
-#' maximum falls on the first or last timepoint of a chromatogram is dropped
-#' with a warning. A window whose peak model fails is kept, with `height` and
-#' `area` set to `NA` and `converged` to `0`. This lets you quantify a compound in samples where it is
-#' not detected, and gives every sample the same set of peak table columns.
-#' With `fit = "raw"` and `baseline = "none"`, two adjacent windows sharing a
-#' boundary time act as a vertical drop line: their areas sum exactly to the
-#' area of their union, so a peak can be split at a chosen time. The peak
-#' models and the other baselines are fit to each window separately, so their
-#' areas do not sum to the area of the union. `max_fwhm` is ignored. Cannot be
-#' combined with `targets`. Defaults to `NULL`.
+#' windows applied to every chromatogram. If provided, peak detection is
+#' skipped and each window is integrated in every sample. Requires
+#' `fit = "raw"`, and `max_fwhm` is ignored. Cannot be combined with
+#' `targets`. Defaults to `NULL`. See *Manual integration windows*.
 #' @param targets Target retention times, as a numeric vector or a table of
 #' targets (see [`targeted_analysis`]). If provided, only peaks with an apex
 #' falling within `tol` of one of these retention times are fit, and [`get_peaktable`]
@@ -192,6 +184,17 @@
 #' and `floor_end` are constrained to be non-negative.
 #' * `target`: The row of `targets` the peak was selected for (only when `targets` is
 #' supplied).
+#' @section Manual integration windows:
+#' Manual windows integrate every sample over the same retention-time ranges,
+#' so each compound is measured the same way in every sample, and every sample
+#' gets the same set of peak table columns. The raw signal in each window is
+#' integrated whether or not a peak is detected there, so a window with no peak
+#' gets an area near zero. With `baseline = "none"`, two adjacent windows
+#' sharing a boundary time act as a vertical drop line: their areas sum exactly
+#' to the area of their union, so a peak can be split at a chosen time. The
+#' `"flat"` and `"sloped"` baselines are drawn within each window separately, so
+#' their areas do not sum to that of the union. To fit peak models at known
+#' retention times, use `targets` instead.
 #' @author Ethan Bass
 #' @note Adapted from `getAllPeaks` by Ron Wehrens
 #' (<https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R>); however,
@@ -301,9 +304,11 @@ get_peaks <- function(chrom_list, lambdas,
       stop("`windows` and `targets` cannot be used together. `targets` selects among detected peaks, whereas `windows` integrates fixed windows.")
     }
     windows <- check_windows(windows, times = get_times(chrom_list))
-    if (fit_is_default){
-      message("`windows` was supplied with the default `fit = \"egh\"`, so a peak model will be fit within each window. Set `fit = \"raw\"` to integrate the raw signal against a zero baseline instead.")
+    if (!fit_is_default && fit != "raw"){
+      stop("`windows` integrates the raw signal, so `fit` must be \"raw\". To fit peak models at known retention times, use `targets`.",
+           call. = FALSE)
     }
+    fit <- "raw"
     if (estimate_purity){
       warning("Spectral purity is not meaningful across a manual integration window spanning more than one component.",
               immediate. = TRUE)
@@ -406,16 +411,6 @@ get_peaks <- function(chrom_list, lambdas,
   n_width <- rowSums(vapply(result, attr, numeric(2), "n_width"))
   result[] <- lapply(result, `attr<-`, "n_width", NULL)
   tables <- lapply(result, function(s) if (is.data.frame(s)) list(s) else s)
-  if (!is.null(windows)){
-    dropped <- nrow(windows) * length(lambdas) -
-      vapply(tables, function(s) sum(vapply(s, nrow, numeric(1))), numeric(1))
-    if (any(dropped > 0)){
-      warning(sprintf(
-        "Some windows were dropped because their apex fell on the edge of the chromatogram, in the following sample%s: %s.",
-        plural(sum(dropped > 0)),
-        format_list(names(dropped)[dropped > 0], quote = FALSE)), immediate. = TRUE)
-    }
-  }
   if (!is.null(targets)){
     found <- seq_len(nrow(targets)) %in%
       unlist(lapply(tables, lapply, `[[`, "target"))

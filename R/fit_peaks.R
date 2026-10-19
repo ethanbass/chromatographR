@@ -396,10 +396,12 @@ fit_peaks <- function (x, lambda, pos = NULL,
   if (!is.null(pos$target)) noPeaksMat$target <- integer(0)
   if (nrow(pos) == 0)
     return(noPeaksMat)
-  on.edge <- sapply(pos$pos, function(x){
-    x <= 1 || is.na(y[x + 1]) || is.na(y[x - 1])
-  })
-  pos <- pos[!on.edge, , drop = FALSE]
+  if (fit != "raw"){
+    on.edge <- sapply(pos$pos, function(x){
+      x <= 1 || is.na(y[x + 1]) || is.na(y[x - 1])
+    })
+    pos <- pos[!on.edge, , drop = FALSE]
+  }
 
   if (nrow(pos) == 0)
     return(noPeaksMat)
