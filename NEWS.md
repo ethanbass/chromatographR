@@ -383,6 +383,10 @@ default, which now returns every wavelength, or when `sample_var` is not
 * `plot_chroms_heatmap(engine = "base")` now labels its color bar with the
 range of the plotted colors. Previously the labels came from the wrong rows and
 were rounded to the nearest 100, so they could all read 0.
+* The `plot.ptw_list` heatmap now plots the wavelength in `lambdas` and puts
+both panels on one color scale. Previously it always used the first wavelength,
+the base engine showed only the warped panel, and the other engines' legend
+matched only the raw panel.
 
 #### Documentation and packaging
 

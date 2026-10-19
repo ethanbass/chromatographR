@@ -770,6 +770,26 @@ test_that("plot_chroms plotly splits traces by wavelength", {
   expect_length(p$x$data, 4)
 })
 
+test_that("plot.ptw_list heatmap uses the requested wavelength", {
+  skip_on_cran()
+  skip_if_not_installed("plotly")
+  data(Sa_pr)
+  warp <- correct_rt(Sa_pr, what = "models", lambdas = c(210, 260))
+  z <- function(l){
+    plotly::plotly_build(plot(warp, what = "heatmap", engine = "plotly",
+                              lambdas = l))$x$data[[1]]$z
+  }
+  expect_false(identical(z(210), z(260)))
+  expect_warning(plot(warp, what = "heatmap", engine = "plotly",
+                      lambdas = c(210, 260)),
+                 "one wavelength")
+  expect_no_warning(plot(warp, what = "heatmap", engine = "plotly"))
+  panels <- plotly::plotly_build(plot(warp, what = "heatmap",
+                                      engine = "plotly"))$x$data
+  expect_equal(c(panels[[1]]$zmin, panels[[1]]$zmax),
+               c(panels[[2]]$zmin, panels[[2]]$zmax))
+})
+
 test_that("plot_baseline accepts a vector with an attached baseline", {
   data(Sa_pr)
   x <- correct_baseline(Sa_pr[[1]][, "210"], attach_baseline = TRUE)

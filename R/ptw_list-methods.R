@@ -12,7 +12,8 @@
 #' @param what What type of plot to return. Either `traces` or `heatmap`.
 #' @param engine What plotting engine to use. One of `base`, `ggplot`, or
 #' `plotly`.
-#' @param lambdas Which lambdas to plot.
+#' @param lambdas Wavelengths to plot, from among those used for warping.
+#' Defaults to all of them. The heatmap shows only the first.
 #' @param show_legend Logical. Whether to include sample legend.
 #' @param ... Additional arguments (placeholder).
 #' @return A `plotly` or `ggplot` object when `engine = "plotly"` or
@@ -35,7 +36,8 @@ plot.ptw_list <- function(x, what = c("traces", "heatmap"),
   all.lambdas <- as.numeric(rownames(x[[1]]$warped.sample))
   ts <- as.numeric(colnames(x[[1]]$sample))
   
-  if (missing(lambdas)){
+  lambdas_missing <- missing(lambdas)
+  if (lambdas_missing){
     lambdas <- all.lambdas
   }
   if (any(!(lambdas %in% all.lambdas))){
@@ -47,7 +49,6 @@ plot.ptw_list <- function(x, what = c("traces", "heatmap"),
     rownames(xx) <- colnames(samp$sample)
     xx
   })
-  lambda.idx <- which(lambdas %in% all.lambdas)
   if (what == "traces"){
     if (engine == "base"){
       oldpar <- par(no.readonly = TRUE)
@@ -84,20 +85,37 @@ plot.ptw_list <- function(x, what = c("traces", "heatmap"),
       p_c
     }
   } else if (what == "heatmap"){
-    original <- sapply(x, function(x) x$sample[1,])
-    warped <- sapply(x, function(x) x$warped.sample[1,])
+    if (length(lambdas) > 1 && !lambdas_missing)
+      warning("The heatmap shows one wavelength; using ", lambdas[1], ".")
+    li <- match(lambdas[1], all.lambdas)
+    original <- sapply(x, function(s) s$sample[li, ])
+    warped <- sapply(x, function(s) s$warped.sample[li, ])
     times <- colnames(x[[1]]$reference)
     rownames(original) <- colnames(x[[1]]$reference)
     rownames(warped) <- colnames(x[[1]]$reference)
+    zlim <- range(original, warped, na.rm = TRUE)
     if (engine == "base"){
+      oldpar <- par(no.readonly = TRUE)
+      on.exit(par(oldpar))
+      if (show_legend){
+        layout(matrix(c(1, 3, 2, 3), 2, byrow = TRUE),
+               widths = c(1, lcm(2.5)))
+      } else {
+        par(mfrow = c(2, 1))
+      }
+      par(mar = c(3, 4, 3, 2))
       plot_chroms_heatmap_base(original, show_legend = FALSE,
-                               title = "Raw data")
+                               title = "Raw data", zlim = zlim)
       plot_chroms_heatmap_base(warped, show_legend = FALSE,
-                               title = "PTW alignment")
+                               title = "PTW alignment", zlim = zlim)
+      if (show_legend)
+        draw_colorbar(hcl.colors(100, "viridis"), zlim = zlim,
+                      label = "Intensity")
     } else{
       if (engine == "ggplot"){
-        p_o <- plot_chroms_heatmap_ggplot(original, title = "Raw data")
-        p_w <- plot_chroms_heatmap_ggplot(warped, title = "PTW alignment")
+        p_o <- plot_chroms_heatmap_ggplot(original, title = "Raw data", zlim = zlim)
+        p_w <- plot_chroms_heatmap_ggplot(warped, title = "PTW alignment",
+                                          zlim = zlim)
         p <- cowplot::plot_grid(p_o + ggplot2::theme(legend.position = "none"),
                                 p_w + ggplot2::theme(legend.position = "none"), 
                                 nrow = 2)
@@ -108,8 +126,8 @@ plot.ptw_list <- function(x, what = c("traces", "heatmap"),
           p <- cowplot::plot_grid(p, legend, ncol = 2, rel_widths  = c(1, 0.2))
         }
       } else if (engine == "plotly"){
-        p_o <- plot_chroms_heatmap_plotly(original)
-        p_w <- plot_chroms_heatmap_plotly(warped, show_legend = FALSE)
+        p_o <- plot_chroms_heatmap_plotly(original, zlim = zlim)
+        p_w <- plot_chroms_heatmap_plotly(warped, show_legend = FALSE, zlim = zlim)
         p <- plotly::subplot(p_o, p_w, nrows = 2, margin = 0.1)
         p <- p |> plotly::layout(
           margin = list(t = 50),

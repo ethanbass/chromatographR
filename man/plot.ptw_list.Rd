@@ -21,7 +21,8 @@
 \item{engine}{What plotting engine to use. One of \code{base}, \code{ggplot}, or
 \code{plotly}.}
 
-\item{lambdas}{Which lambdas to plot.}
+\item{lambdas}{Wavelengths to plot, from among those used for warping.
+Defaults to all of them. The heatmap shows only the first.}
 
 \item{show_legend}{Logical. Whether to include sample legend.}
 
