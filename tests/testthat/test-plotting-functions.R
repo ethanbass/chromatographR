@@ -22,6 +22,37 @@ test_that("plot_all_spectra works", {
   expect_equal(colnames(x), rownames(pk_tab$tab))
 })
 
+test_that("plot_all_spectra names the spectra when idx is given by name", {
+  skip_on_cran()
+  data(pk_tab); data(Sa_warp)
+  keep <- names(Sa_warp)[c(3, 1)]
+  x <- plot_all_spectra("V11", peak_table = pk_tab, chrom_list = Sa_warp,
+                        idx = keep, plot_spectrum = FALSE)
+  expect_equal(colnames(x), keep)
+  expect_equal(x, plot_all_spectra("V11", peak_table = pk_tab, chrom_list = Sa_warp,
+                                   idx = c(3, 1), plot_spectrum = FALSE))
+  expect_error(plot_all_spectra("V11", peak_table = pk_tab, chrom_list = Sa_warp,
+                                idx = c(keep, "nope"), plot_spectrum = FALSE),
+               "nope")
+})
+
+test_that("plot_all_spectra scans by rt or idx without a peak table", {
+  data(Sa_warp)
+  x <- plot_all_spectra(chrom_list = Sa_warp, loc = 13.3, what = "rt",
+                        plot_spectrum = FALSE)
+  expect_equal(colnames(x), names(Sa_warp))
+  expect_false(anyNA(x))
+  x <- plot_all_spectra(chrom_list = Sa_warp, loc = 200, what = "idx",
+                        plot_spectrum = FALSE)
+  expect_false(anyNA(x))
+  expect_error(plot_all_spectra(chrom_list = Sa_warp, loc = "V11"),
+               "Peak table must be provided")
+  expect_error(plot_all_spectra(loc = 13.3, what = "rt"),
+               "Must provide either")
+  expect_error(plot_all_spectra(chrom_list = Sa_warp, loc = 1e3, what = "rt"),
+               "outside the bounds")
+})
+
 test_that("plot_all_spectra works with ggplot2", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")

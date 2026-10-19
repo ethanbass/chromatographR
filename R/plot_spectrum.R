@@ -391,28 +391,45 @@ plot_all_spectra <- function(loc, peak_table, chrom_list, idx = "all",
                              peak = NULL, ...){
   engine <- match.arg(engine, c("base","ggplot2","plotly"))
   what <- match.arg(what, c("peak", "rt", "idx"))
-  check_peaktable(peak_table)
+  if (missing(peak_table) && missing(chrom_list))
+    stop("Must provide either a peak_table or a chrom_list.")
+  if (what == "peak" && missing(peak_table))
+    stop("Peak table must be provided when `what = 'peak'`.")
+  if (!missing(peak_table))
+    check_peaktable(peak_table)
   if (!is.null(peak)){
     message("The `peak` argument is deprecated. Please use `loc` instead.")
     loc <- peak
   }
-  if (missing(chrom_list)){
-    chrom_list <- get_chrom_list(peak_table)
-  } else get_chrom_list(peak_table, chrom_list)
+  chrom_list <- get_chrom_list(if (!missing(peak_table)) peak_table,
+                               if (!missing(chrom_list)) chrom_list)
   if (!(inherits(chrom_list, "list") | inherits(chrom_list, "chrom_list")))
     stop("chrom_list is not a list")
   wavelengths <- get_lambdas(chrom_list)
   if ("all" %in% idx)
     idx <- seq_along(chrom_list)
-  sp <- sapply(idx, function(chr){
+  if (is.character(idx)){
+    pos <- match(idx, names(chrom_list))
+    if (anyNA(pos))
+      stop("Chromatograms not found in `chrom_list`: ",
+           paste(sQuote(idx[is.na(pos)]), collapse = ", "), ".")
+    idx <- pos
+  }
+  errors <- list()
+  sp <- sapply(idx, function(chr, peak_table){
     tryCatch({
       plot_spectrum(loc = loc, peak_table = peak_table, chrom_list = chrom_list,
-                  idx = chr, plot_spectrum = FALSE, plot_trace = FALSE, 
+                  idx = chr, plot_spectrum = FALSE, plot_trace = FALSE,
                   export_spectrum = TRUE, scale_spectrum = scale_spectrum,
                   verbose = verbose, what = what, engine = "base")
-      }, error = function(e) NA
+      }, error = function(e){
+        errors[[length(errors) + 1]] <<- e
+        NA
+      }
     )
-  })
+  }, peak_table = peak_table)
+  if (length(errors) == length(idx))
+    stop(conditionMessage(errors[[1]]), call. = FALSE)
   if (engine == "base"){
     sp <- as.data.frame(do.call(cbind, sp))
     colnames(sp) <- names(chrom_list)[idx]

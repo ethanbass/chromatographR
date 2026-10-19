@@ -361,6 +361,10 @@ unknown `peaks`.
 
 #### Plotting
 
+* `plot_all_spectra` now names the returned spectra when `idx` gives sample
+names, and errors on names not in `chrom_list`.
+* `plot_all_spectra(what = "rt")` and `what = "idx"` no longer require a
+`peak_table`, and a `loc` outside every chromatogram now gives a clear error.
 * `plot_chroms(engine = "base")` now extends the y axis below zero when the
 traces do. Previously it always started at 0, cutting off negative values.
 * The base-engine legend in `plot_chroms` no longer covers the traces at a top
