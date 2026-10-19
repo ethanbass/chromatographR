@@ -50,6 +50,9 @@ accordingly, and peaks whose preceding timepoint had been clipped to zero by
 * Fitted retention times can now fall between timepoints, so `rt` can shift
 by up to one timepoint and `"bemg"` no longer understates `height`. `correct_peaks` no longer rounds `rt.cor` for ptw or lptw models.
 Match `rt` to the time axis with a tolerance, not with `==` or `match()`.
+* `r.squared` in `get_peaks` and `fit_peaks` output is now `1 - SS_res / SS_tot`,
+not the squared correlation between the fit and the data. It is lower for poor
+fits and can be negative, so revisit any cutoffs.
 * `plot_spectrum` and `plot_all_spectra` now label the correct spectral
 maxima, having inherited the same off-by-one error. Reported lambda-max values
 shift by one grid step.

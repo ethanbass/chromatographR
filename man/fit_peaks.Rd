@@ -101,10 +101,9 @@ values of \code{fit}. \code{NA} for a \code{"raw"} peak whose integration window
 fall below half its height on both sides.
 \item \code{height}: Peak height above the fitted baseline.
 \item \code{area}: Peak area above the fitted baseline.
-\item \code{r.squared}: Coefficient of determination (\eqn{R^2}), from a linear
-regression of fitted values on the raw data. Statistically informal, since
-the model was fit by nonlinear least squares rather than OLS, but useful as
-a fit diagnostic. Not returned when \code{fit = "raw"}.
+\item \code{r.squared}: Coefficient of determination (\eqn{R^2}) of the fitted
+curve over the peak window, \code{1 - SS_res / SS_tot}. Negative when the fit is
+worse than a flat line at the mean. Not returned when \code{fit = "raw"}.
 \item \code{purity}: The spectral purity of peak as assessed by \code{\link{get_purity}}.
 \item \code{window_limited}: \code{1} if a fitted shape parameter hit a limit set by the
 integration window, meaning the window rather than the data

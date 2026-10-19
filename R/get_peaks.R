@@ -165,10 +165,9 @@
 #' * `height`: The height of the peak above the fitted baseline.
 #' * `area`: The area of the peak above the fitted baseline, estimated by
 #' trapezoidal approximation.
-#' * `r.squared`: Coefficient of determination (\eqn{R^2}), calculated by
-#' linear regression of fitted values to the raw data. Statistically informal
-#' (the model was fit by nonlinear least squares, not OLS), but useful as a
-#' fit diagnostic. Not returned when `fit = "raw"`.
+#' * `r.squared`: Coefficient of determination (\eqn{R^2}) of the fitted
+#' curve over the peak window, `1 - SS_res / SS_tot`. Negative when the fit is
+#' worse than a flat line at the mean. Not returned when `fit = "raw"`.
 #' * `purity`: The peak purity as estimated by [`get_purity`]. `NA` unless
 #' `estimate_purity = TRUE`.
 #' * `window_limited`: `1` if a fitted shape parameter hit a limit set by the

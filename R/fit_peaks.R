@@ -292,10 +292,9 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' fall below half its height on both sides.
 #' * `height`: Peak height above the fitted baseline.
 #' * `area`: Peak area above the fitted baseline.
-#' * `r.squared`: Coefficient of determination (\eqn{R^2}), from a linear
-#' regression of fitted values on the raw data. Statistically informal, since
-#' the model was fit by nonlinear least squares rather than OLS, but useful as
-#' a fit diagnostic. Not returned when `fit = "raw"`.
+#' * `r.squared`: Coefficient of determination (\eqn{R^2}) of the fitted
+#' curve over the peak window, `1 - SS_res / SS_tot`. Negative when the fit is
+#' worse than a flat line at the mean. Not returned when `fit = "raw"`.
 #' * `purity`: The spectral purity of peak as assessed by [`get_purity`].
 #' * `window_limited`: `1` if a fitted shape parameter hit a limit set by the
 #' integration window, meaning the window rather than the data
@@ -984,6 +983,18 @@ peak_purity <- function(x, pos, estimate_purity, noise_variance, purity_args){
                              noise_variance = noise_variance), purity_args))
 }
 
+#' Coefficient of determination of a fitted curve
+#'
+#' @param y Observed values.
+#' @param y_fit Fitted values.
+#' @return `1 - SS_res / SS_tot`, or `NA` if `y` is constant.
+#' @noRd
+r_squared <- function(y, y_fit){
+  ss_tot <- sum((y - mean(y, na.rm = TRUE))^2, na.rm = TRUE)
+  if (!is.finite(ss_tot) || ss_tot == 0) return(NA_real_)
+  1 - sum((y - y_fit)^2, na.rm = TRUE) / ss_tot
+}
+
 #' Trapezoidal area above a local baseline
 #' @noRd
 integrate_above_baseline <- function(y_fit, peak.loc, floor_val, slope_val){
@@ -1020,7 +1031,7 @@ fitpk_bemg <- function(x, pos, lambda, max_iter,
                                  start.height = y[[xloc]], max_iter = max_iter,
                                  baseline = baseline)
   )
-  r.squared <- suppressWarnings(try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE))
+  r.squared <- r_squared(y[peak.loc], m$y)
   purity <- peak_purity(x, pos, estimate_purity, noise_variance, purity_args)
   bl <- get_local_baseline(m, baseline)
   int <- integrate_above_baseline(m$y, peak.loc, bl$floor, bl$slope)
@@ -1075,7 +1086,7 @@ fitpk_gaussian <- function(x, pos, lambda, max_iter,
   )
   bl <- get_local_baseline(m, baseline)
   area <- integrate_above_baseline(m$y, peak.loc, bl$floor, bl$slope)$area
-  r.squared <- suppressWarnings(try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE))
+  r.squared <- r_squared(y[peak.loc], m$y)
   purity <- peak_purity(x, pos, estimate_purity, noise_variance, purity_args)
   result <- c("rt" = unname(m$center), "start" = pos[2], "end" = pos[3],
     "sd" = unname(m$width), "FWHM" = FWHM_CONST * unname(m$width),
@@ -1098,7 +1109,7 @@ fitpk_egh <- function(x, pos, lambda, max_iter,
                                 start.height = y[[xloc]], max_iter = max_iter,
                                 baseline = baseline)
   )
-  r.squared <- suppressWarnings(try(summary(lm(m$y ~ y[peak.loc]))$r.squared, silent = TRUE))
+  r.squared <- r_squared(y[peak.loc], m$y)
   purity <- peak_purity(x, pos, estimate_purity, noise_variance, purity_args)
   bl <- get_local_baseline(m, baseline)
   area <- integrate_above_baseline(m$y, peak.loc, bl$floor, bl$slope)$area

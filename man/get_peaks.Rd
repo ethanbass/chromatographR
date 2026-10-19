@@ -209,10 +209,9 @@ sides, as for a peak fused with a neighbor. Unlike \code{sd},
 \item \code{height}: The height of the peak above the fitted baseline.
 \item \code{area}: The area of the peak above the fitted baseline, estimated by
 trapezoidal approximation.
-\item \code{r.squared}: Coefficient of determination (\eqn{R^2}), calculated by
-linear regression of fitted values to the raw data. Statistically informal
-(the model was fit by nonlinear least squares, not OLS), but useful as a
-fit diagnostic. Not returned when \code{fit = "raw"}.
+\item \code{r.squared}: Coefficient of determination (\eqn{R^2}) of the fitted
+curve over the peak window, \code{1 - SS_res / SS_tot}. Negative when the fit is
+worse than a flat line at the mean. Not returned when \code{fit = "raw"}.
 \item \code{purity}: The peak purity as estimated by \code{\link{get_purity}}. \code{NA} unless
 \code{estimate_purity = TRUE}.
 \item \code{window_limited}: \code{1} if a fitted shape parameter hit a limit set by the

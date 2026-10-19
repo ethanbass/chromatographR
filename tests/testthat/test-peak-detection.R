@@ -1198,3 +1198,10 @@ test_that("invalid `purity_args` fail once, before fitting", {
                          show_progress = FALSE),
                "Unknown `purity_args`", fixed = TRUE)
 })
+
+test_that("r_squared is 1 - SS_res / SS_tot", {
+  y <- c(1, 3, 2, 5, 4)
+  expect_equal(r_squared(y, y), 1)
+  expect_equal(r_squared(y, y + 2), 1 - 20 / 10)
+  expect_true(is.na(r_squared(rep(2, 5), 1:5)))
+})
