@@ -3,6 +3,7 @@
 #' Returns the first or last parts of the `peak_table` object.
 #'
 #' @importFrom utils head
+#' @importFrom tools toTitleCase
 #' @param x A [`peak_table`] object.
 #' @param ... Additional arguments to [`head`].
 #' @method head peak_table
@@ -161,7 +162,7 @@ print.summary.peak_table <- function(x, ...) {
   cat("  Median:", round(x$intensity$median, 2), "\n")
   
   cat("\nArguments:\n")
-  cat("  Response:", tools::toTitleCase(x$response), "\n")
+  cat("  Response:", toTitleCase(x$response), "\n")
   cat("  Sample Metadata:", ifelse(x$has_sample_meta, "Yes", "No"), "\n")
   cat("  Reference Spectra:", ifelse(x$has_ref_spectra, "Yes", "No"), "\n")
   cat("  Normalization:", ifelse(x$normalized, 

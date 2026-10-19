@@ -51,6 +51,7 @@ Imports:
     purrr,
     scales,
     stats,
+    tools,
     utils,
     VPdtw
 Suggests: 

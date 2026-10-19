@@ -146,6 +146,7 @@ importFrom(stats,
   var,
   weighted.mean
 )
+importFrom(tools,toTitleCase)
 importFrom(utils,
   head,
   tail,
