@@ -7,7 +7,7 @@
 find_peaks(
   y,
   smooth_type = c("gaussian", "box", "savgol", "mva", "tmva", "none"),
-  smooth_window = 0.001,
+  smooth_window = 3,
   min_curvature = 0,
   min_amplitude = 0,
   min_prominence_snr = 0,
@@ -24,15 +24,10 @@ box kernel (\code{"box"}), Savitzky-Golay smoothing (\code{"savgol"}),
 moving average (\code{"mva"}), triangular moving average (\code{"tmva"}), or
 no smoothing (\code{"none"}).}
 
-\item{smooth_window}{Width of the smoothing window, used to suppress the
-spurious local extrema that noise produces in the first derivative. A value
-between 0 and 1 is interpreted as a proportion of the length of \code{y}; a value
-of 1 or greater is interpreted as an absolute number of timepoints. Defaults
-to \code{0.001}, a proportion, so the window you get follows the length of the
-run rather than the width of the peaks: 3 timepoints for a 3,000-point trace
-but 100 for a 100,000-point one. Set it deliberately, and see \emph{Choosing the
-smoothing window} for how the moving-average and Savitzky-Golay methods
-round a non-integer or even-width value to an odd window.}
+\item{smooth_window}{Width of the smoothing window. A value between 0 and 1
+is interpreted as a proportion of the length of \code{y}; a value of 1 or greater
+as a number of timepoints. Defaults to \code{3}. See \emph{Choosing the smoothing
+window}.}
 
 \item{min_curvature}{Minimum curvature at the apex, as the magnitude of the
 second derivative of the smoothed signal. Curvature scales as height over
@@ -106,22 +101,28 @@ Prof. Tom O'Haver's \href{https://terpconnect.umd.edu/~toh/spectrum/PeakFindinga
 }
 \section{Choosing the smoothing window}{
 
-Smoothing trades noise reduction against resolution. Too narrow a window
-fills the peak list with spurious apices from noise-driven sign changes in
-the derivative. Too wide a window merges neighboring peaks into one
-detection. Neither raises an error, and a merge is easier to overlook:
-the merged peak is still fitted and the fit can look reasonable. A merged
-peak shows up as a fitted width well above the rest and a lower \code{r.squared},
-so plot the peak list over the trace rather than reading the table alone.
+Peaks are detected where the first derivative of the signal changes from
+positive to negative. Noise makes the derivative change
+sign many times on its own, so the signal is first smoothed over a window
+set by the \code{smooth_window} argument. A wider window suppresses more noise,
+but can also blur neighboring peaks together if the window is too wide.
 
-Widening the window cuts spurious detections by orders of magnitude while
-costing at most the faintest peak or two, so resolution — losing a peak to
-a merge — is the failure mode to design around, not recall. Set
-\code{smooth_window} to roughly the full width at half maximum of a typical peak,
-in timepoints, then narrow it if closely-eluting peaks disappear. Give
-the width in timepoints rather than as a proportion, which follows run length
-rather than peak width: lengthening a gradient widens the window even though
-the peaks have not changed.
+Set \code{smooth_window} to about a third of the full width at half maximum of
+a typical peak, in timepoints. The default, \code{3}, suits peaks about 10
+timepoints wide. Wider windows may merge neighboring peaks. This may be easy
+to miss through casual inspection of peak tables — a merged pair is
+reported as one peak, with a single retention time and their combined area.
+Plot the peak list over the trace to check. Narrower windows add spurious
+apices. At fine time resolution, you can also reduce the resolution with the
+\code{dim1} argument to \code{\link{preprocess}}.
+
+A \code{smooth_window} between 0 and 1 is interpreted as a proportion of the run.
+A proportional smoothing window is invariant to sampling rate, but it scales
+with run length: \code{0.001} is only 3 timepoints for a 3,000-point trace but 100
+for a 100,000-point one. A width supplied in timepoints has the opposite
+trade-off: it doesn't depend on run length, but it scales with the sampling
+rate, so if you change the time grid with \code{preprocess(dim1 = )}, the
+\code{smooth_window} should be scaled accordingly.
 
 \code{min_prominence_snr} measures the noise for you rather than asking for a
 threshold in instrument units, so its cutoff does not depend on signal scale.

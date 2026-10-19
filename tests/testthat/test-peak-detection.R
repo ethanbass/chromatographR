@@ -131,9 +131,11 @@ test_that("`select_by` resolves multiple peaks in one window", {
   # `proximity` must disagree here or this test proves nothing.
   pick <- function(sb){
     get_peaks(Sa_pr[1], lambdas = lam_rt, targets = 11.20, tol = 0.2,
-              select_by = sb, show_progress = FALSE, cl = 1)[[1]][[lam_rt]]$rt
+              select_by = sb, show_progress = FALSE, cl = 1,
+              smooth_window = 1)[[1]][[lam_rt]]$rt
   }
-  all_rt <- pks_full[[1]][[lam_rt]]$rt
+  all_rt <- get_peaks(Sa_pr[1], lambdas = lam_rt, show_progress = FALSE,
+                      cl = 1, smooth_window = 1)[[1]][[lam_rt]]$rt
   near <- function(t) all_rt[which.min(abs(all_rt - t))]
   expect_equal(pick("height"), near(11.36))
   expect_equal(pick("proximity"), near(11.20))
@@ -280,7 +282,7 @@ test_that("named target columns work downstream", {
   skip_on_cran()
   tg <- data.frame(name = c("a", "b"), rt = c(11.63, 11.77), lambda = 220)
   pk <- get_peaks(Sa_pr, targets = tg, tol = 0.03, show_progress = FALSE, cl = 1)
-  pt <- get_peaktable(filter_peaks(pk, min_area = 0.2))
+  pt <- get_peaktable(filter_peaks(pk, min_area = 0.1))
   expect_equal(colnames(pt$tab), c("a", "b"))
   wide <- reshape_peaktable(pt, peaks = c("a", "b"), format = "wide")
   expect_true(all(c("a", "b") %in% colnames(wide)))
@@ -420,7 +422,7 @@ test_that("get_peaks validates `targets`, `tol` and `select_by`", {
 test_that("a failed target fit is NA in the peak table, and a missing one 0", {
   skip_on_cran()
   pks <- get_peaks(Sa_pr[1:2], lambdas = lam_rt, targets = c(11.18, 12.36),
-                   cl = 1, show_progress = FALSE)
+                   cl = 1, show_progress = FALSE, smooth_window = 1)
   pks[[1]][[lam_rt]][pks[[1]][[lam_rt]]$target == 2, c("height", "area")] <- NA
   pks[[2]][[lam_rt]] <- pks[[2]][[lam_rt]][pks[[2]][[lam_rt]]$target == 2, ]
   tab <- get_peaktable(pks)$tab

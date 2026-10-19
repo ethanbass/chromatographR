@@ -62,6 +62,10 @@ for these methods.
 * `find_peaks` now errors when `smooth_window` is narrower than seven
 timepoints under Savitzky-Golay (`"savgol"`) smoothing. Previously it returned
 the signal unsmoothed.
+* `find_peaks` and `get_peaks` now smooth over 3 timepoints by default. The
+old default, `smooth_window = 0.001`, was a proportion of the run, so the
+smoothing varied with run length. Set it explicitly to restore the old
+behavior; see *Choosing the smoothing window* in `?find_peaks`.
 * Renamed `find_peaks`'s `slope_thresh` and `amp_thresh` arguments to
 `min_curvature` and `min_amplitude`. `slope_thresh` was a misnomer
 because the argument thresholded the second derivative, not the slope.

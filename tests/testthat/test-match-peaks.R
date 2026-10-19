@@ -320,7 +320,8 @@ test_that("match_peaks ranks candidate references and applies the presence floor
 test_that("a peak within tol of two targets counts only for the nearer one", {
   skip_on_cran()
   data(Sa_pr)
-  pks <- get_peaks(Sa_pr, lambdas = 210, cl = 1, show_progress = FALSE)
+  pks <- get_peaks(Sa_pr, lambdas = 210, cl = 1, show_progress = FALSE,
+                   smooth_window = 1)
   tg <- data.frame(name = c("x", "y"), rt = c(11.36, 11.39), tol = 0.1)
   expect_error(match_peaks(pks, chrom_list = Sa_pr, targets = tg), "y 0 of 4")
   expect_error(match_peaks(pks, chrom_list = Sa_pr, targets = data.frame(rt = 11.37), lambda = 254),

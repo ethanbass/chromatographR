@@ -467,7 +467,7 @@ test_that("purity plot works", {
   skip_if_not_installed("vdiffr")
   data(Sa_pr)
   pks <- get_peaks(Sa_pr[1], lambdas = 210, fit = "egh", estimate_purity = TRUE,
-                   cl = 1, show_progress = FALSE)
+                   cl = 1, show_progress = FALSE, smooth_window = 2)
   plot_purity <- function(display){
     function() plot(pks, chrom_list = Sa_pr, points = TRUE, ticks = TRUE,
                     lambda = 210, plot_purity = display)
