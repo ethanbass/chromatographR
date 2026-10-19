@@ -380,6 +380,9 @@ is set, the y axis extends to make room.
 * `plot_chroms` now fits the y axis to the traces within `xlim` when `ylim` is
 not given, under the `"base"` and `"plotly"` engines. Previously it spanned the
 whole run.
+* `plot_spectrum_inset` now draws spectra from the supplied `chrom_list` when
+`idx` covers several samples. Previously it read the peak table's own
+chromatograms instead.
 * `plot_chroms` no longer errors on single-wavelength chromatograms under the
 `"ggplot"` and `"plotly"` engines. A wavelength given in `lambdas` for such data
 must now match the column name. Previously it was ignored.

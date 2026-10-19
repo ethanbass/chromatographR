@@ -297,6 +297,22 @@ test_that("plot_spectrum_inset works correctly", {
   vdiffr::expect_doppelganger("plot_inset", plot_inset)
 })
 
+test_that("plot_spectrum_inset reads spectra from the supplied chrom_list", {
+  skip_on_cran()
+  skip_if_not_installed("ggplot2")
+  data(Sa_warp)
+  data(pk_tab)
+  seen <- NULL
+  local_mocked_bindings(plot_all_spectra = function(..., chrom_list) {
+    seen <<- chrom_list
+    ggplot2::ggplot()
+  })
+  supplied <- lapply(Sa_warp, function(x) x * 2)
+  plot_spectrum_inset("V7", idx = 1:3, peak_table = pk_tab,
+                      chrom_list = supplied, verbose = FALSE)
+  expect_identical(seen, supplied)
+})
+
 test_that("annotate_peaks works correctly", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")

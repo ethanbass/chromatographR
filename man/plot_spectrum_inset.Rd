@@ -32,8 +32,9 @@ wavelengths). If no argument is provided here, the function will try to find
 the \code{chrom_list} object using the pointer in the \code{peak_table}.}
 
 \item{idx}{Index of chromatogram(s) to plot. If \code{"max"} (default) or a
-scalar, plots a single trace using \code{\link[=plot_spectrum]{plot_spectrum()}}. If a vector,
-plots multiple traces using \code{\link[=plot_chroms]{plot_chroms()}}.}
+scalar, plots a single trace, and the inset shows its spectrum. If a
+vector, plots one trace per chromatogram, and the inset overlays their
+spectra.}
 
 \item{lambda}{Wavelength to use for the chromatographic trace and for
 locating the peak apex. Either a numeric value or \code{"max"} (default)
@@ -43,7 +44,8 @@ to use the wavelength of maximum absorbance.}
 \code{"topleft"}, \code{"top"}, \code{"left"}, or \code{"right"}. Alternatively, a numeric
 vector of length 2 giving the proportional coordinates of the bottom-left
 corner, e.g., \code{c(0.6, 0.6)}, used together with \code{inset_width} and
-\code{inset_height}.}
+\code{inset_height}. When \code{loc} names several peaks, a list with one position
+per peak.}
 
 \item{inset_width}{Width of the inset as a proportion of the plot width.
 Defaults to \code{0.35}.}
@@ -51,24 +53,22 @@ Defaults to \code{0.35}.}
 \item{inset_height}{Height of the inset as a proportion of the plot height.
 Defaults to \code{0.35}.}
 
-\item{ylim}{Y axis limits for the main plot. Passed to \code{\link[=plot_chroms]{plot_chroms()}} or
-\code{\link[=plot_spectrum]{plot_spectrum()}}.}
+\item{ylim}{Y axis limits for the main plot. Passed to \code{\link[=plot_chroms]{plot_chroms()}}.}
 
-\item{xlim}{X axis limits for the main plot. Passed to \code{\link[=plot_chroms]{plot_chroms()}} or
-\code{\link[=plot_spectrum]{plot_spectrum()}}.}
+\item{xlim}{X axis limits for the main plot. Passed to \code{\link[=plot_chroms]{plot_chroms()}}.}
 
 \item{engine}{Plotting engine. Currently only \code{"ggplot"} is supported.}
 
-\item{scale_spectrum}{Logical. If \code{TRUE}, scales spectrum to unit height.
-Defaults to \code{FALSE}.}
+\item{scale_spectrum}{Logical. If \code{TRUE} (the default), scales the inset
+spectrum to unit height.}
 
-\item{verbose}{Logical. If \code{TRUE} (default), prints the index and name of
-each chromatogram plotted, with its retention time, wavelength and
-absorbance.}
+\item{verbose}{Logical. If \code{TRUE}, prints the index and name of each
+chromatogram plotted, with its retention time, wavelength and absorbance.
+Defaults to \code{getOption("verbose")}.}
 
 \item{inset_text_size}{Base size for text elements in inset. Defaults to \code{8}.}
 
-\item{...}{Additional arguments passed to \code{\link[=plot_chroms]{plot_chroms()}} or \code{\link[=plot_spectrum]{plot_spectrum()}}.}
+\item{...}{Additional arguments passed to \code{\link[=plot_chroms]{plot_chroms()}}.}
 }
 \value{
 A \code{ggplot} object.
@@ -76,7 +76,7 @@ A \code{ggplot} object.
 \description{
 Plots a chromatogram (either a single trace or multiple traces) with an
 inset UV spectrum for a specified peak. Dotted lines connect the peak apex
-to the corners of the inset box.
+to the two nearest corners of the inset box.
 }
 \examples{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
@@ -97,7 +97,7 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
   # multiple peaks with a list of positions
   plot_spectrum_inset(c("V13", "V25"), peak_table = pk_tab,
                       position = list(c(0.3, 0.5), c(0.65, 0.3)),
-                      inset_width = 0.3, inset_height = 0.3)#'
+                      inset_width = 0.3, inset_height = 0.3)
                       }
 }
 \seealso{

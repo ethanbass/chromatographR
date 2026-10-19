@@ -771,13 +771,14 @@ ggplot_trace <- function(chrom_list, chr, lambda.idx, line.idx = NULL){
 #'
 #' Plots a chromatogram (either a single trace or multiple traces) with an
 #' inset UV spectrum for a specified peak. Dotted lines connect the peak apex
-#' to the corners of the inset box.
+#' to the two nearest corners of the inset box.
 #'
 #' @inheritParams plot_spectrum
 #' @param loc Peak name or vector of names in the peak table (e.g. `"V10"`).
 #' @param idx Index of chromatogram(s) to plot. If `"max"` (default) or a
-#'   scalar, plots a single trace using [plot_spectrum()]. If a vector,
-#'   plots multiple traces using [plot_chroms()].
+#'   scalar, plots a single trace, and the inset shows its spectrum. If a
+#'   vector, plots one trace per chromatogram, and the inset overlays their
+#'   spectra.
 #' @param lambda Wavelength to use for the chromatographic trace and for
 #'   locating the peak apex. Either a numeric value or `"max"` (default)
 #'   to use the wavelength of maximum absorbance.
@@ -785,18 +786,22 @@ ggplot_trace <- function(chrom_list, chr, lambda.idx, line.idx = NULL){
 #'   `"topleft"`, `"top"`, `"left"`, or `"right"`. Alternatively, a numeric
 #'   vector of length 2 giving the proportional coordinates of the bottom-left
 #'   corner, e.g., `c(0.6, 0.6)`, used together with `inset_width` and
-#'   `inset_height`.
+#'   `inset_height`. When `loc` names several peaks, a list with one position
+#'   per peak.
 #' @param inset_width Width of the inset as a proportion of the plot width.
 #'   Defaults to `0.35`.
 #' @param inset_height Height of the inset as a proportion of the plot height.
 #'   Defaults to `0.35`.
-#' @param ylim Y axis limits for the main plot. Passed to [plot_chroms()] or
-#'   [plot_spectrum()].
-#' @param xlim X axis limits for the main plot. Passed to [plot_chroms()] or
-#'   [plot_spectrum()].
+#' @param ylim Y axis limits for the main plot. Passed to [plot_chroms()].
+#' @param xlim X axis limits for the main plot. Passed to [plot_chroms()].
 #' @param engine Plotting engine. Currently only `"ggplot"` is supported.
+#' @param scale_spectrum Logical. If `TRUE` (the default), scales the inset
+#'   spectrum to unit height.
+#' @param verbose Logical. If `TRUE`, prints the index and name of each
+#'   chromatogram plotted, with its retention time, wavelength and absorbance.
+#'   Defaults to `getOption("verbose")`.
 #' @param inset_text_size Base size for text elements in inset. Defaults to `8`. 
-#' @param ... Additional arguments passed to [plot_chroms()] or [plot_spectrum()].
+#' @param ... Additional arguments passed to [plot_chroms()].
 #'
 #' @return A `ggplot` object.
 #'
@@ -821,7 +826,7 @@ ggplot_trace <- function(chrom_list, chr, lambda.idx, line.idx = NULL){
 #'   # multiple peaks with a list of positions
 #'   plot_spectrum_inset(c("V13", "V25"), peak_table = pk_tab,
 #'                       position = list(c(0.3, 0.5), c(0.65, 0.3)),
-#'                       inset_width = 0.3, inset_height = 0.3)#'
+#'                       inset_width = 0.3, inset_height = 0.3)
 #'                       }
 #' @export
 plot_spectrum_inset <- function(loc, peak_table, chrom_list=NULL,
@@ -860,7 +865,7 @@ plot_spectrum_inset <- function(loc, peak_table, chrom_list=NULL,
                           scale_spectrum = scale_spectrum)
     } else {
       p2 <- plot_all_spectra(loc = loc[i], peak_table = peak_table, 
-                             idx = idx, engine = engine, 
+                             chrom_list = chrom_list, idx = idx, engine = engine, 
                              scale_spectrum = scale_spectrum,
                              export_spectrum = FALSE, verbose = verbose)
     }
