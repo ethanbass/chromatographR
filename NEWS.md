@@ -286,6 +286,8 @@ models were applied by position, so reordering `chrom_list` warped each sample
 with another sample's model.
 * `correct_peaks` now replaces the corrected times of an already corrected peak
 list. Previously it added a second set, and `get_peaktable` kept using the first.
+* `correct_rt` and `correct_rt_group` now return a `chrom_list` when given one,
+so `plot()` and chromConverter's `print` method still apply after alignment.
 
 #### Peak detection and integration
 

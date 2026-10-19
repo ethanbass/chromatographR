@@ -811,6 +811,25 @@ test_that("correct_peaks rejects collapsed peak lists", {
   expect_error(correct_peaks(pks, m, Sa_pr), regexp = "collapse = TRUE")
 })
 
+test_that("warped chromatograms keep the class of the input list", {
+  skip_on_cran()
+  data(Sa_pr)
+  cl <- structure(Sa_pr, class = c("chrom_list", "list"))
+  for (alg in c("ptw", "lptw", "vpdtw"))
+    expect_s3_class(correct_rt(cl, lambdas = 210, alg = alg, reference = 1,
+                               verbose = FALSE, show_progress = FALSE),
+                    "chrom_list")
+  expect_s3_class(correct_rt_group(cl, lambdas = 210,
+                                   groups = c("a", "a", "b", "b"),
+                                   show_progress = FALSE, cl = 1),
+                  "chrom_list")
+  expect_null(oldClass(correct_rt(Sa_pr, lambdas = 210, reference = 1,
+                                  verbose = FALSE, show_progress = FALSE)))
+  expect_null(oldClass(correct_rt_group(Sa_pr, lambdas = 210,
+                                        groups = c("a", "a", "b", "b"),
+                                        show_progress = FALSE, cl = 1)))
+})
+
 test_that("scale = TRUE fits on scaled data but returns the original units", {
   skip_on_cran()
   data(Sa_pr)

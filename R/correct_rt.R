@@ -196,6 +196,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
     stop("`regularization` must be a single number >= 0.")
   check_duplicated_names(names(chrom_list), what = "chrom_list")
   check_common_time_axis(chrom_list)
+  input_class <- oldClass(chrom_list)
   
   if (!is.null(models)){
     model_class <- switch(alg, ptw = "ptw_list", lptw = "lptw_list",
@@ -363,7 +364,8 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
         colnames(x) <- colnames(chrom_list_og[[ii]])
         transfer_metadata(x, chrom_list_og[[ii]])
       })
-      result <- structure(result, warped = TRUE, warping_args = args)
+      result <- structure(result, warped = TRUE, warping_args = args,
+                          class = input_class)
       names(result) <- names(chrom_list)
       result
     } else {
@@ -394,8 +396,9 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
     }
     if (what == "corrected.values"){
       if (verbose) message("Applying VPdtw warping models to chromatograms.")
-      apply_vpdtw(chrom_list_og, models, reference, args = args,
-                  fill_zeros = fill_zeros)
+      structure(apply_vpdtw(chrom_list_og, models, reference, args = args,
+                            fill_zeros = fill_zeros),
+                class = input_class)
     } else {
       return(models)
     }
@@ -1032,7 +1035,7 @@ correct_rt_group <- function(chrom_list, lambdas, groups, reference = 'best',
   })
   
   result_flat <- do.call(c, result)
-  result_flat[names(chrom_list)]
+  structure(result_flat[names(chrom_list)], class = oldClass(chrom_list))
 }
 
 #' Pad zeros
