@@ -92,6 +92,8 @@ proportion of peak height rather than of total absorbance. See `?get_purity`.
 in favor of `noise_inflation`.
 * Removed the `noise_threshold` argument from `get_peaks` and `fit_peaks`,
 which had no effect. Pass purity options as `purity_args` instead.
+* `fit_peaks` now defaults to `estimate_purity = FALSE`, matching `get_peaks`,
+so its `purity` column is `NA` unless you set `estimate_purity = TRUE`.
 * `plot_purity = TRUE` in `plot.peak_list` now draws dissimilarity and
 threshold curves. It also accepts `"curves_local"` and `"ratio"`; see
 `?plot.peak_list`.

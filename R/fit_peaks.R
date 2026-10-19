@@ -289,7 +289,7 @@ MIN_WINDOW_PER_FWHM <- 1 / 3
 #' @param max_iter Maximum number of iterations to use in nonlinear least
 #' squares peak-fitting. Defaults to `1000`.
 #' @param estimate_purity Logical. Whether to estimate purity. Defaults
-#' to `TRUE`, but is set to `FALSE` when `x` holds a single wavelength.
+#' to `FALSE`, and is always `FALSE` when `x` holds a single wavelength.
 #' @param purity_args A named list of additional arguments passed to
 #' [`get_purity`], e.g. `list(background = "none", metric = "max")`.
 #' @param noise_variance Variance of noise, passed to [`get_purity`]. If not
@@ -380,7 +380,7 @@ fit_peaks <- function (x, lambda, pos = NULL,
                        max_fwhm = NULL,
                        sd_max = NULL,
                        fit = c("egh", "bemg", "gaussian", "raw"),
-                       max_iter = 1000, estimate_purity = TRUE,
+                       max_iter = 1000, estimate_purity = FALSE,
                        purity_args = list(), noise_variance = NULL,
                        baseline = c("none", "flat", "sloped"), ...){
   lambda.idx <- get_lambda_idx(lambda, get_lambdas(x), allow_max = FALSE)

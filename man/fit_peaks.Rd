@@ -12,7 +12,7 @@ fit_peaks(
   sd_max = NULL,
   fit = c("egh", "bemg", "gaussian", "raw"),
   max_iter = 1000,
-  estimate_purity = TRUE,
+  estimate_purity = FALSE,
   purity_args = list(),
   noise_variance = NULL,
   baseline = c("none", "flat", "sloped"),
@@ -52,7 +52,7 @@ trapezoidal integration without model fitting. Defaults to \code{"egh"}.}
 squares peak-fitting. Defaults to \code{1000}.}
 
 \item{estimate_purity}{Logical. Whether to estimate purity. Defaults
-to \code{TRUE}, but is set to \code{FALSE} when \code{x} holds a single wavelength.}
+to \code{FALSE}, and is always \code{FALSE} when \code{x} holds a single wavelength.}
 
 \item{purity_args}{A named list of additional arguments passed to
 \code{\link{get_purity}}, e.g. \code{list(background = "none", metric = "max")}.}

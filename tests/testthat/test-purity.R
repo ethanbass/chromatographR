@@ -599,3 +599,11 @@ test_that("linear background correction restores purity on sloped baseline", {
   purity_linear <- get_purity(s$bg$mat, s$bg$pos, background = "linear")
   expect_gt(purity_linear, purity_none)
 })
+
+test_that("fit_peaks estimates purity only when asked", {
+  data(Sa_pr)
+  expect_true(all(is.na(fit_peaks(Sa_pr[[1]], lambda = "210", fit = "gaussian")$purity)))
+  pur <- suppressWarnings(fit_peaks(Sa_pr[[1]], lambda = "210", fit = "gaussian",
+                                    estimate_purity = TRUE)$purity)
+  expect_false(all(is.na(pur)))
+})
