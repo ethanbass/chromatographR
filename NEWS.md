@@ -383,6 +383,9 @@ whole run.
 * `plot_spectrum_inset` now draws spectra from the supplied `chrom_list` when
 `idx` covers several samples. Previously it read the peak table's own
 chromatograms instead.
+* `plot.peak_list` now draws shaded peaks at the right width for peak lists
+built with `get_peaks(time_unit = "s")` or `"ms"`. Previously they were drawn
+too wide.
 * `plot_chroms` no longer errors on single-wavelength chromatograms under the
 `"ggplot"` and `"plotly"` engines. A wavelength given in `lambdas` for such data
 must now match the column name. Previously it was ignored.

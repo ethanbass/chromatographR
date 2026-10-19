@@ -71,7 +71,7 @@
 #' Peak lists are expected to contain columns such as `rt`, `height`, `start`, 
 #' `end`, and `sd`, with additional parameters depending on the fit type.
 #'
-#' Time units in `x` are used to rescale width parameters for plotting.
+#' Width parameters are rescaled using the time units of `x`.
 #'
 #' Peak rendering errors are silently ignored.
 #' 
@@ -99,15 +99,17 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
   if (isTRUE(plot_purity))  plot_purity <- "curves"
   if (isFALSE(plot_purity)) plot_purity <- "none"
   plot_purity <- match.arg(plot_purity)
-  baseline <- attr(x, "baseline")
+  baseline <- attr(x, "baseline", exact = TRUE)
   if (is.null(baseline)) baseline <- "none"
-  time.units <- attributes(x)$time.units
-  time.units <- ifelse(is.null(time.units), "", time.units)
-  tfac <- switch(time.units, "min" = 1, "s" = 1/60, "ms" = 1/60000, 1)
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(x)
   } else check_chrom_list_class(chrom_list)
+  time_unit <- attributes(x)$time_unit
   axis_unit <- get_time_unit(chrom_list, idx = idx, na_value = "min")
+  tfac <- if (isTRUE(time_unit %in% c("min", "s", "ms")) &&
+              isTRUE(axis_unit %in% c("min", "s", "ms"))){
+    time_factor(axis_unit) / time_factor(time_unit)
+  } else 1
   if (is.null(lambda)){
     lambda <- names(x[[1]])[1]
   }

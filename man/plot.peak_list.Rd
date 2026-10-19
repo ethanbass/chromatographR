@@ -113,7 +113,7 @@ may be \code{"gaussian"}, \code{"egh"}, \code{"bemg"}, or \code{"raw"}.
 Peak lists are expected to contain columns such as \code{rt}, \code{height}, \code{start},
 \code{end}, and \code{sd}, with additional parameters depending on the fit type.
 
-Time units in \code{x} are used to rescale width parameters for plotting.
+Width parameters are rescaled using the time units of \code{x}.
 
 Peak rendering errors are silently ignored.
 }

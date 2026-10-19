@@ -658,6 +658,24 @@ test_that("plot.peak_table works", {
                regexp = "A peak name must be provided")
 })
 
+test_that("plot.peak_list rescales peak shapes according to `time_unit`", {
+  skip_on_cran()
+  skip_if_not_installed("vdiffr")
+  data(Sa_pr)
+  pks_min <- get_peaks(Sa_pr[1], lambdas = 210, fit = "egh", time_unit = "min",
+                       cl = 1, show_progress = FALSE)
+  pks_sec <- get_peaks(Sa_pr[1], lambdas = 210, fit = "egh", time_unit = "s",
+                       cl = 1, show_progress = FALSE)
+  plot_time_units <- function(){
+    par(mfrow = c(2, 1))
+    plot(pks_min, idx = 1, lambda = "210")
+    legend("topright", "time_unit = min", bty = "n")
+    plot(pks_sec, idx = 1, lambda = "210")
+    legend("topright", "time_unit = s", bty = "n")
+  }
+  vdiffr::expect_doppelganger("plot_peak_list_time_units", plot_time_units)
+})
+
 test_that("purity plot works", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
@@ -677,6 +695,14 @@ test_that("plot.peak_list rejects a peak table passed as `chrom_list`", {
   data(Sa_pr); data(pk_tab)
   pks <- get_peaks(Sa_pr[1], lambdas = 210, show_progress = FALSE)
   expect_error(plot(pks, chrom_list = pk_tab), regexp = "not a `peak_table`")
+})
+
+test_that("get_peaks stamps the `time_unit` attribute that plot.peak_list reads", {
+  data(Sa_pr)
+  pks <- get_peaks(Sa_pr[1], lambdas = 210, time_unit = "s", cl = 1,
+                   show_progress = FALSE)
+  expect_identical(attributes(pks)$time_unit, "s")
+  expect_null(attributes(pks)$time.units)
 })
 
 test_that("plot_chroms checks a supplied wavelength on single-column data", {
