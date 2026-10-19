@@ -960,25 +960,49 @@ test_that("cluster_spectra draws the dendrogram and spectra panels", {
 test_that("plot.peak_list works", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
+  data(Sa_pr)
+  peaks_for <- function(fit){
+    get_peaks(Sa_pr[1], lambdas = "210", fit = fit, cl = 1, show_progress = FALSE)
+  }
+  pks <- peaks_for("egh")
+  pks_gaussian <- peaks_for("gaussian")
+  pks_bemg <- peaks_for("bemg")
   plot_peaks <- function(){
-    plot(pks_egh, chrom_list = dat.pr, points = TRUE,
+    plot(pks, chrom_list = Sa_pr, points = TRUE,
          ticks = TRUE, lambda = 210)
   }
   vdiffr::expect_doppelganger("plot.peak_list", plot_peaks)
   
   plot_peaks_gaussian <- function(){
-    plot(pks_gaussian, chrom_list = dat.pr)
+    plot(pks_gaussian, chrom_list = Sa_pr)
   }
   vdiffr::expect_doppelganger("plot.peak_list_gaussian", plot_peaks_gaussian)
   
   plot_peaks_bemg <- function(){
-    plot(pks_bemg, chrom_list = dat.pr)
+    plot(pks_bemg, chrom_list = Sa_pr)
   }
   skip_on_os(c("windows", "linux"))
   vdiffr::expect_doppelganger("plot.peak_list_bemg", plot_peaks_bemg)
   
-  expect_error(plot(pks_egh, chrom_list = dat.pr, lambda = 190),
+  expect_error(plot(pks, chrom_list = Sa_pr, lambda = 190),
                regexp = "must match one of the wavelengths in your peak list")
+})
+
+test_that("plot.peak_list titles the plot with sample, wavelength and model", {
+  data(Sa_pr)
+  pks <- get_peaks(Sa_pr, lambdas = 210, fit = "egh", show_progress = FALSE, cl = 1)
+  expect_equal(peak_list_title(pks, 1, "210", "egh"), "119, 210 nm (egh)")
+  expect_equal(peak_list_title(pks, "458", "210", NULL), "458, 210 nm")
+  expect_equal(peak_list_title(pks, 2, "intensity", "bemg"), "121 (bemg)")
+  pdf(NULL); on.exit(dev.off())
+  expect_no_error(plot(pks, chrom_list = Sa_pr, main = ""))
+})
+
+test_that("plot.peak_list accepts axis labels and a plot type", {
+  data(Sa_pr)
+  pks <- get_peaks(Sa_pr, lambdas = 210, fit = "egh", show_progress = FALSE, cl = 1)
+  pdf(NULL); on.exit(dev.off(), add = TRUE)
+  expect_no_error(plot(pks, chrom_list = Sa_pr, xlab = "Time (min)", ylab = "mAU", type = "p"))
 })
 
 test_that("plot.peak_list zooms to the selected peaks", {
@@ -1083,6 +1107,55 @@ test_that("plot.peak_list zooms by retention time across samples", {
                regexp = "`tol` must be a single value or one value for each")
 })
 
+test_that("plot.peak_list labels peaks by retention time", {
+  pks <- data.frame(pks_egh[[1]][["210"]])
+  tmp <- tempfile(fileext = ".png")
+  on.exit(unlink(tmp), add = TRUE)
+  png(tmp)
+  on.exit(if (!is.null(dev.list())) dev.off(), add = TRUE, after = FALSE)
+  expect_silent(plot(pks_egh, chrom_list = dat.pr, lambda = 210,
+                     numbers = "rt"))
+  expect_silent(plot(pks_egh, chrom_list = dat.pr, lambda = 210,
+                     numbers = "rt", digits = 3))
+  dev.off()
+  expect_error(plot(pks_egh, chrom_list = dat.pr, lambda = 210,
+                    numbers = "index"),
+               regexp = '`numbers` must be')
+})
+
+test_that("plot.peak_list places peak numbers at the trace", {
+  pks <- data.frame(pks_egh[[1]][["210"]])
+  ts <- get_times(dat.pr, idx = 1)
+  y <- dat.pr[[1]][, "210"]
+
+  apex_y <- unname(y[vapply(pks$rt, function(rt) which.min(abs(ts - rt)),
+                            integer(1))])
+  expect_equal(unname(peak_label_y(pks, ts, y, y.offset = 0, span = 1)), apex_y)
+  expect_equal(unname(peak_label_y(pks, ts, y, y.offset = 0.03, span = 100)),
+               apex_y + 3)
+  expect_false(isTRUE(all.equal(unname(peak_label_y(pks, ts, y, 0, span = 1)),
+                                unname(y[pks$rt]))))
+  expect_warning(peak_label_y(pks, ts, y, y.offset = 25, span = 100),
+                 regexp = "fraction of the plot height")
+})
+
+test_that("plot.peak_list draws raw peaks against padded dimnames", {
+  skip_on_cran()
+  expect_match(rownames(dat.pr[[1]])[11], "^10.10$")
+  pks_raw <- get_peaks(dat.pr, lambdas = lam, fit = "raw", smooth_type = "none",
+                       show_progress = FALSE)
+  pdf(NULL)
+  on.exit(dev.off(), add = TRUE)
+  expect_no_warning(plot(pks_raw, chrom_list = dat.pr, lambda = "210"))
+  peak <- data.frame(pks_raw[[1]][["210"]])[1, ]
+  peak.loc <- seq.int(peak$start, peak$end, by = get_time_resolution(dat.pr))
+  yvals <- raw_from_peak(peak.loc, peak, tfac = 1, chrom_list = dat.pr,
+                         idx = 1, lambda = "210")
+  expect_false(anyNA(yvals))
+  expect_equal(yvals, dat.pr[[1]][get_retention_idx(peak.loc, get_times(dat.pr),
+                                                    clamp = TRUE), "210"])
+})
+
 test_that("plot.ptw_list works", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
@@ -1119,8 +1192,10 @@ test_that("plot.ptw_list works with ggplot", {
 test_that("plot_peak.list works", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
+  data(Sa_pr)
+  pks <- get_peaks(Sa_pr[1:2], lambdas = "210", cl = 1, show_progress = FALSE)
   plot_peaklist <- function(){
-    plot(pks_egh, chrom_list = dat.pr, idx = 2)
+    plot(pks, chrom_list = Sa_pr[1:2], idx = 2)
   }
   vdiffr::expect_doppelganger("plot_peaklist", plot_peaklist)
 })

@@ -20,7 +20,8 @@
   cex.points = 0.5,
   numbers = FALSE,
   cex.font = 0.5,
-  y.offset = 25,
+  digits = 2,
+  y.offset = 0.03,
   plot_purity = c("none", "ratio", "curves", "curves_local"),
   purity_args = list(),
   res
@@ -29,14 +30,18 @@
 \arguments{
 \item{x}{A \code{peak_list} object. Output from the \code{get_peaks} function.}
 
-\item{...}{Additional arguments to main plot function.}
+\item{...}{Additional arguments to main plot function. The plot is titled
+with the sample, wavelength and peak model by default; pass \code{main} to
+change the title, or \code{main = ""} to omit it, and \code{xaxt = "n"} or
+\code{yaxt = "n"} to hide an axis.}
 
-\item{chrom_list}{List of chromatograms (retention time x wavelength
+\item{chrom_list}{List of chromatograms (retention time × wavelength
 matrices). If missing, extracted from environment using the pointer in \code{x}.}
 
 \item{idx}{Index or name of chromatogram to plot from \code{chrom_list}.}
 
-\item{lambda}{Wavelength (column) to use for plotting.}
+\item{lambda}{Wavelength (column) to use for plotting. Defaults to the first
+wavelength in \code{x}.}
 
 \item{targets}{Optional target retention times, as a numeric vector or a
 table of targets (see \code{\link{targeted_analysis}}). If supplied, the plot is
@@ -47,7 +52,7 @@ that window, so that small peaks are not flattened against the axis.
 Defaults to \code{NULL}.}
 
 \item{tol}{Numeric. Half-width of the window around each target, in
-minutes, whatever the time unit of \code{chrom_list}. Either a single value applied to
+minutes, regardless of the time unit of \code{chrom_list}. Either a single value applied to
 every target, or a vector giving a separate tolerance for each target. A
 \code{tol} column in \code{targets} takes precedence. Defaults to \code{0.1}. Ignored if
 \code{targets} is \code{NULL}.}
@@ -66,17 +71,22 @@ Defaults to \code{FALSE}.}
 
 \item{alpha}{Transparency of fitted peak shapes. Defaults to \code{0.5}.}
 
-\item{color}{Color used to fill fitted peak shapes. If \code{NULL}, a default
-color is chosen based on the fitted model type.}
+\item{color}{Color used to fill fitted peak shapes. If \code{NULL}, the color
+depends on the fitted model type.}
 
 \item{cex.points}{Size of points. Defaults to \code{0.5}.}
 
-\item{numbers}{If \code{TRUE}, label peaks with numeric identifiers. Defaults to
-\code{FALSE}.}
+\item{numbers}{Labels drawn above each peak. \code{TRUE} labels peaks with their
+index in the peak list, and \code{"rt"} labels them with their retention time,
+which can be passed back to \code{targets}. Defaults to \code{FALSE}.}
 
 \item{cex.font}{Font size if peaks are numbered. Defaults to \code{0.5}.}
 
-\item{y.offset}{Y offset for peak numbers. Defaults to \code{25}.}
+\item{digits}{Number of decimal places for retention time labels when
+\code{numbers = "rt"}. Defaults to \code{2}.}
+
+\item{y.offset}{Vertical offset of peak numbers, as a fraction of the height
+of the plot region. Defaults to \code{0.03}.}
 
 \item{plot_purity}{Whether and how to draw peak purity traces below the
 chromatogram. \code{"none"} (default) draws nothing. \code{"ratio"} plots the purity
@@ -103,25 +113,24 @@ to \code{\link{get_peaks}} and to this function.}
 No return value, called for side effects.
 }
 \description{
-Visually assess peak integration accuracy by overlaying fitted peak shapes
-over chromatographic traces.
+Draws fitted peak shapes over chromatographic traces to assess integration
+accuracy.
 }
 \details{
 The appearance of fitted peaks depends on the \code{"fit"} attribute of \code{x}, which
 may be \code{"gaussian"}, \code{"egh"}, \code{"bemg"}, or \code{"raw"}.
 
-Peak lists are expected to contain columns such as \code{rt}, \code{height}, \code{start},
-\code{end}, and \code{sd}, with additional parameters depending on the fit type.
+Peak lists must contain columns \code{rt}, \code{height}, \code{start}, \code{end}, and \code{sd},
+with additional columns depending on the fit type.
 
 Width parameters are rescaled using the time units of \code{x}.
 
-Peak rendering errors are silently ignored.
+A peak whose shape cannot be drawn is skipped with a warning.
 }
 \section{Side effects}{
 
-Plots a chromatographic trace from the specified chromatogram (\code{chr})
-at the specified wavelength (\code{lambda}) with fitted peak shapes from the
-provided \code{peak_list} drawn underneath the curve.
+Plots the trace of chromatogram \code{idx} at wavelength \code{lambda}, with the
+fitted peak shapes from \code{x} filled in beneath it.
 }
 
 \examples{

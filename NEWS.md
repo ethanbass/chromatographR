@@ -106,6 +106,9 @@ threshold curves. It also accepts `"curves_local"` and `"ratio"`; see
 * Retention times in dimnames are now formatted to a consistent number of
 decimal places, so an interpolated time axis is no longer ragged. Lookups by the
 old names need updating (`x["10.10", ]` rather than `x["10.1", ]`).
+* `plot.peak_list`'s `y.offset` is now a fraction of the plot height, with a
+default of `0.03`. Previously it was in absorbance units, with a default of `25`.
+Values above 1 warn. Boundary ticks are scaled the same way.
 * `get_peaktable`'s `hmax` and `sigma_t`, and `combine_peaks`'s `tol`, are now
 in minutes, regardless of the time unit of the data. Results change only for
 chromatograms whose times are not in minutes.
@@ -244,6 +247,11 @@ in both `preprocess` and `subtract_blanks`.
 * Added `targets`, `tol` and `pad` arguments to `plot.peak_list` for zooming
 in on the peaks near given retention times, rescaling both axes to the
 selected window.
+* `plot.peak_list` now draws axes and titles each plot with its sample,
+wavelength and peak model. Pass `xaxt = "n"`, `yaxt = "n"` or `main = ""` to
+remove them.
+* `plot.peak_list` now accepts `numbers = "rt"`, labeling peaks with their
+retention times, which can be passed to `targets` to zoom in on them.
 * Added a `what` argument to `plot_chroms` for plotting one element of nested
 chromatograms from `read_chroms`, such as `"dad"` or a pump pressure trace.
 * Added a `zlim` argument to `plot_chroms_heatmap`, fixing the range of its
@@ -383,9 +391,13 @@ whole run.
 * `plot_spectrum_inset` now draws spectra from the supplied `chrom_list` when
 `idx` covers several samples. Previously it read the peak table's own
 chromatograms instead.
+* `plot.peak_list(numbers = TRUE)` now draws each number just above its peak.
+Previously the numbers were drawn at arbitrary heights.
 * `plot.peak_list` now draws shaded peaks at the right width for peak lists
 built with `get_peaks(time_unit = "s")` or `"ms"`. Previously they were drawn
 too wide.
+* `plot.peak_list` now accepts `xlab`, `ylab` and `type`. Previously passing any
+of them gave an error.
 * `plot_chroms` no longer errors on single-wavelength chromatograms under the
 `"ggplot"` and `"plotly"` engines. A wavelength given in `lambdas` for such data
 must now match the column name. Previously it was ignored.

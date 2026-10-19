@@ -1,17 +1,21 @@
 #' Overlay fitted peak shapes on chromatograms
 #' 
-#' Visually assess peak integration accuracy by overlaying fitted peak shapes
-#' over chromatographic traces.
+#' Draws fitted peak shapes over chromatographic traces to assess integration
+#' accuracy.
 #'
 #' @importFrom stats median
 #' @importFrom graphics polygon arrows
 #' @importFrom scales alpha
 #' @param x A `peak_list` object. Output from the `get_peaks` function.
-#' @param ... Additional arguments to main plot function.
-#' @param chrom_list List of chromatograms (retention time x wavelength
+#' @param ... Additional arguments to main plot function. The plot is titled
+#' with the sample, wavelength and peak model by default; pass `main` to
+#' change the title, or `main = ""` to omit it, and `xaxt = "n"` or
+#' `yaxt = "n"` to hide an axis.
+#' @param chrom_list List of chromatograms (retention time × wavelength
 #' matrices). If missing, extracted from environment using the pointer in `x`.
 #' @param idx Index or name of chromatogram to plot from `chrom_list`.
-#' @param lambda Wavelength (column) to use for plotting.
+#' @param lambda Wavelength (column) to use for plotting. Defaults to the first
+#' wavelength in `x`.
 #' @param targets Optional target retention times, as a numeric vector or a
 #' table of targets (see [`targeted_analysis`]). If supplied, the plot is
 #' zoomed to the span of every peak whose apex falls within `tol` of a target,
@@ -20,7 +24,7 @@
 #' that window, so that small peaks are not flattened against the axis.
 #' Defaults to `NULL`.
 #' @param tol Numeric. Half-width of the window around each target, in
-#' minutes, whatever the time unit of `chrom_list`. Either a single value applied to
+#' minutes, regardless of the time unit of `chrom_list`. Either a single value applied to
 #' every target, or a vector giving a separate tolerance for each target. A
 #' `tol` column in `targets` takes precedence. Defaults to `0.1`. Ignored if
 #' `targets` is `NULL`.
@@ -34,13 +38,17 @@
 #' @param ticks Logical. If `TRUE`, mark peak boundaries with tick marks. 
 #' Defaults to `FALSE`.
 #' @param alpha Transparency of fitted peak shapes. Defaults to `0.5`.
-#' @param color Color used to fill fitted peak shapes. If `NULL`, a default 
-#' color is chosen based on the fitted model type.
+#' @param color Color used to fill fitted peak shapes. If `NULL`, the color
+#' depends on the fitted model type.
 #' @param cex.points Size of points. Defaults to `0.5`.
-#' @param numbers If `TRUE`, label peaks with numeric identifiers. Defaults to 
-#' `FALSE`.
+#' @param numbers Labels drawn above each peak. `TRUE` labels peaks with their
+#' index in the peak list, and `"rt"` labels them with their retention time,
+#' which can be passed back to `targets`. Defaults to `FALSE`.
 #' @param cex.font Font size if peaks are numbered. Defaults to `0.5`.
-#' @param y.offset Y offset for peak numbers. Defaults to `25`.
+#' @param digits Number of decimal places for retention time labels when
+#' `numbers = "rt"`. Defaults to `2`.
+#' @param y.offset Vertical offset of peak numbers, as a fraction of the height
+#' of the plot region. Defaults to `0.03`.
 #' @param plot_purity Whether and how to draw peak purity traces below the
 #' chromatogram. `"none"` (default) draws nothing. `"ratio"` plots the purity
 #' ratio as lollipops on a log scale from 0.01 to 100, clamping values beyond
@@ -61,19 +69,18 @@
 #' `chrom_list`.
 #' @return No return value, called for side effects.
 #' @section Side effects:
-#' Plots a chromatographic trace from the specified chromatogram (`chr`)
-#' at the specified wavelength (`lambda`) with fitted peak shapes from the
-#' provided `peak_list` drawn underneath the curve. 
+#' Plots the trace of chromatogram `idx` at wavelength `lambda`, with the
+#' fitted peak shapes from `x` filled in beneath it.
 #' @details
 #' The appearance of fitted peaks depends on the `"fit"` attribute of `x`, which
 #' may be `"gaussian"`, `"egh"`, `"bemg"`, or `"raw"`.
 #'
-#' Peak lists are expected to contain columns such as `rt`, `height`, `start`, 
-#' `end`, and `sd`, with additional parameters depending on the fit type.
+#' Peak lists must contain columns `rt`, `height`, `start`, `end`, and `sd`,
+#' with additional columns depending on the fit type.
 #'
 #' Width parameters are rescaled using the time units of `x`.
 #'
-#' Peak rendering errors are silently ignored.
+#' A peak whose shape cannot be drawn is skipped with a warning.
 #' 
 #' @author Ethan Bass
 #' @examples 
@@ -92,8 +99,8 @@
 plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
                            targets = NULL, tol = 0.1, pad = 0.5,
                            points = FALSE, ticks = FALSE, alpha = 0.5, color = NULL,
-                           cex.points = 0.5, numbers = FALSE, cex.font = 0.5, 
-                           y.offset = 25,
+                           cex.points = 0.5, numbers = FALSE, cex.font = 0.5,
+                           digits = 2, y.offset = 0.03,
                            plot_purity = c("none", "ratio", "curves", "curves_local"),
                            purity_args = list(), res){
   if (isTRUE(plot_purity))  plot_purity <- "curves"
@@ -123,18 +130,23 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
   y <- chrom_list[[idx]][,lambda]
   pks <- data.frame(x[[idx]][[lambda]])
   fit <- attr(x,"fit")
+  labels <- peak_labels(pks, numbers, digits)
   purity_lim <- NULL
-  plot_args <- list(new.ts, y, type = 'l', xlab = '', ylab = '',
-                    xaxt = 'n', yaxt = 'n', ...)
+  plot_args <- list(new.ts, y, ...)
+  plot_args$type <- plot_args$type %||% 'l'
+  plot_args$xlab <- plot_args$xlab %||% ''
+  plot_args$ylab <- plot_args$ylab %||% ''
+  plot_args$main <- plot_args$main %||% peak_list_title(x, idx, lambda, fit)
   zoom <- peak_zoom_xlim(pks, targets, tol, pad, new.ts, rt_factor(axis_unit))
   plot_args$xlim <- plot_args$xlim %||% zoom
   win <- if (!is.null(zoom)) zoom_ylim(plot_args$xlim, pks, new.ts, y, baseline)
   yr <- win %||% range(y, na.rm = TRUE)
   if (plot_purity != "none"){
     purity_lim <- -0.1 * diff(yr)
+    purity_origin <- max(yr[1], 0)
     bands <- 2
     if (is.null(plot_args$ylim)){
-      plot_args$ylim <- c(min(yr[1], purity_lim * bands), yr[2])
+      plot_args$ylim <- c(min(yr[1], purity_origin + purity_lim * bands), yr[2])
     }
   } else if (!is.null(win) && is.null(plot_args$ylim)){
     plot_args$ylim <- win
@@ -147,9 +159,9 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
   if (ticks){
     draw_peak_ticks(pks, new.ts, y)
   }
-  if (numbers){
-    text(pks$rt, y[pks$rt] + y.offset, labels = seq_len(nrow(pks)), 
-         cex = cex.font)
+  if (!is.null(labels)){
+    text(pks$rt, peak_label_y(pks, new.ts, y, y.offset),
+         labels = labels, cex = cex.font)
   }
   if (missing(res))
     res <- get_time_resolution(chrom_list)
@@ -192,8 +204,18 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
   if (plot_purity != "none"){
     plot_peak_purity(x, chrom_list, idx, lambda, new.ts, y,
                      purity_args = purity_args, lim = purity_lim,
-                     purity_display = plot_purity)
+                     origin = purity_origin, purity_display = plot_purity)
   }
+}
+
+#' Default title for a peak list plot
+#' @noRd
+peak_list_title <- function(x, idx, lambda, fit){
+  sample <- if (is.character(idx)) idx else names(x)[idx]
+  nm <- if (length(lambda) && !is.na(suppressWarnings(as.numeric(lambda))))
+    paste(lambda, "nm")
+  label <- paste(c(sample, nm), collapse = ", ")
+  if (length(fit)) paste0(label, " (", fit, ")") else label
 }
 
 #' Plot matched peak pairs
@@ -512,7 +534,9 @@ bemg_from_peak <- function(x, peak, tfac = 1, ...) {
 #' Helper for `plot.peak_list`
 #' @noRd
 raw_from_peak <- function(x, peak, tfac, chrom_list, idx, lambda) {
-  chrom_list[[idx]][as.character(x), lambda]
+  rt_idx <- get_retention_idx(x, get_times(chrom_list, idx = idx),
+                              clamp = TRUE)
+  chrom_list[[idx]][rt_idx, lambda]
 }
 
 #' Apex height of each peak, including any fitted baseline
@@ -589,17 +613,46 @@ zoom_ylim <- function(xlim, pks, new.ts, y, baseline) {
   ylim
 }
 
+#' Labels to draw above each peak
+#' Helper for `plot.peak_list`
+#' @noRd
+peak_labels <- function(pks, numbers, digits) {
+  if (isFALSE(numbers)) return(NULL)
+  if (identical(numbers, "rt")){
+    format(round(pks$rt, digits), nsmall = digits, trim = TRUE)
+  } else if (isTRUE(numbers)){
+    seq_len(nrow(pks))
+  } else {
+    stop("`numbers` must be `TRUE`, `FALSE` or \"rt\".")
+  }
+}
+
+#' Height at which to draw peak numbers
+#' Helper for `plot.peak_list`
+#' @param span Height of the plot region in user units. Defaults to the open
+#'   device's; supplied directly so the offset can be tested without one.
+#' @noRd
+peak_label_y <- function(pks, new.ts, y, y.offset, span = NULL) {
+  if (y.offset > 1)
+    warning("`y.offset` is a fraction of the plot height, so values above 1 ",
+            "place peak labels off the plot. It was in y-axis units before ",
+            "chromatographR 0.9.0.", call. = FALSE)
+  if (is.null(span)) span <- diff(par("usr")[3:4])
+  y[get_retention_idx(pks$rt, new.ts, clamp = TRUE)] + y.offset * span
+}
+
 #' Draw peak boundaries
 #' Helper for `plot.peak_list`
 #' @noRd
 draw_peak_ticks <- function(pks, new.ts, y) {
-  
-  arrows(pks$start, y[match(pks$start, new.ts)] - 5,
-         pks$start, y[match(pks$start, new.ts)] + 5,
+  half <- 0.01 * diff(par("usr")[3:4])
+  y_start <- y[get_retention_idx(pks$start, new.ts, clamp = TRUE)]
+  y_end <- y[get_retention_idx(pks$end, new.ts, clamp = TRUE)]
+
+  arrows(pks$start, y_start - half, pks$start, y_start + half,
          col = "blue", length = 0)
-  
-  arrows(pks$end, y[match(pks$end, new.ts)] - 5,
-         pks$end, y[match(pks$end, new.ts)] + 5,
+
+  arrows(pks$end, y_end - half, pks$end, y_end + half,
          col = "blue", length = 0)
 }
 
@@ -626,15 +679,14 @@ scale_purity_ratio <- function(p, lim){
 #' Helper for `plot.peak_list`. See `plot.peak_list` for display modes.
 #' @noRd
 plot_peak_purity <- function(x, chrom_list, idx, lambda, new.ts, y,
-                             purity_args = list(), lim = NULL,
+                             purity_args = list(), lim = NULL, origin = 0,
                              purity_display = "ratio") {
-  peaks <- x[[idx]][[lambda]][, 3:5]
+  peaks <- x[[idx]][[lambda]][, c("rt", "start", "end")]
   noise_variance <- hoist_noise_variance(chrom_list[[idx]], purity_args)
   purity_args <- purity_args[setdiff(
     intersect(names(purity_args), names(formals(get_purity_values))),
     "noise_variance")]
   usr <- par("usr")
-  yr  <- usr[3:4]
   visible <- sum(new.ts >= usr[1] & new.ts <= usr[2])
   zoom_scale <- (length(new.ts) / max(visible, 1L))^(1/3)
   do_ratio  <- purity_display == "ratio"
@@ -659,27 +711,24 @@ plot_peak_purity <- function(x, chrom_list, idx, lambda, new.ts, y,
       den  <- 1 - thr
       scale_max <- if (global_scale) 1 else max(c(num, den), na.rm = TRUE)
       if (scale_max < .Machine$double.eps) return(NULL)
-      y_num <- 2 * lim * num / scale_max
-      y_den <- 2 * lim * den / scale_max
+      y_num <- origin + 2 * lim * num / scale_max
+      y_den <- origin + 2 * lim * den / scale_max
       n <- length(ts_win)
-      ok <- which(!is.na(y_num) & !is.na(y_den))
-      for (j in ok[ok < n]) {
-        if ((j + 1L) %in% ok) {
-          pure_seg <- num[j] <= den[j] && num[j + 1L] <= den[j + 1L]
-          polygon(ts_win[c(j, j + 1L, j + 1L, j)],
-                  c(y_num[j], y_num[j + 1L], y_den[j + 1L], y_den[j]),
-                  col = scales::alpha(if (pure_seg) "steelblue" else "firebrick", 0.3),
-                  border = NA)
-        }
+      ok <- !is.na(y_num) & !is.na(y_den)
+      a <- which(ok[-n] & ok[-1L])
+      if (length(a)) {
+        b <- a + 1L
+        pure_seg <- num[a] <= den[a] & num[b] <= den[b]
+        polygon(head(as.vector(rbind(ts_win[a], ts_win[b], ts_win[b], ts_win[a], NA)), -1L),
+                head(as.vector(rbind(y_num[a], y_num[b], y_den[b], y_den[a], NA)), -1L),
+                col = scales::alpha(ifelse(pure_seg, "steelblue", "firebrick"), 0.3),
+                border = NA)
       }
       line_colors <- ifelse(num <= den,
                             scales::alpha("steelblue", 0.8),
                             scales::alpha("firebrick", 0.7))
-      for (j in seq_len(n - 1L)) {
-        if (!is.na(y_num[j]) && !is.na(y_num[j + 1L]))
-          lines(ts_win[j:(j + 1L)], y_num[j:(j + 1L)],
-                col = line_colors[j], lwd = 1)
-      }
+      segments(ts_win[-n], y_num[-n], ts_win[-1L], y_num[-1L],
+               col = line_colors[-n], lwd = 1)
       lines(ts_win, y_den, col = "gray40", lty = 3, lwd = 1.5)
       if (!drew_curves_ref) {
         legend("topright",
@@ -692,7 +741,7 @@ plot_peak_purity <- function(x, chrom_list, idx, lambda, new.ts, y,
     }
     if (do_ratio) {
       if (!drew_ratio_ref) {
-        abline(h = lim, lty = 3, col = "darkgray")
+        abline(h = origin + lim, lty = 3, col = "darkgray")
         legend("topright",
                legend = c("Pure (ratio < 1)", "Impure (ratio \u2265 1)"),
                col    = c(scales::alpha("steelblue", 0.8),
@@ -700,9 +749,9 @@ plot_peak_purity <- function(x, chrom_list, idx, lambda, new.ts, y,
                pch = 16, bty = "n", cex = 0.7)
         drew_ratio_ref <<- TRUE
       }
-      yvals  <- scale_purity_ratio(p[keep], lim = lim)
+      yvals  <- origin + scale_purity_ratio(p[keep], lim = lim)
       colors <- ifelse(p[keep] < 1, "steelblue", "firebrick")
-      segments(ts_win, 0, ts_win, yvals, col = "gray70", lwd = 0.8 * zoom_scale)
+      segments(ts_win, origin, ts_win, yvals, col = "gray70", lwd = 0.8 * zoom_scale)
       points(ts_win, yvals, pch = 16, cex = 0.6 * zoom_scale,
              col = scales::alpha(colors, 0.8))
     }

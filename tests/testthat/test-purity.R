@@ -428,6 +428,23 @@ test_that("the purity band fits inside the plot region", {
 
 ### threshold formula ##########################################################
 
+test_that("the purity band keeps the zoom when the window sits above zero", {
+  skip_on_cran()
+  data(Sa_pr)
+  raised <- lapply(Sa_pr[1], function(x) transfer_metadata(x + 500, x))
+  pks <- get_peaks(raised, lambdas = 210, baseline = "flat",
+                   show_progress = FALSE, cl = 1)
+  pdf(NULL)
+  on.exit(dev.off())
+  plot(pks, chrom_list = raised, targets = 11.36, xlim = c(11.26, 11.5))
+  zoomed <- par("usr")
+  plot(pks, chrom_list = raised, targets = 11.36, xlim = c(11.26, 11.5),
+       plot_purity = "ratio")
+  with_band <- par("usr")
+  expect_gt(with_band[3], 400)
+  expect_lt(with_band[3], zoomed[3])
+})
+
 test_that("the threshold is the product of the two reliabilities", {
   # the threshold is the similarity expected between two noisy measurements of
   # the same spectrum, which is the attenuation product. The previous
