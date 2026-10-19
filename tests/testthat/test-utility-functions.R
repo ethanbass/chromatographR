@@ -102,9 +102,22 @@ test_that("get_retention_idx works as expected", {
                regexp = "falls outside the bounds of the chromatogram")
 })
 
+test_that("get_retention_idx resolves a vector of retention times", {
+  data(Sa_pr)
+  times <- get_times(Sa_pr)
+  rts <- c(10.005, 12.34, 18.49, times[c(1, 100, length(times))])
+  expect_equal(get_retention_idx(rts, times = times),
+               vapply(rts, function(rt) which.min(abs(rt - times)), integer(1)))
+  expect_error(get_retention_idx(c(12.34, 20), times = times),
+               regexp = "falls outside the bounds of the chromatogram")
+  expect_equal(get_retention_idx(c(9, 20), times = times, clamp = TRUE),
+               c(1L, length(times)))
+})
+
 test_that("check_idx works as expected", {
   data(Sa_pr)
-  expect_error(check_idx(idx = 1000, chrom_list = Sa_pr))
+  expect_error(check_idx(idx = 1000, chrom_list = Sa_pr),
+               regexp = "exceeds the bounds of the chromatogram")
 })
 
 test_that("get_lambda_idx works as expected", {
@@ -279,6 +292,93 @@ test_that("check_duplicated_names works as expected", {
                fixed = TRUE)
 })
 
+test_that("print.peak_list works as expected", {
+  skip_on_cran()
+  data(Sa_pr)
+  pks <- get_peaks(Sa_pr, lambdas = "210", fit = "egh", smooth_type = "none",
+                   show_progress = FALSE)
+  expect_snapshot(print(pks))
+  invisible(capture.output(res <- print(pks)))
+  expect_equal(res, pks)
+})
+
+test_that("print.peak_table works as expected", {
+  data(pk_tab)
+  expect_snapshot(print(pk_tab))
+})
+
+test_that("get_peaktable rejects objects it has no method for", {
+  expect_error(get_peaktable("nonsense"),
+               regexp = "No get_peaktable method for object of class character")
+  expect_error(get_peaktable(1:3),
+               regexp = "No get_peaktable method for object of class integer")
+})
+
+test_that("get_peaktable accepts a peak list that has lost its class", {
+  data(Sa_pr)
+  pks <- get_peaks(Sa_pr, lambdas = 210, cl = 1, show_progress = FALSE)
+  bare <- lapply(pks, function(s) lapply(s, subset, height > 100))
+  expect_false(inherits(bare, "peak_list"))
+  expect_s3_class(get_peaktable(bare), "peak_table")
+})
+
+test_that("convert_time_units rescales times and records the unit", {
+  data(Sa_pr)
+  ts <- get_times(Sa_pr)
+  for (u in c("min", "s", "ms")){
+    tfac <- switch(u, "min" = 1, "s" = 60, "ms" = 60 * 1000)
+    out <- convert_time_units(Sa_pr, time_unit = u)
+    expect_equal(get_times(out), ts * tfac, info = u)
+    expect_equal(attr(out[[1]], "time_unit"), u)
+    expect_equal(out[[1]], Sa_pr[[1]], ignore_attr = TRUE, info = u)
+  }
+  expect_error(convert_time_units(Sa_pr, time_unit = "fortnight"),
+               regexp = "'arg' should be one of")
+})
+
+test_that("pad_zeros and strip_zeros round-trip", {
+  x <- matrix(seq_len(12), ncol = 3)
+  for (side in c("both", "left", "right")){
+    padded <- pad_zeros(x, n_zeros = 2, side = side)
+    n_added <- if (side == "both") 4 else 2
+    expect_equal(nrow(padded), nrow(x) + n_added, info = side)
+    expect_equal(strip_zeros(padded, n_zeros = 2, side = side), x, info = side)
+  }
+  padded_vec <- pad_zeros(1:4, n_zeros = 1, side = "left")
+  expect_equal(dim(padded_vec), c(5L, 1L))
+  expect_equal(padded_vec[1, 1], 0)
+})
+
+test_that("seq_ncol counts columns", {
+  expect_equal(seq_ncol(matrix(0, nrow = 2, ncol = 5)), 1:5)
+  expect_equal(seq_ncol(matrix(0, nrow = 2, ncol = 0)), integer(0))
+})
+
+test_that("warp_times_ptw matches ptw on timepoints and interpolates between", {
+  skip_on_cran()
+  data(Sa_pr)
+  ptw_predict <- getS3method("predict", "ptw", envir = asNamespace("ptw"))
+  expect_identical(environment(getS3method("predict", "ptw")),
+                   asNamespace("ptw"))
+  tr <- t(sapply(Sa_pr, function(x) x[, "210"]))
+  ref_times <- as.numeric(rownames(Sa_pr[[1]]))
+  colnames(tr) <- ref_times
+  pw_global <- ptw::ptw(ref = tr[3, , drop = FALSE], samp = tr[1:2, ],
+                        warp.type = "global")
+  pw_indiv  <- ptw::ptw(ref = tr[3, , drop = FALSE], samp = tr[1:2, ],
+                        warp.type = "individual")
+  on_grid <- ref_times[c(200, 400, 600)]
+  for (pw in list(global = pw_global, individual = pw_indiv)){
+    expect_equal(warp_times_ptw(pw, on_grid, ref_times),
+                 ptw_predict(pw, what = "time", newdata = on_grid,
+                             RTref = ref_times))
+    lo <- warp_times_ptw(pw, ref_times[400], ref_times)
+    hi <- warp_times_ptw(pw, ref_times[401], ref_times)
+    mid <- warp_times_ptw(pw, mean(ref_times[400:401]), ref_times)
+    expect_true(all(mid > pmin(lo, hi) & mid < pmax(lo, hi)))
+  }
+})
+
 .tr_chrom <- function(unit, ts){
   m <- matrix(sin(seq_along(ts)), ncol = 1,
               dimnames = list(as.character(ts), "220"))
@@ -367,6 +467,30 @@ test_that("get_peaks reports the underlying error from a parallel worker", {
                "wavelength \\(`280`\\) could not be found")
 })
 
+test_that("format_axis keeps the precision of a single value", {
+  expect_equal(format_axis(10.09), "10.09")
+  expect_equal(format_axis(c(10.09, 10.09)), c("10.09", "10.09"))
+  expect_no_warning(format_axis(10.09))
+})
+
+test_that("an interpolation grid needs at least two values", {
+  data(Sa)
+  expect_error(preprocess(Sa[[1]], dim1 = seq(10, 18.6, by = 0.01),
+                          dim2 = 210.5, cl = 1, show_progress = FALSE),
+               regexp = "at least two values")
+  expect_no_error(preprocess(Sa[[1]], dim1 = seq(10, 18.6, by = 0.01),
+                             dim2 = 210.5, interpolate_cols = FALSE,
+                             cl = 1, show_progress = FALSE))
+})
+
+test_that("the package defines its own %||%", {
+  ns <- asNamespace("chromatographR")
+  expect_true(exists("%||%", envir = ns, inherits = FALSE))
+  op <- get("%||%", envir = ns, inherits = FALSE)
+  expect_equal(op(NULL, 42), 42)
+  expect_equal(op(1, stop("RHS was forced")), 1)
+})
+
 test_that("get_time_resolution converts to the requested unit", {
   data(Sa_warp, envir = environment())
   sec <- Sa_warp
@@ -406,65 +530,4 @@ test_that("reshape_chroms does not copy the baseline onto the long data", {
                         cl = 1)
   d <- reshape_chroms(b, lambdas = 210, transfer_metadata = TRUE)
   expect_null(attr(d, "estimated_baseline", exact = TRUE))
-})
-
-test_that("get_peaktable rejects objects it has no method for", {
-  expect_error(get_peaktable("nonsense"),
-               regexp = "No get_peaktable method for object of class character")
-  expect_error(get_peaktable(1:3),
-               regexp = "No get_peaktable method for object of class integer")
-})
-
-test_that("get_peaktable accepts a peak list that has lost its class", {
-  data(Sa_pr)
-  pks <- get_peaks(Sa_pr, lambdas = 210, cl = 1, show_progress = FALSE)
-  bare <- lapply(pks, function(s) lapply(s, subset, height > 100))
-  expect_false(inherits(bare, "peak_list"))
-  expect_s3_class(get_peaktable(bare), "peak_table")
-})
-
-test_that("pad_zeros and strip_zeros round-trip", {
-  x <- matrix(seq_len(12), ncol = 3)
-  for (side in c("both", "left", "right")){
-    padded <- pad_zeros(x, n_zeros = 2, side = side)
-    n_added <- if (side == "both") 4 else 2
-    expect_equal(nrow(padded), nrow(x) + n_added, info = side)
-    expect_equal(strip_zeros(padded, n_zeros = 2, side = side), x, info = side)
-  }
-  # a vector is promoted to a one-column matrix
-  padded_vec <- pad_zeros(1:4, n_zeros = 1, side = "left")
-  expect_equal(dim(padded_vec), c(5L, 1L))
-  expect_equal(padded_vec[1, 1], 0)
-})
-
-test_that("warp_times_ptw matches ptw on timepoints and interpolates between", {
-  skip_on_cran()
-  data(Sa_pr)
-  ptw_predict <- getS3method("predict", "ptw", envir = asNamespace("ptw"))
-  expect_identical(environment(getS3method("predict", "ptw")),
-                   asNamespace("ptw"))
-  tr <- t(sapply(Sa_pr, function(x) x[, "210"]))
-  ref_times <- as.numeric(rownames(Sa_pr[[1]]))
-  colnames(tr) <- ref_times
-  pw_global <- ptw::ptw(ref = tr[3, , drop = FALSE], samp = tr[1:2, ],
-                        warp.type = "global")
-  pw_indiv  <- ptw::ptw(ref = tr[3, , drop = FALSE], samp = tr[1:2, ],
-                        warp.type = "individual")
-  on_grid <- ref_times[c(200, 400, 600)]
-  for (pw in list(global = pw_global, individual = pw_indiv)){
-    expect_equal(warp_times_ptw(pw, on_grid, ref_times),
-                 ptw_predict(pw, what = "time", newdata = on_grid,
-                             RTref = ref_times))
-    lo <- warp_times_ptw(pw, ref_times[400], ref_times)
-    hi <- warp_times_ptw(pw, ref_times[401], ref_times)
-    mid <- warp_times_ptw(pw, mean(ref_times[400:401]), ref_times)
-    expect_true(all(mid > pmin(lo, hi) & mid < pmax(lo, hi)))
-  }
-})
-
-test_that("format_axis keeps the precision of a single value", {
-  # `min(numeric(0))` returned Inf, which passed `digits = 0` immediately
-  expect_equal(format_axis(10.09), "10.09")
-  expect_equal(format_axis(c(10.09, 10.09)), c("10.09", "10.09"))
-  expect_no_warning(format_axis(10.09))
 })

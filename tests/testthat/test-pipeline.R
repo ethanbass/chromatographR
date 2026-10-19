@@ -347,9 +347,6 @@ pks_bemg <- get_peaks(dat.pr, lambdas = lam, fit = "bemg", smooth_type = "none",
 pks_gaussian <- get_peaks(dat.pr, lambdas = lam, fit = "gaussian",
                           smooth_type = "none", show_progress = FALSE)
 
-pks_raw <- get_peaks(dat.pr, lambdas = lam, fit = "raw", smooth_type = "savgol",
-                     show_progress = FALSE, smooth_window = 7)
-
 matched <- match_peaks(pks_egh, chrom_list = dat.pr, lambda = "210",
                        verbose = FALSE)
 
@@ -375,7 +372,11 @@ test_that("[.peak_list works", {
 })
 
 test_that("filter_peaks works", {
-  pks_s <- filter_peaks(pks_egh, min_height = 10, min_area = 10, min_sd = .07)
+  pks_s <- filter_peaks(pks_egh, min_height = 10, min_area = 10,
+                        min_fwhm = FWHM_CONST * .07)
+  expect_warning(pks_sd <- filter_peaks(pks_egh, min_height = 10, min_area = 10,
+                                        min_sd = .07), "deprecated")
+  expect_equal(pks_sd, pks_s)
   expect_equal(names(pks_egh), names(pks_s))
   expect_equal(names(pks_s), names(dat.pr))
   expect_equal(names(pks_s[[1]]), lam)
@@ -920,7 +921,8 @@ test_that("normalize_data works", {
                  regexp = "Invalid normalization values")
   expect_error(pk_tab_pnorm_w <- normalize_data(pk_tab, chrom_list = dat.pr,
                                                   column = bad, by = "peak",
-                                                on_invalid = "error"))
+                                                on_invalid = "error"),
+               regexp = "Invalid normalization values")
 
   # auto-detection of by = "peak"
   pk_tab_auto_peak <- normalize_data(pk_tab, column = good)
