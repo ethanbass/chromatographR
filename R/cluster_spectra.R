@@ -6,32 +6,34 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' 
 #' Before using this function, reference spectra must be attached to the 
 #' `peak_table` using the [`attach_ref_spectra`] function. These spectra are 
-#' then used to construct a distance matrix derived from pairwise Pearson
-#' correlations among peaks. Hierarchical clustering with bootstrap 
-#' resampling is performed on the resulting correlation matrix to classify peaks 
-#' by their spectral similarity as implemented in [`pvclust`][pvclust::pvclust].
-#' Finally, bootstrap values can be used to select clusters that exceed a 
-#' certain confidence specified by `alpha`. 
+#' then used to construct a distance matrix from pairwise Pearson correlations
+#' among peaks, and [`pvclust`][pvclust::pvclust] clusters the peaks
+#' hierarchically, with bootstrap resampling. Clusters whose bootstrap support
+#' exceeds the confidence set by `alpha` are returned. Peaks whose reference
+#' spectrum is constant are dropped before clustering.
 #' 
-#' Clusters can be filtered by the minimum and maximum size of the cluster using
-#' the `min_size` and `max_size` arguments. The clustering algorithm often
-#' returns nested clusters, so an individual peak can appear in more than one. If 
-#' `max.only` is `TRUE`, only the largest cluster in a nested tree of 
-#' clusters meeting the specified confidence threshold will be returned.
+#' Clusters can be filtered by size using the `min_size` and `max_size`
+#' arguments. The clustering algorithm often returns nested clusters, so an
+#' individual peak can appear in more than one. If `max.only` is `TRUE`, only
+#' the largest cluster in a nested tree of clusters meeting the confidence
+#' threshold is returned.
 #' 
-#' It is strongly recommended to use more than 100 bootstraps if you run the 
-#' clustering algorithm on real data even though we use `nboot = 100` in
-#' the example to reduce run time. The authors of `pvclust` suggest using at
-#' least 10,000 bootstrap replicates.
+#' The example uses `nboot = 100` to reduce run time. For real data, the
+#' `pvclust` authors recommend the default of 1000 replicates for a first look,
+#' then 10,000 for smaller errors.
 #' 
 #' @importFrom stats cor
 #' @importFrom methods new
-#' @importFrom graphics matplot
+#' @importFrom graphics matplot rect text
+#' @importFrom grDevices palette.colors
 #' @param peak_table A `peak_table` object from [`get_peaktable`].
 #' @param alpha Significance threshold used to select clusters based on 
-#' bootstrap AU p-values.
-#' @param min_size Minimum number of peaks a cluster may have.
-#' @param max_size Maximum number of peaks a cluster may have.
+#' approximately unbiased (AU) bootstrap p-values from
+#' [`pvclust`][pvclust::pvclust].
+#' @param min_size Clusters must contain more than `min_size` peaks. Defaults
+#' to `5`.
+#' @param max_size Clusters must contain fewer than `max_size` peaks. Defaults
+#' to the number of peaks in `peak_table`.
 #' @param nboot Number of bootstrap replicates for [`pvclust`][pvclust::pvclust].
 #' @param plot_dend Logical. If `TRUE`, plots dendrogram with bootstrap values.
 #' @param plot_spectra Logical. If `TRUE`, plots overlapping spectra for each
@@ -46,22 +48,23 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' [`pvclust`][pvclust::pvclust].
 #' @param max.only Logical. If `TRUE`, returns only highest level cluster from
 #' each nested set of clusters. Named to match the argument of the same name in 
-#' [`pvrect`][pvclust::pvrect] and [`pvpick`][pvclust::pvpick], which receive it.
-#' @param output What to return. Either `"clusters"` to return list of clusters,
-#' `"pvclust"` to return pvclust object, or `"both"` to return both items.
+#' [`pvrect`][pvclust::pvrect] and [`pvpick`][pvclust::pvpick]; passed to `pvpick`.
+#' @param output What to return: `"pvclust"` for the `pvclust` object,
+#' `"clusters"` for the list of clusters, or both (the default).
+#' @param col Colors for each cluster's box and number on the dendrogram and
+#' the title of its spectra panel, recycled if there are more clusters than
+#' colors. Defaults to the Okabe-Ito palette, without black, yellow and grey.
 #' @param ... Additional arguments to [`pvclust`][pvclust::pvclust].
-#' @return Returns clusters and/or `pvclust` object according to the value
-#' of the `output` argument.
-#' * If `output = clusters`, returns a list of S4 `cluster` objects.
-#' * If `output = pvclust`, returns a `pvclust` object.
-#' * If `output = both`, returns a nested list containing `[[1]]` the `pvclust`
-#' object, and `[[2]]` the list of S4 `cluster` objects.
+#' @return Returns a named list with an element for each value of `output`:
+#' `pvclust`, the `pvclust` object, and `clusters`, a list of S4 `cluster`
+#' objects.
 #'
 #' The `cluster` objects consist of the following components:
 #' * `peaks`: a character vector containing the names of all peaks contained in
 #' the given cluster.
-#' * `pval`: a numeric scalar containing the AU bootstrap p-value for the given 
-#' cluster.
+#' * `pval`: a numeric scalar containing one minus the approximately unbiased
+#' (AU) value that [`pvclust`][pvclust::pvclust] reports for the given cluster,
+#' so that small values indicate strong support.
 #' @author Ethan Bass
 #' @references R. Suzuki & H. Shimodaira. 2006. Pvclust: an R package for assessing
 #' the uncertainty in hierarchical clustering. *Bioinformatics*,
@@ -71,8 +74,7 @@ setClass("cluster", representation(peaks = "character", pval = "numeric"))
 #' data(pk_tab)
 #' data(Sa_warp)
 #' pk_tab <- attach_ref_spectra(pk_tab, Sa_warp, ref = "max.int")
-#' cl <- cluster_spectra(pk_tab, nboot = 100, max.only = FALSE, 
-#' save = FALSE, alpha = 0.03)
+#' cl <- cluster_spectra(pk_tab, nboot = 100, max.only = FALSE, alpha = 0.03)
 #' }
 #' }
 #' @export cluster_spectra
@@ -83,7 +85,9 @@ cluster_spectra <- function(peak_table, alpha = 0.05,
                             nboot = 1000, plot_dend = TRUE, plot_spectra = TRUE, 
                             verbose = getOption("verbose"), outfile = NULL,
                             save = NULL, parallel = TRUE, max.only = FALSE,
-                            output = c("pvclust", "clusters"), ...){
+                            output = c("pvclust", "clusters"),
+                            col = palette.colors(palette = "Okabe-Ito")[-c(1, 5, 9)],
+                            ...){
   check_for_pkg("pvclust")
   check_peaktable(peak_table)
   if (!is.null(save)){
@@ -126,11 +130,6 @@ cluster_spectra <- function(peak_table, alpha = 0.05,
                                               nboot = nboot, parallel = parallel,
                                               quiet = !verbose, ...)
   )
-  if (plot_dend){
-    plot(result, labels = FALSE, cex.pv = 0.5, 
-         print.pv = 'au', print.num = FALSE)
-    pvclust::pvrect(result, alpha = (1 - alpha), max.only = max.only)
-  }
   if (!is.null(outfile)){
     tryCatch(saveRDS(result, outfile),
              error = function(e){
@@ -148,6 +147,22 @@ cluster_spectra <- function(peak_table, alpha = 0.05,
   }
   clusters <- picks$clusters[cl_idx]
   pval <- 1 - result$edges[picks$edges[cl_idx], 'au']
+  pal <- rep_len(col, length(cl_idx))
+  if (plot_dend){
+    plot(result, labels = FALSE, cex.pv = 0.5, 
+         print.pv = 'au', print.num = FALSE)
+    usr <- par("usr")
+    mx <- (usr[2] - usr[1]) / length(result$hclust$order) / 3
+    my <- (usr[4] - usr[3]) / 200
+    for (i in seq_along(clusters)){
+      pos <- match(match(clusters[[i]], result$hclust$labels),
+                   result$hclust$order)
+      yt <- result$hclust$height[picks$edges[cl_idx[i]]] + my
+      rect(min(pos) - mx, usr[3] + my, max(pos) + mx, yt, border = pal[i])
+      text(mean(range(pos)), yt, labels = i, col = pal[i], pos = 3,
+           font = 2, xpd = TRUE)
+    }
+  }
   clusters <- lapply(seq_along(clusters), function(i){
     new("cluster", peaks = clusters[[i]], pval = pval[i])
   })
@@ -160,6 +175,7 @@ cluster_spectra <- function(peak_table, alpha = 0.05,
       sapply(seq_along(clusters), function(i){ 
         matplot(lambdas, spectra[, clusters[[i]]@peaks],
                 type = 'l', ylab = '', yaxt = 'n', xlab = expression(lambda),
+                col.main = pal[i],
                 main = paste0('cluster ', i, '; p = ',
                               format.pval(clusters[[i]]@pval, .015, eps = .001, 
                                           digits = 2, nsmall = 2))

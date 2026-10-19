@@ -18,6 +18,7 @@ cluster_spectra(
   parallel = TRUE,
   max.only = FALSE,
   output = c("pvclust", "clusters"),
+  col = palette.colors(palette = "Okabe-Ito")[-c(1, 5, 9)],
   ...
 )
 }
@@ -25,11 +26,14 @@ cluster_spectra(
 \item{peak_table}{A \code{peak_table} object from \code{\link{get_peaktable}}.}
 
 \item{alpha}{Significance threshold used to select clusters based on
-bootstrap AU p-values.}
+approximately unbiased (AU) bootstrap p-values from
+\code{\link[pvclust:pvclust]{pvclust}}.}
 
-\item{min_size}{Minimum number of peaks a cluster may have.}
+\item{min_size}{Clusters must contain more than \code{min_size} peaks. Defaults
+to \code{5}.}
 
-\item{max_size}{Maximum number of peaks a cluster may have.}
+\item{max_size}{Clusters must contain fewer than \code{max_size} peaks. Defaults
+to the number of peaks in \code{peak_table}.}
 
 \item{nboot}{Number of bootstrap replicates for \code{\link[pvclust:pvclust]{pvclust}}.}
 
@@ -52,29 +56,29 @@ instead.}
 
 \item{max.only}{Logical. If \code{TRUE}, returns only highest level cluster from
 each nested set of clusters. Named to match the argument of the same name in
-\code{\link[pvclust:pvrect]{pvrect}} and \code{\link[pvclust:pvpick]{pvpick}}, which receive it.}
+\code{\link[pvclust:pvrect]{pvrect}} and \code{\link[pvclust:pvpick]{pvpick}}; passed to \code{pvpick}.}
 
-\item{output}{What to return. Either \code{"clusters"} to return list of clusters,
-\code{"pvclust"} to return pvclust object, or \code{"both"} to return both items.}
+\item{output}{What to return: \code{"pvclust"} for the \code{pvclust} object,
+\code{"clusters"} for the list of clusters, or both (the default).}
+
+\item{col}{Colors for each cluster's box and number on the dendrogram and
+the title of its spectra panel, recycled if there are more clusters than
+colors. Defaults to the Okabe-Ito palette, without black, yellow and grey.}
 
 \item{...}{Additional arguments to \code{\link[pvclust:pvclust]{pvclust}}.}
 }
 \value{
-Returns clusters and/or \code{pvclust} object according to the value
-of the \code{output} argument.
-\itemize{
-\item If \code{output = clusters}, returns a list of S4 \code{cluster} objects.
-\item If \code{output = pvclust}, returns a \code{pvclust} object.
-\item If \code{output = both}, returns a nested list containing \verb{[[1]]} the \code{pvclust}
-object, and \verb{[[2]]} the list of S4 \code{cluster} objects.
-}
+Returns a named list with an element for each value of \code{output}:
+\code{pvclust}, the \code{pvclust} object, and \code{clusters}, a list of S4 \code{cluster}
+objects.
 
 The \code{cluster} objects consist of the following components:
 \itemize{
 \item \code{peaks}: a character vector containing the names of all peaks contained in
 the given cluster.
-\item \code{pval}: a numeric scalar containing the AU bootstrap p-value for the given
-cluster.
+\item \code{pval}: a numeric scalar containing one minus the approximately unbiased
+(AU) value that \code{\link[pvclust:pvclust]{pvclust}} reports for the given cluster,
+so that small values indicate strong support.
 }
 }
 \description{
@@ -83,23 +87,21 @@ Cluster peaks by spectral similarity.
 \details{
 Before using this function, reference spectra must be attached to the
 \code{peak_table} using the \code{\link{attach_ref_spectra}} function. These spectra are
-then used to construct a distance matrix derived from pairwise Pearson
-correlations among peaks. Hierarchical clustering with bootstrap
-resampling is performed on the resulting correlation matrix to classify peaks
-by their spectral similarity as implemented in \code{\link[pvclust:pvclust]{pvclust}}.
-Finally, bootstrap values can be used to select clusters that exceed a
-certain confidence specified by \code{alpha}.
+then used to construct a distance matrix from pairwise Pearson correlations
+among peaks, and \code{\link[pvclust:pvclust]{pvclust}} clusters the peaks
+hierarchically, with bootstrap resampling. Clusters whose bootstrap support
+exceeds the confidence set by \code{alpha} are returned. Peaks whose reference
+spectrum is constant are dropped before clustering.
 
-Clusters can be filtered by the minimum and maximum size of the cluster using
-the \code{min_size} and \code{max_size} arguments. The clustering algorithm often
-returns nested clusters, so an individual peak can appear in more than one. If
-\code{max.only} is \code{TRUE}, only the largest cluster in a nested tree of
-clusters meeting the specified confidence threshold will be returned.
+Clusters can be filtered by size using the \code{min_size} and \code{max_size}
+arguments. The clustering algorithm often returns nested clusters, so an
+individual peak can appear in more than one. If \code{max.only} is \code{TRUE}, only
+the largest cluster in a nested tree of clusters meeting the confidence
+threshold is returned.
 
-It is strongly recommended to use more than 100 bootstraps if you run the
-clustering algorithm on real data even though we use \code{nboot = 100} in
-the example to reduce run time. The authors of \code{pvclust} suggest using at
-least 10,000 bootstrap replicates.
+The example uses \code{nboot = 100} to reduce run time. For real data, the
+\code{pvclust} authors recommend the default of 1000 replicates for a first look,
+then 10,000 for smaller errors.
 }
 \examples{
 \donttest{
@@ -107,8 +109,7 @@ if (requireNamespace("pvclust", quietly = TRUE)) {
 data(pk_tab)
 data(Sa_warp)
 pk_tab <- attach_ref_spectra(pk_tab, Sa_warp, ref = "max.int")
-cl <- cluster_spectra(pk_tab, nboot = 100, max.only = FALSE, 
-save = FALSE, alpha = 0.03)
+cl <- cluster_spectra(pk_tab, nboot = 100, max.only = FALSE, alpha = 0.03)
 }
 }
 }

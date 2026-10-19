@@ -254,6 +254,9 @@ without requiring a peak table. See `?annotate_peaks`.
 * `get_peaktable` now fills `sample_meta` with any fields added to the
 chromatograms with `chromConverter::add_metadata` (chromConverter 0.11.0 or
 later).
+* `cluster_spectra` now numbers and colors each box on the dendrogram to match
+its spectra panel, with colors set by `col`, and boxes only clusters passing
+`min_size` and `max_size`.
 
 ### Bug fixes and other minor changes
 

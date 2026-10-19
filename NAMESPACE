@@ -74,7 +74,8 @@ importFrom(fastcluster,hclust)
 importFrom(grDevices,
   colorRampPalette,
   grey,
-  hcl.colors
+  hcl.colors,
+  palette.colors
 )
 importFrom(graphics,
   abline,

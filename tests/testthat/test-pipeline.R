@@ -943,6 +943,17 @@ test_that("cluster_spectra works", {
   expect_equal(class(cl[[2]]), "list")
 })
 
+test_that("cluster_spectra draws the dendrogram and spectra panels", {
+  skip_on_cran()
+  skip_if_not_installed("pvclust")
+  pdf(NULL)
+  on.exit(dev.off(), add = TRUE)
+  cl <- suppressWarnings(
+    cluster_spectra(pk_tab, nboot = 10, parallel = FALSE, verbose = FALSE,
+                    min_size = 1, col = "red"))
+  expect_gt(length(cl$clusters), 1)
+})
+
 ### test plotting functions
 
 test_that("plot.peak_list works", {
