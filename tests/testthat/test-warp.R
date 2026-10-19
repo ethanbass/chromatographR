@@ -653,7 +653,9 @@ test_that("correct_peaks places peaks where lptw and vpdtw warping puts them", {
       min(abs(pks_warped[[2]][["210"]]$rt - rt))
     }, numeric(1))
     expect_lte(stats::median(offset), dt)
+    expect_equal(correct_peaks(pks, mods), cor_pks)
   }
+  attr(mods, "chrom_list") <- NULL
   expect_error(correct_peaks(pks, mods), "supply `chrom_list`")
 })
 

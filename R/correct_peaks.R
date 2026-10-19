@@ -26,8 +26,7 @@
 #' Corrected times are on the time axis of the chromatograms `correct_rt`
 #' returns, which for `"vpdtw"` extends beyond the reference at either end.
 #' @param chrom_list List of chromatograms from which the models are derived.
-#' If omitted, it is retrieved using the name stored in `mod_list`, which only
-#' `ptw_list` objects record.
+#' If omitted, it is retrieved using the name stored in `mod_list`.
 #' @param match_names Logical. If `TRUE` (default), models are matched to the
 #' samples of `peak_list` by name when both are named; otherwise by position.
 #' @param chrom_list_aligned Optional aligned chromatograms, as returned by
@@ -49,8 +48,9 @@
 correct_peaks <- function(peak_list, mod_list, chrom_list, match_names = TRUE,
                           chrom_list_aligned = NULL){
   if (missing(chrom_list)){
-    if (!inherits(mod_list, "ptw_list"))
-      stop("Please supply `chrom_list` to correct peaks with `lptw` or `vpdtw` models.")
+    if (is.null(attr(mod_list, "chrom_list")))
+      stop("Please supply `chrom_list`: `mod_list` does not record the chromatograms ",
+           "it was fitted to.", call. = FALSE)
     chrom_list <- get_chrom_list(mod_list)
   }
   if (any(vapply(peak_list, is.data.frame, logical(1))))
@@ -119,6 +119,7 @@ strip_models <- function(mod_list){
            samples = colnames(mod_list$query),
            n_timepoints = nrow(mod_list$query)),
       class = "VPdtw", reference = attr(mod_list, "reference"),
+      chrom_list = attr(mod_list, "chrom_list"),
       parameters = attr(mod_list, "parameters")))
   stripped <- lapply(mod_list, function(m) m[intersect(names(m), c("warp.coef", "mode"))])
   transfer_metadata(stripped, mod_list)

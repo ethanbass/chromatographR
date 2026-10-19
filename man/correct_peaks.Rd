@@ -26,8 +26,7 @@ Corrected times are on the time axis of the chromatograms \code{correct_rt}
 returns, which for \code{"vpdtw"} extends beyond the reference at either end.}
 
 \item{chrom_list}{List of chromatograms from which the models are derived.
-If omitted, it is retrieved using the name stored in \code{mod_list}, which only
-\code{ptw_list} objects record.}
+If omitted, it is retrieved using the name stored in \code{mod_list}.}
 
 \item{match_names}{Logical. If \code{TRUE} (default), models are matched to the
 samples of \code{peak_list} by name when both are named; otherwise by position.}

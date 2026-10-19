@@ -192,7 +192,7 @@ now warns.
 * `correct_rt_group` can now return its warping models, one per sample, with
 `what = "models"`, for use with `correct_peaks`.
 * `correct_peaks` now accepts `"lptw"` and `"vpdtw"` models from `correct_rt`,
-not only `"ptw"`. For these, `chrom_list` must be supplied.
+not only `"ptw"`.
 * Added a `chrom_list_aligned` argument to `correct_peaks`, naming aligned
 chromatograms for later spectrum and trace lookups.
 

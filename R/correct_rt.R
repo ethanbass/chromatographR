@@ -331,7 +331,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
           list(warp.coef = matrix(coef, nrow = 1), mode = "forward")
         })
         names(models) <- names(chrom_list)
-        models <- structure(models, class = "lptw_list",
+        models <- structure(models, class = "lptw_list", chrom_list = chrom_list_name,
                             reference = reference_label(reference, names(chrom_list)))
       }
       for (i in seq_along(models)){
@@ -388,6 +388,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
       models <- VPdtw::VPdtw(query = allmats, reference = allmats[, reference],
                              penalty = penalty, maxshift = maxshift_pts)
       attr(models, "reference") <- reference_label(reference, names(chrom_list_og))
+      attr(models, "chrom_list") <- chrom_list_name
       attr(models, "parameters") <- list(reference = attr(models, "reference"),
                                          max_shift = max_shift)
     }

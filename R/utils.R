@@ -22,7 +22,7 @@ get_chrom_list <- function(x, chrom_list = NULL, verbose = FALSE,
   if (is.null(chrom_list)){
     if (inherits(x, "peak_table")){
       string <- x$args[["chrom_list"]]
-    } else if (inherits(x, "peak_list") | inherits(x, "ptw_list")){
+    } else if (inherits(x, c("peak_list", "ptw_list", "lptw_list", "VPdtw"))){
       string <- attr(x, "chrom_list")
     }
     chrom_list <- if (aligned) get_aligned_chrom_list(x, string)
