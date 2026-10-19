@@ -48,10 +48,10 @@ test_that("find_noise selects rows below the threshold times the global maximum"
   dimnames(d) <- list(1:5, c("200", "210"))
   # row maxima are 1, 50, 100, 50, 1; global maximum is 100. `which()` keeps the
   # rownames, so compare unnamed.
-  expect_equal(unname(fnoise(d, noise_threshold = 0.02, lambdas = 1:2)), c(1L, 5L))
-  expect_equal(unname(fnoise(d, noise_threshold = 0.60, lambdas = 1:2)),
+  expect_equal(unname(fnoise(d, noise_threshold = 0.02)), c(1L, 5L))
+  expect_equal(unname(fnoise(d, noise_threshold = 0.60)),
                c(1L, 2L, 4L, 5L))
-  expect_length(fnoise(d, noise_threshold = 0.005, lambdas = 1:2), 0)
+  expect_length(fnoise(d, noise_threshold = 0.005), 0)
 })
 
 test_that("get_noise_variance averages the variance of the noise rows", {
@@ -61,7 +61,7 @@ test_that("get_noise_variance averages the variance of the noise rows", {
   dimnames(d) <- list(1:5, c("200", "210"))
   # the selected rows are constant, so their variance is exactly zero
   expect_equal(gnv(d, noise_method = "threshold", noise_threshold = 0.02, lambdas = 1:2), 0)
-  d[1, ] <- c(0, 3)                      # row maximum 3, variance 4.5
+  d[1, ] <- c(1, 4)                      # row maximum 4, variance 4.5
   expect_equal(gnv(d, noise_method = "threshold", noise_threshold = 0.05, lambdas = 1:2), (4.5 + 0) / 2)
 })
 
@@ -72,7 +72,7 @@ test_that("get_noise_variance handles a single noise row", {
   d <- rbind(c(1, 1), c(50, 50), c(100, 100), c(50, 50), c(9, 9))
   dimnames(d) <- list(1:5, c("200", "210"))
   # only row 1 falls below 2% of the maximum
-  expect_equal(unname(fnoise(d, noise_threshold = 0.02, lambdas = 1:2)), 1L)
+  expect_equal(unname(fnoise(d, noise_threshold = 0.02)), 1L)
   expect_equal(gnv(d, noise_method = "threshold", noise_threshold = 0.02, lambdas = 1:2), 0)
   expect_silent(gnv(d, noise_method = "threshold", noise_threshold = 0.02, lambdas = 1:2))
 })
@@ -82,13 +82,13 @@ test_that("get_noise_variance handles a single noise row", {
 test_that("the Agilent threshold spans [0, 1] and falls as noise rises", {
   d <- pure_peak()
   # with no noise the threshold demands perfect similarity, up to the ceiling
-  expect_true(all(gat(d, peak_pos, noise_variance = 0, background = "none",
+  expect_true(all(gat(d, peak_pos, noise_variance = 0, background_correction = "none",
                       max_threshold = 1) == 1))
-  expect_true(all(gat(d, peak_pos, noise_variance = 0, background = "none") == 0.99))
+  expect_true(all(gat(d, peak_pos, noise_variance = 0, background_correction = "none") == 0.99))
   # the formula is squared after a max(0, .), so it cannot go negative
-  expect_true(all(gat(d, peak_pos, noise_variance = 1e12, background = "none") == 0))
-  expect_true(all(gat(d, peak_pos, noise_variance = 1, background = "none") >=
-                  gat(d, peak_pos, noise_variance = 10, background = "none")))
+  expect_true(all(gat(d, peak_pos, noise_variance = 1e12, background_correction = "none") == 0))
+  expect_true(all(gat(d, peak_pos, noise_variance = 1, background_correction = "none") >=
+                  gat(d, peak_pos, noise_variance = 10, background_correction = "none")))
 })
 
 ### get_purity_values ##########################################################
@@ -99,16 +99,16 @@ test_that("purity values are finite when the threshold reaches 1", {
   # regardless, and previously produced NaN, which `get_purity` dropped and so
   # counted as impure.
   pv <- gpv(pure_peak(), peak_pos, noise_variance = 0,
-            background = "none", max_threshold = 1)
+            background_correction = "none", max_threshold = 1)
   expect_false(any(is.nan(pv)))
   expect_true(all(pv == 0))
 })
 
 test_that("infinite purity ratios count as impure", {
   expect_equal(get_purity(mixed_peak(), peak_pos, noise_variance = 0,
-                          background = "none", max_threshold = 1), 0)
+                          background_correction = "none", max_threshold = 1), 0)
   expect_equal(get_purity(mixed_peak(), peak_pos, noise_variance = 0,
-                          background = "none", max_threshold = 1,
+                          background_correction = "none", max_threshold = 1,
                           metric = "max"), Inf)
 })
 
@@ -168,7 +168,7 @@ test_that("find_noise_quantile always returns timepoints", {
   # chromatogram, which can select nothing at all. The variance of an empty set
   # is NaN, which is not an error, so purity became NaN silently.
   d <- noisy_chrom()
-  expect_length(find_noise(d, noise_threshold = 0.005, lambdas = seq_len(ncol(d))), 0)
+  expect_length(find_noise(d, noise_threshold = 0.005), 0)
   expect_gt(length(find_noise_quantile(d)), 0)
   expect_true(is.na(get_noise_variance(d, noise_method = "threshold",
                                        noise_threshold = 0.005)))
@@ -279,11 +279,11 @@ sloped_peak <- function(base = 0, quad = 0, frac = 0, seed = 1){
 
 test_that("background correction keeps a pure peak on a curved baseline pure", {
   pos <- c(100, 75, 125)
-  expect_lt(get_purity(sloped_peak(quad = 40), pos, background = "none"), 0.75)
+  expect_lt(get_purity(sloped_peak(quad = 40), pos, background_correction = "none"), 0.75)
   expect_equal(get_purity(sloped_peak(quad = 40), pos), 1)
-  expect_gt(get_purity(sloped_peak(quad = 40), pos, background = "constant"),
-            get_purity(sloped_peak(quad = 40), pos, background = "none"))
-  expect_lt(get_purity(sloped_peak(quad = 40), pos, background = "constant"),
+  expect_gt(get_purity(sloped_peak(quad = 40), pos, background_correction = "constant"),
+            get_purity(sloped_peak(quad = 40), pos, background_correction = "none"))
+  expect_lt(get_purity(sloped_peak(quad = 40), pos, background_correction = "constant"),
             get_purity(sloped_peak(quad = 40), pos))
 })
 
@@ -293,17 +293,17 @@ test_that("background correction does not condemn a narrow peak", {
   # correlation of exactly -1 across the wings unless those timepoints are
   # excluded by the cutoff.
   expect_equal(get_purity(pure_peak(), peak_pos), 1)
-  expect_equal(get_purity(mixed_peak(), peak_pos, background = "constant") < 1, TRUE)
+  expect_equal(get_purity(mixed_peak(), peak_pos, background_correction = "constant") < 1, TRUE)
 })
 
 test_that("background correction is applied when a boundary sits on a neighbor", {
   d <- pure_peak()
   d[12, ] <- d[20, ] * 0.8
   for (bg in c("linear", "constant")){
-    w <- prep_purity_window(d, peak_pos, background = bg)
-    expect_equal(w$background, bg)
+    w <- prep_purity_window(d, peak_pos, background_correction = bg)
+    expect_equal(w$background_correction, bg)
   }
-  expect_equal(unname(prep_purity_window(d, peak_pos, background = "linear")$m[1, ]),
+  expect_equal(unname(prep_purity_window(d, peak_pos, background_correction = "linear")$m[1, ]),
                rep(0, ncol(d)))
 })
 
@@ -319,6 +319,21 @@ test_that("an impure timepoint only counts as part of a run", {
   p <- structure(c(0.2, 5, 5, 0.3, 0.2, 0.1, 0.2, 0.3, 0.1), keep = 1:9)
   expect_equal(summarize_purity(p), 1)
   expect_equal(summarize_purity(p, min_run = 2), 7 / 9)
+})
+
+test_that("min_run is validated", {
+  for (bad in list(NA, c(2, 3), 0, 2.5, "3"))
+    expect_error(get_purity(pure_peak(), peak_pos, min_run = bad),
+                 regexp = "`min_run` must be a single whole number")
+})
+
+test_that("a misspelled option stops get_purity rather than returning NA", {
+  expect_error(get_purity(pure_peak(), peak_pos, background_correction = "bogus"),
+               regexp = "should be one of")
+  expect_error(get_purity(pure_peak(), peak_pos, reference = "bogus"),
+               regexp = "should be one of")
+  expect_error(get_purity(pure_peak(), peak_pos, noise_method = "bogus"),
+               regexp = "should be one of")
 })
 
 test_that("metric = 'max' reports the largest ratio", {
@@ -388,11 +403,11 @@ test_that("a noise_variance in purity_args is used rather than estimated", {
   expect_false(all(purity(1e-6) == 1))
 })
 
-test_that("an unexpected failure warns rather than aborting a peak-fitting run", {
+test_that("an unexpected failure gives NA rather than aborting a peak-fitting run", {
   # purity is a secondary annotation, so a failure should not take down the
-  # integration, but it should not be silent either
+  # integration
   d <- pure_peak()
-  expect_warning(p <- get_purity(d, peak_pos, lambdas = 1:500), "Could not estimate purity")
+  expect_no_warning(p <- get_purity(d, peak_pos, lambdas = 1:500))
   expect_identical(p, NA_real_)
 })
 
@@ -420,10 +435,10 @@ test_that("the threshold is the product of the two reliabilities", {
   # at which point every peak passed unconditionally.
   d <- pure_peak()
   nv <- 0.5
-  w <- prep_purity_window(d, peak_pos, background = "none")
+  w <- prep_purity_window(d, peak_pos, background_correction = "none")
   a <- nv / row_var(w$m)
   b <- nv / var(w$reference)
-  expect_equal(unname(gat(d, peak_pos, noise_variance = nv, background = "none",
+  expect_equal(unname(gat(d, peak_pos, noise_variance = nv, background_correction = "none",
                           max_threshold = 1)),
                unname(pmax(0, 1 - a) * pmax(0, 1 - b)))
 })
@@ -447,10 +462,10 @@ test_that("max_threshold bounds the tolerated dissimilarity", {
   # peaks, so the denominator approaches 0 and purity tracks peak height
   # rather than spectral dissimilarity
   d <- pure_peak() * 1000
-  expect_lt(max(gat(d, peak_pos, background = "none")), 1)
-  expect_equal(max(gat(d, peak_pos, background = "none")), 0.99)
-  expect_gt(max(gat(d, peak_pos, background = "none", max_threshold = 1)), 0.999)
-  expect_true(all(gat(d, peak_pos, background = "none", max_threshold = 0.5) <= 0.5))
+  expect_lt(max(gat(d, peak_pos, background_correction = "none")), 1)
+  expect_equal(max(gat(d, peak_pos, background_correction = "none")), 0.99)
+  expect_gt(max(gat(d, peak_pos, background_correction = "none", max_threshold = 1)), 0.999)
+  expect_true(all(gat(d, peak_pos, background_correction = "none", max_threshold = 0.5) <= 0.5))
 })
 
 test_that("purity is less dependent on peak height than it was", {
@@ -554,7 +569,7 @@ test_that("the average reference flags fewer pure peaks", {
     mean(replicate(150, {
       m <- outer(100 * el, sp) + matrix(rnorm(npt * nl), npt, nl)
       dimnames(m) <- list(seq_len(npt), lams)
-      get_purity(m, c(11, 1, npt), background = "none",
+      get_purity(m, c(11, 1, npt), background_correction = "none",
                  noise_variance = 1, reference = ref) < 1
     }))
   }
@@ -595,8 +610,8 @@ test_that("co-eluting impurity lowers purity vs pure peak", {
 
 test_that("linear background correction restores purity on sloped baseline", {
   s <- purity_sims()
-  purity_none   <- get_purity(s$bg$mat, s$bg$pos, background = "none")
-  purity_linear <- get_purity(s$bg$mat, s$bg$pos, background = "linear")
+  purity_none   <- get_purity(s$bg$mat, s$bg$pos, background_correction = "none")
+  purity_linear <- get_purity(s$bg$mat, s$bg$pos, background_correction = "linear")
   expect_gt(purity_linear, purity_none)
 })
 

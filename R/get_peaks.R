@@ -93,9 +93,9 @@
 #' `FALSE`. When `TRUE`, calls [`get_purity`] for every peak in every sample,
 #' at a cost that grows with the number of wavelengths.
 #' @param purity_args A named list of additional arguments passed to
-#' [`get_purity`], e.g. `list(background = "none", metric = "max")`. A
-#' `lambdas` element here selects the wavelengths used to compare spectra, not
-#' the wavelengths at which peaks are integrated.
+#' [`get_purity`], e.g. `list(background_correction = "none", metric = "max")`.
+#' A `lambdas` element here selects the wavelengths used to compare spectra,
+#' not the wavelengths at which peaks are integrated.
 #' @param show_progress Logical. Whether to show progress bar. Defaults to 
 #' `TRUE` if [`pbapply`][pbapply::pbapply] is installed.
 #' @param cl Number of cores (integer) or a cluster object from

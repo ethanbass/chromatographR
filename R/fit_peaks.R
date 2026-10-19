@@ -291,7 +291,7 @@ MIN_WINDOW_PER_FWHM <- 1 / 3
 #' @param estimate_purity Logical. Whether to estimate purity. Defaults
 #' to `FALSE`, and is always `FALSE` when `x` holds a single wavelength.
 #' @param purity_args A named list of additional arguments passed to
-#' [`get_purity`], e.g. `list(background = "none", metric = "max")`.
+#' [`get_purity`], e.g. `list(background_correction = "none", metric = "max")`.
 #' @param noise_variance Variance of noise, passed to [`get_purity`]. If not
 #' provided, it is estimated once for the whole chromatogram rather than once
 #' per peak.

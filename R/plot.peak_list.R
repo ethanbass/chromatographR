@@ -52,7 +52,8 @@
 #' but rescales each peak to its own maximum. `TRUE` maps to `"curves"` and
 #' `FALSE` to `"none"`.
 #' @param purity_args A named list of additional arguments controlling the
-#' purity calculation, e.g. `list(background = "none")`. See [`get_purity`].
+#' purity calculation, e.g. `list(background_correction = "none")`. See
+#' [`get_purity`].
 #' Arguments that do not apply to the per-peak purity trace drawn here
 #' (`metric`, `min_run` and `try`) are ignored, so the same list can be passed
 #' to [`get_peaks`] and to this function.

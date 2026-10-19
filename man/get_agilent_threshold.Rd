@@ -14,7 +14,7 @@ get_agilent_threshold(
   noise_window = NULL,
   noise_threshold = NULL,
   max_threshold = 0.99,
-  background = c("linear", "constant", "none"),
+  background_correction = c("linear", "constant", "none"),
   reference = c("average", "apex"),
   cutoff = 0.05,
   lambdas,
@@ -46,7 +46,7 @@ region.}
 
 \item{max_threshold}{Ceiling on the threshold. Defaults to \code{0.99}.}
 
-\item{background}{How to correct the peak spectra for background
+\item{background_correction}{How to correct the peak spectra for background
 absorbance. Either \code{"linear"}, \code{"constant"}, or \code{"none"}.}
 
 \item{reference}{Which spectrum to compare against. Either \code{"average"} (the

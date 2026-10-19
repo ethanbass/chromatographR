@@ -90,7 +90,8 @@ but rescales each peak to its own maximum. \code{TRUE} maps to \code{"curves"} a
 \code{FALSE} to \code{"none"}.}
 
 \item{purity_args}{A named list of additional arguments controlling the
-purity calculation, e.g. \code{list(background = "none")}. See \code{\link{get_purity}}.
+purity calculation, e.g. \code{list(background_correction = "none")}. See
+\code{\link{get_purity}}.
 Arguments that do not apply to the per-peak purity trace drawn here
 (\code{metric}, \code{min_run} and \code{try}) are ignored, so the same list can be passed
 to \code{\link{get_peaks}} and to this function.}

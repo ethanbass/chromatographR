@@ -15,7 +15,7 @@ get_purity(
   noise_window = NULL,
   noise_threshold = NULL,
   max_threshold = 0.99,
-  background = c("linear", "constant", "none"),
+  background_correction = c("linear", "constant", "none"),
   reference = c("average", "apex"),
   metric = c("fraction", "max"),
   min_run = 3,
@@ -67,7 +67,7 @@ makes such peaks impure. Corresponds to the user-defined similarity
 threshold in the Agilent ChemStation, where \code{0.99} is a similarity of 990.
 Defaults to \code{0.99}. Set to \code{1} to disable.}
 
-\item{background}{How to correct the peak spectra for background
+\item{background_correction}{How to correct the peak spectra for background
 absorbance. Either \code{"linear"} (the default), \code{"constant"}, or \code{"none"}.}
 
 \item{reference}{Which spectrum to compare the peak spectra against.
@@ -120,12 +120,12 @@ failures are ignored. Stahl requires a run of three.
 
 Spectra are background-corrected before comparison by subtracting the
 spectra at the peak boundaries, interpolated across the peak
-(\code{background = "linear"}) or averaged (\code{background = "constant"}). Anything
-that changes linearly across the peak is removed with the background,
-including a co-eluting impurity much broader than the peak. If
-\code{\link{preprocess}} has removed the baseline completely, \code{background = "none"}
-avoids this, but any remaining baseline then enters the comparison as part of
-each spectrum.
+(\code{background_correction = "linear"}) or averaged
+(\code{background_correction = "constant"}). Anything that changes linearly
+across the peak is removed with the background, including a co-eluting
+impurity much broader than the peak. If \code{\link{preprocess}} has removed the
+baseline completely, \code{background_correction = "none"} avoids this, but any
+remaining baseline then enters the comparison as part of each spectrum.
 
 With the default \code{metric = "fraction"}, pure peaks do not always score
 exactly one, so treat purity below about 0.9, rather than any value below

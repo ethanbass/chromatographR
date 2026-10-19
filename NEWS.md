@@ -85,7 +85,7 @@ For now, the old names still work with a deprecation warning.
 * Overhauled `get_purity`, correcting the purity ratio, so purity values change
 for every peak. `cutoff` now applies to the background-corrected trace, as a
 proportion of peak height rather than of total absorbance. See `?get_purity`.
-* Added arguments to `get_purity`: `background`, `reference`, `metric`,
+* Added arguments to `get_purity`: `background_correction`, `reference`, `metric`,
 `min_run` and `max_threshold` control the purity calculation, and
 `noise_method`, `noise_quantile` and `noise_window` control noise estimation.
 * Deprecated the `weight` argument to `get_purity` and `get_agilent_threshold`

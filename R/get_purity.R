@@ -15,12 +15,12 @@
 #' 
 #' Spectra are background-corrected before comparison by subtracting the
 #' spectra at the peak boundaries, interpolated across the peak
-#' (`background = "linear"`) or averaged (`background = "constant"`). Anything
-#' that changes linearly across the peak is removed with the background,
-#' including a co-eluting impurity much broader than the peak. If
-#' [`preprocess`] has removed the baseline completely, `background = "none"`
-#' avoids this, but any remaining baseline then enters the comparison as part of
-#' each spectrum.
+#' (`background_correction = "linear"`) or averaged
+#' (`background_correction = "constant"`). Anything that changes linearly
+#' across the peak is removed with the background, including a co-eluting
+#' impurity much broader than the peak. If [`preprocess`] has removed the
+#' baseline completely, `background_correction = "none"` avoids this, but any
+#' remaining baseline then enters the comparison as part of each spectrum.
 #'
 #' With the default `metric = "fraction"`, pure peaks do not always score
 #' exactly one, so treat purity below about 0.9, rather than any value below
@@ -62,7 +62,7 @@
 #' makes such peaks impure. Corresponds to the user-defined similarity
 #' threshold in the Agilent ChemStation, where `0.99` is a similarity of 990.
 #' Defaults to `0.99`. Set to `1` to disable.
-#' @param background How to correct the peak spectra for background
+#' @param background_correction How to correct the peak spectra for background
 #' absorbance. Either `"linear"` (the default), `"constant"`, or `"none"`.
 #' @param reference Which spectrum to compare the peak spectra against.
 #' Either `"average"` (the default), the mean of the assessed spectra, or
@@ -107,12 +107,19 @@ get_purity <- function(x, pos, noise_inflation = 1, cutoff = 0.05,
                        noise_method = c("quantile", "threshold"),
                        noise_quantile = 0.1, noise_window = NULL,
                        noise_threshold = NULL, max_threshold = 0.99,
-                       background = c("linear", "constant", "none"),
+                       background_correction = c("linear", "constant", "none"),
                        reference = c("average", "apex"),
                        metric = c("fraction", "max"), min_run = 3,
                        lambdas, try = TRUE, weight = NULL){
   if (!try) return(NA_real_)
   metric <- match.arg(metric, c("fraction", "max"))
+  background_correction <- match.arg(background_correction,
+                                     c("linear", "constant", "none"))
+  reference <- match.arg(reference, c("average", "apex"))
+  noise_method <- match.arg(noise_method, c("quantile", "threshold"))
+  if (length(min_run) != 1 || !is.numeric(min_run) || is.na(min_run) ||
+      min_run < 1 || min_run != round(min_run))
+    stop("`min_run` must be a single whole number >= 1.")
   noise_inflation <- resolve_deprecated(weight, noise_inflation)
   p <- tryCatch(
     get_purity_values(x, pos, noise_inflation = noise_inflation, cutoff = cutoff,
@@ -122,13 +129,10 @@ get_purity <- function(x, pos, noise_inflation = 1, cutoff = 0.05,
                       noise_window = noise_window,
                       noise_threshold = noise_threshold,
                       max_threshold = max_threshold,
-                      background = background, reference = reference,
+                      background_correction = background_correction,
+                      reference = reference,
                       lambdas = if (missing(lambdas)) NULL else lambdas),
-    error = function(e){
-      warning(sprintf("Could not estimate purity for the peak at index %s: %s",
-                      pos[[1]], conditionMessage(e)), call. = FALSE)
-      NULL
-    })
+    error = function(e) NULL)
   summarize_purity(p, metric = metric, min_run = min_run)
 }
 
@@ -148,8 +152,7 @@ summarize_purity <- function(p, metric = "fraction", min_run = 3){
   v <- v[!is.na(v)]
   if (length(v) < 3) return(NA_real_)
   if (metric == "max") return(max(v))
-  fail <- v >= 1
-  if (min_run > 1) fail <- fail & in_run(fail, min_run)
+  fail <- in_run(v >= 1, min_run)
   mean(!fail)
 }
 
@@ -174,7 +177,7 @@ in_run <- function(v, k){
 #' @param x A chromatographic matrix (timepoints × wavelengths).
 #' @param pos A length-3 integer vector `c(apex, start, end)`.
 #' @param lambdas Wavelengths to include.
-#' @param background Either `"linear"`, `"constant"`, or `"none"`.
+#' @param background_correction Either `"linear"`, `"constant"`, or `"none"`.
 #' @param cutoff Proportion of the corrected apex height below which timepoints
 #' are excluded.
 #' @param reference Either `"average"` or `"apex"`.
@@ -182,12 +185,13 @@ in_run <- function(v, k){
 #' reference spectrum (`reference`), the trace at the wavelength of maximum apex
 #' absorbance (`trace`), the index of the apex within the window (`apex_i`), the
 #' indices of the timepoints above `cutoff` (`keep`), and the correction
-#' applied (`background`). Returns `NULL` if the peak cannot be
+#' applied (`background_correction`). Returns `NULL` if the peak cannot be
 #' assessed.
 #' @author Ethan Bass
 #' @noRd
 
-prep_purity_window <- function(x, pos, lambdas = NULL, background = "none",
+prep_purity_window <- function(x, pos, lambdas = NULL,
+                               background_correction = "none",
                                cutoff = 0.05, reference = "average"){
   pos <- as.numeric(pos)
   if (length(pos) < 3 || anyNA(pos)) return(NULL)
@@ -199,10 +203,10 @@ prep_purity_window <- function(x, pos, lambdas = NULL, background = "none",
   m <- m[, colSums(!is.finite(m)) == 0, drop = FALSE]
   if (ncol(m) < 3 || nrow(m) < 3) return(NULL)
   apex_i <- as.integer(pos[1] - pos[2] + 1)
-  if (background != "none"){
+  if (background_correction != "none"){
     edges <- m[c(1L, nrow(m)), , drop = FALSE]
     w <- (seq_len(nrow(m)) - 1) / (nrow(m) - 1)
-    m <- m - if (background == "linear"){
+    m <- m - if (background_correction == "linear"){
       outer(1 - w, edges[1, ]) + outer(w, edges[2, ])
     } else {
       matrix(colMeans(edges), nrow(m), ncol(m), byrow = TRUE)
@@ -217,7 +221,7 @@ prep_purity_window <- function(x, pos, lambdas = NULL, background = "none",
     colMeans(m[keep, , drop = FALSE])
   }
   list(m = m, reference = ref, trace = trace, apex_i = apex_i, keep = keep,
-       background = background)
+       background_correction = background_correction)
 }
 
 #' Resolve wavelengths to column indices
@@ -236,14 +240,14 @@ resolve_lambdas <- function(x, lambdas = NULL){
 }
 
 #' Inflation of the noise variance due to background correction
-#' @param background Either `"linear"`, `"constant"`, or `"none"`.
+#' @param background_correction Either `"linear"`, `"constant"`, or `"none"`.
 #' @return Returns the factor by which the noise variance of a spectrum is
 #' increased by subtracting the boundary spectra.
 #' @author Ethan Bass
 #' @noRd
 
-background_inflation <- function(background){
-  switch(background, "linear" = 5/3, "constant" = 3/2, 1)
+background_inflation <- function(background_correction){
+  switch(background_correction, "linear" = 5/3, "constant" = 3/2, 1)
 }
 
 #' Calculate variance of noise regions
@@ -287,8 +291,7 @@ get_noise_variance <- function(x, noise_method = c("quantile", "threshold"),
     which(seq_len(nrow(xx)) >= min(noise_window) &
             seq_len(nrow(xx)) <= max(noise_window))
   } else if (noise_method == "threshold"){
-    find_noise(xx, noise_threshold = noise_threshold,
-               lambdas = seq_len(ncol(xx)))
+    find_noise(xx, noise_threshold = noise_threshold)
   } else {
     find_noise_quantile(xx, noise_quantile = noise_quantile)
   }
@@ -319,14 +322,13 @@ find_noise_quantile <- function(x, noise_quantile = 0.1){
 #' @param x A chromatogram in matrix format 
 #' @param noise_threshold Threshold to define noise. Highest proportion of 
 #' maximum absorbance.
-#' @param lambdas Wavelengths to include.
 #' @return Returns indices of retention times where the signal falls below the
 #' specified noise threshold.
 #' @author Ethan Bass
 #' @noRd
 
-find_noise <- function(x, noise_threshold = 0.01, lambdas){
-  max_abs <- apply(x[,lambdas, drop = FALSE], 1, max)
+find_noise <- function(x, noise_threshold = 0.01){
+  max_abs <- apply(x, 1, max)
   which(max_abs < max(max_abs, na.rm = TRUE) * noise_threshold)
 }
 
@@ -363,7 +365,7 @@ row_var <- function(m){
 #' @param noise_threshold Threshold to define noise. Used only when
 #' `noise_method == "threshold"`, where `NULL` (the default) means `0.005`.
 #' @param max_threshold Ceiling on the threshold. Defaults to `0.99`.
-#' @param background How to correct the peak spectra for background
+#' @param background_correction How to correct the peak spectra for background
 #' absorbance. Either `"linear"`, `"constant"`, or `"none"`.
 #' @param reference Which spectrum to compare against. Either `"average"` (the
 #' default) or `"apex"`. See [`get_purity`].
@@ -395,7 +397,8 @@ get_agilent_threshold <- function(x, pos, noise_inflation = 1,
                                   noise_method = c("quantile", "threshold"),
                                   noise_quantile = 0.1, noise_window = NULL,
                                   noise_threshold = NULL, max_threshold = 0.99,
-                                  background = c("linear", "constant", "none"),
+                                  background_correction = c("linear", "constant",
+                                                            "none"),
                                   reference = c("average", "apex"),
                                   cutoff = 0.05, lambdas, weight = NULL){
   p <- prep_purity_inputs(x, pos, noise_inflation = noise_inflation, cutoff = cutoff,
@@ -404,7 +407,7 @@ get_agilent_threshold <- function(x, pos, noise_inflation = 1,
                           noise_quantile = noise_quantile,
                           noise_window = noise_window,
                           noise_threshold = noise_threshold,
-                          background = background,
+                          background_correction = background_correction,
                           reference = reference,
                           lambdas = if (missing(lambdas)) NULL else lambdas,
                           weight = weight)
@@ -421,7 +424,8 @@ get_agilent_threshold <- function(x, pos, noise_inflation = 1,
 #' @param noise_window Optional range of row indices to use as noise.
 #' @param noise_threshold Threshold to define noise.
 #' @param lambdas Wavelengths to include.
-#' @param background The background correction applied to the peak spectra.
+#' @param background_correction The background correction applied to the peak
+#' spectra.
 #' @return Returns the noise variance, scaled to account for background
 #' correction.
 #' @author Ethan Bass
@@ -431,7 +435,7 @@ resolve_noise_variance <- function(x, noise_variance = NULL,
                                    noise_method = c("quantile", "threshold"),
                                    noise_quantile = 0.1, noise_window = NULL,
                                    noise_threshold = NULL, lambdas = NULL,
-                                   background = "none"){
+                                   background_correction = "none"){
   noise_method <- match.arg(noise_method, c("quantile", "threshold"))
   if (is.null(noise_variance)){
     if (!is.null(noise_threshold) && noise_method != "threshold" &&
@@ -445,7 +449,7 @@ resolve_noise_variance <- function(x, noise_variance = NULL,
       noise_threshold = if (is.null(noise_threshold)) 0.005 else noise_threshold,
       lambdas = lambdas)
   }
-  noise_variance * background_inflation(background)
+  noise_variance * background_inflation(background_correction)
 }
 
 #' Calculate the Agilent purity threshold for a prepared window
@@ -478,12 +482,13 @@ agilent_threshold <- function(m, reference, noise_inflation = 1, var_noise,
 #' @noRd
 prep_purity_inputs <- function(x, pos, noise_inflation, cutoff, noise_variance,
                                noise_method, noise_quantile, noise_window,
-                               noise_threshold, background, reference,
+                               noise_threshold, background_correction, reference,
                                lambdas, weight){
   noise_inflation <- resolve_deprecated(weight, noise_inflation)
   w <- prep_purity_window(x, pos, lambdas = lambdas,
-                          background = match.arg(background,
-                                                 c("linear", "constant", "none")),
+                          background_correction = match.arg(
+                            background_correction,
+                            c("linear", "constant", "none")),
                           cutoff = cutoff,
                           reference = match.arg(reference,
                                                 c("average", "apex")))
@@ -492,7 +497,7 @@ prep_purity_inputs <- function(x, pos, noise_inflation, cutoff, noise_variance,
     x, noise_variance = noise_variance, noise_method = noise_method,
     noise_quantile = noise_quantile, noise_window = noise_window,
     noise_threshold = noise_threshold, lambdas = lambdas,
-    background = w$background)
+    background_correction = w$background_correction)
   if (!is.finite(var_noise)) return(NULL)
   list(w = w, var_noise = var_noise, noise_inflation = noise_inflation)
 }
@@ -514,7 +519,7 @@ prep_purity_inputs <- function(x, pos, noise_inflation, cutoff, noise_variance,
 #' @param noise_threshold Threshold to define noise. Used only when
 #' `noise_method == "threshold"`.
 #' @param max_threshold Ceiling on the threshold. Defaults to `0.99`.
-#' @param background How to correct the peak spectra for background
+#' @param background_correction How to correct the peak spectra for background
 #' absorbance. Either `"linear"`, `"constant"`, or `"none"`.
 #' @param reference Which spectrum to compare against. Either `"average"` (the
 #' default) or `"apex"`. See [`get_purity`].
@@ -538,7 +543,8 @@ get_purity_values <- function(x, pos, noise_inflation = 1, cutoff = 0.05,
                               noise_method = c("quantile", "threshold"),
                               noise_quantile = 0.1, noise_window = NULL,
                               noise_threshold = NULL, max_threshold = 0.99,
-                              background = c("linear", "constant", "none"),
+                              background_correction = c("linear", "constant",
+                                                        "none"),
                               reference = c("average", "apex"),
                               lambdas = NULL, weight = NULL){
   p <- prep_purity_inputs(x, pos, noise_inflation = noise_inflation, cutoff = cutoff,
@@ -547,7 +553,7 @@ get_purity_values <- function(x, pos, noise_inflation = 1, cutoff = 0.05,
                           noise_quantile = noise_quantile,
                           noise_window = noise_window,
                           noise_threshold = noise_threshold,
-                          background = background,
+                          background_correction = background_correction,
                           reference = reference, lambdas = lambdas,
                           weight = weight)
   if (is.null(p)) return(NULL)

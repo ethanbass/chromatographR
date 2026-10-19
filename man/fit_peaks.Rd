@@ -55,7 +55,7 @@ squares peak-fitting. Defaults to \code{1000}.}
 to \code{FALSE}, and is always \code{FALSE} when \code{x} holds a single wavelength.}
 
 \item{purity_args}{A named list of additional arguments passed to
-\code{\link{get_purity}}, e.g. \code{list(background = "none", metric = "max")}.}
+\code{\link{get_purity}}, e.g. \code{list(background_correction = "none", metric = "max")}.}
 
 \item{noise_variance}{Variance of noise, passed to \code{\link{get_purity}}. If not
 provided, it is estimated once for the whole chromatogram rather than once

@@ -130,9 +130,9 @@ horizontal line at the lower of the two boundary intensities, while
 at a cost that grows with the number of wavelengths.}
 
 \item{purity_args}{A named list of additional arguments passed to
-\code{\link{get_purity}}, e.g. \code{list(background = "none", metric = "max")}. A
-\code{lambdas} element here selects the wavelengths used to compare spectra, not
-the wavelengths at which peaks are integrated.}
+\code{\link{get_purity}}, e.g. \code{list(background_correction = "none", metric = "max")}.
+A \code{lambdas} element here selects the wavelengths used to compare spectra,
+not the wavelengths at which peaks are integrated.}
 
 \item{show_progress}{Logical. Whether to show progress bar. Defaults to
 \code{TRUE} if \code{\link[pbapply:pbapply]{pbapply}} is installed.}
