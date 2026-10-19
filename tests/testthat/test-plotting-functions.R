@@ -76,7 +76,7 @@ test_that("plot_spectrum works", {
                regexp = "Chromatogram must be specified")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = Sa_warp, 
                              what="click", idx = 1), 
-               regexp = "must be specified")
+               regexp = "specify a wavelength")
   expect_error(plot_spectrum(peak_table = pk_tab, chrom_list = Sa_warp, 
                              what="rt", lambda="210"),
                regexp = "Please supply argument")
