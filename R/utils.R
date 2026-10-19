@@ -910,25 +910,18 @@ replay_warnings <- function(warnings, ids){
 
 #' Get y bounds
 #' @noRd
-get_y_bounds <- function(x, idx, lambdas.idx, pad = 1.1){
-  mx <- get_maximum(x, idx, lambdas.idx = lambdas.idx)*pad
-  c(0, mx)
-}
-
-#' Get maximum
-#' @noRd
-get_maximum <- function(x, idx, lambdas.idx){
-  max(sapply(x[idx], function(xx){
-    max(xx[, lambdas.idx], na.rm = TRUE)
-  }))
-}
-
-#' Get minimum
-#' @noRd
-get_minimum <- function(x, idx, lambdas.idx){
-  min(sapply(x[idx], function(xx){
-    min(xx[, lambdas.idx], na.rm = TRUE)
-  }))
+get_y_bounds <- function(x, idx, lambdas.idx, pad = 0.1, xlim = NULL){
+  window <- function(xx){
+    v <- xx[, lambdas.idx, drop = FALSE]
+    if (is.null(xlim)) return(v)
+    t <- as.numeric(rownames(xx))
+    v[t >= xlim[1] & t <= xlim[2], , drop = FALSE]
+  }
+  vals <- unlist(lapply(x[idx], window))
+  if (!any(is.finite(vals)))
+    vals <- unlist(lapply(x[idx], function(xx) xx[, lambdas.idx]))
+  r <- range(0, vals, na.rm = TRUE)
+  c(r[1], r[2] + pad * diff(r))
 }
 
 #' Simple cap

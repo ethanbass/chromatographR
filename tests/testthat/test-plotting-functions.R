@@ -390,6 +390,21 @@ test_that("plot_chroms_heatmap works with plotly", {
   expect_doppelganger_plotly(name = "heatmap_plotly_zoom", p = p2)
 })
 
+test_that("plot_chroms fits the y axis to the traces within xlim", {
+  data(Sa_pr)
+  lam <- which(colnames(Sa_pr[[1]]) == "210")
+  win <- c(12.8, 13.4)
+  in_win <- max(sapply(Sa_pr, function(m){
+    t <- as.numeric(rownames(m)); max(m[t >= win[1] & t <= win[2], lam])
+  }))
+  whole <- max(sapply(Sa_pr, function(m) max(m[, lam])))
+  expect_lt(in_win, whole / 2)
+  expect_equal(get_y_bounds(Sa_pr, seq_along(Sa_pr), lam, xlim = win)[2], in_win * 1.1,
+               tolerance = 0.05)
+  expect_equal(get_y_bounds(Sa_pr, seq_along(Sa_pr), lam, xlim = c(30, 40)),
+               get_y_bounds(Sa_pr, seq_along(Sa_pr), lam))
+})
+
 test_that("plot_chroms works with plotly", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")

@@ -34,7 +34,7 @@ wavelength must match the column name.}
 \item{show_legend}{Logical. Whether to display legend or not. Defaults to
 \code{TRUE}.}
 
-\item{xlim}{Range of x axis values.}
+\item{xlim}{Range of retention times to plot.}
 
 \item{legend_position}{Position of legend. Defaults to \code{"topright"}}
 

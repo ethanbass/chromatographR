@@ -25,7 +25,8 @@
 #' or `ms`. If possible, units will be detected automatically from chromatogram
 #' metadata. If `time_unit` attribute is not present and no argument is 
 #' provided, the time units will default to minutes.
-#' @param xlim Range of x axis values.
+#' @param xlim Range of x axis values. Unless `ylim` is given, the y axis is
+#' then fitted to the traces within this range.
 #' @param ylim Range of y axis values.
 #' @param ylab Y label. Defaults to `"Absorbance"`.
 #' @param xlab X label.
@@ -115,7 +116,7 @@ plot_chroms <- function(x, lambdas = NULL, idx, time_resolution = 0.01,
   }
   if (is.null(ylim)){
     zoom_y <- FALSE
-    ylim <- get_y_bounds(x, idx, lambdas.idx)
+    ylim <- get_y_bounds(x, idx, lambdas.idx, xlim = if (zoom_x) xlim)
   }
   if (engine == "base"){
     plot.new()
@@ -189,7 +190,7 @@ plot_chroms <- function(x, lambdas = NULL, idx, time_resolution = 0.01,
       if (zoom_x){
         p <- plotly::layout(p, xaxis = list(range = xlim))
       }
-      if (zoom_y){
+      if (zoom_x || zoom_y){
         p <- plotly::layout(p, yaxis = list(range = ylim))
       }
     }
@@ -228,6 +229,7 @@ position_plotly_legend <- function(pos){
 #' @importFrom grDevices grey hcl.colors
 #' @importFrom graphics image layout mtext rect
 #' @inheritParams plot_chroms
+#' @param xlim Range of retention times to plot.
 #' @param lambdas A single wavelength to plot. Required for multi-wavelength
 #' chromatograms and optional for one-dimensional ones, where a supplied
 #' wavelength must match the column name.

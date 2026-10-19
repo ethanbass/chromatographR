@@ -357,6 +357,11 @@ unknown `peaks`.
 
 #### Plotting
 
+* `plot_chroms(engine = "base")` now extends the y axis below zero when the
+traces do. Previously it always started at 0, cutting off negative values.
+* `plot_chroms` now fits the y axis to the traces within `xlim` when `ylim` is
+not given, under the `"base"` and `"plotly"` engines. Previously it spanned the
+whole run.
 * `plot_chroms` no longer errors on single-wavelength chromatograms under the
 `"ggplot"` and `"plotly"` engines. A wavelength given in `lambdas` for such data
 must now match the column name. Previously it was ignored.

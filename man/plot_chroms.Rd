@@ -45,7 +45,8 @@ or \code{ms}. If possible, units will be detected automatically from chromatogra
 metadata. If \code{time_unit} attribute is not present and no argument is
 provided, the time units will default to minutes.}
 
-\item{xlim}{Range of x axis values.}
+\item{xlim}{Range of x axis values. Unless \code{ylim} is given, the y axis is
+then fitted to the traces within this range.}
 
 \item{ylim}{Range of y axis values.}
 
