@@ -48,10 +48,8 @@
 #' @param peaks A peak list object from [`get_peaks`] or a `matched_peak_list`
 #' object from [`match_peaks`]. If a `matched_peak_list` is provided, peak
 #' matching will be skipped. Only used when `alg = "lptw"`. If `NULL`, peaks
-#' are found with [`get_peaks`] at its default settings and matched without
-#' regard to peak shape. To use a different peak model, pass a peak list from
-#' `get_peaks(fit = ...)`; to match on peak shape as well, pass the output of
-#' [`match_peaks`] with `shape_weight` or `shape_cutoff` set.
+#' are found with [`get_peaks`] and matched with [`match_peaks`], both at
+#' their default settings. To change either, pass their output instead.
 #' @param what Output type: either the `"corrected.values"` (useful for
 #' visual inspection and downstream analysis) or the warping `"models"`
 #' (for further programmatic use).
@@ -1063,9 +1061,7 @@ strip_zeros <- function(x, n_zeros, side = "both") {
 #' Match peaks across chromatograms
 #'
 #' Matches peaks across chromatograms by spectral correlation and retention
-#' time proximity. Peak shape similarity can be added, either as a hard filter
-#' on candidate pairs (`shape_cutoff`) or as a penalty on their ranking
-#' (`shape_weight`); both are off by default. Each reference peak is matched to
+#' time proximity. Each reference peak is matched to
 #' at most one sample peak, taking candidate pairs in order of score, highest
 #' first. The resulting `matched_peak_list` object can be passed to
 #' [`correct_rt`] to perform landmark parametric time warping
@@ -1111,18 +1107,11 @@ strip_zeros <- function(x, n_zeros, side = "both") {
 #'   the subtraction adds. Background subtraction helps when peaks sit on a
 #'   sloping baseline or the tail of a neighbor, but can hurt peaks near the
 #'   noise level or with boundaries on a neighboring peak.
-#' @param shape_cutoff Numeric. Maximum shape distance for a candidate peak pair
-#'   to be retained. Raises an error when `fit = "raw"`, since peak shape
-#'   parameters are not fit. Defaults to `NULL` (disabled).
 #' @param rt_weight Numeric in \[0, 1\]. Penalizes retention time offset when
 #'   ranking candidate pairs: each pair's spectral correlation is multiplied by
 #'   `1 - rt_weight * d / rt_window`, where `d` is the pair's retention time
 #'   difference. At `rt_weight = 1`, a pair at the edge of the window scores
 #'   zero. Defaults to `0.15`.
-#' @param shape_weight Numeric in \[0, 1\]. Applies a multiplicative
-#'   shape-distance penalty analogous to `rt_weight`. Shape distances are
-#'   normalized by `shape_cutoff` (if provided) or by the maximum observed shape
-#'   distance. Silently ignored when `fit = "raw"`. Defaults to `0`.
 #' @param use_corrected_rt Logical. Whether to compare corrected retention
 #'   times (`rt.cor`) from [`correct_peaks`] rather than raw ones (`rt`), both
 #'   between peaks and against `targets`. Spectra
@@ -1131,13 +1120,6 @@ strip_zeros <- function(x, n_zeros, side = "both") {
 #'   corrected times when every sample has them.
 #' @param plot_it Logical. Whether to plot the matches with
 #'   [`plot.matched_peak_list`]. Defaults to `FALSE`.
-#' @param fit Character. The type of fit used to construct the peak list, one
-#'   of `"egh"`, `"bemg"`, `"gaussian"` or `"raw"`, used only to compare peak
-#'   shapes (`shape_cutoff`, `shape_weight`). Normally this does not need
-#'   to be specified, since it is detected from the `fit` attribute stored in
-#'   the `peak_list` object. Supply it explicitly only if that attribute is
-#'   missing, or to override it (e.g. to use the simpler gaussian shape
-#'   distance, which depends only on `sd`, for an `"egh"` peak list).
 #' @param verbose Whether to print messages to console.
 #' @return A `matched_peak_list` object: a list with one element per sample
 #'   containing the matched peak pairs, per-pair spectral correlation scores,
@@ -1156,8 +1138,8 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
                         targets = NULL,
                         lambda = NULL, rt_window = 0.3, spectral_cutoff = 0.95,
                         spectrum = c("apex", "background"),
-                        shape_cutoff = NULL, rt_weight = 0.15, shape_weight = 0,
-                        use_corrected_rt = NULL, plot_it = FALSE, fit = NULL,
+                        rt_weight = 0.15,
+                        use_corrected_rt = NULL, plot_it = FALSE,
                         verbose = getOption("verbose")) {
   spectrum <- match.arg(spectrum)
   if (!is.null(targets) && identical(reference, "best"))
@@ -1239,8 +1221,6 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
   check_chrom_list(peak_list, chrom_list)
   if (is.null(names(peak_list)) || anyDuplicated(names(peak_list)))
     stop("The samples in `peak_list` must have unique names.")
-  fit <- fit %||% attr(peak_list, "fit")
-  if (!is.null(fit)) fit <- match.arg(fit, c("egh", "bemg", "gaussian", "raw"))
   pks_ref <- pks_flat[[reference]]
   pks_ref <- pks_ref[!is.na(pks_ref$rt),]
   rt_ref <- pks_ref$rt
@@ -1248,16 +1228,6 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
     stop(sprintf(
       "No peaks were found in the reference sample (%s) at wavelength %s. Please choose a different `reference` or relax the criteria used to detect peaks.",
       sQuote(names(peak_list)[reference]), sQuote(lambda_idx)))
-  }
-  use_shape <- !is.null(shape_cutoff) || (shape_weight > 0 && !identical(fit, "raw"))
-  if (use_shape){
-    if (is.null(fit))
-      stop("Please specify `fit` to compare peak shapes.", call. = FALSE)
-    if (fit == "raw"){
-      stop("Peak shape parameters are not fit when `fit = \"raw\"`. Please set ",
-           "`shape_cutoff = NULL` to proceed.")
-    }
-    shape_cols <- check_shape_cols(fit, pks_ref)
   }
   if (spectrum == "background" && !all(c("start", "end") %in% colnames(pks_ref)))
     stop("`spectrum = \"background\"` needs `start` and `end` columns in ",
@@ -1285,8 +1255,7 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
   use_spectra <- nrow(spectra_ref) > 1
   if (!use_spectra)
     warning("Spectral matching is unavailable for one-dimensional ",
-            "chromatograms, so peaks are matched on retention time",
-            if (use_shape) " and peak shape" else "", " alone. ",
+            "chromatograms, so peaks are matched on retention time alone. ",
             "`spectral_cutoff` is ignored.", call. = FALSE)
 
   sample_indices <- seq_along(chrom_list)
@@ -1318,10 +1287,7 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
     rt_dist_matrix <- abs(outer(pks_samp[[dist_col]], pks_ref[[dist_col]], "-"))
     rt_mask <- !is.na(rt_dist_matrix) & sweep(rt_dist_matrix, 2, window_ref, "<=")
 
-    shape_dist_matrix <- if (use_shape) shape_distance(pks_samp, pks_ref, shape_cols)
-    shape_mask <- if (!is.null(shape_cutoff)) shape_dist_matrix <= shape_cutoff else TRUE
-
-    combined_mask <- spectral_mask & shape_mask & rt_mask
+    combined_mask <- spectral_mask & rt_mask
     cor_matrix[!combined_mask] <- NA
 
     if (sum(!is.na(cor_matrix)) == 0) {
@@ -1333,11 +1299,6 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
     score_matrix <- cor_matrix
     if (rt_weight > 0)
       score_matrix <- score_matrix * (1 - rt_weight * sweep(rt_dist_matrix, 2, window_ref, "/"))
-    if (shape_weight > 0 && !is.null(shape_dist_matrix)) {
-      norm <- shape_cutoff %||% max(shape_dist_matrix, na.rm = TRUE)
-      if (norm > 0)
-        score_matrix <- score_matrix * (1 - shape_weight * pmin(shape_dist_matrix / norm, 1))
-    }
 
     pairs <- which(!is.na(cor_matrix), arr.ind = TRUE)
     candidates <- cbind(samp = pairs[, 1], ref = pairs[, 2],
@@ -1507,17 +1468,6 @@ background_spectra <- function(x, times, p){
   f[!is.finite(f)] <- NA
   at(p$rt, BG_APEX_SCANS) - sweep(at(p$start, BG_BOUNDARY_SCANS), 2, 1 - f, "*") -
     sweep(at(p$end, BG_BOUNDARY_SCANS), 2, f, "*")
-}
-
-#' Euclidean distance between the shape parameters of sample and reference peaks
-#' @param p1,p2 Peak tables for the sample and reference peaks.
-#' @param cols Shape-parameter columns to compare.
-#' @return A matrix of relative distances, sample peaks by reference peaks.
-#' @noRd
-shape_distance <- function(p1, p2, cols){
-  rel2 <- function(a, b)
-    (outer(a, b, "-") / outer(a, b, function(u, v) (u + v) / 2))^2
-  sqrt(Reduce(`+`, lapply(cols, function(k) rel2(p1[[k]], p2[[k]]))))
 }
 
 #' Subset matched peak list

@@ -13,12 +13,9 @@ match_peaks(
   rt_window = 0.3,
   spectral_cutoff = 0.95,
   spectrum = c("apex", "background"),
-  shape_cutoff = NULL,
   rt_weight = 0.15,
-  shape_weight = 0,
   use_corrected_rt = NULL,
   plot_it = FALSE,
-  fit = NULL,
   verbose = getOption("verbose")
 )
 }
@@ -61,20 +58,11 @@ the subtraction adds. Background subtraction helps when peaks sit on a
 sloping baseline or the tail of a neighbor, but can hurt peaks near the
 noise level or with boundaries on a neighboring peak.}
 
-\item{shape_cutoff}{Numeric. Maximum shape distance for a candidate peak pair
-to be retained. Raises an error when \code{fit = "raw"}, since peak shape
-parameters are not fit. Defaults to \code{NULL} (disabled).}
-
 \item{rt_weight}{Numeric in [0, 1]. Penalizes retention time offset when
 ranking candidate pairs: each pair's spectral correlation is multiplied by
 \code{1 - rt_weight * d / rt_window}, where \code{d} is the pair's retention time
 difference. At \code{rt_weight = 1}, a pair at the edge of the window scores
 zero. Defaults to \code{0.15}.}
-
-\item{shape_weight}{Numeric in [0, 1]. Applies a multiplicative
-shape-distance penalty analogous to \code{rt_weight}. Shape distances are
-normalized by \code{shape_cutoff} (if provided) or by the maximum observed shape
-distance. Silently ignored when \code{fit = "raw"}. Defaults to \code{0}.}
 
 \item{use_corrected_rt}{Logical. Whether to compare corrected retention
 times (\code{rt.cor}) from \code{\link{correct_peaks}} rather than raw ones (\code{rt}), both
@@ -85,14 +73,6 @@ corrected times when every sample has them.}
 
 \item{plot_it}{Logical. Whether to plot the matches with
 \code{\link{plot.matched_peak_list}}. Defaults to \code{FALSE}.}
-
-\item{fit}{Character. The type of fit used to construct the peak list, one
-of \code{"egh"}, \code{"bemg"}, \code{"gaussian"} or \code{"raw"}, used only to compare peak
-shapes (\code{shape_cutoff}, \code{shape_weight}). Normally this does not need
-to be specified, since it is detected from the \code{fit} attribute stored in
-the \code{peak_list} object. Supply it explicitly only if that attribute is
-missing, or to override it (e.g. to use the simpler gaussian shape
-distance, which depends only on \code{sd}, for an \code{"egh"} peak list).}
 
 \item{verbose}{Whether to print messages to console.}
 }
@@ -106,9 +86,7 @@ stored as the \code{"reference_targets"} attribute.
 }
 \description{
 Matches peaks across chromatograms by spectral correlation and retention
-time proximity. Peak shape similarity can be added, either as a hard filter
-on candidate pairs (\code{shape_cutoff}) or as a penalty on their ranking
-(\code{shape_weight}); both are off by default. Each reference peak is matched to
+time proximity. Each reference peak is matched to
 at most one sample peak, taking candidate pairs in order of score, highest
 first. The resulting \code{matched_peak_list} object can be passed to
 \code{\link{correct_rt}} to perform landmark parametric time warping

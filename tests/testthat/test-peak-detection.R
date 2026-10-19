@@ -988,10 +988,6 @@ test_that("one max_fwhm transfers across every fit", {
   expect_true(all(n == n[["gaussian"]]))
 })
 
-test_that("check_shape_cols requires nothing of a raw peak list", {
-  expect_null(check_shape_cols("raw", data.frame(rt = 1)))
-})
-
 test_that("max_fwhm is ignored when windows are supplied", {
   skip_on_cran()
   cl <- .mk_chrom(0.005)

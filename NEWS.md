@@ -133,10 +133,9 @@ retention times (`rt_range`) and/or wavelengths (`lambda_range`). Cropping is
 pure subsetting, so values and dimnames pass through unchanged, unlike
 `preprocess(dim1 = )`, which interpolates onto a new axis.
 * Added `match_peaks` function for matching peaks across chromatograms using
-spectral correlation, retention time proximity and/or peak shape similarity.
-The resulting `matched_peak_list` can be passed to `correct_rt` for
-landmark-based PTW or to `get_peaktable`. See `?targeted_analysis` for matching
-to a table of targets.
+spectral correlation and retention time proximity. The resulting
+`matched_peak_list` can be passed to `correct_rt` for landmark-based PTW or to
+`get_peaktable`. See `?targeted_analysis` for matching to a table of targets.
 * Added `get_time_resolution` for reading a chromatogram's sampling interval,
 in the units of its time axis by default or in minutes via `unit`.
 

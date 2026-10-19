@@ -126,26 +126,6 @@ check_chrom_list <- function(x, chrom_list, verbose = FALSE){
   }
 }
 
-#' Check that peak shape parameters are available for the specified fit
-#'
-#' Verifies that the columns required to compute shape distances for the
-#' specified `fit` are present in a peak table. Returns the required column
-#' names invisibly.
-#' @author Ethan Bass
-#' @noRd
-check_shape_cols <- function(fit, peaks){
-  shape_cols <- switch(fit, gaussian = "sd", egh = c("sd", "tau"),
-                       bemg = c("sd", "tau_right", "tau_left"))
-  missing_cols <- setdiff(shape_cols, colnames(peaks))
-  if (length(missing_cols) > 0){
-    stop(sprintf(
-      "Shape matching with `fit = %s` requires the column%s %s, which could not be found in the supplied `peak_list`.",
-      sQuote(fit), plural(length(missing_cols)),
-      paste(sQuote(missing_cols), collapse = ", ")))
-  }
-  invisible(shape_cols)
-}
-
 #' Select detected peaks by target retention time
 #'
 #' Restricts a table of detected peak positions to those whose apex falls

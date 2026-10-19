@@ -368,29 +368,6 @@ test_that("match_peaks errors correctly", {
                regexp = "wavelength")
   expect_error(match_peaks(pks_egh, chrom_list = dat.pr[1], lambda = "210"),
                regexp = "do not match")
-  expect_error(match_peaks(pks_egh, chrom_list = dat.pr, lambda = "210",
-                           fit = "nonsense"),
-               regexp = "'arg' should be one of")
-  expect_error(match_peaks(pks_raw, chrom_list = dat.pr, lambda = "210",
-                           shape_cutoff = 1),
-               regexp = "Peak shape parameters are not fit")
-})
-
-test_that("match_peaks honors the `fit` argument", {
-  skip_on_cran()
-  # `fit` must not be silently overwritten by the peak_list's `fit` attribute.
-  # A gaussian peak list has no `tau` column, so requesting the egh shape
-  # distance should fail. If `fit` were ignored, this would succeed.
-  expect_error(match_peaks(pks_gaussian, chrom_list = dat.pr, lambda = "210",
-                           fit = "egh", shape_cutoff = 1),
-               regexp = "tau")
-  # The reverse override is legitimate: the gaussian shape distance depends
-  # only on `sd`, which an egh peak list has.
-  matched_gauss <- match_peaks(pks_egh, chrom_list = dat.pr, lambda = "210",
-                               fit = "gaussian", shape_cutoff = 5,
-                               verbose = FALSE)
-  expect_s3_class(matched_gauss, "matched_peak_list")
-  expect_equal(names(matched_gauss), names(dat.pr))
 })
 
 test_that("match_peaks skips samples containing no peaks", {
@@ -459,57 +436,6 @@ test_that("match_peaks selects the best reference when `reference = 'best'`", {
   expect_equal(attr(m, "rt_ref"), pks_sa_pr[[3]][["210"]]$rt)
 })
 
-# A two-peak case where RT proximity and peak shape disagree. The reference has
-# a narrow peak at 12.00 and a wide one at 12.10; the sample has a wide peak at
-# 12.02 and a narrow one at 12.08. RT alone pairs 12.00-12.02 and 12.10-12.08;
-# shape alone pairs them across. `spectral_cutoff = 0` keeps the spectral mask
-# from being the binding constraint.
-make_shape_conflict <- function(){
-  pks <- function(rt, sd, tau, tau_left, tau_right){
-    data.frame(rt = rt, start = rt - .1, end = rt + .1, sd = sd, tau = tau,
-               tau_left = tau_left, tau_right = tau_right, height = 100,
-               area = 10)
-  }
-  pl <- pks_egh
-  pl[[1]] <- list("210" = pks(c(12.00, 12.10), c(0.05, 0.30), c(0.01, 0.06),
-                              c(0.01, 0.06), c(0.02, 0.07)))
-  pl[[2]] <- list("210" = pks(c(12.02, 12.08), c(0.30, 0.05), c(0.06, 0.01),
-                              c(0.06, 0.01), c(0.07, 0.02)))
-  pl
-}
-
-test_that("`shape_weight` redirects matching from RT proximity to peak shape", {
-  skip_on_cran()
-  pl <- make_shape_conflict()
-  for (f in c("gaussian", "egh", "bemg")){
-    m0 <- match_peaks(pl, chrom_list = dat.pr, lambda = "210", fit = f,
-                      spectral_cutoff = 0, shape_weight = 0, verbose = FALSE)
-    m1 <- match_peaks(pl, chrom_list = dat.pr, lambda = "210", fit = f,
-                      spectral_cutoff = 0, shape_weight = 1, verbose = FALSE)
-    pair0 <- m0[[2]]$matches[order(m0[[2]]$matches[, "rt_ref"]), ]
-    pair1 <- m1[[2]]$matches[order(m1[[2]]$matches[, "rt_ref"]), ]
-    # RT-driven: each reference peak takes its nearest sample peak
-    expect_equal(pair0[, "rt_samp"], c(12.02, 12.08), info = f,
-                 ignore_attr = TRUE)
-    # shape-driven: the pairing crosses over
-    expect_equal(pair1[, "rt_samp"], c(12.08, 12.02), info = f,
-                 ignore_attr = TRUE)
-  }
-})
-
-test_that("match_peaks needs `fit` only to compare peak shapes", {
-  skip_on_cran()
-  pks_nofit <- pks_egh
-  attr(pks_nofit, "fit") <- NULL
-  expect_equal(match_peaks(pks_nofit, chrom_list = dat.pr, lambda = "210",
-                           verbose = FALSE),
-               match_peaks(pks_egh, chrom_list = dat.pr, lambda = "210",
-                           verbose = FALSE))
-  expect_error(match_peaks(pks_nofit, chrom_list = dat.pr, lambda = "210",
-                           shape_weight = 0.5, verbose = FALSE),
-               regexp = "Please specify `fit` to compare peak shapes")
-})
-
 test_that("match_peaks skips samples where no candidate pair survives", {
   skip_on_cran()
   # peaks are present in both samples, but an impossibly tight RT window
@@ -521,22 +447,6 @@ test_that("match_peaks skips samples where no candidate pair survives", {
   expect_null(m[[2]])
   # the reference still matches itself
   expect_false(is.null(m[[1]]))
-})
-
-test_that("`shape_cutoff` prunes shape-mismatched candidate pairs", {
-  skip_on_cran()
-  pl <- make_shape_conflict()
-  args <- list(pl, chrom_list = dat.pr, lambda = "210", fit = "gaussian",
-               spectral_cutoff = 0, verbose = FALSE)
-  m_open <- do.call(match_peaks, args)
-  m_cut  <- do.call(match_peaks, c(args, shape_cutoff = 0.5))
-  # all 4 pairs are candidates without a cutoff; the 2 shape-mismatched pairs
-  # (distance 1.43) are dropped by a cutoff of 0.5
-  expect_equal(nrow(m_open[[2]]$candidates), 4)
-  expect_equal(nrow(m_cut[[2]]$candidates), 2)
-  expect_equal(m_cut[[2]]$matches[order(m_cut[[2]]$matches[, "rt_ref"]),
-                                  "rt_samp"],
-               c(12.08, 12.02), ignore_attr = TRUE)
 })
 
 ### plot.matched_peak_list ###
