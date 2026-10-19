@@ -35,6 +35,9 @@ wider than the chromatogram now errors.
 The default of `0.2` matches `ptw`'s own `20` timepoints at `dt = 0.01`.
 * `max_shift` defaults to `1` and `dilation_span` to `0.3`, so VPdtw alignments
 change. See `?correct_rt`.
+* `correct_rt(scale = TRUE)` now scales chromatograms only to fit the warp, so
+corrected values keep their original units. Scaling divides by the maximum
+instead of rescaling to [0, 1]. Use `preprocess(maxI = 1)` to rescale the data.
 * `correct_rt` and `correct_rt_group` now error when samples' time axes differ
 by a sampling interval or more. Previously they warped such samples by timepoint
 index. Interpolate onto a common grid with `preprocess(dim1 = ...)` first.

@@ -81,8 +81,13 @@ warping are filled with zeros; otherwise they are returned as \code{NA} (default
 \item{n_zeros}{Number of zeros to pad onto each end of the chromatograms
 before fitting. Only used when \code{alg = "ptw"}.}
 
-\item{scale}{Logical. If \code{TRUE}, rescale each chromatogram to the range
-[0, 1] before warping. The returned corrected values stay rescaled.}
+\item{scale}{Logical. If \code{TRUE}, divide each chromatogram by its largest
+absolute value before fitting the warp, so that samples of very different
+concentration are matched on the shape of their signal. The corrected
+values are returned in their original units; to rescale the data
+themselves, use the \code{maxI} argument of \code{\link{preprocess}}. \code{"ptw"} is
+unaffected under its default criterion, weighted cross-correlation, which
+does not change when a sample is multiplied by a constant.}
 
 \item{trwdth}{Width of the triangle in the weighted cross-correlation (WCC)
 criterion, passed to

@@ -28,7 +28,6 @@
 #'
 #' @aliases correct_rt
 #' @import ptw
-#' @importFrom scales rescale
 #' @importFrom stats approx cor
 #' @param chrom_list List of chromatograms in matrix format, sharing a common
 #' time axis (see [`preprocess`]).
@@ -69,8 +68,13 @@
 #' before fitting. Only used when `alg = "ptw"`.
 #' @param n.zeros The `n.zeros` argument is deprecated. Please use `n_zeros`
 #' instead.
-#' @param scale Logical. If `TRUE`, rescale each chromatogram to the range
-#' \[0, 1\] before warping. The returned corrected values stay rescaled.
+#' @param scale Logical. If `TRUE`, divide each chromatogram by its largest
+#' absolute value before fitting the warp, so that samples of very different
+#' concentration are matched on the shape of their signal. The corrected
+#' values are returned in their original units; to rescale the data
+#' themselves, use the `maxI` argument of [`preprocess`]. `"ptw"` is
+#' unaffected under its default criterion, weighted cross-correlation, which
+#' does not change when a sample is multiplied by a constant.
 #' @param trwdth Width of the triangle in the weighted cross-correlation (WCC)
 #' criterion, passed to
 #' [`ptw`][ptw::ptw]. Defaults to `0.2`, which matches the default of `20`
@@ -222,10 +226,11 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
   if (!all(lambdas %in% colnames(chrom_list[[1]]))){
     stop("Lambdas not found!")
   }
-  if (scale){
-    chrom_list <- lapply(chrom_list, scales::rescale)
-  }
   chrom_list_og <- chrom_list
+  if (scale){
+    chrom_list <- lapply(chrom_list, function(x) x / max(abs(x), na.rm = TRUE))
+  }
+  chrom_fit <- chrom_list
   if (n_zeros > 0 && alg == "ptw" && is.null(models)){
     chrom_list <- lapply(chrom_list, function(x){
       x_p <- pad_zeros(x, n_zeros = n_zeros, side = "both")
@@ -303,14 +308,14 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
           if (length(lambdas) > 1)
             stop("LPTW only supports warping by a single wavelength")
           if (is.null(peaks)){
-            peaks <- get_peaks(chrom_list_og, lambdas = lambdas)
+            peaks <- get_peaks(chrom_fit, lambdas = lambdas)
           }
-          matched <- match_peaks(peaks, chrom_list = chrom_list_og,
+          matched <- match_peaks(peaks, chrom_list = chrom_fit,
                                  reference = reference_label(reference, names(chrom_list_og)),
                                  lambda = lambdas, rt_window = rt_window,
                                  spectral_cutoff = spectral_cutoff,
                                  verbose = verbose)
-          matched <- align_matches(matched, chrom_list_og)
+          matched <- align_matches(matched, chrom_fit)
         }
         identity_coef <- identity_warp(length(init.coef))
         models <- laplee(matched, function(m) {
@@ -376,7 +381,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
       maxshift_pts <- time_to_points(max_shift, "max_shift", chrom_list_og,
                                      idx = reference,
                                      clamp = missing(max_shift) || !is.null(maxshift))
-      allmats <- sapply(chrom_list_og, function(x) x[, lambdas, drop = FALSE])
+      allmats <- sapply(chrom_fit, function(x) x[, lambdas, drop = FALSE])
       penalty <- VPdtw::dilation(allmats[,reference], span_pts) * penalty
       models <- VPdtw::VPdtw(query = allmats, reference = allmats[, reference],
                              penalty = penalty, maxshift = maxshift_pts)

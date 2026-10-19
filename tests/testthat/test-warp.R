@@ -810,3 +810,32 @@ test_that("correct_peaks rejects collapsed peak lists", {
                    show_progress = FALSE, cl = 1)
   expect_error(correct_peaks(pks, m, Sa_pr), regexp = "collapse = TRUE")
 })
+
+test_that("scale = TRUE fits on scaled data but returns the original units", {
+  skip_on_cran()
+  data(Sa_pr)
+  for (alg in c("ptw", "lptw", "vpdtw")){
+    warped <- correct_rt(Sa_pr, lambdas = "210", alg = alg, reference = 1,
+                         scale = TRUE, verbose = FALSE, show_progress = FALSE)
+    expect_gt(max(warped[[2]], na.rm = TRUE), 100)
+  }
+})
+
+test_that("scale = TRUE lets vpdtw align a dilution series", {
+  skip_on_cran()
+  seq_dir <- system.file("extdata", "benzoxazinoid_standards",
+                         package = "chromConverter")
+  skip_if_not(dir.exists(seq_dir))
+  chroms <- chromConverter::read_chroms(seq_dir, format_in = "chemstation_ch",
+                                        pattern = "dad1A",
+                                        parser = "chromconverter",
+                                        progress_bar = FALSE)
+  chroms <- preprocess(chroms[c("BENZOS_250PPM", "BENZOS_8PPM")],
+                       dim1 = seq(0, 59.9, by = 1/150),
+                       interpolate_cols = FALSE, show_progress = FALSE, cl = 1)
+  models <- suppressWarnings(
+    correct_rt(chroms, alg = "vpdtw", reference = "BENZOS_250PPM",
+               scale = TRUE, what = "models", show_progress = FALSE))
+  to_ref <- warp_maps(models, chroms)$BENZOS_8PPM
+  expect_lt(max(abs(to_ref(c(19.804, 28.929)) - c(19.068, 28.225))), 0.05)
+})
