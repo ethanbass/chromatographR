@@ -209,6 +209,46 @@ test_that("sloped baseline fit subtracts a linear ramp and recovers the Gaussian
   }
 })
 
+test_that("sloped baseline does not rise above the signal at the window edges", {
+  skip_on_cran()
+  n <- 601
+  x_idx <- seq_len(n)
+  lam <- 1 / 60
+  y <- 5000 * lam * exp(lam * (200 - x_idx) + lam^2 * 12^2 / 2) *
+    pnorm((x_idx - 200 - lam * 12^2) / 12) + 10
+  mat <- matrix(y, ncol = 1, dimnames = list(as.character(x_idx), "220"))
+  pos <- data.frame(pos = which.max(y), lower = 1, upper = n)
+  for (f in BASELINE_FITS){
+    pks <- suppressWarnings(
+      fit_peaks(mat, lambda = "220", pos = pos, fit = f, baseline = "sloped",
+                estimate_purity = FALSE))
+    expect_lte(pks$floor_start, y[1] + 0.001 * (max(y) - 10))
+    expect_lte(pks$floor_end, y[n] + 0.001 * (max(y) - 10))
+  }
+})
+
+test_that("noise at the window edges does not pull the sloped baseline down", {
+  skip_on_cran()
+  withr::local_seed(1)
+  n <- 601
+  x_idx <- seq_len(n)
+  lam <- 1 / 60
+  y0 <- 5000 * lam * exp(lam * (200 - x_idx) + lam^2 * 12^2 / 2) *
+    pnorm((x_idx - 200 - lam * 12^2) / 12) + 10
+  pos <- data.frame(pos = which.max(y0), lower = 1, upper = n)
+  for (f in BASELINE_FITS){
+    offset <- vapply(1:20, function(i){
+      y <- y0 + rnorm(n, sd = 0.5)
+      mat <- matrix(y, ncol = 1, dimnames = list(as.character(x_idx), "220"))
+      pks <- suppressWarnings(
+        fit_peaks(mat, lambda = "220", pos = pos, fit = f, baseline = "sloped",
+                  estimate_purity = FALSE))
+      pks$floor_start - 10
+    }, numeric(1))
+    expect_lt(abs(mean(offset)), 0.1, label = f)
+  }
+})
+
 test_that("bemg reports tail time constants in time_unit", {
   skip_on_cran()
   times <- seq(0, 10, by = 0.01)

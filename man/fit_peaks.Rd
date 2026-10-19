@@ -66,7 +66,8 @@ Options are \code{"none"} (no baseline, default), \code{"flat"} (constant offset
 \code{"sloped"} (linearly varying offset). For the peak models, the offset is
 estimated by nonlinear least squares along with the shape parameters and is
 constrained to be non-negative; a \code{"flat"} offset is also capped at the
-lowest intensity in the window. When \code{fit = "raw"}, the offset is instead
+lowest intensity in the window, and each end of a \code{"sloped"} one at the
+median intensity of the first or last 2\% of the window. When \code{fit = "raw"}, the offset is instead
 read directly off the boundaries of the integration window: \code{"flat"} draws a
 horizontal line at the lower of the two boundary intensities, while
 \code{"sloped"} draws a line between them (valley-to-valley integration). A raw

@@ -53,6 +53,9 @@ accordingly, and peaks whose preceding timepoint had been clipped to zero by
 * Fitted retention times can now fall between timepoints, so `rt` can shift
 by up to one timepoint and `"bemg"` no longer understates `height`. `correct_peaks` no longer rounds `rt.cor` for ptw or lptw models.
 Match `rt` to the time axis with a tolerance, not with `==` or `match()`.
+* With `baseline = "sloped"`, the fitted local baseline no longer rises above
+the signal at the edges of the peak window. Previously it could, underestimating
+`"egh"` and `"gaussian"` areas.
 * `r.squared` in `get_peaks` and `fit_peaks` output is now `1 - SS_res / SS_tot`,
 not the squared correlation between the fit and the data. It is lower for poor
 fits and can be negative, so revisit any cutoffs.

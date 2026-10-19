@@ -300,7 +300,8 @@ MIN_WINDOW_PER_FWHM <- 1 / 3
 #' `"sloped"` (linearly varying offset). For the peak models, the offset is
 #' estimated by nonlinear least squares along with the shape parameters and is
 #' constrained to be non-negative; a `"flat"` offset is also capped at the
-#' lowest intensity in the window. When `fit = "raw"`, the offset is instead
+#' lowest intensity in the window, and each end of a `"sloped"` one at the
+#' median intensity of the first or last 2% of the window. When `fit = "raw"`, the offset is instead
 #' read directly off the boundaries of the integration window: `"flat"` draws a
 #' horizontal line at the lower of the two boundary intensities, while
 #' `"sloped"` draws a line between them (valley-to-valley integration). A raw
@@ -554,12 +555,13 @@ fit_gaussian <- function(x, y, start.center = NULL,
     s3 <- c(as.list(if (!inherits(nlsAns, "try-error"))
                       coef(nlsAns)[c("center", "width", "height")]
                     else c(center = start.center, width = start.width, height = start.height)),
-            floor_s = f0, floor_e = f0)
+            floor_s = min(f0, st$upper_edges[["floor_s"]]),
+            floor_e = min(f0, st$upper_edges[["floor_e"]]))
     nlsAns <- try_nls_lm(
       y ~ gaussian(x, center, width, height, floor_s, (floor_e - floor_s) / peak_width),
       n = length(x), start = s3, control = controlList,
       lower = c(shape_lower, floor_s = 0, floor_e = 0),
-      upper = c(shape_upper, floor_s = Inf, floor_e = Inf))
+      upper = c(shape_upper, st$upper_edges))
   }
 
   if (inherits(nlsAns, "try-error")) {
@@ -661,12 +663,13 @@ fit_egh <- function(x1, y1, start.center = NULL, start.width = NULL,
                       coef(nlsAns)[c("center", "width", "height", "tau")]
                     else c(center = start.center, width = start.width,
                            height = start.height, tau = start.tau)),
-            floor_s = f0, floor_e = f0)
+            floor_s = min(f0, st$upper_edges[["floor_s"]]),
+            floor_e = min(f0, st$upper_edges[["floor_e"]]))
     nlsAns <- try_nls_lm(
       y1 ~ egh(x1, center, width, height, tau, floor_s, (floor_e - floor_s) / peak_width),
       n = length(x1), start = s3, control = controlList,
       lower = c(shape_lower, floor_s = 0, floor_e = 0),
-      upper = c(shape_upper, floor_s = Inf, floor_e = Inf))
+      upper = c(shape_upper, st$upper_edges))
   }
 
   if (inherits(nlsAns, "try-error")) {
@@ -725,6 +728,7 @@ floor_start <- function(y){
 }
 
 FLOOR_START_FRAC <- 0.02
+FLOOR_EDGE_FRAC <- 0.02
 
 #' Full width at half maximum of an exponential-gaussian hybrid
 #' @noRd
@@ -976,6 +980,9 @@ clamp_start <- function(v, lo, hi){
 fit_starts <-function(x, y, start.center, start.width, start.height,
                        baseline = "none", height_mult = NULL){
   upper_floor <- max(min(y), 0)
+  k <- max(3L, ceiling(FLOOR_EDGE_FRAC * length(y)))
+  upper_edges <- c(floor_s = max(median(head(y, k)), 0),
+                   floor_e = max(median(tail(y, k)), 0))
   offset <- if (baseline == "none") 0 else floor_start(y)
   y <- y - offset
   if (!is.null(start.height)) start.height <- start.height - offset
@@ -989,6 +996,7 @@ fit_starts <-function(x, y, start.center, start.width, start.height,
        width = unname(clamp_start(abs(start.width), 0, bnd$width_max)),
        height = unname(start.height),
        span = bnd$span, y = y, offset = offset, upper_floor = upper_floor,
+       upper_edges = upper_edges,
        lower = c(center = bnd$center_min, width = 0, height = -Inf),
        upper = c(center = bnd$center_max, width = bnd$width_max,
                  height = if (is.null(height_mult)) Inf
@@ -1364,12 +1372,13 @@ fit_bemg_once <- function(x1, y1, start.center, start.width, start.a, start.b,
                       coef(nlsAns)[c("center", "width", "height", "a", "b")]
                     else c(center = start.center, width = start.width,
                            height = start.height, a = start.a, b = start.b)),
-            floor_s = f0, floor_e = f0)
+            floor_s = min(f0, st$upper_edges[["floor_s"]]),
+            floor_e = min(f0, st$upper_edges[["floor_e"]]))
     nlsAns <- try_nls_lm(
       y1 ~ model(x1, center, width, height, a, b, floor_s, (floor_e - floor_s) / peak_width),
       n = length(x1), start = s3, control = controlList,
       lower = c(shape_lower, floor_s = 0, floor_e = 0),
-      upper = c(shape_upper, floor_s = Inf, floor_e = Inf))
+      upper = c(shape_upper, st$upper_edges))
   }
 
   nlsAns <- reject_growing_tail(nlsAns)
