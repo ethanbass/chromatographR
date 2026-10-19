@@ -28,8 +28,8 @@ informative error pointing at `seq()`.
 `alg = "vpdtw"`, so a higher value now allows less warping. The default
 changed from `5` to `0.2`; to convert an explicit value, take its reciprocal.
 Values above `1` now warn.
-* `correct_rt`'s `trwdth` is now a width in minutes, not a count of timepoints.
-Multiply an old value by the sampling interval in minutes to convert it; a value
+* The `trwdth` argument in `correct_rt` now specifies a width in minutes, not a count of timepoints.
+Multiply old values by the sampling interval in minutes to convert it; a value
 wider than the chromatogram now errors.
 * `correct_rt` now passes `trwdth` to `ptw`, which previously ignored it.
 The default of `0.2` matches `ptw`'s own `20` timepoints at `dt = 0.01`.
@@ -47,23 +47,21 @@ index. Interpolate onto a common grid with `preprocess(dim1 = ...)` first.
 timepoint early. Retention times from `get_peaks` and `get_peaktable` shift
 accordingly, and peaks whose preceding timepoint had been clipped to zero by
 `preprocess` are now detected.
-* Fitted retention times now fall between timepoints. `fit = "gaussian"` and
-`"egh"` truncated them to the preceding timepoint, up to one timepoint early,
-and `"bemg"` used its highest sampled point, which also understated `height`.
-`correct_peaks` no longer rounds `rt.cor` for ptw or lptw models. Match `rt`
-to the time axis with a tolerance, not `==` or `match()`.
+* Fitted retention times can now fall between timepoints, so `rt` can shift
+by up to one timepoint and `"bemg"` no longer understates `height`. `correct_peaks` no longer rounds `rt.cor` for ptw or lptw models.
+Match `rt` to the time axis with a tolerance, not with `==` or `match()`.
 * `plot_spectrum` and `plot_all_spectra` now label the correct spectral
 maxima, having inherited the same off-by-one error. Reported lambda-max values
 shift by one grid step.
 * `find_peaks` now rounds the `"mva"` and `"tmva"` smoothing windows up to an
 odd width of at least three points, which changes which apices are detected
 for these methods.
-* `find_peaks` now errors when the provided `smooth_window` is narrower 
-than seven timepoints when Savitzky-Golay (`"savgol"`) smoothing is
-selected, rather than silently returning the signal unsmoothed.
+* `find_peaks` now errors when `smooth_window` is narrower than seven
+timepoints under Savitzky-Golay (`"savgol"`) smoothing. Previously it returned
+the signal unsmoothed.
 * Renamed `find_peaks`'s `slope_thresh` and `amp_thresh` arguments to
 `min_curvature` and `min_amplitude`. `slope_thresh` was a misnomer
-because the argument thresholded the second derivative, not the slope. 
+because the argument thresholded the second derivative, not the slope.
 For now, the old names still work with a deprecation warning.
 * `get_peaks` and `fit_peaks` no longer filter on peak width by default.
 `sd_max` used to drop peaks with sd > 50 timepoints. Its replacement,
@@ -71,11 +69,9 @@ For now, the old names still work with a deprecation warning.
 
 #### Peak purity
 
-* Overhauled `get_purity`. Purity values change for every peak. The purity
-ratio is now computed correctly and is far less sensitive to the baseline, to
-the tallest peak in the run, and to isolated noise. Note that `cutoff` now
-applies to the background-corrected trace, so it means a proportion of peak
-height rather than of total absorbance. See `?get_purity`.
+* Overhauled `get_purity`, correcting the purity ratio, so purity values change
+for every peak. `cutoff` now applies to the background-corrected trace, as a
+proportion of peak height rather than of total absorbance. See `?get_purity`.
 * Added arguments to `get_purity`: `background`, `reference`, `metric`,
 `min_run` and `max_threshold` control the purity calculation, and
 `noise_method`, `noise_quantile` and `noise_window` control noise estimation.
@@ -83,11 +79,9 @@ height rather than of total absorbance. See `?get_purity`.
 in favor of `noise_inflation`.
 * Removed the `noise_threshold` argument from `get_peaks` and `fit_peaks`,
 which had no effect. Pass purity options as `purity_args` instead.
-* `plot.peak_list` now accepts `plot_purity = "curves"` (dissimilarity and
-threshold as color-coded lines on a fixed scale; the default for `TRUE`),
-`"curves_local"` (per-peak-scaled for diagnostic use), and `"ratio"` (log-scaled
-lollipop). Also corrected a rescaling bug where the reference line did not mark
-a ratio of 1. See `?plot.peak_list`.
+* `plot_purity = TRUE` in `plot.peak_list` now draws dissimilarity and
+threshold curves. It also accepts `"curves_local"` and `"ratio"`; see
+`?plot.peak_list`.
 
 #### Peak tables and plotting
 
@@ -95,22 +89,24 @@ a ratio of 1. See `?plot.peak_list`.
 decimal places, so an interpolated time axis is no longer ragged. Lookups by the
 old names need updating (`x["10.10", ]` rather than `x["10.1", ]`).
 * `get_peaktable`'s `hmax` and `sigma_t`, and `combine_peaks`'s `tol`, are now
-in minutes whatever the time unit of the data. Results change only for
+in minutes, regardless of the time unit of the data. Results change only for
 chromatograms whose times are not in minutes.
 * Removed `get_peaktable`'s `out` argument, so peak tables are always
 data.frames. Use `as.matrix(pt$tab)` for a matrix.
 * Peak tables built from corrected peaks now name the `pk_meta` rows `rt`,
-`start` and `end`, not `rt.cor`, `start.cor` and `end.cor`, and so does
-`reshape_peaktable`. `args$use.cor` records which times were used.
+`start` and `end` rather than `rt.cor`, `start.cor` and `end.cor`, and so does
+`reshape_peaktable`. Check `args$use_corrected_rt` to see which times were
+used.
 
 #### Other renamed and deprecated arguments
 
 * Renamed dot-separated argument names to snake_case:
 `spec.smooth` to `smooth_spectra`, `min.cor` to `min_cor`,
-`n.traces`/`n.zeros` to `n_traces`/`n_zeros`, and `sigma.t`/`sigma.r` to
-`sigma_t`/`sigma_r`. The old names still work, with a warning. `init.coef` and
-`max.only` are retained, since they are passed through to functions that
-define them.
+`n.traces`/`n.zeros` to `n_traces`/`n_zeros`, `sigma.t`/`sigma.r` to
+`sigma_t`/`sigma_r`, and `use.cor` to `use_corrected_rt`. The old names still
+work, with a warning. `init.coef` and
+`max.only` keep their names, since they are passed through to external
+functions that define them.
 * Deprecated `sd_max` in `get_peaks` and `fit_peaks`, and `min_sd`/`max_sd` in
 `filter_peaks`, in favor of `min_fwhm` and `max_fwhm`. A standard deviation is
 equivalent to peak width only for `fit = "gaussian"`. See `?filter_peaks`.
@@ -137,9 +133,10 @@ retention times (`rt_range`) and/or wavelengths (`lambda_range`). Cropping is
 pure subsetting, so values and dimnames pass through unchanged, unlike
 `preprocess(dim1 = )`, which interpolates onto a new axis.
 * Added `match_peaks` function for matching peaks across chromatograms using
-spectral correlation, retention time proximity and/or peak shape similarity. The
-resulting `matched_peak_list` can be passed to `correct_rt` for landmark-based
-PTW or to `get_peaktable`.
+spectral correlation, retention time proximity and/or peak shape similarity.
+The resulting `matched_peak_list` can be passed to `correct_rt` for
+landmark-based PTW or to `get_peaktable`. See `?targeted_analysis` for matching
+to a table of targets.
 * Added `get_time_resolution` for reading a chromatogram's sampling interval,
 in the units of its time axis by default or in minutes via `unit`.
 
@@ -149,27 +146,23 @@ in the units of its time axis by default or in minutes via `unit`.
 
 #### Baseline correction
 
-* Added a `baseline` argument to `preprocess` selecting the estimator used
-along the time axis: `"als"` (still the default), `"arpls"`, `"aspls"` or
-`"snip"`. See `?baseline_estimators` for what each does and where each fails.
-`"snip"` requires `m`, the filter half-width in timepoints, and has no default.
+* Added a `baseline` argument to `preprocess` choosing the time-axis baseline
+estimator: `"als"` (the default), `"arpls"`, `"aspls"` or `"snip"`. See
+`?baseline_estimators`.
 * The smoothing parameter each estimator used is recorded on the result as a
 `"baseline_param"` attribute, carrying the estimator's name.
-* Added an `attach_baseline` argument to `preprocess`, retaining the estimated
-baseline as a `"baseline"` attribute so a poor fit can be inspected or plotted.
-It is dropped by any transform that invalidates it (`correct_rt`,
-`subtract_blanks`), since it is indexed by the time axis.
-* Baseline estimators now require a complete trace, raising an informative error
-when the signal contains missing or non-finite values rather than failing
-obscurely or silently splicing the two sides of a gap together.
+* Added an `attach_baseline` argument to `preprocess`, keeping the estimated
+baseline as an attribute for inspection. It is removed by `correct_rt` and
+`subtract_blanks`, whose output it would no longer match.
+* Baseline estimators now require a complete trace, and give an informative
+error when the signal contains missing or non-finite values. Previously a gap
+either caused an obscure error or had its two sides spliced together.
 
 #### Retention time correction
 
-* Added new landmark parametric time warping algorithm (`alg = "lptw"`) to
-`correct_rt`, fitting a warping polynomial to matched peak positions rather than
-to full signals, which helps when signals are complex or noisy. A
-`regularization` argument pulls the fit toward the identity; useful values run
-roughly `0`-`10` and it defaults to `0`.
+* Added landmark parametric time warping (`alg = "lptw"`) to `correct_rt`,
+which fits the warp to matched peak positions rather than whole signals. See
+`?correct_rt`.
 * Added a `dilation_span` argument to `correct_rt`: the width, in minutes, of
 the moving-maximum window used to build the `"vpdtw"` penalty, previously
 hardcoded to 350 timepoints. A span wide enough to make the penalty constant
@@ -189,9 +182,12 @@ topographic prominence in multiples of the estimated noise. Unlike
 transfers between datasets. `find_peaks` now also returns a `prominence`
 column.
 * Added manual integration of fixed retention-time windows to `get_peaks`
-and `fit_peaks` via a `windows` argument, quantifying a compound even where
-no peak is detected. `get_peaktable` gives one column per window. See
+via a `windows` argument, quantifying a compound even where no peak is
+detected. `get_peaktable` gives one column per window. See
 `?get_peaks`.
+* Added `targets`, `tol` and `select_by` arguments to `get_peaks` for fitting
+only the peaks near target retention times, which is faster than fitting every
+peak. `get_peaktable` groups the result by target. See `?targeted_analysis`.
 
 #### Fit diagnostics
 
@@ -215,8 +211,14 @@ in both `preprocess` and `subtract_blanks`.
 
 #### Peak tables and plotting
 
+* Added `targets`, `tol` and `pad` arguments to `plot.peak_list` for zooming
+in on the peaks near given retention times, rescaling both axes to the
+selected window.
 * Added `format = "wide"` to `reshape_peaktable`, returning one row per sample
 with metadata and one column per selected peak.
+* `annotate_peaks` now accepts retention times through the `loc` argument,
+labeling the highest point within `tol` of each supplied retention time
+without requiring a peak table. See `?annotate_peaks`.
 
 ### Bug fixes and other minor changes
 

@@ -25,6 +25,10 @@ make_chrom_from_y <- function(y) {
        true_area = sum((y[-length(y)] + y[-1]) / 2))
 }
 
+window_pos <- function(p, w) {
+  windows_to_pos(w, y = p$mat[, 1], times = as.numeric(rownames(p$mat)))
+}
+
 # ── Symmetric Gaussian peak ───────────────────────────────────────────────────
 
 test_that("gaussian fit recovers area, height, center, and sd of a Gaussian peak", {
@@ -159,6 +163,23 @@ test_that("flat baseline fit subtracts the offset and recovers the Gaussian area
   }
 })
 
+test_that("a small peak on a large flat baseline keeps its area", {
+  skip_on_cran()
+  set.seed(1)
+  noise <- rnorm(41, sd = 0.05)
+  peak <- 5 * exp(-(seq_len(41) - 21)^2 / (2 * 3^2))
+  pos <- data.frame(pos = 21, lower = 13, upper = 29)
+  for (f in BASELINE_FITS) for (offset in c(50, 500)){
+    mat <- matrix(offset + peak + noise, ncol = 1,
+                  dimnames = list(as.character(seq_len(41)), "220"))
+    pks <- fit_peaks(mat, lambda = "220", pos = pos, fit = f,
+                     baseline = "flat", estimate_purity = FALSE)
+    expect_equal(pks$area, 5 * 3 * sqrt(2 * pi), tolerance = 0.05,
+                 info = paste(f, offset))
+    expect_equal(pks$floor, offset, tolerance = 0.01, info = paste(f, offset))
+  }
+})
+
 # ── Sloped baseline ───────────────────────────────────────────────────────────
 
 test_that("sloped baseline fit subtracts a linear ramp and recovers the Gaussian area", {
@@ -207,7 +228,7 @@ test_that("egh and bemg return start values for an unfittable window", {
   for (b in c("none", "flat", "sloped")){
     floor0 <- if (b == "none") 0 else floor_start(y)
     pks <- suppressWarnings(
-      fit_peaks(p$mat, lambda = "220", windows = w, fit = "egh",
+      fit_peaks(p$mat, lambda = "220", pos = window_pos(p, w), fit = "egh",
                 baseline = b, max_fwhm = NULL, estimate_purity = FALSE))
     expect_equal(pks$rt,     start_center, info = b)
     expect_equal(pks$sd,     start_width,  info = b)
@@ -216,7 +237,7 @@ test_that("egh and bemg return start values for an unfittable window", {
     expect_equal(pks$tau, 0, info = b)
 
     pks <- suppressWarnings(
-      fit_peaks(p$mat, lambda = "220", windows = w, fit = "bemg",
+      fit_peaks(p$mat, lambda = "220", pos = window_pos(p, w), fit = "bemg",
                 baseline = b, max_fwhm = NULL, estimate_purity = FALSE))
     expect_equal(pks$rt,     start_center, info = b)
     expect_equal(pks$sd,     start_width,  info = b)
@@ -232,11 +253,11 @@ test_that("egh and bemg return start values for an unfittable window", {
   }
   # and the floor terms are their start value, not a fitted value
   pks_flat <- suppressWarnings(
-    fit_peaks(p$mat, lambda = "220", windows = w, fit = "egh",
+    fit_peaks(p$mat, lambda = "220", pos = window_pos(p, w), fit = "egh",
               baseline = "flat", max_fwhm = NULL, estimate_purity = FALSE))
   expect_equal(pks_flat$floor, floor_start(y))
   pks_sloped <- suppressWarnings(
-    fit_peaks(p$mat, lambda = "220", windows = w, fit = "egh",
+    fit_peaks(p$mat, lambda = "220", pos = window_pos(p, w), fit = "egh",
               baseline = "sloped", max_fwhm = NULL, estimate_purity = FALSE))
   expect_equal(pks_sloped$floor_start, floor_start(y))
   expect_equal(pks_sloped$floor_end, floor_start(y))
@@ -326,8 +347,8 @@ test_that("get_peaks area scales with dt and matches the analytical value", {
 test_that("`windows` integrates the supplied window and recovers the area", {
   skip_on_cran()
   p <- make_gaussian_chrom()
-  pks <- fit_peaks(p$mat, lambda = "220", windows = rbind(c(1, p$n)),
-                   fit = "raw", estimate_purity = FALSE)
+  pks <- get_peaks(list(a = p$mat), lambdas = "220", windows = rbind(c(1, p$n)),
+                   fit = "raw", cl = 1, show_progress = FALSE)$a[["220"]]
   expect_equal(nrow(pks), 1L)
   expect_equal(pks$start, 1)
   expect_equal(pks$end, p$n)
@@ -337,8 +358,9 @@ test_that("`windows` integrates the supplied window and recovers the area", {
 test_that("`windows` ignores `max_fwhm`", {
   skip_on_cran()
   p <- make_gaussian_chrom()
-  pks <- fit_peaks(p$mat, lambda = "220", windows = rbind(c(1, p$n)),
-                   fit = "raw", max_fwhm = 1e-9, estimate_purity = FALSE)
+  pks <- get_peaks(list(a = p$mat), lambdas = "220", windows = rbind(c(1, p$n)),
+                   fit = "raw", max_fwhm = 1e-9, cl = 1,
+                   show_progress = FALSE)$a[["220"]]
   expect_equal(nrow(pks), 1L)
   expect_true(is.na(pks$sd))
   expect_equal(pks$end - pks$start, p$n - 1)
@@ -347,21 +369,22 @@ test_that("`windows` ignores `max_fwhm`", {
 test_that("windows sharing a boundary act as a drop line and are exactly additive", {
   skip_on_cran()
   p <- make_gaussian_chrom()
-  whole <- fit_peaks(p$mat, lambda = "220", windows = rbind(c(1, p$n)),
-                     fit = "raw", estimate_purity = FALSE)
-  split <- fit_peaks(p$mat, lambda = "220",
+  whole <- get_peaks(list(a = p$mat), lambdas = "220",
+                     windows = rbind(c(1, p$n)), fit = "raw", cl = 1,
+                     show_progress = FALSE)$a[["220"]]
+  split <- get_peaks(list(a = p$mat), lambdas = "220",
                      windows = rbind(c(1, 200), c(200, 350), c(350, p$n)),
-                     fit = "raw", estimate_purity = FALSE)
+                     fit = "raw", cl = 1, show_progress = FALSE)$a[["220"]]
   expect_equal(nrow(split), 3L)
   expect_equal(sum(split$area), whole$area)
 })
 
 test_that("`windows` returns a peak for a window containing no peak", {
   skip_on_cran()
-  # forced integration: this is what `rts` cannot do, since it filters detected apexes
+  # forced integration: this is what `targets` cannot do, since it filters detected apexes
   p <- make_gaussian_chrom()
-  pks <- fit_peaks(p$mat, lambda = "220", windows = rbind(c(1, 20)),
-                   fit = "raw", estimate_purity = FALSE)
+  pks <- get_peaks(list(a = p$mat), lambdas = "220", windows = rbind(c(1, 20)),
+                   fit = "raw", cl = 1, show_progress = FALSE)$a[["220"]]
   expect_equal(nrow(pks), 1L)
   expect_equal(pks$area, 0, tolerance = 1e-6)
 })
@@ -370,19 +393,32 @@ test_that("`rt` and `height` come from the apex within the window", {
   skip_on_cran()
   p <- make_gaussian_chrom()
   # a window whose midpoint (251) is the apex, and one whose midpoint is not
-  off <- fit_peaks(p$mat, lambda = "220", windows = rbind(c(1, 400)),
-                   fit = "raw", estimate_purity = FALSE)
+  off <- get_peaks(list(a = p$mat), lambdas = "220", windows = rbind(c(1, 400)),
+                   fit = "raw", cl = 1, show_progress = FALSE)$a[["220"]]
   expect_equal(off$rt, p$center)
   expect_equal(off$height, p$height, tolerance = 1e-6)
   # midpoint of c(1, 400) is 200, where the signal is well below the maximum
   expect_gt(off$height, p$mat[200, 1])
 })
 
-
+test_that("`tol` and `select_by` are ignored, not rejected, alongside `windows`", {
+  skip_on_cran()
+  # Unlike `targets`, these two only modify `targets` and both carry defaults that fire
+  # on every call, so erroring on them would break otherwise valid calls.
+  p <- make_gaussian_chrom()
+  cl <- list(a = p$mat)
+  w <- rbind(c(1, 200), c(200, p$n))
+  plain <- get_peaks(cl, lambdas = "220", windows = w, fit = "raw", cl = 1,
+                     show_progress = FALSE)
+  with_args <- get_peaks(cl, lambdas = "220", windows = w, fit = "raw", tol = 5,
+                         select_by = "proximity", cl = 1, show_progress = FALSE)
+  expect_identical(plain[[1]], with_args[[1]])
+})
 
 test_that("`windows` is validated", {
   p <- make_gaussian_chrom()
-  fp <- function(w) fit_peaks(p$mat, lambda = "220", windows = w, fit = "raw")
+  fp <- function(w) get_peaks(list(a = p$mat), lambdas = "220", windows = w,
+                              fit = "raw", cl = 1, show_progress = FALSE)
   expect_error(fp(rbind(c(300, 100))), "must precede its end")
   expect_error(fp(rbind(c(1, 2, 3))), "exactly two columns")
   expect_error(fp(c(1, 2, 3)), "two-column matrix")
@@ -399,9 +435,9 @@ test_that("raw flat baseline sits at the lower of the two window boundaries", {
   y <- c(50, 30, 10, 200, 10, 30, 60)
   p <- make_chrom_from_y(y)
   w <- rbind(c(1, length(y)))
-  none <- fit_peaks(p$mat, lambda = "220", windows = w, fit = "raw",
+  none <- fit_peaks(p$mat, lambda = "220", pos = window_pos(p, w), fit = "raw",
                     baseline = "none", estimate_purity = FALSE)
-  flat <- fit_peaks(p$mat, lambda = "220", windows = w, fit = "raw",
+  flat <- fit_peaks(p$mat, lambda = "220", pos = window_pos(p, w), fit = "raw",
                     baseline = "flat", estimate_purity = FALSE)
   expect_equal(flat$floor, min(y[1], y[length(y)]))
   expect_equal(flat$area, none$area - min(y[1], y[length(y)]) * (length(y) - 1))
@@ -417,7 +453,8 @@ test_that("raw sloped baseline recovers a Gaussian sitting on a linear ramp", {
   idx <- seq_len(p$n)
   ramp <- 10 + 0.5 * (idx - 1)
   p_ramp <- make_chrom_from_y(p$mat[, 1] + ramp)
-  pks <- fit_peaks(p_ramp$mat, lambda = "220", windows = rbind(c(1, p$n)),
+  pks <- fit_peaks(p_ramp$mat, lambda = "220",
+                   pos = window_pos(p_ramp, rbind(c(1, p$n))),
                    fit = "raw", baseline = "sloped", estimate_purity = FALSE)
   expect_equal(pks$floor_start, ramp[1], tolerance = 1e-6)
   expect_equal(pks$floor_end, ramp[p$n], tolerance = 1e-6)
@@ -425,16 +462,15 @@ test_that("raw sloped baseline recovers a Gaussian sitting on a linear ramp", {
   expect_equal(pks$height, p$height, tolerance = 0.01)
 })
 
-test_that("a baseline above the signal gives a negative area, with a warning", {
+test_that("a baseline above the signal gives a negative area", {
   skip_on_cran()
   # both boundaries are high and the interior is low, so a flat baseline drawn
   # at the boundaries sits above the trace
   y <- c(1, 1, 100, 5, 4, 3, 2, 1, 100, 1, 1)
   p <- make_chrom_from_y(y)
-  expect_warning(
-    pks <- fit_peaks(p$mat, lambda = "220", windows = rbind(c(3, 9)),
-                     fit = "raw", baseline = "flat", estimate_purity = FALSE),
-    "negative area")
+  expect_no_warning(
+    pks <- fit_peaks(p$mat, lambda = "220", pos = window_pos(p, rbind(c(3, 9))),
+                     fit = "raw", baseline = "flat", estimate_purity = FALSE))
   expect_lt(pks$area, 0)
 })
 
@@ -475,12 +511,22 @@ test_that("get_peaks points at `fit = \"raw\"` when `windows` is used with the d
                  regexp = NA)
 })
 
+test_that("get_peaks validates `windows` and rejects it alongside `targets`", {
+  p <- make_gaussian_chrom()
+  cl <- list(a = p$mat)
+  expect_error(get_peaks(cl, lambdas = "220", windows = rbind(c(1, p$n)),
+                         targets = 251, cl = 1, show_progress = FALSE),
+               "cannot be used together")
+  expect_error(get_peaks(cl, lambdas = "220", windows = rbind(c(1, p$n + 100)),
+                         fit = "raw", cl = 1, show_progress = FALSE),
+               "outside the bounds")
+})
 
 test_that("`windows` works with a peak model as well as raw integration", {
   skip_on_cran()
   p <- make_gaussian_chrom()
-  pks <- fit_peaks(p$mat, lambda = "220", windows = rbind(c(1, p$n)),
-                   fit = "gaussian", estimate_purity = FALSE)
+  pks <- get_peaks(list(a = p$mat), lambdas = "220", windows = rbind(c(1, p$n)),
+                   fit = "gaussian", cl = 1, show_progress = FALSE)$a[["220"]]
   expect_equal(nrow(pks), 1L)
   expect_equal(pks$area, p$true_area, tolerance = 0.01)
   expect_equal(pks$rt, p$center, tolerance = 0.01)
@@ -506,16 +552,6 @@ test_that("get_peaktable groups by window rather than by apex retention time", {
   expect_equal(unname(unlist(pt$pk_meta["end", ])), w[, 2])
 })
 
-test_that("get_peaktable falls back to retention time clustering without `windows`", {
-  skip_on_cran()
-  p <- make_gaussian_chrom()
-  cl <- list(a = p$mat, b = p$mat)
-  pks <- get_peaks(cl, lambdas = "220", fit = "raw", max_fwhm = NULL, cl = 1,
-                   show_progress = FALSE)
-  expect_null(attr(pks, "windows"))
-  expect_s3_class(get_peaktable(pks), "peak_table")
-})
-
 test_that("get_peaktable still groups by window after retention time correction", {
   skip_on_cran()
   a <- make_chrom_from_y(c(rep(0, 99), 1000, rep(0, 100), 500, rep(0, 100)))
@@ -530,24 +566,17 @@ test_that("get_peaktable still groups by window after retention time correction"
     }
   }
   pt <- get_peaktable(pks)
-  expect_true(pt$args$use.cor)
+  expect_true(pt$args$use_corrected_rt)
   expect_equal(ncol(pt$tab), nrow(w))
   expect_true(all(pt$tab > 0))
 })
 
-test_that("a small peak on a large flat baseline keeps its area", {
+test_that("get_peaktable falls back to retention time clustering without `windows`", {
   skip_on_cran()
-  set.seed(1)
-  noise <- rnorm(41, sd = 0.05)
-  peak <- 5 * exp(-(seq_len(41) - 21)^2 / (2 * 3^2))
-  pos <- data.frame(pos = 21, lower = 13, upper = 29)
-  for (f in BASELINE_FITS) for (offset in c(50, 500)){
-    mat <- matrix(offset + peak + noise, ncol = 1,
-                  dimnames = list(as.character(seq_len(41)), "220"))
-    pks <- fit_peaks(mat, lambda = "220", pos = pos, fit = f,
-                     baseline = "flat", estimate_purity = FALSE)
-    expect_equal(pks$area, 5 * 3 * sqrt(2 * pi), tolerance = 0.05,
-                 info = paste(f, offset))
-    expect_equal(pks$floor, offset, tolerance = 0.01, info = paste(f, offset))
-  }
+  p <- make_gaussian_chrom()
+  cl <- list(a = p$mat, b = p$mat)
+  pks <- get_peaks(cl, lambdas = "220", fit = "raw", max_fwhm = NULL, cl = 1,
+                   show_progress = FALSE)
+  expect_null(attr(pks, "windows"))
+  expect_s3_class(get_peaktable(pks), "peak_table")
 })

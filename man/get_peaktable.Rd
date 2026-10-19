@@ -12,7 +12,7 @@ get_peaktable(peak_list, ...)
   peak_list,
   chrom_list,
   response = c("area", "height"),
-  use.cor = NULL,
+  use_corrected_rt = NULL,
   hmax = 0.2,
   summarize_by = c("weighted.mean", "median", "mean", "max"),
   plot_it = FALSE,
@@ -24,7 +24,8 @@ get_peaktable(peak_list, ...)
   verbose = FALSE,
   ...,
   sigma.t = NULL,
-  sigma.r = NULL
+  sigma.r = NULL,
+  use.cor = NULL
 )
 
 \method{get_peaktable}{matched_peak_list}(
@@ -49,12 +50,12 @@ get_peaktable(peak_list, ...)
 \item{response}{Peak intensity measure: either \code{"area"} (default) or
 \code{"height"}.}
 
-\item{use.cor}{Logical. Indicates whether to use corrected retention times
+\item{use_corrected_rt}{Logical. Indicates whether to use corrected retention times
 (\code{rt.cor} column) or raw retention times (\code{rt} column). Unless
 otherwise specified, the \code{rt.cor} column will be used by default if it
 exists in the provided \code{peak_list}. Either way, they are stored in the \code{rt},
-\code{start} and \code{end} rows of \code{pk_meta}, and \code{args$use.cor} records which were
-used.}
+\code{start} and \code{end} rows of \code{pk_meta}, and \code{args$use_corrected_rt} records
+which were used.}
 
 \item{hmax}{Height at which the clustering tree is cut. With \code{clust = "rt"},
 peaks are clustered by complete linkage on retention time, so \code{hmax} is the
@@ -66,8 +67,9 @@ to 1, and \code{hmax} is the maximum tree height passed to
 split below it (see \code{deepSplit}). There, the default of \code{0.2} lets peaks with
 identical spectra sit about \code{0.67 * sigma_t} apart, a third of the mean
 \code{end - start} at the default \code{sigma_t}. Ignored
-for peak lists produced by \code{get_peaks(windows = )}, since those peaks are
-grouped by integration window instead of being clustered.}
+for peak lists produced by \code{get_peaks(windows = )} or \code{get_peaks(targets = )},
+since those peaks are grouped by integration window or target instead of
+being clustered.}
 
 \item{summarize_by}{How to summarize peak metadata within each cluster.
 Options are \code{"weighted.mean"} (default, weights peaks by their intensity as
@@ -83,7 +85,8 @@ shown indicating the clustering.}
 \item{clust}{Specify whether to perform hierarchical clustering based on
 spectral similarity and retention time (\code{sp.rt}) or retention time alone
 (\code{rt}). Defaults to \code{rt}. Ignored for peak lists produced by
-\code{get_peaks(windows = )}, which are grouped by window.}
+\code{get_peaks(windows = )} or \code{get_peaks(targets = )}, which are grouped by window
+or target.}
 
 \item{sigma_t}{Width of Gaussian kernel for retention time similarity, in
 minutes. Controls the weight given to retention time when
@@ -108,6 +111,9 @@ as before.}
 \item{sigma.r}{The \code{sigma.r} argument is deprecated. Please use \code{sigma_r}
 instead.}
 
+\item{use.cor}{The \code{use.cor} argument is deprecated. Please use
+\code{use_corrected_rt} instead.}
+
 \item{pks}{A \code{peak_list} object from \code{\link{get_peaks}}.
 Required when \code{peak_list} is a \code{matched_peak_list}. Used to
 retrieve per-peak intensities and metadata.}
@@ -125,8 +131,10 @@ An S3 \code{\link{peak_table}} object, containing the following elements:
 \itemize{
 \item \code{tab}: The peak table itself — a \code{data.frame} of
 intensities in a sample × peak configuration. A peak that was not found in a
-sample, or whose response is negative or missing, is recorded as \code{0}
-(\code{na.fill} for a \code{matched_peak_list}).
+sample, or whose response is negative, is recorded as \code{0} (\code{na.fill} for a
+\code{matched_peak_list}). A peak whose model failed, which
+\code{get_peaks(windows = )} and \code{get_peaks(targets = )} keep with a missing \code{height}
+and \code{area}, is recorded as \code{NA}.
 \item \code{pk_meta}: A \code{data.frame} containing peak metadata (e.g., the spectral
 component, peak number, and average retention time), summarized across all
 peaks in each cluster according to \code{summarize_by}.
@@ -178,6 +186,11 @@ integration window rather than clustered by retention time, including after
 \code{\link{correct_peaks}}. This gives one peak table column per window, in order of
 retention time, with every sample contributing to each.
 
+Peak lists produced by \code{get_peaks(targets = )} are grouped by target
+instead of clustered, each peak going to the target it was selected for.
+Targets found in no sample get no column. If \code{targets} has a \code{name} column, the
+columns are named after the targets.
+
 This function is adapted from the \code{getPeakTable} function in the alsace
 package by Ron Wehrens: \url{https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R}.
 
@@ -186,7 +199,11 @@ the returned \code{\link{peak_table}} are defined by the reference
 sample's peaks at the wavelength used by \code{\link{match_peaks}}; other wavelengths
 in \code{pks} are ignored. Peaks absent from the reference sample will not
 appear as columns regardless of their prevalence in other samples. Choose a
-reference with a rich peak profile. To discover peaks across all samples,
+reference with a rich peak profile, or pass a table of \code{targets} to
+\code{\link{match_peaks}} to pick one that contains all of them; the
+targets' columns are then named after them, and the table can be
+restricted to them with \code{x[, targets$name]}. To
+discover peaks across all samples,
 call \code{get_peaktable} on the \code{peak_list} itself, which clusters peaks
 across every sample.
 }

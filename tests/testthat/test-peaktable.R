@@ -59,6 +59,11 @@ test_that("get_peaktable merges distant peaks when hmax is large enough", {
   expect_true(all(pt$tab > 0))
 })
 
+test_that("get_peaktable rejects misspelled arguments", {
+  skip_on_cran()
+  expect_error(get_peaktable(.pks, hmx = 1.0), regexp = "unused argument.*hmx")
+})
+
 # ── metadata reported by only some peaks must survive summarization ──────────
 
 test_that("weighted.mean summarization keeps metadata that only some peaks report", {
@@ -87,6 +92,47 @@ test_that("weighted_mean_finite ignores unusable weights and values", {
   expect_equal(weighted_mean_finite(c(2, 4), c(0, 0)), 3)
   expect_equal(weighted_mean_finite(c(2, 4), c(-1, -1)), 3)
   expect_identical(weighted_mean_finite(c(NA_real_, NaN), c(1, 1)), NA_real_)
+})
+
+test_that("get_peaktable carries window_limited through to pk_meta", {
+  skip_on_cran()
+  data(Sa_pr, envir = environment())
+  pks <- suppressWarnings(get_peaks(Sa_pr, lambdas = 210, fit = "egh",
+                                    estimate_purity = FALSE, cl = 1,
+                                    show_progress = FALSE))
+  expect_true("window_limited" %in% colnames(pks[[1]][[1]]))
+  expect_true(all(pks[[1]][[1]]$window_limited %in% c(0, 1)))
+  expect_true("converged" %in% colnames(pks[[1]][[1]]))
+  expect_true(all(pks[[1]][[1]]$converged %in% c(0, 1)))
+  pt <- suppressWarnings(get_peaktable(pks))
+  expect_true("window_limited" %in% rownames(pt$pk_meta))
+  expect_true("converged" %in% rownames(pt$pk_meta))
+  v <- pt$pk_meta["window_limited", ]
+  expect_true(all(v >= 0 & v <= 1, na.rm = TRUE))
+})
+
+test_that("filter_peaktable can filter on min_converged", {
+  skip_on_cran()
+  data(Sa_pr, envir = environment())
+  pks <- suppressWarnings(get_peaks(Sa_pr, lambdas = 210, fit = "egh",
+                                    baseline = "sloped", sd_max = NULL,
+                                    estimate_purity = FALSE, cl = 1,
+                                    show_progress = FALSE))
+  pt <- suppressWarnings(get_peaktable(pks))
+  cv <- as.numeric(pt$pk_meta["converged", ])
+  for (th in c(0, 0.8, 1)){
+    f <- suppressWarnings(filter_peaktable(pt, min_converged = th))
+    expect_equal(ncol(f$tab), sum(cv >= th), info = paste("th =", th))
+    expect_equal(ncol(f$pk_meta), ncol(f$tab), info = paste("th =", th))
+    expect_s3_class(f, "peak_table")
+  }
+  expect_lte(ncol(suppressWarnings(
+    filter_peaktable(pt, min_converged = 1))$tab), ncol(pt$tab))
+
+  for (bad in list(1.5, -0.1, "x", NA, c(0.5, 0.6))){
+    expect_error(filter_peaktable(pt, min_converged = bad),
+                 "between 0 and 1")
+  }
 })
 
 test_that("filter_peaktable rejects min_converged without a converged row", {
@@ -145,47 +191,6 @@ test_that("filter_peaks retains peaks whose flag is NA", {
                c(1, 3, 4))
 })
 
-test_that("get_peaktable carries window_limited through to pk_meta", {
-  skip_on_cran()
-  data(Sa_pr, envir = environment())
-  pks <- suppressWarnings(get_peaks(Sa_pr, lambdas = 210, fit = "egh",
-                                    estimate_purity = FALSE, cl = 1,
-                                    show_progress = FALSE))
-  expect_true("window_limited" %in% colnames(pks[[1]][[1]]))
-  expect_true(all(pks[[1]][[1]]$window_limited %in% c(0, 1)))
-  expect_true("converged" %in% colnames(pks[[1]][[1]]))
-  expect_true(all(pks[[1]][[1]]$converged %in% c(0, 1)))
-  pt <- suppressWarnings(get_peaktable(pks))
-  expect_true("window_limited" %in% rownames(pt$pk_meta))
-  expect_true("converged" %in% rownames(pt$pk_meta))
-  v <- pt$pk_meta["window_limited", ]
-  expect_true(all(v >= 0 & v <= 1, na.rm = TRUE))
-})
-
-test_that("filter_peaktable can filter on min_converged", {
-  skip_on_cran()
-  data(Sa_pr, envir = environment())
-  pks <- suppressWarnings(get_peaks(Sa_pr, lambdas = 210, fit = "egh",
-                                    baseline = "sloped", sd_max = NULL,
-                                    estimate_purity = FALSE, cl = 1,
-                                    show_progress = FALSE))
-  pt <- suppressWarnings(get_peaktable(pks))
-  cv <- as.numeric(pt$pk_meta["converged", ])
-  for (th in c(0, 0.8, 1)){
-    f <- suppressWarnings(filter_peaktable(pt, min_converged = th))
-    expect_equal(ncol(f$tab), sum(cv >= th), info = paste("th =", th))
-    expect_equal(ncol(f$pk_meta), ncol(f$tab), info = paste("th =", th))
-    expect_s3_class(f, "peak_table")
-  }
-  expect_lte(ncol(suppressWarnings(
-    filter_peaktable(pt, min_converged = 1))$tab), ncol(pt$tab))
-
-  for (bad in list(1.5, -0.1, "x", NA, c(0.5, 0.6))){
-    expect_error(filter_peaktable(pt, min_converged = bad),
-                 "between 0 and 1")
-  }
-})
-
 test_that("summary of a peak table reports the retention time unit", {
   cl <- lapply(.cl, function(m) structure(m, time_unit = "Minutes"))
   pks <- get_peaks(cl, lambdas = "220", fit = "gaussian", smooth_type = "none",
@@ -196,9 +201,132 @@ test_that("summary of a peak table reports the retention time unit", {
   expect_output(print(summary(get_peaktable(.pks))), "\\]\n")
 })
 
-test_that("get_peaktable rejects misspelled arguments", {
+# ── corrected retention times resolve to aligned chromatograms ────────────────
+
+.aligned_fixture <- function(alg = "ptw") {
+  models <- suppressWarnings(correct_rt(Sa_pr, lambdas = 210, alg = alg,
+                                        what = "models", show_progress = FALSE))
+  warped <- suppressWarnings(correct_rt(Sa_pr, models = models, alg = alg,
+                                        lambdas = 210, show_progress = FALSE))
+  pks <- suppressWarnings(get_peaks(Sa_pr, lambdas = 210, show_progress = FALSE))
+  list(models = models, warped = warped, pks = pks)
+}
+
+test_that("a peak table from corrected times rebuilds the aligned chromatograms", {
   skip_on_cran()
-  expect_error(get_peaktable(.pks, hmx = 1.0), regexp = "unused argument.*hmx")
+  for (alg in c("ptw", "vpdtw")) {
+    f <- .aligned_fixture(alg)
+    pt <- get_peaktable(correct_peaks(f$pks, f$models, Sa_pr))
+    expect_true(pt$args$use_corrected_rt)
+    expect_equal(unclass(get_chrom_list(pt)), unclass(f$warped),
+                 ignore_attr = TRUE)
+  }
+})
+
+test_that("stored ptw models keep only the warp", {
+  skip_on_cran()
+  f <- .aligned_fixture("ptw")
+  pt <- get_peaktable(correct_peaks(f$pks, f$models, Sa_pr))
+  stored <- attr(pt, "warp_models")
+  expect_s3_class(stored, "ptw_list")
+  expect_setequal(names(stored[[1]]), c("warp.coef", "mode"))
+})
+
+test_that("stored VPdtw models keep only the warp", {
+  skip_on_cran()
+  f <- .aligned_fixture("vpdtw")
+  pt <- get_peaktable(correct_peaks(f$pks, f$models, Sa_pr))
+  stored <- attr(pt, "warp_models")
+  expect_s3_class(stored, "VPdtw")
+  expect_setequal(names(stored), c("xVals", "shift", "samples", "n_timepoints"))
+  expect_equal(attr(stored, "reference"), attr(f$models, "reference"))
+  expect_equal(attr(stored, "parameters"), attr(f$models, "parameters"))
+})
+
+test_that("a table of some samples rebuilds them from models fitted to all", {
+  skip_on_cran()
+  f <- .aligned_fixture("ptw")
+  pks <- suppressWarnings(get_peaks(Sa_pr[1:2], lambdas = 210,
+                                    show_progress = FALSE))
+  pt <- get_peaktable(correct_peaks(pks, f$models, Sa_pr))
+  expect_equal(unclass(get_chrom_list(pt)), unclass(f$warped[1:2]),
+               ignore_attr = TRUE)
+})
+
+test_that("corrected peak tables store corrected times in the rt rows", {
+  skip_on_cran()
+  f <- .aligned_fixture("ptw")
+  cp <- correct_peaks(f$pks, f$models, Sa_pr)
+  pt <- get_peaktable(cp)
+  raw <- get_peaktable(cp, use_corrected_rt = FALSE)
+  expect_equal(rownames(pt$pk_meta), rownames(raw$pk_meta))
+  expect_false(isTRUE(all.equal(pt$pk_meta["rt", ], raw$pk_meta["rt", ])))
+  aligned <- get_chrom_list(pt)
+  win <- get_retention_idx(unlist(pt$pk_meta[c("start", "end"), "V2"]),
+                           get_times(aligned))
+  coords <- get_peak_coordinates(pt, aligned, loc = "V2", idx = "max",
+                                 lambda = "210")
+  expect_equal(coords$coordinates[[2]],
+               max(aligned[[which.max(pt$tab$V2)]][win[1]:win[2], "210"]))
+  long <- reshape_peaktable(pt, peaks = "V2")
+  expect_equal(colnames(long), c("peak", "sample", "lambda", "rt", "area"))
+  expect_equal(unique(long$rt), pt$pk_meta["rt", "V2"])
+})
+
+test_that("use.cor still works, and old peak tables recording it stay aligned", {
+  skip_on_cran()
+  f <- .aligned_fixture("ptw")
+  cp <- correct_peaks(f$pks, f$models, Sa_pr)
+  expect_warning(old <- get_peaktable(cp, use.cor = FALSE),
+                 "`use.cor` argument is deprecated")
+  expect_equal(old, get_peaktable(cp, use_corrected_rt = FALSE))
+
+  pt <- get_peaktable(cp)
+  names(pt$args)[names(pt$args) == "use_corrected_rt"] <- "use.cor"
+  expect_equal(get_chrom_list(pt), get_chrom_list(get_peaktable(cp)))
+})
+
+test_that("a named aligned chrom_list takes precedence over the models", {
+  skip_on_cran()
+  f <- .aligned_fixture("ptw")
+  assign("aligned_test_chroms", f$warped, envir = globalenv())
+  withr::defer(rm("aligned_test_chroms", envir = globalenv()))
+  cp <- correct_peaks(f$pks, f$models, Sa_pr,
+                      chrom_list_aligned = aligned_test_chroms)
+  pt <- get_peaktable(cp)
+  expect_equal(pt$args$chrom_list_aligned, "aligned_test_chroms")
+  attr(pt, "warp_models") <- NULL
+  expect_identical(get_chrom_list(pt), f$warped)
+})
+
+test_that("uncorrected times resolve to the unaligned chromatograms", {
+  skip_on_cran()
+  f <- .aligned_fixture("ptw")
+  pt <- get_peaktable(correct_peaks(f$pks, f$models, Sa_pr), use_corrected_rt = FALSE)
+  expect_identical(get_chrom_list(pt), Sa_pr)
+})
+
+test_that("corrected times without models or aligned chromatograms warn", {
+  skip_on_cran()
+  f <- .aligned_fixture("ptw")
+  pt <- get_peaktable(correct_peaks(f$pks, f$models, Sa_pr))
+  attr(pt, "warp_models") <- NULL
+  expect_warning(out <- get_chrom_list(pt), "unaligned `Sa_pr`")
+  expect_identical(out, Sa_pr)
+})
+
+test_that("filtering a table of corrected peaks does not add rows", {
+  skip_on_cran()
+  data(Sa_pr)
+  pks <- get_peaks(Sa_pr, lambdas = "210", cl = 1, show_progress = FALSE)
+  mods <- correct_rt(Sa_pr, lambdas = "210", reference = 1, what = "models",
+                     cl = 1, show_progress = FALSE)
+  pt <- get_peaktable(correct_peaks(pks, mods, chrom_list = Sa_pr),
+                      chrom_list = Sa_pr)
+  filtered <- filter_peaktable(pt, min_rt = 11, max_rt = 13)
+  expect_equal(rownames(filtered$pk_meta), rownames(pt$pk_meta))
+  rt_cor <- unlist(filtered$pk_meta["rt", ])
+  expect_true(all(rt_cor >= 11 & rt_cor <= 13))
 })
 
 test_that("hmax, sigma_t and combine_peaks' tol are minutes whatever the time unit", {
@@ -239,117 +367,10 @@ test_that("hmax, sigma_t and combine_peaks' tol are minutes whatever the time un
   expect_equal(colnames(combine_peaks(ts, tol = 0.3, min_cor = 0)$tab), merged)
 })
 
-# ── corrected retention times resolve to aligned chromatograms ────────────────
-
-.aligned_fixture <- function(alg = "ptw") {
-  models <- suppressWarnings(correct_rt(Sa_pr, lambdas = 210, alg = alg,
-                                        what = "models", show_progress = FALSE))
-  warped <- suppressWarnings(correct_rt(Sa_pr, models = models, alg = alg,
-                                        lambdas = 210, show_progress = FALSE))
-  pks <- suppressWarnings(get_peaks(Sa_pr, lambdas = 210, show_progress = FALSE))
-  list(models = models, warped = warped, pks = pks)
-}
-
-test_that("a peak table from corrected times rebuilds the aligned chromatograms", {
-  skip_on_cran()
-  for (alg in c("ptw", "vpdtw")) {
-    f <- .aligned_fixture(alg)
-    pt <- get_peaktable(correct_peaks(f$pks, f$models, Sa_pr))
-    expect_true(pt$args$use.cor)
-    expect_equal(unclass(get_chrom_list(pt)), unclass(f$warped),
-                 ignore_attr = TRUE)
-  }
-})
-
-test_that("stored ptw models keep only the warp", {
-  skip_on_cran()
-  f <- .aligned_fixture("ptw")
-  pt <- get_peaktable(correct_peaks(f$pks, f$models, Sa_pr))
-  stored <- attr(pt, "warp_models")
-  expect_s3_class(stored, "ptw_list")
-  expect_setequal(names(stored[[1]]), c("warp.coef", "mode"))
-})
-
-test_that("stored VPdtw models keep only the warp", {
-  skip_on_cran()
-  f <- .aligned_fixture("vpdtw")
-  pt <- get_peaktable(correct_peaks(f$pks, f$models, Sa_pr))
-  stored <- attr(pt, "warp_models")
-  expect_s3_class(stored, "VPdtw")
-  expect_setequal(names(stored), c("xVals", "shift", "samples", "n_timepoints"))
-  expect_equal(attr(stored, "reference"), attr(f$models, "reference"))
-  expect_equal(attr(stored, "parameters"), attr(f$models, "parameters"))
-})
-
-test_that("a table of some samples rebuilds them from models fitted to all", {
-  skip_on_cran()
-  f <- .aligned_fixture("ptw")
-  pks <- suppressWarnings(get_peaks(Sa_pr[1:2], lambdas = 210,
-                                    show_progress = FALSE))
-  pt <- get_peaktable(correct_peaks(pks, f$models, Sa_pr))
-  expect_equal(unclass(get_chrom_list(pt)), unclass(f$warped[1:2]),
-               ignore_attr = TRUE)
-})
-
-test_that("a named aligned chrom_list takes precedence over the models", {
-  skip_on_cran()
-  f <- .aligned_fixture("ptw")
-  assign("aligned_test_chroms", f$warped, envir = globalenv())
-  withr::defer(rm("aligned_test_chroms", envir = globalenv()))
-  cp <- correct_peaks(f$pks, f$models, Sa_pr,
-                      chrom_list_aligned = aligned_test_chroms)
-  pt <- get_peaktable(cp)
-  expect_equal(pt$args$chrom_list_aligned, "aligned_test_chroms")
-  attr(pt, "warp_models") <- NULL
-  expect_identical(get_chrom_list(pt), f$warped)
-})
-
-test_that("uncorrected times resolve to the unaligned chromatograms", {
-  skip_on_cran()
-  f <- .aligned_fixture("ptw")
-  pt <- get_peaktable(correct_peaks(f$pks, f$models, Sa_pr), use.cor = FALSE)
-  expect_identical(get_chrom_list(pt), Sa_pr)
-})
-
-test_that("corrected times without models or aligned chromatograms warn", {
-  skip_on_cran()
-  f <- .aligned_fixture("ptw")
-  pt <- get_peaktable(correct_peaks(f$pks, f$models, Sa_pr))
-  attr(pt, "warp_models") <- NULL
-  expect_warning(out <- get_chrom_list(pt), "unaligned `Sa_pr`")
-  expect_identical(out, Sa_pr)
-})
-
-test_that("corrected peak tables store corrected times in the rt rows", {
-  skip_on_cran()
-  f <- .aligned_fixture("ptw")
-  cp <- correct_peaks(f$pks, f$models, Sa_pr)
-  pt <- get_peaktable(cp)
-  raw <- get_peaktable(cp, use.cor = FALSE)
-  expect_equal(rownames(pt$pk_meta), rownames(raw$pk_meta))
-  expect_false(isTRUE(all.equal(pt$pk_meta["rt", ], raw$pk_meta["rt", ])))
-  aligned <- get_chrom_list(pt)
-  win <- get_retention_idx(unlist(pt$pk_meta[c("start", "end"), "V2"]),
-                           get_times(aligned))
-  coords <- get_peak_coordinates(pt, aligned, loc = "V2", idx = "max",
-                                 lambda = "210")
-  expect_equal(coords$coordinates[[2]],
-               max(aligned[[which.max(pt$tab$V2)]][win[1]:win[2], "210"]))
-  long <- reshape_peaktable(pt, peaks = "V2")
-  expect_equal(colnames(long), c("peak", "sample", "lambda", "rt", "area"))
-  expect_equal(unique(long$rt), pt$pk_meta["rt", "V2"])
-})
-
-test_that("filtering a table of corrected peaks does not add rows", {
+test_that("get_peaktable errors clearly when no target is found", {
   skip_on_cran()
   data(Sa_pr)
-  pks <- get_peaks(Sa_pr, lambdas = "210", cl = 1, show_progress = FALSE)
-  mods <- correct_rt(Sa_pr, lambdas = "210", reference = 1, what = "models",
-                     cl = 1, show_progress = FALSE)
-  pt <- get_peaktable(correct_peaks(pks, mods, chrom_list = Sa_pr),
-                      chrom_list = Sa_pr)
-  filtered <- filter_peaktable(pt, min_rt = 11, max_rt = 13)
-  expect_equal(rownames(filtered$pk_meta), rownames(pt$pk_meta))
-  rt_cor <- unlist(filtered$pk_meta["rt", ])
-  expect_true(all(rt_cor >= 11 & rt_cor <= 13))
+  p <- suppressWarnings(get_peaks(Sa_pr, lambdas = 220, targets = 11.011, tol = 1e-4,
+                                  cl = 1, show_progress = FALSE))
+  expect_error(get_peaktable(p), "None of the targets was found in any sample")
 })

@@ -258,6 +258,27 @@ test_that("annotate_peaks works correctly", {
                regexp = c("Please supply a ggplot"))
 })
 
+test_that("annotate_peaks labels retention times without a peak table", {
+  skip_if_not_installed("ggplot2")
+  data(Sa_warp)
+  p <- plot_chroms(Sa_warp, lambdas = 210, engine = "ggplot")
+  top <- function(rt, tol = 0.05){
+    k <- abs(p$data$rt - rt) <= tol
+    max(p$data$absorbance[k], na.rm = TRUE)
+  }
+  a <- annotate_peaks(p, c(C1 = 12.18, C2 = 12.70))
+  n <- length(a$layers)
+  expect_equal(a$layers[[n - 1]]$data$x, 12.18)
+  expect_equal(a$layers[[n - 1]]$data$y, top(12.18))
+  expect_equal(a$layers[[n]]$data$y, top(12.70))
+  expect_equal(a$layers[[n]]$aes_params$label, "C2")
+  b <- annotate_peaks(p, 12.18, tol = 0.2)
+  expect_equal(b$layers[[length(b$layers)]]$data$y, top(12.18, 0.2))
+  expect_equal(b$layers[[length(b$layers)]]$aes_params$label, "12.18")
+  expect_error(annotate_peaks(p, 100), "No plotted data within `tol`")
+  expect_error(annotate_peaks(p, "V7"), "Please supply a `peak_table`")
+})
+
 test_that("plot_chroms_heatmap works to plot alignments with ggplot", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
@@ -500,7 +521,7 @@ test_that("plot_baseline renders", {
   bl <- 50 + 30 * exp(tt / 12)
   y <- bl + 1000 * dnorm(tt, 10, 0.4) + 60 * dnorm(tt, 20, 0.4)
   x <- matrix(y - bl, ncol = 1, dimnames = list(tt, "210"))
-  attr(x, "baseline") <- matrix(bl, ncol = 1, dimnames = dimnames(x))
+  attr(x, "estimated_baseline") <- matrix(bl, ncol = 1, dimnames = dimnames(x))
   attr(x, "baseline_param") <- structure(c(stiffness = 18738.87),
                                          method = "arpls")
   vdiffr::expect_doppelganger("plot-baseline", function() plot_baseline(x))
@@ -510,7 +531,7 @@ test_that("plot_baseline yields its defaults to `...` and returns its label", {
   tt <- seq(0, 30, by = 0.01)
   bl <- 50 + 30 * exp(tt / 12)
   x <- matrix(1000 * dnorm(tt, 10, 0.4), ncol = 1, dimnames = list(tt, "210"))
-  attr(x, "baseline") <- matrix(bl, ncol = 1, dimnames = dimnames(x))
+  attr(x, "estimated_baseline") <- matrix(bl, ncol = 1, dimnames = dimnames(x))
   attr(x, "baseline_param") <- structure(c(stiffness = 18738.87),
                                          method = "arpls", dt = 0.01)
   pdf(NULL)
@@ -527,4 +548,25 @@ test_that("plot_baseline accepts a vector with an attached baseline", {
   x <- correct_baseline(Sa_pr[[1]][, "210"], attach_baseline = TRUE)
   pdf(NULL); on.exit(dev.off())
   expect_match(plot_baseline(x), "als")
+})
+test_that("annotate_peaks reads `tol` in minutes on a seconds axis", {
+  skip_on_cran()
+  skip_if_not_installed("ggplot2")
+  data(Sa_pr)
+  s <- lapply(Sa_pr, function(m){
+    rownames(m) <- as.numeric(rownames(m)) * 60
+    attr(m, "time_unit") <- "s"
+    m
+  })
+  expect_s3_class(annotate_peaks(plot_chroms(s, lambdas = 210, engine = "ggplot"),
+                                 c(A = 724.5)), "ggplot")
+})
+
+test_that("plot.peak_list zooms on a targets data.frame", {
+  skip_on_cran()
+  data(Sa_pr)
+  pm <- get_peaks(Sa_pr, lambdas = 210, cl = 1, show_progress = FALSE)
+  pdf(NULL)
+  on.exit(dev.off(), add = TRUE)
+  expect_no_error(plot(pm, chrom_list = Sa_pr, targets = data.frame(rt = 12.07)))
 })

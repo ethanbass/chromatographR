@@ -19,6 +19,7 @@ reference:
     - correct_peaks
     - get_peaks
     - match_peaks
+    - targeted_analysis
     - get_peaktable
     - get_spectra
     - attach_metadata

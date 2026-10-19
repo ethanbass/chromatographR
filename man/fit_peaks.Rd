@@ -8,7 +8,6 @@ fit_peaks(
   x,
   lambda,
   pos = NULL,
-  windows = NULL,
   max_fwhm = NULL,
   sd_max = NULL,
   fit = c("egh", "bemg", "gaussian", "raw"),
@@ -29,24 +28,15 @@ wavelength present in \code{x}.}
 \item{pos}{A \code{data.frame} of peak positions and boundaries, as returned by
 \code{\link{find_peaks}}, with columns \code{pos}, \code{lower} and \code{upper} holding index
 positions into the trace at \code{lambda}. A bare vector of apex positions is not
-enough, since every peak model needs a window to fit over. If \code{NULL} (the
-default), \code{\link{find_peaks}} is run on that trace. Cannot be combined with
-\code{windows}.}
-
-\item{windows}{Optional two-column matrix or \code{data.frame} of start and end
-retention times (or a single pair of times), giving manual integration
-windows. If provided, peak detection is skipped entirely and one peak is
-returned for every window, whether or not a peak is detectable there. Two
-adjacent windows sharing a boundary time act as a vertical drop line: their
-areas sum exactly to the area of their union, which is how a peak is split at
-a chosen time. \code{max_fwhm} is ignored, since the width of each window is
-chosen by the user. Cannot be combined with \code{pos}. Defaults to
-\code{NULL}.}
+enough, since every peak model needs a window to fit over. A peak in \code{pos}
+whose model fails is kept, with \code{height} and \code{area} set to \code{NA} and
+\code{converged} to \code{0}. If \code{NULL}
+(the default), \code{\link{find_peaks}} is run on that trace, and peaks whose model
+fails are dropped.}
 
 \item{max_fwhm}{Maximum peak width, as a full width at half maximum, in
 index units. Peaks whose \code{FWHM} could not be measured (\code{NA}) are retained.
-Defaults to \code{NULL}, which applies no width filter. Ignored if \code{windows} is
-provided.}
+Defaults to \code{NULL}, which applies no width filter.}
 
 \item{sd_max}{The \code{sd_max} argument is deprecated, because a standard
 deviation is not a peak width for any model except \code{"gaussian"}. Please use
@@ -74,19 +64,22 @@ per peak.}
 \item{baseline}{Whether to subtract a local baseline beneath each peak.
 Options are \code{"none"} (no baseline, default), \code{"flat"} (constant offset), or
 \code{"sloped"} (linearly varying offset). For the peak models, the offset is
-estimated by non-linear least squares along with the shape parameters. When
-\code{fit = "raw"}, it is instead read directly off the boundaries of the
-integration window: \code{"flat"} draws a horizontal line at the lower of the two
-boundary intensities, while \code{"sloped"} draws a line between them
-(valley-to-valley integration). A baseline lying above the signal produces a
-negative area, which is reported as such, with a warning.}
+estimated by nonlinear least squares along with the shape parameters and is
+constrained to be non-negative; a \code{"flat"} offset is also capped at the
+lowest intensity in the window. When \code{fit = "raw"}, the offset is instead
+read directly off the boundaries of the integration window: \code{"flat"} draws a
+horizontal line at the lower of the two boundary intensities, while
+\code{"sloped"} draws a line between them (valley-to-valley integration). A raw
+baseline lying above the signal gives a negative area. \code{fit_peaks} reports
+it as is; \code{\link{get_peaktable}} records it as \code{0}.}
 
 \item{...}{Additional arguments to \code{find_peaks}.}
 }
 \value{
 A \code{data.frame} with one row per peak and the following columns:
 \itemize{
-\item \code{rt}: Peak maximum location.
+\item \code{rt}: Apex of the fitted peak model, or of the detected peak when
+\code{fit = "raw"}.
 \item \code{start}: Peak start.
 \item \code{end}: Peak end.
 \item \code{sd}: Standard deviation of the Gaussian component of the fitted model,
@@ -97,9 +90,9 @@ which is not the width of the peak unless \code{fit = "gaussian"}. \code{NA} whe
 \code{fit = "bemg"}).
 \item \code{tau_left}: Exponential decay constant for left side of peak (only when
 \code{fit = "bemg"}).
-\item \code{h}: The \code{height} parameter of the fitted BEMG shape function: the value
-of the pure shape at \code{center}, before any baseline is added, and distinct
-from \code{height} (only when \code{fit = "bemg"}).
+\item \code{h}: The amplitude parameter of the fitted BEMG shape function. It scales
+the shape but is neither its value at \code{center} nor the peak \code{height} (only
+when \code{fit = "bemg"}).
 \item \code{center}: The center parameter of the fitted BEMG shape function, the
 location around which the exponential tails are applied. May differ from
 \code{rt} (only when \code{fit = "bemg"}).
@@ -111,10 +104,10 @@ fall below half its height on both sides.
 \item \code{r.squared}: Coefficient of determination (\eqn{R^2}), from a linear
 regression of fitted values on the raw data. Statistically informal, since
 the model was fit by nonlinear least squares rather than OLS, but useful as
-a fit diagnostic.
+a fit diagnostic. Not returned when \code{fit = "raw"}.
 \item \code{purity}: The spectral purity of peak as assessed by \code{\link{get_purity}}.
-\item \code{window_limited}: \code{1} if a fitted shape parameter came to rest on a bound
-derived from the integration window, meaning the window rather than the data
+\item \code{window_limited}: \code{1} if a fitted shape parameter hit a limit set by the
+integration window, meaning the window rather than the data
 determined the reported shape, and \code{0} otherwise. Not returned when
 \code{fit = "raw"}.
 \item \code{converged}: \code{1} if the optimizer reported convergence for the final stage
@@ -128,9 +121,9 @@ when \code{baseline = "sloped"}).
 \item \code{floor_end}: Baseline level at the right edge of the peak window (only
 when \code{baseline = "sloped"}).
 The table is in index units rather than retention times: \code{rt}, \code{start},
-\code{end} and \code{center} are index positions; \code{sd}, \code{FWHM}, \code{area} and \code{tau} are
-widths on the index scale; and \code{tau_right} and \code{tau_left} are in inverse
-index units. \code{\link{get_peaks}} converts them to the chromatogram's time axis.
+\code{end} and \code{center} are index positions; \code{sd}, \code{FWHM} and \code{tau} are widths on
+the index scale; \code{area} is integrated over the index axis; and \code{tau_right}
+and \code{tau_left} are in inverse index units. \code{\link{get_peaks}} converts them to the chromatogram's time axis.
 }
 }
 \description{

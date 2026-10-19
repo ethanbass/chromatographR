@@ -343,6 +343,15 @@ test_that("normalize_data matches `column` exactly when inferring `by`", {
   expect_error(normalize_data(pk_tab, "zzz"), "could not be found")
 })
 
+test_that("reshape_chroms does not copy the baseline onto the long data", {
+  skip_on_cran()
+  data(Sa_pr)
+  b <- correct_baseline(Sa_pr, attach_baseline = TRUE, show_progress = FALSE,
+                        cl = 1)
+  d <- reshape_chroms(b, lambdas = 210, transfer_metadata = TRUE)
+  expect_null(attr(d, "estimated_baseline", exact = TRUE))
+})
+
 test_that("get_peaktable rejects objects it has no method for", {
   expect_error(get_peaktable("nonsense"),
                regexp = "No get_peaktable method for object of class character")

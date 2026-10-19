@@ -18,7 +18,7 @@ check_peaktable <- function(peak_table){
 #' @noRd
 get_chrom_list <- function(x, chrom_list = NULL, verbose = FALSE,
                            aligned = inherits(x, "peak_table") &&
-                             isTRUE(x$args$use.cor)){
+                             isTRUE(x$args$use_corrected_rt %||% x$args$use.cor)){
   if (is.null(chrom_list)){
     if (inherits(x, "peak_table")){
       string <- x$args[["chrom_list"]]
@@ -146,6 +146,133 @@ check_shape_cols <- function(fit, peaks){
   invisible(shape_cols)
 }
 
+#' Select detected peaks by target retention time
+#'
+#' Restricts a table of detected peak positions to those whose apex falls
+#' within `tol` of one of the retention times in `rts`. Called by [`get_peaks`].
+#'
+#' Filters the output of [`find_peaks`] rather than restricting its input,
+#' because peak bounds are derived from derivative sign changes across the whole
+#' trace. Truncating the input would clip the bounds of any peak whose true
+#' start precedes the window, alter the smoothing bandwidth (which is a fraction
+#' of `length(y)`), and introduce smoothing edge artifacts at every window
+#' boundary. Filtering afterwards is also where essentially all of the speedup
+#' lies, since peak detection is a small fraction of the cost of model fitting.
+#' @author Ethan Bass
+#' @noRd
+select_peaks_by_rt <- function(pos, y, times, rts, tol = 0.1,
+                               select_by = c("height", "proximity", "none")){
+  select_by <- match.arg(select_by)
+  tol <- check_rts(rts, tol)
+  apex_idx <- pos[, "pos"]
+  keep <- match_rts(times[apex_idx], rts, tol = tol, weight = y[apex_idx],
+                    select_by = select_by)
+  structure(pos[keep, , drop = FALSE], target = attr(keep, "target"))
+}
+
+#' Validate target retention times and tolerances
+#'
+#' Returns `tol` recycled to the length of `rts`.
+#' @author Ethan Bass
+#' @noRd
+check_rts <- function(rts, tol){
+  rts <- suppressWarnings(as.numeric(rts))
+  if (length(rts) == 0 || anyNA(rts)){
+    stop("Please provide a numeric vector of retention times to `targets`.")
+  }
+  if (!length(tol) %in% c(1L, length(rts))){
+    stop(sprintf(
+      "`tol` must be a single value or one value for each of the %d retention time%s in `targets`, not %d.",
+      length(rts), plural(length(rts)), length(tol)))
+  }
+  if (any(!is.finite(tol)) || any(tol < 0)){
+    stop("`tol` must be a non-negative number.")
+  }
+  rep_len(tol, length(rts))
+}
+
+#' Reject `bounds = FALSE`, which `find_peaks` accepts but integration cannot use
+#' @noRd
+check_bounds_arg <- function(...){
+  dots <- list(...)
+  if ("bounds" %in% names(dots) && !isTRUE(dots$bounds)){
+    stop("`bounds = FALSE` cannot be used with `fit_peaks`, since peak boundaries are required in order to integrate. It is only meaningful when calling `find_peaks` directly.")
+  }
+}
+
+#' Standardize the `targets` argument to `get_peaks` into a table of targets
+#'
+#' Returns a data.frame with columns `rt`, `tol`, `lambda` and `name`, where
+#' `lambda` is `NA` for a target measured at every wavelength and `name` is
+#' `NA` for an unnamed target.
+#' @author Ethan Bass
+#' @noRd
+check_targets <- function(rts, tol){
+  as_number <- function(x) suppressWarnings(as.numeric(as.character(x)))
+  if (!is.data.frame(rts)){
+    rt <- as_number(rts)
+    return(data.frame(rt = rt, tol = check_rts(rt, tol),
+                      lambda = NA_character_, name = NA_character_))
+  }
+  if (!"rt" %in% colnames(rts)){
+    stop("A data.frame supplied to `targets` must have an `rt` column.")
+  }
+  if ("tol" %in% colnames(rts)){
+    fill <- is.na(rts$tol)
+    tol <- replace(as_number(rts$tol), fill, rep_len(tol, nrow(rts))[fill])
+  }
+  rt <- as_number(rts$rt)
+  out <- data.frame(rt = rt, tol = check_rts(rt, tol),
+                    lambda = NA_character_, name = NA_character_)
+  for (col in c("lambda", "name")){
+    if (col %in% colnames(rts)){
+      v <- as.character(rts[[col]])
+      if (anyNA(v) || any(v == "")){
+        stop(sprintf("The `%s` column of `targets` must not contain missing or empty values.", col))
+      }
+      out[[col]] <- v
+    }
+  }
+  num <- as_number(out$lambda)
+  out$lambda[!is.na(num)] <- as.character(num[!is.na(num)])
+  if (anyDuplicated(out$name[!is.na(out$name)])){
+    stop("Target names must be unique. Duplicated: ",
+         paste(unique(out$name[duplicated(out$name)]), collapse = ", "), ".")
+  }
+  out
+}
+
+#' Match peak apices to target retention times
+#'
+#' Returns the indices of `apex_rt` falling within `tol` of any element of
+#' `rts`, resolving ties within a window according to `select_by`. An apex
+#' within `tol` of several targets is a candidate only for the nearest of them.
+#' The `target` attribute gives the element of `rts` each index was matched to.
+#' @author Ethan Bass
+#' @noRd
+match_rts <- function(apex_rt, rts, tol = 0.1, weight = NULL,
+                      select_by = c("height", "proximity", "none")){
+  select_by <- match.arg(select_by)
+  tol <- rep_len(tol, length(rts))
+  d <- abs(outer(apex_rt, rts, "-"))
+  d[is.na(d) | d > rep(tol, each = length(apex_rt))] <- Inf
+  owner <- max.col(-d, ties.method = "first")
+  owner[!is.finite(d[cbind(seq_along(apex_rt), owner)])] <- NA
+  keep <- target <- integer(0)
+  for (k in seq_along(rts)){
+    cand <- which(owner == k)
+    if (length(cand) == 0) next
+    sel <- switch(select_by,
+                  none = cand,
+                  proximity = cand[which.min(d[cand, k])],
+                  height = cand[which.max(weight[cand])])
+    keep <- c(keep, sel)
+    target <- c(target, rep(k, length(sel)))
+  }
+  o <- order(keep)
+  structure(keep[o], target = target[o])
+}
+
 #' Get retention index
 #'
 #' Matches retention times to the nearest positions on a sorted time axis.
@@ -261,10 +388,12 @@ get_times <- function(x, idx = 1){
 
 #' Get lambdas
 #' 
-#' Get wavelengths from a list of chromatograms or a `peak_table` object.
+#' Get wavelengths from a chromatogram, a list of chromatograms, or a
+#' `peak_table` object.
 #' 
-#' @param x A list of chromatograms or `peak_table` object.
-#' @return A numeric vector of wavelengths.
+#' @param x A chromatogram, a list of chromatograms, or a `peak_table` object.
+#' @return A numeric vector of wavelengths, taken from the first chromatogram
+#' if `x` is a list.
 #' @family accessors
 #' @examples
 #' data(Sa_warp)
@@ -276,9 +405,9 @@ get_lambdas <- function(x){
     x <- get_chrom_list(x)
   }
   if (inherits(x, "chrom_list") | inherits(x, "list")){
-    as.numeric(colnames(x[[1]]))
+    suppressWarnings(as.numeric(colnames(x[[1]])))
   } else if (inherits(x, "matrix")){
-    as.numeric(colnames(x))
+    suppressWarnings(as.numeric(colnames(x)))
   }
 }
 
@@ -311,7 +440,7 @@ get_baseline <- function(x){
     class(out) <- class(x)
     return(out)
   }
-  bl <- attr(x, "baseline", exact = TRUE)
+  bl <- attr(x, "estimated_baseline", exact = TRUE)
   if (is.null(bl)){
     if (isTRUE(attr(attr(x, "baseline_param", exact = TRUE), "attached")))
       stop("No baseline found. It was discarded by a later step that changes ",
@@ -424,9 +553,8 @@ axis_dt <- function(v){
 
 #' Check manual integration windows
 #'
-#' Validates and standardizes the `windows` argument to [`get_peaks`] and
-#' [`fit_peaks`], returning a two-column numeric matrix of start and end
-#' retention times.
+#' Validates and standardizes the `windows` argument to [`get_peaks`],
+#' returning a two-column numeric matrix of start and end retention times.
 #' @author Ethan Bass
 #' @noRd
 check_windows <- function(windows, times){
@@ -499,10 +627,10 @@ time_factor <- function(time_unit = c("min", "s", "ms")){
 
 #' Multiplier from minutes to the units of a retention-time axis
 #'
-#' An unrecorded unit is taken to be minutes.
+#' An unrecorded or unrecognized unit is taken to be minutes.
 #' @noRd
 rt_factor <- function(unit){
-  if (is.null(unit) || is.na(unit)) return(1)
+  if (is.null(unit) || is.na(unit) || !unit %in% c("min", "s", "ms")) return(1)
   time_factor(unit)
 }
 
@@ -625,20 +753,13 @@ as_chrom_list <- function(x, arg = "X"){
 #' Transfer metadata
 #' Transfers metadata attributes between objects.
 #' @details
-#' `"baseline"` is excluded by default because it is indexed by the time axis
-#' and is therefore invalidated by any transform that resamples or rescales the
-#' signal. This matters most for warping: `correct_rt` transfers metadata over
-#' the warped matrices, and under `vpdtw` the baseline and the data end up with
-#' different numbers of rows outright, while under `ptw` the shapes and
-#' rownames still agree even though the signal has been mapped onto a new time
-#' axis and the baseline has not -- so it looks valid while being silently
-#' misaligned. Note that `exclude` only filters what is copied from
-#' `old_object`: an attribute that arithmetic already carried onto `new_object`
-#' survives, which is why `subtract_blanks` drops the baseline itself.
+#' `exclude` only filters what is copied from `old_object`: an attribute that
+#' arithmetic already carried onto `new_object` survives, which is why
+#' `subtract_blanks` drops the baseline itself.
 #' @noRd
 transfer_metadata <- function(new_object, old_object, transfer_class = TRUE,
                               exclude = c('names','row.names','dim','dimnames',
-                                          'baseline')){
+                                          'estimated_baseline')){
   if (!transfer_class){
     exclude <- c(exclude, "class")
   }

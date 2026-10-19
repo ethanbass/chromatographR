@@ -177,6 +177,7 @@ plot_chroms <- function(x, lambdas, idx, time_resolution = 0.01,
     }
     attr(p, "lambdas") <- lambdas
     attr(p, "idx") <- idx
+    attr(p, "time_unit") <- time_unit
     suppressWarnings(p)
   }
 }
@@ -414,26 +415,37 @@ plot_chroms_heatmap_plotly <- function(chrom_list, lambdas.idx = 1, idx = NULL,
 #' Annotate peaks on a chromatogram
 #'
 #' Adds text labels to peaks on a chromatogram plot produced by
-#' [plot_chroms()]. Peak retention times and intensities are looked up
-#' automatically from the peak table.
+#' [plot_chroms()]. Peaks named in a peak table are labeled at their
+#' retention time, above the highest point of the chromatograms in `idx`
+#' between the peak's start and end. Peaks given as retention times are
+#' labeled at that time, above the highest plotted point within `tol` of it,
+#' and need no peak table; the label then marks the tallest trace in that
+#' window, whichever peak it belongs to.
 #'
 #' @param p A `ggplot` object produced by [plot_chroms()].
-#' @param loc A character vector of peak names (e.g. `c("V8", "V15")`).
-#'   If named, the names are used as labels (e.g.
-#'   `c(Sinigrin = "V8", `1ME` = "V15")`).
+#' @param loc Either a character vector of peak names from `peak_table`
+#'   (e.g. `c("V8", "V15")`) or a numeric vector of retention times, in the
+#'   units of the plot's time axis. If named, the names are used as labels.
 #' @param peak_table A `peak_table` object created by [`get_peaktable`].
-#' @param chrom_list A list of chromatograms in matrix format (timepoints x
+#'   Required when `loc` gives peak names.
+#' @param chrom_list A list of chromatograms in matrix format (timepoints ×
 #' wavelengths). If no argument is provided here, the function will try to find
 #' the `chrom_list` object using the pointer in the `peak_table`.
 #' @param label Labels to display at each peak. Can be a character vector of
-#'   labels (one per peak), `"rt"` to use retention times from the peak table.
+#'   labels (one per peak), or `"rt"` to use the retention times.
 #'   If labels are not specified here, the names of `loc` will be applied, or
 #'   if the `loc` vector is not named, the peak names will be used directly.
 #' @param lambda Wavelength(s) to use for locating the peak apex. Inherited
 #'   from `p` if `NULL` (default). If multiple wavelengths are provided, the
-#'   one with the highest absorbance is used.
+#'   one with the highest absorbance at the peak's retention time is used.
 #' @param idx Index of chromatogram(s) to use for locating the peak apex.
 #'   Inherited from `p` if `NULL` (default).
+#'
+#'   `lambda` and `idx` apply only to peak names; retention times use the
+#'   plotted traces.
+#' @param tol Half-width of the window around each retention time in which the
+#'   highest plotted point is found, in minutes. Defaults to `0.05`. Ignored for
+#'   peak names.
 #' @param vjust Vertical justification of the label relative to the peak apex.
 #'   Defaults to `-0.5`.
 #' @param ... Additional arguments passed to [ggplot2::annotate()].
@@ -448,12 +460,19 @@ plot_chroms_heatmap_plotly <- function(chrom_list, lambdas.idx = 1, idx = NULL,
 #'   data(pk_tab)
 #'   plot_chroms(Sa_warp, lambdas = 210, engine = "ggplot") |>
 #'     annotate_peaks(c(C1="V9", C2="V11", C3="V17"), peak_table = pk_tab)
+#'   plot_chroms(Sa_warp, lambdas = 210, engine = "ggplot") |>
+#'     annotate_peaks(c(C1 = 12.18, C2 = 12.70))
 #' }
 #' @export
-annotate_peaks <- function(p, loc, peak_table, chrom_list=NULL, label = NULL, 
-                           lambda = NULL, idx = NULL, vjust = -0.5, ...) {
+annotate_peaks <- function(p, loc, peak_table = NULL, chrom_list = NULL,
+                           label = NULL, lambda = NULL, idx = NULL, tol = 0.05,
+                           vjust = -0.5, ...) {
   if (!inherits(p, "ggplot")){
     stop("Please supply a ggplot object to `p`.")
+  }
+  by_rt <- is.numeric(loc)
+  if (!by_rt && is.null(peak_table)){
+    stop("Please supply a `peak_table`, or give `loc` as retention times.")
   }
   lambda <- if (is.null(lambda)) attr(p, "lambdas") else lambda
   idx    <- if (is.null(idx))    attr(p, "idx")    else idx
@@ -461,15 +480,27 @@ annotate_peaks <- function(p, loc, peak_table, chrom_list=NULL, label = NULL,
   if (is.null(label) && !is.null(names(loc))) {
     label <- names(loc)
   } else if (identical(label, "rt")){
-    label <- peak_table$pk_meta["rt", loc]
+    label <- if (by_rt) as.character(loc) else peak_table$pk_meta["rt", loc]
   } else if (is.null(label)) {
-    label <- loc
+    label <- if (by_rt) as.character(loc) else loc
   }
-  
+
   for (i in seq_along(loc)) {
-    peak_data <- get_peak_coordinates(peak_table, chrom_list = chrom_list, 
-                                      loc[i], lambda = lambda, idx = idx)
-    coords <- peak_data$coordinates
+    if (by_rt){
+      near <- abs(p$data$rt - loc[[i]]) <= tol * rt_factor(attr(p, "time_unit")) &
+        !is.na(p$data$absorbance)
+      if (!any(near)){
+        stop("No plotted data within `tol` of retention time ", loc[[i]], ".",
+             call. = FALSE)
+      }
+      coords <- c(loc[[i]], max(p$data$absorbance[near]))
+    } else {
+      coords <- get_peak_coordinates(peak_table, chrom_list = chrom_list,
+                                     loc[i],
+                                     lambda = lambda %||%
+                                       peak_table$pk_meta["lambda", loc[i]],
+                                     idx = idx)$coordinates
+    }
     p <- p + ggplot2::annotate("text", x = coords[1], y = coords[2], 
                                label = label[i], vjust = vjust, ...)
   }

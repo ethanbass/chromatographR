@@ -15,7 +15,7 @@
 #' in whatever unit the chromatogram carries, as returned by [`get_times`], and
 #' wavelengths as labeled in the column names, as returned by [`get_lambdas`].
 #'
-#' A `"baseline"` attribute attached by [`preprocess`] or [`correct_baseline`]
+#' An `"estimated_baseline"` attribute attached by [`preprocess`] or [`correct_baseline`]
 #' is cropped alongside the data, so it stays aligned and can still be
 #' retrieved with [`get_baseline`].
 #'
@@ -159,9 +159,9 @@ crop_matrix <- function(x, rt_range = NULL, lambda_range = NULL,
                       n = nrow(x))
   ci <- crop_axis_idx(axis$lambda, lambda_range, "lambda_range", "wavelengths",
                       n = ncol(x))
-  bl <- attr(x, "baseline", exact = TRUE)
+  bl <- attr(x, "estimated_baseline", exact = TRUE)
   out <- transfer_metadata(x[ri, ci, drop = FALSE], x, transfer_class = FALSE)
   if (!is.null(bl))
-    attr(out, "baseline") <- bl[ri, ci, drop = FALSE]
+    attr(out, "estimated_baseline") <- bl[ri, ci, drop = FALSE]
   out
 }

@@ -10,6 +10,9 @@
   chrom_list,
   idx = 1,
   lambda = NULL,
+  targets = NULL,
+  tol = 0.1,
+  pad = 0.5,
   points = FALSE,
   ticks = FALSE,
   alpha = 0.5,
@@ -34,6 +37,26 @@ matrices). If missing, extracted from environment using the pointer in \code{x}.
 \item{idx}{Index or name of chromatogram to plot from \code{chrom_list}.}
 
 \item{lambda}{Wavelength (column) to use for plotting.}
+
+\item{targets}{Optional target retention times, as a numeric vector or a
+table of targets (see \code{\link{targeted_analysis}}). If supplied, the plot is
+zoomed to the span of every peak whose apex falls within \code{tol} of a target,
+or, for a target with no such peak, whose boundaries (widened by \code{tol})
+enclose it. The vertical axis is rescaled to the contents of
+that window, so that small peaks are not flattened against the axis.
+Defaults to \code{NULL}.}
+
+\item{tol}{Numeric. Half-width of the window around each target, in
+minutes, whatever the time unit of \code{chrom_list}. Either a single value applied to
+every target, or a vector giving a separate tolerance for each target. A
+\code{tol} column in \code{targets} takes precedence. Defaults to \code{0.1}. Ignored if
+\code{targets} is \code{NULL}.}
+
+\item{pad}{Fraction of the selected peak span to add on either side when
+zooming. Defaults to \code{0.5}, which keeps neighboring peaks in view. An
+explicit \code{xlim} or \code{ylim} passed through \code{...} takes precedence over the
+zoom; if \code{xlim} is given, the vertical axis is rescaled to that window
+instead.}
 
 \item{points}{Logical. If \code{TRUE}, display peak apex locations as points.
 Defaults to \code{FALSE}.}
@@ -104,6 +127,10 @@ provided \code{peak_list} drawn underneath the curve.
 data(Sa_warp)
 pks <- get_peaks(chrom_list = Sa_warp[1], lambdas = 210)
 plot(pks, points = TRUE, ticks = TRUE)
+plot(pks, targets = 11.12, ticks = TRUE)
+op <- par(mfrow = c(1, 2))
+for (t in c(12.19, 14.41)) plot(pks, targets = t)
+par(op)
 }
 \seealso{
 \code{\link{get_peaks}}

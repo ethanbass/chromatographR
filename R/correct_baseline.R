@@ -16,7 +16,7 @@
 #' (`"aspls"`), or statistics-sensitive non-linear iterative peak-clipping
 #' (`"snip"`). See [`baseline_estimators`] for a description of each.
 #' @param attach_baseline Logical. Whether to retain the estimated baseline
-#' alongside the corrected data, as a `"baseline"` attribute on each returned
+#' alongside the corrected data, as an `"estimated_baseline"` attribute on each returned
 #' matrix, retrievable with [`get_baseline`]. The baseline is subtracted either
 #' way; this argument only controls whether the estimate is kept for
 #' inspection. Defaults to `FALSE`: the baseline is estimated separately for
@@ -89,7 +89,7 @@ correct_baseline_matrix <- function(x, baseline,
   if (attach_baseline){
     bl <- corrected$baseline
     dimnames(bl) <- dimnames(out)
-    attr(out, "baseline") <- bl
+    attr(out, "estimated_baseline") <- bl
   }
   if (!is.null(corrected$param)) attr(out, "baseline_param") <- corrected$param
   out
@@ -99,9 +99,9 @@ correct_baseline_matrix <- function(x, baseline,
 #' @noRd
 undim_trace <- function(x){
   nm <- rownames(x)
-  bl <- attr(x, "baseline", exact = TRUE)
+  bl <- attr(x, "estimated_baseline", exact = TRUE)
   dim(x) <- NULL
   names(x) <- nm
-  if (!is.null(bl)) attr(x, "baseline") <- setNames(as.vector(bl), nm)
+  if (!is.null(bl)) attr(x, "estimated_baseline") <- setNames(as.vector(bl), nm)
   x
 }

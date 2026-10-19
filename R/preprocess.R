@@ -48,7 +48,7 @@
 #' (`"snip"`), or `"none"` to skip baseline correction along the time axis
 #' altogether. See [`baseline_estimators`] for a description of each.
 #' @param attach_baseline Logical. Whether to retain the estimated baseline
-#' alongside the corrected data as a `"baseline"` attribute. The parameter
+#' alongside the corrected data as an `"estimated_baseline"` attribute. The parameter
 #' that produced it (`stiffness`, or `m` for `"snip"`) is always recorded, as a
 #' `"baseline_param"` attribute, whether or not the baseline itself is kept.
 #' The baseline is subtracted either way; this argument only controls whether the estimate is
@@ -270,7 +270,7 @@ subtract_baseline <- function(X, baseline,
   # for the rest of the call when nobody will read it
   param <- effective_baseline_param(baseline, bl_args, dt = dt)
   if (attach_baseline && !is.null(param)) attr(param, "attached") <- TRUE
-  list(x = structure(X - bl, baseline = NULL),
+  list(x = structure(X - bl, estimated_baseline = NULL),
        baseline = if (attach_baseline) bl else NULL,
        param = param)
 }
@@ -291,7 +291,7 @@ preprocess_matrix <- function(X,
     stop("X should be a matrix!")
   metadata <- attributes(X)
   metadata[c("dimnames", "names", "row.names", "dim", "class", "levels",
-             "baseline", "baseline_param")] <- NULL
+             "estimated_baseline", "baseline_param")] <- NULL
   if (interpolate_rows){
     if (length(tpoints <- as.numeric(rownames(X))) == 0)
       tpoints <- seq_nrow(X)
@@ -342,7 +342,7 @@ preprocess_matrix <- function(X,
   attributes(X) <- c(attributes(X), metadata)
   if (attach_baseline){
     dimnames(bl) <- dimnames(X)
-    attr(X, "baseline") <- bl
+    attr(X, "estimated_baseline") <- bl
   }
   if (!is.null(bl_param)) attr(X, "baseline_param") <- bl_param
   X

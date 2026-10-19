@@ -8,8 +8,11 @@
 #' spectral wavelength. Every sample × wavelength component is described by a
 #' `data.frame` where every row represents a peak, and the columns contain
 #' information on retention time, peak shape, height, and area.
-#' @param min_height Minimum peak height.
-#' @param min_area Minimum peak area.
+#' @param min_height Minimum peak height. Peaks whose `height` is `NA`, such as
+#' failed fits kept by [`get_peaks`], are dropped if `min_height` is supplied
+#' and retained otherwise.
+#' @param min_area Minimum peak area. Peaks whose `area` is `NA` are treated
+#' the same way.
 #' @param min_sd The `min_sd` argument is deprecated. Please use `min_fwhm`
 #' instead.
 #' @param max_sd The `max_sd` argument is deprecated. Please use `max_fwhm`
@@ -76,10 +79,12 @@ filter_peaks <- function(peak_list, min_height, min_area,
     }
   }
   x <- do.call(rbind, do.call(rbind, peak_list))
-  if (!missing(min_height)){
+  keep_na_height <- missing(min_height)
+  keep_na_area <- missing(min_area)
+  if (!missing(min_height) && !anyNA(x$height)){
     if (min_height < min(x$height))
       warning("The 'min_height' is less than minimum peak height.")}
-  if (!missing(min_area)){
+  if (!missing(min_area) && !anyNA(x$area)){
     if (min_area < min(x$area))
       warning("The 'min_area' is less than minimum peak area.")}
   measured <- x$FWHM[!is.na(x$FWHM)]
@@ -101,18 +106,20 @@ filter_peaks <- function(peak_list, min_height, min_area,
 
   result <- lapply(peak_list,
          function(smpl)
-           lapply(smpl,
+           transfer_metadata(lapply(smpl,
                   function(comp)
                     comp[which((is.na(comp[, "FWHM"]) |
                               (comp[, "FWHM"] >= min_fwhm &
                                  comp[, "FWHM"] <= max_fwhm)) &
-                           comp[, "height"] >= min_height &
-                           comp[, "area"] >= min_area &
+                           (comp[, "height"] >= min_height |
+                              (keep_na_height & is.na(comp[, "height"]))) &
+                           (comp[, "area"] >= min_area |
+                              (keep_na_area & is.na(comp[, "area"]))) &
                            comp[, "rt"] >= as.numeric(min_rt) &
                            comp[, "rt"] <= as.numeric(max_rt) &
                            keep_by_flag(comp, "converged", converged) &
                            keep_by_flag(comp, "window_limited",
-                                        window_limited)), , drop = FALSE]))
+                                        window_limited)), , drop = FALSE]), smpl))
   transfer_metadata(result, peak_list, transfer_class = TRUE)
 }
 

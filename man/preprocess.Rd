@@ -55,7 +55,7 @@ asymmetric least squares (\code{"als"}, the default, via
 altogether. See \code{\link{baseline_estimators}} for a description of each.}
 
 \item{attach_baseline}{Logical. Whether to retain the estimated baseline
-alongside the corrected data as a \code{"baseline"} attribute. The parameter
+alongside the corrected data as an \code{"estimated_baseline"} attribute. The parameter
 that produced it (\code{stiffness}, or \code{m} for \code{"snip"}) is always recorded, as a
 \code{"baseline_param"} attribute, whether or not the baseline itself is kept.
 The baseline is subtracted either way; this argument only controls whether the estimate is

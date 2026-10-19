@@ -1,0 +1,94 @@
+#' Targeted analysis
+#'
+#' Targeted analysis measures a set of known compounds. Two routes lead from a
+#' table of target compounds to a peak table with a named column for each
+#' target: selecting peaks by retention time in [`get_peaks`], or matching peaks
+#' to a reference sample with [`match_peaks`].
+#'
+#' @section Choosing a route:
+#' Select peaks by retention time using [`get_peaks`] when the samples are
+#' aligned, or can be aligned with [`correct_rt`], and no other peak falls
+#' within `tol` of a target. Only the peaks near the targets are fitted, which
+#' is quicker, and each target can be measured at its own wavelength.
+#'
+#' Match peaks to a reference using [`match_peaks`] when retention times alone
+#' cannot identify the targets (e.g., in crowded windows). Peaks are matched by
+#' spectrum as well as retention time, so a target can be picked out from its
+#' neighbors, and the retention-time window can be wider to allow for drift.
+#' Every peak is fitted, and every target is measured at the same wavelength.
+#'
+#' @section Constructing the targets table:
+#' Build a `data.frame` with an `rt` column giving the retention time of each target
+#' and, optionally:
+#' * `name`: Unique names, used as peak table column names.
+#' * `lambda`: The wavelength at which to measure each target. When matching to
+#' a reference, it must equal the `lambda` given to [`match_peaks`].
+#' * `tol`: How far each target's peak may lie from its `rt`, in minutes,
+#' regardless of the time unit of the chromatograms. Defaults to `0.1`.
+#' * `spectral_cutoff`: Used only by [`match_peaks`]. The minimum spectral
+#' correlation for a match to each target's reference peak. Defaults to the
+#' `spectral_cutoff` argument of [`match_peaks`].
+#' * `rt_window`: Used only by [`match_peaks`]. The maximum difference in
+#' retention time, in minutes, between each target's reference peak and its
+#' match in another sample. Defaults to the `rt_window` argument of
+#' [`match_peaks`].
+#'
+#' @section Selecting peaks by retention time:
+#' 1. Call `get_peaks(chrom_list, targets = targets)`. In each sample, `get_peaks`
+#' fits only the peaks whose apex lies within `tol` of a target.
+#' 2. Call [`get_peaktable`] on the result. The peak table has one column per
+#' target found in at least one sample; a target found in no sample gets no
+#' column.
+#'
+#' Peaks are assigned by retention time only, so each target must stay within
+#' `tol` of its listed time in every sample, and closer to it than to any
+#' neighboring target. If the samples drift more than that, fit warping models
+#' with [`correct_rt`] and pass them as a `mod_list`; the targets are then found
+#' on the aligned time axis.
+#'
+#' When more than one peak falls within `tol` of a target, the `select_by`
+#' argument of [`get_peaks`] decides which is retained. The default,
+#' `select_by = "height"`, keeps the tallest, which may not be the target;
+#' narrow `tol`, or set `select_by = "proximity"` to keep the peak closest to
+#' the target. Peaks are selected before they are fitted, so `"height"`
+#' compares the signal at each apex, including any baseline beneath it.
+#'
+#' To keep every candidate in the peak list, set `select_by = "none"`. Where a
+#' sample has several peaks for one target, [`get_peaktable`] enters the one
+#' with the largest `response` in the table, but summarizes the target's
+#' `pk_meta` over all of them, so its `rt` can fall between the candidates. To
+#' take the metadata from the most intense peak instead, set
+#' `summarize_by = "max"` in [`get_peaktable`].
+#'
+#' @section Matching peaks to a reference sample:
+#' 1. Call [`get_peaks`] without providing `targets`, so that every peak is fitted.
+#' 2. Call `match_peaks(peak_list, targets = targets, lambda = ...)`.
+#' Unless `reference` is supplied, `match_peaks` picks as reference a sample that
+#' has a peak for every target, then matches each sample's peaks to the
+#' reference peaks by spectral correlation and retention time.
+#' 3. Call `get_peaktable(matched, pks = peak_list)`. Unlike the other
+#' pathway, the peak table will still include untargeted peaks. Use
+#' `[, targets$name]` to keep only the targets.
+#'
+#' In the reference sample, each target is assigned to the tallest well-fitted
+#' peak within `tol` minutes of the specified `rt`. A peak in another sample can
+#' match a reference peak only if it lies within `rt_window` minutes of it and
+#' their spectral correlation is above the `spectral_cutoff`.
+#'
+#' @name targeted_analysis
+#' @author Ethan Bass
+#' @seealso [`get_peaks`], [`match_peaks`], [`get_peaktable`]
+#' @examples
+#' data(Sa_pr)
+#' targets <- data.frame(name = c("A", "B"), rt = c(12.07, 14.31))
+#'
+#' # selecting by retention time, on the aligned time axis
+#' mods <- correct_rt(Sa_pr, lambdas = 220, what = "models", reference = 1)
+#' pks_t <- get_peaks(Sa_pr, lambdas = 220, targets = targets, mod_list = mods)
+#' get_peaktable(pks_t)
+#'
+#' # matching to a reference sample
+#' pks <- get_peaks(Sa_pr, lambdas = 220)
+#' matched <- match_peaks(pks, targets = targets, lambda = 220)
+#' get_peaktable(matched, pks = pks)[, targets$name]
+NULL

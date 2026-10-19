@@ -167,9 +167,9 @@ test_that("attach_baseline retains a baseline that reconstructs the input", {
   withbl <- do.call(preprocess, c(list(Sa), args, attach_baseline = TRUE))
   nobl <- do.call(preprocess, c(list(Sa), args, baseline = "none"))
   for (i in seq_along(withbl)){
-    bl <- attr(withbl[[i]], "baseline", exact = TRUE)
+    bl <- attr(withbl[[i]], "estimated_baseline", exact = TRUE)
     expect_equal(dim(bl), dim(withbl[[i]]))
-    # `as.vector` because arithmetic carries the "baseline" attribute forward
+    # `as.vector` because arithmetic carries the "estimated_baseline" attribute forward
     expect_equal(as.vector(withbl[[i]] + bl), as.vector(nobl[[i]]),
                  tolerance = 1e-8)
   }
@@ -179,7 +179,7 @@ test_that("attach_baseline retains a baseline that reconstructs the input", {
   # ...but clipping is applied after the subtraction, so it breaks the identity
   clipped <- do.call(preprocess, c(list(Sa[1]), args, attach_baseline = TRUE,
                                    zero_floor = TRUE))[[1]]
-  expect_gt(max(abs(as.vector(clipped + attr(clipped, "baseline", exact = TRUE)) -
+  expect_gt(max(abs(as.vector(clipped + attr(clipped, "estimated_baseline", exact = TRUE)) -
                       as.vector(nobl[[1]]))), 1)
 })
 
@@ -190,7 +190,7 @@ test_that("attach_baseline warns and is ignored without baseline correction", {
                     dim2 = seq(200, 318, by = 2), attach_baseline = TRUE,
                     baseline = "none", show_progress = FALSE),
     regexp = "ignored")
-  expect_null(attr(x, "baseline", exact = TRUE))
+  expect_null(attr(x, "estimated_baseline", exact = TRUE))
 })
 
 test_that("the deprecated `remove.time.baseline` argument maps to `baseline`", {
@@ -347,7 +347,7 @@ test_that("warping drops the baseline attribute and keeps fixed-width times", {
   pr <- preprocess(Sa, dim1 = seq(10, 18.66, by = .01),
                    dim2 = seq(200, 318, by = 2), attach_baseline = TRUE,
                    show_progress = FALSE, cl = 1)
-  has_bl <- function(l) any(vapply(l, function(x) !is.null(attr(x, "baseline", exact = TRUE)),
+  has_bl <- function(l) any(vapply(l, function(x) !is.null(attr(x, "estimated_baseline", exact = TRUE)),
                                    logical(1)))
   ndec <- function(x) length(unique(nchar(sub("^.*\\.", "", rownames(x)))))
   for (alg in c("ptw", "lptw", "vpdtw")){

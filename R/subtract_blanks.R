@@ -32,7 +32,7 @@
 #'
 #' @return A `chrom_list` with blank-subtracted samples. Blanks
 #'   themselves are removed from the returned list, and so is any
-#'   `"baseline"` attribute on the samples.
+#'   `"estimated_baseline"` attribute on the samples.
 #'
 #' @family preprocessing functions
 #' @seealso [`preprocess`], [`correct_baseline`]
@@ -103,10 +103,8 @@ subtract_blanks <- function(chrom_list, pattern = NULL, blank_id,
                     format_list(ids[n_extrap > 5], quote = FALSE)), call. = FALSE)
   }
   out <- Map(function(new, old){
-    attr(new, "baseline") <- NULL
-    transfer_metadata(new, old, transfer_class = FALSE,
-                      exclude = c('names', 'row.names', 'dim', 'dimnames',
-                                  'baseline'))
+    attr(new, "estimated_baseline") <- NULL
+    transfer_metadata(new, old, transfer_class = FALSE)
   }, out, chrom_list[sample_id])
   if (zero_floor){
     floored <- vapply(out, function(x) mean(x < 0, na.rm = TRUE), numeric(1))

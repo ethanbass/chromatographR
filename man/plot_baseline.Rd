@@ -18,7 +18,7 @@ plot_baseline(
 )
 }
 \arguments{
-\item{x}{A matrix or vector with an attached \code{"baseline"}, or a list of such
+\item{x}{A matrix or vector with an attached \code{"estimated_baseline"}, or a list of such
 matrices, as returned by \code{\link{preprocess}} or \code{\link{correct_baseline}} with
 \code{attach_baseline = TRUE}.}
 

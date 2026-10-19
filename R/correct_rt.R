@@ -226,8 +226,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
   if (n_zeros > 0 && alg == "ptw" && is.null(models)){
     chrom_list <- lapply(chrom_list, function(x){
       x_p <- pad_zeros(x, n_zeros = n_zeros, side = "both")
-      transfer_metadata(x_p, x, exclude = c('names', 'row.names', 'dim',
-                                            'dimnames', 'baseline'))
+      transfer_metadata(x_p, x)
     })
   }
   needs_reference <- (is.null(models) || alg == "vpdtw") &&
@@ -354,9 +353,7 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
                              fill_zeros = fill_zeros, mode = mod$mode)
         rownames(x) <- rownames(chrom_list_og[[ii]])
         colnames(x) <- colnames(chrom_list_og[[ii]])
-        transfer_metadata(x, chrom_list_og[[ii]],
-                          exclude = c('names', 'row.names', 'dim', 'dimnames',
-                                      'baseline'))
+        transfer_metadata(x, chrom_list_og[[ii]])
       })
       result <- structure(result, warped = TRUE, warping_args = args)
       names(result) <- names(chrom_list)
@@ -652,9 +649,7 @@ apply_vpdtw <- function(chrom_list, models, reference, args = NULL,
   result <- lapply(seq_along(chrom_list), function(ii) {
     x <- warp_sample_vpdtw(chrom_list[[ii]], s$src[, s$pos[ii]])
     rownames(x) <- new_rownames
-    transfer_metadata(x, chrom_list[[ii]],
-                      exclude = c('names', 'row.names', 'dim', 'dimnames',
-                                  'baseline'))
+    transfer_metadata(x, chrom_list[[ii]])
   })
   names(result) <- names(chrom_list)
   
@@ -1076,19 +1071,46 @@ strip_zeros <- function(x, n_zeros, side = "both") {
 #' [`correct_rt`] to perform landmark parametric time warping
 #' (`alg = "lptw"`).
 #'
+#' @details
+#' With `targets`, a sample's peak for a target is its tallest peak within
+#' `tol` of it that, when fitted, has `r.squared` of at least 0.5; a peak
+#' within `tol` of several targets counts only for the nearest. Unless
+#' `reference` is given, the reference is chosen among samples with a peak for
+#' every target, where a peak counts if it is at least a tenth of that target's
+#' median height across samples. The sample whose weakest target is largest
+#' relative to its median is chosen, then the one whose peaks lie closest to
+#' the target times.
+#'
 #' @param peak_list A peak list object from [`get_peaks`].
 #' @param chrom_list List of chromatograms in matrix format. If `NULL`, will be
 #'   retrieved from the `peak_list` object.
-#' @param reference Index or name of the reference sample, or `"best"` to select the
-#'   reference algorithmically using [`bestref`][ptw::bestref]. Defaults to `1`.
+#' @param reference Index or name of the reference sample, or `"best"` to
+#'   select the reference algorithmically using [`bestref`][ptw::bestref].
+#'   Defaults to `NULL`, which uses the first sample, or, if `targets` is
+#'   given, a sample chosen from the targets.
+#' @param targets Optional table of targets, or a numeric vector of their
+#'   retention times (see [`targeted_analysis`]). Used to choose the reference
+#'   sample, unless `reference` is given, and to name the targets' columns in
+#'   the peak table. Cannot be combined with `reference = "best"`. Defaults to
+#'   `NULL`.
 #' @param lambda A character or numeric value specifying the wavelength to use
 #'   for peak matching. Required if peaks were detected at multiple wavelengths.
 #' @param rt_window Numeric. Maximum allowed difference in retention time, in
 #'   minutes, between a reference and sample peak to be considered a candidate
-#'   match. Defaults to `0.3`.
+#'   match. An `rt_window` column in `targets` overrides it for those targets.
+#'   Defaults to `0.3`.
 #' @param spectral_cutoff Numeric. Minimum spectral correlation for a candidate
-#'   peak pair to be retained. Ignored, with a warning, for one-dimensional
-#'   chromatograms. Defaults to `0.95`.
+#'   peak pair to be retained. A `spectral_cutoff` column in `targets`
+#'   overrides it for those targets. Ignored, with a warning, for
+#'   one-dimensional chromatograms. Defaults to `0.95`.
+#' @param spectrum Which spectrum of each peak to correlate: `"apex"` (the
+#'   default), the spectrum at the peak apex, or `"background"`, the apex
+#'   spectrum minus the background under the peak, interpolated between the
+#'   spectra at its `start` and `end`. The apex spectrum is averaged over 2
+#'   scans either side and each boundary spectrum over 5, to limit the noise
+#'   the subtraction adds. Background subtraction helps when peaks sit on a
+#'   sloping baseline or the tail of a neighbor, but can hurt peaks near the
+#'   noise level or with boundaries on a neighboring peak.
 #' @param shape_cutoff Numeric. Maximum shape distance for a candidate peak pair
 #'   to be retained. Raises an error when `fit = "raw"`, since peak shape
 #'   parameters are not fit. Defaults to `NULL` (disabled).
@@ -1101,10 +1123,17 @@ strip_zeros <- function(x, n_zeros, side = "both") {
 #'   shape-distance penalty analogous to `rt_weight`. Shape distances are
 #'   normalized by `shape_cutoff` (if provided) or by the maximum observed shape
 #'   distance. Silently ignored when `fit = "raw"`. Defaults to `0`.
+#' @param use_corrected_rt Logical. Whether to compare corrected retention
+#'   times (`rt.cor`) from [`correct_peaks`] rather than raw ones (`rt`), both
+#'   between peaks and against `targets`. Spectra
+#'   are still read at the raw times from `chrom_list`, and the matches and
+#'   `"reference_targets"` keep the raw times. Defaults to `NULL`, which uses
+#'   corrected times when every sample has them.
 #' @param plot_it Logical. Whether to plot the matches with
 #'   [`plot.matched_peak_list`]. Defaults to `FALSE`.
 #' @param fit Character. The type of fit used to construct the peak list, one
-#'   of `"egh"`, `"bemg"`, `"gaussian"` or `"raw"`. Normally this does not need
+#'   of `"egh"`, `"bemg"`, `"gaussian"` or `"raw"`, used only to compare peak
+#'   shapes (`shape_cutoff`, `shape_weight`). Normally this does not need
 #'   to be specified, since it is detected from the `fit` attribute stored in
 #'   the `peak_list` object. Supply it explicitly only if that attribute is
 #'   missing, or to override it (e.g. to use the simpler gaussian shape
@@ -1113,19 +1142,28 @@ strip_zeros <- function(x, n_zeros, side = "both") {
 #' @return A `matched_peak_list` object: a list with one element per sample
 #'   containing the matched peak pairs, per-pair spectral correlation scores,
 #'   and peak data in index space for use with [`correct_rt`]. A sample with no
-#'   peaks or no matches is `NULL`, with a warning.
+#'   peaks or no matches is `NULL`, with a warning. When `targets` is given,
+#'   the targets with `rt` replaced by the reference's own retention times are
+#'   stored as the `"reference_targets"` attribute.
 #' @author Ethan Bass
-#' @seealso [`correct_rt`], [`get_peaks`]
+#' @seealso [`correct_rt`], [`get_peaks`], [`targeted_analysis`]
 #' @examples
 #' data(Sa_pr)
 #' pks <- get_peaks(Sa_pr, lambdas = 210, fit = "egh")
 #' match_peaks(pks, lambda = 210)
 #' @export match_peaks
-match_peaks <- function(peak_list, chrom_list = NULL, reference = 1,
+match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
+                        targets = NULL,
                         lambda = NULL, rt_window = 0.3, spectral_cutoff = 0.95,
+                        spectrum = c("apex", "background"),
                         shape_cutoff = NULL, rt_weight = 0.15, shape_weight = 0,
-                        plot_it = FALSE, fit = NULL,
+                        use_corrected_rt = NULL, plot_it = FALSE, fit = NULL,
                         verbose = getOption("verbose")) {
+  spectrum <- match.arg(spectrum)
+  if (!is.null(targets) && identical(reference, "best"))
+    stop("`reference = \"best\"` cannot be combined with `targets`. Give the ",
+         "reference sample by index or name, or omit `reference` to choose it ",
+         "from the targets.", call. = FALSE)
   if (is.null(chrom_list)){
     chrom_list <- get_chrom_list(peak_list)
   }
@@ -1142,28 +1180,67 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = 1,
   } else{
     lambda_idx <- as.character(lambda)
   }
+  pks_flat <- lapply(peak_list, function(x) x[[lambda_idx]])
+  has_cor <- vapply(Filter(Negate(is.null), pks_flat),
+                    function(p) "rt.cor" %in% colnames(p), logical(1))
+  if (is.null(use_corrected_rt)){
+    if (any(has_cor) && !all(has_cor))
+      stop("Some samples in `peak_list` have corrected retention times (`rt.cor`) ",
+           "and others do not. Pass every sample through `correct_peaks`, or ",
+           "set `use_corrected_rt = FALSE`.")
+    use_corrected_rt <- length(has_cor) > 0 && all(has_cor)
+  } else if (isTRUE(use_corrected_rt) && !all(has_cor)){
+    stop("`use_corrected_rt = TRUE` requires corrected retention times ",
+         "(`rt.cor`) from `correct_peaks` in every sample.")
+  }
+  dist_col <- if (use_corrected_rt) "rt.cor" else "rt"
+  reference_targets <- NULL
+  target_cutoff <- NULL
+  target_window <- NULL
+  if (is.data.frame(targets) && "rt_window" %in% colnames(targets)) {
+    target_window <- targets$rt_window
+    if (all(is.na(target_window))) target_window <- rep(NA_real_, length(target_window))
+    if (!is.numeric(target_window) || any(target_window < 0, na.rm = TRUE))
+      stop("The `rt_window` column of `targets` must be numeric and non-negative.",
+           call. = FALSE)
+    target_window[is.na(target_window)] <- rt_window
+  }
+  if (is.data.frame(targets) && "spectral_cutoff" %in% colnames(targets)) {
+    target_cutoff <- targets$spectral_cutoff
+    if (all(is.na(target_cutoff))) target_cutoff <- rep(NA_real_, length(target_cutoff))
+    if (!is.numeric(target_cutoff) ||
+        any(target_cutoff < -1 | target_cutoff > 1, na.rm = TRUE))
+      stop("The `spectral_cutoff` column of `targets` must be numeric, ",
+           "between -1 and 1.", call. = FALSE)
+    target_cutoff[is.na(target_cutoff)] <- spectral_cutoff
+  }
   if (identical(reference, "best")) {
     reference <- resolve_best_reference(stack_chroms(chrom_list, lambda_idx),
                                         isTRUE(verbose))
-  } else {
+  } else if (!is.null(reference)) {
     ref_idx <- if (is.character(reference)) match(reference, names(peak_list))
                else reference
     if (length(reference) != 1 || !isTRUE(ref_idx %in% seq_along(peak_list)))
       stop(sprintf("`reference` %s is not a sample in `peak_list`.",
                    sQuote(paste(reference, collapse = ", "))))
     reference <- ref_idx
+  } else if (is.null(targets)) reference <- 1
+  if (!is.null(targets)) {
+    chosen <- reference_from_targets(pks_flat, targets, lambda_idx,
+                                     rt_factor(get_time_unit(peak_list)),
+                                     dist_col, reference = reference)
+    if (isTRUE(verbose) && is.null(reference))
+      message(sprintf("Selected %s as the reference: it contains every target.",
+                      if (is.null(names(peak_list))) chosen$index
+                      else sQuote(names(peak_list)[chosen$index])))
+    reference <- chosen$index
+    reference_targets <- chosen$targets
   }
   check_chrom_list(peak_list, chrom_list)
   if (is.null(names(peak_list)) || anyDuplicated(names(peak_list)))
     stop("The samples in `peak_list` must have unique names.")
-  if (is.null(fit)){
-    fit <- attr(peak_list, "fit")
-    if (is.null(fit)){
-      stop("Please specify `fit` to proceed.")
-    }
-  }
-  fit <- match.arg(fit, c("egh", "bemg", "gaussian", "raw"))
-  pks_flat <- lapply(peak_list, function(x) x[[lambda_idx]])
+  fit <- fit %||% attr(peak_list, "fit")
+  if (!is.null(fit)) fit <- match.arg(fit, c("egh", "bemg", "gaussian", "raw"))
   pks_ref <- pks_flat[[reference]]
   pks_ref <- pks_ref[!is.na(pks_ref$rt),]
   rt_ref <- pks_ref$rt
@@ -1172,22 +1249,38 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = 1,
       "No peaks were found in the reference sample (%s) at wavelength %s. Please choose a different `reference` or relax the criteria used to detect peaks.",
       sQuote(names(peak_list)[reference]), sQuote(lambda_idx)))
   }
-  use_shape <- !is.null(shape_cutoff) || (shape_weight > 0 && fit != "raw")
+  use_shape <- !is.null(shape_cutoff) || (shape_weight > 0 && !identical(fit, "raw"))
   if (use_shape){
+    if (is.null(fit))
+      stop("Please specify `fit` to compare peak shapes.", call. = FALSE)
     if (fit == "raw"){
       stop("Peak shape parameters are not fit when `fit = \"raw\"`. Please set ",
            "`shape_cutoff = NULL` to proceed.")
     }
     shape_cols <- check_shape_cols(fit, pks_ref)
   }
+  if (spectrum == "background" && !all(c("start", "end") %in% colnames(pks_ref)))
+    stop("`spectrum = \"background\"` needs `start` and `end` columns in ",
+         "`peak_list`.", call. = FALSE)
+  cutoff_ref <- rep(spectral_cutoff, length(rt_ref))
+  if (!is.null(target_cutoff))
+    cutoff_ref[match(reference_targets$rt, rt_ref)] <- target_cutoff
+  window_ref <- rep(rt_window_rt, length(rt_ref))
+  if (!is.null(target_window))
+    window_ref[match(reference_targets$rt, rt_ref)] <-
+      target_window * rt_factor(get_time_unit(peak_list))
 
-  spectra_at <- function(rts, i){
-    m <- t(chrom_list[[i]][get_retention_idx(rts, get_times(chrom_list, i)), ,
-                           drop = FALSE])
-    colnames(m) <- rts
+  spectra_at <- function(p, i){
+    if (spectrum == "apex"){
+      m <- t(chrom_list[[i]][get_retention_idx(p$rt, get_times(chrom_list, i)), ,
+                             drop = FALSE])
+    } else {
+      m <- background_spectra(chrom_list[[i]], get_times(chrom_list, i), p)
+    }
+    colnames(m) <- p$rt
     m
   }
-  spectra_ref <- spectra_at(rt_ref, reference)
+  spectra_ref <- spectra_at(pks_ref, reference)
 
   use_spectra <- nrow(spectra_ref) > 1
   if (!use_spectra)
@@ -1214,16 +1307,16 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = 1,
     }
 
     if (use_spectra){
-      cor_matrix <- cor(spectra_at(rt_samp, idx), spectra_ref)
-      spectral_mask <- cor_matrix >= spectral_cutoff
+      cor_matrix <- suppressWarnings(cor(spectra_at(pks_samp, idx), spectra_ref))
+      spectral_mask <- !is.na(cor_matrix) & sweep(cor_matrix, 2, cutoff_ref, ">=")
     } else {
       cor_matrix <- matrix(1, nrow = length(rt_samp), ncol = length(rt_ref),
                            dimnames = list(rt_samp, rt_ref))
       spectral_mask <- TRUE
     }
 
-    rt_dist_matrix <- abs(outer(rt_samp, rt_ref, "-"))
-    rt_mask <- rt_dist_matrix <= rt_window_rt
+    rt_dist_matrix <- abs(outer(pks_samp[[dist_col]], pks_ref[[dist_col]], "-"))
+    rt_mask <- !is.na(rt_dist_matrix) & sweep(rt_dist_matrix, 2, window_ref, "<=")
 
     shape_dist_matrix <- if (use_shape) shape_distance(pks_samp, pks_ref, shape_cols)
     shape_mask <- if (!is.null(shape_cutoff)) shape_dist_matrix <= shape_cutoff else TRUE
@@ -1239,7 +1332,7 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = 1,
 
     score_matrix <- cor_matrix
     if (rt_weight > 0)
-      score_matrix <- score_matrix * (1 - rt_weight * rt_dist_matrix / rt_window_rt)
+      score_matrix <- score_matrix * (1 - rt_weight * sweep(rt_dist_matrix, 2, window_ref, "/"))
     if (shape_weight > 0 && !is.null(shape_dist_matrix)) {
       norm <- shape_cutoff %||% max(shape_dist_matrix, na.rm = TRUE)
       if (norm > 0)
@@ -1293,7 +1386,9 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = 1,
   result <- structure(matches_list, reference = names_peaks[reference],
                       rt_ref = rt_ref, lambda = lambda_idx,
                       spectral_cutoff = spectral_cutoff,
+                      spectrum = spectrum,
                       rt_window = rt_window_rt,
+                      reference_targets = reference_targets,
                       class = "matched_peak_list")
   if (plot_it) plot(result)
   result
@@ -1327,6 +1422,91 @@ resolve_best_reference <- function(allmats.t, verbose = FALSE){
   if (verbose)
     message(paste("Selected chromatogram", reference, "as best reference."))
   reference
+}
+
+#' Choose a reference sample that contains every target
+#' @noRd
+reference_from_targets <- function(pks_flat, targets, lambda_idx, rtf,
+                                   rt_col = "rt", reference = NULL){
+  targets <- check_targets(targets, tol = 0.1)
+  targets$lambda[is.na(targets$lambda)] <- lambda_idx
+  if (any(targets$lambda != lambda_idx))
+    stop(sprintf(paste("Every target must be measured at the matching",
+                       "wavelength (%s), since the matched peak table covers",
+                       "only that wavelength."), lambda_idx), call. = FALSE)
+  if (all(vapply(pks_flat, is.null, logical(1))))
+    stop(sprintf("No peaks were found at wavelength %s in any sample.",
+                 sQuote(lambda_idx)), call. = FALSE)
+  labels <- ifelse(is.na(targets$name), paste("rt", targets$rt), targets$name)
+  n_t <- nrow(targets)
+  empty <- matrix(NA_real_, length(pks_flat), n_t)
+  rt <- rt_d <- height <- empty
+  for (s in seq_along(pks_flat)){
+    p <- pks_flat[[s]]
+    if (is.null(p) || !nrow(p)) next
+    fitted_ok <- if (is.null(p$r.squared)) TRUE
+                 else !is.na(p$r.squared) & p$r.squared >= REF_MIN_R2
+    p <- p[!is.na(p$rt) & !is.na(p[[rt_col]]) & !is.na(p$height) & fitted_ok, ,
+           drop = FALSE]
+    j <- match_rts(p[[rt_col]], targets$rt, targets$tol * rtf, weight = p$height,
+                   select_by = "height")
+    k <- attr(j, "target")
+    rt[s, k] <- p$rt[j]
+    rt_d[s, k] <- p[[rt_col]][j]
+    height[s, k] <- p$height[j]
+  }
+  if (!is.null(reference)) {
+    absent <- is.na(height[reference, ])
+    if (any(absent))
+      stop(sprintf(paste("The reference sample (%s) has no peak fitted with",
+                         "`r.squared` of at least %s within `tol` of %s."),
+                   sQuote(names(pks_flat)[reference] %||% reference), REF_MIN_R2,
+                   format_list(labels[absent], quote = FALSE)), call. = FALSE)
+    targets$rt <- rt[reference, ]
+    return(list(index = reference, targets = targets))
+  }
+  rel <- sweep(height, 2, apply(height, 2, median, na.rm = TRUE), "/")
+  rel[rel < REF_MIN_REL_HEIGHT] <- NA
+  present <- !is.na(rel)
+  full <- which(rowSums(present) == n_t)
+  if (!length(full))
+    stop(sprintf(paste("No sample contains a peak for every target. Samples",
+                       "containing each target: %s. Check the target",
+                       "retention times and wavelength."),
+                 paste(sprintf("%s %d of %d", labels, colSums(present),
+                               nrow(present)), collapse = ", ")),
+         call. = FALSE)
+  min_rel <- apply(rel[full, , drop = FALSE], 1, min)
+  max_off <- apply(abs(sweep(rt_d[full, , drop = FALSE], 2, targets$rt)), 1, max)
+  best <- full[order(-min_rel, max_off)[1]]
+  targets$rt <- rt[best, ]
+  list(index = unname(best), targets = targets)
+}
+
+REF_MIN_REL_HEIGHT <- 0.1
+REF_MIN_R2 <- 0.5
+BG_APEX_SCANS <- 2L
+BG_BOUNDARY_SCANS <- 5L
+
+#' Background-subtracted spectra at peak apices
+#' @param x A chromatogram matrix (times by wavelengths).
+#' @param times Retention times of the rows of `x`.
+#' @param p A peak table with `rt`, `start` and `end` columns.
+#' @return A matrix of spectra, wavelengths by peaks. Peaks without usable
+#'   boundaries get a column of `NA`.
+#' @noRd
+background_spectra <- function(x, times, p){
+  mean_spectrum <- function(rt, k){
+    if (is.na(rt)) return(rep(NA_real_, ncol(x)))
+    i <- get_retention_idx(rt, times)
+    colMeans(x[max(1, i - k):min(nrow(x), i + k), , drop = FALSE])
+  }
+  at <- function(rts, k)
+    matrix(vapply(rts, mean_spectrum, numeric(ncol(x)), k = k), nrow = ncol(x))
+  f <- (p$rt - p$start) / (p$end - p$start)
+  f[!is.finite(f)] <- NA
+  at(p$rt, BG_APEX_SCANS) - sweep(at(p$start, BG_BOUNDARY_SCANS), 2, 1 - f, "*") -
+    sweep(at(p$end, BG_BOUNDARY_SCANS), 2, f, "*")
 }
 
 #' Euclidean distance between the shape parameters of sample and reference peaks

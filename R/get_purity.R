@@ -609,3 +609,27 @@ hoist_noise_variance <- function(x, purity_args = list()){
           c(list(x), purity_args[intersect(names(purity_args),
                                            names(formals(get_noise_variance)))]))
 }
+
+#' Check `purity_args` before fitting
+#' @noRd
+check_purity_args <- function(purity_args){
+  if (!is.list(purity_args) ||
+      (length(purity_args) && (is.null(names(purity_args)) ||
+                               any(names(purity_args) == ""))))
+    stop("`purity_args` must be a named list.", call. = FALSE)
+  fmls <- formals(get_purity)
+  unknown <- setdiff(names(purity_args), names(fmls))
+  if (length(unknown))
+    stop(sprintf("Unknown `purity_args`: %s. See `?get_purity` for the available arguments.",
+                 paste(sQuote(unknown, FALSE), collapse = ", ")), call. = FALSE)
+  for (a in names(purity_args)){
+    d <- fmls[[a]]
+    if (!is.call(d) || !identical(d[[1]], as.name("c"))) next
+    choices <- eval(d)
+    v <- purity_args[[a]]
+    if (!is.character(v) || length(v) != 1 || is.na(pmatch(v, choices)))
+      stop(sprintf("`purity_args$%s` must be one of %s.", a,
+                   paste(dQuote(choices, FALSE), collapse = ", ")), call. = FALSE)
+  }
+  invisible(purity_args)
+}

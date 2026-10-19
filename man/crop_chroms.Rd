@@ -38,7 +38,7 @@ open. Ranges are expressed in the units of the data itself: retention times
 in whatever unit the chromatogram carries, as returned by \code{\link{get_times}}, and
 wavelengths as labeled in the column names, as returned by \code{\link{get_lambdas}}.
 
-A \code{"baseline"} attribute attached by \code{\link{preprocess}} or \code{\link{correct_baseline}}
+An \code{"estimated_baseline"} attribute attached by \code{\link{preprocess}} or \code{\link{correct_baseline}}
 is cropped alongside the data, so it stays aligned and can still be
 retrieved with \code{\link{get_baseline}}.
 

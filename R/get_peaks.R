@@ -5,28 +5,16 @@
 #' 
 #' Peaks are detected by [`find_peaks`] as zero-crossings in the smoothed first
 #' derivative of each trace, then fitted by [`fit_peaks`] according to `fit`.
-#' Peak areas are estimated by trapezoidal approximation.
-#'
-#' Pass additional arguments to `find_peaks` via `...` to adjust detection.
-#' Increase `smooth_window` to reduce splitting of broad peaks; too wide a
-#' window will merge closely-eluting peaks.
-#'
-#' `sd`, `FWHM`, `tau`, `tau_right`, `tau_left`, and `area` are in the units
-#' set by `time_unit`, which defaults to minutes. To compare directly with
-#' ChemStation integration results, set `time_unit = "s"`.
-#'
-#' `rt`, `start`, and `end` are *not* affected by `time_unit`: they are read
-#' off the chromatogram's own time axis and are always in its units. With
-#' `time_unit = "s"` against a chromatogram indexed in minutes, `rt` is in
-#' minutes while `FWHM` is in seconds. `max_fwhm` is compared against `FWHM`
-#' and is in the same units.
+#' Peak areas are the trapezoidal integral of the fitted curve (or, for
+#' `fit = "raw"`, of the signal) above the local `baseline`.
 #' 
 #' @aliases get_peaks
 #' @importFrom stats median
 #' @param chrom_list A list of chromatograms in matrix format (timepoints ×
 #' wavelengths).
 #' @param lambdas A character or numeric vector specifying the wavelengths to 
-#' find peaks at. Omit for one-dimensional chromatograms.
+#' find peaks at. Omit for one-dimensional chromatograms, or when `targets` has a
+#' `lambda` column.
 #' @param fit Peak model. Options are bidirectional exponentially modified
 #' Gaussian (`"bemg"`), exponential-Gaussian hybrid (`"egh"`), `"gaussian"`,
 #' or `"raw"`. `"raw"` integrates the signal directly by trapezoidal
@@ -34,44 +22,79 @@
 #' @param windows Optional two-column matrix or `data.frame` of start and end
 #' retention times (or a single pair of times), giving manual integration
 #' windows that are applied to every chromatogram. If provided, peak detection
-#' is skipped entirely and one peak is returned for every window in every
-#' sample, whether or not a peak is detectable there. This lets you
-#' quantify a compound in samples where it is not detected, and guarantees that
-#' every sample contributes to the same set of peak table columns. Two adjacent
-#' windows sharing a boundary time act as a vertical drop line: their areas sum
-#' exactly to the area of their union, which is how a peak is split at a chosen
-#' time. `max_fwhm` is ignored, since the width of each window is chosen by
-#' the user. Defaults to `NULL`.
+#' is skipped and one peak is returned for every window in every sample,
+#' whether or not a peak is detectable there, except that a window whose
+#' maximum falls on the first or last timepoint of a chromatogram is dropped
+#' with a warning. A window whose peak model fails is kept, with `height` and
+#' `area` set to `NA` and `converged` to `0`. This lets you quantify a compound in samples where it is
+#' not detected, and gives every sample the same set of peak table columns.
+#' With `fit = "raw"` and `baseline = "none"`, two adjacent windows sharing a
+#' boundary time act as a vertical drop line: their areas sum exactly to the
+#' area of their union, so a peak can be split at a chosen time. The peak
+#' models and the other baselines are fit to each window separately, so their
+#' areas do not sum to the area of the union. `max_fwhm` is ignored. Cannot be
+#' combined with `targets`. Defaults to `NULL`.
+#' @param targets Target retention times, as a numeric vector or a table of
+#' targets (see [`targeted_analysis`]). If provided, only peaks with an apex
+#' falling within `tol` of one of these retention times are fit, and [`get_peaktable`]
+#' groups peaks by target instead of clustering them. A `lambda` column takes
+#' the place of `lambdas`, and a `tol` column the place of the `tol` argument,
+#' which must then be omitted. A target's peak whose model fails is kept, with `height` and `area` set to
+#' `NA` and `converged` to `0`, whereas without `targets` such peaks are dropped.
+#' Defaults to `NULL`, in which case all detected peaks are fit.
+#' @param tol Numeric. Half-width of the window around each value of `targets`, in
+#' minutes, whatever the time unit of `chrom_list`. Either a single value applied to
+#' every target, or a vector giving a separate tolerance for each element of
+#' `targets`. Defaults to `0.1`. `tol` is compared against the apex of the
+#' detected peak rather than the returned `rt`, which is the apex of the fitted
+#' model, so a returned `rt` may fall outside the window. Where the windows of
+#' two targets overlap, a peak in the overlap is considered only for the nearer
+#' target. Targets closer together than the drift between samples can
+#' therefore be assigned each other's peaks; supply `mod_list` to read them on
+#' the aligned time axis. Ignored if `targets` is `NULL`.
+#' @param select_by Character. How to proceed when more than one peak falls
+#' within the window around a target retention time. `"height"` (the default)
+#' retains the most intense peak, `"proximity"` retains the peak closest to the
+#' target retention time, and `"none"` retains every peak in the window.
+#' Because selection precedes model fitting, `"height"` compares raw apex
+#' intensities, so the retained peak does not always have the largest fitted
+#' `height`. With `"none"`, [`get_peaktable`] keeps only the peak with the
+#' largest `response` for each target in each sample, but every peak in the
+#' window contributes to the target's `pk_meta`, including its `rt`. Ignored if
+#' `targets` is `NULL`.
+#' @param mod_list Optional warping models from [`correct_rt`] (with
+#' `what = "models"`). If provided, the times in `targets` are read on the
+#' aligned time axis, so they can be copied from the `rt` row of an aligned peak table. Peaks are
+#' still detected and fitted on the unaligned data; use [`correct_peaks`]
+#' afterwards to add corrected retention times. Requires `targets`.
 #' @param max_fwhm Maximum peak width, as a full width at half maximum, in the
-#' units set by `time_unit`. Peaks wider than `max_fwhm` are discarded.
-#' Expressed in the same units as `max_fwhm` in [`filter_peaks`], so the same
-#' value transfers between the two, and, unlike a standard deviation, it is
-#' comparable across values of `fit`. Peaks whose `FWHM` could not be measured
-#' (`NA`, see the `FWHM` entry under *Value*) are retained. Defaults to
-#' `NULL`, which disables width filtering: a "typical" peak width varies too
-#' much across instruments and methods for a fixed cutoff to be safe as a
-#' default. See the section on calibrating these parameters from your own
-#' data in `vignette("chromatographR")` for how to choose a value.
-#' Ignored if `windows` is provided. A warning fires if filtering discards an
-#' unusually large share of detected peaks.
-#' @param sd_max The `sd_max` argument is deprecated, because it is expressed as
-#' a standard deviation in timepoints, which is a peak width only for
-#' `fit = "gaussian"`. It is also not expressed in the same units as
-#' `max_fwhm` in [`filter_peaks`]. Please use `max_fwhm` instead. If supplied,
-#' it is converted to a `FWHM` cutoff of `2.355 * sd_max * dt` in the units of
-#' `time_unit`, where `dt` is the chromatogram's time step. Pass `sd_max = NULL`
-#' to disable width filtering. Ignored if `windows` is provided.
+#' units set by `time_unit`. Peaks wider than `max_fwhm` are discarded, and a
+#' warning is issued if that removes more than 20% of detected peaks. Peaks
+#' whose `FWHM` could not be measured (`NA`, see the `FWHM` entry under
+#' *Value*) are retained. The same value means the same thing as `max_fwhm` in
+#' [`filter_peaks`] and, unlike a standard deviation, is comparable across
+#' values of `fit`. Defaults to `NULL`, which disables width filtering. To
+#' choose a value, see the section on calibrating these parameters from your
+#' own data in `vignette("chromatographR")`. Ignored if `windows` is provided.
+#' @param sd_max The `sd_max` argument is deprecated. Please use `max_fwhm`
+#' instead. `sd_max` is a standard deviation in timepoints, which is a peak
+#' width only for `fit = "gaussian"`. If supplied, it is converted to a `FWHM`
+#' cutoff of `2.355 * sd_max * dt` in the units of `time_unit`, where `dt` is
+#' the chromatogram's time step. Pass `sd_max = NULL` to disable width
+#' filtering. Cannot be combined with `max_fwhm`. Ignored if `windows` is
+#' provided.
 #' @param sd.max The `sd.max` argument is deprecated. Please use `sd_max` instead.
 #' @param max_iter Maximum number of iterations for non-linear least squares
 #' in [`fit_peaks`]. Defaults to `1000`.
 #' @param max.iter The `max.iter` argument is deprecated. Please use `max_iter` 
 #' instead.
-#' @param time_unit Specifies the units for `sd`, `FWHM`, `area`, and `tau` (if
-#' applicable). Options are minutes (`"min"`), seconds (`"s"`), or
-#' milliseconds (`"ms"`). Defaults to the time unit of `chrom_list` (minutes if
-#' none is recorded), so that every column shares one unit. `rt`, `start` and
-#' `end` are not converted: they are always in the units of the chromatogram's
-#' own time axis.
+#' @param time_unit Units for `sd`, `FWHM`, `tau`, `area` and `max_fwhm`;
+#' `tau_right` and `tau_left` are in the reciprocal units. Options are minutes
+#' (`"min"`), seconds (`"s"`), or milliseconds (`"ms"`). Defaults to the time
+#' unit of `chrom_list` (minutes if none is recorded), so that every column
+#' shares one unit. Set `"s"` to compare areas with ChemStation integration
+#' results. `rt`, `start` and `end` are not converted: they are always in the
+#' units of the chromatogram's own time axis.
 #' @param time.units The `time.units` argument is deprecated. Please use 
 #' `time_unit` instead.
 #' @param estimate_purity Logical. Whether to estimate purity. Defaults to
@@ -84,8 +107,8 @@
 #' @param show_progress Logical. Whether to show progress bar. Defaults to 
 #' `TRUE` if [`pbapply`][pbapply::pbapply] is installed.
 #' @param cl Number of cores (integer) or a cluster object from
-#' [`makeCluster`][parallel::makeCluster]. Defaults to `2`. On Windows,
-#' integers are ignored.
+#' [`makeCluster`][parallel::makeCluster]. Defaults to `2`. On Windows, only a
+#' cluster object runs in parallel; an integer runs serially.
 #' @param baseline Whether to subtract a local baseline beneath each peak.
 #' Options are `"none"` (no baseline, default), `"flat"` (constant offset per
 #' peak), or `"sloped"` (linearly varying offset per peak, useful for gradient
@@ -94,14 +117,19 @@
 #' read directly off the boundaries of the integration window: `"flat"` draws a
 #' horizontal line at the lower of the two boundary intensities, while
 #' `"sloped"` draws a line between them (valley-to-valley integration).
-#' @param collapse Logical. Whether to collapse multiple peak lists per sample
-#' into a single list when multiple wavelengths (`lambdas`) are provided.
+#' @param collapse Logical. Whether to combine the peaks from every wavelength
+#' into a single `data.frame` per sample. Defaults to `FALSE`.
 #' @param ... Additional arguments passed to [`find_peaks`]. Increase
-#' `smooth_window` if peaks are split across multiple detections. Other
-#' useful arguments: `smooth_type`, `min_curvature`, `min_amplitude`.
+#' `smooth_window` if peaks are split across multiple detections, but too wide
+#' a window merges closely-eluting peaks. Other useful arguments:
+#' `smooth_type`, `min_prominence_snr`, `min_curvature`, `min_amplitude`.
 #' @return An S3 object of class `peak_list`: a nested list
-#' (sample → wavelength) of `data.frame`s, one row per peak, with columns:
-#' * `rt`: The retention time of the peak maximum.
+#' (sample, then wavelength) of `data.frame`s, or a list of one `data.frame` per
+#' sample when `collapse = TRUE`, with one row per peak and columns:
+#' * `rt`: The retention time of the peak maximum. For the fitted models it
+#' generally falls between timepoints, so match it to the time axis with a
+#' tolerance rather than `==` or [match()]; [`get_spectra`] with `what = "rt"`
+#' returns the spectrum at the nearest timepoint.
 #' * `start`: The retention time where the peak is estimated to begin.
 #' * `end`: The retention time where the peak is estimated to end.
 #' * `sd`: The standard deviation (\eqn{\sigma}) of the Gaussian component of
@@ -114,18 +142,16 @@
 #' * `tau`: Empirical skewness parameter (in units of time) determining peak
 #' asymmetry when `fit == "egh"`.
 #' * `tau_right`: Exponential rate constant controlling right-sided tailing
-#' when `fit = "bemg"`. Note that unlike `tau` in the EGH model,
-#' this parameter has units of 1/time.
+#' when `fit = "bemg"`. Unlike `tau` in the EGH model, it has units of 1/time.
 #' * `tau_left`: Exponential rate constant controlling left-sided tailing
-#' when `fit = "bemg"`. Note that unlike `tau` in the EGH model,
-#' this parameter has units of 1/time.
+#' when `fit = "bemg"`. Unlike `tau` in the EGH model, it has units of 1/time.
 #' * `h`: The amplitude parameter of the fitted BEMG shape function (only when
-#' `fit = "bemg"`), i.e. the value of the pure shape at `center` before any
-#' baseline is added. Not the same quantity as the `height` column.
+#' `fit = "bemg"`). It scales the shape but is not its value at `center`, so
+#' use the `height` column for the height of the peak.
 #' * `center`: The center parameter of the fitted BEMG shape function (only
 #' when `fit = "bemg"`). This is the location around which the exponential
 #' tails are applied. Because BEMG peaks can be asymmetric
-#' (`tau_right ≠ tau_left`) and a sloped baseline shifts the fitted curve,
+#' (`tau_right != tau_left`) and a sloped baseline shifts the fitted curve,
 #' the actual peak maximum (`rt`) may differ from `center`.
 #' * `FWHM`: The full width at half maximum of the peak. For `"gaussian"` this
 #' is \eqn{2\sqrt{2\ln 2}\,\sigma \approx 2.355 \sigma}; for `"egh"` it is the
@@ -134,7 +160,7 @@
 #' measured numerically from the fitted shape. For `"raw"` it is measured
 #' directly from the signal above the local `baseline`, and is `NA` when the
 #' integration window does not fall below half the height of the peak on both
-#' sides, which happens for peaks that are fused with a neighbor. Unlike `sd`,
+#' sides, as for a peak fused with a neighbor. Unlike `sd`,
 #' `FWHM` is comparable across values of `fit`.
 #' * `height`: The height of the peak above the fitted baseline.
 #' * `area`: The area of the peak above the fitted baseline, estimated by
@@ -142,11 +168,11 @@
 #' * `r.squared`: Coefficient of determination (\eqn{R^2}), calculated by
 #' linear regression of fitted values to the raw data. Statistically informal
 #' (the model was fit by nonlinear least squares, not OLS), but useful as a
-#' fit diagnostic.
+#' fit diagnostic. Not returned when `fit = "raw"`.
 #' * `purity`: The peak purity as estimated by [`get_purity`]. `NA` unless
 #' `estimate_purity = TRUE`.
-#' * `window_limited`: `1` if a fitted shape parameter came to rest on a bound
-#' derived from the integration window, meaning the window rather than the data
+#' * `window_limited`: `1` if a fitted shape parameter hit a limit set by the
+#' integration window, meaning the window rather than the data
 #' determined the reported shape, and `0` otherwise. Not returned when
 #' `fit = "raw"`.
 #' * `converged`: `1` if the nonlinear least squares optimizer reported
@@ -156,15 +182,17 @@
 #' It also covers the case where no optimizer ran at all: a fitting stage whose
 #' integration window holds fewer points than the stage has parameters is
 #' skipped, since such a window cannot determine the model, and the reported
-#' parameters are then the starting estimates rather than a measurement. Both
-#' are common in peak lists that contain many narrow, low windows.
+#' parameters are then the starting estimates rather than a measurement.
+#' `get_peaks` warns when more than 20% of peaks sit in such a window.
 #' Not returned when `fit = "raw"`.
 #' * `floor`: Constant baseline level (only when `baseline = "flat"`).
 #' * `floor_start`: Baseline level at the left edge of the peak window (only
 #' when `baseline = "sloped"`).
 #' * `floor_end`: Baseline level at the right edge of the peak window (only
-#' when `baseline = "sloped"`). Both `floor_start` and `floor_end` are
-#' constrained to be non-negative.
+#' when `baseline = "sloped"`). For the peak models, `floor`, `floor_start`
+#' and `floor_end` are constrained to be non-negative.
+#' * `target`: The row of `targets` the peak was selected for (only when `targets` is
+#' supplied).
 #' @author Ethan Bass
 #' @note Adapted from `getAllPeaks` by Ron Wehrens
 #' (<https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R>); however,
@@ -182,7 +210,7 @@
 #' Deconvolution through In-Depth Study of the Data Matrix from Liquid 
 #' Chromatography Coupled with a Photo-Diode Array Detector Applied to 
 #' Pharmaceutical Analysis. *Journal of Chromatography. A*, 1469: 35–47. 
-#' \doi{doi.org/10.1016/j.chroma.2016.09.037}.
+#' \doi{10.1016/j.chroma.2016.09.037}.
 #'
 #' * O'Haver, Tom. Pragmatic Introduction to Signal Processing:
 #' Applications in scientific measurement.
@@ -196,20 +224,23 @@
 #' data(Sa_pr)
 #' pks <- get_peaks(Sa_pr, lambdas = c('210'), max_fwhm = 1, fit = "egh")
 #' @seealso [`find_peaks`], [`fit_peaks`], [`print.peak_list`], 
-#' \code{\link{[.peak_list}}
+#' \code{\link{[.peak_list}}, [`targeted_analysis`]
 #' @export get_peaks
 #' @md
 
 get_peaks <- function(chrom_list, lambdas,
                       fit = c("egh", "bemg", "gaussian", "raw"),
-                      windows = NULL,
+                      windows = NULL, targets = NULL, tol = 0.1,
+                      select_by = c("height", "proximity", "none"),
+                      mod_list = NULL,
                       max_fwhm = NULL, sd_max = NULL, max_iter = 1000,
                       time_unit = NULL,
                       baseline = c("none", "flat", "sloped"),
                       estimate_purity = FALSE, purity_args = list(),
                       show_progress = NULL, cl = 2, collapse = FALSE,
                       time.units = NULL, sd.max = NULL, max.iter = NULL, ...){
-  check_duplicated_names(names(chrom_list))
+  check_duplicated_names(names(chrom_list), what = "chrom_list")
+  if (estimate_purity) check_purity_args(purity_args)
   max_iter <- resolve_deprecated(max.iter, max_iter)
   # `sd_max = NULL` was the documented way to switch width filtering off, so an
   # explicitly supplied `NULL` has to stay distinguishable from the default.
@@ -239,6 +270,15 @@ get_peaks <- function(chrom_list, lambdas,
   chrom_list_string <- deparse(substitute(chrom_list))
   if (class(chrom_list)[1] == "matrix")
     chrom_list <- list(chrom_list)
+  if (!missing(tol) && is.data.frame(targets) && "tol" %in% colnames(targets))
+    stop("Supply tolerances either in `tol` or in the `tol` column of `targets`, not both.")
+  if (!is.null(targets)) targets <- check_targets(targets, tol)
+  if (!is.null(targets)) check_bounds_arg(...)
+  if (!is.null(targets) && !anyNA(targets$lambda)){
+    if (!missing(lambdas))
+      stop("Supply wavelengths either in `lambdas` or in the `lambda` column of `targets`, not both.")
+    lambdas <- unique(targets$lambda)
+  }
   if (missing(lambdas)){
     if (ncol(chrom_list[[1]]) == 1){
       lambdas <- colnames(chrom_list[[1]])
@@ -247,12 +287,20 @@ get_peaks <- function(chrom_list, lambdas,
   if (is.numeric(lambdas)){
     lambdas <- as.character(lambdas)
   }
+  if (!is.null(targets) && anyNA(targets$lambda) && any(!is.na(targets$name)) &&
+      length(lambdas) > 1){
+    stop("Named targets would be duplicated across wavelengths. Add a `lambda` column to `targets` giving the wavelength for each target.")
+  }
   if (is.null(names(chrom_list))){
     warning("Sample names not found. It is recommended to include names for your samples.",
             immediate. = TRUE)
     names(chrom_list) <- seq_along(chrom_list)
   }
+  select_by <- match.arg(select_by)
   if (!is.null(windows)){
+    if (!is.null(targets)){
+      stop("`windows` and `targets` cannot be used together. `targets` selects among detected peaks, whereas `windows` integrates fixed windows.")
+    }
     windows <- check_windows(windows, times = get_times(chrom_list))
     if (fit_is_default){
       message("`windows` was supplied with the default `fit = \"egh\"`, so a peak model will be fit within each window. Set `fit = \"raw\"` to integrate the raw signal against a zero baseline instead.")
@@ -260,6 +308,35 @@ get_peaks <- function(chrom_list, lambdas,
     if (estimate_purity){
       warning("Spectral purity is not meaningful across a manual integration window spanning more than one component.",
               immediate. = TRUE)
+    }
+  }
+  to_ref <- NULL
+  if (!is.null(mod_list)){
+    if (is.null(targets))
+      stop("`mod_list` is only used to place the target retention times in `targets`.")
+    to_ref <- warp_maps(mod_list, chrom_list)
+    to_ref <- to_ref[model_positions(to_ref, chrom_list)]
+  }
+  if (!is.null(targets)){
+    all_times <- lapply(seq_along(chrom_list), function(i){
+      times <- get_times(chrom_list, idx = i)
+      if (is.null(to_ref)) times else to_ref[[i]](times)
+    })
+    rts <- targets$rt
+    ts_range <- range(unlist(all_times), na.rm = TRUE)
+    oob <- which(rts < ts_range[1] | rts > ts_range[2])
+    if (length(oob) > 0){
+      stop(sprintf(
+        "The following retention times fall outside the bounds of the chromatograms (%s-%s):\n%s",
+        signif(ts_range[1], 4), signif(ts_range[2], 4),
+        paste(sprintf("         %d (%s)", oob, sQuote(rts[oob])), collapse = ", \n")))
+    }
+    span <- diff(ts_range) / rt_factor(axis_unit)
+    wide <- unique(targets$tol[targets$tol > span / 10])
+    if (length(wide) > 0){
+      warning(sprintf(
+        "`tol` is always in minutes. A tolerance of %s min is more than a tenth of the run (%s min).",
+        paste(wide, collapse = ", "), signif(span, 3)), immediate. = TRUE)
     }
   }
   peaks <- list()
@@ -275,16 +352,31 @@ get_peaks <- function(chrom_list, lambdas,
     cutoff <- if (sd_max_supplied){
       if (is.null(sd_max)) NULL else FWHM_CONST * sd_max * tdiff * tfac
     } else max_fwhm
-    suppressWarnings(ptable <- lapply(lambdas, function(lambda){
+    aligned_times <- if (!is.null(to_ref)) all_times[[sample]]
+    n_width <- c(0L, 0L)
+    ptable <- lapply(lambdas, function(lambda){
+      y <- chrom_list[[sample]][, get_lambda_idx(lambda, get_lambdas(chrom_list[[sample]]),
+                                                 allow_max = FALSE)]
+      pos <- if (!is.null(windows)){
+        windows_to_pos(windows, y = y, times = timepoints)
+      } else if (!is.null(targets)){
+        idx <- which(is.na(targets$lambda) | targets$lambda == lambda)
+        p <- select_peaks_by_rt(find_peaks(y, ...), y = y,
+                                times = aligned_times %||% timepoints,
+                                rts = targets$rt[idx],
+                                tol = targets$tol[idx] * rt_factor(axis_unit),
+                                select_by = select_by)
+        p$target <- idx[attr(p, "target")]
+        p[!duplicated(p[, c("lower", "upper")]), , drop = FALSE]
+      }
       pks <- fit_peaks(chrom_list[[sample]], lambda = lambda, fit = fit,
-                       windows = windows,
-                       max_iter = max_iter, max_fwhm = NULL,
+                       pos = pos, max_iter = max_iter, max_fwhm = NULL,
                        estimate_purity = estimate_purity,
                        purity_args = purity_args,
                        noise_variance = noise_variance,
                        baseline = baseline, ...)
       if (nrow(pks) == 0){
-        # No peaks in this sample/wavelength.
+        # No peaks in this sample/wavelength (e.g. no peak near any of `targets`).
         # Return an empty table with the full schema so downstream `rbind`s and
         # column lookups behave as they do for non-empty samples.
         return(cbind(sample = character(0), lambda = character(0), pks))
@@ -294,63 +386,56 @@ get_peaks <- function(chrom_list, lambdas,
       pks <- convert_indices_to_times(pks, timepoints = timepoints,
                                       tdiff = tdiff, tfac = tfac)
       if (is.null(windows)){
-        n_width_before <- nrow(pks)
+        n_before <- nrow(pks)
         pks <- pks[keep_by_width(pks$FWHM, cutoff), , drop = FALSE]
-        attr(pks, "n_width_before") <- n_width_before
-        attr(pks, "n_width_after") <- nrow(pks)
+        n_width <<- n_width + c(n_before, nrow(pks))
       }
       pks
-    }))
+    })
     names(ptable) <- lambdas
-    n_width_before <- sum(vapply(ptable, function(x) attr(x, "n_width_before") %||% 0L, numeric(1)))
-    n_width_after <- sum(vapply(ptable, function(x) attr(x, "n_width_after") %||% 0L, numeric(1)))
     if (collapse){
       ptable <- do.call(rbind, ptable)
     }
-    attr(ptable, "n_width_before") <- n_width_before
-    attr(ptable, "n_width_after") <- n_width_after
+    attr(ptable, "n_width") <- n_width
     ptable <- transfer_metadata(ptable, chrom_list[[sample]],
                                 exclude = c('names','row.names','dim',
-                                              'dimnames', 'baseline', "format_out",
+                                              'dimnames', 'estimated_baseline', "format_out",
                                               "data_format", "parser"))
     ptable
   }
   result <- laplee(setNames(seq_along(chrom_list), names(chrom_list)), fit_sample)
-  names(result) <- names(chrom_list)
-  # `result` is either a data.frame per sample (when `collapse`) or a list of
-  # data.frames, one per wavelength
-  collect <- function(var){
-    unlist(lapply(result, function(s){
-      if (is.data.frame(s)) s[[var]] else lapply(s, function(d) d[[var]])
-    }), use.names = FALSE)
-  }
+  n_width <- rowSums(vapply(result, attr, numeric(2), "n_width"))
+  result[] <- lapply(result, `attr<-`, "n_width", NULL)
+  tables <- lapply(result, function(s) if (is.data.frame(s)) list(s) else s)
   if (!is.null(windows)){
-    n_expected <- nrow(windows) * length(lambdas)
-    dropped <- vapply(result, function(s){
-      n_expected - ifelse(is.data.frame(s), nrow(s), sum(vapply(s, nrow, numeric(1))))
-    }, numeric(1))
+    dropped <- nrow(windows) * length(lambdas) -
+      vapply(tables, function(s) sum(vapply(s, nrow, numeric(1))), numeric(1))
     if (any(dropped > 0)){
       warning(sprintf(
         "Some windows were dropped because their apex fell on the edge of the chromatogram, in the following sample%s: %s.",
         plural(sum(dropped > 0)),
         format_list(names(dropped)[dropped > 0], quote = FALSE)), immediate. = TRUE)
     }
-    n_negative <- sum(collect("area") < 0, na.rm = TRUE)
-    if (n_negative > 0){
+  }
+  if (!is.null(targets)){
+    found <- seq_len(nrow(targets)) %in%
+      unlist(lapply(tables, lapply, `[[`, "target"))
+    if (any(!found)){
+      label <- ifelse(is.na(targets$name), targets$rt, targets$name)
       warning(sprintf(
-        "The local baseline lies above the signal in %d window%s, giving a negative area.\n     Negative areas are reported as such, but are coerced to zero by `get_peaktable`.",
-        n_negative, plural(n_negative)), immediate. = TRUE)
+        "No peak was assigned to the following targets in any sample: %s.\n     Either none was found within `tol` (try a larger `tol`, or check whether `max_fwhm` removed it), or its peak went to another target.",
+        paste(label[!found], collapse = ", ")), immediate. = TRUE)
     }
   }
 
   if (is.null(windows)){
-    warn_if_width_filtered(result)
-    warn_if_underdetermined(result, chrom_list, fit, baseline)
+    warn_if_width_filtered(n_width[1], n_width[2])
+    warn_if_underdetermined(tables, chrom_list, fit, baseline)
   }
   structure(result,
             chrom_list = chrom_list_string,
             lambdas = lambdas, fit = fit, sd_max = sd_max, max_fwhm = max_fwhm,
-            max_iter = max_iter, windows = windows,
+            max_iter = max_iter, windows = windows, targets = targets,
             time_unit = time_unit,
             baseline = baseline,
             intensity_unit = get_metadata_attribute(chrom_list[[1]], "detector_y_unit"),
@@ -366,14 +451,12 @@ get_peaks <- function(chrom_list, lambdas,
 #' rather than left for the user to notice from a suspiciously short peak
 #' list.
 #'
-#' @param result The assembled per-sample peak tables, carrying
-#' `n_width_before`/`n_width_after` attributes set by `get_peaks`.
+#' @param n_before,n_after Peak counts before and after the width filter,
+#' summed over samples and wavelengths.
 #' @return `NULL`, invisibly; called for its warning.
 #' @author Ethan Bass
 #' @noRd
-warn_if_width_filtered <- function(result){
-  n_before <- sum(vapply(result, function(s) attr(s, "n_width_before") %||% 0L, numeric(1)))
-  n_after <- sum(vapply(result, function(s) attr(s, "n_width_after") %||% 0L, numeric(1)))
+warn_if_width_filtered <- function(n_before, n_after){
   if (n_before == 0) return(invisible(NULL))
   frac <- 1 - n_after / n_before
   if (frac > WIDTH_FILTER_WARN_FRAC){
@@ -393,24 +476,23 @@ warn_if_width_filtered <- function(result){
 #' invisible in the peak list itself. Skipped when `windows` is supplied, since
 #' the user chose those windows.
 #'
-#' @param result The assembled per-sample peak tables.
+#' @param tables The assembled peak tables: per sample, a list of
+#' data.frames.
 #' @param chrom_list The chromatograms, for their timepoints.
 #' @param fit The peak model.
 #' @param baseline The baseline model.
 #' @return `NULL`, invisibly; called for its warning.
 #' @author Ethan Bass
 #' @noRd
-warn_if_underdetermined <- function(result, chrom_list, fit, baseline){
+warn_if_underdetermined <- function(tables, chrom_list, fit, baseline){
   p <- n_fit_params(fit, baseline)
   if (is.na(p)) return(invisible(NULL))
   n_bad <- 0L
   n_all <- 0L
-  for (i in seq_along(result)){
-    s <- result[[i]]
-    dfs <- if (is.data.frame(s)) list(s) else s
+  for (i in seq_along(tables)){
     tdiff <- get_time_resolution(chrom_list, idx = i)
     if (!is.finite(tdiff) || tdiff <= 0) next
-    for (df in dfs){
+    for (df in tables[[i]]){
       if (is.null(df) || nrow(df) == 0) next
       npts <- (df$end - df$start) / tdiff + 1
       n_bad <- n_bad + sum(npts < p, na.rm = TRUE)
@@ -476,11 +558,7 @@ convert_indices_to_times <- function(x, timepoints, tdiff, tfac){
 #' @method [ peak_list
 #' @export
 `[.peak_list` <- function(x, i, j, ..., drop = FALSE) {
-  # `exclude` is given explicitly because a `peak_list`'s `baseline` attribute
-  # is the local-baseline *mode*, not the estimated baseline that
-  # `transfer_metadata` drops by default
-  transfer_metadata(.subset(x, i), x,
-                    exclude = c('names', 'row.names', 'dim', 'dimnames'))
+  transfer_metadata(.subset(x, i), x)
 }
 
 #' Print peak list

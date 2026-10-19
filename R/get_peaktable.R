@@ -51,12 +51,12 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' `clust = "sp.rt"`.
 #' @param response Peak intensity measure: either `"area"` (default) or 
 #' `"height"`.
-#' @param use.cor Logical. Indicates whether to use corrected retention times
+#' @param use_corrected_rt Logical. Indicates whether to use corrected retention times
 #' (`rt.cor` column) or raw retention times (`rt` column). Unless
-#' otherwise specified, the `rt.cor` column will be used by default if it 
+#' otherwise specified, the `rt.cor` column will be used by default if it
 #' exists in the provided `peak_list`. Either way, they are stored in the `rt`,
-#' `start` and `end` rows of `pk_meta`, and `args$use.cor` records which were
-#' used.
+#' `start` and `end` rows of `pk_meta`, and `args$use_corrected_rt` records
+#' which were used.
 #' @param hmax Height at which the clustering tree is cut. With `clust = "rt"`,
 #' peaks are clustered by complete linkage on retention time, so `hmax` is the
 #' largest retention time difference allowed between any two peaks in the same
@@ -67,8 +67,9 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' split below it (see `deepSplit`). There, the default of `0.2` lets peaks with
 #' identical spectra sit about `0.67 * sigma_t` apart, a third of the mean
 #' `end - start` at the default `sigma_t`. Ignored
-#' for peak lists produced by `get_peaks(windows = )`, since those peaks are
-#' grouped by integration window instead of being clustered.
+#' for peak lists produced by `get_peaks(windows = )` or `get_peaks(targets = )`,
+#' since those peaks are grouped by integration window or target instead of
+#' being clustered.
 #' @param summarize_by How to summarize peak metadata within each cluster.
 #' Options are `"weighted.mean"` (default, weights peaks by their intensity as
 #' given by `response`), `"mean"`, `"median"` (which aggregate metadata across 
@@ -80,7 +81,8 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' @param clust Specify whether to perform hierarchical clustering based on
 #' spectral similarity and retention time (`sp.rt`) or retention time alone
 #' (`rt`). Defaults to `rt`. Ignored for peak lists produced by
-#' `get_peaks(windows = )`, which are grouped by window.
+#' `get_peaks(windows = )` or `get_peaks(targets = )`, which are grouped by window
+#' or target.
 #' @param sigma_t Width of Gaussian kernel for retention time similarity, in
 #' minutes. Controls the weight given to retention time when
 #' `clust = "sp.rt"`. Defaults to half the mean `end - start` across all peaks.
@@ -92,6 +94,8 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' as before.
 #' @param sigma.r The `sigma.r` argument is deprecated. Please use `sigma_r`
 #' instead.
+#' @param use.cor The `use.cor` argument is deprecated. Please use
+#' `use_corrected_rt` instead.
 #' @param deepSplit Logical. Controls sensitivity to cluster splitting when
 #' `clust = "sp.rt"`. If `TRUE`, returns a larger number of smaller clusters.
 #' Defaults to `FALSE`. For additional information, see
@@ -105,8 +109,10 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' @return An S3 [`peak_table`] object, containing the following elements:
 #' * `tab`: The peak table itself — a `data.frame` of
 #' intensities in a sample × peak configuration. A peak that was not found in a
-#' sample, or whose response is negative or missing, is recorded as `0`
-#' (`na.fill` for a `matched_peak_list`).
+#' sample, or whose response is negative, is recorded as `0` (`na.fill` for a
+#' `matched_peak_list`). A peak whose model failed, which
+#' `get_peaks(windows = )` and `get_peaks(targets = )` keep with a missing `height`
+#' and `area`, is recorded as `NA`.
 #' * `pk_meta`: A `data.frame` containing peak metadata (e.g., the spectral
 #' component, peak number, and average retention time), summarized across all
 #' peaks in each cluster according to `summarize_by`.
@@ -123,6 +129,10 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' integration window rather than clustered by retention time, including after
 #' [`correct_peaks`]. This gives one peak table column per window, in order of
 #' retention time, with every sample contributing to each.
+#' @note Peak lists produced by `get_peaks(targets = )` are grouped by target
+#' instead of clustered, each peak going to the target it was selected for.
+#' Targets found in no sample get no column. If `targets` has a `name` column, the
+#' columns are named after the targets.
 #' @note This function is adapted from the `getPeakTable` function in the alsace
 #' package by Ron Wehrens: <https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R>.
 #' @md
@@ -146,16 +156,16 @@ get_peaktable <- function(peak_list, ...) UseMethod("get_peaktable")
 #' @method get_peaktable default
 #' @export
 get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "height"),
-                          use.cor = NULL, hmax = 0.2, 
+                          use_corrected_rt = NULL, hmax = 0.2,
                           summarize_by = c("weighted.mean", "median", "mean", "max"),
-                          plot_it = FALSE, ask = plot_it, 
-                          clust = c("rt", "sp.rt"), 
+                          plot_it = FALSE, ask = plot_it,
+                          clust = c("rt", "sp.rt"),
                           sigma_t = NULL, sigma_r = 0.5,
-                          deepSplit = FALSE, verbose = FALSE,
-                          ...,
-                          sigma.t = NULL, sigma.r = NULL){
+                          deepSplit = FALSE, verbose = FALSE, ...,
+                          sigma.t = NULL, sigma.r = NULL, use.cor = NULL){
   if (...length()) stop("unused argument(s): ", paste(...names(), collapse = ", "))
   sigma_r <- resolve_deprecated(sigma.r, sigma_r)
+  use_corrected_rt <- resolve_deprecated(use.cor, use_corrected_rt)
   rtf <- rt_factor(get_time_unit(peak_list))
   if (!is.null(sigma.t)){
     warning(paste("The `sigma.t` argument is deprecated. Please use `sigma_t`,",
@@ -170,18 +180,17 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
   clust <- match.arg(clust, c("rt", "sp.rt"))
   summarize_by <- match.arg(summarize_by, choices = c("weighted.mean", 
                                                       "median", "mean", "max"))
-  if (is.null(use.cor)){
-    use.cor <- "rt.cor" %in% colnames(peak_list[[1]][[1]])
+  if (is.null(use_corrected_rt)){
+    use_corrected_rt <- "rt.cor" %in% colnames(peak_list[[1]][[1]])
   }
-  rt <- ifelse(use.cor, "rt.cor", "rt")
-  start <- ifelse(use.cor, "start.cor", "start")
-  end <- ifelse(use.cor, "end.cor", "end")
+  rt <- ifelse(use_corrected_rt, "rt.cor", "rt")
+  start <- ifelse(use_corrected_rt, "start.cor", "start")
+  end <- ifelse(use_corrected_rt, "end.cor", "end")
   check_duplicated_names(names(peak_list))
   windows <- attr(peak_list, "windows")
-  if (clust == "sp.rt" && is.null(windows)){
-    if (missing(chrom_list)){
-      chrom_list <- get_chrom_list(peak_list)
-    } else get_chrom_list(peak_list, chrom_list)
+  targets <- attr(peak_list, "targets")
+  if (clust == "sp.rt" && is.null(windows) && is.null(targets)){
+    chrom_list <- get_chrom_list(peak_list, if (!missing(chrom_list)) chrom_list)
   }
   ncomp <- length(peak_list[[1]]) ## all elements should have the same length
   if (plot_it) {
@@ -189,20 +198,34 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
     on.exit(par(opar))
     myPalette <- colorRampPalette(c("green", "blue", "purple", "red", "orange"))
   }
-  clusterPeaks <- function(comp, pkLst){
-    pkLst <- lapply(pkLst, function(x) lapply(x, function(y){
-      if (nrow(y) > 0){
+  pks_found <- lapply(peak_list, function(x) lapply(x, function(y){
+    if (nrow(y) > 0){
       y[!is.na(y[, rt]), , drop = FALSE]
     } else {
       y
     }}))
+  if (clust == "sp.rt" && is.null(windows) && is.null(targets)){
+    sigma_t_rt <- if (is.null(sigma_t)){
+      all_pks <- do.call(rbind, unlist(pks_found, recursive = FALSE))
+      0.5 * mean(all_pks$end - all_pks$start)
+    } else sigma_t * rtf
+  }
+  clusterPeaks <- function(comp, pkLst){
     xx <- do.call(rbind, sapply(pkLst, function(samp) samp[comp]))
     file.idx <- xx$sample
     pkcenters <- xx[, rt]
     names(pkcenters) <- NULL
-    if (length(pkcenters) < 2) 
+    tg <- if (!is.null(targets)){
+      intersect(which(is.na(targets$lambda) |
+                        targets$lambda == names(peak_list[[1]])[comp]),
+                xx$target)
+    }
+    if (!is.null(tg)){
+      if (length(tg) == 0) return(NULL)
+      pkcenters.cl <- match(xx$target, tg)
+    } else if (length(pkcenters) < 2){
       return(NULL)
-    if (!is.null(windows)){
+    } else if (!is.null(windows)){
       dist_to_window <- outer(xx[["start"]], windows[, 1], function(a, b) abs(a - b)) +
                         outer(xx[["end"]], windows[, 2], function(a, b) abs(a - b))
       win_idx <- apply(dist_to_window, 1, which.min)
@@ -211,10 +234,6 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
       pkcenters.hcl <- fastcluster::hclust(dist(pkcenters), method = "complete")
       pkcenters.cl <- cutree(pkcenters.hcl, h = hmax * rtf)
     } else if (clust == 'sp.rt'){
-        sigma_t_rt <- if (is.null(sigma_t)){
-          0.5 * mean(do.call(rbind, unlist(pkLst, recursive = FALSE))$end -
-                       do.call(rbind, unlist(pkLst, recursive = FALSE))$start)
-        } else sigma_t * rtf
       ts <- as.numeric(rownames(chrom_list[[1]]))
       sp <- sapply(seq_along(pkcenters), function(i){
         rescale(t(chrom_list[[file.idx[i]]][
@@ -252,23 +271,26 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
       cl.centers <- do.call(rbind, 
                             tapply(seq_along(pkcenters), 
                                    pkcenters.cl, function(i){
-        xx[i[which.max(xx[i, response])], vars.idx]
+        xx[i[c(which.max(xx[i, response]), 1L)[1]], vars.idx]
       }))
     } else{
       cl.centers <- aggregate(xx[, vars.idx], by = list(pkcenters.cl),
                               FUN = summarize_by,
                               na.action = "na.pass")[, -1, drop = FALSE]
     }
+    if (is.null(tg)){
+      pkcenters.cl <- order(order(cl.centers[, rt]))[pkcenters.cl]
+      cl.centers <- cl.centers[order(cl.centers[, rt]), , drop = FALSE]
+    }
     ncl <- length(cl.centers[, rt])
-    pkcenters.cl <- order(order(cl.centers[, rt]))[pkcenters.cl]
-    cl.centers <- cl.centers[order(cl.centers[, rt]), , drop = FALSE]
+    cl_names <- if (!is.null(tg)) target_ids(targets, names(peak_list[[1]]))[tg]
     metaInfo <- cbind(lambda = rep(suppressWarnings(
       as.numeric(names(peak_list[[1]])[comp])), ncl),
                       peak = 1:ncl, 
                       cl.centers
                       )
-    if (use.cor) colnames(metaInfo) <- sub("\\.cor$", "", colnames(metaInfo))
-    rownames(metaInfo) <- NULL
+    if (use_corrected_rt) colnames(metaInfo) <- sub("\\.cor$", "", colnames(metaInfo))
+    rownames(metaInfo) <- cl_names
     if (plot_it){
       mycols <- myPalette(nrow(cl.centers))
       cl.df <- data.frame(peaks = pkcenters, 
@@ -284,28 +306,34 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
                         panel.abline(v = cl.centers[,rt], col = mycols)
                       }))
     }
-    if (verbose & max(clusCount <- table(file.idx, pkcenters.cl)) > 1){
+    if (verbose && max(clusCount <- table(file.idx, pkcenters.cl)) > 1){
       warning(paste("More than one peak of one injection in the same cluster", 
                 paste("for component ", comp, ".", sep = ""), 
                 "Keeping only the most intense one.", "", sep = "\n"))
     }
     allIs <- unlist(lapply(pkLst, function(samp) samp[[comp]][, response]))
-    allIs[!is.finite(allIs) | allIs < 0] <- 0
-    Iinfo <- matrix(0, ncl, length(pkLst), dimnames = list(NULL, names(pkLst)))
-    for (i in seq_along(allIs)){
-      Iinfo[pkcenters.cl[i],  file.idx[i]] <- 
-      max(allIs[i], Iinfo[pkcenters.cl[i], file.idx[i]])
+    allIs[which(allIs < 0)] <- 0
+    failed <- !is.finite(allIs)
+    Iinfo <- matrix(0, ncl, length(pkLst), dimnames = list(cl_names, names(pkLst)))
+    Iinfo[cbind(pkcenters.cl, match(file.idx, names(pkLst)))[failed, , drop = FALSE]] <- NA
+    for (i in which(!failed)){
+      Iinfo[pkcenters.cl[i],  file.idx[i]] <-
+      max(allIs[i], Iinfo[pkcenters.cl[i], file.idx[i]], na.rm = TRUE)
     }
     return(list(Iinfo, metaInfo))
   }
-  result <- lapply(seq_len(ncomp), clusterPeaks, peak_list)
+  result <- lapply(seq_len(ncomp), clusterPeaks, pks_found)
+  if (all(vapply(result, is.null, logical(1)))){
+    stop(if (!is.null(targets)) "None of the targets was found in any sample."
+         else "Too few peaks to build a peak table.", call. = FALSE)
+  }
   pt <- new_peak_table(result, peak_list,
                  args = list(peak_list = deparse(substitute(peak_list)),
                         chrom_list = attr(peak_list, "chrom_list"),
                         chrom_list_aligned = attr(peak_list, "chrom_list_aligned") %||% NA,
                         lambdas = list(names(peak_list[[1]])),
                         response = response,
-                        use.cor = use.cor,
+                        use_corrected_rt = use_corrected_rt,
                         hmax = hmax,
                         clust = clust,
                         sigma_t = sigma_t,
@@ -320,6 +348,10 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
                         rt_unit = get_time_unit(peak_list),
                         intensity_unit = get_metadata_attribute(peak_list, "intensity_unit")
                         ))
+  ids <- target_ids(targets, names(peak_list[[1]]))
+  if (!is.null(ids)){
+    pt <- pt[, intersect(ids, colnames(pt$tab))]
+  }
   attr(pt, "warp_models") <- attr(peak_list, "warp_models")
   pt
 }
@@ -336,7 +368,11 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
 #'   sample's peaks at the wavelength used by [`match_peaks`]; other wavelengths
 #'   in `pks` are ignored. Peaks absent from the reference sample will not
 #'   appear as columns regardless of their prevalence in other samples. Choose a
-#'   reference with a rich peak profile. To discover peaks across all samples,
+#'   reference with a rich peak profile, or pass a table of `targets` to
+#'   [`match_peaks`] to pick one that contains all of them; the
+#'   targets' columns are then named after them, and the table can be
+#'   restricted to them with `x[, targets$name]`. To
+#'   discover peaks across all samples,
 #'   call `get_peaktable` on the `peak_list` itself, which clusters peaks
 #'   across every sample.
 #' @method get_peaktable matched_peak_list
@@ -395,8 +431,8 @@ get_peaktable.matched_peak_list <- function(peak_list, pks,
         row_d[cbind(k, row_idx)] <= rt_tol &
         is.finite(vals) & vals >= 0
 
-      Imat[cbind(rep(samp_i, sum(ok)), col_idx[ok])] <- vals[ok]
       n_assigned <- sum(ok)
+      Imat[samp_i, col_idx[ok]] <- vals[ok]
 
       if (verbose) {
         n_drop <- n_ref - n_assigned
@@ -413,7 +449,10 @@ get_peaktable.matched_peak_list <- function(peak_list, pks,
       peak   = seq_len(n_ref),
       ref_pks[, present, drop = FALSE]
     )
-    rownames(metaInfo) <- NULL
+    col_names <- target_column_names(attr(matched, "reference_targets"),
+                                     rt_ref_all, rt_tol)
+    colnames(Imat) <- col_names
+    rownames(metaInfo) <- col_names
     list(t(Imat), metaInfo)
   }
 
@@ -440,6 +479,39 @@ get_peaktable.matched_peak_list <- function(peak_list, pks,
       rt_unit          = get_time_unit(pks),
       intensity_unit   = get_metadata_attribute(pks, "intensity_unit")
     ))
+}
+
+#' Column names for a matched peak table, named after any targets
+#' @noRd
+target_column_names <- function(targets, rt_ref, rt_tol){
+  out <- paste0("V", seq_along(rt_ref))
+  if (is.null(targets) || all(is.na(targets$name))) return(out)
+  k <- vapply(targets$rt, function(r){
+    d <- abs(rt_ref - r)
+    if (length(d) && min(d) <= rt_tol) which.min(d) else NA_integer_
+  }, integer(1))
+  if (anyNA(k))
+    stop(sprintf(paste("No reference peak found for target%s %s. Build the",
+                       "peak table from the same peak list passed to",
+                       "`match_peaks`."),
+                 plural(sum(is.na(k))),
+                 paste(sQuote(targets$name[is.na(k)]), collapse = ", ")),
+         call. = FALSE)
+  named <- !is.na(targets$name)
+  out[k[named]] <- targets$name[named]
+  out
+}
+
+#' Peak table column names for a targets table
+#'
+#' `NULL` when unnamed targets are measured at more than one wavelength, since
+#' a target then has one column per wavelength.
+#' @noRd
+target_ids <- function(targets, lambdas){
+  if (is.null(targets)) return(NULL)
+  if (!anyNA(targets$name)) targets$name
+  else if (!anyNA(targets$lambda) || length(lambdas) == 1)
+    paste0("V", seq_len(nrow(targets)))
 }
 
 #' Assemble a peak table

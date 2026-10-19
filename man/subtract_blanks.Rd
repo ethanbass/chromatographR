@@ -39,7 +39,7 @@ signal before baseline correction.}
 \value{
 A \code{chrom_list} with blank-subtracted samples. Blanks
 themselves are removed from the returned list, and so is any
-\code{"baseline"} attribute on the samples.
+\code{"estimated_baseline"} attribute on the samples.
 }
 \description{
 Subtracts a blank chromatogram from each sample in a \code{chrom_list},

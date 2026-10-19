@@ -27,7 +27,7 @@ asymmetric least squares (\code{"als"}, the default, via
 (\code{"snip"}). See \code{\link{baseline_estimators}} for a description of each.}
 
 \item{attach_baseline}{Logical. Whether to retain the estimated baseline
-alongside the corrected data, as a \code{"baseline"} attribute on each returned
+alongside the corrected data, as an \code{"estimated_baseline"} attribute on each returned
 matrix, retrievable with \code{\link{get_baseline}}. The baseline is subtracted either
 way; this argument only controls whether the estimate is kept for
 inspection. Defaults to \code{FALSE}: the baseline is estimated separately for

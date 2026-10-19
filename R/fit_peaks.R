@@ -231,22 +231,14 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' @param pos A `data.frame` of peak positions and boundaries, as returned by
 #' [`find_peaks`], with columns `pos`, `lower` and `upper` holding index
 #' positions into the trace at `lambda`. A bare vector of apex positions is not
-#' enough, since every peak model needs a window to fit over. If `NULL` (the
-#' default), [`find_peaks`] is run on that trace. Cannot be combined with
-#' `windows`.
-#' @param windows Optional two-column matrix or `data.frame` of start and end
-#' retention times (or a single pair of times), giving manual integration
-#' windows. If provided, peak detection is skipped entirely and one peak is
-#' returned for every window, whether or not a peak is detectable there. Two
-#' adjacent windows sharing a boundary time act as a vertical drop line: their
-#' areas sum exactly to the area of their union, which is how a peak is split at
-#' a chosen time. `max_fwhm` is ignored, since the width of each window is
-#' chosen by the user. Cannot be combined with `pos`. Defaults to
-#' `NULL`.
+#' enough, since every peak model needs a window to fit over. A peak in `pos`
+#' whose model fails is kept, with `height` and `area` set to `NA` and
+#' `converged` to `0`. If `NULL`
+#' (the default), [`find_peaks`] is run on that trace, and peaks whose model
+#' fails are dropped.
 #' @param max_fwhm Maximum peak width, as a full width at half maximum, in
 #' index units. Peaks whose `FWHM` could not be measured (`NA`) are retained.
-#' Defaults to `NULL`, which applies no width filter. Ignored if `windows` is
-#' provided.
+#' Defaults to `NULL`, which applies no width filter.
 #' @param sd_max The `sd_max` argument is deprecated, because a standard
 #' deviation is not a peak width for any model except `"gaussian"`. Please use
 #' `max_fwhm` instead. If supplied, it is applied as a cutoff on `FWHM` of
@@ -267,15 +259,18 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' @param baseline Whether to subtract a local baseline beneath each peak.
 #' Options are `"none"` (no baseline, default), `"flat"` (constant offset), or
 #' `"sloped"` (linearly varying offset). For the peak models, the offset is
-#' estimated by non-linear least squares along with the shape parameters. When
-#' `fit = "raw"`, it is instead read directly off the boundaries of the
-#' integration window: `"flat"` draws a horizontal line at the lower of the two
-#' boundary intensities, while `"sloped"` draws a line between them
-#' (valley-to-valley integration). A baseline lying above the signal produces a
-#' negative area, which is reported as such, with a warning.
+#' estimated by nonlinear least squares along with the shape parameters and is
+#' constrained to be non-negative; a `"flat"` offset is also capped at the
+#' lowest intensity in the window. When `fit = "raw"`, the offset is instead
+#' read directly off the boundaries of the integration window: `"flat"` draws a
+#' horizontal line at the lower of the two boundary intensities, while
+#' `"sloped"` draws a line between them (valley-to-valley integration). A raw
+#' baseline lying above the signal gives a negative area. `fit_peaks` reports
+#' it as is; [`get_peaktable`] records it as `0`.
 #' @param ... Additional arguments to `find_peaks`.
 #' @return A `data.frame` with one row per peak and the following columns:
-#' * `rt`: Peak maximum location.
+#' * `rt`: Apex of the fitted peak model, or of the detected peak when
+#' `fit = "raw"`.
 #' * `start`: Peak start.
 #' * `end`: Peak end.
 #' * `sd`: Standard deviation of the Gaussian component of the fitted model,
@@ -286,9 +281,9 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' `fit = "bemg"`).
 #' * `tau_left`: Exponential decay constant for left side of peak (only when
 #' `fit = "bemg"`).
-#' * `h`: The `height` parameter of the fitted BEMG shape function: the value
-#' of the pure shape at `center`, before any baseline is added, and distinct
-#' from `height` (only when `fit = "bemg"`).
+#' * `h`: The amplitude parameter of the fitted BEMG shape function. It scales
+#' the shape but is neither its value at `center` nor the peak `height` (only
+#' when `fit = "bemg"`).
 #' * `center`: The center parameter of the fitted BEMG shape function, the
 #' location around which the exponential tails are applied. May differ from
 #' `rt` (only when `fit = "bemg"`).
@@ -300,10 +295,10 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' * `r.squared`: Coefficient of determination (\eqn{R^2}), from a linear
 #' regression of fitted values on the raw data. Statistically informal, since
 #' the model was fit by nonlinear least squares rather than OLS, but useful as
-#' a fit diagnostic.
+#' a fit diagnostic. Not returned when `fit = "raw"`.
 #' * `purity`: The spectral purity of peak as assessed by [`get_purity`].
-#' * `window_limited`: `1` if a fitted shape parameter came to rest on a bound
-#' derived from the integration window, meaning the window rather than the data
+#' * `window_limited`: `1` if a fitted shape parameter hit a limit set by the
+#' integration window, meaning the window rather than the data
 #' determined the reported shape, and `0` otherwise. Not returned when
 #' `fit = "raw"`.
 #' * `converged`: `1` if the optimizer reported convergence for the final stage
@@ -317,9 +312,9 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' * `floor_end`: Baseline level at the right edge of the peak window (only
 #' when `baseline = "sloped"`).
 #' The table is in index units rather than retention times: `rt`, `start`,
-#' `end` and `center` are index positions; `sd`, `FWHM`, `area` and `tau` are
-#' widths on the index scale; and `tau_right` and `tau_left` are in inverse
-#' index units. [`get_peaks`] converts them to the chromatogram's time axis.
+#' `end` and `center` are index positions; `sd`, `FWHM` and `tau` are widths on
+#' the index scale; `area` is integrated over the index axis; and `tau_right`
+#' and `tau_left` are in inverse index units. [`get_peaks`] converts them to the chromatogram's time axis.
 #' @note The `fit_peaks` function is adapted from Dr. Robert Morrison's
 #' [DuffyTools](https://github.com/robertdouglasmorrison/DuffyTools) package
 #' as well as code published in Ron Wehrens' [alsace](
@@ -341,7 +336,7 @@ find_peaks <- function(y, smooth_type = c("gaussian", "box", "savgol", "mva",
 #' @md
 #' @keywords internal
 
-fit_peaks <- function (x, lambda, pos = NULL, windows = NULL,
+fit_peaks <- function (x, lambda, pos = NULL,
                        max_fwhm = NULL,
                        sd_max = NULL,
                        fit = c("egh", "bemg", "gaussian", "raw"),
@@ -352,10 +347,7 @@ fit_peaks <- function (x, lambda, pos = NULL, windows = NULL,
   y <- x[,lambda.idx]
   # `find_peaks` returns a bare vector of apex positions when `bounds = FALSE`,
   # which cannot be integrated, since every peak model needs a window.
-  dots <- list(...)
-  if ("bounds" %in% names(dots) && !isTRUE(dots$bounds)){
-    stop("`bounds = FALSE` cannot be used with `fit_peaks`, since peak boundaries are required in order to integrate. It is only meaningful when calling `find_peaks` directly.")
-  }
+  check_bounds_arg(...)
   if (!is.null(sd_max)){
     if (!missing(max_fwhm))
       stop("Supply either `max_fwhm` or `sd_max`, not both. `max_fwhm` is a ",
@@ -374,16 +366,8 @@ fit_peaks <- function (x, lambda, pos = NULL, windows = NULL,
     stop("`pos` must be a data.frame with columns `pos`, `lower` and `upper`, ",
          "as returned by `find_peaks`.")
   }
-  if (!is.null(windows)){
-    if (!is.null(pos)){
-      stop("Please supply either `windows` or `pos`, not both.")
-    }
-    pos <- windows_to_pos(windows, y = y, times = get_times(x))
-    # the width of a manual window is chosen by the user, so it must not be
-    # filtered.
-    max_fwhm <- NULL
-  }
-  if (is.null(pos)){
+  pos_supplied <- !is.null(pos)
+  if (!pos_supplied){
     pos <- find_peaks(y = y, ...)
   }
   if (ncol(x) == 1){
@@ -408,20 +392,12 @@ fit_peaks <- function (x, lambda, pos = NULL, windows = NULL,
                                      ncol = length(tabnames),
                                      dimnames = list(NULL, tabnames)),
                               check.names = FALSE)
+  if (!is.null(pos$target)) noPeaksMat$target <- integer(0)
   if (nrow(pos) == 0)
     return(noPeaksMat)
   on.edge <- sapply(pos$pos, function(x){
     x <= 1 || is.na(y[x + 1]) || is.na(y[x - 1])
   })
-  if (!is.null(windows) && any(on.edge)){
-    warning(sprintf(
-      "The apex of the following window%s falls on the edge of the chromatogram, so %s dropped: %s.",
-      plural(sum(on.edge)),
-      ifelse(sum(on.edge) > 1, "they were", "it was"),
-      paste(sprintf("%s-%s", signif(get_times(x)[pos$lower[on.edge]], 4),
-                    signif(get_times(x)[pos$upper[on.edge]], 4)), collapse = ", ")),
-      immediate. = TRUE)
-  }
   pos <- pos[!on.edge, , drop = FALSE]
 
   if (nrow(pos) == 0)
@@ -431,6 +407,7 @@ fit_peaks <- function (x, lambda, pos = NULL, windows = NULL,
                   "egh" = fitpk_egh,
                   "raw" = fitpk_raw,
                   "bemg" = fitpk_bemg)
+  if (estimate_purity) check_purity_args(purity_args)
   if (estimate_purity && is.null(noise_variance)){
     noise_variance <- hoist_noise_variance(x, purity_args)
   }
@@ -442,7 +419,8 @@ fit_peaks <- function (x, lambda, pos = NULL, windows = NULL,
                              baseline = baseline)))
   colnames(huhn) <- tabnames
   huhn <- data.frame(sapply(huhn, as.numeric, simplify = FALSE))
-  huhn <- drop_unfittable_peaks(huhn)
+  if (!is.null(pos$target)) huhn$target <- pos$target
+  huhn <- drop_unfittable_peaks(huhn, keep = pos_supplied)
   huhn <- huhn[keep_by_width(huhn$FWHM, max_fwhm), , drop = FALSE]
   df <- try(huhn[which(huhn$rt > 0), ], silent = TRUE)
   if(inherits(df, "try-error")) NA else df
@@ -451,27 +429,23 @@ fit_peaks <- function (x, lambda, pos = NULL, windows = NULL,
 #' Drop peaks whose model did not yield a usable intensity
 #'
 #' A model that diverges can leave finite coefficients alongside a non-finite
-#' fitted curve, so `height` and `area` are the columns that reveal it. Such a
-#' row is a failed fit rather than a measurement, and a non-finite `response`
-#' propagates into [`get_peaktable`], so it is removed here with a warning
-#' rather than passed on.
+#' fitted curve, so `height` and `area` are the columns that reveal it. With
+#' `keep = TRUE`, such rows are kept with `height` and `area` set to `NA` and
+#' `converged` to `0`.
 #'
 #' @param huhn A `data.frame` of fitted peak parameters.
+#' @param keep Whether to keep failed fits instead of dropping them.
 #' @return `huhn`, without rows whose `height` or `area` is non-finite.
 #' @author Ethan Bass
 #' @noRd
-drop_unfittable_peaks <- function(huhn){
+drop_unfittable_peaks <- function(huhn, keep = FALSE){
   cols <- intersect(c("height", "area"), colnames(huhn))
   if (length(cols) == 0 || nrow(huhn) == 0) return(huhn)
   bad <- !Reduce(`&`, lapply(huhn[cols], is.finite))
-  if (any(bad)){
-    warning(sprintf(
-      "Discarded %d peak%s whose fitted %s not finite, indicating the peak model did not converge.",
-      sum(bad), plural(sum(bad)),
-      if (length(cols) > 1) "height or area was" else paste(cols, "was")),
-      call. = FALSE)
-  }
-  huhn[!bad, , drop = FALSE]
+  if (!keep) return(huhn[!bad, , drop = FALSE])
+  huhn[bad, cols] <- NA
+  if (!is.null(huhn$converged)) huhn$converged[bad] <- 0
+  huhn
 }
 
 #' Gaussian function
@@ -1166,12 +1140,6 @@ fitpk_raw <- function(x, pos, lambda, max_iter,
   # perform trapezoidal integration on raw signal
   int <- integrate_above_baseline(yp, peak.loc, floor_val, slope_val)
   area <- int$area
-  if (!is.na(area) && area < 0){
-    warning(sprintf(
-      "The local baseline lies above the signal in the window from %s to %s, giving a negative area.",
-      signif(get_times(x)[pos[2]], 4), signif(get_times(x)[pos[3]], 4)),
-      immediate. = TRUE)
-  }
   purity <- peak_purity(x, pos, estimate_purity, noise_variance, purity_args)
   result <- c("rt" = pos[1], "start" = pos[2], "end" = pos[3],
     "sd" = NA_real_, "FWHM" = measured_fwhm(int$y_above),

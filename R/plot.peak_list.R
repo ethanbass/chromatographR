@@ -12,6 +12,23 @@
 #' matrices). If missing, extracted from environment using the pointer in `x`.
 #' @param idx Index or name of chromatogram to plot from `chrom_list`.
 #' @param lambda Wavelength (column) to use for plotting.
+#' @param targets Optional target retention times, as a numeric vector or a
+#' table of targets (see [`targeted_analysis`]). If supplied, the plot is
+#' zoomed to the span of every peak whose apex falls within `tol` of a target,
+#' or, for a target with no such peak, whose boundaries (widened by `tol`)
+#' enclose it. The vertical axis is rescaled to the contents of
+#' that window, so that small peaks are not flattened against the axis.
+#' Defaults to `NULL`.
+#' @param tol Numeric. Half-width of the window around each target, in
+#' minutes, whatever the time unit of `chrom_list`. Either a single value applied to
+#' every target, or a vector giving a separate tolerance for each target. A
+#' `tol` column in `targets` takes precedence. Defaults to `0.1`. Ignored if
+#' `targets` is `NULL`.
+#' @param pad Fraction of the selected peak span to add on either side when
+#' zooming. Defaults to `0.5`, which keeps neighboring peaks in view. An
+#' explicit `xlim` or `ylim` passed through `...` takes precedence over the
+#' zoom; if `xlim` is given, the vertical axis is rescaled to that window
+#' instead.
 #' @param points Logical. If `TRUE`, display peak apex locations as points. 
 #' Defaults to `FALSE`.
 #' @param ticks Logical. If `TRUE`, mark peak boundaries with tick marks. 
@@ -62,12 +79,17 @@
 #' data(Sa_warp)
 #' pks <- get_peaks(chrom_list = Sa_warp[1], lambdas = 210)
 #' plot(pks, points = TRUE, ticks = TRUE)
+#' plot(pks, targets = 11.12, ticks = TRUE)
+#' op <- par(mfrow = c(1, 2))
+#' for (t in c(12.19, 14.41)) plot(pks, targets = t)
+#' par(op)
 #' @seealso [`get_peaks`]
 #' @rdname plot.peak_list
 #' @family visualization functions
 #' @export
 
 plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
+                           targets = NULL, tol = 0.1, pad = 0.5,
                            points = FALSE, ticks = FALSE, alpha = 0.5, color = NULL,
                            cex.points = 0.5, numbers = FALSE, cex.font = 0.5, 
                            y.offset = 25,
@@ -84,6 +106,7 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
   if (missing(chrom_list)){
     chrom_list <- get_chrom_list(x)
   }
+  axis_unit <- get_time_unit(chrom_list, idx = idx, na_value = "min")
   if (is.null(lambda)){
     lambda <- names(x[[1]])[1]
   }
@@ -100,26 +123,23 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
   purity_lim <- NULL
   plot_args <- list(new.ts, y, type = 'l', xlab = '', ylab = '',
                     xaxt = 'n', yaxt = 'n', ...)
-  yr <- range(y, na.rm = TRUE)
+  zoom <- peak_zoom_xlim(pks, targets, tol, pad, new.ts, rt_factor(axis_unit))
+  plot_args$xlim <- plot_args$xlim %||% zoom
+  win <- if (!is.null(zoom)) zoom_ylim(plot_args$xlim, pks, new.ts, y, baseline)
+  yr <- win %||% range(y, na.rm = TRUE)
   if (plot_purity != "none"){
     purity_lim <- -0.1 * diff(yr)
     bands <- 2
     if (is.null(plot_args$ylim)){
       plot_args$ylim <- c(min(yr[1], purity_lim * bands), yr[2])
     }
+  } else if (!is.null(win) && is.null(plot_args$ylim)){
+    plot_args$ylim <- win
   }
   do.call(plot, plot_args)
   if (points){
-    apex_y <- if (baseline == "flat" && !is.null(pks$floor)) {
-      pks$height + pks$floor
-    } else if (baseline == "sloped" && !is.null(pks$floor_start) && !is.null(pks$floor_end)) {
-      # apex is at rt; interpolate baseline linearly between start and end
-      frac <- (pks$rt - pks$start) / (pks$end - pks$start)
-      pks$height + pks$floor_start + frac * (pks$floor_end - pks$floor_start)
-    } else {
-      pks$height
-    }
-    points(pks$rt, apex_y, pch = 20, cex = cex.points, col = 'red')
+    points(pks$rt, peak_apex_y(pks, baseline), pch = 20, cex = cex.points,
+           col = 'red')
   }
   if (ticks){
     draw_peak_ticks(pks, new.ts, y)
@@ -476,6 +496,80 @@ bemg_from_peak <- function(x, peak, tfac = 1, ...) {
 #' @noRd
 raw_from_peak <- function(x, peak, tfac, chrom_list, idx, lambda) {
   chrom_list[[idx]][as.character(x), lambda]
+}
+
+#' Apex height of each peak, including any fitted baseline
+#' Helper for `plot.peak_list`
+#' @noRd
+peak_apex_y <- function(pks, baseline) {
+  if (baseline == "flat" && !is.null(pks$floor)) {
+    pks$height + pks$floor
+  } else if (baseline == "sloped" && !is.null(pks$floor_start) &&
+             !is.null(pks$floor_end)) {
+    # apex is at rt; interpolate baseline linearly between start and end
+    frac <- (pks$rt - pks$start) / (pks$end - pks$start)
+    pks$height + pks$floor_start + frac * (pks$floor_end - pks$floor_start)
+  } else {
+    pks$height
+  }
+}
+
+#' Horizontal limits spanning a subset of peaks
+#' Helper for `plot.peak_list`
+#' @noRd
+peak_zoom_xlim <- function(pks, rts, tol, pad, new.ts, rtf = 1) {
+  if (is.null(rts)) return(NULL)
+  if (nrow(pks) == 0){
+    stop("Cannot zoom on a peak: the peak list is empty.")
+  }
+  targets <- check_targets(rts, tol)
+  rts <- targets$rt
+  tol <- targets$tol
+  win <- tol * rtf
+  near <- function(k){
+    hits <- which(abs(pks$rt - rts[k]) <= win[k])
+    if (length(hits)) hits
+    else which(rts[k] >= pks$start - win[k] & rts[k] <= pks$end + win[k])
+  }
+  hits <- lapply(seq_along(rts), near)
+  sel <- sort(unique(unlist(hits)))
+  if (length(sel) == 0){
+    stop(sprintf(
+      "No peak within %s of %s. The peaks in this chromatogram run from %s to %s.",
+      paste(unique(tol), collapse = "/"),
+      paste(rts, collapse = ", "),
+      format(min(pks$rt)), format(max(pks$rt))))
+  }
+  missed <- which(lengths(hits) == 0)
+  if (length(missed) > 0){
+    warning(sprintf("No peak within %s of %s.",
+                    paste(tol[missed], collapse = ", "),
+                    paste(rts[missed], collapse = ", ")), call. = FALSE)
+  }
+  if (!is.numeric(pad) || length(pad) != 1 || is.na(pad) || pad < 0){
+    stop("`pad` must be a single non-negative number.")
+  }
+  xlim <- range(c(pks$start[sel], pks$end[sel]))
+  xlim + c(-1, 1) * pad * max(diff(xlim), diff(range(new.ts)) * 1e-3)
+}
+
+#' Vertical limits covering the trace, peaks and baseline within a time window
+#' Helper for `plot.peak_list`
+#' @noRd
+zoom_ylim <- function(xlim, pks, new.ts, y, baseline) {
+  w <- which(new.ts >= xlim[1] & new.ts <= xlim[2])
+  sel <- which(pks$rt >= xlim[1] & pks$rt <= xlim[2])
+  floors <- if (baseline == "flat" && !is.null(pks$floor)){
+    pks$floor[sel]
+  } else if (baseline == "sloped" && !is.null(pks$floor_start)){
+    c(pks$floor_start[sel], pks$floor_end[sel])
+  } else 0
+  ylim <- suppressWarnings(
+    range(c(y[w], floors, peak_apex_y(pks, baseline)[sel]), na.rm = TRUE))
+  if (!all(is.finite(ylim)) || diff(ylim) == 0){
+    ylim <- range(y, na.rm = TRUE)
+  }
+  ylim
 }
 
 #' Draw peak boundaries

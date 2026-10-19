@@ -7,11 +7,12 @@
 annotate_peaks(
   p,
   loc,
-  peak_table,
+  peak_table = NULL,
   chrom_list = NULL,
   label = NULL,
   lambda = NULL,
   idx = NULL,
+  tol = 0.05,
   vjust = -0.5,
   ...
 )
@@ -19,27 +20,35 @@ annotate_peaks(
 \arguments{
 \item{p}{A \code{ggplot} object produced by \code{\link[=plot_chroms]{plot_chroms()}}.}
 
-\item{loc}{A character vector of peak names (e.g. \code{c("V8", "V15")}).
-If named, the names are used as labels (e.g.
-\verb{c(Sinigrin = "V8", }1ME\verb{ = "V15")}).}
+\item{loc}{Either a character vector of peak names from \code{peak_table}
+(e.g. \code{c("V8", "V15")}) or a numeric vector of retention times, in the
+units of the plot's time axis. If named, the names are used as labels.}
 
-\item{peak_table}{A \code{peak_table} object created by \code{\link{get_peaktable}}.}
+\item{peak_table}{A \code{peak_table} object created by \code{\link{get_peaktable}}.
+Required when \code{loc} gives peak names.}
 
-\item{chrom_list}{A list of chromatograms in matrix format (timepoints x
+\item{chrom_list}{A list of chromatograms in matrix format (timepoints ×
 wavelengths). If no argument is provided here, the function will try to find
 the \code{chrom_list} object using the pointer in the \code{peak_table}.}
 
 \item{label}{Labels to display at each peak. Can be a character vector of
-labels (one per peak), \code{"rt"} to use retention times from the peak table.
+labels (one per peak), or \code{"rt"} to use the retention times.
 If labels are not specified here, the names of \code{loc} will be applied, or
 if the \code{loc} vector is not named, the peak names will be used directly.}
 
 \item{lambda}{Wavelength(s) to use for locating the peak apex. Inherited
 from \code{p} if \code{NULL} (default). If multiple wavelengths are provided, the
-one with the highest absorbance is used.}
+one with the highest absorbance at the peak's retention time is used.}
 
 \item{idx}{Index of chromatogram(s) to use for locating the peak apex.
-Inherited from \code{p} if \code{NULL} (default).}
+Inherited from \code{p} if \code{NULL} (default).
+
+\code{lambda} and \code{idx} apply only to peak names; retention times use the
+plotted traces.}
+
+\item{tol}{Half-width of the window around each retention time in which the
+highest plotted point is found, in minutes. Defaults to \code{0.05}. Ignored for
+peak names.}
 
 \item{vjust}{Vertical justification of the label relative to the peak apex.
 Defaults to \code{-0.5}.}
@@ -51,8 +60,12 @@ A \code{ggplot} object.
 }
 \description{
 Adds text labels to peaks on a chromatogram plot produced by
-\code{\link[=plot_chroms]{plot_chroms()}}. Peak retention times and intensities are looked up
-automatically from the peak table.
+\code{\link[=plot_chroms]{plot_chroms()}}. Peaks named in a peak table are labeled at their
+retention time, above the highest point of the chromatograms in \code{idx}
+between the peak's start and end. Peaks given as retention times are
+labeled at that time, above the highest plotted point within \code{tol} of it,
+and need no peak table; the label then marks the tallest trace in that
+window, whichever peak it belongs to.
 }
 \examples{
 if (requireNamespace("ggplot2", quietly = TRUE)) {
@@ -60,6 +73,8 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
   data(pk_tab)
   plot_chroms(Sa_warp, lambdas = 210, engine = "ggplot") |>
     annotate_peaks(c(C1="V9", C2="V11", C3="V17"), peak_table = pk_tab)
+  plot_chroms(Sa_warp, lambdas = 210, engine = "ggplot") |>
+    annotate_peaks(c(C1 = 12.18, C2 = 12.70))
 }
 }
 \seealso{

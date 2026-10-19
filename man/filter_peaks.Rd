@@ -25,9 +25,12 @@ spectral wavelength. Every sample × wavelength component is described by a
 \code{data.frame} where every row represents a peak, and the columns contain
 information on retention time, peak shape, height, and area.}
 
-\item{min_height}{Minimum peak height.}
+\item{min_height}{Minimum peak height. Peaks whose \code{height} is \code{NA}, such as
+failed fits kept by \code{\link{get_peaks}}, are dropped if \code{min_height} is supplied
+and retained otherwise.}
 
-\item{min_area}{Minimum peak area.}
+\item{min_area}{Minimum peak area. Peaks whose \code{area} is \code{NA} are treated
+the same way.}
 
 \item{min_sd}{The \code{min_sd} argument is deprecated. Please use \code{min_fwhm}
 instead.}

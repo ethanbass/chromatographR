@@ -8,7 +8,7 @@
 #' [`get_baseline`].
 #'
 #' @importFrom graphics lines mtext
-#' @param x A matrix or vector with an attached `"baseline"`, or a list of such
+#' @param x A matrix or vector with an attached `"estimated_baseline"`, or a list of such
 #' matrices, as returned by [`preprocess`] or [`correct_baseline`] with
 #' `attach_baseline = TRUE`.
 #' @param lambda Wavelength to plot, as a string or number. Optional for a

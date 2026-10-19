@@ -7,13 +7,16 @@
 match_peaks(
   peak_list,
   chrom_list = NULL,
-  reference = 1,
+  reference = NULL,
+  targets = NULL,
   lambda = NULL,
   rt_window = 0.3,
   spectral_cutoff = 0.95,
+  spectrum = c("apex", "background"),
   shape_cutoff = NULL,
   rt_weight = 0.15,
   shape_weight = 0,
+  use_corrected_rt = NULL,
   plot_it = FALSE,
   fit = NULL,
   verbose = getOption("verbose")
@@ -25,19 +28,38 @@ match_peaks(
 \item{chrom_list}{List of chromatograms in matrix format. If \code{NULL}, will be
 retrieved from the \code{peak_list} object.}
 
-\item{reference}{Index or name of the reference sample, or \code{"best"} to select the
-reference algorithmically using \code{\link[ptw:bestref]{bestref}}. Defaults to \code{1}.}
+\item{reference}{Index or name of the reference sample, or \code{"best"} to
+select the reference algorithmically using \code{\link[ptw:bestref]{bestref}}.
+Defaults to \code{NULL}, which uses the first sample, or, if \code{targets} is
+given, a sample chosen from the targets.}
+
+\item{targets}{Optional table of targets, or a numeric vector of their
+retention times (see \code{\link{targeted_analysis}}). Used to choose the reference
+sample, unless \code{reference} is given, and to name the targets' columns in
+the peak table. Cannot be combined with \code{reference = "best"}. Defaults to
+\code{NULL}.}
 
 \item{lambda}{A character or numeric value specifying the wavelength to use
 for peak matching. Required if peaks were detected at multiple wavelengths.}
 
 \item{rt_window}{Numeric. Maximum allowed difference in retention time, in
 minutes, between a reference and sample peak to be considered a candidate
-match. Defaults to \code{0.3}.}
+match. An \code{rt_window} column in \code{targets} overrides it for those targets.
+Defaults to \code{0.3}.}
 
 \item{spectral_cutoff}{Numeric. Minimum spectral correlation for a candidate
-peak pair to be retained. Ignored, with a warning, for one-dimensional
-chromatograms. Defaults to \code{0.95}.}
+peak pair to be retained. A \code{spectral_cutoff} column in \code{targets}
+overrides it for those targets. Ignored, with a warning, for
+one-dimensional chromatograms. Defaults to \code{0.95}.}
+
+\item{spectrum}{Which spectrum of each peak to correlate: \code{"apex"} (the
+default), the spectrum at the peak apex, or \code{"background"}, the apex
+spectrum minus the background under the peak, interpolated between the
+spectra at its \code{start} and \code{end}. The apex spectrum is averaged over 2
+scans either side and each boundary spectrum over 5, to limit the noise
+the subtraction adds. Background subtraction helps when peaks sit on a
+sloping baseline or the tail of a neighbor, but can hurt peaks near the
+noise level or with boundaries on a neighboring peak.}
 
 \item{shape_cutoff}{Numeric. Maximum shape distance for a candidate peak pair
 to be retained. Raises an error when \code{fit = "raw"}, since peak shape
@@ -54,11 +76,19 @@ shape-distance penalty analogous to \code{rt_weight}. Shape distances are
 normalized by \code{shape_cutoff} (if provided) or by the maximum observed shape
 distance. Silently ignored when \code{fit = "raw"}. Defaults to \code{0}.}
 
+\item{use_corrected_rt}{Logical. Whether to compare corrected retention
+times (\code{rt.cor}) from \code{\link{correct_peaks}} rather than raw ones (\code{rt}), both
+between peaks and against \code{targets}. Spectra
+are still read at the raw times from \code{chrom_list}, and the matches and
+\code{"reference_targets"} keep the raw times. Defaults to \code{NULL}, which uses
+corrected times when every sample has them.}
+
 \item{plot_it}{Logical. Whether to plot the matches with
 \code{\link{plot.matched_peak_list}}. Defaults to \code{FALSE}.}
 
 \item{fit}{Character. The type of fit used to construct the peak list, one
-of \code{"egh"}, \code{"bemg"}, \code{"gaussian"} or \code{"raw"}. Normally this does not need
+of \code{"egh"}, \code{"bemg"}, \code{"gaussian"} or \code{"raw"}, used only to compare peak
+shapes (\code{shape_cutoff}, \code{shape_weight}). Normally this does not need
 to be specified, since it is detected from the \code{fit} attribute stored in
 the \code{peak_list} object. Supply it explicitly only if that attribute is
 missing, or to override it (e.g. to use the simpler gaussian shape
@@ -70,7 +100,9 @@ distance, which depends only on \code{sd}, for an \code{"egh"} peak list).}
 A \code{matched_peak_list} object: a list with one element per sample
 containing the matched peak pairs, per-pair spectral correlation scores,
 and peak data in index space for use with \code{\link{correct_rt}}. A sample with no
-peaks or no matches is \code{NULL}, with a warning.
+peaks or no matches is \code{NULL}, with a warning. When \code{targets} is given,
+the targets with \code{rt} replaced by the reference's own retention times are
+stored as the \code{"reference_targets"} attribute.
 }
 \description{
 Matches peaks across chromatograms by spectral correlation and retention
@@ -82,13 +114,23 @@ first. The resulting \code{matched_peak_list} object can be passed to
 \code{\link{correct_rt}} to perform landmark parametric time warping
 (\code{alg = "lptw"}).
 }
+\details{
+With \code{targets}, a sample's peak for a target is its tallest peak within
+\code{tol} of it that, when fitted, has \code{r.squared} of at least 0.5; a peak
+within \code{tol} of several targets counts only for the nearest. Unless
+\code{reference} is given, the reference is chosen among samples with a peak for
+every target, where a peak counts if it is at least a tenth of that target's
+median height across samples. The sample whose weakest target is largest
+relative to its median is chosen, then the one whose peaks lie closest to
+the target times.
+}
 \examples{
 data(Sa_pr)
 pks <- get_peaks(Sa_pr, lambdas = 210, fit = "egh")
 match_peaks(pks, lambda = 210)
 }
 \seealso{
-\code{\link{correct_rt}}, \code{\link{get_peaks}}
+\code{\link{correct_rt}}, \code{\link{get_peaks}}, \code{\link{targeted_analysis}}
 }
 \author{
 Ethan Bass

@@ -497,13 +497,17 @@ test_that("`shape_weight` redirects matching from RT proximity to peak shape", {
   }
 })
 
-test_that("match_peaks errors when `fit` can be neither found nor inferred", {
+test_that("match_peaks needs `fit` only to compare peak shapes", {
   skip_on_cran()
   pks_nofit <- pks_egh
   attr(pks_nofit, "fit") <- NULL
-  expect_error(match_peaks(pks_nofit, chrom_list = dat.pr, lambda = "210",
+  expect_equal(match_peaks(pks_nofit, chrom_list = dat.pr, lambda = "210",
                            verbose = FALSE),
-               regexp = "Please specify `fit` to proceed")
+               match_peaks(pks_egh, chrom_list = dat.pr, lambda = "210",
+                           verbose = FALSE))
+  expect_error(match_peaks(pks_nofit, chrom_list = dat.pr, lambda = "210",
+                           shape_weight = 0.5, verbose = FALSE),
+               regexp = "Please specify `fit` to compare peak shapes")
 })
 
 test_that("match_peaks skips samples where no candidate pair survives", {
@@ -663,7 +667,7 @@ test_that("correct_peaks works", {
                                what = "models", show_progress = FALSE)
   
   pks_cor <- correct_peaks(pks, mod_list = warping.models)
-  pktab_cor <- get_peaktable(pks_cor, use.cor = TRUE)
+  pktab_cor <- get_peaktable(pks_cor, use_corrected_rt = TRUE)
 
   ptw_warp <- correct_rt(Sa_pr, models = warping.models, show_progress = FALSE)
   pks_warp <- get_peaks(ptw_warp, lambdas = 210, show_progress = FALSE)
@@ -1016,6 +1020,108 @@ test_that("plot.peak_list works", {
   
   expect_error(plot(pks_egh, chrom_list = dat.pr, lambda = 190),
                regexp = "must match one of the wavelengths in your peak list")
+})
+
+test_that("plot.peak_list zooms to the selected peaks", {
+  skip_on_cran()
+  pks <- data.frame(pks_egh[[1]][["210"]])
+  ts <- get_times(dat.pr, idx = 1)
+  y <- dat.pr[[1]][, "210"]
+
+  tmp <- tempfile(fileext = ".png")
+  on.exit(unlink(tmp), add = TRUE)
+  png(tmp)
+  on.exit(if (!is.null(dev.list())) dev.off(), add = TRUE, after = FALSE)
+
+  plot(pks_egh, chrom_list = dat.pr, lambda = 210)
+  full <- par("usr")
+
+  plot(pks_egh, chrom_list = dat.pr, lambda = 210, targets = pks$rt[2],
+       tol = 0.001, pad = 0)
+  zoomed <- par("usr")
+  expect_true(zoomed[1] > full[1] && zoomed[2] < full[2])
+  expect_true(diff(zoomed[3:4]) < diff(full[3:4]))
+  expect_lt(zoomed[1], pks$start[2])
+  expect_gt(zoomed[2], pks$end[2])
+
+  # the vertical axis must cover the trace inside the window, and no more
+  w <- which(ts >= zoomed[1] & ts <= zoomed[2])
+  expect_gte(zoomed[4], max(y[w], na.rm = TRUE))
+  expect_lte(zoomed[3], min(y[w], na.rm = TRUE))
+
+  # a span of peaks is wider than any one of them
+  plot(pks_egh, chrom_list = dat.pr, lambda = 210, targets = pks$rt[2:4],
+       tol = 0.001, pad = 0)
+  span <- par("usr")
+  expect_lt(span[1], zoomed[1])
+  expect_gt(span[2], zoomed[2])
+
+  # `pad` widens the window
+  plot(pks_egh, chrom_list = dat.pr, lambda = 210, targets = pks$rt[2],
+       tol = 0.001, pad = 1)
+  padded <- par("usr")
+  expect_lt(padded[1], zoomed[1])
+  expect_gt(padded[2], zoomed[2])
+
+  # an explicit `xlim` wins, and the vertical axis follows it
+  plot(pks_egh, chrom_list = dat.pr, lambda = 210, targets = pks$rt[2],
+       tol = 0.001, xlim = range(ts))
+  override <- par("usr")
+  expect_equal(override[3:4], full[3:4])
+
+  # an explicit `ylim` wins
+  plot(pks_egh, chrom_list = dat.pr, lambda = 210, targets = pks$rt[2],
+       tol = 0.001, ylim = c(0, 1000))
+  expect_equal(par("usr")[3:4], c(-40, 1040))
+
+  dev.off()
+
+  expect_error(plot(pks_egh, chrom_list = dat.pr, lambda = 210,
+                    targets = pks$rt[1], pad = -1),
+               regexp = "`pad` must be a single non-negative number")
+})
+
+test_that("plot.peak_list zooms by retention time across samples", {
+  skip_on_cran()
+  pk <- get_peaks(dat.pr, lambdas = lam, fit = "egh", smooth_type = "none",
+                  show_progress = FALSE)
+
+  tmp <- tempfile(fileext = ".png")
+  on.exit(unlink(tmp), add = TRUE)
+  png(tmp)
+  on.exit(if (!is.null(dev.list())) dev.off(), add = TRUE, after = FALSE)
+
+  by_rt <- matrix(NA_real_, nrow = length(pk), ncol = 2)
+  for (i in seq_along(pk)){
+    plot(pk, chrom_list = dat.pr, idx = i, lambda = "210", targets = 12.62)
+    by_rt[i, ] <- par("usr")[1:2]
+  }
+  expect_true(all(by_rt[, 1] < 12.62 & by_rt[, 2] > 12.62))
+
+  # a wider tolerance pulls in more peaks and so widens the window
+  plot(pk, chrom_list = dat.pr, idx = 1, lambda = "210", targets = 12.62, tol = 0.01)
+  tight <- par("usr")[1:2]
+  plot(pk, chrom_list = dat.pr, idx = 1, lambda = "210", targets = 12.62, tol = 0.5)
+  loose <- par("usr")[1:2]
+  expect_lt(loose[1], tight[1])
+  expect_gt(loose[2], tight[2])
+
+  # multiple targets span all of them
+  plot(pk, chrom_list = dat.pr, idx = 1, lambda = "210", targets = c(12.62, 13.65), tol = 0.2)
+  span <- par("usr")[1:2]
+  expect_lt(span[1], 12.62)
+  expect_gt(span[2], 13.65)
+  dev.off()
+
+  expect_error(plot(pk, chrom_list = dat.pr, idx = 1, lambda = "210", targets = 99),
+               regexp = "No peak within 0.1 of 99")
+  expect_warning(plot(pk, chrom_list = dat.pr, idx = 1, lambda = "210", targets = c(12.62, 99)),
+                 regexp = "No peak within 0.1 of 99")
+  expect_error(plot(pk, chrom_list = dat.pr, idx = 1, lambda = "210", targets = "a"),
+               regexp = "numeric vector of retention times")
+  expect_error(plot(pk, chrom_list = dat.pr, idx = 1, lambda = "210", targets = c(12.62, 13.65),
+                    tol = c(0.1, 0.2, 0.3)),
+               regexp = "`tol` must be a single value or one value for each")
 })
 
 test_that("plot.ptw_list works", {

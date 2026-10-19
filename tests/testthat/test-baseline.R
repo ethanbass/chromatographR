@@ -56,15 +56,13 @@ test_that("a stale baseline attribute does not survive re-correction", {
   x2 <- preprocess(x1, dim1 = seq(11, 18, by = 0.02),
                    dim2 = seq(200, 318, by = 4), attach_baseline = FALSE,
                    cl = 1, show_progress = FALSE)
-  expect_null(attr(x2[[1]], "baseline", exact = TRUE))
+  expect_null(attr(x2[[1]], "estimated_baseline", exact = TRUE))
   expect_error(get_baseline(x2[[1]]), regexp = "No baseline found")
-  # `attr()` partial-matches, so a bare read would return `baseline_param`
-  expect_type(attr(x2[[1]], "baseline"), "double")
 
   # and neither must `correct_baseline`
   x3 <- correct_baseline(x1, attach_baseline = FALSE, cl = 1,
                          show_progress = FALSE)
-  expect_null(attr(x3[[1]], "baseline", exact = TRUE))
+  expect_null(attr(x3[[1]], "estimated_baseline", exact = TRUE))
 })
 
 test_that("a trace too short to baseline is rejected, not silently mangled", {
@@ -89,7 +87,7 @@ test_that("subtract_baseline always returns a baseline shaped like the data", {
   res <- subtract_baseline(X, baseline = "als", attach_baseline = TRUE)
   expect_equal(dim(res$baseline), dim(X))
   expect_equal(dim(res$x), dim(X))
-  expect_null(attr(res$x, "baseline", exact = TRUE))
+  expect_null(attr(res$x, "estimated_baseline", exact = TRUE))
 })
 
 test_that("correct_baseline accepts a bare numeric vector", {
@@ -118,9 +116,9 @@ test_that("get_baseline explains a baseline discarded by a later step", {
                   dim2 = seq(200, 318, by = 2), attach_baseline = TRUE,
                   cl = 1, show_progress = FALSE)
   y <- x[[1]]
-  attr(y, "baseline") <- NULL
+  attr(y, "estimated_baseline") <- NULL
   expect_error(get_baseline(y), regexp = "discarded by a later step")
 
   pks <- get_peaks(x, lambdas = "210", show_progress = FALSE)
-  expect_null(attr(pks[[1]], "baseline", exact = TRUE))
+  expect_null(attr(pks[[1]], "estimated_baseline", exact = TRUE))
 })
