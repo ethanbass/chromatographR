@@ -348,6 +348,9 @@ retention times by up to 0.005 minutes and set small `tau` values to zero.
 named `peaks` vector. Previously both were `NA`.
 * `filter_peaktable` no longer appends a spurious `rt` row to `pk_meta` when
 filtering a table built from corrected peaks.
+* `reshape_peaktable` now errors on `metadata` columns it cannot find, which
+were previously dropped, and gives clear errors for unattached metadata or
+unknown `peaks`.
 
 #### Plotting
 

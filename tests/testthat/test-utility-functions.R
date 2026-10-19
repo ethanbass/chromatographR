@@ -150,6 +150,15 @@ test_that("reshape_peaktable works as expected",{
   expect_equal(pktab_wide$sample, rownames(pk_tab$tab))
   expect_equal(pktab_wide$b, pk_tab$tab$V58)
   expect_equal(pktab_wide$trt, pk_tab$sample_meta$trt)
+
+  expect_error(reshape_peaktable(pk_tab, peaks = c("V49", "V999")),
+               "Peak not found in the peak table: 'V999'")
+  expect_error(reshape_peaktable(pk_tab, peaks = "V49", metadata = c("trt", "Vial")),
+               "Metadata column not found: 'Vial'. Available: .*'trt'")
+  bare <- pk_tab
+  bare$sample_meta <- NA
+  expect_error(reshape_peaktable(bare, peaks = "V49", metadata = "trt"),
+               "No sample metadata is attached")
 })
 
 test_that("reshape_chroms works as expected", {

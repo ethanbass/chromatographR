@@ -632,6 +632,10 @@ reshape_peaktable <- function(x, peaks, metadata, fixed_levels = TRUE,
     if (is.numeric(peaks)){
       peaks <- colnames(x$tab)[peaks]
     }
+    unknown <- setdiff(peaks, colnames(x$tab))
+    if (length(unknown))
+      stop(sprintf("Peak%s not found in the peak table: %s.", plural(length(unknown)),
+                   paste(sQuote(unknown, FALSE), collapse = ", ")), call. = FALSE)
     df <- x$tab[, match(peaks, colnames(x$tab)), drop = FALSE]
     if (!is.null(names(peaks))){
       x$pk_meta <- x$pk_meta[, match(peaks, colnames(x$pk_meta)), drop = FALSE]
@@ -642,6 +646,16 @@ reshape_peaktable <- function(x, peaks, metadata, fixed_levels = TRUE,
     df <- x$tab
   }
   if (!missing(metadata)){
+    if (!is_attached(x$sample_meta))
+      stop("No sample metadata is attached to `x`, so `metadata` cannot be ",
+           "selected. Attach it first with `attach_metadata()`, or omit `metadata`.",
+           call. = FALSE)
+    absent <- setdiff(metadata, colnames(x$sample_meta))
+    if (length(absent))
+      stop(sprintf("Metadata column%s not found: %s. Available: %s.",
+                   plural(length(absent)), paste(sQuote(absent, FALSE), collapse = ", "),
+                   paste(sQuote(colnames(x$sample_meta), FALSE), collapse = ", ")),
+           call. = FALSE)
     meta_idx <- which(colnames(x$sample_meta) %in% metadata)
     x$sample_meta <- x$sample_meta[, meta_idx, drop = FALSE]
   }
