@@ -28,6 +28,7 @@ get_chrom_list <- function(x, chrom_list = NULL, verbose = FALSE,
     chrom_list <- if (aligned) get_aligned_chrom_list(x, string)
                   else lookup_chrom_list(string)
   }
+  chrom_list <- unnest_chrom_list(chrom_list)
   check_chrom_list(x, chrom_list, verbose = verbose)
   chrom_list
 }
@@ -730,15 +731,52 @@ as_chrom_list <- function(x, arg = "X"){
     x <- list(x)
     return_matrix <- TRUE
   } else return_matrix <- FALSE
-  if (inherits(x, "list") &&
-      all(sapply(x, function(xx){
-        inherits(xx, "list") && "dad" %in% names(xx) && is.matrix(xx$dad)
-      }))){
-    x <- lapply(x, function(xx) xx$dad)
-  }
+  if (inherits(x, "list")) x <- unnest_chrom_list(x)
   if (!(inherits(x, "matrix") || (inherits(x, "list") && all(sapply(x, is.matrix)))))
     stop(sprintf("%s should be a matrix or a list of matrices", arg))
   list(chrom_list = x, return_matrix = return_matrix, class = x_class)
+}
+
+#' Reduce nested chromatograms to one matrix per sample
+#'
+#' A list of matrices is returned unchanged. Otherwise `what` (default `"dad"`)
+#' selects an element of each sample with `get_element()`.
+#' @noRd
+unnest_chrom_list <- function(x, what = NULL){
+  if (length(x) == 0 || !is.list(x[[1]]) || is.data.frame(x[[1]])) return(x)
+  get_element(x, what %||% "dad")
+}
+
+#' Extract one element from each chromatogram in a nested list
+#'
+#' @param x A list of chromatograms, each a list of elements.
+#' @param what A single name (e.g. `"dad"`), a vector of names for a nested
+#' element, or one string split at the first colon (e.g.
+#' `"instrument:PMP1, Pressure"`), unless that string is itself an element name.
+#' @return A list of matrices, with the names and class of `x`.
+#' @noRd
+get_element <- function(x, what){
+  colon <- length(what) == 1 && grepl(":", what, fixed = TRUE) &&
+    !(what %in% names(x[[1]]))
+  if (colon)
+    what <- trimws(c(sub(":.*$", "", what), sub("^[^:]*:", "", what)))
+  path <- function(w){
+    sprintf("`what = %s`", if (colon) deparse(paste(w, collapse = ":")) else deparse(w))
+  }
+  out <- lapply(x, function(xx){
+    el <- if (is.list(xx)) tryCatch(xx[[what]], error = function(e) NULL)
+    if (is.matrix(el)) return(el)
+    if (is.list(el))
+      stop(sprintf("%s is a list, not a matrix. Choose one of its elements, e.g. %s. Elements: %s.",
+                   path(what), path(c(what, names(el)[1])),
+                   paste(sQuote(names(el), FALSE), collapse = ", ")), call. = FALSE)
+    parent <- if (length(what) > 1) tryCatch(xx[[what[-length(what)]]], error = function(e) NULL) else xx
+    stop(sprintf("%s was not found. Elements available%s: %s.", path(what),
+                 if (length(what) > 1) sprintf(" in %s", path(what[-length(what)])) else "",
+                 paste(sQuote(names(parent), FALSE), collapse = ", ")), call. = FALSE)
+  })
+  class(out) <- class(x)
+  out
 }
 
 #' Transfer metadata

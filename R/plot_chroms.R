@@ -36,6 +36,13 @@
 #' @param legend_position Position of legend. Defaults to `"topright"`
 #' @param title Title for plot.
 #' @param ... Additional arguments to plotting function specified by `engine`.
+#' @param what Which element to plot when each chromatogram in `x` is itself a
+#' list, as returned by [chromConverter::read_chroms()] with several `what`
+#' values. A single name (e.g. `"dad"`), or a vector of names for a nested
+#' element (e.g. `c("instrument", "PMP1, Pressure")`). A nested element can
+#' also be written as one string split at the first colon, as in
+#' `"instrument:PMP1, Pressure"`, unless that string is itself an element name.
+#' Defaults to `"dad"` for such lists; ignored when `x` is a list of matrices.
 #' @return A `plotly` or `ggplot` object when `engine = "plotly"` or
 #' `engine = "ggplot"`, respectively. No value is returned when
 #' `engine = "base"`.
@@ -63,10 +70,11 @@ plot_chroms <- function(x, lambdas, idx, time_resolution = 0.01,
                         xlab = "", ylab = "Absorbance",
                         engine = c("base", "ggplot", "plotly"), linewidth = 1, 
                         show_legend = FALSE, legend_position = "topright", 
-                        title = "", ...){
+                        title = "", what = NULL, ...){
   if (inherits(x, "peak_table")){
     x <- get_chrom_list(x)
   }
+  x <- unnest_chrom_list(x, what)
   if (!inherits(x, c("list", "chrom_list"))){
     stop("Please supply a list of chromatograms.")
   }
@@ -232,6 +240,7 @@ plot_chroms_heatmap <- function(x, idx = NULL, lambdas,
   if (inherits(x, "peak_table")){
     x <- get_chrom_list(x)
   }
+  x <- unnest_chrom_list(x)
   if (!inherits(x, c("list", "chrom_list"))){
     stop("Please supply a list of chromatograms.")
   }

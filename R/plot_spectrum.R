@@ -317,6 +317,7 @@ scan_chrom <- function(chrom_list, idx, lambda,
     stop("List of chromatograms must be provided for scan function.")
   if (!inherits(chrom_list, c("list", "chrom_list")))
     stop("`chrom_list` argument should be a list of chromatograms in matrix format")
+  chrom_list <- unnest_chrom_list(chrom_list)
   if (missing(idx)){
     idx <- as.numeric(readline(
       prompt = "Which chromatogram do you wish to plot? \n"))

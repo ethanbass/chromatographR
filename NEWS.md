@@ -233,6 +233,8 @@ in both `preprocess` and `subtract_blanks`.
 * Added `targets`, `tol` and `pad` arguments to `plot.peak_list` for zooming
 in on the peaks near given retention times, rescaling both axes to the
 selected window.
+* Added a `what` argument to `plot_chroms` for plotting one element of nested
+chromatograms from `read_chroms`, such as `"dad"` or a pump pressure trace.
 * Added `format = "wide"` to `reshape_peaktable`, returning one row per sample
 with metadata and one column per selected peak.
 * `annotate_peaks` now accepts retention times through the `loc` argument,

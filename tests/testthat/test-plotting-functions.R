@@ -261,6 +261,40 @@ test_that("annotate_peaks works correctly", {
                regexp = c("Please supply a ggplot"))
 })
 
+test_that("plot_chroms plots an element of nested chromatograms", {
+  skip_if_not_installed("ggplot2")
+  data(Sa_warp)
+  nested <- lapply(Sa_warp, function(m){
+    list(dad = m, instrument = list(pressure = m[, "210", drop = FALSE]))
+  })
+  flat <- plot_chroms(Sa_warp, lambdas = 210, engine = "ggplot")
+  expect_equal(plot_chroms(nested, lambdas = 210, engine = "ggplot")$data,
+               flat$data)
+  expect_error(plot_chroms(nested, what = "instrument:flow"),
+               "`what = \"instrument:flow\"` was not found")
+  colon_named <- lapply(nested, function(el) c(el, list("dad:raw" = el$dad)))
+  expect_equal(plot_chroms(colon_named, lambdas = 210, engine = "ggplot",
+                           what = "dad:raw")$data, flat$data)
+  expect_error(plot_chroms(nested, lambdas = 210, what = "uv"),
+               "not found. Elements available: 'dad', 'instrument'")
+  expect_error(plot_chroms(nested, what = "instrument"),
+               "is a list, not a matrix.*c\\(\"instrument\", \"pressure\"\\)")
+  expect_error(plot_chroms(nested, what = c("instrument", "flow")),
+               "Elements available in .*: 'pressure'")
+})
+
+test_that("get_element extracts nested elements as a list of matrices", {
+  data(Sa_pr)
+  nested <- lapply(Sa_pr, function(m){
+    list(dad = m, instrument = list(pressure = m[, "210", drop = FALSE]))
+  })
+  class(nested) <- class(Sa_pr)
+  expect_equal(get_element(nested, "dad"), Sa_pr)
+  p <- get_element(nested, "instrument:pressure")
+  expect_equal(names(p), names(Sa_pr))
+  expect_equal(p[[2]], Sa_pr[[2]][, "210", drop = FALSE])
+})
+
 test_that("annotate_peaks labels retention times without a peak table", {
   skip_if_not_installed("ggplot2")
   data(Sa_warp)

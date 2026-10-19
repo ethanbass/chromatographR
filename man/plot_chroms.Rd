@@ -19,6 +19,7 @@ plot_chroms(
   show_legend = FALSE,
   legend_position = "topright",
   title = "",
+  what = NULL,
   ...
 )
 }
@@ -62,6 +63,14 @@ provided, the time units will default to minutes.}
 \item{legend_position}{Position of legend. Defaults to \code{"topright"}}
 
 \item{title}{Title for plot.}
+
+\item{what}{Which element to plot when each chromatogram in \code{x} is itself a
+list, as returned by \code{\link[chromConverter:read_chroms]{chromConverter::read_chroms()}} with several \code{what}
+values. A single name (e.g. \code{"dad"}), or a vector of names for a nested
+element (e.g. \code{c("instrument", "PMP1, Pressure")}). A nested element can
+also be written as one string split at the first colon, as in
+\code{"instrument:PMP1, Pressure"}, unless that string is itself an element name.
+Defaults to \code{"dad"} for such lists; ignored when \code{x} is a list of matrices.}
 
 \item{...}{Additional arguments to plotting function specified by \code{engine}.}
 }
