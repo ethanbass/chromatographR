@@ -53,6 +53,16 @@ test_that("plot_all_spectra scans by rt or idx without a peak table", {
                "outside the bounds")
 })
 
+test_that("axis labels use the unit they are asked for", {
+  x <- structure(matrix(1), time_unit = "Minutes", detector_x_unit = "nm",
+                 detector_y_unit = NA)
+  expect_equal(add_unit("Wavelength", list(x), unit = "detector_x_unit", idx = 1),
+               "Wavelength (nm)")
+  expect_equal(add_unit("Time", list(x), idx = 1), "Time (Minutes)")
+  expect_equal(add_unit("Absorbance", list(x), unit = "detector_y_unit", idx = 1),
+               "Absorbance")
+})
+
 test_that("an omitted or NULL chrom_list is looked up from the peak table", {
   skip_on_cran()
   data(pk_tab); data(Sa_warp)

@@ -722,13 +722,12 @@ plotly_trace <- function(chrom_list, chr, lambda.idx, line.idx = NULL,
 
 #' Add unit
 #' @noRd
-add_unit <- function(string, chrom_list, unit, idx){
+add_unit <- function(string, chrom_list, unit = "time_unit", idx){
   if (length(idx) > 1){
     idx <- idx[1]
   }
-  unit <- extract_chrom_metadata(chrom_list, "time_unit", idx = idx)
-  addition <- ifelse(unit != "", sprintf(" (%s)", unit), "")
-  paste0(string, addition)
+  unit <- extract_chrom_metadata(chrom_list, unit, idx = idx)
+  if (is.na(unit) || unit == "") string else sprintf("%s (%s)", string, unit)
 }
 
 # Extract chromatogram metadata

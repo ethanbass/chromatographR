@@ -361,6 +361,9 @@ unknown `peaks`.
 
 #### Plotting
 
+* `plot_all_spectra` axes, and the absorbance axis of `plot_spectrum`'s ggplot2
+and plotly traces, now show wavelength and absorbance units instead of the time
+unit.
 * `plot_all_spectra` now names the returned spectra when `idx` gives sample
 names, and errors on names not in `chrom_list`.
 * `plot.peak_table(idx = "all")` no longer errors when `chrom_list` is omitted,
