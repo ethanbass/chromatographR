@@ -4,9 +4,11 @@
 #' at one or more wavelengths.
 #' 
 #' Peaks are detected by [`find_peaks`] as zero-crossings in the smoothed first
-#' derivative of each trace, then fitted by [`fit_peaks`] according to `fit`.
-#' Peak areas are the trapezoidal integral of the fitted curve (or, for
-#' `fit = "raw"`, of the signal) above the local `baseline`.
+#' derivative of each trace, then fitted by [`fit_peaks`] according to `fit`
+#' (see *Peak models* and *Fitting procedure*). Peak areas are the trapezoidal
+#' integral of the fitted curve (or, for `fit = "raw"`, of the signal) above the
+#' local `baseline` (see *Local baselines*). To integrate fixed retention-time
+#' ranges instead, see *Manual integration windows*.
 #' 
 #' @aliases get_peaks
 #' @importFrom stats median
@@ -19,7 +21,7 @@
 #' Gaussian (`"bemg"`), exponential-Gaussian hybrid (`"egh"`), `"gaussian"`,
 #' or `"raw"`. `"raw"` integrates the signal directly by trapezoidal
 #' approximation without fitting a model. Defaults to `"egh"`, or to `"raw"`
-#' when `windows` is provided, which allows no other value.
+#' when `windows` is provided, which allows no other value. See *Peak models*.
 #' @param windows Optional two-column matrix or `data.frame` of start and end
 #' retention times (or a single pair of times), giving manual integration
 #' windows applied to every chromatogram. If provided, peak detection is
@@ -27,54 +29,36 @@
 #' `fit = "raw"`, and `max_fwhm` is ignored. Cannot be combined with
 #' `targets`. Defaults to `NULL`. See *Manual integration windows*.
 #' @param targets Target retention times, as a numeric vector or a table of
-#' targets (see [`targeted_analysis`]). If provided, only peaks with an apex
-#' falling within `tol` of one of these retention times are fit, and [`get_peaktable`]
-#' groups peaks by target instead of clustering them. A `lambda` column takes
-#' the place of `lambdas`, and a `tol` column the place of the `tol` argument,
-#' which must then be omitted. A target's peak whose model fails is kept, with `height` and `area` set to
-#' `NA` and `converged` to `0`, whereas without `targets` such peaks are dropped.
-#' Defaults to `NULL`, in which case all detected peaks are fit.
-#' @param tol Numeric. Half-width of the window around each value of `targets`, in
-#' minutes, whatever the time unit of `chrom_list`. Either a single value applied to
-#' every target, or a vector giving a separate tolerance for each element of
-#' `targets`. Defaults to `0.1`. `tol` is compared against the apex of the
-#' detected peak rather than the returned `rt`, which is the apex of the fitted
-#' model, so a returned `rt` may fall outside the window. Where the windows of
-#' two targets overlap, a peak in the overlap is considered only for the nearer
-#' target. Targets closer together than the drift between samples can
-#' therefore be assigned each other's peaks; supply `mod_list` to read them on
-#' the aligned time axis. Ignored if `targets` is `NULL`.
-#' @param select_by Character. How to proceed when more than one peak falls
-#' within the window around a target retention time. `"height"` (the default)
-#' retains the most intense peak, `"proximity"` retains the peak closest to the
-#' target retention time, and `"none"` retains every peak in the window.
-#' Because selection precedes model fitting, `"height"` compares raw apex
-#' intensities, so the retained peak does not always have the largest fitted
-#' `height`. With `"none"`, [`get_peaktable`] keeps only the peak with the
-#' largest `response` for each target in each sample, but every peak in the
-#' window contributes to the target's `pk_meta`, including its `rt`. Ignored if
-#' `targets` is `NULL`.
+#' targets (see [`targeted_analysis`]). If provided, only peaks whose apex
+#' falls within `tol` of a target are fit, and [`get_peaktable`] groups peaks by target
+#' instead of clustering them. A `lambda` column replaces `lambdas`, and a `tol`
+#' column replaces the `tol` argument, which must then be omitted. Defaults to
+#' `NULL`, which fits every detected peak.
+#' @param tol Numeric. The maximum distance between a peak's apex and its target
+#' in `targets`, in minutes, regardless of the time unit of `chrom_list`. Give one value
+#' for all targets, or one per target. Defaults to `0.1`. Ignored if `targets`
+#' is `NULL`.
+#' @param select_by Character. Which peak to keep when more than one falls in a
+#' target's window: `"height"` (the default) keeps the most intense,
+#' `"proximity"` the one closest to the target, and `"none"` all of them.
+#' Ignored if `targets` is `NULL`.
 #' @param mod_list Optional warping models from [`correct_rt`] (with
 #' `what = "models"`). If provided, the times in `targets` are read on the
 #' aligned time axis, so they can be copied from the `rt` row of an aligned peak table. Peaks are
 #' still detected and fitted on the unaligned data; use [`correct_peaks`]
 #' afterwards to add corrected retention times. Requires `targets`.
-#' @param max_fwhm Maximum peak width, as a full width at half maximum, in the
-#' units set by `time_unit`. Peaks wider than `max_fwhm` are discarded, and a
-#' warning is issued if that removes more than 20% of detected peaks. Peaks
-#' whose `FWHM` could not be measured (`NA`, see the `FWHM` entry under
-#' *Value*) are retained. The same value means the same thing as `max_fwhm` in
-#' [`filter_peaks`] and, unlike a standard deviation, is comparable across
-#' values of `fit`. Defaults to `NULL`, which disables width filtering. To
-#' choose a value, see the section on calibrating these parameters from your
-#' own data in `vignette("chromatographR")`. Ignored if `windows` is provided.
-#' @param sd_max The `sd_max` argument is deprecated. Please use `max_fwhm`
-#' instead. `sd_max` is a standard deviation in timepoints, which is a peak
-#' width only for `fit = "gaussian"`. If supplied, it is converted to a `FWHM`
-#' cutoff of `2.355 * sd_max * dt` in the units of `time_unit`, where `dt` is
-#' the chromatogram's time step. Pass `sd_max = NULL` to disable width
-#' filtering. Cannot be combined with `max_fwhm`. Ignored if `windows` is
-#' provided.
+#' @param max_fwhm Maximum peak width, as a full width at half maximum in the
+#' units of `time_unit`. Wider peaks are discarded, with a warning if that
+#' removes more than 20% of detected peaks; peaks whose `FWHM` could not be
+#' measured (`NA`) are kept. It means the same as `max_fwhm` in
+#' [`filter_peaks`]. Defaults to
+#' `NULL` (no width filtering). Ignored if `windows` is provided. To choose a
+#' value from your own data, see `vignette("chromatographR")`.
+#' @param sd_max Deprecated; use `max_fwhm`. A standard deviation in
+#' timepoints, converted to a `FWHM` cutoff of `2.355 * sd_max * dt` in the
+#' units of `time_unit`, where `dt` is the chromatogram's time step. `NULL`
+#' disables width filtering. Cannot be combined with `max_fwhm`. Ignored if
+#' `windows` is provided.
 #' @param sd.max The `sd.max` argument is deprecated. Please use `sd_max` instead.
 #' @param max_iter Maximum number of iterations for non-linear least squares
 #' in [`fit_peaks`]. Defaults to `1000`.
@@ -83,10 +67,10 @@
 #' @param time_unit Units for `sd`, `FWHM`, `tau`, `tau_right`, `tau_left`,
 #' `area` and `max_fwhm`. Options are minutes
 #' (`"min"`), seconds (`"s"`), or milliseconds (`"ms"`). Defaults to the time
-#' unit of `chrom_list` (minutes if none is recorded), so that every column
-#' shares one unit. Set `"s"` to compare areas with ChemStation integration
-#' results. `rt`, `start` and `end` are not converted: they are always in the
-#' units of the chromatogram's own time axis.
+#' unit of `chrom_list` (minutes if none is recorded). `rt`, `start` and `end`
+#' are not converted: they stay in the units of the chromatogram's own time
+#' axis. ChemStation reports areas with time in seconds, so use `"s"` to
+#' compare with it.
 #' @param time.units The `time.units` argument is deprecated. Please use 
 #' `time_unit` instead.
 #' @param estimate_purity Logical. Whether to estimate purity. Defaults to
@@ -101,20 +85,14 @@
 #' @param cl Number of cores (integer) or a cluster object from
 #' [`makeCluster`][parallel::makeCluster]. Defaults to `2`. On Windows, only a
 #' cluster object runs in parallel; an integer runs serially.
-#' @param baseline Whether to subtract a local baseline beneath each peak.
-#' Options are `"none"` (no baseline, default), `"flat"` (constant offset per
-#' peak), or `"sloped"` (linearly varying offset per peak, useful for gradient
-#' elution). For the peak models, the offset is estimated by non-linear least
-#' squares along with the shape parameters. When `fit = "raw"`, it is instead
-#' read directly off the boundaries of the integration window: `"flat"` draws a
-#' horizontal line at the lower of the two boundary intensities, while
-#' `"sloped"` draws a line between them (valley-to-valley integration).
+#' @param baseline Whether to measure each peak above a local baseline:
+#' `"none"` (the default), `"flat"` (a constant offset per peak), or `"sloped"`
+#' (an offset that varies linearly across the peak). See *Local baselines*.
 #' @param collapse Logical. Whether to combine the peaks from every wavelength
 #' into a single `data.frame` per sample. Defaults to `FALSE`.
-#' @param ... Additional arguments passed to [`find_peaks`]. Increase
-#' `smooth_window` if peaks are split across multiple detections, but too wide
-#' a window merges closely-eluting peaks. Other useful arguments:
-#' `smooth_type`, `min_prominence_snr`, `min_curvature`, `min_amplitude`.
+#' @param ... Additional arguments passed to [`find_peaks`], such as
+#' `smooth_window`, `smooth_type`, `min_prominence_snr`, `min_curvature` and
+#' `min_amplitude`. See *Choosing the smoothing window* in [`find_peaks`].
 #' @return An S3 object of class `peak_list`: a nested list
 #' (sample, then wavelength) of `data.frame`s, or a list of one `data.frame` per
 #' sample when `collapse = TRUE`, with one row per peak and columns:
@@ -172,10 +150,9 @@
 #' convergence for the final stage of the fit, and `0` otherwise. A `0` means
 #' the reported parameters are wherever the optimizer stopped rather than a
 #' converged fit, so treat the corresponding `height` and `area` with caution.
-#' It also covers the case where no optimizer ran at all: a fitting stage whose
-#' integration window holds fewer points than the stage has parameters is
-#' skipped, since such a window cannot determine the model, and the reported
-#' parameters are then the starting estimates rather than a measurement.
+#' It also covers the case where part or all of the fit was skipped because
+#' the integration window holds too few points to determine it; the peak then
+#' keeps the last step that ran, or its starting values (see *Fitting procedure*).
 #' `get_peaks` warns when more than 20% of peaks sit in such a window.
 #' Not returned when `fit = "raw"`.
 #' * `floor`: Constant baseline level (only when `baseline = "flat"`).
@@ -186,6 +163,65 @@
 #' and `floor_end` are constrained to be non-negative.
 #' * `target`: The row of `targets` the peak was selected for (only when `targets` is
 #' supplied).
+#' @section Peak models:
+#' The three peak models are fitted to each peak by nonlinear least squares;
+#' `"raw"` uses no model.
+#' * `"gaussian"`: a symmetric Gaussian, with a center, a width (`sd`) and a
+#' height.
+#' * `"egh"`: the exponential-Gaussian hybrid of Lan & Jorgenson (2001), a
+#' Gaussian whose width grows on one side of the apex. It adds one parameter,
+#' `tau`, which is positive for a tailing peak and negative for a fronting one.
+#' * `"bemg"`: the average of two exponentially modified Gaussians, one with an
+#' exponential tail to the left and one to the right. Their time constants,
+#' `tau_left` and `tau_right`, set the two tails independently, so a peak can
+#' tail, front, or both; a value near 0 means no tail on that side.
+#' * `"raw"`: no model. The signal itself is integrated across the window, so
+#' `r.squared`, `window_limited` and `converged` are not reported.
+#'
+#' `"gaussian"` cannot follow tailing or fronting; `"egh"` follows one or the
+#' other, but not both in the same peak; `"bemg"` follows both. The more
+#' flexible models have more parameters (3, 4 and 5 respectively for the peak
+#' shape, plus one more for a `"flat"` baseline or two more for a `"sloped"`
+#' baseline).
+#' @section Local baselines:
+#' A peak's height and area are measured over its integration window, which
+#' runs from the valley before the peak to the valley after it, as found by
+#' [`find_peaks`], or spans the manual window if the `windows` argument is given.
+#' * With `baseline = "none"`, `height` and `area` are measured from zero, so
+#' the chromatogram should already be baseline corrected (see [`preprocess`]).
+#' * With the fitted peak models (`"gaussian"`, `"egh"`, `"bemg"`), a `"flat"`
+#' or `"sloped"` baseline is fitted together with the peak shape by nonlinear
+#' least squares. It cannot be negative; a flat baseline is capped at the
+#' lowest intensity in the window, and each end of a sloped one is capped at the
+#' median intensity of the first or last 2% of the window. `height` and
+#' `area` are those of the fitted shape above the baseline, with the area
+#' integrated across the integration window only.
+#' * With `fit = "raw"`, nothing is fitted: a `"flat"` baseline is a horizontal
+#' line at the lower of the two boundary intensities, and a `"sloped"` one a
+#' straight line between them. Where that line lies above the signal, it
+#' subtracts area, so the area can come out negative; [`get_peaktable`]
+#' records a negative area as `0`.
+#'
+#' With `"flat"` or `"sloped"`, each peak gets its own baseline. This differs
+#' from drop-line integration in vendor software such as ChemStation, where a
+#' vertical line from each valley meets a baseline shared by the whole cluster
+#' of peaks.
+#' @section Fitting procedure:
+#' A fit is built up in successive steps: first the peak shape, then a constant
+#' baseline, and finally its slope. To fit the full model, a peak's integration
+#' window must have at least as many timepoints as there are parameters in the
+#' model. A step is skipped if the window has too few timepoints to fit all the
+#' required parameters, and discarded if the optimizer cannot start from its
+#' initial values or, for `"bemg"`, if a fitted tail rises towards the edge of
+#' the window instead of falling back towards the baseline. Either way, the
+#' peak keeps the last step that worked. A `"sloped"` baseline can therefore
+#' come out flat, or a baseline can be left at its starting estimate rather than
+#' fitted, and if even the shape fails, every parameter will keep its starting
+#' value. In each of these cases, `converged` is set to `0`.
+#'
+#' Peaks that can't be fitted at all are dropped, unless they come from
+#' `targets`. Those are kept, with `height` and `area` set to `NA` and
+#' `converged` to `0`, so that every target found has a row.
 #' @section Manual integration windows:
 #' Manual windows integrate every sample over the same retention-time ranges,
 #' so each compound is measured the same way in every sample, and every sample

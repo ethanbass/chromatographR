@@ -25,28 +25,23 @@ fit_peaks(
 \item{lambda}{Wavelength at which to fit peaks. Must correspond to a
 wavelength present in \code{x}.}
 
-\item{pos}{A \code{data.frame} of peak positions and boundaries, as returned by
-\code{\link{find_peaks}}, with columns \code{pos}, \code{lower} and \code{upper} holding index
-positions into the trace at \code{lambda}. A bare vector of apex positions is not
-enough, since every peak model needs a window to fit over. A peak in \code{pos}
-whose model fails is kept, with \code{height} and \code{area} set to \code{NA} and
-\code{converged} to \code{0}. If \code{NULL}
-(the default), \code{\link{find_peaks}} is run on that trace, and peaks whose model
-fails are dropped.}
+\item{pos}{A \code{data.frame} of peak apices and boundaries, as returned by
+\code{\link{find_peaks}}, with columns \code{pos}, \code{lower} and \code{upper} giving row indices
+of \code{x}. If \code{NULL} (the default), \code{\link{find_peaks}} is run on \code{x} at \code{lambda}.}
 
 \item{max_fwhm}{Maximum peak width, as a full width at half maximum, in
 index units. Peaks whose \code{FWHM} could not be measured (\code{NA}) are retained.
 Defaults to \code{NULL}, which applies no width filter.}
 
-\item{sd_max}{The \code{sd_max} argument is deprecated, because a standard
-deviation is not a peak width for any model except \code{"gaussian"}. Please use
-\code{max_fwhm} instead. If supplied, it is applied as a cutoff on \code{FWHM} of
+\item{sd_max}{The \code{sd_max} argument is deprecated. Please use \code{max_fwhm}
+instead. If supplied, it is applied as a cutoff on \code{FWHM} of
 \code{2.355 * sd_max}.}
 
-\item{fit}{Peak model to use. Options include \code{"bemg"} (bidirectional
-exponentially modified Gaussian), \code{"egh"} (exponential-Gaussian hybrid),
-\code{"gaussian"}, and \code{"raw"}. If \code{raw} is selected, peaks are integrated using
-trapezoidal integration without model fitting. Defaults to \code{"egh"}.}
+\item{fit}{Peak model. Options are bidirectional exponentially modified
+Gaussian (\code{"bemg"}), exponential-Gaussian hybrid (\code{"egh"}), \code{"gaussian"},
+or \code{"raw"}. \code{"raw"} integrates the signal directly by trapezoidal
+approximation without fitting a model. Defaults to \code{"egh"}. See \emph{Peak
+models} in \code{\link{get_peaks}}.}
 
 \item{max_iter}{Maximum number of iterations to use in nonlinear least
 squares peak-fitting. Defaults to \code{1000}.}
@@ -55,26 +50,21 @@ squares peak-fitting. Defaults to \code{1000}.}
 to \code{FALSE}, and is always \code{FALSE} when \code{x} holds a single wavelength.}
 
 \item{purity_args}{A named list of additional arguments passed to
-\code{\link{get_purity}}, e.g. \code{list(background_correction = "none", metric = "max")}.}
+\code{\link{get_purity}}, e.g. \code{list(background_correction = "none", metric = "max")}.
+A \code{lambdas} element here selects the wavelengths used to compare spectra,
+not the wavelengths at which peaks are integrated.}
 
 \item{noise_variance}{Variance of noise, passed to \code{\link{get_purity}}. If not
 provided, it is estimated once for the whole chromatogram rather than once
 per peak.}
 
-\item{baseline}{Whether to subtract a local baseline beneath each peak.
-Options are \code{"none"} (no baseline, default), \code{"flat"} (constant offset), or
-\code{"sloped"} (linearly varying offset). For the peak models, the offset is
-estimated by nonlinear least squares along with the shape parameters and is
-constrained to be non-negative; a \code{"flat"} offset is also capped at the
-lowest intensity in the window, and each end of a \code{"sloped"} one at the
-median intensity of the first or last 2\% of the window. When \code{fit = "raw"}, the offset is instead
-read directly off the boundaries of the integration window: \code{"flat"} draws a
-horizontal line at the lower of the two boundary intensities, while
-\code{"sloped"} draws a line between them (valley-to-valley integration). A raw
-baseline lying above the signal gives a negative area. \code{fit_peaks} reports
-it as is; \code{\link{get_peaktable}} records it as \code{0}.}
+\item{baseline}{Whether to measure each peak above a local baseline:
+\code{"none"} (the default), \code{"flat"} or \code{"sloped"}. See \emph{Local baselines} in
+\code{\link{get_peaks}}.}
 
-\item{...}{Additional arguments to \code{find_peaks}.}
+\item{...}{Additional arguments passed to \code{\link{find_peaks}}, such as
+\code{smooth_window}, \code{smooth_type}, \code{min_prominence_snr}, \code{min_curvature} and
+\code{min_amplitude}. See \emph{Choosing the smoothing window} in \code{\link{find_peaks}}.}
 }
 \value{
 A \code{data.frame} with one row per peak and the following columns:
@@ -110,10 +100,9 @@ worse than a flat line at the mean. Not returned when \code{fit = "raw"}.
 integration window, meaning the window rather than the data
 determined the reported shape, and \code{0} otherwise. Not returned when
 \code{fit = "raw"}.
-\item \code{converged}: \code{1} if the optimizer reported convergence for the final stage
-of the fit, and \code{0} otherwise. A \code{0} also covers a stage skipped for holding
-fewer timepoints than the model has parameters, in which case the reported
-parameters are starting estimates rather than a measurement. Not returned
+\item \code{converged}: \code{1} if the optimizer reported convergence for the final step
+of the fit, and \code{0} otherwise, including when part or all of the fit was
+skipped or failed (see \emph{Fitting procedure} in \code{\link{get_peaks}}). Not returned
 when \code{fit = "raw"}.
 \item \code{floor}: Constant baseline offset (only when \code{baseline = "flat"}).
 \item \code{floor_start}: Baseline level at the left edge of the peak window (only
@@ -132,6 +121,16 @@ using nonlinear least squares (\code{\link[minpack.lm:nlsLM]{nlsLM}}). Supported
 models include Gaussian, bidirectional exponentially modified Gaussian,
 or exponential-Gaussian hybrid functions. The area under each fitted curve is
 estimated using trapezoidal approximation.
+}
+\details{
+Peaks that can't be fitted are dropped if they've been detected automatically
+with \code{find_peaks}. Otherwise, if the peak positions are provided explicitly
+through \code{pos}, \code{height} and \code{area} are set to \code{NA} and they are marked \code{0} in
+the \code{converged} column.
+
+The peak models, local baselines and fitting procedure are described in
+\code{\link{get_peaks}}, under \emph{Peak models}, \emph{Local baselines} and \emph{Fitting
+procedure}.
 }
 \note{
 The loop over peaks in \code{fit_peaks} is adapted from the \code{fitpeaks}

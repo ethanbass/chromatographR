@@ -34,8 +34,8 @@ second derivative of the smoothed signal. Curvature scales as height over
 width squared, so larger values exclude broader peaks. Defaults to \code{0}.}
 
 \item{min_amplitude}{Minimum peak amplitude, as the intensity of the
-unsmoothed signal at the apex. Larger values exclude smaller peaks. Defaults
-to \code{0}.}
+unsmoothed signal at the apex. Apices at or below this value are removed.
+Defaults to \code{0}, which removes apices at or below zero.}
 
 \item{min_prominence_snr}{Minimum peak prominence, as a multiple of the
 noise standard deviation. Requires \code{bounds = TRUE}. Only meaningful on
@@ -46,16 +46,16 @@ applies no filtering.}
 \code{data.frame}.}
 
 \item{slope_thresh}{The \code{slope_thresh} argument is deprecated. Please use
-\code{min_curvature} instead. (The name is misleading: the filter applies to the
-second derivative, not the slope.)}
+\code{min_curvature} instead.}
 
 \item{amp_thresh}{The \code{amp_thresh} argument is deprecated. Please use
 \code{min_amplitude} instead.}
 }
 \value{
-If \code{bounds == TRUE}, a \code{data.frame} with the center, start, end, and
-prominence of each peak. Otherwise, a numeric vector of peak centers. All
-locations are expressed as indices.
+If \code{bounds == TRUE}, a \code{data.frame} with one row per peak and
+columns \code{pos} (apex), \code{lower} and \code{upper} (boundaries), and \code{prominence}.
+Otherwise, a numeric vector of apex positions. All locations are expressed
+as indices.
 }
 \description{
 Detects peaks in a chromatographic profile by finding zero-crossings in the
@@ -106,13 +106,12 @@ window wide enough to avoid splitting peaks before applying prominence
 filtering. \code{find_peaks} warns when \code{smooth_window} is under a third of the
 typical peak width.
 
-\strong{Method-specific caveats.} \code{"savgol"} requires a window around the peak
-width, and errors below 7 timepoints rather than silently widening:
-Savitzky-Golay fits a 4th-order polynomial, so a 5-point window is an exact
-fit that returns the signal unchanged, quietly reducing the method to
-\code{"none"}. \code{"mva"} and \code{"tmva"} round the window to the nearest odd integer,
-floored at three (an even-width running mean is not centered on a sample and
-reports the apex one timepoint off).
+\strong{Method-specific caveats.} At the same \code{smooth_window}, \code{"savgol"} smooths
+about a third as much as the other methods, so it needs a wider window for
+the same noise reduction. It errors below 7 timepoints. \code{"savgol"}, \code{"mva"},
+and \code{"tmva"} round the window to the nearest integer, then up to the next
+odd one if it is even. The moving averages also use at least three points,
+since a one-point window does no smoothing.
 }
 
 \section{Filtering peaks}{

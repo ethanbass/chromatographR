@@ -43,13 +43,12 @@
 #' filtering. `find_peaks` warns when `smooth_window` is under a third of the
 #' typical peak width.
 #'
-#' **Method-specific caveats.** `"savgol"` requires a window around the peak
-#' width, and errors below 7 timepoints rather than silently widening:
-#' Savitzky-Golay fits a 4th-order polynomial, so a 5-point window is an exact
-#' fit that returns the signal unchanged, quietly reducing the method to
-#' `"none"`. `"mva"` and `"tmva"` round the window to the nearest odd integer,
-#' floored at three (an even-width running mean is not centered on a sample and
-#' reports the apex one timepoint off).
+#' **Method-specific caveats.** At the same `smooth_window`, `"savgol"` smooths
+#' about a third as much as the other methods, so it needs a wider window for
+#' the same noise reduction. It errors below 7 timepoints. `"savgol"`, `"mva"`,
+#' and `"tmva"` round the window to the nearest integer, then up to the next
+#' odd one if it is even. The moving averages also use at least three points,
+#' since a one-point window does no smoothing.
 #'
 #' @section Filtering peaks:
 #' The curvature and amplitude filters (`min_curvature` and `min_amplitude`)
@@ -88,8 +87,8 @@
 #' second derivative of the smoothed signal. Curvature scales as height over
 #' width squared, so larger values exclude broader peaks. Defaults to `0`.
 #' @param min_amplitude Minimum peak amplitude, as the intensity of the
-#' unsmoothed signal at the apex. Larger values exclude smaller peaks. Defaults
-#' to `0`.
+#' unsmoothed signal at the apex. Apices at or below this value are removed.
+#' Defaults to `0`, which removes apices at or below zero.
 #' @param min_prominence_snr Minimum peak prominence, as a multiple of the
 #' noise standard deviation. Requires `bounds = TRUE`. Only meaningful on
 #' baseline-corrected data (see *Filtering peaks*). Defaults to `0`, which
@@ -97,13 +96,13 @@
 #' @param bounds Logical. If `TRUE` (default), includes peak boundaries in a
 #' `data.frame`.
 #' @param slope_thresh The `slope_thresh` argument is deprecated. Please use
-#' `min_curvature` instead. (The name is misleading: the filter applies to the
-#' second derivative, not the slope.)
+#' `min_curvature` instead.
 #' @param amp_thresh The `amp_thresh` argument is deprecated. Please use
 #' `min_amplitude` instead.
-#' @return If `bounds == TRUE`, a `data.frame` with the center, start, end, and
-#' prominence of each peak. Otherwise, a numeric vector of peak centers. All
-#' locations are expressed as indices.
+#' @return If `bounds == TRUE`, a `data.frame` with one row per peak and
+#' columns `pos` (apex), `lower` and `upper` (boundaries), and `prominence`.
+#' Otherwise, a numeric vector of apex positions. All locations are expressed
+#' as indices.
 #' @note The `find_peaks` function is adapted from MATLAB code included in
 #' Prof. Tom O'Haver's [Pragmatic Introduction to Signal Processing](
 #' https://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm).
@@ -263,51 +262,48 @@ MIN_WINDOW_PER_FWHM <- 1 / 3
 #' models include Gaussian, bidirectional exponentially modified Gaussian,
 #' or exponential-Gaussian hybrid functions. The area under each fitted curve is 
 #' estimated using trapezoidal approximation.
+#'
+#' @details
+#' Peaks that can't be fitted are dropped if they've been detected automatically
+#' with `find_peaks`. Otherwise, if the peak positions are provided explicitly
+#' through `pos`, `height` and `area` are set to `NA` and they are marked `0` in
+#' the `converged` column.
+#'
+#' The peak models, local baselines and fitting procedure are described in
+#' [`get_peaks`], under *Peak models*, *Local baselines* and *Fitting
+#' procedure*.
 #' 
 #' @param x A single chromatogram in matrix format.
 #' @param lambda Wavelength at which to fit peaks. Must correspond to a 
 #' wavelength present in `x`.
-#' @param pos A `data.frame` of peak positions and boundaries, as returned by
-#' [`find_peaks`], with columns `pos`, `lower` and `upper` holding index
-#' positions into the trace at `lambda`. A bare vector of apex positions is not
-#' enough, since every peak model needs a window to fit over. A peak in `pos`
-#' whose model fails is kept, with `height` and `area` set to `NA` and
-#' `converged` to `0`. If `NULL`
-#' (the default), [`find_peaks`] is run on that trace, and peaks whose model
-#' fails are dropped.
+#' @param pos A `data.frame` of peak apices and boundaries, as returned by
+#' [`find_peaks`], with columns `pos`, `lower` and `upper` giving row indices
+#' of `x`. If `NULL` (the default), [`find_peaks`] is run on `x` at `lambda`.
 #' @param max_fwhm Maximum peak width, as a full width at half maximum, in
 #' index units. Peaks whose `FWHM` could not be measured (`NA`) are retained.
 #' Defaults to `NULL`, which applies no width filter.
-#' @param sd_max The `sd_max` argument is deprecated, because a standard
-#' deviation is not a peak width for any model except `"gaussian"`. Please use
-#' `max_fwhm` instead. If supplied, it is applied as a cutoff on `FWHM` of
+#' @param sd_max The `sd_max` argument is deprecated. Please use `max_fwhm`
+#' instead. If supplied, it is applied as a cutoff on `FWHM` of
 #' `2.355 * sd_max`.
-#' @param fit Peak model to use. Options include `"bemg"` (bidirectional 
-#' exponentially modified Gaussian), `"egh"` (exponential-Gaussian hybrid),
-#' `"gaussian"`, and `"raw"`. If `raw` is selected, peaks are integrated using
-#' trapezoidal integration without model fitting. Defaults to `"egh"`.
 #' @param max_iter Maximum number of iterations to use in nonlinear least
 #' squares peak-fitting. Defaults to `1000`.
 #' @param estimate_purity Logical. Whether to estimate purity. Defaults
 #' to `FALSE`, and is always `FALSE` when `x` holds a single wavelength.
-#' @param purity_args A named list of additional arguments passed to
-#' [`get_purity`], e.g. `list(background_correction = "none", metric = "max")`.
 #' @param noise_variance Variance of noise, passed to [`get_purity`]. If not
 #' provided, it is estimated once for the whole chromatogram rather than once
 #' per peak.
-#' @param baseline Whether to subtract a local baseline beneath each peak.
-#' Options are `"none"` (no baseline, default), `"flat"` (constant offset), or
-#' `"sloped"` (linearly varying offset). For the peak models, the offset is
-#' estimated by nonlinear least squares along with the shape parameters and is
-#' constrained to be non-negative; a `"flat"` offset is also capped at the
-#' lowest intensity in the window, and each end of a `"sloped"` one at the
-#' median intensity of the first or last 2% of the window. When `fit = "raw"`, the offset is instead
-#' read directly off the boundaries of the integration window: `"flat"` draws a
-#' horizontal line at the lower of the two boundary intensities, while
-#' `"sloped"` draws a line between them (valley-to-valley integration). A raw
-#' baseline lying above the signal gives a negative area. `fit_peaks` reports
-#' it as is; [`get_peaktable`] records it as `0`.
-#' @param ... Additional arguments to `find_peaks`.
+#' @param fit Peak model. Options are bidirectional exponentially modified
+#' Gaussian (`"bemg"`), exponential-Gaussian hybrid (`"egh"`), `"gaussian"`,
+#' or `"raw"`. `"raw"` integrates the signal directly by trapezoidal
+#' approximation without fitting a model. Defaults to `"egh"`. See *Peak
+#' models* in [`get_peaks`].
+#' @param baseline Whether to measure each peak above a local baseline:
+#' `"none"` (the default), `"flat"` or `"sloped"`. See *Local baselines* in
+#' [`get_peaks`].
+#' @param ... Additional arguments passed to [`find_peaks`], such as
+#' `smooth_window`, `smooth_type`, `min_prominence_snr`, `min_curvature` and
+#' `min_amplitude`. See *Choosing the smoothing window* in [`find_peaks`].
+#' @inheritParams get_peaks
 #' @return A `data.frame` with one row per peak and the following columns:
 #' * `rt`: Apex of the fitted peak model, or of the detected peak when
 #' `fit = "raw"`.
@@ -340,10 +336,9 @@ MIN_WINDOW_PER_FWHM <- 1 / 3
 #' integration window, meaning the window rather than the data
 #' determined the reported shape, and `0` otherwise. Not returned when
 #' `fit = "raw"`.
-#' * `converged`: `1` if the optimizer reported convergence for the final stage
-#' of the fit, and `0` otherwise. A `0` also covers a stage skipped for holding
-#' fewer timepoints than the model has parameters, in which case the reported
-#' parameters are starting estimates rather than a measurement. Not returned
+#' * `converged`: `1` if the optimizer reported convergence for the final step
+#' of the fit, and `0` otherwise, including when part or all of the fit was
+#' skipped or failed (see *Fitting procedure* in [`get_peaks`]). Not returned
 #' when `fit = "raw"`.
 #' * `floor`: Constant baseline offset (only when `baseline = "flat"`).
 #' * `floor_start`: Baseline level at the left edge of the peak window (only

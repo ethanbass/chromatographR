@@ -41,7 +41,7 @@ find peaks at. Omit for one-dimensional chromatograms, or when \code{targets} ha
 Gaussian (\code{"bemg"}), exponential-Gaussian hybrid (\code{"egh"}), \code{"gaussian"},
 or \code{"raw"}. \code{"raw"} integrates the signal directly by trapezoidal
 approximation without fitting a model. Defaults to \code{"egh"}, or to \code{"raw"}
-when \code{windows} is provided, which allows no other value.}
+when \code{windows} is provided, which allows no other value. See \emph{Peak models}.}
 
 \item{windows}{Optional two-column matrix or \code{data.frame} of start and end
 retention times (or a single pair of times), giving manual integration
@@ -51,35 +51,21 @@ skipped and each window is integrated in every sample. Requires
 \code{targets}. Defaults to \code{NULL}. See \emph{Manual integration windows}.}
 
 \item{targets}{Target retention times, as a numeric vector or a table of
-targets (see \code{\link{targeted_analysis}}). If provided, only peaks with an apex
-falling within \code{tol} of one of these retention times are fit, and \code{\link{get_peaktable}}
-groups peaks by target instead of clustering them. A \code{lambda} column takes
-the place of \code{lambdas}, and a \code{tol} column the place of the \code{tol} argument,
-which must then be omitted. A target's peak whose model fails is kept, with \code{height} and \code{area} set to
-\code{NA} and \code{converged} to \code{0}, whereas without \code{targets} such peaks are dropped.
-Defaults to \code{NULL}, in which case all detected peaks are fit.}
+targets (see \code{\link{targeted_analysis}}). If provided, only peaks whose apex
+falls within \code{tol} of a target are fit, and \code{\link{get_peaktable}} groups peaks by target
+instead of clustering them. A \code{lambda} column replaces \code{lambdas}, and a \code{tol}
+column replaces the \code{tol} argument, which must then be omitted. Defaults to
+\code{NULL}, which fits every detected peak.}
 
-\item{tol}{Numeric. Half-width of the window around each value of \code{targets}, in
-minutes, whatever the time unit of \code{chrom_list}. Either a single value applied to
-every target, or a vector giving a separate tolerance for each element of
-\code{targets}. Defaults to \code{0.1}. \code{tol} is compared against the apex of the
-detected peak rather than the returned \code{rt}, which is the apex of the fitted
-model, so a returned \code{rt} may fall outside the window. Where the windows of
-two targets overlap, a peak in the overlap is considered only for the nearer
-target. Targets closer together than the drift between samples can
-therefore be assigned each other's peaks; supply \code{mod_list} to read them on
-the aligned time axis. Ignored if \code{targets} is \code{NULL}.}
+\item{tol}{Numeric. The maximum distance between a peak's apex and its target
+in \code{targets}, in minutes, regardless of the time unit of \code{chrom_list}. Give one value
+for all targets, or one per target. Defaults to \code{0.1}. Ignored if \code{targets}
+is \code{NULL}.}
 
-\item{select_by}{Character. How to proceed when more than one peak falls
-within the window around a target retention time. \code{"height"} (the default)
-retains the most intense peak, \code{"proximity"} retains the peak closest to the
-target retention time, and \code{"none"} retains every peak in the window.
-Because selection precedes model fitting, \code{"height"} compares raw apex
-intensities, so the retained peak does not always have the largest fitted
-\code{height}. With \code{"none"}, \code{\link{get_peaktable}} keeps only the peak with the
-largest \code{response} for each target in each sample, but every peak in the
-window contributes to the target's \code{pk_meta}, including its \code{rt}. Ignored if
-\code{targets} is \code{NULL}.}
+\item{select_by}{Character. Which peak to keep when more than one falls in a
+target's window: \code{"height"} (the default) keeps the most intense,
+\code{"proximity"} the one closest to the target, and \code{"none"} all of them.
+Ignored if \code{targets} is \code{NULL}.}
 
 \item{mod_list}{Optional warping models from \code{\link{correct_rt}} (with
 \code{what = "models"}). If provided, the times in \code{targets} are read on the
@@ -87,23 +73,19 @@ aligned time axis, so they can be copied from the \code{rt} row of an aligned pe
 still detected and fitted on the unaligned data; use \code{\link{correct_peaks}}
 afterwards to add corrected retention times. Requires \code{targets}.}
 
-\item{max_fwhm}{Maximum peak width, as a full width at half maximum, in the
-units set by \code{time_unit}. Peaks wider than \code{max_fwhm} are discarded, and a
-warning is issued if that removes more than 20\% of detected peaks. Peaks
-whose \code{FWHM} could not be measured (\code{NA}, see the \code{FWHM} entry under
-\emph{Value}) are retained. The same value means the same thing as \code{max_fwhm} in
-\code{\link{filter_peaks}} and, unlike a standard deviation, is comparable across
-values of \code{fit}. Defaults to \code{NULL}, which disables width filtering. To
-choose a value, see the section on calibrating these parameters from your
-own data in \code{vignette("chromatographR")}. Ignored if \code{windows} is provided.}
+\item{max_fwhm}{Maximum peak width, as a full width at half maximum in the
+units of \code{time_unit}. Wider peaks are discarded, with a warning if that
+removes more than 20\% of detected peaks; peaks whose \code{FWHM} could not be
+measured (\code{NA}) are kept. It means the same as \code{max_fwhm} in
+\code{\link{filter_peaks}}. Defaults to
+\code{NULL} (no width filtering). Ignored if \code{windows} is provided. To choose a
+value from your own data, see \code{vignette("chromatographR")}.}
 
-\item{sd_max}{The \code{sd_max} argument is deprecated. Please use \code{max_fwhm}
-instead. \code{sd_max} is a standard deviation in timepoints, which is a peak
-width only for \code{fit = "gaussian"}. If supplied, it is converted to a \code{FWHM}
-cutoff of \code{2.355 * sd_max * dt} in the units of \code{time_unit}, where \code{dt} is
-the chromatogram's time step. Pass \code{sd_max = NULL} to disable width
-filtering. Cannot be combined with \code{max_fwhm}. Ignored if \code{windows} is
-provided.}
+\item{sd_max}{Deprecated; use \code{max_fwhm}. A standard deviation in
+timepoints, converted to a \code{FWHM} cutoff of \code{2.355 * sd_max * dt} in the
+units of \code{time_unit}, where \code{dt} is the chromatogram's time step. \code{NULL}
+disables width filtering. Cannot be combined with \code{max_fwhm}. Ignored if
+\code{windows} is provided.}
 
 \item{max_iter}{Maximum number of iterations for non-linear least squares
 in \code{\link{fit_peaks}}. Defaults to \code{1000}.}
@@ -111,19 +93,14 @@ in \code{\link{fit_peaks}}. Defaults to \code{1000}.}
 \item{time_unit}{Units for \code{sd}, \code{FWHM}, \code{tau}, \code{tau_right}, \code{tau_left},
 \code{area} and \code{max_fwhm}. Options are minutes
 (\code{"min"}), seconds (\code{"s"}), or milliseconds (\code{"ms"}). Defaults to the time
-unit of \code{chrom_list} (minutes if none is recorded), so that every column
-shares one unit. Set \code{"s"} to compare areas with ChemStation integration
-results. \code{rt}, \code{start} and \code{end} are not converted: they are always in the
-units of the chromatogram's own time axis.}
+unit of \code{chrom_list} (minutes if none is recorded). \code{rt}, \code{start} and \code{end}
+are not converted: they stay in the units of the chromatogram's own time
+axis. ChemStation reports areas with time in seconds, so use \code{"s"} to
+compare with it.}
 
-\item{baseline}{Whether to subtract a local baseline beneath each peak.
-Options are \code{"none"} (no baseline, default), \code{"flat"} (constant offset per
-peak), or \code{"sloped"} (linearly varying offset per peak, useful for gradient
-elution). For the peak models, the offset is estimated by non-linear least
-squares along with the shape parameters. When \code{fit = "raw"}, it is instead
-read directly off the boundaries of the integration window: \code{"flat"} draws a
-horizontal line at the lower of the two boundary intensities, while
-\code{"sloped"} draws a line between them (valley-to-valley integration).}
+\item{baseline}{Whether to measure each peak above a local baseline:
+\code{"none"} (the default), \code{"flat"} (a constant offset per peak), or \code{"sloped"}
+(an offset that varies linearly across the peak). See \emph{Local baselines}.}
 
 \item{estimate_purity}{Logical. Whether to estimate purity. Defaults to
 \code{FALSE}. When \code{TRUE}, calls \code{\link{get_purity}} for every peak in every sample,
@@ -152,10 +129,9 @@ into a single \code{data.frame} per sample. Defaults to \code{FALSE}.}
 \item{max.iter}{The \code{max.iter} argument is deprecated. Please use \code{max_iter}
 instead.}
 
-\item{...}{Additional arguments passed to \code{\link{find_peaks}}. Increase
-\code{smooth_window} if peaks are split across multiple detections, but too wide
-a window merges closely-eluting peaks. Other useful arguments:
-\code{smooth_type}, \code{min_prominence_snr}, \code{min_curvature}, \code{min_amplitude}.}
+\item{...}{Additional arguments passed to \code{\link{find_peaks}}, such as
+\code{smooth_window}, \code{smooth_type}, \code{min_prominence_snr}, \code{min_curvature} and
+\code{min_amplitude}. See \emph{Choosing the smoothing window} in \code{\link{find_peaks}}.}
 }
 \value{
 An S3 object of class \code{peak_list}: a nested list
@@ -216,10 +192,9 @@ determined the reported shape, and \code{0} otherwise. Not returned when
 convergence for the final stage of the fit, and \code{0} otherwise. A \code{0} means
 the reported parameters are wherever the optimizer stopped rather than a
 converged fit, so treat the corresponding \code{height} and \code{area} with caution.
-It also covers the case where no optimizer ran at all: a fitting stage whose
-integration window holds fewer points than the stage has parameters is
-skipped, since such a window cannot determine the model, and the reported
-parameters are then the starting estimates rather than a measurement.
+It also covers the case where part or all of the fit was skipped because
+the integration window holds too few points to determine it; the peak then
+keeps the last step that ran, or its starting values (see \emph{Fitting procedure}).
 \code{get_peaks} warns when more than 20\% of peaks sit in such a window.
 Not returned when \code{fit = "raw"}.
 \item \code{floor}: Constant baseline level (only when \code{baseline = "flat"}).
@@ -238,15 +213,89 @@ at one or more wavelengths.
 }
 \details{
 Peaks are detected by \code{\link{find_peaks}} as zero-crossings in the smoothed first
-derivative of each trace, then fitted by \code{\link{fit_peaks}} according to \code{fit}.
-Peak areas are the trapezoidal integral of the fitted curve (or, for
-\code{fit = "raw"}, of the signal) above the local \code{baseline}.
+derivative of each trace, then fitted by \code{\link{fit_peaks}} according to \code{fit}
+(see \emph{Peak models} and \emph{Fitting procedure}). Peak areas are the trapezoidal
+integral of the fitted curve (or, for \code{fit = "raw"}, of the signal) above the
+local \code{baseline} (see \emph{Local baselines}). To integrate fixed retention-time
+ranges instead, see \emph{Manual integration windows}.
 }
 \note{
 Adapted from \code{getAllPeaks} by Ron Wehrens
 (\url{https://github.com/rwehrens/alsace/blob/master/R/getAllPeaks.R}); however,
 the underlying algorithms for finding and integrating peaks differ.
 }
+\section{Peak models}{
+
+The three peak models are fitted to each peak by nonlinear least squares;
+\code{"raw"} uses no model.
+\itemize{
+\item \code{"gaussian"}: a symmetric Gaussian, with a center, a width (\code{sd}) and a
+height.
+\item \code{"egh"}: the exponential-Gaussian hybrid of Lan & Jorgenson (2001), a
+Gaussian whose width grows on one side of the apex. It adds one parameter,
+\code{tau}, which is positive for a tailing peak and negative for a fronting one.
+\item \code{"bemg"}: the average of two exponentially modified Gaussians, one with an
+exponential tail to the left and one to the right. Their time constants,
+\code{tau_left} and \code{tau_right}, set the two tails independently, so a peak can
+tail, front, or both; a value near 0 means no tail on that side.
+\item \code{"raw"}: no model. The signal itself is integrated across the window, so
+\code{r.squared}, \code{window_limited} and \code{converged} are not reported.
+}
+
+\code{"gaussian"} cannot follow tailing or fronting; \code{"egh"} follows one or the
+other, but not both in the same peak; \code{"bemg"} follows both. The more
+flexible models have more parameters (3, 4 and 5 respectively for the peak
+shape, plus one more for a \code{"flat"} baseline or two more for a \code{"sloped"}
+baseline).
+}
+
+\section{Local baselines}{
+
+A peak's height and area are measured over its integration window, which
+runs from the valley before the peak to the valley after it, as found by
+\code{\link{find_peaks}}, or spans the manual window if the \code{windows} argument is given.
+\itemize{
+\item With \code{baseline = "none"}, \code{height} and \code{area} are measured from zero, so
+the chromatogram should already be baseline corrected (see \code{\link{preprocess}}).
+\item With the fitted peak models (\code{"gaussian"}, \code{"egh"}, \code{"bemg"}), a \code{"flat"}
+or \code{"sloped"} baseline is fitted together with the peak shape by nonlinear
+least squares. It cannot be negative; a flat baseline is capped at the
+lowest intensity in the window, and each end of a sloped one is capped at the
+median intensity of the first or last 2\% of the window. \code{height} and
+\code{area} are those of the fitted shape above the baseline, with the area
+integrated across the integration window only.
+\item With \code{fit = "raw"}, nothing is fitted: a \code{"flat"} baseline is a horizontal
+line at the lower of the two boundary intensities, and a \code{"sloped"} one a
+straight line between them. Where that line lies above the signal, it
+subtracts area, so the area can come out negative; \code{\link{get_peaktable}}
+records a negative area as \code{0}.
+}
+
+With \code{"flat"} or \code{"sloped"}, each peak gets its own baseline. This differs
+from drop-line integration in vendor software such as ChemStation, where a
+vertical line from each valley meets a baseline shared by the whole cluster
+of peaks.
+}
+
+\section{Fitting procedure}{
+
+A fit is built up in successive steps: first the peak shape, then a constant
+baseline, and finally its slope. To fit the full model, a peak's integration
+window must have at least as many timepoints as there are parameters in the
+model. A step is skipped if the window has too few timepoints to fit all the
+required parameters, and discarded if the optimizer cannot start from its
+initial values or, for \code{"bemg"}, if a fitted tail rises towards the edge of
+the window instead of falling back towards the baseline. Either way, the
+peak keeps the last step that worked. A \code{"sloped"} baseline can therefore
+come out flat, or a baseline can be left at its starting estimate rather than
+fitted, and if even the shape fails, every parameter will keep its starting
+value. In each of these cases, \code{converged} is set to \code{0}.
+
+Peaks that can't be fitted at all are dropped, unless they come from
+\code{targets}. Those are kept, with \code{height} and \code{area} set to \code{NA} and
+\code{converged} to \code{0}, so that every target found has a row.
+}
+
 \section{Manual integration windows}{
 
 Manual windows integrate every sample over the same retention-time ranges,
