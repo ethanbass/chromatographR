@@ -59,6 +59,8 @@ reference:
     contents:
     - print.peak_table
     - print.peak_list
+    - print.matched_peak_list
+    - print.matched_peak_list_set
     - summary.peak_table
     - "[.peak_table"
     - "[.peak_list"

@@ -12,9 +12,12 @@ match_peaks(
   lambda = NULL,
   rt_window = 0.3,
   spectral_cutoff = 0.95,
-  spectrum = c("apex", "background"),
+  background_correction = c("none", "linear"),
   rt_weight = 0.15,
   use_corrected_rt = NULL,
+  consensus_spectra = FALSE,
+  spectral_test = c("cutoff", "noise"),
+  alpha = 0.01,
   plot_it = FALSE,
   verbose = getOption("verbose")
 )
@@ -33,11 +36,13 @@ given, a sample chosen from the targets.}
 \item{targets}{Optional table of targets, or a numeric vector of their
 retention times (see \code{\link{targeted_analysis}}). Used to choose the reference
 sample, unless \code{reference} is given, and to name the targets' columns in
-the peak table. Cannot be combined with \code{reference = "best"}. Defaults to
-\code{NULL}.}
+the peak table. See \emph{Targets and the reference sample}. Cannot be
+combined with \code{reference = "best"}. Defaults to \code{NULL}.}
 
 \item{lambda}{A character or numeric value specifying the wavelength to use
-for peak matching. Required if peaks were detected at multiple wavelengths.}
+for peak matching. Required if peaks were detected at multiple wavelengths,
+unless \code{targets} has a \code{lambda} column, which sets the wavelength per
+target; \code{lambda} then fills in targets without one.}
 
 \item{rt_window}{Numeric. Maximum allowed difference in retention time, in
 minutes, between a reference and sample peak to be considered a candidate
@@ -49,14 +54,10 @@ peak pair to be retained. A \code{spectral_cutoff} column in \code{targets}
 overrides it for those targets. Ignored, with a warning, for
 one-dimensional chromatograms. Defaults to \code{0.95}.}
 
-\item{spectrum}{Which spectrum of each peak to correlate: \code{"apex"} (the
-default), the spectrum at the peak apex, or \code{"background"}, the apex
-spectrum minus the background under the peak, interpolated between the
-spectra at its \code{start} and \code{end}. The apex spectrum is averaged over 2
-scans either side and each boundary spectrum over 5, to limit the noise
-the subtraction adds. Background subtraction helps when peaks sit on a
-sloping baseline or the tail of a neighbor, but can hurt peaks near the
-noise level or with boundaries on a neighboring peak.}
+\item{background_correction}{How to correct the apex spectrum of each peak
+before correlating: \code{"none"} (the default) uses it as is, and \code{"linear"}
+subtracts the background under the peak, interpolated between the spectra
+at its \code{start} and \code{end}. See \emph{Background correction}.}
 
 \item{rt_weight}{Numeric in [0, 1]. Penalizes retention time offset when
 ranking candidate pairs: each pair's spectral correlation is multiplied by
@@ -66,10 +67,30 @@ zero. Defaults to \code{0.15}.}
 
 \item{use_corrected_rt}{Logical. Whether to compare corrected retention
 times (\code{rt.cor}) from \code{\link{correct_peaks}} rather than raw ones (\code{rt}), both
-between peaks and against \code{targets}. Spectra
-are still read at the raw times from \code{chrom_list}, and the matches and
-\code{"reference_targets"} keep the raw times. Defaults to \code{NULL}, which uses
+between peaks and against \code{targets}. Defaults to \code{NULL}, which uses
 corrected times when every sample has them.}
+
+\item{consensus_spectra}{Logical. Whether to compare sample spectra with a
+consensus spectrum for each reference peak, built from a first round of
+matches, rather than with the reference sample's own. See \emph{Consensus
+spectra}.
+Defaults to \code{FALSE}.}
+
+\item{spectral_test}{How a candidate pair's spectra are compared:
+\code{"cutoff"} (the default) requires their correlation to be at least
+\code{spectral_cutoff}; \code{"noise"} tests whether they could be the same spectrum
+given each sample's noise, so that a small, noisy peak is not rejected for
+its noise alone. The \code{"noise"} test is experimental; see \emph{Testing spectra
+against noise}.}
+
+\item{alpha}{Significance level for \code{spectral_test = "noise"}. A pair is
+rejected if its p-value is below \code{alpha}. Pairs whose spectra are the same
+apart from noise are rejected at most about \code{alpha} of the time, except
+when the reference peak is small (up to roughly 20 times the noise), where
+they are rejected more often. Pairs whose spectra truly correlate at
+\code{spectral_cutoff} are rejected more often too, up to about half the time
+for peaks far above the noise, as with a correlation threshold. Defaults to
+\code{0.01}.}
 
 \item{plot_it}{Logical. Whether to plot the matches with
 \code{\link{plot.matched_peak_list}}. Defaults to \code{FALSE}.}
@@ -82,7 +103,13 @@ containing the matched peak pairs, per-pair spectral correlation scores,
 and peak data in index space for use with \code{\link{correct_rt}}. A sample with no
 peaks or no matches is \code{NULL}, with a warning. When \code{targets} is given,
 the targets with \code{rt} replaced by the reference's own retention times are
-stored as the \code{"reference_targets"} attribute.
+stored as the \code{"reference_targets"} attribute. When the targets
+span several wavelengths, peaks are matched separately at each, and the
+result is a \code{matched_peak_list_set}: a list of \code{matched_peak_list} objects
+named by wavelength, which \code{\link{get_peaktable}} combines into one table.
+Unless \code{reference} is given, every wavelength uses the same reference
+sample, chosen from all the targets; if no sample contains every target,
+each wavelength gets its own, with a warning.
 }
 \description{
 Matches peaks across chromatograms by spectral correlation and retention
@@ -92,20 +119,94 @@ first. The resulting \code{matched_peak_list} object can be passed to
 \code{\link{correct_rt}} to perform landmark parametric time warping
 (\code{alg = "lptw"}).
 }
-\details{
+\section{Targets and the reference sample}{
+
 With \code{targets}, a sample's peak for a target is its tallest peak within
 \code{tol} of it that, when fitted, has \code{r.squared} of at least 0.5; a peak
 within \code{tol} of several targets counts only for the nearest. Unless
 \code{reference} is given, the reference is chosen among samples with a peak for
 every target, where a peak counts if it is at least a tenth of that target's
 median height across samples. The sample whose weakest target is largest
-relative to its median is chosen, then the one whose peaks lie closest to
-the target times.
+relative to its median is chosen, then the one whose farthest peak lies
+closest to its target time.
 }
+
+\section{Background correction}{
+
+With \code{background_correction = "linear"}, the apex spectrum is averaged over
+2 scans either side and each boundary spectrum over 5 scans either side, to
+limit the noise the subtraction adds. The subtraction removes a background
+that varies linearly across the peak, such as a sloping baseline or a
+neighbor's tail. It also adds noise, and where a boundary lies on a
+neighboring peak it subtracts part of that peak's spectrum.
+}
+
+\section{Consensus spectra}{
+
+With \code{consensus_spectra = TRUE}, peaks are matched once against the
+reference sample. Each reference peak's consensus is then the average of its
+matched spectra, each scaled to its height at \code{lambda} and weighted by the
+squared ratio of that height to the sample's noise, and the peaks are
+matched again against the consensus. Averaging reduces the influence of
+noise, or of an overlapping peak, in any one sample's spectrum, including the
+reference's. The consensus describes what was matched, so it cannot show
+that a target is the intended compound.
+}
+
+\section{Testing spectra against noise}{
+
+With \code{spectral_test = "noise"}, each candidate pair is tested rather than
+thresholded. The sample spectrum is fitted as an offset plus a multiple of
+the reference spectrum by least squares, each wavelength weighted by the
+reciprocal of the sample's noise there. The hypothesis is that, without
+noise, the two spectra would correlate at \code{spectral_cutoff}; the residual
+that this mismatch would leave is subtracted, and what remains is compared
+with the residuals left under the same fit by pairs of noise spectra, one
+from the sample and one from the reference scaled by the fitted multiple.
+For a peak far above the noise, this reduces to requiring a noise-weighted
+correlation of at least \code{spectral_cutoff}; for a small peak, it allows for
+the noise, so a real peak is not rejected because its spectrum is noisy.
+Each matched sample's \code{spectral_p} holds the p-values of its matched pairs.
+
+This test is experimental. It has had little testing on real data, and the
+way its p-values are calculated may change in future versions.
+
+The noise spectra come from each chromatogram's own peak-free timepoints:
+those outside every peak in \code{peak_list} taller than 5 times its trace's
+noise, at any wavelength in \code{peak_list}, after dropping timepoints whose
+spectra still stand out from the rest. A trace's noise is the scaled median
+absolute deviation of its timepoints outside every peak taller than 3 times
+the noise, found by iterating from the estimate given by its point-to-point
+differences, \code{mad(diff(y)) / sqrt(2)} (von Neumann 1941; Donoho and
+Johnstone 1994). With \code{consensus_spectra = TRUE}, the consensus is treated
+as carrying the reference sample's noise, reduced by the square root of the
+total weight of the spectra averaged into it.
+
+The test cannot tell compounds apart near the noise level, where every
+spectrum is consistent with every other; decide whether a small peak is
+present by its height instead. A peak overlapped by a neighbor or sitting on
+structured background may be rejected because its apex spectrum really is a
+mixture. The test needs \code{background_correction = "none"} and, in each
+chromatogram, at least 30 peak-free timepoints and at least \code{1 / alpha},
+since with fewer it could never reject a match. On short traces with strongly
+autocorrelated noise, the peak-free timepoints are fewer independent spectra
+than their number, so a \code{spectral_cutoff} of \code{1} rejects identical spectra up
+to about twice as often as \code{alpha}.
+}
+
 \examples{
 data(Sa_pr)
 pks <- get_peaks(Sa_pr, lambdas = 210, fit = "egh")
 match_peaks(pks, lambda = 210)
+}
+\references{
+\itemize{
+\item Donoho, D. L., and Johnstone, I. M. 1994. Ideal spatial adaptation by
+wavelet shrinkage. \emph{Biometrika} 81:425-455. \doi{10.1093/biomet/81.3.425}.
+\item von Neumann, J. 1941. Distribution of the ratio of the mean square
+successive difference to the variance. \emph{Ann. Math. Stat.} 12:367-395.
+\doi{10.1214/aoms/1177731677}.
+}
 }
 \seealso{
 \code{\link{correct_rt}}, \code{\link{get_peaks}}, \code{\link{targeted_analysis}}

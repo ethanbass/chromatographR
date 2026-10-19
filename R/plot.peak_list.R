@@ -217,7 +217,8 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
 #'
 #' @importFrom grDevices hcl.colors
 #' @importFrom graphics layout image axis box rect mtext lines points rug legend abline segments lcm grconvertX grconvertY
-#' @param x A `matched_peak_list` object from [`match_peaks`].
+#' @param x A `matched_peak_list` object from [`match_peaks`], or a
+#'   `matched_peak_list_set`, whose wavelengths are plotted in turn.
 #' @param idx Integer or character vector of sample indices or names to plot.
 #'   Defaults to all non-reference samples.
 #' @param type Plot type, either `"ladder"` (default) or `"scatter"`. See
@@ -244,6 +245,18 @@ plot.matched_peak_list <- function(x, idx = NULL, type = c("ladder", "scatter"),
   }
   view <- if (type == "ladder") plot_matched_ladder else plot_matched_scatter
   view(x, idx, attr(x, "rt_ref"), names(x)[ref_idx], cor_col, pal, zlim, ...)
+  invisible(x)
+}
+
+#' @rdname plot.matched_peak_list
+#' @export
+plot.matched_peak_list_set <- function(x, ...){
+  for (lam in names(x)){
+    args <- list(x[[lam]], ...)
+    if (is.null(args$main) && !identical(args$type, "scatter"))
+      args$main <- paste(lam, "nm")
+    do.call(plot, args)
+  }
   invisible(x)
 }
 

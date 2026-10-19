@@ -366,7 +366,9 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
 #' @note When `peak_list` is a `matched_peak_list`, the columns of
 #'   the returned [`peak_table`] are defined by the reference
 #'   sample's peaks at the wavelength used by [`match_peaks`]; other wavelengths
-#'   in `pks` are ignored. Peaks absent from the reference sample will not
+#'   in `pks` are ignored. A `matched_peak_list_set`, from targets at several
+#'   wavelengths, gives one table with the columns for each wavelength, each
+#'   defined by that wavelength's reference sample. Peaks absent from the reference sample will not
 #'   appear as columns regardless of their prevalence in other samples. Choose a
 #'   reference with a rich peak profile, or pass a table of `targets` to
 #'   [`match_peaks`] to pick one that contains all of them; the
@@ -383,18 +385,65 @@ get_peaktable.matched_peak_list <- function(peak_list, pks,
                                             na.fill = 0,
                                             verbose = FALSE, ...) {
   if (...length()) stop("unused argument(s): ", paste(...names(), collapse = ", "))
-  matched  <- peak_list
   response <- match.arg(response, c("area", "height"))
+  check_matched_pks(peak_list, pks)
+  use_corrected_rt <- "rt.cor" %in% colnames(pks[[1]][[1]])
+  parts <- matched_table_parts(peak_list, pks, response, rt_tol, na.fill, verbose,
+                               use_corrected_rt)
+  matched_peak_table(parts$result, pks, lambdas = parts$lambdas,
+                     reference = parts$ref_idx, reference_sample = parts$ref_name,
+                     response = response, rt_tol = rt_tol,
+                     use_corrected_rt = use_corrected_rt,
+                     labels = list(deparse(substitute(peak_list)), deparse(substitute(pks))))
+}
 
+#' @rdname get_peaktable
+#' @method get_peaktable matched_peak_list_set
+#' @export
+get_peaktable.matched_peak_list_set <- function(peak_list, pks,
+                                                response = c("area", "height"),
+                                                rt_tol = 0.01,
+                                                na.fill = 0,
+                                                verbose = FALSE, ...) {
+  if (...length()) stop("unused argument(s): ", paste(...names(), collapse = ", "))
+  response <- match.arg(response, c("area", "height"))
+  for (m in peak_list) check_matched_pks(m, pks)
+  use_corrected_rt <- "rt.cor" %in% colnames(pks[[1]][[1]])
+  parts <- lapply(peak_list, matched_table_parts, pks = pks, response = response,
+                  rt_tol = rt_tol, na.fill = na.fill, verbose = verbose,
+                  use_corrected_rt = use_corrected_rt)
+  result <- unlist(lapply(parts, `[[`, "result"), recursive = FALSE)
+  targets <- unlist(lapply(peak_list, function(m) attr(m, "reference_targets")$name))
+  cols <- unlist(lapply(result, function(r) rownames(r[[2]])))
+  unnamed <- !cols %in% targets
+  cols[unnamed] <- paste0("V", seq_len(sum(unnamed)))
+  cols <- split(cols, rep(seq_along(result), vapply(result, function(r) nrow(r[[2]]), integer(1))))
+  result <- unname(Map(function(r, nm){ rownames(r[[1]]) <- nm; rownames(r[[2]]) <- nm; r },
+                       result, cols))
+  matched_peak_table(result, pks, lambdas = names(peak_list),
+                     reference = vapply(parts, `[[`, integer(1), "ref_idx"),
+                     reference_sample = vapply(parts, `[[`, character(1), "ref_name"),
+                     response = response, rt_tol = rt_tol,
+                     use_corrected_rt = use_corrected_rt,
+                     labels = list(deparse(substitute(peak_list)), deparse(substitute(pks))))
+}
+
+#' Check that a `peak_list` can supply the values for a `matched_peak_list`
+#' @noRd
+check_matched_pks <- function(matched, pks){
   if (missing(pks))
     stop("Please supply the original peak_list from get_peaks() as 'pks'.")
   if (!inherits(pks, "peak_list"))
     stop("'pks' must be a 'peak_list' object.")
   if (!identical(names(matched), names(pks)))
     stop("Sample names of 'peak_list' and 'pks' must match.")
+}
 
+#' Peak table columns for one `matched_peak_list`, at its wavelength
+#' @noRd
+matched_table_parts <- function(matched, pks, response, rt_tol, na.fill, verbose,
+                                use_corrected_rt = FALSE){
   ref_idx      <- reference_position(matched)
-  ref_name     <- names(pks)[ref_idx]
   lambdas      <- attr(matched, "lambda")
   sample_names <- names(pks)
 
@@ -442,13 +491,15 @@ get_peaktable.matched_peak_list <- function(peak_list, pks,
       }
     }
 
-    present <- c("rt", "start", "end", PEAK_META_COLS)
+    present <- c(if (use_corrected_rt) c("rt.cor", "start.cor", "end.cor")
+                 else c("rt", "start", "end"), PEAK_META_COLS)
     present <- present[present %in% colnames(ref_pks)]
     metaInfo <- cbind(
       lambda = rep(suppressWarnings(as.numeric(lam)), n_ref),
       peak   = seq_len(n_ref),
       ref_pks[, present, drop = FALSE]
     )
+    colnames(metaInfo) <- sub("\\.cor$", "", colnames(metaInfo))
     col_names <- target_column_names(attr(matched, "reference_targets"),
                                      rt_ref_all, rt_tol)
     colnames(Imat) <- col_names
@@ -456,21 +507,29 @@ get_peaktable.matched_peak_list <- function(peak_list, pks,
     list(t(Imat), metaInfo)
   }
 
-  result <- Filter(Negate(is.null), lapply(lambdas, process_lambda))
+  list(result = Filter(Negate(is.null), lapply(lambdas, process_lambda)),
+       ref_idx = ref_idx, ref_name = sample_names[ref_idx], lambdas = lambdas)
+}
+
+#' Assemble a `peak_table` from matched peak table columns
+#' @noRd
+matched_peak_table <- function(result, pks, lambdas, reference, reference_sample,
+                               response, rt_tol, use_corrected_rt, labels){
   if (length(result) == 0)
     stop("No peaks found in reference sample across any wavelength.")
-
-  new_peak_table(
+  pt <- new_peak_table(
     result, pks,
     args = list(
-      peak_list        = deparse(substitute(peak_list)),
-      pks              = deparse(substitute(pks)),
+      peak_list        = labels[[1]],
+      pks              = labels[[2]],
       chrom_list       = attr(pks, "chrom_list"),
+      chrom_list_aligned = attr(pks, "chrom_list_aligned") %||% NA,
       lambdas          = list(lambdas),
-      reference        = ref_idx,
-      reference_sample = ref_name,
+      reference        = reference,
+      reference_sample = reference_sample,
       response         = response,
       rt_tol           = rt_tol,
+      use_corrected_rt = use_corrected_rt,
       reference_spectra = NA,
       metadata_path    = NA,
       normalized       = FALSE,
@@ -479,6 +538,8 @@ get_peaktable.matched_peak_list <- function(peak_list, pks,
       rt_unit          = get_time_unit(pks),
       intensity_unit   = get_metadata_attribute(pks, "intensity_unit")
     ))
+  attr(pt, "warp_models") <- attr(pks, "warp_models")
+  pt
 }
 
 #' Column names for a matched peak table, named after any targets

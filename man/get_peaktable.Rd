@@ -4,6 +4,7 @@
 \alias{get_peaktable}
 \alias{get_peaktable.default}
 \alias{get_peaktable.matched_peak_list}
+\alias{get_peaktable.matched_peak_list_set}
 \title{Convert peak lists into an aligned peak table}
 \usage{
 get_peaktable(peak_list, ...)
@@ -29,6 +30,16 @@ get_peaktable(peak_list, ...)
 )
 
 \method{get_peaktable}{matched_peak_list}(
+  peak_list,
+  pks,
+  response = c("area", "height"),
+  rt_tol = 0.01,
+  na.fill = 0,
+  verbose = FALSE,
+  ...
+)
+
+\method{get_peaktable}{matched_peak_list_set}(
   peak_list,
   pks,
   response = c("area", "height"),
@@ -197,7 +208,9 @@ package by Ron Wehrens: \url{https://github.com/rwehrens/alsace/blob/master/R/ge
 When \code{peak_list} is a \code{matched_peak_list}, the columns of
 the returned \code{\link{peak_table}} are defined by the reference
 sample's peaks at the wavelength used by \code{\link{match_peaks}}; other wavelengths
-in \code{pks} are ignored. Peaks absent from the reference sample will not
+in \code{pks} are ignored. A \code{matched_peak_list_set}, from targets at several
+wavelengths, gives one table with the columns for each wavelength, each
+defined by that wavelength's reference sample. Peaks absent from the reference sample will not
 appear as columns regardless of their prevalence in other samples. Choose a
 reference with a rich peak profile, or pass a table of \code{targets} to
 \code{\link{match_peaks}} to pick one that contains all of them; the

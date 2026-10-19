@@ -206,6 +206,10 @@ correct_rt <- function(chrom_list, lambdas, models = NULL, reference = 'best',
         reference, stored_ref, names(chrom_list), "the supplied `models`",
         "Re-fit the models with the desired reference, or omit `reference` to use the stored one.")
   }
+  if (alg == "lptw" && inherits(peaks, "matched_peak_list_set"))
+    stop(sprintf(paste("`alg = \"lptw\"` takes the matches at one wavelength.",
+                       "Pass one of them, e.g. `peaks[[\"%s\"]]`."), names(peaks)[1]),
+         call. = FALSE)
   has_precomputed_matches <- alg == "lptw" && inherits(peaks, "matched_peak_list")
   if (missing(lambdas)) {
     if (ncol(chrom_list[[1]]) != 1 & is.null(models) & is.null(n_traces) &
@@ -727,7 +731,8 @@ align_matches <- function(matched, chrom_list){
 #' Re-express a PTW warp fitted on zero-padded indices in unpadded indices
 #' @param coef Warp polynomial coefficients.
 #' @param shift Number of points padded onto the start of the chromatogram.
-#' @return Coefficients `c` such that `warp.time(t, c) = warp.time(t + shift, coef) - shift`.
+#' @return Coefficients `c` such that
+#'   `warp.time(t, c) = warp.time(t + shift, coef) - shift`.
 #' @noRd
 shift_warp_coef <- function(coef, shift){
   k <- seq_along(coef) - 1
@@ -1068,15 +1073,72 @@ strip_zeros <- function(x, n_zeros, side = "both") {
 #' [`correct_rt`] to perform landmark parametric time warping
 #' (`alg = "lptw"`).
 #'
-#' @details
+#' @section Targets and the reference sample:
 #' With `targets`, a sample's peak for a target is its tallest peak within
 #' `tol` of it that, when fitted, has `r.squared` of at least 0.5; a peak
 #' within `tol` of several targets counts only for the nearest. Unless
 #' `reference` is given, the reference is chosen among samples with a peak for
 #' every target, where a peak counts if it is at least a tenth of that target's
 #' median height across samples. The sample whose weakest target is largest
-#' relative to its median is chosen, then the one whose peaks lie closest to
-#' the target times.
+#' relative to its median is chosen, then the one whose farthest peak lies
+#' closest to its target time.
+#'
+#' @section Background correction:
+#' With `background_correction = "linear"`, the apex spectrum is averaged over
+#' 2 scans either side and each boundary spectrum over 5 scans either side, to
+#' limit the noise the subtraction adds. The subtraction removes a background
+#' that varies linearly across the peak, such as a sloping baseline or a
+#' neighbor's tail. It also adds noise, and where a boundary lies on a
+#' neighboring peak it subtracts part of that peak's spectrum.
+#'
+#' @section Consensus spectra:
+#' With `consensus_spectra = TRUE`, peaks are matched once against the
+#' reference sample. Each reference peak's consensus is then the average of its
+#' matched spectra, each scaled to its height at `lambda` and weighted by the
+#' squared ratio of that height to the sample's noise, and the peaks are
+#' matched again against the consensus. Averaging reduces the influence of
+#' noise, or of an overlapping peak, in any one sample's spectrum, including the
+#' reference's. The consensus describes what was matched, so it cannot show
+#' that a target is the intended compound.
+#'
+#' @section Testing spectra against noise:
+#' With `spectral_test = "noise"`, each candidate pair is tested rather than
+#' thresholded. The sample spectrum is fitted as an offset plus a multiple of
+#' the reference spectrum by least squares, each wavelength weighted by the
+#' reciprocal of the sample's noise there. The hypothesis is that, without
+#' noise, the two spectra would correlate at `spectral_cutoff`; the residual
+#' that this mismatch would leave is subtracted, and what remains is compared
+#' with the residuals left under the same fit by pairs of noise spectra, one
+#' from the sample and one from the reference scaled by the fitted multiple.
+#' For a peak far above the noise, this reduces to requiring a noise-weighted
+#' correlation of at least `spectral_cutoff`; for a small peak, it allows for
+#' the noise, so a real peak is not rejected because its spectrum is noisy.
+#' Each matched sample's `spectral_p` holds the p-values of its matched pairs.
+#'
+#' This test is experimental. It has had little testing on real data, and the
+#' way its p-values are calculated may change in future versions.
+#'
+#' The noise spectra come from each chromatogram's own peak-free timepoints:
+#' those outside every peak in `peak_list` taller than 5 times its trace's
+#' noise, at any wavelength in `peak_list`, after dropping timepoints whose
+#' spectra still stand out from the rest. A trace's noise is the scaled median
+#' absolute deviation of its timepoints outside every peak taller than 3 times
+#' the noise, found by iterating from the estimate given by its point-to-point
+#' differences, `mad(diff(y)) / sqrt(2)` (von Neumann 1941; Donoho and
+#' Johnstone 1994). With `consensus_spectra = TRUE`, the consensus is treated
+#' as carrying the reference sample's noise, reduced by the square root of the
+#' total weight of the spectra averaged into it.
+#'
+#' The test cannot tell compounds apart near the noise level, where every
+#' spectrum is consistent with every other; decide whether a small peak is
+#' present by its height instead. A peak overlapped by a neighbor or sitting on
+#' structured background may be rejected because its apex spectrum really is a
+#' mixture. The test needs `background_correction = "none"` and, in each
+#' chromatogram, at least 30 peak-free timepoints and at least `1 / alpha`,
+#' since with fewer it could never reject a match. On short traces with strongly
+#' autocorrelated noise, the peak-free timepoints are fewer independent spectra
+#' than their number, so a `spectral_cutoff` of `1` rejects identical spectra up
+#' to about twice as often as `alpha`.
 #'
 #' @param peak_list A peak list object from [`get_peaks`].
 #' @param chrom_list List of chromatograms in matrix format. If `NULL`, will be
@@ -1088,10 +1150,12 @@ strip_zeros <- function(x, n_zeros, side = "both") {
 #' @param targets Optional table of targets, or a numeric vector of their
 #'   retention times (see [`targeted_analysis`]). Used to choose the reference
 #'   sample, unless `reference` is given, and to name the targets' columns in
-#'   the peak table. Cannot be combined with `reference = "best"`. Defaults to
-#'   `NULL`.
+#'   the peak table. See *Targets and the reference sample*. Cannot be
+#'   combined with `reference = "best"`. Defaults to `NULL`.
 #' @param lambda A character or numeric value specifying the wavelength to use
-#'   for peak matching. Required if peaks were detected at multiple wavelengths.
+#'   for peak matching. Required if peaks were detected at multiple wavelengths,
+#'   unless `targets` has a `lambda` column, which sets the wavelength per
+#'   target; `lambda` then fills in targets without one.
 #' @param rt_window Numeric. Maximum allowed difference in retention time, in
 #'   minutes, between a reference and sample peak to be considered a candidate
 #'   match. An `rt_window` column in `targets` overrides it for those targets.
@@ -1100,14 +1164,10 @@ strip_zeros <- function(x, n_zeros, side = "both") {
 #'   peak pair to be retained. A `spectral_cutoff` column in `targets`
 #'   overrides it for those targets. Ignored, with a warning, for
 #'   one-dimensional chromatograms. Defaults to `0.95`.
-#' @param spectrum Which spectrum of each peak to correlate: `"apex"` (the
-#'   default), the spectrum at the peak apex, or `"background"`, the apex
-#'   spectrum minus the background under the peak, interpolated between the
-#'   spectra at its `start` and `end`. The apex spectrum is averaged over 2
-#'   scans either side and each boundary spectrum over 5, to limit the noise
-#'   the subtraction adds. Background subtraction helps when peaks sit on a
-#'   sloping baseline or the tail of a neighbor, but can hurt peaks near the
-#'   noise level or with boundaries on a neighboring peak.
+#' @param background_correction How to correct the apex spectrum of each peak
+#'   before correlating: `"none"` (the default) uses it as is, and `"linear"`
+#'   subtracts the background under the peak, interpolated between the spectra
+#'   at its `start` and `end`. See *Background correction*.
 #' @param rt_weight Numeric in \[0, 1\]. Penalizes retention time offset when
 #'   ranking candidate pairs: each pair's spectral correlation is multiplied by
 #'   `1 - rt_weight * d / rt_window`, where `d` is the pair's retention time
@@ -1115,10 +1175,27 @@ strip_zeros <- function(x, n_zeros, side = "both") {
 #'   zero. Defaults to `0.15`.
 #' @param use_corrected_rt Logical. Whether to compare corrected retention
 #'   times (`rt.cor`) from [`correct_peaks`] rather than raw ones (`rt`), both
-#'   between peaks and against `targets`. Spectra
-#'   are still read at the raw times from `chrom_list`, and the matches and
-#'   `"reference_targets"` keep the raw times. Defaults to `NULL`, which uses
+#'   between peaks and against `targets`. Defaults to `NULL`, which uses
 #'   corrected times when every sample has them.
+#' @param consensus_spectra Logical. Whether to compare sample spectra with a
+#'   consensus spectrum for each reference peak, built from a first round of
+#'   matches, rather than with the reference sample's own. See *Consensus
+#'   spectra*.
+#'   Defaults to `FALSE`.
+#' @param spectral_test How a candidate pair's spectra are compared:
+#'   `"cutoff"` (the default) requires their correlation to be at least
+#'   `spectral_cutoff`; `"noise"` tests whether they could be the same spectrum
+#'   given each sample's noise, so that a small, noisy peak is not rejected for
+#'   its noise alone. The `"noise"` test is experimental; see *Testing spectra
+#'   against noise*.
+#' @param alpha Significance level for `spectral_test = "noise"`. A pair is
+#'   rejected if its p-value is below `alpha`. Pairs whose spectra are the same
+#'   apart from noise are rejected at most about `alpha` of the time, except
+#'   when the reference peak is small (up to roughly 20 times the noise), where
+#'   they are rejected more often. Pairs whose spectra truly correlate at
+#'   `spectral_cutoff` are rejected more often too, up to about half the time
+#'   for peaks far above the noise, as with a correlation threshold. Defaults to
+#'   `0.01`.
 #' @param plot_it Logical. Whether to plot the matches with
 #'   [`plot.matched_peak_list`]. Defaults to `FALSE`.
 #' @param verbose Whether to print messages to console.
@@ -1127,7 +1204,19 @@ strip_zeros <- function(x, n_zeros, side = "both") {
 #'   and peak data in index space for use with [`correct_rt`]. A sample with no
 #'   peaks or no matches is `NULL`, with a warning. When `targets` is given,
 #'   the targets with `rt` replaced by the reference's own retention times are
-#'   stored as the `"reference_targets"` attribute.
+#'   stored as the `"reference_targets"` attribute. When the targets
+#'   span several wavelengths, peaks are matched separately at each, and the
+#'   result is a `matched_peak_list_set`: a list of `matched_peak_list` objects
+#'   named by wavelength, which [`get_peaktable`] combines into one table.
+#'   Unless `reference` is given, every wavelength uses the same reference
+#'   sample, chosen from all the targets; if no sample contains every target,
+#'   each wavelength gets its own, with a warning.
+#' @references
+#' * Donoho, D. L., and Johnstone, I. M. 1994. Ideal spatial adaptation by
+#' wavelet shrinkage. *Biometrika* 81:425-455. \doi{10.1093/biomet/81.3.425}.
+#' * von Neumann, J. 1941. Distribution of the ratio of the mean square
+#' successive difference to the variance. *Ann. Math. Stat.* 12:367-395.
+#' \doi{10.1214/aoms/1177731677}.
 #' @author Ethan Bass
 #' @seealso [`correct_rt`], [`get_peaks`], [`targeted_analysis`]
 #' @examples
@@ -1138,17 +1227,73 @@ strip_zeros <- function(x, n_zeros, side = "both") {
 match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
                         targets = NULL,
                         lambda = NULL, rt_window = 0.3, spectral_cutoff = 0.95,
-                        spectrum = c("apex", "background"),
+                        background_correction = c("none", "linear"),
                         rt_weight = 0.15,
-                        use_corrected_rt = NULL, plot_it = FALSE,
+                        use_corrected_rt = NULL, consensus_spectra = FALSE,
+                        spectral_test = c("cutoff", "noise"), alpha = 0.01,
+                        plot_it = FALSE,
                         verbose = getOption("verbose")) {
-  spectrum <- match.arg(spectrum)
+  background_correction <- match.arg(background_correction)
+  spectral_test <- match.arg(spectral_test)
+  if (!is.numeric(alpha) || length(alpha) != 1 || !(alpha > 0 && alpha < 1))
+    stop("`alpha` must be a single number between 0 and 1.", call. = FALSE)
   if (!is.null(targets) && identical(reference, "best"))
     stop("`reference = \"best\"` cannot be combined with `targets`. Give the ",
          "reference sample by index or name, or omit `reference` to choose it ",
          "from the targets.", call. = FALSE)
+  if (is.data.frame(targets) && "lambda" %in% colnames(targets)) {
+    lam_t <- as.character(targets$lambda)
+    if (!is.null(lambda)) lam_t[is.na(lam_t)] <- as.character(lambda)
+    if (anyNA(lam_t) && !all(is.na(lam_t)))
+      stop("Give every target a wavelength, or set `lambda` for those without one.",
+           call. = FALSE)
+    if (!anyNA(lam_t)) {
+      targets$lambda <- lam_t
+      lam_t <- targets$lambda <- check_targets(targets, tol = 0.1)$lambda
+    }
+    if (!anyNA(lam_t) && length(unique(lam_t)) > 1) {
+      by_lambda <- split(seq_len(nrow(targets)), factor(lam_t, unique(lam_t)))
+      pk_lambdas <- unique(unlist(lapply(peak_list, names)))
+      absent <- setdiff(names(by_lambda), pk_lambdas)
+      if (length(absent))
+        stop(sprintf("No peaks at %s nm: `peak_list` has peaks at %s only.",
+                     paste(absent, collapse = ", "),
+                     paste(pk_lambdas, collapse = ", ")), call. = FALSE)
+      if (is.null(reference)) {
+        reference <- common_reference(peak_list, targets, by_lambda,
+                                      use_corrected_rt)
+        if (is.na(reference)) {
+          warning("No sample contains every target at every wavelength, so ",
+                  "each wavelength has its own reference sample. Pass ",
+                  "`reference` to use one sample for all of them.",
+                  call. = FALSE)
+          reference <- NULL
+        } else if (isTRUE(verbose)) {
+          message(sprintf("Selected %s as the reference for every wavelength.",
+                          if (is.null(names(peak_list))) reference
+                          else sQuote(names(peak_list)[reference])))
+        }
+      }
+      out <- lapply(names(by_lambda), function(lam)
+        match_peaks(peak_list, chrom_list = chrom_list, reference = reference,
+                    targets = targets[by_lambda[[lam]], , drop = FALSE],
+                    lambda = lam, rt_window = rt_window,
+                    spectral_cutoff = spectral_cutoff,
+                    background_correction = background_correction,
+                    rt_weight = rt_weight,
+                    use_corrected_rt = use_corrected_rt,
+                    consensus_spectra = consensus_spectra,
+                    spectral_test = spectral_test, alpha = alpha, plot_it = plot_it,
+                    verbose = verbose))
+      return(structure(setNames(out, names(by_lambda)),
+                       class = "matched_peak_list_set"))
+    }
+    if (is.null(lambda) && !anyNA(lam_t)) lambda <- lam_t[1]
+  }
   if (is.null(chrom_list)){
     chrom_list <- get_chrom_list(peak_list)
+  } else {
+    check_spectra_source(peak_list, chrom_list)
   }
   if (!is.null(names(chrom_list)) &&
       setequal(names(chrom_list), names(peak_list)))
@@ -1163,6 +1308,10 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
   } else{
     lambda_idx <- as.character(lambda)
   }
+  pk_lambdas <- unique(unlist(lapply(peak_list, names)))
+  if (!lambda_idx %in% pk_lambdas)
+    stop(sprintf("No peaks at %s nm: `peak_list` has peaks at %s only.",
+                 lambda_idx, paste(pk_lambdas, collapse = ", ")), call. = FALSE)
   pks_flat <- lapply(peak_list, function(x) x[[lambda_idx]])
   has_cor <- vapply(Filter(Negate(is.null), pks_flat),
                     function(p) "rt.cor" %in% colnames(p), logical(1))
@@ -1230,8 +1379,9 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
       "No peaks were found in the reference sample (%s) at wavelength %s. Please choose a different `reference` or relax the criteria used to detect peaks.",
       sQuote(names(peak_list)[reference]), sQuote(lambda_idx)))
   }
-  if (spectrum == "background" && !all(c("start", "end") %in% colnames(pks_ref)))
-    stop("`spectrum = \"background\"` needs `start` and `end` columns in ",
+  if (background_correction == "linear" &&
+      !all(c("start", "end") %in% colnames(pks_ref)))
+    stop("`background_correction = \"linear\"` needs `start` and `end` columns in ",
          "`peak_list`.", call. = FALSE)
   cutoff_ref <- rep(spectral_cutoff, length(rt_ref))
   if (!is.null(target_cutoff))
@@ -1242,7 +1392,7 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
       target_window * rt_factor(get_time_unit(peak_list))
 
   spectra_at <- function(p, i){
-    if (spectrum == "apex"){
+    if (background_correction == "none"){
       m <- t(chrom_list[[i]][get_retention_idx(p$rt, get_times(chrom_list, i)), ,
                              drop = FALSE])
     } else {
@@ -1258,11 +1408,29 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
     warning("Spectral matching is unavailable for one-dimensional ",
             "chromatograms, so peaks are matched on retention time alone. ",
             "`spectral_cutoff` is ignored.", call. = FALSE)
+  noise_test <- use_spectra && spectral_test == "noise"
+  if (noise_test) {
+    if (background_correction == "linear")
+      stop("`spectral_test = \"noise\"` needs `background_correction = \"none\"`.",
+           call. = FALSE)
+    noise_models <- lapply(seq_along(chrom_list), function(i)
+      spectral_noise_model(chrom_list[[i]], get_times(chrom_list, i), peak_list[[i]]))
+    n_rows <- vapply(noise_models, function(m) nrow(m$Y), integer(1))
+    min_rows <- max(SPECTRAL_NOISE_MIN_ROWS, ceiling(1 / alpha))
+    if (any(n_rows < min_rows))
+      stop(sprintf(paste("Too few peak-free timepoints to estimate spectral noise",
+                         "(fewer than %d) in sample%s %s."), min_rows,
+                   plural(sum(n_rows < min_rows)),
+                   format_list(names(chrom_list)[n_rows < min_rows])),
+           call. = FALSE)
+    ref_noise <- list(Y = noise_models[[reference]]$Y,
+                      scale = rep(1, length(rt_ref)))
+  } else ref_noise <- NULL
 
   sample_indices <- seq_along(chrom_list)
   names_peaks <- names(peak_list)
-  matches_list <- lapply(sample_indices, function(idx) {
-    if (verbose){
+  match_one <- function(idx, spectra_ref, ref_noise, announce = verbose) {
+    if (announce){
       message(sprintf("Comparing %s against reference (%s)",
                       sQuote(names_peaks[idx]), sQuote(names_peaks[reference])))
     }
@@ -1276,17 +1444,35 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
       return(NULL)
     }
 
+    rt_dist_matrix <- abs(outer(pks_samp[[dist_col]], pks_ref[[dist_col]], "-"))
+    rt_mask <- !is.na(rt_dist_matrix) & sweep(rt_dist_matrix, 2, window_ref, "<=")
+
+    p_matrix <- NULL
     if (use_spectra){
-      cor_matrix <- suppressWarnings(cor(spectra_at(pks_samp, idx), spectra_ref))
-      spectral_mask <- !is.na(cor_matrix) & sweep(cor_matrix, 2, cutoff_ref, ">=")
+      spectra_samp <- spectra_at(pks_samp, idx)
+      cor_matrix <- suppressWarnings(cor(spectra_samp, spectra_ref))
+      if (noise_test) {
+        p_matrix <- matrix(NA_real_, nrow(cor_matrix), ncol(cor_matrix))
+        cand <- which(rt_mask, arr.ind = TRUE)
+        w <- noise_models[[idx]]$w
+        ks <- unique(cand[cutoff_ref[cand[, 2]] > 0, 2])
+        nulls <- setNames(spectral_nulls(spectra_ref[, ks, drop = FALSE],
+                                         noise_models[[idx]]$Y, ref_noise$Y, w,
+                                         ref_noise$scale[ks]), ks)
+        for (q in seq_len(nrow(cand))) {
+          k <- cand[q, 2]
+          p_matrix[cand[q, 1], k] <- spectral_p(spectra_samp[, cand[q, 1]],
+                                                nulls[[as.character(k)]], w, cutoff_ref[k])
+        }
+        spectral_mask <- !is.na(p_matrix) & p_matrix >= alpha
+      } else {
+        spectral_mask <- !is.na(cor_matrix) & sweep(cor_matrix, 2, cutoff_ref, ">=")
+      }
     } else {
       cor_matrix <- matrix(1, nrow = length(rt_samp), ncol = length(rt_ref),
                            dimnames = list(rt_samp, rt_ref))
       spectral_mask <- TRUE
     }
-
-    rt_dist_matrix <- abs(outer(pks_samp[[dist_col]], pks_ref[[dist_col]], "-"))
-    rt_mask <- !is.na(rt_dist_matrix) & sweep(rt_dist_matrix, 2, window_ref, "<=")
 
     combined_mask <- spectral_mask & rt_mask
     cor_matrix[!combined_mask] <- NA
@@ -1338,19 +1524,59 @@ match_peaks <- function(peak_list, chrom_list = NULL, reference = NULL,
     samp_i <- cbind(rt = to_idx(matches[, "rt_samp"], idx),
                     I  = pks_samp$height[matched_cols])
 
-    list(matches = matches, ref_i = ref_i, samp_i = samp_i,
-         cor_scores = cor_scores,
-         rt_samp = rt_samp, candidates = candidates,
-         matched_rows = matched_rows, matched_cols = matched_cols)
-  })
+    out <- list(matches = matches, ref_i = ref_i, samp_i = samp_i,
+                cor_scores = cor_scores,
+                rt_samp = rt_samp, candidates = candidates,
+                matched_rows = matched_rows, matched_cols = matched_cols)
+    if (!is.null(p_matrix)) out$spectral_p <- p_matrix[pair_idx]
+    out
+  }
+  first <- if (consensus_spectra && use_spectra) suppressWarnings else identity
+  matches_list <- first(lapply(sample_indices, match_one, spectra_ref = spectra_ref,
+                               ref_noise = ref_noise))
+  consensus_n <- NULL
+  if (consensus_spectra && use_spectra) {
+    num <- matrix(0, nrow(spectra_ref), ncol(spectra_ref))
+    den <- consensus_n <- numeric(ncol(spectra_ref))
+    for (idx in sample_indices) {
+      m <- matches_list[[idx]]
+      if (is.null(m)) next
+      sigma2 <- trace_noise(chrom_list[[idx]][, lambda_idx], get_times(chrom_list, idx),
+                            pks_flat[[idx]])^2
+      if (!is.finite(sigma2) || sigma2 <= 0) next
+      p <- pks_flat[[idx]]
+      p <- p[!is.na(p$rt), , drop = FALSE]
+      sp <- spectra_at(p[m$matched_cols, , drop = FALSE], idx)
+      h <- sp[match(lambda_idx, colnames(chrom_list[[idx]])), ]
+      ok <- is.finite(h) & h > 0 & colSums(!is.finite(sp)) == 0
+      j <- m$matched_rows[ok]
+      num[, j] <- num[, j] + sweep(sp[, ok, drop = FALSE], 2, h[ok] / sigma2, "*")
+      den[j] <- den[j] + h[ok]^2 / sigma2
+      consensus_n[j] <- consensus_n[j] + 1
+    }
+    has <- den > 0
+    spectra_ref[, has] <- sweep(num[, has, drop = FALSE], 2, den[has], "/")
+    rownames(spectra_ref) <- colnames(chrom_list[[reference]])
+    if (noise_test) {
+      sigma_ref <- trace_noise(chrom_list[[reference]][, lambda_idx],
+                               get_times(chrom_list, reference), pks_flat[[reference]])
+      ref_noise$scale[has] <- 1 / (sigma_ref * sqrt(den[has]))
+    }
+    matches_list <- lapply(sample_indices, match_one, spectra_ref = spectra_ref,
+                           ref_noise = ref_noise, announce = FALSE)
+  }
 
   names(matches_list) <- names_peaks
   result <- structure(matches_list, reference = names_peaks[reference],
                       rt_ref = rt_ref, lambda = lambda_idx,
                       spectral_cutoff = spectral_cutoff,
-                      spectrum = spectrum,
+                      background_correction = background_correction,
                       rt_window = rt_window_rt,
                       reference_targets = reference_targets,
+                      consensus_spectra = if (!is.null(consensus_n)) spectra_ref,
+                      consensus_n = consensus_n,
+                      spectral_test = if (noise_test) spectral_test,
+                      alpha = if (noise_test) alpha,
                       class = "matched_peak_list")
   if (plot_it) plot(result)
   result
@@ -1400,8 +1626,33 @@ reference_from_targets <- function(pks_flat, targets, lambda_idx, rtf,
     stop(sprintf("No peaks were found at wavelength %s in any sample.",
                  sQuote(lambda_idx)), call. = FALSE)
   labels <- ifelse(is.na(targets$name), paste("rt", targets$rt), targets$name)
-  n_t <- nrow(targets)
-  empty <- matrix(NA_real_, length(pks_flat), n_t)
+  m <- target_peaks(pks_flat, targets, rtf, rt_col)
+  if (!is.null(reference)) {
+    absent <- is.na(m$height[reference, ])
+    if (any(absent))
+      stop(sprintf(paste("The reference sample (%s) has no peak fitted with",
+                         "`r.squared` of at least %s within `tol` of %s."),
+                   sQuote(names(pks_flat)[reference] %||% reference), REF_MIN_R2,
+                   format_list(labels[absent], quote = FALSE)), call. = FALSE)
+    targets$rt <- m$rt[reference, ]
+    return(list(index = reference, targets = targets))
+  }
+  best <- rank_references(m$height, m$rt_d, targets$rt)
+  if (is.na(best)){
+    present <- attr(best, "present")
+    stop(sprintf(paste("No sample contains a peak for every target. Samples",
+                       "containing each target: %s. Check the target",
+                       "retention times and wavelength."),
+                 paste(sprintf("%s %d of %d", labels, colSums(present),
+                               nrow(present)), collapse = ", ")),
+         call. = FALSE)
+  }
+  targets$rt <- m$rt[best, ]
+  list(index = as.vector(best), targets = targets)
+}
+
+target_peaks <- function(pks_flat, targets, rtf, rt_col = "rt"){
+  empty <- matrix(NA_real_, length(pks_flat), nrow(targets))
   rt <- rt_d <- height <- empty
   for (s in seq_along(pks_flat)){
     p <- pks_flat[[s]]
@@ -1417,38 +1668,233 @@ reference_from_targets <- function(pks_flat, targets, lambda_idx, rtf,
     rt_d[s, k] <- p[[rt_col]][j]
     height[s, k] <- p$height[j]
   }
-  if (!is.null(reference)) {
-    absent <- is.na(height[reference, ])
-    if (any(absent))
-      stop(sprintf(paste("The reference sample (%s) has no peak fitted with",
-                         "`r.squared` of at least %s within `tol` of %s."),
-                   sQuote(names(pks_flat)[reference] %||% reference), REF_MIN_R2,
-                   format_list(labels[absent], quote = FALSE)), call. = FALSE)
-    targets$rt <- rt[reference, ]
-    return(list(index = reference, targets = targets))
-  }
+  list(rt = rt, rt_d = rt_d, height = height)
+}
+
+rank_references <- function(height, rt_d, target_rt){
   rel <- sweep(height, 2, apply(height, 2, median, na.rm = TRUE), "/")
   rel[rel < REF_MIN_REL_HEIGHT] <- NA
   present <- !is.na(rel)
-  full <- which(rowSums(present) == n_t)
-  if (!length(full))
-    stop(sprintf(paste("No sample contains a peak for every target. Samples",
-                       "containing each target: %s. Check the target",
-                       "retention times and wavelength."),
-                 paste(sprintf("%s %d of %d", labels, colSums(present),
-                               nrow(present)), collapse = ", ")),
-         call. = FALSE)
+  full <- which(rowSums(present) == ncol(height))
+  if (!length(full)) return(structure(NA_integer_, present = present))
   min_rel <- apply(rel[full, , drop = FALSE], 1, min)
-  max_off <- apply(abs(sweep(rt_d[full, , drop = FALSE], 2, targets$rt)), 1, max)
-  best <- full[order(-min_rel, max_off)[1]]
-  targets$rt <- rt[best, ]
-  list(index = unname(best), targets = targets)
+  max_off <- apply(abs(sweep(rt_d[full, , drop = FALSE], 2, target_rt)), 1, max)
+  structure(unname(full[order(-min_rel, max_off)[1]]), present = present)
 }
 
+common_reference <- function(peak_list, targets, by_lambda, use_corrected_rt){
+  rtf <- rt_factor(get_time_unit(peak_list))
+  parts <- lapply(names(by_lambda), function(lam){
+    tg <- check_targets(targets[by_lambda[[lam]], , drop = FALSE], tol = 0.1)
+    pks_flat <- lapply(peak_list, function(x) x[[lam]])
+    has_cor <- vapply(Filter(Negate(is.null), pks_flat),
+                      function(p) "rt.cor" %in% colnames(p), logical(1))
+    rt_col <- if (isTRUE(use_corrected_rt) ||
+                  (is.null(use_corrected_rt) && length(has_cor) && all(has_cor)))
+      "rt.cor" else "rt"
+    c(target_peaks(pks_flat, tg, rtf, rt_col), list(target_rt = tg$rt))
+  })
+  bind <- function(k) do.call(cbind, lapply(parts, `[[`, k))
+  as.vector(rank_references(bind("height"), bind("rt_d"),
+                            unlist(lapply(parts, `[[`, "target_rt"))))
+}
+
+#' Robust noise standard deviation of a trace from point-to-point differences
+#' @noRd
+diff_noise <- function(y) mad(diff(y), na.rm = TRUE) / sqrt(2)
+
+#' Noise standard deviation and level of a trace, from its peak-free timepoints
+#'
+#' Starting from `diff_noise()`, sets aside the spans of peaks taller than
+#' `TRACE_NOISE_K` times the current estimate and re-estimates the noise as
+#' the scaled MAD of the timepoints left, and the level as their median, until
+#' the noise changes by less than `TRACE_NOISE_TOL`. If too few timepoints are
+#' left, the mask uses `SPECTRAL_NOISE_K` instead, and failing that the
+#' difference estimate is returned.
+#' @param y A trace.
+#' @param times Positions of `y`, in the units of `start` and `end`.
+#' @param peaks Peak table for `y`, with columns `start` and `end`, and
+#'   `height` unless `apex` is given.
+#' @param apex Optional values of `y` at the apex of each peak. If given, a
+#'   peak's height is its apex less the current level, so the mask is
+#'   unaffected by an offset of the trace.
+#' @return A list with `sigma`, the noise standard deviation, and `centre`,
+#'   the median of the peak-free timepoints.
+#' @noRd
+trace_noise_level <- function(y, times, peaks, apex = NULL){
+  fallback <- list(sigma = diff_noise(y), centre = median(y, na.rm = TRUE))
+  needed <- c("start", "end", if (is.null(apex)) "height")
+  if (!is.finite(fallback$sigma) || fallback$sigma <= 0 || is.null(peaks) ||
+      !nrow(peaks) || !all(needed %in% colnames(peaks))) return(fallback)
+  relative <- !is.null(apex)
+  if (!relative) apex <- peaks$height
+  ok <- !is.na(apex) & !is.na(peaks$start) & !is.na(peaks$end)
+  peaks <- peaks[ok, , drop = FALSE]
+  apex <- apex[ok]
+  for (k in c(TRACE_NOISE_K, SPECTRAL_NOISE_K)) {
+    s <- fallback$sigma
+    centre <- fallback$centre
+    for (i in seq_len(TRACE_NOISE_MAX_ITER)) {
+      height <- if (relative) apex - centre else apex
+      keep <- is.finite(y)
+      for (j in which(height > k * s))
+        keep[times >= peaks$start[j] & times <= peaks$end[j]] <- FALSE
+      if (sum(keep) < TRACE_NOISE_MIN_POINTS) {
+        s <- NA_real_
+        break
+      }
+      s_new <- mad(y[keep])
+      centre <- median(y[keep])
+      if (!(s_new > 0)) {
+        s <- NA_real_
+        break
+      }
+      converged <- abs(s_new / s - 1) < TRACE_NOISE_TOL
+      s <- s_new
+      if (converged) break
+    }
+    if (is.finite(s)) return(list(sigma = s, centre = centre))
+  }
+  fallback
+}
+
+#' Noise standard deviation of a trace, from its peak-free timepoints
+#' @inheritParams trace_noise_level
+#' @noRd
+trace_noise <- function(y, times, peaks) trace_noise_level(y, times, peaks)$sigma
+
+#' Spectral noise model of a chromatogram, from its peak-free timepoints
+#'
+#' Timepoints inside any peak in `peaks` taller than `SPECTRAL_NOISE_K` times
+#' its trace's noise are excluded, each remaining spectrum is centred, and
+#' spectra still carrying signal are dropped.
+#' @param x A chromatogram matrix (times by wavelengths).
+#' @param times Retention times of the rows of `x`.
+#' @param peaks The chromatogram's element of a `peak_list`.
+#' @return A list with `Y`, the centred noise spectra (rows), and `w`, the
+#'   reciprocal of the noise standard deviation at each wavelength.
+#' @noRd
+spectral_noise_model <- function(x, times, peaks){
+  keep <- rep(TRUE, nrow(x))
+  for (lam in intersect(names(peaks), colnames(x))) {
+    p <- peaks[[lam]]
+    if (is.null(p) || !nrow(p) || !all(c("start", "end") %in% colnames(p))) next
+    tall <- which(!is.na(p$height) & !is.na(p$start) & !is.na(p$end) &
+                    p$height > SPECTRAL_NOISE_K * trace_noise(x[, lam], times, p))
+    for (j in tall) keep[times >= p$start[j] & times <= p$end[j]] <- FALSE
+  }
+  Y <- x[keep & rowSums(!is.finite(x)) == 0, , drop = FALSE]
+  Y <- Y - rowMeans(Y)
+  sigma <- apply(Y, 2, mad)
+  sigma[!(sigma > 0)] <- min(sigma[sigma > 0])
+  z <- sqrt(rowSums(sweep(Y, 2, sigma, "/")^2))
+  list(Y = Y[z <= median(z) + SPECTRAL_NOISE_CLIP * mad(z), , drop = FALSE],
+       w = 1 / sigma)
+}
+
+#' Noise residuals for testing spectra against reference spectra
+#'
+#' The fit of `s = c + a * r` depends only on the reference spectrum and the
+#' weights, so the residuals of the noise spectra under it are shared by every
+#' sample peak tested against `r` in the same sample. Sample and reference noise
+#' spectra are paired, offset by half the reference rows so that a chromatogram
+#' tested against itself is not paired with the same timepoint, and each pair's
+#' squared residuals and their cross product are kept, so that `spectral_p()`
+#' can form the residual of `e_s - a * e_r` for any `a`. The residuals are
+#' found from dot products with the two columns of the fit, `w` and `r * w`,
+#' so one matrix product covers every reference spectrum.
+#' @param R Reference spectra, one per column.
+#' @param Ys,Yr Noise spectra (rows) of the sample and reference.
+#' @param w Weight per wavelength, the reciprocal of the sample's noise.
+#' @param scale Factor applied to the reference noise for each reference
+#'   spectrum.
+#' @return A list with one element per column of `R`, `NULL` where the fit is
+#'   degenerate.
+#' @noRd
+spectral_nulls <- function(R, Ys, Yr, w, scale = rep(1, ncol(R))){
+  n <- max(nrow(Ys), nrow(Yr))
+  i_s <- rep_len(seq_len(nrow(Ys)), n)
+  i_r <- (seq_len(n) - 1 + nrow(Yr) %/% 2) %% nrow(Yr) + 1
+  zs <- sweep(Ys[i_s, , drop = FALSE], 2, w, "*")
+  zr <- sweep(Yr[i_r, , drop = FALSE], 2, w, "*")
+  ok <- colSums(!is.finite(R)) == 0
+  rw <- R * w
+  rw[, !ok] <- 0
+  ww <- sum(w^2)
+  wr <- colSums(w * rw)
+  rr2 <- colSums(rw^2)
+  ss <- rowSums(zs^2); rr <- rowSums(zr^2); sr <- rowSums(zs * zr)
+  ws <- drop(zs %*% w); wz <- drop(zr %*% w)
+  bs <- zs %*% rw; br <- zr %*% rw
+  lapply(seq_len(ncol(R)), function(k){
+    if (!ok[k]) return(NULL)
+    qx <- qr(cbind(w, rw[, k]))
+    if (qx$rank < 2) return(NULL)
+    det <- ww * rr2[k] - wr[k]^2
+    proj <- function(g1, g2, h1, h2)
+      (rr2[k] * g1 * h1 - wr[k] * (g1 * h2 + g2 * h1) + ww * g2 * h2) / det
+    list(qx = qx, rc2 = rr2[k] - wr[k]^2 / ww,
+         q_samp = ss - proj(ws, bs[, k], ws, bs[, k]),
+         q_ref = scale[k]^2 * (rr - proj(wz, br[, k], wz, br[, k])),
+         q_cross = scale[k] * (sr - proj(ws, bs[, k], wz, br[, k])))
+  })
+}
+
+spectral_null <- function(r, Ys, Yr, w) spectral_nulls(matrix(r), Ys, Yr, w)[[1]]
+
+#' Probability that a sample spectrum is the reference spectrum, given the noise
+#'
+#' Fits `s = c + a * r` by noise-weighted least squares and compares the
+#' residual, less the mismatch allowed by `cutoff`, with the residuals of
+#' paired sample and reference noise spectra, `e_s - a * e_r`, under the same
+#' fit.
+#' @param s Sample spectrum.
+#' @param null The output of `spectral_null()` for the reference spectrum.
+#' @param w Weight per wavelength, the reciprocal of the sample's noise.
+#' @param cutoff Correlation required of noise-free spectra.
+#' @return A p-value; `1` when `cutoff` is not positive.
+#' @noRd
+spectral_p <- function(s, null, w, cutoff){
+  if (cutoff <= 0) return(1)
+  if (is.null(null) || any(!is.finite(s))) return(NA_real_)
+  st <- s * w
+  a <- qr.coef(null$qx, st)[2]
+  if (!(a > 0)) return(0)
+  excess <- sum(qr.resid(null$qx, st)^2) -
+    (1 - cutoff^2) / cutoff^2 * a^2 * null$rc2
+  q <- null$q_samp + a^2 * null$q_ref - 2 * a * null$q_cross
+  (1 + sum(q >= excess)) / (1 + length(q))
+}
+
+SPECTRAL_NOISE_K <- 5
+TRACE_NOISE_K <- 3
+TRACE_NOISE_TOL <- 0.005
+TRACE_NOISE_MAX_ITER <- 30L
+TRACE_NOISE_MIN_POINTS <- 10L
+SPECTRAL_NOISE_CLIP <- 3
+SPECTRAL_NOISE_MIN_ROWS <- 30L
 REF_MIN_REL_HEIGHT <- 0.1
 REF_MIN_R2 <- 0.5
 BG_APEX_SCANS <- 2L
 BG_BOUNDARY_SCANS <- 5L
+
+#' Stop if aligned chromatograms are paired with peaks found in unaligned ones
+#' @noRd
+check_spectra_source <- function(peak_list, chrom_list){
+  if (!isTRUE(attr(chrom_list, "warped"))) return(invisible())
+  has_rt_cor <- function(s){
+    if (is.data.frame(s)) "rt.cor" %in% names(s)
+    else any(vapply(s, function(d) "rt.cor" %in% names(d), logical(1)))
+  }
+  corrected <- any(vapply(peak_list, has_rt_cor, logical(1)))
+  src <- attr(peak_list, "chrom_list")
+  src <- if (is.character(src) && length(src) == 1) get0(sub("\\[.*$", "", src))
+  if (corrected || (!is.null(src) && !isTRUE(attr(src, "warped"))))
+    stop(paste("`chrom_list` was aligned by `correct_rt`, but the peaks in",
+               "`peak_list` were found in the unaligned chromatograms, so their",
+               "spectra would be read from the wrong timepoints. Pass the",
+               "unaligned chromatograms instead."), call. = FALSE)
+}
 
 #' Background-subtracted spectra at peak apices
 #' @param x A chromatogram matrix (times by wavelengths).
@@ -1486,4 +1932,78 @@ background_spectra <- function(x, times, p){
 #' @export
 `[.matched_peak_list` <- function(x, i, j, ..., drop = FALSE) {
   transfer_metadata(.subset(x, i), x)
+}
+
+#' Print matched peak list
+#'
+#' Prints a summary of a `matched_peak_list`: the wavelength and reference
+#' sample, the matching settings, and how many peaks each sample matched.
+#'
+#' @param x A `matched_peak_list` object.
+#' @param ... Additional arguments (ignored).
+#' @return Invisibly returns `x`.
+#' @author Ethan Bass
+#' @method print matched_peak_list
+#' @export
+print.matched_peak_list <- function(x, ...){
+  ref <- attr(x, "reference")
+  cat(sprintf("A matched_peak_list with %d samples, matched at %s nm against reference sample %s\n",
+              length(x), attr(x, "lambda"), ref))
+  settings <- c(sprintf("Reference peaks: %d", length(attr(x, "rt_ref"))),
+                sprintf("spectral_cutoff: %s", attr(x, "spectral_cutoff")),
+                sprintf("background correction: %s", attr(x, "background_correction")),
+                if (!is.null(attr(x, "spectral_test")))
+                  sprintf("spectral test: noise (alpha %s)", attr(x, "alpha")),
+                if (!is.null(attr(x, "consensus_spectra"))) "consensus spectra")
+  cat(paste(settings, collapse = " | "), "\n", sep = "")
+  others <- setdiff(names(x), ref)
+  n <- vapply(others, function(s) if (is.null(x[[s]])) 0L else nrow(x[[s]]$matches),
+              integer(1))
+  matched <- n[n > 0]
+  if (length(matched))
+    cat("Matched peaks per sample: ",
+        if (length(matched) <= 8) paste(names(matched), matched, collapse = ", ")
+        else sprintf("median %s (range %d-%d)", stats::median(matched),
+                     min(matched), max(matched)),
+        "\n", sep = "")
+  if (any(n == 0))
+    cat("No matches: ", paste(names(n)[n == 0], collapse = ", "), "\n", sep = "")
+  tg <- attr(x, "reference_targets")
+  if (!is.null(tg))
+    cat("Targets: ", paste(target_labels(tg), collapse = ", "), "\n", sep = "")
+  invisible(x)
+}
+
+#' Print a set of matched peak lists
+#'
+#' Prints a summary of a `matched_peak_list_set`: its wavelengths, the reference
+#' sample, and the reference peaks and targets at each wavelength.
+#'
+#' @param x A `matched_peak_list_set` object.
+#' @param ... Additional arguments (ignored).
+#' @return Invisibly returns `x`.
+#' @author Ethan Bass
+#' @method print matched_peak_list_set
+#' @export
+print.matched_peak_list_set <- function(x, ...){
+  refs <- vapply(x, attr, character(1), "reference")
+  shared <- length(unique(refs)) == 1
+  cat(sprintf("A matched_peak_list_set at %d wavelengths%s\n", length(x),
+              if (shared) sprintf(", reference sample %s", refs[[1]]) else ""))
+  for (lam in names(x)){
+    tg <- attr(x[[lam]], "reference_targets")
+    lab <- if (!is.null(tg)) target_labels(tg)
+    cat(sprintf("  %s nm: %s%d reference peaks%s\n", lam,
+                if (shared) "" else sprintf("reference %s, ", refs[[lam]]),
+                length(attr(x[[lam]], "rt_ref")),
+                if (length(lab)) sprintf(", target%s %s", plural(length(lab)),
+                                         paste(lab, collapse = ", "))
+                else ""))
+  }
+  cat(sprintf("Extract one wavelength with `[[`, e.g. `[[\"%s\"]]`.\n", names(x)[1]))
+  invisible(x)
+}
+
+target_labels <- function(targets){
+  ifelse(is.na(targets$name), paste("rt", signif(targets$rt, 4)), targets$name)
 }

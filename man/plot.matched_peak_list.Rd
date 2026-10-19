@@ -2,12 +2,16 @@
 % Please edit documentation in R/plot.peak_list.R
 \name{plot.matched_peak_list}
 \alias{plot.matched_peak_list}
+\alias{plot.matched_peak_list_set}
 \title{Plot matched peak pairs}
 \usage{
 \method{plot}{matched_peak_list}(x, idx = NULL, type = c("ladder", "scatter"), ...)
+
+\method{plot}{matched_peak_list_set}(x, ...)
 }
 \arguments{
-\item{x}{A \code{matched_peak_list} object from \code{\link{match_peaks}}.}
+\item{x}{A \code{matched_peak_list} object from \code{\link{match_peaks}}, or a
+\code{matched_peak_list_set}, whose wavelengths are plotted in turn.}
 
 \item{idx}{Integer or character vector of sample indices or names to plot.
 Defaults to all non-reference samples.}
