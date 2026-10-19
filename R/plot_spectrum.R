@@ -297,10 +297,16 @@ plot_spectrum_ggpl <- function(loc, peak_table, chrom_list,
 #' @importFrom scales rescale
 #' @importFrom graphics identify title text abline
 #' @inheritParams plot_spectrum
+#' @param idx Index or name of the chromatogram to plot. If missing, you are
+#' prompted for one.
+#' @param lambda The wavelength at which to plot the chromatographic trace.
+#' Required; `"max"` is not accepted.
 #' @param ... Additional arguments to `plot_spectrum`.
-#' @return Invisibly returns the numeric index of the scan selected by the user.
+#' @return Invisibly returns the spectrum when `export_spectrum = TRUE` and
+#' `plot_spectrum = TRUE`; otherwise the numeric index of the scan selected by
+#' the user.
 #' @section Side effects:
-#' If `engine == "base"`, plots are rendered to the active graphics device.
+#' Plots are rendered to the active graphics device.
 #' @author Ethan Bass
 #' @examplesIf interactive()
 #' data(Sa_pr)
@@ -339,15 +345,17 @@ scan_chrom <- function(chrom_list, idx, lambda,
   line.idx <- plot_trace(chrom_list = chrom_list, chr = idx, 
                          lambda.idx = lambda.idx, what = "click")
   
+  out <- line.idx
   if (plot_spectrum){
-    plot_spectrum(loc = line.idx, chrom_list = chrom_list,
+    sp <- plot_spectrum(loc = line.idx, chrom_list = chrom_list,
                   idx = idx, lambda = lambda, what = "idx",
                   scale_spectrum = scale_spectrum,
                   spectrum_labels = spectrum_labels, 
                   export_spectrum = export_spectrum,
                   engine = "base", ...)
+    if (export_spectrum) out <- sp
   }
-  invisible(line.idx)
+  invisible(out)
 }
 
 #' Plot all spectra for chosen peak

@@ -395,6 +395,8 @@ were rounded to the nearest 100, so they could all read 0.
 both panels on one color scale. Previously it always used the first wavelength,
 the base engine showed only the warped panel, and the other engines' legend
 matched only the raw panel.
+* `scan_chrom(export_spectrum = TRUE)` now returns the spectrum instead of the
+scan index.
 * `plot.peak_table` now warns when several `loc` are given but only the first
 is returned.
 

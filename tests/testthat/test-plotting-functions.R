@@ -857,6 +857,15 @@ test_that("plot.peak_table names `vars` when it is missing for a boxplot", {
                "`vars`")
 })
 
+test_that("scan_chrom returns the spectrum when export_spectrum = TRUE", {
+  data(Sa_pr)
+  pdf(NULL); on.exit(dev.off())
+  sp <- testthat::with_mocked_bindings(
+    scan_chrom(Sa_pr, idx = 1, lambda = "210", export_spectrum = TRUE),
+    identify = function(...) 100)
+  expect_s3_class(sp, "data.frame")
+})
+
 test_that("plot_baseline accepts a vector with an attached baseline", {
   data(Sa_pr)
   x <- correct_baseline(Sa_pr[[1]][, "210"], attach_baseline = TRUE)

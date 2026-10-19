@@ -21,12 +21,11 @@ scan_chrom(
 wavelengths). If no argument is provided here, the function will try to find
 the \code{chrom_list} object using the pointer in the \code{peak_table}.}
 
-\item{idx}{Numerical index of chromatogram you wish to plot, or "max" to
-automatically select the chromatogram with the highest signal intensity at
-the specified peak or retention time.}
+\item{idx}{Index or name of the chromatogram to plot. If missing, you are
+prompted for one.}
 
-\item{lambda}{The wavelength used for plotting chromatographic traces and
-determining signal intensity.}
+\item{lambda}{The wavelength at which to plot the chromatographic trace.
+Required; \code{"max"} is not accepted.}
 
 \item{plot_spectrum}{Logical. If \code{TRUE}, plots the spectrum of the chosen
 peak. Defaults to \code{TRUE}.}
@@ -45,7 +44,9 @@ Defaults to \code{FALSE}.}
 \item{...}{Additional arguments to \code{plot_spectrum}.}
 }
 \value{
-Invisibly returns the numeric index of the scan selected by the user.
+Invisibly returns the spectrum when \code{export_spectrum = TRUE} and
+\code{plot_spectrum = TRUE}; otherwise the numeric index of the scan selected by
+the user.
 }
 \description{
 Plots a chromatographic trace from the specified chromatogram (\code{idx}),
@@ -60,7 +61,7 @@ row from the chromatographic matrix.
 }
 \section{Side effects}{
 
-If \code{engine == "base"}, plots are rendered to the active graphics device.
+Plots are rendered to the active graphics device.
 }
 
 \examples{
