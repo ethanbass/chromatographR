@@ -4,12 +4,13 @@
 \name{chromatographR-package}
 \alias{chromatographR}
 \alias{chromatographR-package}
-\title{chromatographR: Chromatographic Data Analysis Toolset}
+\title{chromatographR: Chromatographic Data Analysis Toolkit}
 \description{
-Tools for high-throughput analysis of HPLC-DAD/UV chromatographic data.
-The package provides functionality for preprocessing, alignment, peak
-detection and fitting, peak table construction, and visualization of
-chromatographic data.
+Analyzes chromatographic data from high performance liquid chromatography
+with diode-array or ultraviolet detection (HPLC-DAD/UV), as well as other
+detectors, in a high-throughput and reproducible workflow. Provides
+functionality for preprocessing, alignment, peak detection, peak model
+fitting, peak table construction, and data visualization.
 }
 \details{
 A typical workflow includes signal preprocessing and peak table construction
@@ -20,7 +21,8 @@ variable penalty dynamic time warping (VPdtw).
 
 Peak detection is based on zero-crossings in smoothed derivatives. Peaks are
 then modeled using Gaussian, exponential-Gaussian hybrid, or bidirectional
-exponentially modified Gaussian peak functions via nonlinear least squares.
+exponentially modified Gaussian peak functions via nonlinear least squares,
+or integrated directly from the signal.
 
 Further details and example workflows are provided in the package vignettes.
 }
@@ -38,6 +40,7 @@ Further details and example workflows are provided in the package vignettes.
 \item \code{attach_metadata()}: Attach metadata to peak table.
 \item \code{attach_ref_spectra()}: Attach reference spectra to peak table.
 \item \code{normalize_data()}: Normalize \code{peak_table} or \code{chrom_list}.
+\item \code{get_purity()}: Calculate peak purity.
 }
 }
 
@@ -59,6 +62,7 @@ Further details and example workflows are provided in the package vignettes.
 \item \code{plot_chroms_heatmap()}: Plot chromatograms as heatmap.
 \item \code{annotate_peaks()}: Add peak labels to chromatogram plots.
 \item \code{mirror_plot()}: Plot chromatograms as mirror plots.
+\item \code{plot_baseline()}: Plot an estimated baseline over its trace.
 \item \code{plot.ptw_list()}: Plot parametric time warping (PTW) alignment object.
 }
 }
@@ -86,6 +90,8 @@ Further details and example workflows are provided in the package vignettes.
 \itemize{
 \item \code{get_times()}: Return retention times from a peak table or a list of chromatograms.
 \item \code{get_lambdas()}: Return wavelengths from a peak table or a list of chromatograms.
+\item \code{get_time_resolution()}: Return the sampling interval of a chromatogram.
+\item \code{get_baseline()}: Retrieve a baseline retained by preprocessing.
 \item \code{write_peaktable()}: Export peak table to CSV or XLSX format.
 \item \code{reshape_chroms()}: Reshape a list of chromatograms to long format.
 \item \code{reshape_peaktable()}: Reshape a peak table to long format.

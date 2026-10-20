@@ -11,17 +11,19 @@ Authors@R: c(
            comment = c("Author of code adapted from alsace and ptw"))
     )
 Maintainer: Ethan Bass <ethanbass@gmail.com>
-Description: Tools for high-throughput analysis of HPLC-DAD/UV
-    chromatographic data. Provides functionality for preprocessing,
-    alignment, peak detection, peak model fitting, peak table construction,
-    and data visualization. Chromatogram alignment is available via
+Description: Analyzes chromatographic data from high performance liquid
+    chromatography with diode-array or ultraviolet detection (HPLC-DAD/UV),
+    as well as other detectors, in a high-throughput and reproducible
+    workflow. Provides functionality for preprocessing, alignment, peak
+    detection, peak model fitting, peak table construction, and data
+    visualization. Chromatogram alignment is available via
     parametric time warping (as implemented in 'ptw') or variable penalty
     dynamic time warping (as implemented in 'VPdtw'). Peak detection is
     based on a first-derivative zero-crossing algorithm, and peak shapes
     are fitted using non-linear least squares. Underlying methodologies
     are described in: Wehrens et al. (2015) <doi:10.1007/s11306-014-0683-5>
     for preprocessing and peak table construction; Eilers (2004)
-    <doi:10.1021/ac034800e> and Wehrens et al. (2015) 
+    <doi:10.1021/ac034800e> and Wehrens et al. (2015)
     <doi:10.1093/bioinformatics/btv299> for parametric time warping; Clifford &
     Stone (2012) <doi:10.18637/jss.v047.i08> for variable penalty dynamic time
     warping; Tom O'Haver
@@ -34,7 +36,7 @@ License: GPL (>= 2)
 URL: https://ethanbass.github.io/chromatographR/, https://github.com/ethanbass/chromatographR/
 BugReports: https://github.com/ethanbass/chromatographR/issues/
 Depends: R (>= 4.1.0)
-Imports: 
+Imports:
     caTools,
     chromConverter,
     dynamicTreeCut,
@@ -54,7 +56,7 @@ Imports:
     tools,
     utils,
     VPdtw
-Suggests: 
+Suggests:
     cowplot,
     ggplot2,
     knitr,
@@ -77,5 +79,5 @@ Encoding: UTF-8
 Language: en-US
 LazyData: true
 LazyDataCompression: xz
-Config/roxygen2/version: 8.1.0
+Config/roxygen2/version: 8.1.1
 Roxygen: list(markdown = TRUE)

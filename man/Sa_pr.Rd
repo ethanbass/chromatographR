@@ -13,8 +13,8 @@ data(Sa_pr)
 \description{
 A list of four pre-processed HPLC-DAD chromatograms derived from the raw data
 stored in \code{\link{Sa}}. Retention times are stored in rows and wavelengths
-are stored in columns. The time axis is compressed to save space and
-processing time so the data are a little choppy.
+are stored in columns. The time axis is interpolated from the 0.0067-minute
+interval of \code{\link{Sa}} to 0.02 minutes, to save space and processing time.
 }
 \seealso{
 Other data objects:

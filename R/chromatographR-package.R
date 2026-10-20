@@ -1,9 +1,10 @@
-#' chromatographR: Chromatographic Data Analysis Toolset
+#' chromatographR: Chromatographic Data Analysis Toolkit
 #' 
-#' Tools for high-throughput analysis of HPLC-DAD/UV chromatographic data. 
-#' The package provides functionality for preprocessing, alignment, peak
-#' detection and fitting, peak table construction, and visualization of
-#' chromatographic data.
+#' Analyzes chromatographic data from high performance liquid chromatography
+#' with diode-array or ultraviolet detection (HPLC-DAD/UV), as well as other
+#' detectors, in a high-throughput and reproducible workflow. Provides
+#' functionality for preprocessing, alignment, peak detection, peak model
+#' fitting, peak table construction, and data visualization.
 #' 
 #' A typical workflow includes signal preprocessing and peak table construction
 #' following general approaches described in Wehrens et al. (2015). 
@@ -12,8 +13,9 @@
 #' variable penalty dynamic time warping (VPdtw).
 #' 
 #' Peak detection is based on zero-crossings in smoothed derivatives. Peaks are
-#' then modeled using Gaussian, exponential-Gaussian hybrid, or bidirectional 
-#' exponentially modified Gaussian peak functions via nonlinear least squares.
+#' then modeled using Gaussian, exponential-Gaussian hybrid, or bidirectional
+#' exponentially modified Gaussian peak functions via nonlinear least squares,
+#' or integrated directly from the signal.
 #' 
 #' Further details and example workflows are provided in the package vignettes.
 #' 
@@ -29,6 +31,7 @@
 #' - `attach_metadata()`: Attach metadata to peak table.
 #' - `attach_ref_spectra()`: Attach reference spectra to peak table.
 #' - `normalize_data()`: Normalize `peak_table` or `chrom_list`.
+#' - `get_purity()`: Calculate peak purity.
 #' @section Peak refinement:
 #' - `combine_peaks()`: Combine duplicate peaks based on retention time and spectral similarity.
 #' - `merge_peaks()`: Merge split peaks into a single feature in a peak table.
@@ -40,6 +43,7 @@
 #' - `plot_chroms_heatmap()`: Plot chromatograms as heatmap.
 #' - `annotate_peaks()`: Add peak labels to chromatogram plots.
 #' - `mirror_plot()`: Plot chromatograms as mirror plots.
+#' - `plot_baseline()`: Plot an estimated baseline over its trace.
 #' - `plot.ptw_list()`: Plot parametric time warping (PTW) alignment object.
 #' ### Spectral plots
 #' - `plot_spectrum()`: Plot spectrum and/or trace of specified peak.
@@ -53,6 +57,8 @@
 #' @section Data utilities and I/O:
 #' - `get_times()`: Return retention times from a peak table or a list of chromatograms.
 #' - `get_lambdas()`: Return wavelengths from a peak table or a list of chromatograms.
+#' - `get_time_resolution()`: Return the sampling interval of a chromatogram.
+#' - `get_baseline()`: Retrieve a baseline retained by preprocessing.
 #' - `write_peaktable()`: Export peak table to CSV or XLSX format.
 #' - `reshape_chroms()`: Reshape a list of chromatograms to long format.
 #' - `reshape_peaktable()`: Reshape a peak table to long format.
@@ -88,7 +94,7 @@
 #' 
 #' A list of four HPLC-DAD data matrices of *Solidago altissima* roots
 #' extracted in 90\% methanol. Retention times are stored in rows and 
-#' wavelengths are stored in columns. Data were collected on a Agilent 1100 HPLC.
+#' wavelengths are stored in columns. Data were collected on an Agilent 1100 HPLC.
 #' 
 #' @name Sa
 #' @docType data
@@ -102,8 +108,8 @@ NULL
 #' 
 #' A list of four pre-processed HPLC-DAD chromatograms derived from the raw data
 #' stored in [`Sa`]. Retention times are stored in rows and wavelengths
-#' are stored in columns. The time axis is compressed to save space and 
-#' processing time so the data are a little choppy. 
+#' are stored in columns. The time axis is interpolated from the 0.0067-minute
+#' interval of [`Sa`] to 0.02 minutes, to save space and processing time.
 #'
 #' @name Sa_pr
 #' @keywords data
