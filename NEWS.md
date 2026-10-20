@@ -387,17 +387,19 @@ unknown `peaks`.
 
 #### Plotting
 
+* `annotate_peaks` and `plot_spectrum_inset` now place labels at each peak's
+maximum for tables built from corrected peaks, as for uncorrected ones.
 * `plot_all_spectra` axes, and the absorbance axis of `plot_spectrum`'s ggplot2
 and plotly traces, now show wavelength and absorbance units instead of the time
 unit.
 * `plot_all_spectra` now names the returned spectra when `idx` gives sample
 names, and errors on names not in `chrom_list`.
+* `plot_all_spectra(what = "rt")` and `what = "idx"` no longer require a
+`peak_table`, and a `loc` outside every chromatogram now gives a clear error.
 * `plot.peak_table(idx = "all")` no longer errors when `chrom_list` is omitted,
 and `attach_ref_spectra`, `mirror_plot` and `get_peaktable(clust = "sp")` now
 treat `chrom_list = NULL` as omitted. Omitting `lambdas` for multi-wavelength
 data in `mirror_plot` now gives a clear error.
-* `plot_all_spectra(what = "rt")` and `what = "idx"` no longer require a
-`peak_table`, and a `loc` outside every chromatogram now gives a clear error.
 * `plot_chroms(engine = "base")` now extends the y axis below zero when the
 traces do. Previously it always started at 0, cutting off negative values.
 * The base-engine legend in `plot_chroms` no longer covers the traces at a top
@@ -430,9 +432,6 @@ default, which now returns every wavelength, or when `sample_var` is not
 `"sample"`.
 * `plot_chroms` now draws each wavelength as a separate line under the
 `"ggplot"` and `"plotly"` engines, instead of joining them into one.
-* `plot_chroms_heatmap(engine = "base")` now labels its color bar with the
-range of the plotted colors. Previously the labels came from the wrong rows and
-were rounded to the nearest 100, so they could all read 0.
 * The `plot.ptw_list` heatmap now plots the wavelength in `lambdas` and puts
 both panels on one color scale. Previously it always used the first wavelength,
 the base engine showed only the warped panel, and the other engines' legend
@@ -441,6 +440,9 @@ matched only the raw panel.
 scan index.
 * `plot.peak_table` now warns when several `loc` are given but only the first
 is returned.
+* `plot_chroms_heatmap(engine = "base")` now labels its color bar with the
+range of the plotted colors. Previously the labels came from the wrong rows and
+were rounded to the nearest 100, so they could all read 0.
 
 #### Documentation and packaging
 
