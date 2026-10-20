@@ -25,7 +25,8 @@ automatically from the chromatograms.
 \item \code{ref_spectra}: A matrix of reference spectra (in a wavelength × peak
 configuration). \code{NA} until added with \code{\link{attach_ref_spectra}}.
 \item \code{args}: A list of the arguments given to \code{\link{get_peaktable}} to generate
-the peak table.
+the peak table, with the peak list's fitting settings. See
+\code{\link{get_peaktable}}.
 }
 }
 

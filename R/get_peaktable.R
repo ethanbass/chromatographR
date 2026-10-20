@@ -127,8 +127,17 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' * `ref_spectra`: A matrix of reference spectra (in a wavelength × peak
 #' configuration). `NA` until added with [`attach_ref_spectra`].
 #' * `args`: A list of the arguments given to [`get_peaktable`] to generate
-#' the peak table. Its `filters` element holds any [`filter_peaks`] and
-#' [`filter_peaktable`] calls applied, as code, separated by `"; "`.
+#' the peak table, with the `fit`, `baseline` and `max_iter` the peaks were
+#' fitted with in [`get_peaks`]. Its `filters` element holds any
+#' [`filter_peaks`] and [`filter_peaktable`] calls applied, as code, separated
+#' by `"; "`.
+#'
+#' Peak tables built from `get_peaks(windows = )` or `get_peaks(targets = )`
+#' keep those `windows` or `targets` as an attribute of the same name, which
+#' you can pass to [`get_peaks`] to integrate another batch of samples the same
+#' way. The `targets` attribute holds each target's tolerance in a `tol`
+#' column, so pass it without `tol`. Neither attribute is updated when columns
+#' are removed.
 #' @author Ron Wehrens, Ethan Bass
 #' @note Peak lists produced by `get_peaks(windows = )` are grouped by
 #' integration window rather than clustered by retention time, including after
@@ -585,8 +594,8 @@ target_ids <- function(targets, lambdas){
 #' Assemble a peak table
 #'
 #' Shared by the `peak_list` and `matched_peak_list` methods so the object
-#' layout is defined once. Each method supplies its own `args`, which is
-#' recorded verbatim.
+#' layout is defined once. Each method supplies its own `args`, to which the
+#' peak list's fitting settings are appended.
 #' @noRd
 new_peak_table <- function(result, source, args){
   pull <- function(k) as.data.frame(t(do.call("rbind", lapply(result, `[[`, k))))
@@ -597,9 +606,24 @@ new_peak_table <- function(result, source, args){
            chromConverter::extract_metadata(source, what = added) else NA,
          instrument_meta = chromConverter::extract_metadata(source),
          ref_spectra = NA,
-         args = args),
+         args = c(args,
+                  list(fit = get_metadata_attribute(source, "fit"),
+                       baseline = get_metadata_attribute(source, "baseline"),
+                       max_iter = get_metadata_attribute(source, "max_iter")))),
     class = c("peak_table", "list"),
-    pk_args = attr(source, "meta"))
+    windows = attr(source, "windows"),
+    targets = drop_empty_columns(attr(source, "targets")))
+}
+
+#' Drop the columns of a data.frame that hold only `NA`
+#'
+#' @param x A data.frame, or `NULL`.
+#' @return `x` without its all-`NA` columns.
+#' @author Ethan Bass
+#' @noRd
+drop_empty_columns <- function(x){
+  if (is.null(x)) return(NULL)
+  x[!vapply(x, function(v) all(is.na(v)), logical(1))]
 }
 
 #' Reshape peaktable

@@ -22,7 +22,8 @@
 #' * `ref_spectra`: A matrix of reference spectra (in a wavelength × peak
 #' configuration). `NA` until added with [`attach_ref_spectra`].
 #' * `args`: A list of the arguments given to [`get_peaktable`] to generate
-#' the peak table.
+#' the peak table, with the peak list's fitting settings. See
+#' [`get_peaktable`].
 #'
 #' @section Methods:
 #' The following methods are available:

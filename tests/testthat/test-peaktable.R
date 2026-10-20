@@ -225,6 +225,39 @@ test_that("filter calls are recorded as code that repeats them", {
                "filter_peaktable(min_rt = 12)")
 })
 
+test_that("peak tables record how their peaks were fitted", {
+  pt <- get_peaktable(.pks)
+  expect_equal(pt$args[c("fit", "baseline", "max_iter")],
+               list(fit = "gaussian", baseline = "none", max_iter = 1000))
+  expect_null(attr(pt, "windows"))
+  expect_null(attr(pt, "targets"))
+  w <- rbind(c(1.2, 2.1), c(2.9, 3.8))
+  pw <- get_peaktable(get_peaks(.cl, lambdas = "220", windows = w, fit = "raw",
+                                estimate_purity = FALSE, show_progress = FALSE))
+  again <- get_peaktable(get_peaks(.cl, lambdas = "220",
+                                   windows = attr(pw, "windows"), fit = "raw",
+                                   estimate_purity = FALSE,
+                                   show_progress = FALSE))
+  expect_equal(again$tab, pw$tab)
+  expect_equal(attr(filter_peaktable(pw, max_rt = 2), "windows"),
+               attr(pw, "windows"))
+  tg <- data.frame(rt = c(1.67, 3.33), name = c("a", "b"))
+  pt <- get_peaktable(get_peaks(.cl, lambdas = "220", targets = tg,
+                                fit = "gaussian", estimate_purity = FALSE,
+                                show_progress = FALSE))
+  expect_equal(attr(pt, "targets")$name, c("a", "b"))
+  for (tg in list(tg, c(1.67, 3.33))){
+    pt <- get_peaktable(get_peaks(.cl, lambdas = "220", targets = tg,
+                                  fit = "gaussian", estimate_purity = FALSE,
+                                  show_progress = FALSE))
+    again <- get_peaktable(get_peaks(.cl, lambdas = "220",
+                                     targets = attr(pt, "targets"),
+                                     fit = "gaussian", estimate_purity = FALSE,
+                                     show_progress = FALSE))
+    expect_equal(again$tab, pt$tab)
+  }
+})
+
 test_that("write_peaktable writes args with several values as one field", {
   pt <- get_peaktable(suppressWarnings(
     filter_peaks(.pks, min_fwhm = 0.05, max_rt = 2)))

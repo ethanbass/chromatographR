@@ -275,6 +275,9 @@ later).
 * `filter_peaks` and `filter_peaktable` now record each call as code, which
 `print` shows for peak lists and `get_peaktable` stores in `args$filters`. See
 `?filter_peaks`.
+* `get_peaktable` now records how the peaks were fitted (`fit`, `baseline` and
+`max_iter`) in `args`, and keeps any `windows` or `targets` for reuse on another
+batch. See `?get_peaktable`.
 * `cluster_spectra` now numbers and colors each box on the dendrogram to match
 its spectra panel, with colors set by `col`, and boxes only clusters passing
 `min_size` and `max_size`.

@@ -160,9 +160,18 @@ automatically from the chromatograms.
 \item \code{ref_spectra}: A matrix of reference spectra (in a wavelength × peak
 configuration). \code{NA} until added with \code{\link{attach_ref_spectra}}.
 \item \code{args}: A list of the arguments given to \code{\link{get_peaktable}} to generate
-the peak table. Its \code{filters} element holds any \code{\link{filter_peaks}} and
-\code{\link{filter_peaktable}} calls applied, as code, separated by \code{"; "}.
+the peak table, with the \code{fit}, \code{baseline} and \code{max_iter} the peaks were
+fitted with in \code{\link{get_peaks}}. Its \code{filters} element holds any
+\code{\link{filter_peaks}} and \code{\link{filter_peaktable}} calls applied, as code, separated
+by \code{"; "}.
 }
+
+Peak tables built from \code{get_peaks(windows = )} or \code{get_peaks(targets = )}
+keep those \code{windows} or \code{targets} as an attribute of the same name, which
+you can pass to \code{\link{get_peaks}} to integrate another batch of samples the same
+way. The \code{targets} attribute holds each target's tolerance in a \code{tol}
+column, so pass it without \code{tol}. Neither attribute is updated when columns
+are removed.
 }
 \description{
 Converts a \code{peak_list} object containing peaks from multiple samples into
