@@ -247,7 +247,7 @@ pk_tab <- get_peaktable(pks_egh, response = "area", hmax = 0.2)
 head(pk_tab$tab[,1:6])
 ```
 
-If you only need a few known compounds, `get_peaks(targets = ...)` fits only the peaks at the retention times you list, and `get_peaktable` returns one named column per target. See `?targeted_analysis`, and the [calibration article](https://ethanbass.github.io/chromatographR/articles/calibration.html) for a worked example.
+If you only need a few known compounds, `get_peaks(targets = ...)` fits only the peaks at the retention times you list, and `get_peaktable` returns one named column per target. See `?targeted_analysis`, and the [targeted analysis article](https://ethanbass.github.io/chromatographR/articles/targeted-analysis.html) for a worked example.
 
 ### Further analysis and data-visualization
 
