@@ -11,6 +11,7 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' retention time and (optionally) spectral similarity. The tree is cut at
 #' height `hmax`, whose meaning depends on `clust` (see `hmax`).
 #' 
+#' @section Clustering:
 #' By default, clustering is performed on retention times alone (when 
 #' `clust = "rt"`). Alternatively, clustering can also incorporate information 
 #' about spectral similarity (when `clust = "sp.rt"`) using a similarity function 
@@ -31,10 +32,6 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' warnings are often benign, but they can also mean `hmax` is too large. Lowering `hmax` merges fewer peaks, at the
 #' cost of splitting some across multiple clusters; filtering low-intensity
 #' peaks before clustering reduces the warnings without that trade-off. 
-#' 
-#' Once clusters are formed, peak metadata are summarized within each cluster
-#' according to `summarize_by`, by default weighting each peak by its
-#' intensity, which reduces the influence of small peaks.
 #' 
 #' @name get_peaktable
 #' @aliases get_peaktable
@@ -69,7 +66,7 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' `end - start` at the default `sigma_t`. Ignored
 #' for peak lists produced by `get_peaks(windows = )` or `get_peaks(targets = )`,
 #' since those peaks are grouped by integration window or target instead of
-#' being clustered.
+#' being clustered (see *Windows and targets*).
 #' @param summarize_by How to summarize peak metadata within each cluster.
 #' Options are `"weighted.mean"` (default, weights peaks by their intensity as
 #' given by `response`), `"mean"`, `"median"` (which aggregate metadata across 
@@ -82,7 +79,7 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' spectral similarity and retention time (`sp.rt`) or retention time alone
 #' (`rt`). Defaults to `rt`. Ignored for peak lists produced by
 #' `get_peaks(windows = )` or `get_peaks(targets = )`, which are grouped by window
-#' or target.
+#' or target (see *Windows and targets*).
 #' @param sigma_t Width of Gaussian kernel for retention time similarity, in
 #' minutes. Controls the weight given to retention time when
 #' `clust = "sp.rt"`. Defaults to half the mean `end - start` across all peaks.
@@ -116,9 +113,14 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' * `pk_meta`: A `data.frame` of peak metadata, one column per peak. Its rows
 #' are the wavelength (`lambda`), the peak number (`peak`), and whichever of the
 #' peak list's `rt`, `start`, `end`, `sd`, `tau`, `FWHM`, `r.squared`, `purity`,
-#' `window_limited` and `converged` columns it has, each summarized across the
-#' peaks in that column according to `summarize_by`. See the Value section of
-#' [`get_peaks`] for their meanings.
+#' `window_limited` and `converged` columns it has. See the `Value` section of
+#' [`get_peaks`] for their meanings. The rows taken from the peak list are
+#' summarized across samples according to `summarize_by`; by default, peaks
+#' are weighted by intensity, which reduces the influence of small peaks. With
+#' `"weighted.mean"` or `"mean"`, the `converged` and `window_limited` rows
+#' become the share of the column's peaks with that flag, so `0.25` means a
+#' quarter of them. In a table built from a `matched_peak_list`, the rows hold
+#' the reference sample's values instead.
 #' * `sample_meta`: A `data.frame` of sample metadata: the fields added to the
 #' chromatograms with `chromConverter::add_metadata()` (chromConverter 0.11.0
 #' or later), and any attached with [`attach_metadata`]. `NA` if there are none.
@@ -131,22 +133,23 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' fitted with in [`get_peaks`]. Its `filters` element holds any
 #' [`filter_peaks`] and [`filter_peaktable`] calls applied, as code, separated
 #' by `"; "`.
+#' @section Windows and targets:
+#' Peak lists produced by `get_peaks(windows = )` are grouped by
+#' integration window rather than clustered by retention time, including after
+#' [`correct_peaks`]. This gives one peak table column per window, ordered by
+#' retention time.
+#'
+#' Peak lists produced by `get_peaks(targets = )` are grouped by target
+#' instead of being clustered, each peak going to the matching target.
+#' Targets found in no sample are omitted from the peak table. If `targets` has 
+#' a `name` column, the columns are named after the targets.
 #'
 #' Peak tables built from `get_peaks(windows = )` or `get_peaks(targets = )`
-#' keep those `windows` or `targets` as an attribute of the same name, which
-#' you can pass to [`get_peaks`] to integrate another batch of samples the same
-#' way. The `targets` attribute holds each target's tolerance in a `tol`
-#' column, so pass it without `tol`. Neither attribute is updated when columns
-#' are removed.
+#' keep those `windows` or `targets` as an attribute of the same name, as a
+#' record of how the table was built. The `targets` attribute lists every
+#' target that was searched for, including any found in no sample, which have
+#' no column. Neither attribute is updated when columns are removed.
 #' @author Ron Wehrens, Ethan Bass
-#' @note Peak lists produced by `get_peaks(windows = )` are grouped by
-#' integration window rather than clustered by retention time, including after
-#' [`correct_peaks`]. This gives one peak table column per window, in order of
-#' retention time, with every sample contributing to each.
-#' @note Peak lists produced by `get_peaks(targets = )` are grouped by target
-#' instead of clustered, each peak going to the target it was selected for.
-#' Targets found in no sample get no column. If `targets` has a `name` column, the
-#' columns are named after the targets.
 #' @note This function is adapted from the `getPeakTable` function in the alsace
 #' package by Ron Wehrens: <https://github.com/rwehrens/alsace/blob/master/R/getPeakTable.R>.
 #' @md
@@ -378,20 +381,20 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
 #' @param rt_tol Numeric. Maximum allowed deviation (in retention-time units)
 #'   when joining matched peak RTs back to the corresponding row in `pks`.
 #'   Defaults to `0.01`.
-#' @note When `peak_list` is a `matched_peak_list`, the columns of
-#'   the returned [`peak_table`] are defined by the reference
-#'   sample's peaks at the wavelength used by [`match_peaks`]; other wavelengths
-#'   in `pks` are ignored. A `matched_peak_list_set`, from targets at several
-#'   wavelengths, gives one table with the columns for each wavelength, each
-#'   defined by that wavelength's reference sample. Peaks absent from the reference sample will not
-#'   appear as columns regardless of their prevalence in other samples. Choose a
-#'   reference with a rich peak profile, or pass a table of `targets` to
-#'   [`match_peaks`] to pick one that contains all of them; the
-#'   targets' columns are then named after them, and the table can be
-#'   restricted to them with `x[, targets$name]`. To
-#'   discover peaks across all samples,
-#'   call `get_peaktable` on the `peak_list` itself, which clusters peaks
-#'   across every sample.
+#' @section Matched peak lists:
+#' [`match_peaks`] pairs the peaks in each sample with the peaks of a reference
+#' sample, by spectrum as well as retention time. Each column then follows one
+#' compound across the samples, even where retention times drift too far for
+#' clustering to group the peaks reliably. In crowded stretches of the
+#' chromatogram, this works only if neighboring compounds have distinct
+#' spectra. This suits targeted analysis (see [`targeted_analysis`]) and
+#' studies in which one sample, such as a standard mix or a pooled sample,
+#' contains every compound of interest.
+#'
+#' The peak table has one column for each peak
+#' in the reference sample, at each of the specified wavelengths. A peak that's
+#' missing in the reference sample gets no column, even if it's present in other
+#' samples, so choose the reference with care (see [`match_peaks`]).
 #' @method get_peaktable matched_peak_list
 #' @export
 get_peaktable.matched_peak_list <- function(peak_list, pks,
