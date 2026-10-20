@@ -925,8 +925,10 @@ test_that("plot.peak_table names `vars` when it is missing for a boxplot", {
 test_that("scan_chrom returns the spectrum when export_spectrum = TRUE", {
   data(Sa_pr)
   pdf(NULL); on.exit(dev.off())
-  sp <- testthat::with_mocked_bindings(
-    scan_chrom(Sa_pr, idx = 1, lambda = "210", export_spectrum = TRUE),
+  testthat::with_mocked_bindings(
+    expect_message(sp <- scan_chrom(Sa_pr, idx = 1, lambda = "210",
+                                    export_spectrum = TRUE, verbose = FALSE),
+                   "Click trace to select timepoint"),
     identify = function(...) 100)
   expect_s3_class(sp, "data.frame")
 })
