@@ -28,7 +28,7 @@
 #'
 #' @aliases correct_rt
 #' @import ptw
-#' @importFrom stats approx cor
+#' @importFrom stats approx cor mad
 #' @param chrom_list List of chromatograms in matrix format, sharing a common
 #' time axis (see [`preprocess`]).
 #' @param lambdas A character or numeric vector specifying the wavelengths to
