@@ -68,7 +68,9 @@ Requires a \code{window_limited} column, which peak lists made with
 }
 \value{
 A filtered \code{peak_list} object containing only peaks that satisfy the
-specified criteria.
+specified criteria. The call is appended to the \code{filters} attribute, as a
+line of code that repeats it; \code{print} shows it, and \code{\link{get_peaktable}}
+copies it into \code{args$filters}.
 }
 \description{
 Filters peaks from a \code{peak_list} object by height, area, width, retention

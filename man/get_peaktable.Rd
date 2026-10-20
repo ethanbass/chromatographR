@@ -160,7 +160,8 @@ automatically from the chromatograms.
 \item \code{ref_spectra}: A matrix of reference spectra (in a wavelength × peak
 configuration). \code{NA} until added with \code{\link{attach_ref_spectra}}.
 \item \code{args}: A list of the arguments given to \code{\link{get_peaktable}} to generate
-the peak table.
+the peak table. Its \code{filters} element holds any \code{\link{filter_peaks}} and
+\code{\link{filter_peaktable}} calls applied, as code, separated by \code{"; "}.
 }
 }
 \description{

@@ -569,6 +569,8 @@ print.peak_list <- function(x, ...) {
   if (!is.null(meta$sd_max))
     cat(sprintf("Width filter: FWHM <= %s * %s timepoints (from sd_max)\n",
                 signif(FWHM_CONST, 4), meta$sd_max))
+  if (!is.null(meta$filters))
+    cat(sprintf("Filtered with: %s\n", meta$filters), sep = "")
   cat(sprintf("Total peaks: %d (mean %s per sample)\n",
               n_peaks, mean_peaks))
   if (!is.na(meta$chrom_list))

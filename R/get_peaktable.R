@@ -127,7 +127,8 @@ PEAK_META_COLS <- c("sd", "width", "tau", "FWHM", "r.squared", "purity",
 #' * `ref_spectra`: A matrix of reference spectra (in a wavelength × peak
 #' configuration). `NA` until added with [`attach_ref_spectra`].
 #' * `args`: A list of the arguments given to [`get_peaktable`] to generate
-#' the peak table.
+#' the peak table. Its `filters` element holds any [`filter_peaks`] and
+#' [`filter_peaktable`] calls applied, as code, separated by `"; "`.
 #' @author Ron Wehrens, Ethan Bass
 #' @note Peak lists produced by `get_peaks(windows = )` are grouped by
 #' integration window rather than clustered by retention time, including after
@@ -350,6 +351,7 @@ get_peaktable.default <- function(peak_list, chrom_list, response = c("area", "h
                         summarized_by = summarize_by,
                         time_unit = get_metadata_attribute(peak_list, "time_unit"),
                         rt_unit = get_time_unit(peak_list),
+                        filters = join_filters(attr(peak_list, "filters")),
                         intensity_unit = get_metadata_attribute(peak_list, "intensity_unit")
                         ))
   ids <- target_ids(targets, names(peak_list[[1]]))
@@ -540,6 +542,7 @@ matched_peak_table <- function(result, pks, lambdas, reference, reference_sample
       normalization_by = NA,
       time_unit        = get_metadata_attribute(pks, "time_unit"),
       rt_unit          = get_time_unit(pks),
+      filters          = join_filters(attr(pks, "filters")),
       intensity_unit   = get_metadata_attribute(pks, "intensity_unit")
     ))
   attr(pt, "warp_models") <- attr(pks, "warp_models")

@@ -272,6 +272,9 @@ without requiring a peak table. See `?annotate_peaks`.
 * `get_peaktable` now fills `sample_meta` with any fields added to the
 chromatograms with `chromConverter::add_metadata` (chromConverter 0.11.0 or
 later).
+* `filter_peaks` and `filter_peaktable` now record each call as code, which
+`print` shows for peak lists and `get_peaktable` stores in `args$filters`. See
+`?filter_peaks`.
 * `cluster_spectra` now numbers and colors each box on the dendrogram to match
 its spectra panel, with colors set by `col`, and boxes only clusters passing
 `min_size` and `max_size`.
@@ -370,6 +373,9 @@ that it stays aligned with `tab`.
 * `combine_peaks(choose = "least_sparse")` now keeps the peak detected in the
 most samples. Previously every candidate tied and the first was kept.
 * `filter_peaktable` now errors when `rts` is combined with `min_rt` or `max_rt`.
+* `write_peaktable(what = "args")` now writes a CSV that reads back. Previously
+arguments holding several values, such as two or more wavelengths, spilled into
+extra columns.
 * `reshape_peaktable` now keeps `lambda` and `rt` when peaks are renamed with a
 named `peaks` vector. Previously both were `NA`.
 * `reshape_peaktable` now errors on `metadata` columns it cannot find, which

@@ -43,7 +43,8 @@ write_peaktable <- function(peak_table, path, filename = "peak_table",
                  "sample_meta" = peak_table$sample_meta,
                  "instrument_meta" = peak_table$instrument_meta,
                  "ref_spectra" = peak_table$ref_spectra,
-                 "args" = as.matrix(peak_table$args)
+                 "args" = as.matrix(vapply(peak_table$args, flatten_arg,
+                                          character(1)))
   )
 
   sheets <- sheets[what]
@@ -64,6 +65,17 @@ write_peaktable <- function(peak_table, path, filename = "peak_table",
   } 
   # write sheets
   writer(sheets, file = path, rowNames = TRUE)
+}
+
+#' Flatten a peak table argument to one string
+#'
+#' @param a One element of a peak table's `args`.
+#' @return Its values joined by `", "`, or `NA` if it has none.
+#' @author Ethan Bass
+#' @noRd
+flatten_arg <- function(a){
+  a <- unlist(a)
+  if (!length(a) || all(is.na(a))) NA_character_ else paste(a, collapse = ", ")
 }
 
 #' Write CSV from peak_table

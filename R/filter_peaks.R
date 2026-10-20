@@ -40,7 +40,9 @@
 #' `fit = "raw"` or before chromatographR 0.9.0 lack. Peaks whose
 #' `window_limited` is `NA` are retained.
 #' @return A filtered `peak_list` object containing only peaks that satisfy the
-#' specified criteria.
+#' specified criteria. The call is appended to the `filters` attribute, as a
+#' line of code that repeats it; `print` shows it, and [`get_peaktable`]
+#' copies it into `args$filters`.
 #' @author Ron Wehrens, Ethan Bass
 #' @note The structure of `filter_peaks` is adapted from the `filterPeaks`
 #' function in Ron Wehrens' [alsace](https://github.com/rwehrens/alsace)
@@ -81,6 +83,8 @@ filter_peaks <- function(peak_list, min_height, min_area,
       max_fwhm <- FWHM_CONST * max_sd
     }
   }
+  supplied <- setdiff(names(match.call())[-1], "peak_list")
+  applied <- describe_call("filter_peaks", mget(sub("_sd$", "_fwhm", supplied)))
   x <- do.call(rbind, do.call(rbind, peak_list))
   keep_na_height <- missing(min_height)
   keep_na_area <- missing(min_area)
@@ -123,7 +127,34 @@ filter_peaks <- function(peak_list, min_height, min_area,
                            keep_by_flag(comp, "converged", converged) &
                            keep_by_flag(comp, "window_limited",
                                         window_limited)), , drop = FALSE]), smpl))
-  transfer_metadata(result, peak_list, transfer_class = TRUE)
+  result <- transfer_metadata(result, peak_list, transfer_class = TRUE)
+  attr(result, "filters") <- c(attr(peak_list, "filters"), applied)
+  result
+}
+
+#' Describe a call as code
+#'
+#' @param fn The function name.
+#' @param args A named list of the arguments supplied.
+#' @return A single string, such as `"filter_peaks(min_fwhm = 0.1)"`.
+#' @author Ethan Bass
+#' @noRd
+describe_call <- function(fn, args){
+  vals <- vapply(args, function(a) paste(deparse(a), collapse = " "),
+                 character(1))
+  sprintf("%s(%s)", fn, paste(names(args), vals, sep = " = ", collapse = ", "))
+}
+
+#' Join filter calls for a peak table's `args`
+#'
+#' @param old The calls recorded so far: `NULL`, `NA`, or a string.
+#' @param new Further calls, as a character vector.
+#' @return The calls joined by `"; "`, or `NA` if there are none.
+#' @author Ethan Bass
+#' @noRd
+join_filters <- function(old, new = NULL){
+  calls <- c(old[!is.na(old)], new)
+  if (length(calls)) paste(calls, collapse = "; ") else NA
 }
 
 #' Validate a fit-diagnostic filter
@@ -192,7 +223,8 @@ keep_by_flag <- function(comp, col, want){
 #' Defaults to `0`, which requires an exact match.
 #' @return A filtered `peak_table` containing only features (columns) that
 #' satisfy the specified criteria. The same feature indices are applied to all
-#' `peak_table` components.
+#' `peak_table` components. The call is appended to `args$filters`, as a line
+#' of code that repeats it.
 #' @author Ethan Bass
 #' @seealso [`get_peaktable`], [`filter_peaks`]
 #' @examples
@@ -213,6 +245,8 @@ filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value,
     warning("Nothing to filter...")
     return(peak_table)
   }
+  applied <- describe_call("filter_peaktable",
+                           mget(setdiff(names(match.call())[-1], "peak_table")))
   peak_table$pk_meta["rt",] <- as.numeric(peak_table$pk_meta["rt",])
   what <- match.arg(what, c("median", "mean", "max"))
   if (!missing(rts)){
@@ -268,5 +302,7 @@ filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value,
   } else (idx.conv <- seq_along(peak_table$tab))
   idx <- Reduce(intersect, list(idx.rt, idx.val, idx.lambda, idx.zeros,
                                 idx.conv))
-  peak_table[, idx]
+  peak_table <- peak_table[, idx]
+  peak_table$args$filters <- join_filters(peak_table$args$filters, applied)
+  peak_table
 }

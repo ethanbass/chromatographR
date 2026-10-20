@@ -210,6 +210,33 @@ test_that("filter_peaks retains peaks whose flag is NA", {
                c(1, 3, 4))
 })
 
+test_that("filter calls are recorded as code that repeats them", {
+  f <- suppressWarnings(filter_peaks(.pks, min_fwhm = 0.05))
+  f <- suppressWarnings(filter_peaks(f, converged = TRUE, max_rt = 2))
+  expect_equal(attr(f, "filters"), c("filter_peaks(min_fwhm = 0.05)",
+                                     "filter_peaks(max_rt = 2, converged = TRUE)"))
+  expect_output(print(f), "Filtered with: filter_peaks\\(min_fwhm = 0.05\\)")
+  pt <- get_peaktable(f)
+  expect_equal(pt$args$filters, paste(attr(f, "filters"), collapse = "; "))
+  pt <- filter_peaktable(pt, min_rt = 0)
+  expect_match(pt$args$filters, "; filter_peaktable\\(min_rt = 0\\)$")
+  expect_true(is.na(get_peaktable(.pks)$args$filters))
+  expect_equal(filter_peaktable(pk_tab, min_rt = 12)$args$filters,
+               "filter_peaktable(min_rt = 12)")
+})
+
+test_that("write_peaktable writes args with several values as one field", {
+  pt <- get_peaktable(suppressWarnings(
+    filter_peaks(.pks, min_fwhm = 0.05, max_rt = 2)))
+  pt$args$lambdas <- list(c("210", "260"))
+  d <- withr::local_tempdir()
+  write_peaktable(pt, d, what = "args")
+  a <- utils::read.csv(file.path(d, "peak_table-args.csv"), row.names = 1)
+  expect_equal(ncol(a), 1)
+  expect_equal(a["lambdas", 1], "210, 260")
+  expect_equal(a["filters", 1], pt$args$filters)
+})
+
 test_that("summary of a peak table reports the retention time unit", {
   cl <- lapply(.cl, function(m) structure(m, time_unit = "Minutes"))
   pks <- get_peaks(cl, lambdas = "220", fit = "gaussian", smooth_type = "none",
