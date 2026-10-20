@@ -342,7 +342,7 @@ for (w in c(10, 28)) {
 With a 10-point smoothing window, the two fitted shapes follow the trace. With a
 28-point smoothing window, a single broad shape is fitted to the whole region,
 missing both summits. The fitted values show the same thing, at two more window
-sizes. Each row gives the number of fitted peaks that are at leaast half the 
+sizes. Each row gives the number of fitted peaks that are at least half the 
 true height, the widest of their FWHMs (each true peak is
 `r round(2.355 * 0.12 / 0.01)` timepoints wide), and the lowest `r.squared`:
 
