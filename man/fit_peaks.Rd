@@ -8,7 +8,6 @@ fit_peaks(
   x,
   lambda,
   pos = NULL,
-  max_fwhm = NULL,
   sd_max = NULL,
   fit = c("egh", "bemg", "gaussian", "raw"),
   max_iter = 1000,
@@ -29,13 +28,9 @@ wavelength present in \code{x}.}
 \code{\link{find_peaks}}, with columns \code{pos}, \code{lower} and \code{upper} giving row indices
 of \code{x}. If \code{NULL} (the default), \code{\link{find_peaks}} is run on \code{x} at \code{lambda}.}
 
-\item{max_fwhm}{Maximum peak width, as a full width at half maximum, in
-index units. Peaks whose \code{FWHM} could not be measured (\code{NA}) are retained.
-Defaults to \code{NULL}, which applies no width filter.}
-
-\item{sd_max}{The \code{sd_max} argument is deprecated. Please use \code{max_fwhm}
+\item{sd_max}{Deprecated. Filter peaks by width with \code{\link{filter_peaks}}
 instead. If supplied, it is applied as a cutoff on \code{FWHM} of
-\code{2.355 * sd_max}.}
+\code{2.355 * sd_max} timepoints.}
 
 \item{fit}{Peak model. Options are bidirectional exponentially modified
 Gaussian (\code{"bemg"}), exponential-Gaussian hybrid (\code{"egh"}), \code{"gaussian"},

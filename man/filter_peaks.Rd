@@ -47,9 +47,8 @@ time units of the peak list. Peaks whose \code{FWHM} could not be measured
 (\code{NA}) are retained.}
 
 \item{max_fwhm}{Maximum peak width, as a full width at half maximum, in the
-time units of the peak list. Expressed in the same units as \code{max_fwhm} in
-\code{\link{get_peaks}}, so the same value transfers between the two. Peaks whose
-\code{FWHM} could not be measured (\code{NA}) are retained.}
+time units of the peak list. Peaks whose \code{FWHM} could not be measured
+(\code{NA}) are retained.}
 
 \item{converged}{Logical. If \code{TRUE}, retains only peaks whose fit converged;
 if \code{FALSE}, retains only those that did not. A peak has \code{converged == 0}

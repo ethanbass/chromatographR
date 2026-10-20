@@ -229,9 +229,9 @@ legend("topright", "Sloped baseline", bty = "n")
 
 #### Peak filtering
 
-The peak-finding algorithm often detects peaks that are little more than noise. Filtering these out at this stage reduces the cost of peak table construction, which matters most when there are many samples. Use the `max_fwhm` argument to filter by peak width and `min_amplitude` to filter by peak height, or call `filter_peaks` on a `peak_list` that already exists.
+The peak-finding algorithm often detects peaks that are little more than noise. Filtering these out at this stage reduces the cost of peak table construction, which matters most when there are many samples. Call `filter_peaks` on the `peak_list` to filter by peak width (`min_fwhm`, `max_fwhm`), height or area, or pass `min_amplitude` to `get_peaks` to drop low apices before they are fitted.
 
-To set `max_fwhm`, and the peak-finding settings, from the widths of your own peaks, see the [peak-finding article](https://ethanbass.github.io/chromatographR/articles/peak-finding.html).
+To set the width limits, and the peak-finding settings, from the widths of your own peaks, see the [peak-finding article](https://ethanbass.github.io/chromatographR/articles/peak-finding.html).
 
 ### Peak table assembly
 

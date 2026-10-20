@@ -333,13 +333,13 @@ test_that("`targets` is checked against every sample's time range", {
 
 test_that("targets left without a peak are reported", {
   skip_on_cran()
-  expect_warning(expect_warning(
-    get_peaks(Sa_pr, lambdas = "210", max_fwhm = 0.105,
+  expect_warning(
+    get_peaks(Sa_pr, lambdas = "210",
               targets = data.frame(rt = c(10.654, 11.342, 12.123),
-                               name = c("a", "b", "c")),
+                                   name = c("a", "b", "c"),
+                                   tol = c(0.001, 0.001, 0.1)),
               show_progress = FALSE, cl = 1),
-    regexp = "No peak was assigned to the following targets in any sample: a, b\\."),
-    regexp = "discarded for exceeding `max_fwhm`")
+    regexp = "No peak was assigned to the following targets in any sample: a, b\\.")
   expect_warning(
     get_peaks(Sa_pr, lambdas = "210",
               targets = data.frame(rt = c(12.123, 12.123), name = c("x", "y")),
@@ -870,7 +870,6 @@ test_that("the bound does not disturb a peak that fits comfortably inside it", {
   }
 })
 
-# ── max_fwhm is in time units and agrees with filter_peaks ──────────────────
 
 .mk_chrom <- function(dt){
   ts <- seq(0, 3, by = dt)
@@ -878,48 +877,29 @@ test_that("the bound does not disturb a peak that fits comfortably inside it", {
   list(s1 = matrix(y, ncol = 1, dimnames = list(as.character(ts), "220")))
 }
 
-test_that("get_peaks(max_fwhm) and filter_peaks(max_fwhm) select the same peaks", {
+test_that("filter_peaks(max_fwhm) reads widths in time units at any sampling interval", {
   skip_on_cran()
   for (dt in c(0.005, 0.01)){
-    cl <- .mk_chrom(dt)
-    all <- get_peaks(cl, lambdas = "220", max_fwhm = Inf, estimate_purity = FALSE,
+    pks <- get_peaks(.mk_chrom(dt), lambdas = "220", estimate_purity = FALSE,
                      show_progress = FALSE)
-    for (v in c(0.03, 0.1, 1)){
-      a <- suppressWarnings(get_peaks(cl, lambdas = "220", max_fwhm = v,
-                                      estimate_purity = FALSE,
-                                      show_progress = FALSE))[[1]][[1]]
-      b <- suppressWarnings(filter_peaks(all, max_fwhm = v))[[1]][[1]]
-      expect_equal(nrow(a), nrow(b))
-      expect_equal(a$rt, b$rt)
-    }
+    kept <- vapply(c(0.03, 0.1, 1), function(v)
+      nrow(suppressWarnings(filter_peaks(pks, max_fwhm = v))[[1]][[1]]),
+      numeric(1))
+    expect_equal(kept, c(0, 1, 2), info = dt)
   }
-})
-
-test_that("the max_fwhm default applies no width filtering", {
-  skip_on_cran()
-  dt <- 0.005
-  cl <- .mk_chrom(dt)
-  d <- get_peaks(cl, lambdas = "220", estimate_purity = FALSE, show_progress = FALSE)[[1]][[1]]
-  e <- get_peaks(cl, lambdas = "220", max_fwhm = Inf,
-                 estimate_purity = FALSE, show_progress = FALSE)[[1]][[1]]
-  expect_equal(d$rt, e$rt)
-  expect_equal(d$sd, e$sd)
 })
 
 test_that("sd_max is deprecated but keeps its timepoint semantics", {
   skip_on_cran()
   cl <- .mk_chrom(0.005)
-  expect_warning(
-    expect_warning(old <- get_peaks(cl, lambdas = "220", sd_max = 8,
-                                    estimate_purity = FALSE, show_progress = FALSE),
-                   "deprecated"),
-    "discarded")
-  new <- suppressWarnings(get_peaks(cl, lambdas = "220", max_fwhm = FWHM_CONST * 8 * 0.005,
-                   estimate_purity = FALSE, show_progress = FALSE))
+  expect_warning(old <- get_peaks(cl, lambdas = "220", sd_max = 8,
+                                  estimate_purity = FALSE, show_progress = FALSE),
+                 "filter_peaks")
+  new <- filter_peaks(get_peaks(cl, lambdas = "220", estimate_purity = FALSE,
+                                show_progress = FALSE),
+                      max_fwhm = FWHM_CONST * 8 * 0.005)
   expect_length(old[[1]][[1]]$rt, 1)
   expect_equal(old[[1]][[1]]$rt, new[[1]][[1]]$rt)
-  expect_error(get_peaks(cl, lambdas = "220", max_fwhm = 1, sd_max = 50),
-               "not both")
 })
 
 # ── FWHM is a measured width, not a rescaled sigma ──────────────────────────
@@ -1011,25 +991,26 @@ test_that("a raw peak has no fitted sigma and a measured FWHM", {
                nrow(none))
 })
 
+test_that("sd_max is ignored when windows are supplied", {
+  skip_on_cran()
+  cl <- .mk_chrom(0.005)
+  k <- suppressWarnings(suppressMessages(
+    get_peaks(cl, lambdas = "220", windows = matrix(c(0.9, 1.1), nrow = 1),
+              fit = "raw", sd_max = 1e-9, estimate_purity = FALSE,
+              show_progress = FALSE)))
+  expect_equal(nrow(k[[1]][[1]]), 1)
+  expect_false(any(grepl("Width filter", capture.output(print(k)))))
+})
+
 test_that("one max_fwhm transfers across every fit", {
   skip_on_cran()
   cl <- .mk_chrom(0.005)
   n <- vapply(c("gaussian", "egh", "bemg", "raw"), function(f)
-    nrow(suppressWarnings(
-      get_peaks(cl, lambdas = "220", fit = f, max_fwhm = 0.2,
-                estimate_purity = FALSE, show_progress = FALSE))[[1]][[1]]),
+    nrow(suppressWarnings(filter_peaks(
+      get_peaks(cl, lambdas = "220", fit = f, estimate_purity = FALSE,
+                show_progress = FALSE), max_fwhm = 0.2))[[1]][[1]]),
     numeric(1))
   expect_true(all(n == n[["gaussian"]]))
-})
-
-test_that("max_fwhm is ignored when windows are supplied", {
-  skip_on_cran()
-  cl <- .mk_chrom(0.005)
-  k <- suppressMessages(get_peaks(cl, lambdas = "220",
-                                  windows = matrix(c(0.9, 1.1), nrow = 1),
-                                  fit = "raw", max_fwhm = 1e-9,
-                                  estimate_purity = FALSE, show_progress = FALSE))
-  expect_equal(nrow(k[[1]][[1]]), 1)
 })
 
 test_that("filter_peaks can filter on converged and window_limited", {
@@ -1138,9 +1119,12 @@ test_that("get_lambda_idx checks the wavelength of a single-column chromatogram"
   expect_equal(get_lambda_idx("999", lambdas = NA_real_, allow_max = FALSE), 1)
 })
 
-test_that("print.peak_list reports no width filter by default", {
+test_that("print.peak_list reports a width filter only when sd_max sets one", {
   pks <- get_peaks(Sa_pr[1], lambdas = "210", show_progress = FALSE)
-  expect_output(print(pks), "max_fwhm: none")
+  expect_false(any(grepl("Width filter", capture.output(print(pks)))))
+  old <- suppressWarnings(get_peaks(Sa_pr[1], lambdas = "210", sd_max = 50,
+                                    show_progress = FALSE))
+  expect_output(print(old), "Width filter: FWHM <= 2.355 \\* 50 timepoints")
 })
 
 test_that("print.peak_list counts a sample with no peaks as zero", {

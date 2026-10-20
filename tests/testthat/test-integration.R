@@ -131,7 +131,7 @@ test_that("raw integration matches trapezoidal sum of the signal", {
   y <- p$mat[, 1]
   expected_area <- sum((y[-length(y)] + y[-1]) / 2)
   pks <- fit_peaks(p$mat, lambda = "220", pos = pos, fit = "raw",
-                   max_fwhm = NULL, estimate_purity = FALSE)
+                   estimate_purity = FALSE)
   expect_equal(pks$area, expected_area, tolerance = 1e-6)
 })
 
@@ -286,7 +286,7 @@ test_that("egh and bemg return start values for an unfittable window", {
     floor0 <- if (b == "none") 0 else floor_start(y)
     pks <- suppressWarnings(
       fit_peaks(p$mat, lambda = "220", pos = window_pos(p, w), fit = "egh",
-                baseline = b, max_fwhm = NULL, estimate_purity = FALSE))
+                baseline = b, estimate_purity = FALSE))
     expect_equal(pks$rt,     start_center, info = b)
     expect_equal(pks$sd,     start_width,  info = b)
     expect_equal(pks$height, start_height - floor0, info = b)
@@ -295,7 +295,7 @@ test_that("egh and bemg return start values for an unfittable window", {
 
     pks <- suppressWarnings(
       fit_peaks(p$mat, lambda = "220", pos = window_pos(p, w), fit = "bemg",
-                baseline = b, max_fwhm = NULL, estimate_purity = FALSE))
+                baseline = b, estimate_purity = FALSE))
     expect_equal(pks$rt,     start_center, info = b)
     expect_equal(pks$sd,     start_width,  info = b)
     # `h` is the amplitude parameter, which is what starts at the window
@@ -311,11 +311,11 @@ test_that("egh and bemg return start values for an unfittable window", {
   # and the floor terms are their start value, not a fitted value
   pks_flat <- suppressWarnings(
     fit_peaks(p$mat, lambda = "220", pos = window_pos(p, w), fit = "egh",
-              baseline = "flat", max_fwhm = NULL, estimate_purity = FALSE))
+              baseline = "flat", estimate_purity = FALSE))
   expect_equal(pks_flat$floor, floor_start(y))
   pks_sloped <- suppressWarnings(
     fit_peaks(p$mat, lambda = "220", pos = window_pos(p, w), fit = "egh",
-              baseline = "sloped", max_fwhm = NULL, estimate_purity = FALSE))
+              baseline = "sloped", estimate_purity = FALSE))
   expect_equal(pks_sloped$floor_start, floor_start(y))
   expect_equal(pks_sloped$floor_end, floor_start(y))
 })
@@ -410,17 +410,6 @@ test_that("`windows` integrates the supplied window and recovers the area", {
   expect_equal(pks$start, 1)
   expect_equal(pks$end, p$n)
   expect_equal(pks$area, p$true_area, tolerance = 0.01)
-})
-
-test_that("`windows` ignores `max_fwhm`", {
-  skip_on_cran()
-  p <- make_gaussian_chrom()
-  pks <- get_peaks(list(a = p$mat), lambdas = "220", windows = rbind(c(1, p$n)),
-                   fit = "raw", max_fwhm = 1e-9, cl = 1,
-                   show_progress = FALSE)$a[["220"]]
-  expect_equal(nrow(pks), 1L)
-  expect_true(is.na(pks$sd))
-  expect_equal(pks$end - pks$start, p$n - 1)
 })
 
 test_that("windows sharing a boundary act as a drop line and are exactly additive", {
@@ -638,7 +627,7 @@ test_that("get_peaktable falls back to retention time clustering without `window
   skip_on_cran()
   p <- make_gaussian_chrom()
   cl <- list(a = p$mat, b = p$mat)
-  pks <- get_peaks(cl, lambdas = "220", fit = "raw", max_fwhm = NULL, cl = 1,
+  pks <- get_peaks(cl, lambdas = "220", fit = "raw", cl = 1,
                    show_progress = FALSE)
   expect_null(attr(pks, "windows"))
   expect_s3_class(get_peaktable(pks), "peak_table")

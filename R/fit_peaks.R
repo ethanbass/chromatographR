@@ -279,12 +279,9 @@ MIN_WINDOW_PER_FWHM <- 1 / 3
 #' @param pos A `data.frame` of peak apices and boundaries, as returned by
 #' [`find_peaks`], with columns `pos`, `lower` and `upper` giving row indices
 #' of `x`. If `NULL` (the default), [`find_peaks`] is run on `x` at `lambda`.
-#' @param max_fwhm Maximum peak width, as a full width at half maximum, in
-#' index units. Peaks whose `FWHM` could not be measured (`NA`) are retained.
-#' Defaults to `NULL`, which applies no width filter.
-#' @param sd_max The `sd_max` argument is deprecated. Please use `max_fwhm`
+#' @param sd_max Deprecated. Filter peaks by width with [`filter_peaks`]
 #' instead. If supplied, it is applied as a cutoff on `FWHM` of
-#' `2.355 * sd_max`.
+#' `2.355 * sd_max` timepoints.
 #' @param max_iter Maximum number of iterations to use in nonlinear least
 #' squares peak-fitting. Defaults to `1000`.
 #' @param estimate_purity Logical. Whether to estimate purity. Defaults
@@ -374,7 +371,6 @@ MIN_WINDOW_PER_FWHM <- 1 / 3
 #' @keywords internal
 
 fit_peaks <- function (x, lambda, pos = NULL,
-                       max_fwhm = NULL,
                        sd_max = NULL,
                        fit = c("egh", "bemg", "gaussian", "raw"),
                        max_iter = 1000, estimate_purity = FALSE,
@@ -385,16 +381,14 @@ fit_peaks <- function (x, lambda, pos = NULL,
   # `find_peaks` returns a bare vector of apex positions when `bounds = FALSE`,
   # which cannot be integrated, since every peak model needs a window.
   check_bounds_arg(...)
+  cutoff <- NULL
   if (!is.null(sd_max)){
-    if (!missing(max_fwhm))
-      stop("Supply either `max_fwhm` or `sd_max`, not both. `max_fwhm` is a ",
-           "full width at half maximum in timepoints, whereas `sd_max` is a ",
-           "standard deviation in timepoints.")
     warning("The `sd_max` argument is deprecated. It is expressed as a ",
             "standard deviation, which is not a peak width for any model ",
-            "except `\"gaussian\"`. Please use `max_fwhm` instead, which is ",
-            "expressed as a full width at half maximum.", immediate. = TRUE)
-    max_fwhm <- FWHM_CONST * sd_max
+            "except `\"gaussian\"`. Please filter with ",
+            "`filter_peaks(max_fwhm = )` instead, which is expressed as a full ",
+            "width at half maximum.", immediate. = TRUE)
+    cutoff <- FWHM_CONST * sd_max
   }
   fit <- match.arg(fit, c("egh", "bemg", "gaussian", "raw"))
   baseline <- match.arg(baseline, c("none", "flat", "sloped"))
@@ -460,7 +454,7 @@ fit_peaks <- function (x, lambda, pos = NULL,
   huhn <- data.frame(sapply(huhn, as.numeric, simplify = FALSE))
   if (!is.null(pos$target)) huhn$target <- pos$target
   huhn <- drop_unfittable_peaks(huhn, keep = pos_supplied)
-  huhn <- huhn[keep_by_width(huhn$FWHM, max_fwhm), , drop = FALSE]
+  huhn <- huhn[keep_by_width(huhn$FWHM, cutoff), , drop = FALSE]
   df <- try(huhn[which(huhn$rt > 0), ], silent = TRUE)
   if(inherits(df, "try-error")) NA else df
 }
@@ -929,11 +923,6 @@ FIT_FWHM_MIN <- 1
 ## than a property of the method.
 UNDERDETERMINED_WARN_FRAC <- 0.2
 
-## Fraction of detected peaks discarded by `max_fwhm`/`sd_max`, above which
-## `get_peaks` warns that the cutoff may be too tight. Not independently
-## calibrated; reuses `UNDERDETERMINED_WARN_FRAC`'s threshold since both flag
-## the same failure shape (peaks silently missing from the output).
-WIDTH_FILTER_WARN_FRAC <- 0.2
 
 #' Parameter bounds derived from the integration window
 #'

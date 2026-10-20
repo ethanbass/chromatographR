@@ -75,7 +75,7 @@
       print(pks)
     Output
       A peak_list with 4 samples and 1 wavelength(s) (210 nm)
-      Fit method: egh | Time unit: min | max_fwhm: none
+      Fit method: egh | Time unit: min
       Total peaks: 138 (mean 34 per sample)
       Source: Sa_pr
 

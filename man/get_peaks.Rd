@@ -13,7 +13,6 @@ get_peaks(
   tol = 0.1,
   select_by = c("height", "proximity", "none"),
   mod_list = NULL,
-  max_fwhm = NULL,
   sd_max = NULL,
   max_iter = 1000,
   time_unit = NULL,
@@ -47,8 +46,7 @@ when \code{windows} is provided, which allows no other value. See \emph{Peak mod
 retention times (or a single pair of times), giving manual integration
 windows applied to every chromatogram. If provided, peak detection is
 skipped and each window is integrated in every sample. Requires
-\code{fit = "raw"}, and \code{max_fwhm} is ignored. Cannot be combined with
-\code{targets}. Defaults to \code{NULL}. See \emph{Manual integration windows}.}
+\code{fit = "raw"}. Cannot be combined with \code{targets}. Defaults to \code{NULL}. See \emph{Manual integration windows}.}
 
 \item{targets}{Target retention times, as a numeric vector or a table of
 targets (see \code{\link{targeted_analysis}}). If provided, only peaks whose apex
@@ -73,25 +71,18 @@ aligned time axis, so they can be copied from the \code{rt} row of an aligned pe
 still detected and fitted on the unaligned data; use \code{\link{correct_peaks}}
 afterwards to add corrected retention times. Requires \code{targets}.}
 
-\item{max_fwhm}{Maximum peak width, as a full width at half maximum in the
-units of \code{time_unit}. Wider peaks are discarded, with a warning if that
-removes more than 20\% of detected peaks; peaks whose \code{FWHM} could not be
-measured (\code{NA}) are kept. It means the same as \code{max_fwhm} in
-\code{\link{filter_peaks}}. Defaults to
-\code{NULL} (no width filtering). Ignored if \code{windows} is provided. To choose a
-value from your own data, see \code{vignette("chromatographR")}.}
-
-\item{sd_max}{Deprecated; use \code{max_fwhm}. A standard deviation in
+\item{sd_max}{Deprecated. Filter peaks by width with \code{\link{filter_peaks}}
+instead, using \code{min_fwhm} and \code{max_fwhm}. A standard deviation in
 timepoints, converted to a \code{FWHM} cutoff of \code{2.355 * sd_max * dt} in the
-units of \code{time_unit}, where \code{dt} is the chromatogram's time step. \code{NULL}
-disables width filtering. Cannot be combined with \code{max_fwhm}. Ignored if
-\code{windows} is provided.}
+units of \code{time_unit}, where \code{dt} is the chromatogram's time step; wider
+peaks are discarded. \code{NULL} disables width filtering. Ignored if \code{windows}
+is provided.}
 
 \item{max_iter}{Maximum number of iterations for non-linear least squares
 in \code{\link{fit_peaks}}. Defaults to \code{1000}.}
 
 \item{time_unit}{Units for \code{sd}, \code{FWHM}, \code{tau}, \code{tau_right}, \code{tau_left},
-\code{area} and \code{max_fwhm}. Options are minutes
+and \code{area}. Options are minutes
 (\code{"min"}), seconds (\code{"s"}), or milliseconds (\code{"ms"}). Defaults to the time
 unit of \code{chrom_list} (minutes if none is recorded). \code{rt}, \code{start} and \code{end}
 are not converted: they stay in the units of the chromatogram's own time
@@ -314,7 +305,8 @@ retention times, use \code{targets} instead.
 
 \examples{
 data(Sa_pr)
-pks <- get_peaks(Sa_pr, lambdas = c('210'), max_fwhm = 1, fit = "egh")
+pks <- get_peaks(Sa_pr, lambdas = c('210'), fit = "egh")
+pks <- filter_peaks(pks, max_fwhm = 1)
 }
 \references{
 \itemize{

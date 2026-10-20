@@ -26,8 +26,7 @@
 #' retention times (or a single pair of times), giving manual integration
 #' windows applied to every chromatogram. If provided, peak detection is
 #' skipped and each window is integrated in every sample. Requires
-#' `fit = "raw"`, and `max_fwhm` is ignored. Cannot be combined with
-#' `targets`. Defaults to `NULL`. See *Manual integration windows*.
+#' `fit = "raw"`. Cannot be combined with `targets`. Defaults to `NULL`. See *Manual integration windows*.
 #' @param targets Target retention times, as a numeric vector or a table of
 #' targets (see [`targeted_analysis`]). If provided, only peaks whose apex
 #' falls within `tol` of a target are fit, and [`get_peaktable`] groups peaks by target
@@ -47,25 +46,19 @@
 #' aligned time axis, so they can be copied from the `rt` row of an aligned peak table. Peaks are
 #' still detected and fitted on the unaligned data; use [`correct_peaks`]
 #' afterwards to add corrected retention times. Requires `targets`.
-#' @param max_fwhm Maximum peak width, as a full width at half maximum in the
-#' units of `time_unit`. Wider peaks are discarded, with a warning if that
-#' removes more than 20% of detected peaks; peaks whose `FWHM` could not be
-#' measured (`NA`) are kept. It means the same as `max_fwhm` in
-#' [`filter_peaks`]. Defaults to
-#' `NULL` (no width filtering). Ignored if `windows` is provided. To choose a
-#' value from your own data, see `vignette("chromatographR")`.
-#' @param sd_max Deprecated; use `max_fwhm`. A standard deviation in
+#' @param sd_max Deprecated. Filter peaks by width with [`filter_peaks`]
+#' instead, using `min_fwhm` and `max_fwhm`. A standard deviation in
 #' timepoints, converted to a `FWHM` cutoff of `2.355 * sd_max * dt` in the
-#' units of `time_unit`, where `dt` is the chromatogram's time step. `NULL`
-#' disables width filtering. Cannot be combined with `max_fwhm`. Ignored if
-#' `windows` is provided.
+#' units of `time_unit`, where `dt` is the chromatogram's time step; wider
+#' peaks are discarded. `NULL` disables width filtering. Ignored if `windows`
+#' is provided.
 #' @param sd.max The `sd.max` argument is deprecated. Please use `sd_max` instead.
 #' @param max_iter Maximum number of iterations for non-linear least squares
 #' in [`fit_peaks`]. Defaults to `1000`.
 #' @param max.iter The `max.iter` argument is deprecated. Please use `max_iter` 
 #' instead.
 #' @param time_unit Units for `sd`, `FWHM`, `tau`, `tau_right`, `tau_left`,
-#' `area` and `max_fwhm`. Options are minutes
+#' and `area`. Options are minutes
 #' (`"min"`), seconds (`"s"`), or milliseconds (`"ms"`). Defaults to the time
 #' unit of `chrom_list` (minutes if none is recorded). `rt`, `start` and `end`
 #' are not converted: they stay in the units of the chromatogram's own time
@@ -264,7 +257,8 @@
 #' 
 #' @examples
 #' data(Sa_pr)
-#' pks <- get_peaks(Sa_pr, lambdas = c('210'), max_fwhm = 1, fit = "egh")
+#' pks <- get_peaks(Sa_pr, lambdas = c('210'), fit = "egh")
+#' pks <- filter_peaks(pks, max_fwhm = 1)
 #' @seealso [`find_peaks`], [`fit_peaks`], [`print.peak_list`], 
 #' \code{\link{[.peak_list}}, [`targeted_analysis`]
 #' @export get_peaks
@@ -275,7 +269,7 @@ get_peaks <- function(chrom_list, lambdas,
                       windows = NULL, targets = NULL, tol = 0.1,
                       select_by = c("height", "proximity", "none"),
                       mod_list = NULL,
-                      max_fwhm = NULL, sd_max = NULL, max_iter = 1000,
+                      sd_max = NULL, max_iter = 1000,
                       time_unit = NULL,
                       baseline = c("none", "flat", "sloped"),
                       estimate_purity = FALSE, purity_args = list(),
@@ -284,22 +278,14 @@ get_peaks <- function(chrom_list, lambdas,
   check_duplicated_names(names(chrom_list), what = "chrom_list")
   if (estimate_purity) check_purity_args(purity_args)
   max_iter <- resolve_deprecated(max.iter, max_iter)
-  # `sd_max = NULL` was the documented way to switch width filtering off, so an
-  # explicitly supplied `NULL` has to stay distinguishable from the default.
-  sd_max_supplied <- !missing(sd_max) || !is.null(sd.max)
   sd_max <- resolve_deprecated(sd.max, sd_max)
-  if (sd_max_supplied){
-    if (!missing(max_fwhm))
-      stop("Supply either `max_fwhm` or `sd_max`, not both. `max_fwhm` is a ",
-           "full width at half maximum in the time units of the chromatogram, ",
-           "whereas `sd_max` is a standard deviation in timepoints.")
-    if (!is.null(sd_max))
-      warning("The `sd_max` argument is deprecated. It is expressed as a ",
-              "standard deviation in timepoints, which is not a peak width ",
-              "for any model except `\"gaussian\"`. Please use `max_fwhm` ",
-              "instead, which is expressed as a full width at half maximum in ",
-              "the time units of the chromatogram, like `max_fwhm` in ",
-              "`filter_peaks`.", immediate. = TRUE)
+  if (!is.null(sd_max)){
+    warning("The `sd_max` argument is deprecated. It is expressed as a ",
+            "standard deviation in timepoints, which is not a peak width ",
+            "for any model except `\"gaussian\"`. Please filter with ",
+            "`filter_peaks(max_fwhm = )` instead, which is expressed as a full ",
+            "width at half maximum in the time units of the chromatogram.",
+            immediate. = TRUE)
   }
   time_unit <- resolve_deprecated(time.units, time_unit)
   axis_unit <- get_time_unit(chrom_list, na_value = "min")
@@ -393,11 +379,9 @@ get_peaks <- function(chrom_list, lambdas,
     tdiff <- get_time_resolution(chrom_list, idx = sample)
     noise_variance <- if (estimate_purity)
       hoist_noise_variance(chrom_list[[sample]], purity_args) else NULL
-    cutoff <- if (sd_max_supplied){
-      if (is.null(sd_max)) NULL else FWHM_CONST * sd_max * tdiff * tfac
-    } else max_fwhm
+    cutoff <- if (!is.null(sd_max))
+      FWHM_CONST * sd_max * tdiff * tfac
     aligned_times <- if (!is.null(to_ref)) all_times[[sample]]
-    n_width <- c(0L, 0L)
     ptable <- lapply(lambdas, function(lambda){
       y <- chrom_list[[sample]][, get_lambda_idx(lambda, get_lambdas(chrom_list[[sample]]),
                                                  allow_max = FALSE)]
@@ -414,7 +398,7 @@ get_peaks <- function(chrom_list, lambdas,
         p[!duplicated(p[, c("lower", "upper")]), , drop = FALSE]
       }
       pks <- fit_peaks(chrom_list[[sample]], lambda = lambda, fit = fit,
-                       pos = pos, max_iter = max_iter, max_fwhm = NULL,
+                       pos = pos, max_iter = max_iter,
                        estimate_purity = estimate_purity,
                        purity_args = purity_args,
                        noise_variance = noise_variance,
@@ -430,9 +414,7 @@ get_peaks <- function(chrom_list, lambdas,
       pks <- convert_indices_to_times(pks, timepoints = timepoints,
                                       tdiff = tdiff, tfac = tfac)
       if (is.null(windows)){
-        n_before <- nrow(pks)
         pks <- pks[keep_by_width(pks$FWHM, cutoff), , drop = FALSE]
-        n_width <<- n_width + c(n_before, nrow(pks))
       }
       pks
     })
@@ -440,7 +422,6 @@ get_peaks <- function(chrom_list, lambdas,
     if (collapse){
       ptable <- do.call(rbind, ptable)
     }
-    attr(ptable, "n_width") <- n_width
     ptable <- transfer_metadata(ptable, chrom_list[[sample]],
                                 exclude = c('names','row.names','dim',
                                               'dimnames', 'estimated_baseline', "format_out",
@@ -448,8 +429,6 @@ get_peaks <- function(chrom_list, lambdas,
     ptable
   }
   result <- laplee(setNames(seq_along(chrom_list), names(chrom_list)), fit_sample)
-  n_width <- rowSums(vapply(result, attr, numeric(2), "n_width"))
-  result[] <- lapply(result, `attr<-`, "n_width", NULL)
   tables <- lapply(result, function(s) if (is.data.frame(s)) list(s) else s)
   if (!is.null(targets)){
     found <- seq_len(nrow(targets)) %in%
@@ -457,48 +436,23 @@ get_peaks <- function(chrom_list, lambdas,
     if (any(!found)){
       label <- ifelse(is.na(targets$name), targets$rt, targets$name)
       warning(sprintf(
-        "No peak was assigned to the following targets in any sample: %s.\n     Either none was found within `tol` (try a larger `tol`, or check whether `max_fwhm` removed it), or its peak went to another target.",
+        "No peak was assigned to the following targets in any sample: %s.\n     Either none was found within `tol` (try a larger `tol`), or its peak went to another target.",
         paste(label[!found], collapse = ", ")), immediate. = TRUE)
     }
   }
 
   if (is.null(windows)){
-    warn_if_width_filtered(n_width[1], n_width[2])
     warn_if_underdetermined(tables, chrom_list, fit, baseline)
   }
   structure(result,
             chrom_list = chrom_list_string,
-            lambdas = lambdas, fit = fit, sd_max = sd_max, max_fwhm = max_fwhm,
+            lambdas = lambdas, fit = fit,
+            sd_max = if (is.null(windows)) sd_max,
             max_iter = max_iter, windows = windows, targets = targets,
             time_unit = time_unit,
             baseline = baseline,
             intensity_unit = get_metadata_attribute(chrom_list[[1]], "detector_y_unit"),
             class = c("peak_list", "list"))
-}
-
-#' Report a peak list dominated by width-filtered peaks
-#'
-#' `max_fwhm`/`sd_max` discard peaks silently, which is invisible in the
-#' returned peak list unless the count of detected peaks is compared against
-#' the count before filtering. A large discarded share usually means the
-#' cutoff was set too tight for this data, so it's surfaced as a warning
-#' rather than left for the user to notice from a suspiciously short peak
-#' list.
-#'
-#' @param n_before,n_after Peak counts before and after the width filter,
-#' summed over samples and wavelengths.
-#' @return `NULL`, invisibly; called for its warning.
-#' @author Ethan Bass
-#' @noRd
-warn_if_width_filtered <- function(n_before, n_after){
-  if (n_before == 0) return(invisible(NULL))
-  frac <- 1 - n_after / n_before
-  if (frac > WIDTH_FILTER_WARN_FRAC){
-    warning(sprintf(
-      "%d of %d detected peaks (%.0f%%) were discarded for exceeding `max_fwhm`.\n     If this is unexpected, `max_fwhm` may be set too tight for this data; see `?get_peaks`.",
-      n_before - n_after, n_before, 100 * frac), immediate. = TRUE, call. = FALSE)
-  }
-  invisible(NULL)
 }
 
 #' Report a peak list dominated by unfittable windows
@@ -611,13 +565,10 @@ print.peak_list <- function(x, ...) {
   
   cat(sprintf("A peak_list with %d samples and %d wavelength(s) (%s nm)\n",
               n_samples, length(meta$lambdas), lambdas))
-  cat(sprintf("Fit method: %s | Time unit: %s | max_fwhm: %s\n",
-              meta$fit, meta$time_unit,
-              if (!is.null(meta$max_fwhm)) meta$max_fwhm
-              else if (!is.null(meta$sd_max))
-                sprintf("%s * %s timepoints (from sd_max)",
-                        signif(FWHM_CONST, 4), meta$sd_max)
-              else "none"))
+  cat(sprintf("Fit method: %s | Time unit: %s\n", meta$fit, meta$time_unit))
+  if (!is.null(meta$sd_max))
+    cat(sprintf("Width filter: FWHM <= %s * %s timepoints (from sd_max)\n",
+                signif(FWHM_CONST, 4), meta$sd_max))
   cat(sprintf("Total peaks: %d (mean %s per sample)\n",
               n_peaks, mean_peaks))
   if (!is.na(meta$chrom_list))

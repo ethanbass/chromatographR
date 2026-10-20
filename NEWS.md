@@ -80,8 +80,8 @@ behavior; see *Choosing the smoothing window* in `?find_peaks`.
 because the argument thresholded the second derivative, not the slope.
 For now, the old names still work with a deprecation warning.
 * `get_peaks` and `fit_peaks` no longer filter on peak width by default.
-`sd_max` used to drop peaks with sd > 50 timepoints. Its replacement,
-`max_fwhm`, defaults to no filtering; set it to restore the filter.
+Previously `sd_max` dropped peaks with sd > 50 timepoints; to filter by
+width, call `filter_peaks(max_fwhm = )` on the result.
 
 #### Peak purity
 
@@ -139,8 +139,9 @@ zero, and most `pk_tab` peak names have shifted; for example, `V13` is now `V11`
 work, with a warning. `init.coef` and
 `max.only` keep their names, since they are passed through to external
 functions that define them.
-* Deprecated `sd_max` in `get_peaks` and `fit_peaks`, and `min_sd`/`max_sd` in
-`filter_peaks`, in favor of `min_fwhm` and `max_fwhm`. A standard deviation is
+* Deprecated `sd_max` in `get_peaks` and `fit_peaks` in favor of
+`filter_peaks(max_fwhm = )`, and `min_sd`/`max_sd` in `filter_peaks` in favor
+of `min_fwhm` and `max_fwhm`. A standard deviation is
 equivalent to peak width only for `fit = "gaussian"`. See `?filter_peaks`.
 * Renamed the Whittaker smoothing penalty passed to `preprocess` and
 `correct_baseline` from `lambda` to `stiffness`, reserving `lambda` for

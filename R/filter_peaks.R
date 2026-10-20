@@ -23,9 +23,8 @@
 #' time units of the peak list. Peaks whose `FWHM` could not be measured
 #' (`NA`) are retained.
 #' @param max_fwhm Maximum peak width, as a full width at half maximum, in the
-#' time units of the peak list. Expressed in the same units as `max_fwhm` in
-#' [`get_peaks`], so the same value transfers between the two. Peaks whose
-#' `FWHM` could not be measured (`NA`) are retained.
+#' time units of the peak list. Peaks whose `FWHM` could not be measured
+#' (`NA`) are retained.
 #' @param converged Logical. If `TRUE`, retains only peaks whose fit converged;
 #' if `FALSE`, retains only those that did not. A peak has `converged == 0`
 #' either because the optimizer stopped short of convergence or because no
