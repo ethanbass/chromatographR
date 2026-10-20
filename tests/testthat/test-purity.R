@@ -426,8 +426,6 @@ test_that("the purity band fits inside the plot region", {
   expect_lt(usr[3], -0.1 * diff(range(y, na.rm = TRUE)) * 2)
 })
 
-### threshold formula ##########################################################
-
 test_that("the purity band keeps the zoom when the window sits above zero", {
   skip_on_cran()
   data(Sa_pr)
@@ -444,6 +442,8 @@ test_that("the purity band keeps the zoom when the window sits above zero", {
   expect_gt(with_band[3], 400)
   expect_lt(with_band[3], zoomed[3])
 })
+
+### threshold formula ##########################################################
 
 test_that("the threshold is the product of the two reliabilities", {
   # the threshold is the similarity expected between two noisy measurements of

@@ -228,7 +228,7 @@ test_that("get_spectra scale_spectrum normalizes to [0, 1]", {
 
 test_that("get_spectra errors when neither peak_table nor chrom_list provided", {
   expect_error(get_spectra("13.75", what = "rt"),
-               regexp = "Must provide either")
+               regexp = "Must provide either a peak_table or a chrom_list")
 })
 
 test_that("plot_spectrum works with ggplot2", {
@@ -435,10 +435,10 @@ test_that("plot_chroms can subset chromatograms correctly", {
 test_that("plot_chroms handles unrecognized character idx", {
   data(Sa_warp)
   expect_error(plot_chroms(Sa_warp, lambdas = "210", idx = "bad_name"),
-               regexp = "could not be found")
+               regexp = "Chromatogram could not be found")
   expect_warning(plot_chroms(Sa_warp, lambdas = "210",
                              idx = c(names(Sa_warp)[1], "bad_name")),
-                 regexp = "bad_name")
+                 regexp = "following chromatograms could not be found")
 })
 
 # run the following line to activate plotly tests:
@@ -931,12 +931,19 @@ test_that("scan_chrom returns the spectrum when export_spectrum = TRUE", {
   expect_s3_class(sp, "data.frame")
 })
 
+test_that("get_spectra asks for a peak_table when what = 'peak'", {
+  data(Sa_warp)
+  expect_error(get_spectra("V12", chrom_list = Sa_warp),
+               "A `peak_table` must be provided")
+})
+
 test_that("plot_baseline accepts a vector with an attached baseline", {
   data(Sa_pr)
   x <- correct_baseline(Sa_pr[[1]][, "210"], attach_baseline = TRUE)
   pdf(NULL); on.exit(dev.off())
   expect_match(plot_baseline(x), "als")
 })
+
 test_that("plot_chrom_contour draws one sample across wavelengths", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")

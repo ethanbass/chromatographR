@@ -293,13 +293,22 @@ test_that("PTW plot displays correctly", {
 test_that("plot_chroms works to plot alignments", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
+  data(Sa_pr); data(Sa_warp)
   alignment <- function(){
     par(mfrow = c(2,1))
-    plot_chroms(warp, lambdas = "210", show_legend = TRUE)
-    plot_chroms(dat.pr, lambdas = "210", show_legend = TRUE)
+    plot_chroms(Sa_warp, lambdas = "210", show_legend = TRUE)
+    plot_chroms(Sa_pr, lambdas = "210", show_legend = TRUE)
   }
   vdiffr::expect_doppelganger("alignment", alignment)
-  expect_error(plot_chroms(pktab))
+})
+
+test_that("plot_chroms accepts a peak table", {
+  data(pk_tab)
+  pdf(NULL)
+  on.exit(dev.off())
+  expect_no_error(plot_chroms(pk_tab, lambdas = "210"))
+  expect_error(plot_chroms("not a chrom_list"),
+               regexp = "Please supply a list of chromatograms")
 })
 
 test_that("plot_chroms can subset chromatograms correctly", {
@@ -642,9 +651,10 @@ test_that("strip plot works", {
   skip_on_os("windows")
   skip_if_not_installed("vdiffr")
   skip_on_ci()
+  data(Sa_pr)
+  pks <- get_peaks(Sa_pr, lambdas = "210", cl = 1, show_progress = FALSE)
   plot_peak_table <- function(){
-    pktab <- get_peaktable(pks_egh, plot_it = TRUE,
-                           ask = FALSE)
+    pktab <- get_peaktable(pks, plot_it = TRUE, ask = FALSE)
   }
   
   vdiffr::expect_doppelganger("peak_table_plot", plot_peak_table)
@@ -1159,6 +1169,9 @@ test_that("plot.peak_list draws raw peaks against padded dimnames", {
 test_that("plot.ptw_list works", {
   skip_on_cran()
   skip_if_not_installed("vdiffr")
+  data(Sa_pr)
+  warping.models <- correct_rt(Sa_pr, lambdas = c("210", "260", "318"),
+                               what = "models", show_progress = FALSE)
   plot_ptw_list_traces_base <- function(){
     plot(warping.models, what = "traces", engine = "base")
   }
@@ -1250,6 +1263,9 @@ test_that("plot.ptw_list (base) works with plotly", {
   skip_if_not_installed("reticulate")
   skip_if_not_installed("rsvg")
   
+  data(Sa_pr)
+  warping.models <- correct_rt(Sa_pr, lambdas = c("210", "260", "318"),
+                               what = "models", show_progress = FALSE)
   plot_ptw_list_traces_plotly <- suppressWarnings(plot(warping.models, 
                                                        what = "traces", 
                                                        engine = "plotly")
@@ -1266,6 +1282,9 @@ test_that("plot.ptw_list (heatmap) works with plotly", {
   skip_if_not_installed("reticulate")
   skip_if_not_installed("rsvg")
   
+  data(Sa_pr)
+  warping.models <- correct_rt(Sa_pr, lambdas = c("210", "260", "318"),
+                               what = "models", show_progress = FALSE)
   plot_ptw_list_heatmap_plotly <- plot(warping.models, what = "heatmap", 
                                        engine = "plotly")
   
