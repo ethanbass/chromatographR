@@ -30,8 +30,12 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: github::r-lib/pkgdown, github::ethanbass/chromConverter, local::.
+          extra-packages: github::r-lib/pkgdown, local::.
           needs: website
+
+      - name: Install dev chromConverter
+        run: pak::pkg_install("ethanbass/chromConverter")
+        shell: Rscript {0}
 
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
