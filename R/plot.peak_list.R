@@ -301,7 +301,7 @@ plot_matched_ladder <- function(x, idx, rt_ref, ref_name, cor_col, pal, zlim,
   xlab <- xlab %||% sprintf("Retention time (reference: %s)", ref_name)
   plot(NA, xlim = xlim, ylim = ylim, yaxt = "n", ylab = ylab, xlab = xlab, ...)
   axis(2, at = y, labels = names(x)[idx], las = 1, tick = FALSE)
-  shade <- y[c(FALSE, TRUE)]
+  shade <- y[seq_along(y) %% 2 == 0]
   if (length(shade) > 0){
     rect(par("usr")[1], shade - 0.5, par("usr")[2], shade + 0.5,
          col = "gray96", border = NA)
