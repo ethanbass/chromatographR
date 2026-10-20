@@ -58,7 +58,7 @@ Defaults to \code{0}, which requires an exact match.}
 A filtered \code{peak_table} containing only features (columns) that
 satisfy the specified criteria. The same feature indices are applied to all
 \code{peak_table} components. The call is appended to \code{args$filters}, as a line
-of code that repeats it.
+of code with numbers to 15 significant digits.
 }
 \description{
 Filters features (columns) in a \code{peak_table}. Filtering is

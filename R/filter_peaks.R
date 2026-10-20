@@ -41,8 +41,8 @@
 #' `window_limited` is `NA` are retained.
 #' @return A filtered `peak_list` object containing only peaks that satisfy the
 #' specified criteria. The call is appended to the `filters` attribute, as a
-#' line of code that repeats it; `print` shows it, and [`get_peaktable`]
-#' copies it into `args$filters`.
+#' line of code with numbers to 15 significant digits; `print` shows it, and
+#' [`get_peaktable`] copies it into `args$filters`.
 #' @author Ron Wehrens, Ethan Bass
 #' @note The structure of `filter_peaks` is adapted from the `filterPeaks`
 #' function in Ron Wehrens' [alsace](https://github.com/rwehrens/alsace)
@@ -83,7 +83,7 @@ filter_peaks <- function(peak_list, min_height, min_area,
       max_fwhm <- FWHM_CONST * max_sd
     }
   }
-  supplied <- setdiff(names(match.call())[-1], "peak_list")
+  supplied <- supplied_args(match.call(), environment(), "peak_list")
   applied <- describe_call("filter_peaks", mget(sub("_sd$", "_fwhm", supplied)))
   x <- do.call(rbind, do.call(rbind, peak_list))
   keep_na_height <- missing(min_height)
@@ -130,6 +130,21 @@ filter_peaks <- function(peak_list, min_height, min_area,
   result <- transfer_metadata(result, peak_list, transfer_class = TRUE)
   attr(result, "filters") <- c(attr(peak_list, "filters"), applied)
   result
+}
+
+#' Names of the arguments a call supplied
+#'
+#' @param mc The call, from [`match.call`].
+#' @param env The frame of the function that was called.
+#' @param drop Names to leave out.
+#' @return The names of the arguments in `mc` that are not missing in `env`,
+#' so that a missing argument passed on by a wrapper is left out.
+#' @author Ethan Bass
+#' @noRd
+supplied_args <- function(mc, env, drop){
+  nms <- setdiff(names(mc)[-1], drop)
+  nms[!vapply(nms, function(n) eval(call("missing", as.name(n)), env),
+              logical(1))]
 }
 
 #' Describe a call as code
@@ -224,7 +239,7 @@ keep_by_flag <- function(comp, col, want){
 #' @return A filtered `peak_table` containing only features (columns) that
 #' satisfy the specified criteria. The same feature indices are applied to all
 #' `peak_table` components. The call is appended to `args$filters`, as a line
-#' of code that repeats it.
+#' of code with numbers to 15 significant digits.
 #' @author Ethan Bass
 #' @seealso [`get_peaktable`], [`filter_peaks`]
 #' @examples
@@ -246,7 +261,8 @@ filter_peaktable <- function(peak_table, rts, min_rt, max_rt, min_value,
     return(peak_table)
   }
   applied <- describe_call("filter_peaktable",
-                           mget(setdiff(names(match.call())[-1], "peak_table")))
+                           mget(supplied_args(match.call(), environment(),
+                                              "peak_table")))
   peak_table$pk_meta["rt",] <- as.numeric(peak_table$pk_meta["rt",])
   what <- match.arg(what, c("median", "mean", "max"))
   if (!missing(rts)){

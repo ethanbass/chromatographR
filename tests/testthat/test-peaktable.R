@@ -258,6 +258,15 @@ test_that("peak tables record how their peaks were fitted", {
   }
 })
 
+test_that("filter calls passed on by a wrapper record only what was given", {
+  wrap_peaks <- function(x, h, rt) filter_peaks(x, min_height = h, max_rt = rt)
+  f <- suppressWarnings(wrap_peaks(.pks, rt = 2))
+  expect_equal(attr(f, "filters"), "filter_peaks(max_rt = 2)")
+  wrap_table <- function(x, lo, hi) filter_peaktable(x, min_rt = lo, max_rt = hi)
+  expect_equal(wrap_table(pk_tab, lo = 12)$args$filters,
+               "filter_peaktable(min_rt = 12)")
+})
+
 test_that("write_peaktable writes args with several values as one field", {
   pt <- get_peaktable(suppressWarnings(
     filter_peaks(.pks, min_fwhm = 0.05, max_rt = 2)))
