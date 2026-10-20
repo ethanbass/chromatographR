@@ -20,9 +20,9 @@ library(ggplot2)
 
 ### Introduction
 
-While the basic workflow is similar for analyzing different types of chromatographic data with `chromatographR`, there are a few important differences when analyzing GC-FID data (or other 1-dimensional data). This vignette highlights some important considerations when using chromatographR to analyze GC-FID data (or other 2D chromatography data).
+While the basic workflow is similar for analyzing different types of chromatographic data with `chromatographR`, there are a few important differences when analyzing GC-FID data (or other 1-dimensional data). This vignette highlights some important considerations when using chromatographR to analyze GC-FID data.
 
-To demonstrate the use of `chromatographR` for the analysis GC-FID data, we will analyze a dataset on cuticular hydrocarbons (CHCs) composition in four species of paper wasps (*Polistes spp.*) collected by Dr. Andrew Legan [@legan2022; @legan2022a]. The dataset includes CHCs collected from *Polistes dominula* (european paper wasp), *Polistes exclamans* (common paper wasp), *P. fuscatus* (northern paper wasp), and *P. metricus* (metric paper wasp). As in other social insects, cuticular hydrocarbons serve as chemical cues mediating a number of social behaviors in paper wasps [@legan2021], including nestmate recognition [@gamboa1986; @gamboa1996; @bruschini2011], establishment of social hierarchies [@jandt2014] and mate choice [@reed1990].
+To demonstrate the use of `chromatographR` for the analysis of GC-FID data, we will analyze a dataset on cuticular hydrocarbons (CHCs) composition in four species of paper wasps (*Polistes spp.*) collected by Dr. Andrew Legan [@legan2022; @legan2022a]. The dataset includes CHCs collected from *Polistes dominula* (European paper wasp), *Polistes exclamans* (common paper wasp), *P. fuscatus* (northern paper wasp), and *P. metricus* (metric paper wasp). As in other social insects, cuticular hydrocarbons serve as chemical cues mediating a number of social behaviors in paper wasps [@legan2021], including nestmate recognition [@gamboa1986; @gamboa1996; @bruschini2011], establishment of social hierarchies [@jandt2014] and mate choice [@reed1990].
 
 
 ::: {#fig-polistes layout-ncol=2 layout-nrow=2}
@@ -35,7 +35,7 @@ To demonstrate the use of `chromatographR` for the analysis GC-FID data, we will
 
 ![*P. metricus* [@drabik-hamshare2022]](images/p_metricus_c.jpeg){height=300, fig.alt="A photograph of Polistes metricus"}
 
-*Polistes* species includes in this study.
+*Polistes* species included in this study.
 :::
 
 
@@ -59,18 +59,29 @@ path_to_metadata <- grep("METADATA", files, value = TRUE)
 meta <- read.csv(path_to_metadata, sep = "\t")
 ```
 
-In order to get a good alignment, it is helpful to remove the solvent peak. We also want to reduce the time-axis resolution (from 40 ms to 300 ms), since it drastically reduces computation time while seemingly having little effect on the accuracy of the integration results. The `preprocess` function does both at once: interpolating onto a new time axis resamples the signal and restricts it to the range of the new axis, so supplying `dim1` starting at four minutes drops the solvent peak as a side effect. (If you only want to trim a chromatogram, without resampling it, use `crop_chroms` instead — it subsets the existing time points rather than interpolating onto new ones.)
+Printing `dat` gives an overview of what was read: the number of chromatograms, the method they were run with, and the sample name and run time recorded in each file.
+
+```{r print_chroms}
+dat
+```
+
+The sample names recorded in the files are the original sample labels (e.g. `box13_42`), so the species and sex of each wasp come from the separate metadata file, matched on file name. The chromatograms also differ slightly in length, so they do not share a time axis as read:
+
+```{r chrom_lengths}
+table(sapply(dat, nrow))
+```
+
+In order to get a good alignment, it is helpful to remove the solvent peak. We also want to reduce the time-axis resolution (from 40 ms to 300 ms), which cuts the number of timepoints about 7.5-fold and so reduces computation time. The `preprocess` function does both at once: interpolating onto a new time axis resamples the signal and restricts it to the range of the new axis, so supplying `dim1` starting at four minutes drops the solvent peak as a side effect. It also puts every chromatogram on the same time points. (If you only want to trim a chromatogram, without resampling it, use `crop_chroms` instead — it subsets the existing time points rather than interpolating onto new ones.)
 
 ```{r preprocess_data}
 dat.pr <- preprocess(dat, smooth_spectra = FALSE, dim1 = seq(from = 4, to = 59.9, by = .005), # .005 minutes = 300 ms
                      cl = 1)
-names(dat.pr) <- gsub(".txt", "", names(dat.pr))
 ```
 
 We can then group the chromatograms by species for further analysis.
 
 ```{r obtain_species_idx}
-species <- c(dominula = "DOMINULA", exclamans.= "EXCLAMANS", 
+species <- c(dominula = "DOMINULA", exclamans = "EXCLAMANS", 
              fuscatus = "FUSCATUS", metricus = "METRICUS")
 
 species_idx <- lapply(species, function(sp){
@@ -79,11 +90,11 @@ species_idx <- lapply(species, function(sp){
 })
 ```
 
-We can extract the peaks from the alkane ladder using the `get_peaks` function and plot the integrated peak areas. To eliminate small peaks that are not part of the alkane ladder, we use the `filter_peaks` function to remove features that do not have an amplitude of at least 10^4 response units.
+We can extract the peaks from the alkane ladder using the `get_peaks` function and plot the integrated peak areas. To eliminate small peaks that are not part of the alkane ladder, we use the `filter_peaks` function to remove features lower than 10^4 response units.
 
 ```{r integrate_alkanes}
 ladder <- grep("LADDER", names(dat.pr))
-pks <- get_peaks(dat.pr[ladder], time.units = "s")
+pks <- get_peaks(dat.pr[ladder], time_unit = "s")
 plot(pks, chrom_list = dat.pr[ladder])
 pks_f <- filter_peaks(pks, min_height = 10000)
 ```
@@ -110,7 +121,7 @@ legend("bottomright", bty = "n",
        legend = bquote(R^2 == .(format(summary(m)$adj.r.squared, digits = 4))))
 
 plot(pks_f$ALKANE_LADDER[[1]]$height ~ alkanes$Height[-1], pch = 20,
-     xlab = "Area (LabSolutions)", ylab = "Area (chromatographR)", 
+     xlab = "Height (LabSolutions)", ylab = "Height (chromatographR)", 
      main = "Height")
 m <- lm(pks_f$ALKANE_LADDER[[1]]$height ~ alkanes$Height[-1])
 abline(m)
@@ -118,7 +129,7 @@ legend("bottomright", bty = "n",
        legend = bquote(R^2 == .(format(summary(m)$adj.r.squared, digits = 4))))
 ```
 
-Reassuringly, the peak areas and heights estimated by chromatographR are very similar to the results provided by LabSolutions.
+The peak areas and heights estimated by chromatographR closely match those from LabSolutions (see the R² in each panel).
 
 ### Alignment of chromatograms
 
@@ -250,7 +261,7 @@ m <- vegan::adonis2(pktab$tab ~ POLISTES_SPECIES + STATE + SEX + LAT + LON,
 m
 ```
 
-As one might expect, the permanova results shows that species is the largest contributor to the variance in CHC profiles (R^2^<sub>marginal</sub> = `r round(m$R2[1], digits = 2)`), followed by state of origin (R^2^<sub>marginal</sub> = `r round(m$R2[2], digits = 2)`) and sex (R^2^<sub>marginal</sub> = `r round(m$R2[3], digits = 2)`).
+The PERMANOVA attributes variance in CHC profiles to species (R^2^<sub>marginal</sub> = `r round(m$R2[1], digits = 2)`), state of origin (R^2^<sub>marginal</sub> = `r round(m$R2[2], digits = 2)`) and sex (R^2^<sub>marginal</sub> = `r round(m$R2[3], digits = 2)`).
 
 ```{r modified_ggordiplot}
 #| code-fold: true
@@ -375,7 +386,7 @@ gg_ordiplot(ord, groups = pktab$sample_meta[,"POLISTES_SPECIES"],
   theme_classic()
 ```
 
-Principal componenets analysis shows decent separation between species, with *P. dominula*, *P. fuscatus* and *P. dominula* separating along PC2 and *P. exclamans* separating from the other species along PC1.
+Principal components analysis separates *P. exclamans* from the other species along PC1 and partly separates *P. metricus* from *P. dominula* along PC2, with *P. fuscatus* overlapping both, although the first two axes explain only `r round(100 * sum(summary(ord)$cont$importance[2, 1:2]))`% of the variance.
 
 We can get even better separation if we break down our data by sex, though there is considerable intraspecific variation.
 
