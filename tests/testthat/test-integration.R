@@ -334,7 +334,7 @@ test_that("egh and bemg fall back to start values when nlsLM errors", {
     # the start values: the window max is 0, at the first index
     expect_equal(unname(fit$center), 1, info = b)
     expect_equal(unname(fit$height), 0, info = b)
-    expect_equal(unname(fit$width),  0, info = b)
+    expect_equal(unname(fit$width),  FIT_FWHM_MIN / FWHM_CONST, info = b)
     expect_equal(unname(fit$tau),    0, info = b)
     # the floor terms are start values too, never a fitted value, and are
     # reported only for the baseline modes that fit them

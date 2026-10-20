@@ -333,7 +333,9 @@ MIN_WINDOW_PER_FWHM <- 1 / 3
 #' worse than a flat line at the mean. Not returned when `fit = "raw"`.
 #' * `purity`: The spectral purity of peak as assessed by [`get_purity`].
 #' * `window_limited`: `1` if a fitted shape parameter hit a limit set by the
-#' integration window, meaning the window rather than the data
+#' integration window, or a `"gaussian"` or `"egh"` fit narrowed to one
+#' sampling interval at half height, meaning the window or the sampling rather
+#' than the data
 #' determined the reported shape, and `0` otherwise. Not returned when
 #' `fit = "raw"`.
 #' * `converged`: `1` if the optimizer reported convergence for the final step
@@ -785,12 +787,13 @@ measured_fwhm <- function(y){
 
 #' Whether a fitted shape came to rest on a window-derived limit
 #'
-#' Most bounds passed to `nlsLM` are derived from the integration window, so a
-#' coefficient sitting on one means the window, rather than the data, decided
-#' the reported shape. Infinite bounds are skipped, since they constrain
-#' nothing, and so are the bounds that do not come from the window: the lower
-#' bounds on `width` and on the `bemg` rates `a` and `b`, which are positivity
-#' constraints, and the bounds on `height`.
+#' Most bounds passed to `nlsLM` are derived from the integration window, and
+#' the lower bound on `width` from the sampling interval, so a coefficient
+#' sitting on one means the window or the sampling, rather than the data,
+#' decided the reported shape. Infinite bounds are skipped, since they
+#' constrain nothing, and so are the positivity constraints (the `bemg` rates
+#' `a` and `b`, and the `bemg` core `width`, whose lower bound is `0`) and the
+#' bounds on `height`.
 #'
 #' @param out A fitted model, as returned by `fit_gaussian`/`fit_egh`/`fit_bemg`.
 #' @param lower,upper The named bound vectors given to `nlsLM`.
@@ -807,7 +810,8 @@ is_window_limited <- function(out, lower, upper, tol = 1e-6){
     f <- is.finite(b)
     any(abs(v[f] - b[f]) <= tol * pmax(1, abs(b[f])), na.rm = TRUE)
   }
-  on_bound(lower[!names(lower) %in% c("width", "height", "a", "b")]) ||
+  lower <- lower[!(names(lower) == "width" & lower == 0)]
+  on_bound(lower[!names(lower) %in% c("height", "a", "b")]) ||
     on_bound(upper[names(upper) != "height"])
 }
 
@@ -912,6 +916,9 @@ x_spacing <- function(x){
 ## but that has to be caught after the fit, not by constraining the optimizer.
 FIT_WIDTH_MAX_MULT <- 2
 
+## Smallest fitted FWHM, in sampling intervals.
+FIT_FWHM_MIN <- 1
+
 ## Fraction of detected peaks whose integration window cannot determine the
 ## peak model, above which `get_peaks` reports that the peak list is dominated
 ## by windows too small to fit. On a well sampled run essentially no peak should
@@ -973,7 +980,8 @@ clamp_start <- function(v, lo, hi){
 #' floor, returned as `offset`, and the shifted `y` is returned for fitting.
 #' @noRd
 fit_starts <-function(x, y, start.center, start.width, start.height,
-                       baseline = "none", height_mult = NULL){
+                       baseline = "none", height_mult = NULL,
+                       width_min = FIT_FWHM_MIN * x_spacing(x) / FWHM_CONST){
   upper_floor <- max(min(y), 0)
   k <- max(3L, ceiling(FLOOR_EDGE_FRAC * length(y)))
   upper_edges <- c(floor_s = max(median(head(y, k)), 0),
@@ -988,11 +996,11 @@ fit_starts <-function(x, y, start.center, start.width, start.height,
     start.width <- sum(y > (start.height / 2)) / 2 * x_spacing(x)
   bnd <- fit_window_bounds(x)
   list(center = unname(clamp_start(start.center, bnd$center_min, bnd$center_max)),
-       width = unname(clamp_start(abs(start.width), 0, bnd$width_max)),
+       width = unname(clamp_start(abs(start.width), width_min, bnd$width_max)),
        height = unname(start.height),
        span = bnd$span, y = y, offset = offset, upper_floor = upper_floor,
        upper_edges = upper_edges,
-       lower = c(center = bnd$center_min, width = 0, height = -Inf),
+       lower = c(center = bnd$center_min, width = width_min, height = -Inf),
        upper = c(center = bnd$center_max, width = bnd$width_max,
                  height = if (is.null(height_mult)) Inf
                           else height_mult * start.height))
@@ -1316,7 +1324,7 @@ fit_bemg_once <- function(x1, y1, start.center, start.width, start.a, start.b,
   if (is.null(start.b))      start.b      <- 1.0
 
   st <- fit_starts(x1, y1, start.center, start.width, start.height, baseline,
-                   height_mult = 5)
+                   height_mult = 5, width_min = 0)
   y_shape <- st$y
   start.center <- st$center
   start.width <- st$width

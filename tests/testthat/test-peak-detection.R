@@ -1246,3 +1246,16 @@ test_that("r_squared is 1 - SS_res / SS_tot", {
   expect_equal(r_squared(y, y + 2), 1 - 20 / 10)
   expect_true(is.na(r_squared(rep(2, 5), 1:5)))
 })
+
+test_that("a gaussian or egh peak cannot narrow below one sampling interval", {
+  set.seed(1)
+  y <- c(rep(0, 15), 10, rep(0, 15)) + rnorm(31, sd = 0.05)
+  x <- matrix(y, ncol = 1, dimnames = list(seq_along(y) * 0.01, "1"))
+  for (fit in c("gaussian", "egh")) {
+    fp <- fit_peaks(x, lambda = "1", fit = fit,
+                    pos = data.frame(pos = 16, lower = 10, upper = 22))
+    expect_gte(fp$FWHM, 1 - 1e-6, label = fit)
+    expect_equal(fp$window_limited, 1, label = fit)
+    expect_lte(fp$height, max(y), label = fit)
+  }
+})

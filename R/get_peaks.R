@@ -143,7 +143,9 @@
 #' * `purity`: The peak purity as estimated by [`get_purity`]. `NA` unless
 #' `estimate_purity = TRUE`.
 #' * `window_limited`: `1` if a fitted shape parameter hit a limit set by the
-#' integration window, meaning the window rather than the data
+#' integration window, or a `"gaussian"` or `"egh"` fit narrowed to one
+#' sampling interval at half height, meaning the window or the sampling rather
+#' than the data
 #' determined the reported shape, and `0` otherwise. Not returned when
 #' `fit = "raw"`.
 #' * `converged`: `1` if the nonlinear least squares optimizer reported

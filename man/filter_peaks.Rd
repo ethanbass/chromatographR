@@ -60,8 +60,9 @@ which peak lists made with \code{fit = "raw"} or before chromatographR 0.9.0 lac
 Peaks whose \code{converged} is \code{NA} are retained.}
 
 \item{window_limited}{Logical. If \code{FALSE}, drops peaks whose fitted shape
-hit a limit set by the integration window, meaning the window rather than
-the data determined the reported shape; if \code{TRUE}, retains only those.
+hit a limit set by the integration window or the sampling interval, meaning
+the window or the sampling rather than the data determined the reported
+shape; if \code{TRUE}, retains only those.
 Requires a \code{window_limited} column, which peak lists made with
 \code{fit = "raw"} or before chromatographR 0.9.0 lack. Peaks whose
 \code{window_limited} is \code{NA} are retained.}

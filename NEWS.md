@@ -230,7 +230,8 @@ peak. `get_peaktable` groups the result by target. See `?targeted_analysis`.
 
 * Two fit-diagnostic columns are now reported by `get_peaks`: `converged`
 (flagging peaks that didn't converge) and `window_limited` (flagging peaks whose
-reported width is at the limit defined by the integration window).
+fitted shape sits at a limit set by the integration window or the sampling
+interval).
 * Fit diagnostics can now be used for filtering: `filter_peaks` gains `converged` and
 `window_limited` arguments, and `filter_peaktable` gains `min_converged`. All three 
 error on `fit = "raw"`, which reports no fit diagnostics.
@@ -346,6 +347,9 @@ peak's integration window spans about 700 timepoints or more.
 * `fit = "bemg"` now rejects fits whose tail grows away from the apex, which
 inflated the reported area. Such peaks are refitted, and flagged
 `converged = FALSE` if the refit also fails.
+* `fit = "gaussian"` and `"egh"` peaks can no longer narrow below one timepoint
+at half height. Previously a fit to a noise apex could collapse between two
+samples and report a height several times the signal around it.
 
 #### Peak tables and filtering
 
