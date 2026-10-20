@@ -18,14 +18,14 @@
 `chromatographR` implements a vendor-agnostic, fully scriptable workflow for reproducible analysis of HPLC-DAD and other chromatographic data (e.g., GC-FID, HPLC-UV, or HPLC-FD) in R. It provides an open-source alternative to proprietary chromatography software, with support for:
 
 - **Pre-processing**: smoothing, baseline correction, and interpolation
-- **Retention-time alignment**: parametric time warping (PTW) and variable penalty dynamic time warping (VPdtw)
-- **Peak detection and integration**: Gaussian, exponential-Gaussian hybrid (EGH), or raw trapezoidal integration
+- **Retention-time alignment**: parametric time warping (PTW), landmark parametric time warping (LPTW), and variable penalty dynamic time warping (VPdtw)
+- **Peak detection and integration**: Gaussian, exponential-Gaussian hybrid (EGH), or bidirectional exponentially modified Gaussian (BEMG) fits, or raw trapezoidal integration
 - **Peak table construction**: hierarchical clustering to match peaks across samples
 - **Downstream analysis**: metadata attachment, normalization, UV spectral analysis, and visualization
   
 ## Installation
 
-chromatographR can now be installed from CRAN:
+chromatographR can be installed from CRAN:
 
 ```
 install.packages("chromatographR")
@@ -47,19 +47,24 @@ install.packages("chromatographR", repos="https://ethanbass.r-universe.dev/")
 ## Usage
 
 #### Importing data
-chromatographR can import a variety of vendor formats, including 'Agilent ChemStation' and 'MassHunter' files. This is accomplished using parsers from my chromConverter package. See the [chromConverter page](https://ethanbass.github.io/chromConverter/) for a detailed list of supported formats. Alternatively, chromatographR can also be used with regular `csv` files.
+chromatographR can import many vendor formats, including 'Agilent ChemStation' and 'MassHunter' files, using parsers from the chromConverter package. See the [chromConverter page](https://ethanbass.github.io/chromConverter/) for a detailed list of supported formats. Alternatively, chromatographR can also be used with regular `csv` files.
 
 #### Analysis
-Please see the [vignette](https://ethanbass.github.io/chromatographR/articles/chromatographR.html) included with the package for details on the application of chromatographR for the analysis of HPLC data. Additional articles are available on the pkgdown website: 1) a suggested [workflow for the analysis of GC-FID data](https://ethanbass.github.io/chromatographR/articles/GC-FID.html) (*Polistes* cuticular hydrocarbons) and 2) an introductory guide to the [programmatic analysis of UV spectra](https://ethanbass.github.io/chromatographR/articles/uv_spectra.html).
+Please see the [vignette](https://ethanbass.github.io/chromatographR/articles/chromatographR.html) included with the package for details on the application of chromatographR for the analysis of HPLC data. Additional articles are available on the pkgdown website:
+
+- a suggested [workflow for the analysis of GC-FID data](https://ethanbass.github.io/chromatographR/articles/GC-FID.html) (*Polistes* cuticular hydrocarbons)
+- an introductory guide to the [programmatic analysis of UV spectra](https://ethanbass.github.io/chromatographR/articles/uv_spectra.html)
 
 ## Contributing
 
-Contributions are always welcome. Please get in touch (preferable by opening a GitHub [issue](https://github.com/ethanbass/chromatographR/issues)) to discuss any suggestions or to file a bug report. Some good reasons to file an issue:
+Contributions are always welcome. Please get in touch (preferably by opening a GitHub [issue](https://github.com/ethanbass/chromatographR/issues)) to discuss any suggestions or to file a bug report. Some good reasons to file an issue:
 
 - You think you've found a bug.  
 - You're getting a cryptic error message that you don't understand.  
 - You have a file format you'd like to read that isn't currently supported by chromatographR.  (If you do this, please make sure to include a link to an example file!)  
 - You have a new feature you'd like to see implemented.  
+
+When reporting a bug, please check existing issues first, then include a code snippet that reproduces the problem, any error messages printed to the console, and the version of chromatographR you're running (`packageVersion("chromatographR")`).
 
 Also see the [contributing.md](https://github.com/ethanbass/chromatographR/blob/master/.github/contributing.md) page for more details.
 
@@ -69,8 +74,8 @@ Also see the [contributing.md](https://github.com/ethanbass/chromatographR/blob/
 
 If you use chromatographR in published work, please cite it as follows:
 
-`Bass, E. (2026). chromatographR: Chromatographic Data Analysis Toolkit. http://doi.org/10.5281/zenodo.6944334`.
+`Bass, E. (2026). chromatographR: Chromatographic Data Analysis Toolkit. https://doi.org/10.5281/zenodo.6944334`.
 
 If your workflow includes data import with chromConverter, please also cite:
 
-`Bass, E. (2026). chromConverter: Chromatographic File Converter. http://doi.org/10.5281/zenodo.6792521`.
+`Bass, E. (2026). chromConverter: Chromatographic File Converter. https://doi.org/10.5281/zenodo.6792521`.
