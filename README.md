@@ -54,6 +54,7 @@ Please see the [vignette](https://ethanbass.github.io/chromatographR/articles/ch
 
 - a suggested [workflow for the analysis of GC-FID data](https://ethanbass.github.io/chromatographR/articles/GC-FID.html) (*Polistes* cuticular hydrocarbons)
 - an introductory guide to the [programmatic analysis of UV spectra](https://ethanbass.github.io/chromatographR/articles/uv_spectra.html)
+- a guide to [choosing peak-finding parameters](https://ethanbass.github.io/chromatographR/articles/peak-finding.html) and filtering spurious peaks
 
 ## Contributing
 

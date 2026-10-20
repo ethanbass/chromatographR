@@ -106,6 +106,9 @@ window wide enough to avoid splitting peaks before applying prominence
 filtering. \code{find_peaks} warns when \code{smooth_window} is under a third of the
 typical peak width.
 
+The \href{https://ethanbass.github.io/chromatographR/articles/peak-finding.html}{peak-finding article}
+tests these recommendations on simulated chromatograms with known peaks.
+
 \strong{Method-specific caveats.} At the same \code{smooth_window}, \code{"savgol"} smooths
 about a third as much as the other methods, so it needs a wider window for
 the same noise reduction. It errors below 7 timepoints. \code{"savgol"}, \code{"mva"},

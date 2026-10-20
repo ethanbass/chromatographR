@@ -43,6 +43,9 @@
 #' filtering. `find_peaks` warns when `smooth_window` is under a third of the
 #' typical peak width.
 #'
+#' The [peak-finding article](https://ethanbass.github.io/chromatographR/articles/peak-finding.html)
+#' tests these recommendations on simulated chromatograms with known peaks.
+#'
 #' **Method-specific caveats.** At the same `smooth_window`, `"savgol"` smooths
 #' about a third as much as the other methods, so it needs a wider window for
 #' the same noise reduction. It errors below 7 timepoints. `"savgol"`, `"mva"`,
