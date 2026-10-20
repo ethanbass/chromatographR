@@ -10,20 +10,21 @@ attach_ref_spectra(peak_table, chrom_list, ref = c("max.cor", "max.int"))
 \item{peak_table}{A \code{peak_table} object created by \code{\link{get_peaktable}}.}
 
 \item{chrom_list}{Optional list of chromatograms (timepoints × wavelengths).
-If \code{NULL}, the function attempts to retrieve the original \code{chrom_list}
+If omitted, the function attempts to retrieve the original \code{chrom_list}
 used to generate \code{peak_table}.}
 
-\item{ref}{Method for selecting reference spectra. Options are \code{"max.int"}
-(maximum intensity) or \code{"max.cor"} (maximum average correlation).}
+\item{ref}{Method for selecting reference spectra: \code{"max.cor"} (maximum
+mean correlation, the default) or \code{"max.int"} (maximum intensity).}
 }
 \value{
 A \code{peak_table} object with reference spectra stored in the
 \verb{$ref_spectra} slot.
 }
 \description{
-Reference spectra are selected either as the spectrum with maximum intensity
-(\code{"max.int"}) or as the spectrum with the highest average correlation to all
-other spectra in the peak table (\code{"max.cor"}).
+For each peak, selects one sample's spectrum as the reference: either the
+spectrum with the highest mean correlation to that peak's spectra in the
+other samples (\code{"max.cor"}), or the spectrum from the sample where the peak
+is most intense (\code{"max.int"}). Spectra are scaled before they are stored.
 }
 \examples{
 data(pk_tab)

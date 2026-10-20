@@ -2,27 +2,28 @@
 #' 
 #' Plots [`ptw`][ptw::ptw] alignments.
 #' 
-#' Plots PTW alignments at the specified wavelength (`lambda`) either as
+#' Plots raw and warped chromatograms, one above the other, either as
 #' individual traces or as a heatmap, according to the value of `what`. The
 #' plot can be produced using either base R graphics, `ggplot2`, or `plotly`,
-#' according to the value of the `engine` argument. 
+#' according to the value of the `engine` argument.
 #' 
 #' @importFrom graphics matplot
 #' @param x A `ptw_list` object created by [`correct_rt`].
-#' @param what What type of plot to return. Either `traces` or `heatmap`.
-#' @param engine What plotting engine to use. One of `base`, `ggplot`, or
-#' `plotly`.
+#' @param what What type of plot to return. Either `"traces"` (default) or
+#' `"heatmap"`.
+#' @param engine What plotting engine to use. One of `"base"` (default),
+#' `"ggplot"`, or `"plotly"`.
 #' @param lambdas Wavelengths to plot, from among those used for warping.
 #' Defaults to all of them. The heatmap shows only the first.
 #' @param show_legend Logical. Whether to include sample legend.
-#' @param ... Additional arguments (placeholder).
+#' @param ... Ignored.
 #' @return A `plotly` or `ggplot` object when `engine = "plotly"` or
 #' `engine = "ggplot"`, respectively. No value is returned when
 #' `engine = "base"`.
 #' @section Side effects:
 #' If `engine == "base"`, plots are rendered to the active graphics device.
 #' @author Ethan Bass
-#' @examplesIf interactive()
+#' @examples
 #' data(Sa_pr)
 #' warp <- correct_rt(chrom_list = Sa_pr, what = "models", lambdas = 210)
 #' plot(warp)

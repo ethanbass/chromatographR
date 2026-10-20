@@ -22,8 +22,8 @@ plot_chroms_heatmap(
 or a \code{peak_table} containing a pointer to a list of chromatograms accessible
 in the current environment.}
 
-\item{idx}{A vector representing the names or numerical indices of the
-chromatograms to plot.}
+\item{idx}{A vector of names or numerical indices of the chromatograms to
+plot. Defaults to all chromatograms.}
 
 \item{lambdas}{A single wavelength to plot. Required for multi-wavelength
 chromatograms and optional for one-dimensional ones, where a supplied
@@ -32,7 +32,7 @@ wavelength must match the column name.}
 \item{engine}{Plotting backend to use. One of \code{\link[graphics:matplot]{"base"}},
 \code{\link[ggplot2:ggplot2-package]{"ggplot"}}, or \code{\link[plotly:plotly]{"plotly"}}.}
 
-\item{show_legend}{Logical. Whether to display legend or not. Defaults to
+\item{show_legend}{Logical. Whether to display a color bar. Defaults to
 \code{TRUE}.}
 
 \item{xlim}{Range of retention times to plot.}
@@ -46,7 +46,8 @@ be repositioned when using the \code{base} plotting engine.}
 
 \item{title}{Title for plot.}
 
-\item{show_ylabs}{Logical. Whether to show y labels. Defaults to \code{FALSE}.}
+\item{show_ylabs}{Logical. Whether to label each row with its chromatogram
+name. Defaults to \code{FALSE}.}
 }
 \value{
 A \code{plotly} or \code{ggplot} object when \code{engine = "plotly"} or
@@ -54,13 +55,9 @@ A \code{plotly} or \code{ggplot} object when \code{engine = "plotly"} or
 \code{engine = "base"}.
 }
 \description{
-Plots the specified traces from a list of chromatograms as a heatmap.
-}
-\details{
-Plots the traces of the chromatograms specified by \code{idx} at the specified
-wavelengths (\code{lambdas}) as a heatmap. Plots can be produced using base
-graphics engine, \code{ggplot2}, or \code{plotly}, according to the value of the
-\code{engine} argument. Adapted from \code{\link[VPdtw:plot.VPdtw]{VPdtw::plot.VPdtw}}.
+Plots the traces from a list of chromatograms as a heatmap, with one row
+per chromatogram and color encoding absorbance at a single wavelength.
+Adapted from \code{\link[VPdtw:plot.VPdtw]{VPdtw::plot.VPdtw}}.
 }
 \section{Side effects}{
 

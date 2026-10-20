@@ -33,12 +33,11 @@ plot. Required for multi-wavelength chromatograms and optional for
 one-dimensional ones, where a supplied wavelength must match the column name.}
 
 \item{idx}{A vector representing the names or numerical indices of the
-chromatograms to plot.}
+chromatograms to plot. Defaults to all chromatograms.}
 
 \item{time_resolution}{Desired temporal resolution for plotting (in minutes).
 Chromatograms are thinned to approximately this interval prior to plotting,
-which can substantially improve performance for large datasets.  Defaults to
-\code{0.01}.}
+which speeds up rendering of large datasets. Defaults to \code{0.01}.}
 
 \item{time_unit}{Time units of the provided chromatograms: either \code{min}, \code{s},
 or \code{ms}. If possible, units will be detected automatically from chromatogram
@@ -59,7 +58,7 @@ then fitted to the traces within this range.}
 
 \item{linewidth}{Line width. Defaults to \code{1}.}
 
-\item{show_legend}{Logical. Whether to display legend or not. Defaults to
+\item{show_legend}{Logical. Whether to display a legend. Defaults to
 \code{FALSE}.}
 
 \item{legend_position}{Position of legend. Defaults to \code{"topright"}. For
@@ -78,7 +77,9 @@ also be written as one string split at the first colon, as in
 \code{"instrument:PMP1, Pressure"}, unless that string is itself an element name.
 Defaults to \code{"dad"} for such lists; ignored when \code{x} is a list of matrices.}
 
-\item{...}{Additional arguments to plotting function specified by \code{engine}.}
+\item{...}{Additional arguments to \code{\link{matplot}} (\code{engine = "base"}),
+\code{\link[ggplot2:geom_line]{ggplot2::geom_line()}} (\code{engine = "ggplot"}), or the \code{line} list of
+\code{\link[plotly:plot_ly]{plotly::plot_ly()}} (\code{engine = "plotly"}).}
 }
 \value{
 A \code{plotly} or \code{ggplot} object when \code{engine = "plotly"} or
@@ -89,19 +90,9 @@ A \code{plotly} or \code{ggplot} object when \code{engine = "plotly"} or
 Visualizes absorbance traces from a list of one- or multi-wavelength
 chromatograms using base R, ggplot2, or plotly graphics. For
 multi-wavelength chromatograms, one or more wavelengths can be selected
-using \code{lambdas}. When plotting many chromatograms, traces are automatically
-thinned according to \code{time_resolution} to improve rendering performance.
-Each chromatogram specified by \code{idx} is plotted as a separate trace and
-assigned a distinct color.
-}
-\details{
-For multi-wavelength chromatograms, wavelength indices are resolved
-internally using \code{get_lambda_idx()}. Time values are converted according
-to \code{time_unit}, either supplied explicitly or inferred from chromatogram
-metadata.
-
-When using the \code{"ggplot"} or \code{"plotly"} engines, chromatograms are first
-reshaped into long format using \code{reshape_chroms()}.
+using \code{lambdas}. Traces are thinned to \code{time_resolution} before plotting.
+Each chromatogram specified by \code{idx} is plotted as a separate trace in its
+own color.
 }
 \section{Side effects}{
 

@@ -27,11 +27,12 @@
 #' @param chrom_list A list of chromatograms in matrix format (timepoints ×
 #' wavelengths). If no argument is provided here, the function will try to find
 #' the `chrom_list` object using the pointer in the `peak_table`.
-#' @param idx Numerical index of chromatogram you wish to plot, or "max" to
-#' automatically select the chromatogram with the highest signal intensity at 
-#' the specified peak or retention time.
-#' @param lambda The wavelength used for plotting chromatographic traces and
-#' determining signal intensity.
+#' @param idx Index or name of the chromatogram to plot, or `"max"` (the
+#' default) to select the chromatogram with the largest value for `loc` in
+#' `peak_table`. `"max"` is available only when `what = "peak"`.
+#' @param lambda The wavelength at which to plot the chromatographic trace, or
+#' `"max"` (the default) for the wavelength of maximum absorbance in the
+#' extracted spectrum.
 #' @param plot_spectrum Logical. If `TRUE`, plots the spectrum of the chosen
 #' peak. Defaults to `TRUE`.
 #' @param plot_trace Logical. If `TRUE`, plots the trace of the chosen peak at
@@ -49,6 +50,7 @@
 #' information for a certain peak, `rt` to scan by retention time, 
 #' `idx` to scan by numeric index, or `click` to manually select 
 #' retention time by clicking on the chromatogram. Defaults to `"peak"` mode.
+#' `"click"` requires `engine = "base"`.
 #' @param engine Plotting backend to use. One of `"base"`,
 #' [`"ggplot"`][ggplot2::ggplot2-package], or [`"plotly"`][plotly::plotly].
 #' `"ggplot2"` is also accepted here, for backward compatibility, but `"ggplot"`
@@ -64,7 +66,7 @@
 #' @section Side effects:
 #' If `engine == "base"`, plots are rendered to the active graphics device.
 #' @author Ethan Bass
-#' @examplesIf interactive()
+#' @examples
 #' data(Sa)
 #' pks <- get_peaks(Sa, lambda = "220.00000")
 #' pk_tab <- get_peaktable(pks)
@@ -360,12 +362,18 @@ scan_chrom <- function(chrom_list, idx, lambda,
 
 #' Plot all spectra for chosen peak
 #' 
-#' Plot multiple spectra for a given peak in peak table. Wrapper for [`plot_spectrum`].
+#' Plot the spectra of a peak from several chromatograms. Wrapper for
+#' [`plot_spectrum`].
 #' 
 #' @inheritParams plot_spectrum
 #' @param peak The `peak` argument is deprecated. Please use `loc` instead.
-#' @param idx Vector of chromatograms to plot.
-#' @param overlapping Logical. If `TRUE`, plot spectra in single plot.
+#' @param idx Vector of chromatograms to plot, or `"all"` (the default).
+#' @param overlapping Logical. If `TRUE` (the default), plots the spectra on a
+#' single plot. Used only when `engine = "base"`.
+#' @param scale_spectrum Logical. If `TRUE` (the default), scales each spectrum
+#' to the range \[0, 1\].
+#' @param export_spectrum Logical. If `TRUE` (the default), invisibly returns
+#' the spectra as a `data.frame`.
 #' @param verbose Logical. If `TRUE`, prints the index and name of each
 #' chromatogram plotted, with its retention time, wavelength and absorbance.
 #' Defaults to `FALSE`.
@@ -374,16 +382,16 @@ scan_chrom <- function(chrom_list, idx, lambda,
 #' `"idx"` to scan by numeric index. Defaults to "peak" mode.
 #' @param ... Additional arguments to `plot_spectrum`.
 #' @return 
-#' * If `export_spectrum = FALSE` (default), a `plotly` or `ggplot` object, or
+#' * If `export_spectrum = TRUE` (the default), invisibly returns a
+#' `data.frame` with wavelengths as rows and one column per sample encoding
+#' absorbance at each wavelength (normalized if `scale_spectrum = TRUE`).
+#' * If `export_spectrum = FALSE`, returns a `plotly` or `ggplot` object, or
 #' nothing if `engine == "base"`.
-#' * If `export_spectrum = TRUE`, invisibly returns a `data.frame` with 
-#' wavelengths as rows and one column per sample encoding absorbance at each 
-#' wavelength (normalized if `scale_spectrum = TRUE`).
 #' @section Side effects:
 #' If `engine == "base"`, the spectra are rendered to the active graphics 
 #' device.
 #' @author Ethan Bass
-#' @examplesIf interactive()
+#' @examples
 #' data(Sa_warp)
 #' pks <- get_peaks(Sa_warp, lambda = "220")
 #' pk_tab <- get_peaktable(pks)

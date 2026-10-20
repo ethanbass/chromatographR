@@ -56,17 +56,18 @@ attach_metadata <- function(peak_table, metadata, column){
 
 #' Attach reference spectra to a `peak_table` object
 #' 
-#' Reference spectra are selected either as the spectrum with maximum intensity
-#' (`"max.int"`) or as the spectrum with the highest average correlation to all
-#' other spectra in the peak table (`"max.cor"`).
+#' For each peak, selects one sample's spectrum as the reference: either the
+#' spectrum with the highest mean correlation to that peak's spectra in the
+#' other samples (`"max.cor"`), or the spectrum from the sample where the peak
+#' is most intense (`"max.int"`). Spectra are scaled before they are stored.
 #' 
 #' @aliases attach_ref_spectra
 #' @param peak_table A `peak_table` object created by [`get_peaktable`].
 #' @param chrom_list Optional list of chromatograms (timepoints × wavelengths).
-#' If `NULL`, the function attempts to retrieve the original `chrom_list`
+#' If omitted, the function attempts to retrieve the original `chrom_list`
 #' used to generate `peak_table`.
-#' @param ref Method for selecting reference spectra. Options are `"max.int"`
-#' (maximum intensity) or `"max.cor"` (maximum average correlation).
+#' @param ref Method for selecting reference spectra: `"max.cor"` (maximum
+#' mean correlation, the default) or `"max.int"` (maximum intensity).
 #' @return A `peak_table` object with reference spectra stored in the
 #' `$ref_spectra` slot.
 #' @author Ethan Bass

@@ -30,7 +30,7 @@ spectral data.}
 wavelengths). If no argument is provided here, the function will try to find
 the \code{chrom_list} object using the pointer in the \code{peak_table}.}
 
-\item{idx}{Vector of chromatograms to plot.}
+\item{idx}{Vector of chromatograms to plot, or \code{"all"} (the default).}
 
 \item{engine}{Plotting backend to use. One of \code{"base"},
 \code{\link[ggplot2:ggplot2-package]{"ggplot"}}, or \code{\link[plotly:plotly]{"plotly"}}.
@@ -40,13 +40,14 @@ is the spelling the other plotting functions take.}
 \item{plot_spectrum}{Logical. If \code{TRUE}, plots the spectrum of the chosen
 peak. Defaults to \code{TRUE}.}
 
-\item{export_spectrum}{Logical. If \code{TRUE}, invisibly returns the spectrum as a \code{data.frame}.
-Defaults to \code{FALSE}.}
+\item{export_spectrum}{Logical. If \code{TRUE} (the default), invisibly returns
+the spectra as a \code{data.frame}.}
 
-\item{scale_spectrum}{Logical. If \code{TRUE}, scales spectrum to unit height.
-Defaults to \code{FALSE}.}
+\item{scale_spectrum}{Logical. If \code{TRUE} (the default), scales each spectrum
+to the range [0, 1].}
 
-\item{overlapping}{Logical. If \code{TRUE}, plot spectra in single plot.}
+\item{overlapping}{Logical. If \code{TRUE} (the default), plots the spectra on a
+single plot. Used only when \code{engine = "base"}.}
 
 \item{verbose}{Logical. If \code{TRUE}, prints the index and name of each
 chromatogram plotted, with its retention time, wavelength and absorbance.
@@ -62,15 +63,16 @@ information for a certain peak, \code{"rt"} to scan by retention time, or
 }
 \value{
 \itemize{
-\item If \code{export_spectrum = FALSE} (default), a \code{plotly} or \code{ggplot} object, or
+\item If \code{export_spectrum = TRUE} (the default), invisibly returns a
+\code{data.frame} with wavelengths as rows and one column per sample encoding
+absorbance at each wavelength (normalized if \code{scale_spectrum = TRUE}).
+\item If \code{export_spectrum = FALSE}, returns a \code{plotly} or \code{ggplot} object, or
 nothing if \code{engine == "base"}.
-\item If \code{export_spectrum = TRUE}, invisibly returns a \code{data.frame} with
-wavelengths as rows and one column per sample encoding absorbance at each
-wavelength (normalized if \code{scale_spectrum = TRUE}).
 }
 }
 \description{
-Plot multiple spectra for a given peak in peak table. Wrapper for \code{\link{plot_spectrum}}.
+Plot the spectra of a peak from several chromatograms. Wrapper for
+\code{\link{plot_spectrum}}.
 }
 \section{Side effects}{
 
@@ -79,12 +81,10 @@ device.
 }
 
 \examples{
-\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 data(Sa_warp)
 pks <- get_peaks(Sa_warp, lambda = "220")
 pk_tab <- get_peaktable(pks)
 plot_all_spectra(loc = "V11", peak_table = pk_tab, overlapping = TRUE)
-\dontshow{\}) # examplesIf}
 }
 \seealso{
 Other visualization functions:

@@ -31,12 +31,13 @@ spectral data.}
 wavelengths). If no argument is provided here, the function will try to find
 the \code{chrom_list} object using the pointer in the \code{peak_table}.}
 
-\item{idx}{Numerical index of chromatogram you wish to plot, or "max" to
-automatically select the chromatogram with the highest signal intensity at
-the specified peak or retention time.}
+\item{idx}{Index or name of the chromatogram to plot, or \code{"max"} (the
+default) to select the chromatogram with the largest value for \code{loc} in
+\code{peak_table}. \code{"max"} is available only when \code{what = "peak"}.}
 
-\item{lambda}{The wavelength used for plotting chromatographic traces and
-determining signal intensity.}
+\item{lambda}{The wavelength at which to plot the chromatographic trace, or
+\code{"max"} (the default) for the wavelength of maximum absorbance in the
+extracted spectrum.}
 
 \item{plot_spectrum}{Logical. If \code{TRUE}, plots the spectrum of the chosen
 peak. Defaults to \code{TRUE}.}
@@ -60,7 +61,8 @@ absorbance.}
 \item{what}{What to look for. Either \code{peak} to extract spectral
 information for a certain peak, \code{rt} to scan by retention time,
 \code{idx} to scan by numeric index, or \code{click} to manually select
-retention time by clicking on the chromatogram. Defaults to \code{"peak"} mode.}
+retention time by clicking on the chromatogram. Defaults to \code{"peak"} mode.
+\code{"click"} requires \code{engine = "base"}.}
 
 \item{engine}{Plotting backend to use. One of \code{"base"},
 \code{\link[ggplot2:ggplot2-package]{"ggplot"}}, or \code{\link[plotly:plotly]{"plotly"}}.
@@ -105,7 +107,6 @@ If \code{engine == "base"}, plots are rendered to the active graphics device.
 }
 
 \examples{
-\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 data(Sa)
 pks <- get_peaks(Sa, lambda = "220.00000")
 pk_tab <- get_peaktable(pks)
@@ -113,7 +114,6 @@ oldpar <- par(no.readonly = TRUE)
 par(mfrow = c(2, 1))
 plot_spectrum(loc = "V8", peak_table = pk_tab, what = "peak")
 par(oldpar)
-\dontshow{\}) # examplesIf}
 }
 \seealso{
 Other visualization functions:

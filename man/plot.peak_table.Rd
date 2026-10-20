@@ -38,7 +38,8 @@ the \code{chrom_list} object using the pointer in the \code{peak_table}.}
 \item{what}{What to look for. Either \code{peak} to extract spectral
 information for a certain peak, \code{rt} to scan by retention time,
 \code{idx} to scan by numeric index, or \code{click} to manually select
-retention time by clicking on the chromatogram. Defaults to \code{"peak"} mode.}
+retention time by clicking on the chromatogram. Defaults to \code{"peak"} mode.
+\code{"click"} requires \code{engine = "base"}.}
 
 \item{idx}{Numerical index of chromatogram you wish to plot; \code{"max"}
 (default) to plot the chromatogram with the largest value for the peak in

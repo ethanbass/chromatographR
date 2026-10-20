@@ -16,17 +16,18 @@
 \arguments{
 \item{x}{A \code{ptw_list} object created by \code{\link{correct_rt}}.}
 
-\item{what}{What type of plot to return. Either \code{traces} or \code{heatmap}.}
+\item{what}{What type of plot to return. Either \code{"traces"} (default) or
+\code{"heatmap"}.}
 
-\item{engine}{What plotting engine to use. One of \code{base}, \code{ggplot}, or
-\code{plotly}.}
+\item{engine}{What plotting engine to use. One of \code{"base"} (default),
+\code{"ggplot"}, or \code{"plotly"}.}
 
 \item{lambdas}{Wavelengths to plot, from among those used for warping.
 Defaults to all of them. The heatmap shows only the first.}
 
 \item{show_legend}{Logical. Whether to include sample legend.}
 
-\item{...}{Additional arguments (placeholder).}
+\item{...}{Ignored.}
 }
 \value{
 A \code{plotly} or \code{ggplot} object when \code{engine = "plotly"} or
@@ -37,7 +38,7 @@ A \code{plotly} or \code{ggplot} object when \code{engine = "plotly"} or
 Plots \code{\link[ptw:ptw]{ptw}} alignments.
 }
 \details{
-Plots PTW alignments at the specified wavelength (\code{lambda}) either as
+Plots raw and warped chromatograms, one above the other, either as
 individual traces or as a heatmap, according to the value of \code{what}. The
 plot can be produced using either base R graphics, \code{ggplot2}, or \code{plotly},
 according to the value of the \code{engine} argument.
@@ -48,11 +49,9 @@ If \code{engine == "base"}, plots are rendered to the active graphics device.
 }
 
 \examples{
-\dontshow{if (interactive()) withAutoprint(\{ # examplesIf}
 data(Sa_pr)
 warp <- correct_rt(chrom_list = Sa_pr, what = "models", lambdas = 210)
 plot(warp)
-\dontshow{\}) # examplesIf}
 }
 \author{
 Ethan Bass
