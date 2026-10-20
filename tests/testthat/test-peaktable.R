@@ -32,12 +32,12 @@ test_that("get_peaktable carries metadata added to the chromatograms", {
                    estimate_purity = FALSE, show_progress = FALSE)
   pt <- get_peaktable(pks)
   expect_equal(pt$sample_meta$name, rownames(pt$tab))
-  expect_equal(pt$sample_meta$dose, c(1, 2))
+  expect_equal(as.numeric(pt$sample_meta$dose), c(1, 2))
 
   pt <- attach_metadata(pt, data.frame(id = c("s2", "s1"), site = c("b", "a")),
                         column = "id")
   expect_equal(pt$sample_meta$site, c("a", "b"))
-  expect_equal(pt$sample_meta$dose, c(1, 2))
+  expect_equal(as.numeric(pt$sample_meta$dose), c(1, 2))
 
   expect_false(is.data.frame(get_peaktable(.pks)$sample_meta))
 })
