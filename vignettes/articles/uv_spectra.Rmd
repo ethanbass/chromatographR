@@ -26,7 +26,7 @@ pktab <- get_peaktable(pks)
 pktab <- attach_ref_spectra(pktab, ref = "max.cor")
 ```
 
-After assigning reference spectra to our peak table, we can use pearson correlations to easily locate peaks falling within a certain similarity threshold to a reference spectrum. To do this, we must first construct a correlation matrix using the `cor` function.
+After assigning reference spectra to our peak table, we can use Pearson correlations to locate peaks within a chosen similarity threshold of a reference spectrum. To do this, we first construct a correlation matrix using the `cor` function.
 
 ##### Analysis of spectral correlations
 
@@ -34,24 +34,30 @@ After assigning reference spectra to our peak table, we can use pearson correlat
 cor_mat <- cor(pktab$ref_spectra)
 ```
 
-We can then plot spectra falling within a desired similarity threshold (`t`) to a reference peak (in this case 'V21').
+We can then plot spectra falling within a desired similarity threshold (`t`) to a reference peak (in this case `V18`).
 
 ```{r plot_spectra}
+ref <- "V18"
+wl <- as.numeric(rownames(pktab$ref_spectra))
 par(mfrow=c(2,2))
-idx_90 <- which(cor_mat[,"V21"] > .9)
-matplot(pktab$ref_spectra[,idx_90],type='l', ylab="Abs")
+idx_90 <- which(cor_mat[,ref] > .9)
+matplot(wl, pktab$ref_spectra[,idx_90], type='l',
+        xlab="Wavelength (nm)", ylab="Relative absorbance")
 legend("top", "t = 0.90", bty = "n")
 
-idx_95 <- which(cor_mat[,"V21"] > .95)
-matplot(pktab$ref_spectra[,idx_95],type='l', ylab="Abs")
+idx_95 <- which(cor_mat[,ref] > .95)
+matplot(wl, pktab$ref_spectra[,idx_95], type='l',
+        xlab="Wavelength (nm)", ylab="Relative absorbance")
 legend("top", "t = 0.95", bty = "n")
 
-idx_97 <- which(cor_mat[,"V21"] > .97)
-matplot(pktab$ref_spectra[,idx_97],type='l', ylab="Abs")
+idx_97 <- which(cor_mat[,ref] > .97)
+matplot(wl, pktab$ref_spectra[,idx_97], type='l',
+        xlab="Wavelength (nm)", ylab="Relative absorbance")
 legend("top", "t = 0.97", bty = "n")
 
-idx_99 <- which(cor_mat[,"V21"] > .99)
-matplot(pktab$ref_spectra[,idx_99],type='l', ylab="Abs")
+idx_99 <- which(cor_mat[,ref] > .99)
+matplot(wl, pktab$ref_spectra[,idx_99], type='l',
+        xlab="Wavelength (nm)", ylab="Relative absorbance")
 legend("top", "t = 0.99", bty = "n")
 ```
 
@@ -75,27 +81,27 @@ abline(v = pktab$pk_meta["rt", idx_97], lty=2, col = "darkgray")
 If we are interested in the combined area of these peaks, we could also use these indices to sum them together.
 
 ```{r sum_areas}
-apply(pktab$tab[,idx_99], 1, sum)
+rowSums(pktab$tab[, idx_99, drop = FALSE])
 ```
 
 ##### Hierarchical clustering of spectra
 
-`chromatographR` also includes a function (`cluster_spectra`) to group spectra using hierarchical clustering. We can set the seed with the `iseed` argument to ensure repeatability among instantiations of this vignette. For simplicity, we use the argument `max.only = TRUE` to return only the largest clusters.
+`chromatographR` also includes a function (`cluster_spectra`) to group spectra using hierarchical clustering. We can set the seed with the `iseed` argument to ensure repeatability among instantiations of this vignette. Clusters of 20 or more peaks span most of the table and say little about any one chromophore, so we drop them with `max_size`.
 
 ```{r hierarchical_clustering}
 par(mfrow=c(2,2))
-cl <- cluster_spectra(pktab, alpha = 0.05, iseed = 1, max.only = TRUE)
+cl <- cluster_spectra(pktab, alpha = 0.05, max_size = 20, iseed = 1)
 ```
 
-The output is a dendrogram of peaks, annotated with bootstrap values (cluster support estimated by resampling) at each node. It also plots the spectra of clusters whose bootstrap p-value falls below the significance level specified by `alpha`. In this case, we recovered two clusters, representing two different classes of compounds distinguished by their chromophores. The second cluster closely matches the spectrum represented by peak `'V21'`. We can access the peaks in cluster two as follows:
+The output is a dendrogram of peaks, annotated with bootstrap values (cluster support estimated by resampling) at each node. It also plots the spectra of clusters whose bootstrap p-value falls below the significance level specified by `alpha`. In this case, we recovered `r length(cl$clusters)` clusters. We can find the cluster containing our reference peak and access its peaks as follows:
 
 ```{r return_peaks}
-cl2 <- cl$clusters$c2@peaks
-cl2
+ref_cl <- Filter(function(k) ref %in% k@peaks, cl$clusters)[[1]]
+ref_cl@peaks
 ```
 
-In this case, the peaks in cluster two happen to overlap completely with the peaks recovered through pearson correlation at the 95% threshold.
+This cluster holds the same peaks that correlate with `r ref` above 0.95:
 
 ```{r show_overlap}
-all.equal(cl2, names(idx_95))
+setequal(ref_cl@peaks, names(idx_95))
 ```
