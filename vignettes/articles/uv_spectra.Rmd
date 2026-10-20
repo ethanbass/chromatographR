@@ -11,6 +11,8 @@ knitr::opts_chunk$set(
 )
 ```
 
+Compounds that share a chromophore have similar UV spectra, so the spectra in a peak table can group peaks by compound class. This article shows two ways to do it: correlation with the spectrum of a chosen peak, and hierarchical clustering of all the spectra.
+
 ```{r setup}
 library(chromatographR)
 data("Sa_warp")
@@ -105,3 +107,7 @@ This cluster holds the same peaks that correlate with `r ref` above 0.95:
 ```{r show_overlap}
 setequal(ref_cl@peaks, names(idx_95))
 ```
+
+##### Choosing an approach
+
+A correlation threshold needs a reference peak and a cutoff, and returns the peaks whose spectra resemble that one. Clustering needs no reference peak: it groups the spectra of the whole table and estimates the support for each group by bootstrapping, though you still choose `alpha` and `max_size`. Here both found the same `r length(ref_cl@peaks)` peaks. Use a threshold when you know which compound you are looking for, and clustering to see which groups of spectra the table contains.
