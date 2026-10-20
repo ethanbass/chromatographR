@@ -697,6 +697,19 @@ test_that("plot.peak_list rejects a peak table passed as `chrom_list`", {
   expect_error(plot(pks, chrom_list = pk_tab), regexp = "not a `peak_table`")
 })
 
+test_that("plot.peak_list finds the column when the wavelength is written differently", {
+  skip_on_cran()
+  data(Sa)
+  expect_equal(colnames(Sa[[1]])[11], "220.00000")
+  pdf(NULL)
+  on.exit(dev.off(), add = TRUE)
+  for (fit in c("egh", "raw")) {
+    pks <- get_peaks(Sa[1], lambdas = "220", fit = fit, cl = 1,
+                     show_progress = FALSE)
+    expect_no_error(plot(pks, chrom_list = Sa[1]))
+  }
+})
+
 test_that("get_peaks stamps the `time_unit` attribute that plot.peak_list reads", {
   data(Sa_pr)
   pks <- get_peaks(Sa_pr[1], lambdas = 210, time_unit = "s", cl = 1,

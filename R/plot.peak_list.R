@@ -127,7 +127,8 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
     lambda <- as.character(lambda)
   }
   new.ts <- get_times(x = chrom_list, idx = idx)
-  y <- chrom_list[[idx]][,lambda]
+  lambda.idx <- get_lambda_idx(lambda, get_lambdas(chrom_list), allow_max = FALSE)
+  y <- chrom_list[[idx]][, lambda.idx]
   pks <- data.frame(x[[idx]][[lambda]])
   fit <- attr(x,"fit")
   labels <- peak_labels(pks, numbers, digits)
@@ -181,7 +182,7 @@ plot.peak_list <- function(x, ..., chrom_list, idx = 1, lambda = NULL,
   for (i in seq_len(nrow(pks))){
     tryCatch({
       peak.loc <- seq.int((pks$start[i]),(pks$end[i]), by = res)
-      yvals <- fit_fun(peak.loc, pks[i,], tfac, chrom_list, idx, lambda)
+      yvals <- fit_fun(peak.loc, pks[i,], tfac, chrom_list, idx, lambda.idx)
       floor_vec <- if (baseline == "flat" && !is.null(pks$floor)) {
         pks$floor[i]
       } else if (baseline == "sloped" && !is.null(pks$floor_start)) {

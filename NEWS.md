@@ -402,6 +402,9 @@ built with `get_peaks(time_unit = "s")` or `"ms"`. Previously they were drawn
 too wide.
 * `plot.peak_list` now accepts `xlab`, `ylab` and `type`. Previously passing any
 of them gave an error.
+* `plot.peak_list` no longer fails with "subscript out of bounds" when the
+wavelength given to `get_peaks` is written differently from the chromatogram's
+column name, such as `"220"` for `"220.00000"`.
 * `plot_chroms` no longer errors on single-wavelength chromatograms under the
 `"ggplot"` and `"plotly"` engines. A wavelength given in `lambdas` for such data
 must now match the column name. Previously it was ignored.
