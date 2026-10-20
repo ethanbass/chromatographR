@@ -157,12 +157,9 @@ test_that("filter_peaktable can filter on min_converged", {
 test_that("filter_peaktable rejects min_converged without a converged row", {
   skip_on_cran()
   data(pk_tab, envir = environment())
-  if (!"converged" %in% rownames(pk_tab$pk_meta)){
-    expect_error(filter_peaktable(pk_tab, min_converged = 0.5),
-                 "no `converged` row")
-  } else {
-    skip("stored pk_tab already carries a converged row")
-  }
+  pt <- pk_tab
+  pt$pk_meta <- pt$pk_meta[rownames(pt$pk_meta) != "converged", , drop = FALSE]
+  expect_error(filter_peaktable(pt, min_converged = 0.5), "no `converged` row")
 })
 
 test_that("filter_peaktable matches one peak per requested retention time", {
