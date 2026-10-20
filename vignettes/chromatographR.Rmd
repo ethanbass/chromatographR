@@ -34,11 +34,12 @@ The *chromatographR* package began as a fork from the previously published *alsa
 chromatographR can import data from a growing list of proprietary file formats using the `read_chroms` function from the chromConverter package. Supported file formats include 'Agilent ChemStation' and 'MassHunter' (`.D`) files, 'Thermo Raw' (`.raw`), 'Chromeleon' UV ASCII (`.txt`), 'Waters ARW' (`.arw`), 'Shimadzu' ASCII (`.txt`), and more. (For a complete list, see the [chromConverter documentation](https://ethanbass.github.io/chromConverter/)). Select the appropriate file format by specifying the `format_in` argument (e.g., `csv`, `chemstation_uv`, `masshunter_dad`, `chromeleon_uv`, `waters_arw`, etc).
 
 ```{r load-data, eval = FALSE}
+path <- 'foo' # path to parent directory
+
 # single folder
 read_chroms(paths = path, format_in = "chemstation_uv")
 
 # multiple folders
-path <- 'foo' # path to parent directory
 folders <- list.files(path = path, full.names = TRUE)
 dat <- read_chroms(folders, format_in = "chemstation_uv")
 ```
@@ -55,7 +56,7 @@ data(Sa)
 
 Data from liquid chromatography often carry non-informative artifacts, such as noise or a drifting baseline. The data may also have a higher resolution or wider range (along either the time or spectral dimensions) than we require. Smoothing reduces noise in the spectral direction, and baseline subtraction corrects a drifting baseline. Interpolating wavelengths and retention times reduces the dimensionality of the data, which makes samples easier to compare and cuts the time and memory that downstream analyses need. All three (smoothing, baseline correction, and interpolation) are available through the `preprocess` function and are enabled by default.
 
-To select a narrower range of times and/or wavelengths, arguments can be provided to the optional `dim1` and `dim2` arguments.
+To select a narrower range of times and/or wavelengths, supply them to the optional `dim1` and `dim2` arguments.
 
 Several estimators are available for baseline correction. Here we focus on the default estimator: asymmetric least squares (`"als"`, via `ptw::asysm` [@bloemberg2010]), which fits a smooth curve to the signal while weighting points above the fit differently from points below it; the strength of that asymmetry is set by `p` and the stiffness of the curve by `stiffness`. Three other estimators are available -- `"arpls"`, `"aspls"` and `"snip"` -- which differ in how they decide what counts as baseline (see `?baseline_estimators` for further details).
 
@@ -131,13 +132,15 @@ Clearly, the alignment is considerably improved after warping. You can also use 
 
 #### Variable penalty dynamic time warping
 
-Variable penalty dynamic time warping is another algorithm that can be very effective for correcting retention time shifts [@clifford2009; @clifford2012]. Instead of calculating an explicit warping function, dynamic time warping (DTW) works by repeatedly shifting, expanding or contracting the time axis in small steps until a satisfactory alignment is attained. This process can result in very close matching of peaks, but can also lead to severe peak distortion if the time axis is repeatedly expanded and/or contracted [@tomasi2004]. **Variable penalty dynamic time warping** is a derivative of DTW that constrains expansion and contraction of the time-axis by applying a penalty to these types of "risky" moves. This can often achieve a very good alignment with minimal peak distortion. Unlike `PTW`, `VPdtw` can only take a single wavelength as input (but it returns a global warping on the whole chromatographic matrix). The code snippet below uses VPdtw to warp the example chromatograms using the first chromatogram as a reference. The `penalty`, `maxshift` and `dilation_span` parameters can be adjusted to control the degree of warping. The latter two are widths along the time axis, given in the same units as the retention times.
+Variable penalty dynamic time warping is another algorithm that can be very effective for correcting retention time shifts [@clifford2009; @clifford2012]. Instead of calculating an explicit warping function, dynamic time warping (DTW) works by repeatedly shifting, expanding or contracting the time axis in small steps until a satisfactory alignment is attained. This process can result in very close matching of peaks, but can also lead to severe peak distortion if the time axis is repeatedly expanded and/or contracted [@tomasi2004]. **Variable penalty dynamic time warping** is a derivative of DTW that constrains expansion and contraction of the time-axis by applying a penalty to these types of "risky" moves. This often places peaks very closely, but it does not prevent distortion: a peak that falls where the warp changes is still stretched or squeezed, and its area changes with it (see *Peak detection and integration* below). Unlike `PTW`, `VPdtw` can only take a single wavelength as input (but it returns a global warping on the whole chromatographic matrix). The code snippet below uses VPdtw to warp the example chromatograms using the first chromatogram as a reference. The `penalty`, `max_shift` and `dilation_span` parameters can be adjusted to control the degree of warping. The latter two are widths along the time axis, given in minutes.
 
 (Note: `VPdtw` is a suggested rather than a required dependency, since it needs a working C++ compiler.)
 
 ```{r vpdtw-alignmment, eval = TRUE}
-warp_vpdtw <- correct_rt(chrom_list = dat.pr, alg = "vpdtw", lambdas = 210, 
-                   what = "corrected.values")
+vpdtw_models <- correct_rt(chrom_list = dat.pr, alg = "vpdtw", lambdas = 210,
+                           what = "models")
+warp_vpdtw <- correct_rt(chrom_list = dat.pr, models = vpdtw_models,
+                         alg = "vpdtw", lambdas = 210)
 ```
 
 ```{r plot-chroms, fig.height = 6, fig.cap = "Comparison of variable penalty dynamic time warping (VPdtw) aligned chromatograms (top) with raw data (bottom)."}
@@ -151,7 +154,7 @@ legend("topleft", legend = "VPdtw", bty = "n")
 
 Chromatograms can also be visualized as heatmaps with `plot_chroms_heatmap`, which can be a powerful way to check the alignment of chromatograms across samples.
 
-```{r plot-chroms-heatmap, fig.height = 6, fig.cap = "Comparison of variable penalty dynamic time warping (VPdtw) aligned chromatograms (top) with raw data (bottom) via heatmap plot."}
+```{r plot-chroms-heatmap, fig.height = 6, fig.cap = "Heatmaps of the raw chromatograms (top), and of the chromatograms aligned by parametric time warping (middle) and variable penalty dynamic time warping (bottom)."}
 par(mfrow=c(3,1))
 plot_chroms_heatmap(dat.pr, lambdas = 210, show_legend = FALSE,
                     title="Raw data")
@@ -161,26 +164,31 @@ plot_chroms_heatmap(warp_vpdtw, lambdas = 210, show_legend = FALSE,
                     title="Variable Penalty Dynamic Time Warping (VPdtw)")
 ```
 
-In this case the alignments produced by the two algorithms are quite similar, but in other cases one algorithm may dramatically outperform the other. PTW's parametric warp can occasionally go awry and overwarp the data, distorting peaks; VPdtw is less prone to this failure mode, while PTW remains more interpretable since it fits an explicit model to the data. Examination of the coefficients from these models can often be useful for the identification of problematic samples.
+In this case the alignments produced by the two algorithms are quite similar, but in other cases one algorithm may dramatically outperform the other. PTW's parametric warp can occasionally go awry and overwarp the data, distorting peaks. On the other hand, PTW fits an explicit model to each chromatogram, and its coefficients often reveal problematic samples.
 
 ### Peak detection and integration
 
-The `get_peaks` function produces a nested list of peaks by looping through the supplied chromatograms at the specified wavelengths, finding peaks, and fitting them to the specified function using non-linear least squares. The area under the curve for each peak is then estimated using trapezoidal approximation. The `fit` argument specifies the peak model. By default, peaks are fit to an exponential-gaussian hybrid function (`"egh"`) [@lan2001]. The other models are the bidirectional exponentially modified gaussian (`"bemg"`) and `"gaussian"`. Alternatively, peak areas can be integrated without applying a model (`fit = "raw"`). The function returns a nested list of data.frames containing parameters for the peaks identified in each chromatogram.
+The `get_peaks` function produces a nested list of peaks by looping through the supplied chromatograms at the specified wavelengths, finding peaks, and fitting them to the specified function using non-linear least squares. The area under each fitted curve is then estimated by the trapezoidal rule. The `fit` argument specifies the peak model. By default, peaks are fit to an exponential-gaussian hybrid function (`"egh"`) [@lan2001]. The other models are the bidirectional exponentially modified gaussian (`"bemg"`) and `"gaussian"`. Alternatively, peak areas can be integrated without applying a model (`fit = "raw"`). The function returns a nested list of data.frames containing parameters for the peaks identified in each chromatogram.
+
+Integrate the unaligned chromatograms (`dat.pr`), not the warped ones. Warping resamples the signal, so any peak it stretches or squeezes is no longer the peak that was measured, and its area is wrong. Alignment is still needed to decide which peaks are the same compound across samples; `correct_peaks` supplies it by mapping each peak's retention time through the warping models, leaving areas untouched.
 
 ```{r get-peaks, message = FALSE, warning = FALSE}
 # find and integrate peaks using bidirectional exponentially modified gaussian
-pks_bemg <- get_peaks(warp_vpdtw, lambdas = c(210), fit = "bemg")
+pks_bemg <- get_peaks(dat.pr, lambdas = c(210), fit = "bemg")
 
 # find and integrate peaks using gaussian peak fitting
-pks_gauss <- get_peaks(warp_vpdtw, lambdas = c(210), fit = "gaussian")
+pks_gauss <- get_peaks(dat.pr, lambdas = c(210), fit = "gaussian")
 
 # find and integrate peaks using exponential-gaussian hybrid model
-pks_egh <- get_peaks(warp_vpdtw, lambdas = c(210),fit = "egh")
+pks_egh <- get_peaks(dat.pr, lambdas = c(210), fit = "egh")
+
+# map retention times onto the aligned time axis
+pks_egh <- correct_peaks(pks_egh, mod_list = vpdtw_models, chrom_list = dat.pr)
 ```
 
 #### Visualization
 
-The `plot.peak_list` function shows how well the peaks were integrated. Below we compare the peaks fitted for the first chromatogram (`idx = 1`) using the three peak models. Usually the egh function performs slightly better for asymmetrical peaks than the symmetric gaussian.
+The `plot.peak_list` function shows how well the peaks were integrated. Below we compare the peaks fitted for the first chromatogram (`idx = 1`) using the three peak models. On these data, both asymmetric models fit more closely than the symmetric gaussian, as the `r.squared` column of each peak list shows.
 
 ```{r plot-peaks, warning = FALSE, fig.height = 6, fig.cap = "Comparison of peak models: gaussian (top), exponential-gaussian hybrid (middle) and bidirectional exponentially modified gaussian (bottom)."}
 par(mfrow=c(3,1))
@@ -223,35 +231,23 @@ legend("topright", "Sloped baseline", bty = "n")
 
 The peak-finding algorithm often detects peaks that are little more than noise. Filtering these out at this stage reduces the cost of peak table construction, which matters most when there are many samples. Use the `max_fwhm` argument to filter by peak width and `min_amplitude` to filter by peak height, or call `filter_peaks` on a `peak_list` that already exists.
 
-#### Calibrating these parameters from your own data
-
-`max_fwhm` in `get_peaks` and `filter_peaks` is expressed as a peak width. Rather than guessing at it, you can measure your peak widths from a peak table and feed them back. Run `get_peaks` once with `max_fwhm = NULL`, which disables width filtering, then read the widths off the result. Measuring from a run that left the default filter in place would be circular: the widest peaks would already have been discarded before you saw them.
-
-```{r calibrate-peak-width}
-pks_unfiltered <- get_peaks(warp_vpdtw, lambdas = 210, max_fwhm = NULL, cl = 1)
-widths <- do.call(rbind, lapply(pks_unfiltered, function(x) data.frame(x[["210"]])))
-
-median(widths$FWHM, na.rm = TRUE) # typical peak width
-max(widths$FWHM, na.rm = TRUE)    # widest peak detected
-```
-
-`max_fwhm` is a full width at half maximum, so the `FWHM` column feeds it directly with no conversion. (The `sd` column is the standard deviation of the fitted Gaussian core, `FWHM / 2.355`; it is not comparable across values of `fit`, which is why the width arguments are expressed as FWHM instead.) The median `FWHM` here is `r round(median(widths$FWHM, na.rm = TRUE), 2)` minutes and the widest detected peak is `r round(max(widths$FWHM, na.rm = TRUE), 2)`. Since the point of `max_fwhm` is to reject peaks wider than any real one, set it above that maximum, not at an upper quantile of it -- a quantile discards the broadest real peaks by construction. Plot the widest few first to decide whether they are peaks or merged detections.
-
-One unit caveat: `max_fwhm` is compared against the `FWHM` column, which is reported in the units set by `get_peaks`' `time_unit` argument. The retention times (`rt`, `start`, `end`) are always in the chromatogram's own units, whatever `time_unit` says. With the default `time_unit = "min"` and a chromatogram indexed in minutes, as here, the two coincide and there is nothing to think about.
-
-Two further caveats. First, this is a calibration pass rather than automatic parameter selection: the widths are measured from data that has *already* been baseline-corrected at some stiffness, so a badly wrong first guess is worth iterating once. Second, a single number hides a wide distribution -- across these four samples the fitted `FWHM` spans `r round(min(widths$FWHM, na.rm = TRUE), 2)` to `r round(max(widths$FWHM, na.rm = TRUE), 2)` minutes, a spread of roughly `r round(max(widths$FWHM, na.rm = TRUE) / min(widths$FWHM, na.rm = TRUE))`-fold, because later peaks are genuinely broader than early ones. Treat the result as a starting point, and check it the way the pre-processing section does, by plotting the estimated baseline against the trace.
+To set `max_fwhm`, and the peak-finding settings, from the widths of your own peaks, see the [peak-finding article](https://ethanbass.github.io/chromatographR/articles/peak-finding.html).
 
 ### Peak table assembly
 
-After obtaining a `peak_list`, the `get_peaktable` function performs complete-linkage hierarchical clustering to link peaks across samples. It returns a `peak_table` object with samples as rows and peaks as columns. The `peak_table` object also has slots for holding metadata about peaks, samples, and the parameters used in the analysis. With many samples this step is expensive, so filter the `peak_list` before passing it to `get_peaktable` (see *Peak filtering* above). Peaks can also be filtered after `peak_table` assembly using the `filter_peaktable` function. An important parameter here is `hmax` which controls the stringency with which retention times are matched across samples. A low value of `hmax` will increase the odds of splitting a single peak across multiple columns, while a high value of `hmax` will increase the odds of erroneously combining multiple peaks into the same column.
+After obtaining a `peak_list`, the `get_peaktable` function links peaks across samples by hierarchical clustering (complete linkage on retention times, by default). It returns a `peak_table` object with samples as rows and peaks as columns. The `peak_table` object also has slots for holding metadata about peaks, samples, and the parameters used in the analysis. With many samples this step is expensive, so filter the `peak_list` before passing it to `get_peaktable` (see *Peak filtering* above). Peaks can also be filtered after `peak_table` assembly using the `filter_peaktable` function. An important parameter here is `hmax`, the height at which the clustering tree is cut, which controls how closely retention times must agree to be matched across samples. A low value of `hmax` increases the odds of splitting a single peak across multiple columns, while a high value increases the odds of combining multiple peaks into the same column.
+
+Because `pks_egh` carries corrected retention times, `get_peaktable` clusters on those, and functions that later read spectra or traces from the peak table use the aligned chromatograms automatically, rebuilt from the warping models that `correct_peaks` stored.
 
 ```{r get-peaktable}
-# assembly peak table from peak_list saved in `pks_egh`
+# assemble peak table from peak_list saved in `pks_egh`
 pk_tab <- get_peaktable(pks_egh, response = "area", hmax = 0.2)
 
 # print first six columns of peak table
 head(pk_tab$tab[,1:6])
 ```
+
+If you only need a few known compounds, `get_peaks(targets = ...)` fits only the peaks at the retention times you list, and `get_peaktable` returns one named column per target. See `?targeted_analysis`, and the [calibration article](https://ethanbass.github.io/chromatographR/articles/calibration.html) for a worked example.
 
 ### Further analysis and data-visualization
 
@@ -276,7 +272,7 @@ Optionally, attach scaled reference spectra to the `peak_table` with the `attach
 ```{r attach-reference-spectra}
 pk_tab <- attach_ref_spectra(pk_tab, ref = "max.int")
 cor_matrix <- cor(pk_tab$ref_spectra)
-hx <- names(which(cor_matrix[,"V20"] > .97))
+hx <- names(which(cor_matrix[,"V21"] > .97))
 matplot(x = as.numeric(rownames(pk_tab$ref_spectra)),
                    y = pk_tab$ref_spectra[, hx], type = 'l',
                    ylab = "Abs (mAU)", 
@@ -297,9 +293,9 @@ mirror_plot(pk_tab, lambdas = c(210), var = "trt", legend_size = 2)
 
 The `plot_spectrum` function plots or returns the spectra associated with a particular peak in your peak table -- useful for checking whether the spectra for a peak match across samples, or for comparing one against a known standard. Set `plot_spectrum` or `plot_trace` to `FALSE` to draw only the other. By default it plots the trace and spectrum from the chromatogram with the largest peak in the peak table; `idx` and `lambda` choose the chromatogram and wavelength instead.
 
-```{r plot-spectra, fig.height = 6, fig.alt = "Output of `plot_spectrum` function. Trace of chromatogram 4 at 318 nm (top) and spectrum of peak `V7` (bottom)."}
+```{r plot-spectra, fig.height = 6, fig.alt = "Output of `plot_spectrum` function. Trace of the chromatogram with the largest `V8` peak, at the wavelength where its spectrum is highest (top), and spectrum of peak `V8` (bottom)."}
 par(mfrow = c(2,1))
-peak <- "V7"
+peak <- "V8"
 plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp_vpdtw,
               verbose = FALSE)
 ```
@@ -313,33 +309,33 @@ plot_spectrum(peak, peak_table = pk_tab, chrom_list = warp_vpdtw,
 
 The `plot_all_spectra` function compares the spectra for a specified peak across all samples.
 
-```{r plot-all-spectra, fig.alt="Output of `plot_all_spectra` function showing scaled spectra of peaks `V13` and `V14`."}
+```{r plot-all-spectra, fig.alt="Output of `plot_all_spectra` function showing scaled spectra of peaks `V14` and `V15`."}
 par(mfrow=c(1,2))
-plot_all_spectra("V13", peak_table = pk_tab, export_spectrum = FALSE)
 plot_all_spectra("V14", peak_table = pk_tab, export_spectrum = FALSE)
+plot_all_spectra("V15", peak_table = pk_tab, export_spectrum = FALSE)
 ```
 
-Inconsistent spectra, as in `V13`, can indicate a problem with the alignment, or co-elution of several substances in the same retention window. By contrast, `V14` looks relatively pure.
+Inconsistent spectra, as in `V14`, can indicate a problem with the alignment, or co-elution of several substances in the same retention window. By contrast, `V15` looks relatively pure.
 
 The `plot_spectrum_inset` function plots spectra onto the chromatogram.
 
 ```{r inset-plot, eval=requireNamespace("ggplot2", quietly=TRUE), fig.width=8, fig.height=6}
-plot_spectrum_inset("V13", peak_table = pk_tab, 
+plot_spectrum_inset("V14", peak_table = pk_tab, 
               verbose = FALSE, xlab="Retention time (min)",
               position="top", inset_width = 0.25)
 ```
 
-It also produces multiple insets, and the `title` argument gives the spectra titles. Additional peaks can be labeled with arbitrary labels using the `annotate_peaks` function.
+Passing several peaks draws one inset per peak, titled by the names of `loc`. Additional peaks can be labeled with arbitrary labels using the `annotate_peaks` function.
 
 ```{r double-inset-plot, eval=requireNamespace("ggplot2", quietly=TRUE), fig.width=8, fig.height=6}
-plot_spectrum_inset(c("Unknown 1" = "V7",
-                      "Unknown 2" = "V15"), idx=c(1:4), 
+plot_spectrum_inset(c("Unknown 1" = "V8",
+                      "Unknown 2" = "V16"), idx=c(1:4), 
                     peak_table = pk_tab, 
               verbose = FALSE, xlab="Retention time (min)",
               position=list(c(0.0,0.6),c(0.55,0.4)), inset_width = 0.25,
               scale_spectrum = FALSE) |>
-   annotate_peaks(loc = c(A = "V5", B = "V7", C="V17",
-                          D = "V21", E = "V22"), peak_table = pk_tab)
+   annotate_peaks(loc = c(A = "V6", B = "V8", C="V18",
+                          D = "V22", E = "V23"), peak_table = pk_tab)
 ```
 
 ##### Plot peak table function
@@ -348,7 +344,7 @@ The `plot.peak_table` function is a simplified interface to the plots above: it 
 
 ```{r plot-peaktable, fig.height = 6}
 par(mfrow = c(3,1))
-plot(pk_tab, loc = "V13", box_plot = TRUE, vars = "trt", verbose = FALSE)
+plot(pk_tab, loc = "V14", box_plot = TRUE, vars = "trt", verbose = FALSE)
 ```
 
 ## References
