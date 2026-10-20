@@ -24,8 +24,7 @@ subset(x, subset, select, drop = FALSE, ...)
 
 - select:
 
-  Logical expression indicating columns (peaks) to select from
-  `peak_table`.
+  Expression indicating columns (peaks) to select from `peak_table`.
 
 - drop:
 

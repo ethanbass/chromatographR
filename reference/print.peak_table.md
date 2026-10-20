@@ -23,5 +23,5 @@ print(x, ...)
 
 ## Value
 
-Prints and invisible returns the `tab` element from the supplied
+Prints and invisibly returns the `tab` element from the supplied
 `peak_table`.

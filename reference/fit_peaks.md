@@ -14,11 +14,12 @@ fit_peaks(
   x,
   lambda,
   pos = NULL,
-  sd_max = 50,
+  sd_max = NULL,
   fit = c("egh", "bemg", "gaussian", "raw"),
   max_iter = 1000,
-  estimate_purity = TRUE,
-  noise_threshold = 0.001,
+  estimate_purity = FALSE,
+  purity_args = list(),
+  noise_variance = NULL,
   baseline = c("none", "flat", "sloped"),
   ...
 )
@@ -37,20 +38,28 @@ fit_peaks(
 
 - pos:
 
-  Locations of peaks in vector `y`. If `NULL`, `find_peaks` will run
-  automatically to find peak positions.
+  A `data.frame` of peak apices and boundaries, as returned by
+  [`find_peaks`](https://ethanbass.github.io/chromatographR/reference/find_peaks.md),
+  with columns `pos`, `lower` and `upper` giving row indices of `x`. If
+  `NULL` (the default),
+  [`find_peaks`](https://ethanbass.github.io/chromatographR/reference/find_peaks.md)
+  is run on `x` at `lambda`.
 
 - sd_max:
 
-  Maximum width (standard deviation) for peaks. Defaults to `50`.
+  Deprecated. Filter peaks by width with
+  [`filter_peaks`](https://ethanbass.github.io/chromatographR/reference/filter_peaks.md)
+  instead. If supplied, it is applied as a cutoff on `FWHM` of
+  `2.355 * sd_max` timepoints.
 
 - fit:
 
-  Peak model to use. Options include `"bemg"` (bidirectional
-  exponentially modified Gaussian), `"egh"` (exponential-Gaussian
-  hybrid), `"gaussian"`, and `"raw"`. If `raw` is selected, peaks are
-  integrated using trapezoidal integration without model fitting.
-  Defaults to `"egh"`.
+  Peak model. Options are bidirectional exponentially modified Gaussian
+  (`"bemg"`), exponential-Gaussian hybrid (`"egh"`), `"gaussian"`, or
+  `"raw"`. `"raw"` integrates the signal directly by trapezoidal
+  approximation without fitting a model. Defaults to `"egh"`. See *Peak
+  models* in
+  [`get_peaks`](https://ethanbass.github.io/chromatographR/reference/get_peaks.md).
 
 - max_iter:
 
@@ -59,54 +68,99 @@ fit_peaks(
 
 - estimate_purity:
 
-  Logical. Whether to estimate purity or not. Defaults to `TRUE`.
+  Logical. Whether to estimate purity. Defaults to `FALSE`, and is
+  always `FALSE` when `x` holds a single wavelength.
 
-- noise_threshold:
+- purity_args:
 
-  Noise threshold. Input to `get_purity`.
+  A named list of additional arguments passed to
+  [`get_purity`](https://ethanbass.github.io/chromatographR/reference/get_purity.md),
+  e.g. `list(background_correction = "none", metric = "max")`. A
+  `lambdas` element here selects the wavelengths used to compare
+  spectra, not the wavelengths at which peaks are integrated.
+
+- noise_variance:
+
+  Variance of noise, passed to
+  [`get_purity`](https://ethanbass.github.io/chromatographR/reference/get_purity.md).
+  If not provided, it is estimated once for the whole chromatogram
+  rather than once per peak.
 
 - baseline:
 
-  Whether to fit a baseline offset beneath each peak model. Options are
-  `"none"` (no baseline, default), `"flat"` (constant offset), or
-  `"sloped"` (linearly varying offset). Not available when
-  `fit = "raw"`.
+  Whether to measure each peak above a local baseline: `"none"` (the
+  default), `"flat"` or `"sloped"`. See *Local baselines* in
+  [`get_peaks`](https://ethanbass.github.io/chromatographR/reference/get_peaks.md).
 
 - ...:
 
-  Additional arguments to `find_peaks`.
+  Additional arguments passed to
+  [`find_peaks`](https://ethanbass.github.io/chromatographR/reference/find_peaks.md),
+  such as `smooth_window`, `smooth_type`, `min_prominence_snr`,
+  `min_curvature` and `min_amplitude`. See *Choosing the smoothing
+  window* in
+  [`find_peaks`](https://ethanbass.github.io/chromatographR/reference/find_peaks.md).
 
 ## Value
 
-A matrix with one row per peak and the following columns:
+A `data.frame` with one row per peak and the following columns:
 
-- `rt`: Peak maximum location.
+- `rt`: Apex of the fitted peak model, or of the detected peak when
+  `fit = "raw"`.
 
-- `start`: Peak start (only included in table if `bounds = TRUE`).
+- `start`: Peak start.
 
-- `end`: Peak end (only included in table if `bounds = TRUE`).
+- `end`: Peak end.
 
-- `sd`: Peak standard deviation.
+- `sd`: Standard deviation of the Gaussian component of the fitted
+  model, which is not the width of the peak unless `fit = "gaussian"`.
+  `NA` when `fit = "raw"`.
 
-- `tau`: Exponential decay constant (only included in table if
-  `fit = "egh"`).
+- `tau`: Exponential decay constant (only when `fit = "egh"`).
 
-- `tau_right`: Exponential decay constant for right side of peak (when
-  `bemg` is selected).
+- `tau_right`: Time constant of the exponential tail on the right side
+  of the peak, the reciprocal of its fitted rate (only when
+  `fit = "bemg"`).
 
-- `tau_left`: Exponential decay constant for left side of peak (when
-  `bemg` is selected).
+- `tau_left`: Time constant of the exponential tail on the left side of
+  the peak, the reciprocal of its fitted rate (only when
+  `fit = "bemg"`).
 
-- `FWHM`: The full width at half maximum.
+- `h`: The amplitude parameter of the fitted BEMG shape function. It
+  scales the shape but is neither its value at `center` nor the peak
+  `height` (only when `fit = "bemg"`).
+
+- `center`: The center parameter of the fitted BEMG shape function, the
+  location around which the exponential tails are applied. May differ
+  from `rt` (only when `fit = "bemg"`).
+
+- `FWHM`: The full width at half maximum of the peak, comparable across
+  values of `fit`. `NA` for a `"raw"` peak whose integration window does
+  not fall below half its height on both sides.
 
 - `height`: Peak height above the fitted baseline.
 
 - `area`: Peak area above the fitted baseline.
 
-- `r.squared`: The R² value for linear fit of the model to the data.
+- `r.squared`: Coefficient of determination (\\R^2\\) of the fitted
+  curve over the peak window, `1 - SS_res / SS_tot`. Negative when the
+  fit is worse than a flat line at the mean. Not returned when
+  `fit = "raw"`.
 
 - `purity`: The spectral purity of peak as assessed by
   [`get_purity`](https://ethanbass.github.io/chromatographR/reference/get_purity.md).
+
+- `window_limited`: `1` if a fitted shape parameter hit a limit set by
+  the integration window, or a `"gaussian"` or `"egh"` fit narrowed to
+  one sampling interval at half height, meaning the window or the
+  sampling rather than the data determined the reported shape, and `0`
+  otherwise. Not returned when `fit = "raw"`.
+
+- `converged`: `1` if the optimizer reported convergence for the final
+  step of the fit, and `0` otherwise, including when part or all of the
+  fit was skipped or failed (see *Fitting procedure* in
+  [`get_peaks`](https://ethanbass.github.io/chromatographR/reference/get_peaks.md)).
+  Not returned when `fit = "raw"`.
 
 - `floor`: Constant baseline offset (only when `baseline = "flat"`).
 
@@ -114,17 +168,32 @@ A matrix with one row per peak and the following columns:
   (only when `baseline = "sloped"`).
 
 - `floor_end`: Baseline level at the right edge of the peak window (only
-  when `baseline = "sloped"`). The first five elements (`rt`, `start`,
-  `end`, `sd` and `FWHM`) are expressed as index positions rather than
-  absolute retention times. The transformation to real time is done in
-  `get_peaks`.
+  when `baseline = "sloped"`). The table is in index units rather than
+  retention times: `rt`, `start`, `end` and `center` are index
+  positions; `sd`, `FWHM`, `tau`, `tau_right` and `tau_left` are widths
+  on the index scale; and `area` is integrated over the index axis.
+  [`get_peaks`](https://ethanbass.github.io/chromatographR/reference/get_peaks.md)
+  converts them to the chromatogram's time axis.
+
+## Details
+
+Peaks that can't be fitted are dropped if they've been detected
+automatically with `find_peaks`. Otherwise, if the peak positions are
+provided explicitly through `pos`, `height` and `area` are set to `NA`
+and they are marked `0` in the `converged` column.
+
+The peak models, local baselines and fitting procedure are described in
+[`get_peaks`](https://ethanbass.github.io/chromatographR/reference/get_peaks.md),
+under *Peak models*, *Local baselines* and *Fitting procedure*.
 
 ## Note
 
-The `fit_peaks` function is adapted from Dr. Robert Morrison's
+The loop over peaks in `fit_peaks` is adapted from the `fitpeaks`
+function in Ron Wehrens' [alsace](https://github.com/rwehrens/alsace)
+package. The Gaussian peak shape and the interface of the internal
+fitting functions are adapted from Robert Morrison's
 [DuffyTools](https://github.com/robertdouglasmorrison/DuffyTools)
-package as well as code published in Ron Wehrens'
-[alsace](https://github.com/rwehrens/alsace) package.
+package.
 
 ## References
 
@@ -153,66 +222,56 @@ Ethan Bass
 ``` r
 data(Sa_pr)
 fit_peaks(Sa_pr[[1]], lambda = 220)
-#>           rt start end        sd           tau      FWHM      height
-#> 1   30.69332    14  46 6.2865644    1.20769992 14.773426   9.1034627
-#> 2   50.94330    46  52 0.5711967  -11.41366848  1.342312   0.4022556
-#> 3   61.44532    53  61 3.2042222    2.37308275  7.529922  14.3385995
-#> 4   69.97526    61  78 2.7067311   -1.01879444  6.360818 124.1300652
-#> 5   82.42709    78  85 1.3744994   -0.73109961  3.230074   2.3051668
-#> 6   89.64284    85  93 1.5296385    0.61202488  3.594650   2.6256571
-#> 7  104.49707    93 114 2.1826134   -0.19394678  5.129142 894.1248943
-#> 8   81.84177   114 118 2.4690722   22.61770113  5.802320  42.5947951
-#> 9  119.85327   118 123 5.2832737  -13.86056689 12.415693   8.6545653
-#> 10 131.85675   123 139 1.8315236    0.11513594  4.304081 468.1212567
-#> 11 141.10828   139 147 4.1299082   -4.37157201  9.705284   8.4526758
-#> 12 156.09501   149 161 1.7963783   -0.01487998  4.221489   7.1019209
-#> 13 167.73853   161 171 1.6517982   -0.14556475  3.881726  28.2608430
-#> 14 183.22815   171 188 2.0807233   -0.22145455  4.889700 414.6928515
-#> 15 193.98654   188 200 2.4682084   -1.29245512  5.800290 126.0967365
-#> 16 216.44045   200 228 1.8375563   -0.13007408  4.318257 433.2796803
-#> 17 234.50440   228 238 1.9619252   -0.17648212  4.610524  47.8442003
-#> 18 243.58113   238 254 4.9483859    0.66568143 11.628707  14.0416866
-#> 19 262.00099   254 264 1.8302984   -0.98597515  4.301201  19.1541885
-#> 20 272.87432   264 279 3.0837104    0.05107119  7.246719  94.1813171
-#> 21 284.45995   279 293 1.8712197   -0.34947351  4.397366 161.7599016
-#> 22 298.28530   293 303 2.0217365   -0.90317976  4.751081  17.1078695
-#> 24 320.15708   315 323 1.2587749    0.34042184  2.958121   0.9339542
-#> 25 336.89949   323 347 2.2339189   -0.82019092  5.249709 171.5472176
-#> 26 351.82167   347 363 4.3854006    2.73641711 10.305691   6.9880680
-#> 27 379.01651   363 383 9.6193330  -13.36671566 22.605432   3.8160109
-#> 28 389.96461   383 390 0.4505398  -11.19848606  1.058768   5.7371410
-#> 29 396.32753   390 401 7.3086188   -2.14825864 17.175254   6.4654057
-#> 30 410.94947   401 411 1.7808715 -123.44165218  4.185048   5.7088185
-#> 31 419.42472   411 421 4.8293966  -14.83514636 11.349082   7.7061414
-#>           area r.squared     purity
-#> 1   141.237161 0.9869708 0.63636364
-#> 2     1.664893 0.7267476 1.00000000
-#> 3    37.107139 0.9997068 1.00000000
-#> 4   846.567716 0.9954198 0.17647059
-#> 5     7.964953 0.9529150 1.00000000
-#> 6     9.667361 0.9974965 1.00000000
-#> 7  4895.364758 0.9991512 0.09090909
-#> 8    38.579138 0.8292605 0.60000000
-#> 9    38.911532 0.9637970 1.00000000
-#> 10 2149.558127 0.9991802 0.22222222
-#> 11   46.615211 0.9910774 1.00000000
-#> 12   31.861289 0.9960339 1.00000000
-#> 13  114.667078 0.9997472 1.00000000
-#> 14 2149.492159 0.9987345 0.18181818
-#> 15  759.917479 0.9870224 0.18181818
-#> 16 1996.653868 0.9988400 0.70000000
-#> 17  227.707869 0.9889112 0.72727273
-#> 18  150.579316 0.8325459 0.69230769
-#> 19   84.009309 0.9912112 0.70000000
-#> 20  707.817033 0.9118992 0.50000000
-#> 21  755.914103 0.9843055 0.36363636
-#> 22   85.445828 0.9455491 0.72727273
-#> 24    2.857647 0.9897500 1.00000000
-#> 25  972.589353 0.9950354 0.33333333
-#> 26   71.516308 0.7701393 1.00000000
-#> 27   63.064242 0.9955775 1.00000000
-#> 28   29.703398 0.9392470 1.00000000
-#> 29   64.730873 0.8411157 1.00000000
-#> 30   54.811944 0.8662737 1.00000000
-#> 31   66.589250 0.8950062 1.00000000
+#>           rt start end        sd          tau      FWHM      height
+#> 1   30.66114    14  48  6.101575   1.44697364 14.403076   8.9748818
+#> 2   49.94050    48  54  1.181971  -1.10373785  2.886559   0.3915597
+#> 3   70.01920    54  79  2.729871  -1.17486581  6.479732 123.7545250
+#> 4   82.33054    79  86  1.482960  -0.43913100  3.505344   2.5630020
+#> 5   89.65612    86  93  1.725862   0.74138982  4.096455   2.8793770
+#> 6  104.49705    93 124  2.183908  -0.19404617  5.144468 894.3629580
+#> 7  131.85646   124 149  1.833434   0.11605405  4.318157 468.3178181
+#> 8  156.03382   149 161  1.858660   0.17723271  4.378535   7.4302224
+#> 9  167.74077   161 173  1.681790  -0.15232333  3.961719  28.6002885
+#> 10 183.20931   173 189  2.094857  -0.16099380  4.934272 414.2717933
+#> 11 193.90505   189 201  2.400072  -0.87407104  5.684120 128.4663742
+#> 12 216.44076   201 229  1.842958  -0.13155394  4.340793 433.8264796
+#> 13 234.37947   229 240  2.087220   0.30929995  4.919702  47.6597945
+#> 14 243.28110   240 255  3.721672   3.76517021  9.144208  16.0564058
+#> 15 261.90773   255 265  2.102433  -0.57181758  4.966692  18.9817970
+#> 16 272.86037   265 279  3.095311   0.09729706  7.289213  94.6165502
+#> 17 284.46078   279 294  1.877091  -0.35653644  4.427114 161.9127876
+#> 18 298.16377   294 311  1.928674  -0.35565627  4.548366  17.6025746
+#> 19 320.10828   311 323  1.046951   0.27961372  2.472988   0.7954206
+#> 20 336.89987   323 348  2.228935  -0.81884813  5.279340 171.3788902
+#> 21 351.76261   348 364  3.699194   3.37989773  9.020474   6.9747887
+#> 22 378.91468   364 384 10.262991  -7.88194072 24.777329   3.4392483
+#> 23 396.45231   384 403  9.840007  -2.54701213 23.238604   5.8916446
+#> 24 411.06601   403 412  7.643896 -97.75200512 70.106682   5.3320058
+#> 25 419.24718   412 422  6.088367  -6.96651196 15.128362   7.2786470
+#>            area r.squared purity window_limited converged
+#> 1   136.6168187 0.9834201     NA              0         1
+#> 2     0.9895294 0.1434314     NA              0         1
+#> 3   861.2327696 0.9910190     NA              0         1
+#> 4     9.2206621 0.9982737     NA              0         1
+#> 5    11.6265191 0.9937378     NA              0         1
+#> 6  4899.5751670 0.9985326     NA              0         1
+#> 7  2153.0681287 0.9981330     NA              0         1
+#> 8    34.3806776 0.9355800     NA              0         1
+#> 9   120.5844854 0.9995746     NA              0         1
+#> 10 2172.4932812 0.9960212     NA              0         1
+#> 11  735.7342180 0.9970448     NA              0         1
+#> 12 2005.0667012 0.9957840     NA              0         1
+#> 13  247.0319456 0.9661289     NA              0         1
+#> 14  145.4116996 0.9588278     NA              0         1
+#> 15   96.0671652 0.9711060     NA              0         1
+#> 16  710.5446283 0.8959060     NA              0         1
+#> 17  758.8991868 0.9748398     NA              0         1
+#> 18   82.6349173 0.9781477     NA              0         1
+#> 19    2.0678877 0.1506531     NA              0         1
+#> 20  969.4820324 0.9942008     NA              0         1
+#> 21   64.0434095 0.8251971     NA              0         1
+#> 22   57.4508700 0.9935989     NA              0         1
+#> 23   94.7135320 0.8801906     NA              0         1
+#> 24   46.5196604 0.8663922     NA              1         1
+#> 25   64.5439100 0.9002292     NA              0         1
 ```

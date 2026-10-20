@@ -2,7 +2,7 @@
 
 Plots a chromatogram (either a single trace or multiple traces) with an
 inset UV spectrum for a specified peak. Dotted lines connect the peak
-apex to the corners of the inset box.
+apex to the two nearest corners of the inset box.
 
 ## Usage
 
@@ -39,17 +39,16 @@ plot_spectrum_inset(
 
 - chrom_list:
 
-  A list of chromatograms in matrix format (timepoints x wavelengths).
+  A list of chromatograms in matrix format (timepoints × wavelengths).
   If no argument is provided here, the function will try to find the
   `chrom_list` object using the pointer in the `peak_table`.
 
 - idx:
 
   Index of chromatogram(s) to plot. If `"max"` (default) or a scalar,
-  plots a single trace using
-  [`plot_spectrum()`](https://ethanbass.github.io/chromatographR/reference/plot_spectrum.md).
-  If a vector, plots multiple traces using
-  [`plot_chroms()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms.md).
+  plots a single trace, and the inset shows its spectrum. If a vector,
+  plots one trace per chromatogram, and the inset overlays their
+  spectra.
 
 - lambda:
 
@@ -63,7 +62,8 @@ plot_spectrum_inset(
   `"top"`, `"left"`, or `"right"`. Alternatively, a numeric vector of
   length 2 giving the proportional coordinates of the bottom-left
   corner, e.g., `c(0.6, 0.6)`, used together with `inset_width` and
-  `inset_height`.
+  `inset_height`. When `loc` names several peaks, a list with one
+  position per peak.
 
 - inset_width:
 
@@ -78,16 +78,12 @@ plot_spectrum_inset(
 - ylim:
 
   Y axis limits for the main plot. Passed to
-  [`plot_chroms()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms.md)
-  or
-  [`plot_spectrum()`](https://ethanbass.github.io/chromatographR/reference/plot_spectrum.md).
+  [`plot_chroms()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms.md).
 
 - xlim:
 
   X axis limits for the main plot. Passed to
-  [`plot_chroms()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms.md)
-  or
-  [`plot_spectrum()`](https://ethanbass.github.io/chromatographR/reference/plot_spectrum.md).
+  [`plot_chroms()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms.md).
 
 - engine:
 
@@ -95,12 +91,14 @@ plot_spectrum_inset(
 
 - scale_spectrum:
 
-  Logical. If `TRUE`, scales spectrum to unit height. Defaults to
-  `FALSE`.
+  Logical. If `TRUE` (the default), scales the inset spectrum to unit
+  height.
 
 - verbose:
 
-  Logical. If `TRUE` (default), prints verbose output to console.
+  Logical. If `TRUE`, prints the index and name of each chromatogram
+  plotted, with its retention time, wavelength and absorbance. Defaults
+  to `getOption("verbose")`.
 
 - inset_text_size:
 
@@ -109,9 +107,7 @@ plot_spectrum_inset(
 - ...:
 
   Additional arguments passed to
-  [`plot_chroms()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms.md)
-  or
-  [`plot_spectrum()`](https://ethanbass.github.io/chromatographR/reference/plot_spectrum.md).
+  [`plot_chroms()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms.md).
 
 ## Value
 
@@ -129,20 +125,20 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
   data(pk_tab)
   data(Sa_warp)
   # single trace with inset spectrum
-  plot_spectrum_inset("V15", peak_table = pk_tab)
+  plot_spectrum_inset("V13", peak_table = pk_tab)
 
   # multiple traces, inset in the center
-  plot_spectrum_inset("V15", peak_table = pk_tab, idx=c(1:4),
+  plot_spectrum_inset("V13", peak_table = pk_tab, idx=c(1:4),
   position = "top")
 
   # manual inset placement
-  plot_spectrum_inset("V15", peak_table = pk_tab,
+  plot_spectrum_inset("V13", peak_table = pk_tab,
                       position = c(0.6, 0.3),
                       inset_width = 0.35, inset_height = 0.25)
 
   # multiple peaks with a list of positions
-  plot_spectrum_inset(c("V15", "V26"), peak_table = pk_tab,
+  plot_spectrum_inset(c("V13", "V25"), peak_table = pk_tab,
                       position = list(c(0.3, 0.5), c(0.65, 0.3)),
-                      inset_width = 0.3, inset_height = 0.3)#'
+                      inset_width = 0.3, inset_height = 0.3)
                       }
 ```

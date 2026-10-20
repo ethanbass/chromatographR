@@ -1,7 +1,8 @@
-# Summarize Peak Table
+# Summarize peak table
 
-Prints basic statistics about `peak_table` to the console (e.g., the
-number of peaks, wavelengths, range of intensities, etc).
+Computes basic statistics about a `peak_table` (e.g., the number of
+peaks, wavelengths, range of intensities), which print as a formatted
+summary.
 
 ## Usage
 

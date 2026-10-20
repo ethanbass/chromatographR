@@ -33,7 +33,7 @@ x[i, j, ..., drop = FALSE]
 
 - drop:
 
-  Passed to the `[ `indexing operator.
+  Passed to the `[` indexing operator.
 
 ## Value
 

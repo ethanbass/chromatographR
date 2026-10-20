@@ -1,7 +1,13 @@
-# Attaches sample metadata to a `peak_table` object by matching sample names.
+# Attach sample metadata to a `peak_table`
 
-Metadata is provided as a `data.frame`, with one column containing
-sample identifiers matching the row names of `peak_table$tab`.
+Matches rows of `metadata` to samples by name and stores them in the
+`sample_meta` slot, in the same order as the rows of `peak_table$tab`.
+Samples missing from `metadata` get `NA` values, with a warning. Columns
+already in `sample_meta`, such as fields added to the chromatograms with
+[`chromConverter::add_metadata()`](https://ethanbass.github.io/chromConverter/reference/add_metadata.html)
+(chromConverter 0.11.0 or later), are kept unless `metadata` replaces
+them. To replace `sample_meta` entirely, set
+`peak_table$sample_meta <- NA` first.
 
 ## Usage
 
@@ -18,12 +24,12 @@ attach_metadata(peak_table, metadata, column)
 
 - metadata:
 
-  A `data.frame` of sample metadata.
+  A `data.frame` (or tibble) of sample metadata.
 
 - column:
 
-  Name of the column in `metadata` containing sample identifiers. Must
-  match the row names of `peak_table$tab`.
+  Name of the column in `metadata` containing sample identifiers, which
+  must be unique and match the row names of `peak_table$tab`.
 
 ## Value
 

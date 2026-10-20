@@ -25,20 +25,19 @@ scan_chrom(
 
 - chrom_list:
 
-  A list of chromatograms in matrix format (timepoints x wavelengths).
+  A list of chromatograms in matrix format (timepoints × wavelengths).
   If no argument is provided here, the function will try to find the
   `chrom_list` object using the pointer in the `peak_table`.
 
 - idx:
 
-  Numerical index of chromatogram you wish to plot, or "max" to
-  automatically select the chromatogram with the highest signal
-  intensity at the specified peak or retention time.
+  Index or name of the chromatogram to plot. If missing, you are
+  prompted for one.
 
 - lambda:
 
-  The wavelength used for plotting chromatographic traces and
-  determining signal intensity.
+  The wavelength at which to plot the chromatographic trace. Required;
+  `"max"` is not accepted.
 
 - plot_spectrum:
 
@@ -71,7 +70,9 @@ scan_chrom(
 
 ## Value
 
-Invisibly returns the numeric index of the scan selected by the user.
+Invisibly returns the spectrum when `export_spectrum = TRUE` and
+`plot_spectrum = TRUE`; otherwise the numeric index of the scan selected
+by the user.
 
 ## Details
 
@@ -81,16 +82,19 @@ single row from the chromatographic matrix.
 
 ## Side effects
 
-If `engine == "base"`, plots are rendered to the active graphics device.
+Plots are rendered to the active graphics device.
 
 ## See also
 
 Other visualization functions:
 [`boxplot.peak_table()`](https://ethanbass.github.io/chromatographR/reference/boxplot.peak_table.md),
 [`mirror_plot()`](https://ethanbass.github.io/chromatographR/reference/mirror_plot.md),
+[`plot.chrom_list()`](https://ethanbass.github.io/chromatographR/reference/plot.chrom_list.md),
+[`plot.matched_peak_list()`](https://ethanbass.github.io/chromatographR/reference/plot.matched_peak_list.md),
 [`plot.peak_list()`](https://ethanbass.github.io/chromatographR/reference/plot.peak_list.md),
 [`plot.peak_table()`](https://ethanbass.github.io/chromatographR/reference/plot.peak_table.md),
 [`plot_all_spectra()`](https://ethanbass.github.io/chromatographR/reference/plot_all_spectra.md),
+[`plot_chrom_contour()`](https://ethanbass.github.io/chromatographR/reference/plot_chrom_contour.md),
 [`plot_chroms()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms.md),
 [`plot_chroms_heatmap()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms_heatmap.md),
 [`plot_spectrum()`](https://ethanbass.github.io/chromatographR/reference/plot_spectrum.md)

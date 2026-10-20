@@ -1,4 +1,4 @@
-# Return first or last parts of a `peak_table`.
+# Return first or last parts of a `peak_table`
 
 Returns the first or last parts of the `peak_table` object.
 

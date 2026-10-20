@@ -1,4 +1,4 @@
-# Warped goldenrod root chromatograms.
+# Warped goldenrod root chromatograms
 
 A list of four pre-processed and warped goldenrod root chromatograms
 derived from the raw data stored in
@@ -12,7 +12,7 @@ data(Sa_warp)
 
 ## Format
 
-A list of four pre-processed and warped matrices (434 times x 60
+A list of four pre-processed and warped matrices (434 timepoints × 60
 wavelengths).
 
 ## See also

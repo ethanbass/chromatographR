@@ -1,8 +1,9 @@
 # Normalize peak table or chromatograms
 
-Normalizes peak table or list of chromatograms by a column in the sample
-metadata or in the peak table. For normalization by sample metadata, the
-metadata must first be attached to the `peak_table` using
+Divides each sample in a peak table or list of chromatograms by its
+value in a column of the sample metadata or of the peak table. For
+normalization by sample metadata, the metadata must first be attached to
+the `peak_table` using
 [`attach_metadata`](https://ethanbass.github.io/chromatographR/reference/attach_metadata.md).
 
 ## Usage
@@ -30,9 +31,9 @@ normalize_data(
 
 - chrom_list:
 
-  List of chromatograms for normalization. The samples must be in same
-  order as the `peak_table`. If omitted, the function will attempt to
-  find it automatically using the pointer from the `peak_table`.
+  List of chromatograms for normalization. Its names must match the
+  sample names of the `peak_table`, in the same order. If omitted, it is
+  retrieved using the name stored in the `peak_table`.
 
 - what:
 
@@ -41,9 +42,10 @@ normalize_data(
 
 - by:
 
-  Whether to normalize by a column in sample metadata (`meta`) or by a
-  column in the peak table (`peak`). By default, this parameter is
-  inferred based on the `column` name.
+  Whether to normalize by a column in sample metadata (`"meta"`) or by a
+  column in the peak table (`"peak"`). By default, it is inferred from
+  where `column` is found, and an error is raised if it is found in
+  both.
 
 - on_invalid:
 
@@ -58,7 +60,7 @@ depending on the value of `what`.
 
 ## See also
 
-[`get_peaktable`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md)
+[`get_peaktable`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md),
 [`attach_metadata`](https://ethanbass.github.io/chromatographR/reference/attach_metadata.md)
 
 ## Author
@@ -77,5 +79,5 @@ pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
 norm <- normalize_data(pk_tab, "mass", what = "peak_table")
 
 # normalize by internal standard
-norm <- normalize_data(pk_tab, column = "V16", by = "peak")
+norm <- normalize_data(pk_tab, column = "V14", by = "peak")
 ```

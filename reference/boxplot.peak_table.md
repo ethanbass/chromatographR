@@ -1,4 +1,4 @@
-# Make boxplot from peak table.
+# Make boxplot from peak table
 
 The function can take multiple response variables on the left hand side
 of the formula (separated by `+`). In this case, a separate boxplot will
@@ -39,9 +39,12 @@ supplied `peak_table` object.
 
 Other visualization functions:
 [`mirror_plot()`](https://ethanbass.github.io/chromatographR/reference/mirror_plot.md),
+[`plot.chrom_list()`](https://ethanbass.github.io/chromatographR/reference/plot.chrom_list.md),
+[`plot.matched_peak_list()`](https://ethanbass.github.io/chromatographR/reference/plot.matched_peak_list.md),
 [`plot.peak_list()`](https://ethanbass.github.io/chromatographR/reference/plot.peak_list.md),
 [`plot.peak_table()`](https://ethanbass.github.io/chromatographR/reference/plot.peak_table.md),
 [`plot_all_spectra()`](https://ethanbass.github.io/chromatographR/reference/plot_all_spectra.md),
+[`plot_chrom_contour()`](https://ethanbass.github.io/chromatographR/reference/plot_chrom_contour.md),
 [`plot_chroms()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms.md),
 [`plot_chroms_heatmap()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms_heatmap.md),
 [`plot_spectrum()`](https://ethanbass.github.io/chromatographR/reference/plot_spectrum.md),
@@ -58,5 +61,5 @@ data(pk_tab)
 path <- system.file("extdata", "Sa_metadata.csv", package = "chromatographR")
 meta <- read.csv(path)
 pk_tab <- attach_metadata(peak_table = pk_tab, metadata = meta, column="vial")
-boxplot(pk_tab, formula=V11 ~ trt)
+boxplot(pk_tab, formula=V9 ~ trt)
 ```

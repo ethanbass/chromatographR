@@ -17,7 +17,8 @@
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><script src="GC-FID_files/libs/quarto-html/popper.min.js"></script><script src="GC-FID_files/libs/quarto-html/tippy.umd.min.js"></script><link href="GC-FID_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="GC-FID_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Analysis of Polistes cuticular hydrocarbons with GC-FID">
+<!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
+<meta property="og:title" content="Analysis of Polistes cuticular hydrocarbons with GC-FID">
 <meta property="og:image" content="https://ethanbass.github.io/chromatographR/logo.png">
 </head>
 <body>
@@ -28,7 +29,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,6 +45,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/FAQ.html">Frequently asked questions</a></li>
     <li><a class="dropdown-item" href="../articles/GC-FID.html">Analysis of *Polistes* cuticular hydrocarbons with GC-FID</a></li>
+    <li><a class="dropdown-item" href="../articles/peak-finding.html">Choosing peak-finding parameters</a></li>
+    <li><a class="dropdown-item" href="../articles/targeted-analysis.html">Targeted analysis: calibration curves for four benzoxazinoids</a></li>
     <li><a class="dropdown-item" href="../articles/uv_spectra.html">Programmatic analysis of UV spectra</a></li>
   </ul>
 </li>
@@ -67,7 +70,7 @@
 
 
 
-      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/v0.8.0/vignettes/articles/GC-FID.qmd" class="external-link"><code>vignettes/articles/GC-FID.qmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/master/vignettes/articles/GC-FID.qmd" class="external-link"><code>vignettes/articles/GC-FID.qmd</code></a></small>
       <div class="d-none name"><code></code></div>
     </div>
 
@@ -79,18 +82,14 @@
     <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ethanbass.github.io/chromatographR/">chromatographR</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Registered S3 method overwritten by 'chromatographR':</span></span>
-<span><span class="co">#&gt;   method      from</span></span>
-<span><span class="co">#&gt;   predict.ptw ptw</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/rdryad" class="external-link">rdryad</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://vegandevs.github.io/vegan/" class="external-link">vegan</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: permute</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <section class="level3"><h3 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h3>
-<p>While the basic workflow is similar for analyzing different types of chromatographic data with <code>chromatographR</code>, there are a few important differences when analyzing GC-FID data (or other 1-dimensional data). This vignette highlights some important considerations when using chromatographR to analyze GC-FID data (or other 2D chromatography data).</p>
-<p>To demonstrate the use of <code>chromatographR</code> for the analysis GC-FID data, we will analyze a dataset on cuticular hydrocarbons (CHCs) composition in four species of paper wasps (<em>Polistes spp.</em>) collected by Dr. Andrew Legan <span class="citation" data-cites="legan2022 legan2022a">(<a href="#ref-legan2022" role="doc-biblioref">Legan 2022</a>; <a href="#ref-legan2022a" role="doc-biblioref">Legan et al. 2022</a>)</span>. The dataset includes CHCs collected from <em>Polistes dominula</em> (european paper wasp), <em>Polistes exclamans</em> (common paper wasp), <em>P. fuscatus</em> (northern paper wasp), and <em>P. metricus</em> (metric paper wasp). As in other social insects, cuticular hydrocarbons serve as chemical cues mediating a number of social behaviors in paper wasps <span class="citation" data-cites="legan2021">(<a href="#ref-legan2021" role="doc-biblioref">Legan et al. 2021</a>)</span>, including nestmate recognition <span class="citation" data-cites="gamboa1986 gamboa1996 bruschini2011">(<a href="#ref-gamboa1986" role="doc-biblioref">Gamboa et al. 1986</a>; <a href="#ref-gamboa1996" role="doc-biblioref">Gamboa et al. 1996</a>; <a href="#ref-bruschini2011" role="doc-biblioref">Bruschini et al. 2011</a>)</span>, establishment of social hierarchies <span class="citation" data-cites="jandt2014">(<a href="#ref-jandt2014" role="doc-biblioref">Jandt et al. 2014</a>)</span> and mate choice <span class="citation" data-cites="reed1990">(<a href="#ref-reed1990" role="doc-biblioref">Reed and Landolt 1990</a>)</span>.</p>
+<p>While the basic workflow is similar for analyzing different types of chromatographic data with <code>chromatographR</code>, there are a few important differences when analyzing GC-FID data (or other 1-dimensional data). This vignette highlights some important considerations when using chromatographR to analyze GC-FID data.</p>
+<p>To demonstrate the use of <code>chromatographR</code> for the analysis of GC-FID data, we will analyze a dataset on cuticular hydrocarbons (CHCs) composition in four species of paper wasps (<em>Polistes spp.</em>) collected by Dr. Andrew Legan <span class="citation" data-cites="legan2022 legan2022a">(<a href="#ref-legan2022" role="doc-biblioref">Legan 2022</a>; <a href="#ref-legan2022a" role="doc-biblioref">Legan et al. 2022</a>)</span>. The dataset includes CHCs collected from <em>Polistes dominula</em> (European paper wasp), <em>Polistes exclamans</em> (common paper wasp), <em>P. fuscatus</em> (northern paper wasp), and <em>P. metricus</em> (metric paper wasp). As in other social insects, cuticular hydrocarbons serve as chemical cues mediating a number of social behaviors in paper wasps <span class="citation" data-cites="legan2021">(<a href="#ref-legan2021" role="doc-biblioref">Legan et al. 2021</a>)</span>, including nestmate recognition <span class="citation" data-cites="gamboa1986 gamboa1996 bruschini2011">(<a href="#ref-gamboa1986" role="doc-biblioref">Gamboa et al. 1986</a>; <a href="#ref-gamboa1996" role="doc-biblioref">Gamboa et al. 1996</a>; <a href="#ref-bruschini2011" role="doc-biblioref">Bruschini et al. 2011</a>)</span>, establishment of social hierarchies <span class="citation" data-cites="jandt2014">(<a href="#ref-jandt2014" role="doc-biblioref">Jandt et al. 2014</a>)</span> and mate choice <span class="citation" data-cites="reed1990">(<a href="#ref-reed1990" role="doc-biblioref">Reed and Landolt 1990</a>)</span>.</p>
 <div id="fig-polistes" class="quarto-layout-panel">
 <figure class="quarto-float quarto-float-fig"><div aria-describedby="fig-polistes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="quarto-layout-row">
@@ -123,43 +122,66 @@
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-polistes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure 1: <em>Polistes</em> species includes in this study.
+Figure 1: <em>Polistes</em> species included in this study.
 </figcaption></figure>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">is_github_actions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"GITHUB_ACTIONS"</span><span class="op">)</span> <span class="op">==</span> <span class="st">"true"</span></span>
+<code class="sourceCode R"><span><span class="co"># These data are archived on Dryad (doi:10.5061/dryad.wpzgmsbr8), but Dryad's API now</span></span>
+<span><span class="co"># requires an authentication token, so we retrieve them from a mirror on GitHub:</span></span>
+<span><span class="co"># https://github.com/ethanbass/10_5061_dryad_wpzgmsbr8/releases/tag/v1.0</span></span>
+<span><span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".zip"</span><span class="op">)</span></span>
+<span><span class="fu">curl</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/curl/reference/curl_download.html" class="external-link">curl_download</a></span><span class="op">(</span><span class="st">"https://github.com/ethanbass/10_5061_dryad_wpzgmsbr8/archive/refs/tags/v1.0.zip"</span>,</span>
+<span>                    destfile <span class="op">=</span> <span class="va">tmp</span><span class="op">)</span></span>
 <span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="va">is_github_actions</span><span class="op">)</span><span class="op">{</span></span>
-<span>  <span class="co"># Load files from GitHub (https://github.com/ethanbass/10_5061_dryad_wpzgmsbr8/releases/tag/v1.0)</span></span>
-<span>  <span class="va">tmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".zip"</span><span class="op">)</span></span>
-<span>  <span class="fu">curl</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/curl/reference/curl_download.html" class="external-link">curl_download</a></span><span class="op">(</span><span class="st">"https://github.com/ethanbass/10_5061_dryad_wpzgmsbr8/archive/refs/tags/v1.0.zip"</span>, destfile <span class="op">=</span> <span class="va">tmp</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/unzip.html" class="external-link">unzip</a></span><span class="op">(</span><span class="va">tmp</span>, exdir <span class="op">=</span> <span class="st">"./data/"</span><span class="op">)</span></span>
-<span>  <span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="st">"./data/10_5061_dryad_wpzgmsbr8-1.0"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="op">}</span> <span class="kw">else</span><span class="op">{</span></span>
-<span>  <span class="co"># Load files from Dryad</span></span>
-<span>  <span class="va">files</span> <span class="op">&lt;-</span> <span class="fu">rdryad</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/rdryad/reference/dryad_download.html" class="external-link">dryad_download</a></span><span class="op">(</span><span class="st">"10.5061/dryad.wpzgmsbr8"</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="op">}</span></span>
+<span><span class="va">exdir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/unzip.html" class="external-link">unzip</a></span><span class="op">(</span><span class="va">tmp</span>, exdir <span class="op">=</span> <span class="va">exdir</span><span class="op">)</span></span>
+<span><span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="va">exdir</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">chrom_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"README|METADATA|ANNOTATED"</span>, <span class="va">files</span>, invert <span class="op">=</span> <span class="cn">TRUE</span>, </span>
 <span>                    value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ethanbass.github.io/chromConverter/reference/read_chroms.html" class="external-link">read_chroms</a></span><span class="op">(</span><span class="va">chrom_paths</span>, format_in <span class="op">=</span> <span class="st">"shimadzu_fid"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Downloading uv...Done!</span></span>
 <span></span>
 <span><span class="va">path_to_metadata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"METADATA"</span>, <span class="va">files</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">path_to_metadata</span>, sep <span class="op">=</span> <span class="st">"\t"</span><span class="op">)</span></span></code></pre></div>
 </div>
-<p>In order to get a good alignment, it is helpful to remove the solvent peak. To accomplish this, we can use the <code>preprocess</code> function to remove the first four minutes of the chromatogram. We also reduce the time-axis resolution (from 40 ms to 300 ms) since it drastically reduces computation time while seemingly having little effect on the accuracy of the integration results.</p>
+<p>Printing <code>dat</code> gives an overview of what was read: the number of chromatograms, the method they were run with, and the sample name and run time recorded in each file.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dat.pr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/preprocess.html">preprocess</a></span><span class="op">(</span><span class="va">dat</span>, spec.smooth <span class="op">=</span> <span class="cn">FALSE</span>, dim1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">4</span>, to <span class="op">=</span> <span class="fl">59.9</span>, by <span class="op">=</span> <span class="fl">.005</span><span class="op">)</span>, <span class="co"># .005 minutes = 300 ms</span></span>
-<span>                     cl <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="st">".txt"</span>, <span class="st">""</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">dat</span></span>
+<span><span class="co">#&gt; A chrom_list with 120 chromatograms</span></span>
+<span><span class="co">#&gt; method: C:\LabSolutions\Data\A Legan\AWL Nov 6 ladder.gcm</span></span>
+<span><span class="co">#&gt;             name  sample_name        run_datetime</span></span>
+<span><span class="co">#&gt; 1  ALKANE_LADDER ladder w/ IS 2018-11-15 12:20:51</span></span>
+<span><span class="co">#&gt; 2  PDOM_F_CO_001     box13_42 2018-11-29 21:10:51</span></span>
+<span><span class="co">#&gt; 3  PDOM_F_CO_002     box13_43 2018-11-29 22:15:46</span></span>
+<span><span class="co">#&gt; 4  PDOM_F_CO_003     box13_38 2018-11-29 15:38:47</span></span>
+<span><span class="co">#&gt; 5  PDOM_F_CO_004     box13_39 2018-11-29 16:43:42</span></span>
+<span><span class="co">#&gt; 6  PDOM_F_CO_005     box13_40 2018-11-29 17:48:32</span></span>
+<span><span class="co">#&gt; 7  PDOM_F_CO_006     box13_52 2018-11-29 03:40:16</span></span>
+<span><span class="co">#&gt; 8  PDOM_F_CO_007     box13_51 2018-11-29 23:20:35</span></span>
+<span><span class="co">#&gt; 9  PDOM_F_CO_008     box13_75 2018-11-29 07:59:34</span></span>
+<span><span class="co">#&gt; 10 PDOM_F_CO_009     box13_66 2018-11-30 01:30:22</span></span>
+<span><span class="co">#&gt; ... with 110 more chromatograms</span></span></code></pre></div>
+</div>
+<p>The sample names recorded in the files are the original sample labels (e.g. <code>box13_42</code>), so the species and sex of each wasp come from the separate metadata file, matched on file name. The chromatograms also differ slightly in length, so they do not share a time axis as read:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">dat</span>, <span class="va">nrow</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; 89999 90000 </span></span>
+<span><span class="co">#&gt;    37    83</span></span></code></pre></div>
+</div>
+<p>In order to get a good alignment, it is helpful to remove the solvent peak. We also want to reduce the time-axis resolution (from 40 ms to 300 ms), which cuts the number of timepoints about 7.5-fold and so reduces computation time. The <code>preprocess</code> function does both at once: interpolating onto a new time axis resamples the signal and restricts it to the range of the new axis, so supplying <code>dim1</code> starting at four minutes drops the solvent peak as a side effect. It also puts every chromatogram on the same time points. (If you only want to trim a chromatogram, without resampling it, use <code>crop_chroms</code> instead — it subsets the existing time points rather than interpolating onto new ones.)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">dat.pr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/preprocess.html">preprocess</a></span><span class="op">(</span><span class="va">dat</span>, smooth_spectra <span class="op">=</span> <span class="cn">FALSE</span>, dim1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fl">4</span>, to <span class="op">=</span> <span class="fl">59.9</span>, by <span class="op">=</span> <span class="fl">.005</span><span class="op">)</span>, <span class="co"># .005 minutes = 300 ms</span></span>
+<span>                     cl <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 </div>
 <p>We can then group the chromatograms by species for further analysis.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">species</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>dominula <span class="op">=</span> <span class="st">"DOMINULA"</span>, exclamans.<span class="op">=</span> <span class="st">"EXCLAMANS"</span>, </span>
+<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">species</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>dominula <span class="op">=</span> <span class="st">"DOMINULA"</span>, exclamans <span class="op">=</span> <span class="st">"EXCLAMANS"</span>, </span>
 <span>             fuscatus <span class="op">=</span> <span class="st">"FUSCATUS"</span>, metricus <span class="op">=</span> <span class="st">"METRICUS"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">species_idx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">species</span>, <span class="kw">function</span><span class="op">(</span><span class="va">sp</span><span class="op">)</span><span class="op">{</span></span>
@@ -167,13 +189,11 @@ Figure 1: <em>Polistes</em> species includes in this study.
 <span>                                     <span class="st">"SAMPLE_ID"</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 </div>
-<p>We can extract the peaks from the alkane ladder using the <code>get_peaks</code> function and plot the integrated peak areas. To eliminate small peaks that are not part of the alkane ladder, we use the <code>filter_peaks</code> function to remove features that do not have an amplitude of at least 10^4 response units.</p>
+<p>We can extract the peaks from the alkane ladder using the <code>get_peaks</code> function and plot the integrated peak areas. To eliminate small peaks that are not part of the alkane ladder, we use the <code>filter_peaks</code> function to remove features lower than 10^4 response units.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ladder</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"LADDER"</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">pks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_peaks.html">get_peaks</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">[</span><span class="va">ladder</span><span class="op">]</span>, time.units <span class="op">=</span> <span class="st">"s"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in resolve_deprecated(time.units, time_unit): The 'time.units' function</span></span>
-<span><span class="co">#&gt; is deprecated. Please use 'time_unit' instead.</span></span>
+<span><span class="va">pks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_peaks.html">get_peaks</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">[</span><span class="va">ladder</span><span class="op">]</span>, time_unit <span class="op">=</span> <span class="st">"s"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pks</span>, chrom_list <span class="op">=</span> <span class="va">dat.pr</span><span class="op">[</span><span class="va">ladder</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
@@ -181,17 +201,17 @@ Figure 1: <em>Polistes</em> species includes in this study.
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pks_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/filter_peaks.html">filter_peaks</a></span><span class="op">(</span><span class="va">pks</span>, min_height <span class="op">=</span> <span class="fl">10000</span><span class="op">)</span></span></code></pre></div>
 </div>
 <p>In this case, we also have integration results from ‘Shimadzu LabSolutions’, so we can check the integration results provided by <code>chromatographR</code> against the results from LabSolutions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">path_to_annotated_alkanes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"ANNOTATED"</span>, <span class="va">files</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">path_to_annotated_alkanes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grep</a></span><span class="op">(</span><span class="st">"ANNOTATED"</span>, <span class="va">files</span>, value <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">alkanes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">path_to_annotated_alkanes</span>, sep<span class="op">=</span><span class="st">"\t"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># check equality of retention times</span></span>
 <span><span class="co"># all.equal(alkanes$RT[-1], pks_f$ALKANE_LADDER[[1]]$rt)</span></span>
 <span></span>
@@ -206,7 +226,7 @@ Figure 1: <em>Polistes</em> species includes in this study.
 <span>       legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/bquote.html" class="external-link">bquote</a></span><span class="op">(</span><span class="va">R</span><span class="op">^</span><span class="fl">2</span> <span class="op">==</span> <span class="fu">.</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">$</span><span class="va">adj.r.squared</span>, digits <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pks_f</span><span class="op">$</span><span class="va">ALKANE_LADDER</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">height</span> <span class="op">~</span> <span class="va">alkanes</span><span class="op">$</span><span class="va">Height</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span>, pch <span class="op">=</span> <span class="fl">20</span>,</span>
-<span>     xlab <span class="op">=</span> <span class="st">"Area (LabSolutions)"</span>, ylab <span class="op">=</span> <span class="st">"Area (chromatographR)"</span>, </span>
+<span>     xlab <span class="op">=</span> <span class="st">"Height (LabSolutions)"</span>, ylab <span class="op">=</span> <span class="st">"Height (chromatographR)"</span>, </span>
 <span>     main <span class="op">=</span> <span class="st">"Height"</span><span class="op">)</span></span>
 <span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">pks_f</span><span class="op">$</span><span class="va">ALKANE_LADDER</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">height</span> <span class="op">~</span> <span class="va">alkanes</span><span class="op">$</span><span class="va">Height</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span>
@@ -219,17 +239,17 @@ Figure 1: <em>Polistes</em> species includes in this study.
 </div>
 </div>
 </div>
-<p>Reassuringly, the peak areas and heights estimated by chromatographR are very similar to the results provided by LabSolutions.</p>
+<p>The peak areas and heights estimated by chromatographR closely match those from LabSolutions (see the R² in each panel).</p>
 </section><section class="level3"><h3 id="alignment-of-chromatograms">Alignment of chromatograms<a class="anchor" aria-label="anchor" href="#alignment-of-chromatograms"></a>
 </h3>
-<p>We can align chromatograms by species using variable dynamic time warping.</p>
+<p>We can align chromatograms by species using variable penalty dynamic time warping.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">warp_dominula</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="../reference/correct_rt.html">correct_rt</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">[</span><span class="va">species_idx</span><span class="op">$</span><span class="va">dominula</span><span class="op">]</span>, </span>
 <span>                                            alg <span class="op">=</span> <span class="st">"vpdtw"</span>, </span>
 <span>                                            what <span class="op">=</span> <span class="st">"corrected.values"</span>, </span>
 <span>                                            plot_it <span class="op">=</span> <span class="cn">TRUE</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span>, </span>
-<span>                                            penalty <span class="op">=</span> <span class="fl">1</span>, maxshift <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span>                                            penalty <span class="op">=</span> <span class="fl">1</span>, max_shift <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Selected chromatogram 9 as best reference.</span></span>
 <span><span class="co">#&gt; Fitting VPdtw warping models.</span></span></code></pre></div>
 <div class="cell-output-display">
@@ -244,28 +264,28 @@ Figure 1: <em>Polistes</em> species includes in this study.
 <span>                                            alg <span class="op">=</span> <span class="st">"vpdtw"</span>,</span>
 <span>                                            what <span class="op">=</span> <span class="st">"corrected.values"</span>,</span>
 <span>                                            plot_it <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>                                            penalty <span class="op">=</span> <span class="fl">2</span>, maxshift <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span>                                            penalty <span class="op">=</span> <span class="fl">0.5</span>, max_shift <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">warp_exclamans</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="../reference/correct_rt.html">correct_rt</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">[</span><span class="va">species_idx</span><span class="op">$</span><span class="va">exclamans</span><span class="op">]</span>,</span>
 <span>                                             alg <span class="op">=</span> <span class="st">"vpdtw"</span>,</span>
 <span>                                             what <span class="op">=</span> <span class="st">"corrected.values"</span>,</span>
 <span>                                             plot_it <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>                                             penalty <span class="op">=</span> <span class="fl">2</span>, maxshift <span class="op">=</span> <span class="fl">200</span><span class="op">)</span><span class="op">)</span></span>
+<span>                                             penalty <span class="op">=</span> <span class="fl">0.5</span>, max_shift <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">warp_fuscatus</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="../reference/correct_rt.html">correct_rt</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">[</span><span class="va">species_idx</span><span class="op">$</span><span class="va">fuscatus</span><span class="op">]</span>,</span>
 <span>                            alg <span class="op">=</span> <span class="st">"vpdtw"</span>, what <span class="op">=</span> <span class="st">"corrected.values"</span>,</span>
 <span>                            plot_it <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>                            penalty <span class="op">=</span> <span class="fl">2</span>, maxshift <span class="op">=</span> <span class="fl">200</span><span class="op">)</span><span class="op">)</span></span></code></pre>
+<span>                            penalty <span class="op">=</span> <span class="fl">0.5</span>, max_shift <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">warp_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="../reference/correct_rt.html">correct_rt</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span>, alg <span class="op">=</span> <span class="st">"vpdtw"</span>,</span>
 <span>                       what <span class="op">=</span> <span class="st">"corrected.values"</span>, plot_it <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>                       verbose <span class="op">=</span> <span class="cn">FALSE</span>, penalty <span class="op">=</span> <span class="fl">2</span>, maxshift <span class="op">=</span> <span class="fl">200</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>                       verbose <span class="op">=</span> <span class="cn">FALSE</span>, penalty <span class="op">=</span> <span class="fl">0.5</span>, max_shift <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <p>As a sanity check, we can compare the single species alignments for each species to the multi-species alignment of the corresponding chromatograms.</p>
 <div class="cell">
-<details class="code-fold"><summary>Utility function to format text in base R plots with italics.</summary><div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
+<details class="code-fold"><summary>Utility function to format text in base R plots with italics.</summary><div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">format_italics</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">str</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">spl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/strsplit.html" class="external-link">strsplit</a></span><span class="op">(</span><span class="va">str</span>, <span class="st">"\\*"</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span>  <span class="va">non_empty</span> <span class="op">&lt;-</span> <span class="va">spl</span><span class="op">[</span><span class="va">spl</span> <span class="op">!=</span> <span class="st">""</span><span class="op">]</span></span>
@@ -274,7 +294,7 @@ Figure 1: <em>Polistes</em> species includes in this study.
 </details>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot_chroms_heatmap.html">plot_chroms_heatmap</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">[</span><span class="va">species_idx</span><span class="op">$</span><span class="va">metricus</span><span class="op">]</span>, show_legend <span class="op">=</span> <span class="cn">FALSE</span>, </span>
 <span>                    title <span class="op">=</span> <span class="fu">format_italics</span><span class="op">(</span><span class="st">"*P. metricus* (raw data)"</span><span class="op">)</span>, xlim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">25</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span>
@@ -294,7 +314,7 @@ Figure 1: <em>Polistes</em> species includes in this study.
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot_chroms_heatmap.html">plot_chroms_heatmap</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">[</span><span class="va">species_idx</span><span class="op">$</span><span class="va">fuscatus</span><span class="op">]</span>, show_legend <span class="op">=</span> <span class="cn">FALSE</span>, </span>
 <span>                    title <span class="op">=</span> <span class="fu">format_italics</span><span class="op">(</span><span class="st">"*P. fuscatus* (raw data)"</span><span class="op">)</span>,</span>
@@ -315,7 +335,7 @@ Figure 1: <em>Polistes</em> species includes in this study.
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot_chroms_heatmap.html">plot_chroms_heatmap</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">[</span><span class="va">species_idx</span><span class="op">$</span><span class="va">dominula</span><span class="op">]</span>, show_legend <span class="op">=</span> <span class="cn">FALSE</span>, </span>
 <span>                    title <span class="op">=</span> <span class="fu">format_italics</span><span class="op">(</span><span class="st">"*P. dominula* (raw data)"</span><span class="op">)</span>,</span>
@@ -336,7 +356,7 @@ Figure 1: <em>Polistes</em> species includes in this study.
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot_chroms_heatmap.html">plot_chroms_heatmap</a></span><span class="op">(</span><span class="va">dat.pr</span><span class="op">[</span><span class="va">species_idx</span><span class="op">$</span><span class="va">exclamans</span><span class="op">]</span>, show_legend <span class="op">=</span> <span class="cn">FALSE</span>, </span>
 <span>                    title <span class="op">=</span> <span class="fu">format_italics</span><span class="op">(</span><span class="st">"*P. exclamans* (raw data)"</span><span class="op">)</span>,</span>
@@ -357,10 +377,10 @@ Figure 1: <em>Polistes</em> species includes in this study.
 </div>
 </div>
 <p>In general, the results are quite similar between multi-species and single species alignments, though the single-species alignments are noticeably better in some areas. Since we want to compare CHCs across species, we will proceed with the imperfect multi-species alignments.</p>
-</section><section class="level3"><h3 id="integration-and-peaktable-assembly">Integration and peaktable assembly<a class="anchor" aria-label="anchor" href="#integration-and-peaktable-assembly"></a>
+</section><section class="level3"><h3 id="integration-and-peak-table-assembly">Integration and peak table assembly<a class="anchor" aria-label="anchor" href="#integration-and-peak-table-assembly"></a>
 </h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_peaks.html">get_peaks</a></span><span class="op">(</span><span class="va">warp_all</span><span class="op">)</span></span>
 <span><span class="va">pktab</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_peaktable.html">get_peaktable</a></span><span class="op">(</span><span class="va">pks</span><span class="op">)</span></span>
 <span><span class="va">pktab</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/attach_metadata.html">attach_metadata</a></span><span class="op">(</span><span class="va">pktab</span>, metadata <span class="op">=</span> <span class="va">meta</span>, column <span class="op">=</span> <span class="st">"SAMPLE_ID"</span><span class="op">)</span></span></code></pre></div>
@@ -368,7 +388,7 @@ Figure 1: <em>Polistes</em> species includes in this study.
 </section><section class="level3"><h3 id="analysis-of-cuticular-hydrocarbon-composition">Analysis of cuticular hydrocarbon composition<a class="anchor" aria-label="anchor" href="#analysis-of-cuticular-hydrocarbon-composition"></a>
 </h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">vegan</span><span class="fu">::</span><span class="fu"><a href="https://vegandevs.github.io/vegan/reference/adonis.html" class="external-link">adonis2</a></span><span class="op">(</span><span class="va">pktab</span><span class="op">$</span><span class="va">tab</span> <span class="op">~</span> <span class="va">POLISTES_SPECIES</span> <span class="op">+</span> <span class="va">STATE</span> <span class="op">+</span> <span class="va">SEX</span> <span class="op">+</span> <span class="va">LAT</span> <span class="op">+</span> <span class="va">LON</span>,</span>
 <span>               data <span class="op">=</span> <span class="va">pktab</span><span class="op">$</span><span class="va">sample_meta</span>, method <span class="op">=</span> <span class="st">"manhattan"</span>,</span>
 <span>               na.action <span class="op">=</span> <span class="va">na.omit</span>, by <span class="op">=</span> <span class="st">"margin"</span><span class="op">)</span></span>
@@ -380,19 +400,19 @@ Figure 1: <em>Polistes</em> species includes in this study.
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; vegan::adonis2(formula = pktab$tab ~ POLISTES_SPECIES + STATE + SEX + LAT + LON, data = pktab$sample_meta, method = "manhattan", by = "margin", na.action = na.omit)</span></span>
 <span><span class="co">#&gt;                   Df   SumOfSqs      R2      F Pr(&gt;F)    </span></span>
-<span><span class="co">#&gt; POLISTES_SPECIES   3 1.3191e+11 0.12374 9.1912  0.001 ***</span></span>
-<span><span class="co">#&gt; STATE              7 1.2344e+11 0.11579 3.6861  0.001 ***</span></span>
-<span><span class="co">#&gt; SEX                1 4.1426e+10 0.03886 8.6592  0.001 ***</span></span>
-<span><span class="co">#&gt; LAT                1 8.1923e+09 0.00768 1.7124  0.120    </span></span>
-<span><span class="co">#&gt; LON                1 1.3227e+10 0.01241 2.7648  0.027 *  </span></span>
-<span><span class="co">#&gt; Residual         105 5.0233e+11 0.47119                  </span></span>
-<span><span class="co">#&gt; Total            118 1.0661e+12 1.00000                  </span></span>
+<span><span class="co">#&gt; POLISTES_SPECIES   3 4.7981e+10 0.09058 5.3513  0.001 ***</span></span>
+<span><span class="co">#&gt; STATE              7 5.8241e+10 0.10995 2.7838  0.001 ***</span></span>
+<span><span class="co">#&gt; SEX                1 1.1548e+10 0.02180 3.8639  0.001 ***</span></span>
+<span><span class="co">#&gt; LAT                1 5.4575e+09 0.01030 1.8260  0.064 .  </span></span>
+<span><span class="co">#&gt; LON                1 7.4975e+09 0.01415 2.5086  0.004 ** </span></span>
+<span><span class="co">#&gt; Residual         105 3.1382e+11 0.59244                  </span></span>
+<span><span class="co">#&gt; Total            118 5.2971e+11 1.00000                  </span></span>
 <span><span class="co">#&gt; ---</span></span>
 <span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span></code></pre></div>
 </div>
-<p>As one might expect, the permanova results shows that species is the largest contributor to the variance in CHC profiles (R<sup>2</sup><sub>marginal</sub> = 0.12), followed by state of origin (R<sup>2</sup><sub>marginal</sub> = 0.12) and sex (R<sup>2</sup><sub>marginal</sub> = 0.04).</p>
+<p>The PERMANOVA attributes variance in CHC profiles to species (R<sup>2</sup><sub>marginal</sub> = 0.09), state of origin (R<sup>2</sup><sub>marginal</sub> = 0.11) and sex (R<sup>2</sup><sub>marginal</sub> = 0.02).</p>
 <div class="cell">
-<details class="code-fold"><summary>Modified <code>ggordiplot</code> function with added <code>shape</code> argument.</summary><div class="sourceCode cell-code" id="cb19"><pre class="downlit sourceCode r">
+<details class="code-fold"><summary>Modified <code>ggordiplot</code> function with added <code>shape</code> argument.</summary><div class="sourceCode cell-code" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># ggordiplot function (modified from https://github.com/jfq3/ggordiplots/blob/master/R/gg_ordiplot.R) with added shape argument</span></span>
 <span></span>
 <span><span class="va">gg_ordiplot</span> <span class="op">&lt;-</span> <span class="kw">function</span> <span class="op">(</span><span class="va">ord</span>, <span class="va">groups</span>, <span class="va">shape</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">scaling</span> <span class="op">=</span> <span class="fl">1</span>, <span class="va">choices</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, </span>
@@ -502,7 +522,7 @@ Figure 1: <em>Polistes</em> species includes in this study.
 </details>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ord</span> <span class="op">&lt;-</span> <span class="fu">vegan</span><span class="fu">::</span><span class="fu"><a href="https://vegandevs.github.io/vegan/reference/cca.html" class="external-link">rda</a></span><span class="op">(</span><span class="va">pktab</span><span class="op">$</span><span class="va">tab</span>, scale <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">pktab</span><span class="op">$</span><span class="va">sample_meta</span><span class="op">$</span><span class="va">SEX_SP</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/interaction.html" class="external-link">interaction</a></span><span class="op">(</span><span class="va">pktab</span><span class="op">$</span><span class="va">sample_meta</span><span class="op">$</span><span class="va">SEX</span>,</span>
 <span>                                      <span class="va">pktab</span><span class="op">$</span><span class="va">sample_meta</span><span class="op">$</span><span class="va">POLISTES_SPECIES</span><span class="op">)</span></span>
@@ -519,10 +539,10 @@ Figure 1: <em>Polistes</em> species includes in this study.
 </div>
 </div>
 </div>
-<p>Principal componenets analysis shows decent separation between species, with <em>P. dominula</em>, <em>P. fuscatus</em> and <em>P. dominula</em> separating along PC2 and <em>P. exclamans</em> separating from the other species along PC1.</p>
+<p>Principal components analysis separates <em>P. exclamans</em> from the other species along PC1 and partly separates <em>P. metricus</em> from <em>P. dominula</em> along PC2, with <em>P. fuscatus</em> overlapping both, although the first two axes explain only 14% of the variance.</p>
 <p>We can get even better separation if we break down our data by sex, though there is considerable intraspecific variation.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cond</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">pktab</span><span class="op">$</span><span class="va">sample_meta</span><span class="op">$</span><span class="va">SEX</span> <span class="op">==</span> <span class="st">"M"</span><span class="op">)</span></span>
 <span><span class="va">ord_m</span> <span class="op">&lt;-</span> <span class="fu">vegan</span><span class="fu">::</span><span class="fu"><a href="https://vegandevs.github.io/vegan/reference/cca.html" class="external-link">rda</a></span><span class="op">(</span><span class="va">pktab</span><span class="op">$</span><span class="va">tab</span><span class="op">[</span><span class="va">cond</span>,<span class="op">]</span>, scale <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -550,7 +570,7 @@ Figure 1: <em>Polistes</em> species includes in this study.
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p_female</span></span></code></pre></div>
 <div class="cell-output-display">
 <div>
@@ -599,7 +619,7 @@ Reed, H. C., and P. J. Landolt. 1990. <span>“Sex Attraction in Paper Wasp,<spa
 </section><section class="level3"><h3 id="session-information">Session Information<a class="anchor" aria-label="anchor" href="#session-information"></a>
 </h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.6.1 (2026-06-24)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
@@ -623,35 +643,32 @@ Reed, H. C., and P. J. Landolt. 1990. <span>“Sex Attraction in Paper Wasp,<spa
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
 <span><span class="co">#&gt; [1] ggplot2_4.0.3        vegan_2.7-6          permute_0.9-10      </span></span>
-<span><span class="co">#&gt; [4] rdryad_1.0.0         chromatographR_0.8.0</span></span>
+<span><span class="co">#&gt; [4] chromatographR_0.9.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] gtable_0.3.6          xfun_0.61             caTools_1.18.4       </span></span>
-<span><span class="co">#&gt;  [4] lattice_0.22-9        generics_0.1.4        vctrs_0.7.3          </span></span>
-<span><span class="co">#&gt;  [7] tools_4.6.1           bitops_1.1-0          curl_8.0.0           </span></span>
+<span><span class="co">#&gt;  [1] gtable_0.3.6          xfun_0.62             caTools_1.18.4       </span></span>
+<span><span class="co">#&gt;  [4] lattice_0.22-9        vctrs_0.7.3           tools_4.6.1          </span></span>
+<span><span class="co">#&gt;  [7] bitops_1.1-0          generics_0.1.4        curl_8.1.0           </span></span>
 <span><span class="co">#&gt; [10] parallel_4.6.1        tibble_3.3.1          cluster_2.1.8.2      </span></span>
 <span><span class="co">#&gt; [13] pkgconfig_2.0.3       Matrix_1.7-5          data.table_1.18.6.1  </span></span>
-<span><span class="co">#&gt; [16] RColorBrewer_1.1-3    S7_0.2.2              readxl_1.5.0.1       </span></span>
+<span><span class="co">#&gt; [16] RColorBrewer_1.1-3    S7_0.2.2              readxl_1.6.0         </span></span>
 <span><span class="co">#&gt; [19] lifecycle_1.0.5       compiler_4.6.1        farver_2.1.2         </span></span>
 <span><span class="co">#&gt; [22] stringr_1.6.0         ptw_1.9-17            RcppDE_0.1.9         </span></span>
 <span><span class="co">#&gt; [25] minpack.lm_1.2-4      htmltools_0.5.9       yaml_2.3.12          </span></span>
 <span><span class="co">#&gt; [28] Formula_1.2-6         pillar_1.11.1         MASS_7.3-65          </span></span>
-<span><span class="co">#&gt; [31] RaMS_1.4.3            nlme_3.1-169          mime_0.13            </span></span>
-<span><span class="co">#&gt; [34] tidyselect_1.2.1      zip_3.0.2             digest_0.6.39        </span></span>
-<span><span class="co">#&gt; [37] stringi_1.8.9         dplyr_1.2.1           purrr_1.2.2          </span></span>
-<span><span class="co">#&gt; [40] labeling_0.4.3        VPdtw_2.2.1           splines_4.6.1        </span></span>
-<span><span class="co">#&gt; [43] rprojroot_2.1.1       fastmap_1.2.0         grid_4.6.1           </span></span>
-<span><span class="co">#&gt; [46] here_1.0.2            cli_3.6.6             chromConverter_0.9.0 </span></span>
-<span><span class="co">#&gt; [49] magrittr_2.0.5        base64enc_0.1-6       crul_1.6.0           </span></span>
-<span><span class="co">#&gt; [52] dynamicTreeCut_1.63-1 withr_3.0.3           ggordiplots_0.4.3    </span></span>
-<span><span class="co">#&gt; [55] scales_1.4.0          rappdirs_0.3.4        bit64_4.8.6          </span></span>
-<span><span class="co">#&gt; [58] rmarkdown_2.32        bit_4.6.0             otel_0.2.0           </span></span>
-<span><span class="co">#&gt; [61] reticulate_1.47.0     cellranger_1.1.0      fastcluster_1.3.0    </span></span>
-<span><span class="co">#&gt; [64] png_0.1-9             pbapply_1.7-5         evaluate_1.0.5       </span></span>
-<span><span class="co">#&gt; [67] knitr_1.52            hoardr_0.5.5          mgcv_1.9-4           </span></span>
-<span><span class="co">#&gt; [70] rlang_1.3.0           Rcpp_1.1.2            glue_1.8.1           </span></span>
-<span><span class="co">#&gt; [73] httpcode_0.3.0        xml2_1.6.0            jsonlite_2.0.0       </span></span>
-<span><span class="co">#&gt; [76] R6_2.6.1</span></span></code></pre></div>
+<span><span class="co">#&gt; [31] RaMS_1.4.3            nlme_3.1-169          tidyselect_1.2.1     </span></span>
+<span><span class="co">#&gt; [34] digest_0.6.39         stringi_1.8.9         dplyr_1.2.1          </span></span>
+<span><span class="co">#&gt; [37] purrr_1.2.2           labeling_0.4.3        VPdtw_2.2.1          </span></span>
+<span><span class="co">#&gt; [40] splines_4.6.1         fastmap_1.2.0         grid_4.6.1           </span></span>
+<span><span class="co">#&gt; [43] cli_3.6.6             chromConverter_0.11.1 magrittr_2.0.5       </span></span>
+<span><span class="co">#&gt; [46] base64enc_0.1-6       dynamicTreeCut_1.63-1 withr_3.0.3          </span></span>
+<span><span class="co">#&gt; [49] ggordiplots_0.4.3     scales_1.4.0          bit64_4.8.6          </span></span>
+<span><span class="co">#&gt; [52] rmarkdown_2.32        bit_4.6.0             otel_0.2.0           </span></span>
+<span><span class="co">#&gt; [55] reticulate_1.47.0     cellranger_1.1.0      fastcluster_1.3.0    </span></span>
+<span><span class="co">#&gt; [58] png_0.1-9             pbapply_1.7-5         evaluate_1.0.5       </span></span>
+<span><span class="co">#&gt; [61] knitr_1.52            mgcv_1.9-4            rlang_1.3.0          </span></span>
+<span><span class="co">#&gt; [64] Rcpp_1.1.2            glue_1.8.1            xml2_1.6.0           </span></span>
+<span><span class="co">#&gt; [67] jsonlite_2.0.0        R6_2.6.1              fs_2.1.0</span></span></code></pre></div>
 </div>
 </section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {

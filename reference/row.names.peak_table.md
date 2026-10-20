@@ -1,4 +1,4 @@
-# Return row names from a `peak_table` object.
+# Return row names from a `peak_table` object
 
 These will be the names of the samples.
 

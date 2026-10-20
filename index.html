@@ -15,9 +15,10 @@
 <link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Chromatographic Data Analysis Toolkit">
-<meta name="description" content="Tools for high-throughput analysis of HPLC-DAD/UV chromatographic data. Provides functionality for preprocessing, alignment, peak detection, peak model fitting, peak table construction, and data visualization. Chromatogram alignment is available via parametric time warping (as implemented in ptw) or variable penalty dynamic time warping (as implemented in VPdtw). Peak detection is based on a first-derivative zero-crossing algorithm, and peak shapes are fitted using non-linear least squares. Underlying methodologies are described in: Wehrens et al. (2015) &lt;doi:10.1007/s11306-014-0683-5&gt; for preprocessing and peak table construction; Eilers (2004) &lt;doi:10.1021/ac034800e&gt; and Wehrens et al. (2015) &lt;doi:10.1093/bioinformatics/btv299&gt; for parametric time warping; Clifford &amp; Stone (2012) &lt;doi:10.18637/jss.v047.i08&gt; for variable penalty dynamic time warping; Tom O'Haver &lt;https://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm&gt; for peak detection; Lan &amp; Jorgenson (2001) &lt;doi:10.1016/S0021-9673(01)00594-5&gt; for exponential-Gaussian hybrid fitting; and Naish &amp; Hartwell (1988) &lt;doi:10.1007/BF02268168&gt; for bi-exponentially modified Gaussian fitting.">
-<meta property="og:description" content="Tools for high-throughput analysis of HPLC-DAD/UV chromatographic data. Provides functionality for preprocessing, alignment, peak detection, peak model fitting, peak table construction, and data visualization. Chromatogram alignment is available via parametric time warping (as implemented in ptw) or variable penalty dynamic time warping (as implemented in VPdtw). Peak detection is based on a first-derivative zero-crossing algorithm, and peak shapes are fitted using non-linear least squares. Underlying methodologies are described in: Wehrens et al. (2015) &lt;doi:10.1007/s11306-014-0683-5&gt; for preprocessing and peak table construction; Eilers (2004) &lt;doi:10.1021/ac034800e&gt; and Wehrens et al. (2015) &lt;doi:10.1093/bioinformatics/btv299&gt; for parametric time warping; Clifford &amp; Stone (2012) &lt;doi:10.18637/jss.v047.i08&gt; for variable penalty dynamic time warping; Tom O'Haver &lt;https://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm&gt; for peak detection; Lan &amp; Jorgenson (2001) &lt;doi:10.1016/S0021-9673(01)00594-5&gt; for exponential-Gaussian hybrid fitting; and Naish &amp; Hartwell (1988) &lt;doi:10.1007/BF02268168&gt; for bi-exponentially modified Gaussian fitting.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
+<meta property="og:title" content="Chromatographic Data Analysis Toolkit">
+<meta name="description" content="Analyzes chromatographic data from high performance liquid chromatography with diode-array or ultraviolet detection (HPLC-DAD/UV), as well as other detectors, in a high-throughput and reproducible workflow. Provides functionality for preprocessing, alignment, peak detection, peak model fitting, peak table construction, and data visualization. Chromatogram alignment is available via parametric time warping (as implemented in ptw) or variable penalty dynamic time warping (as implemented in VPdtw). Peak detection is based on a first-derivative zero-crossing algorithm, and peak shapes are fitted using non-linear least squares. Underlying methodologies are described in: Wehrens et al. (2015) &lt;doi:10.1007/s11306-014-0683-5&gt; for preprocessing and peak table construction; Eilers (2004) &lt;doi:10.1021/ac034800e&gt; and Wehrens et al. (2015) &lt;doi:10.1093/bioinformatics/btv299&gt; for parametric time warping; Clifford &amp; Stone (2012) &lt;doi:10.18637/jss.v047.i08&gt; for variable penalty dynamic time warping; Tom O'Haver &lt;https://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm&gt; for peak detection; Lan &amp; Jorgenson (2001) &lt;doi:10.1016/S0021-9673(01)00594-5&gt; for exponential-Gaussian hybrid fitting; and Naish &amp; Hartwell (1988) &lt;doi:10.1007/BF02268168&gt; for bi-exponentially modified Gaussian fitting.">
+<meta property="og:description" content="Analyzes chromatographic data from high performance liquid chromatography with diode-array or ultraviolet detection (HPLC-DAD/UV), as well as other detectors, in a high-throughput and reproducible workflow. Provides functionality for preprocessing, alignment, peak detection, peak model fitting, peak table construction, and data visualization. Chromatogram alignment is available via parametric time warping (as implemented in ptw) or variable penalty dynamic time warping (as implemented in VPdtw). Peak detection is based on a first-derivative zero-crossing algorithm, and peak shapes are fitted using non-linear least squares. Underlying methodologies are described in: Wehrens et al. (2015) &lt;doi:10.1007/s11306-014-0683-5&gt; for preprocessing and peak table construction; Eilers (2004) &lt;doi:10.1021/ac034800e&gt; and Wehrens et al. (2015) &lt;doi:10.1093/bioinformatics/btv299&gt; for parametric time warping; Clifford &amp; Stone (2012) &lt;doi:10.18637/jss.v047.i08&gt; for variable penalty dynamic time warping; Tom O'Haver &lt;https://terpconnect.umd.edu/~toh/spectrum/PeakFindingandMeasurement.htm&gt; for peak detection; Lan &amp; Jorgenson (2001) &lt;doi:10.1016/S0021-9673(01)00594-5&gt; for exponential-Gaussian hybrid fitting; and Naish &amp; Hartwell (1988) &lt;doi:10.1007/BF02268168&gt; for bi-exponentially modified Gaussian fitting.">
 <meta property="og:image" content="https://ethanbass.github.io/chromatographR/logo.png">
 </head>
 <body>
@@ -28,7 +29,7 @@
 
     <a class="navbar-brand me-2" href="index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,6 +45,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="articles/FAQ.html">Frequently asked questions</a></li>
     <li><a class="dropdown-item" href="articles/GC-FID.html">Analysis of *Polistes* cuticular hydrocarbons with GC-FID</a></li>
+    <li><a class="dropdown-item" href="articles/peak-finding.html">Choosing peak-finding parameters</a></li>
+    <li><a class="dropdown-item" href="articles/targeted-analysis.html">Targeted analysis: calibration curves for four benzoxazinoids</a></li>
     <li><a class="dropdown-item" href="articles/uv_spectra.html">Programmatic analysis of UV spectra</a></li>
   </ul>
 </li>
@@ -77,9 +80,9 @@
 <li>
 <strong>Pre-processing</strong>: smoothing, baseline correction, and interpolation</li>
 <li>
-<strong>Retention-time alignment</strong>: parametric time warping (PTW) and variable penalty dynamic time warping (VPdtw)</li>
+<strong>Retention-time alignment</strong>: parametric time warping (PTW), landmark parametric time warping (LPTW), and variable penalty dynamic time warping (VPdtw)</li>
 <li>
-<strong>Peak detection and integration</strong>: Gaussian, exponential-Gaussian hybrid (EGH), or raw trapezoidal integration</li>
+<strong>Peak detection and integration</strong>: Gaussian, exponential-Gaussian hybrid (EGH), or bidirectional exponentially modified Gaussian (BEMG) fits, or raw trapezoidal integration</li>
 <li>
 <strong>Peak table construction</strong>: hierarchical clustering to match peaks across samples</li>
 <li>
@@ -89,7 +92,7 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>chromatographR can now be installed from CRAN:</p>
+<p>chromatographR can be installed from CRAN:</p>
 <pre><code><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"chromatographR"</span><span class="op">)</span></span></code></pre>
 <p>However, it’s recommended to install the latest development version of chromatographR from GitHub using the <code>pak</code> package:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -105,18 +108,24 @@
 <div class="section level4">
 <h4 id="importing-data">Importing data<a class="anchor" aria-label="anchor" href="#importing-data"></a>
 </h4>
-<p>chromatographR can import a variety of vendor formats, including ‘Agilent ChemStation’ and ‘MassHunter’ files. This is accomplished using parsers from my chromConverter package. See the <a href="https://ethanbass.github.io/chromConverter/" class="external-link">chromConverter page</a> for a detailed list of supported formats. Alternatively, chromatographR can also be used with regular <code>csv</code> files.</p>
+<p>chromatographR can import many vendor formats, including ‘Agilent ChemStation’ and ‘MassHunter’ files, using parsers from the chromConverter package. See the <a href="https://ethanbass.github.io/chromConverter/" class="external-link">chromConverter page</a> for a detailed list of supported formats. Alternatively, chromatographR can also be used with regular <code>csv</code> files.</p>
 </div>
 <div class="section level4">
 <h4 id="analysis">Analysis<a class="anchor" aria-label="anchor" href="#analysis"></a>
 </h4>
-<p>Please see the <a href="https://ethanbass.github.io/chromatographR/articles/chromatographR.html">vignette</a> included with the package for details on the application of chromatographR for the analysis of HPLC data. Additional articles are available on the pkgdown website: 1) a suggested <a href="https://ethanbass.github.io/chromatographR/articles/GC-FID.html">workflow for the analysis of GC-FID data</a> (<em>Polistes</em> cuticular hydrocarbons) and 2) an introductory guide to the <a href="https://ethanbass.github.io/chromatographR/articles/uv_spectra.html">programmatic analysis of UV spectra</a>.</p>
+<p>Please see the <a href="https://ethanbass.github.io/chromatographR/articles/chromatographR.html">vignette</a> included with the package for details on the application of chromatographR for the analysis of HPLC data. Additional articles are available on the pkgdown website:</p>
+<ul>
+<li>a suggested <a href="https://ethanbass.github.io/chromatographR/articles/GC-FID.html">workflow for the analysis of GC-FID data</a> (<em>Polistes</em> cuticular hydrocarbons)</li>
+<li>an introductory guide to the <a href="https://ethanbass.github.io/chromatographR/articles/uv_spectra.html">programmatic analysis of UV spectra</a>
+</li>
+<li>a guide to <a href="https://ethanbass.github.io/chromatographR/articles/peak-finding.html">choosing peak-finding parameters</a> and filtering spurious peaks</li>
+</ul>
 </div>
 </div>
 <div class="section level2">
 <h2 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
 </h2>
-<p>Contributions are always welcome. Please get in touch (preferable by opening a GitHub <a href="https://github.com/ethanbass/chromatographR/issues" class="external-link">issue</a>) to discuss any suggestions or to file a bug report. Some good reasons to file an issue:</p>
+<p>Contributions are always welcome. Please get in touch (preferably by opening a GitHub <a href="https://github.com/ethanbass/chromatographR/issues" class="external-link">issue</a>) to discuss any suggestions or to file a bug report. Some good reasons to file an issue:</p>
 <ul>
 <li>You think you’ve found a bug.<br>
 </li>
@@ -126,6 +135,7 @@
 </li>
 <li>You have a new feature you’d like to see implemented.</li>
 </ul>
+<p>When reporting a bug, please check existing issues first, then include a code snippet that reproduces the problem, any error messages printed to the console, and the version of chromatographR you’re running (<code>packageVersion("chromatographR")</code>).</p>
 <p>Also see the <a href="https://github.com/ethanbass/chromatographR/blob/master/.github/contributing.md" class="external-link">contributing.md</a> page for more details.</p>
 <p>(<strong>Note:</strong> Please direct questions about file conversions to the <a href="https://github.com/ethanbass/chromConverter/issues" class="external-link">chromConverter</a> page).</p>
 </div>
@@ -133,9 +143,9 @@
 <h2 id="citation">Citation:<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
 <p>If you use chromatographR in published work, please cite it as follows:</p>
-<p><code>Bass, E. (2026). chromatographR: Chromatographic Data Analysis Toolkit. http://doi.org/10.5281/zenodo.6944334</code>.</p>
+<p><code>Bass, E. (2026). chromatographR: Chromatographic Data Analysis Toolkit. https://doi.org/10.5281/zenodo.6944334</code>.</p>
 <p>If your workflow includes data import with chromConverter, please also cite:</p>
-<p><code>Bass, E. (2026). chromConverter: Chromatographic File Converter. http://doi.org/10.5281/zenodo.6792521</code>.</p>
+<p><code>Bass, E. (2026). chromConverter: Chromatographic File Converter. https://doi.org/10.5281/zenodo.6792521</code>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -165,7 +175,7 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Ethan Bass <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-6175-6739" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Ethan Bass <br><small class="roles"> Author, maintainer, copyright holder </small> <a href="https://orcid.org/0000-0002-6175-6739" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>

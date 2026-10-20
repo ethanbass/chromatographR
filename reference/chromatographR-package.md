@@ -1,9 +1,11 @@
-# chromatographR: Chromatographic Data Analysis Toolset
+# chromatographR: Chromatographic Data Analysis Toolkit
 
-Tools for high-throughput analysis of HPLC-DAD/UV chromatographic data.
-The package provides functionality for preprocessing, alignment, peak
-detection and fitting, peak table construction, and visualization of
-chromatographic data.
+Analyzes chromatographic data from high performance liquid
+chromatography with diode-array or ultraviolet detection (HPLC-DAD/UV),
+as well as other detectors, in a high-throughput and reproducible
+workflow. Provides functionality for preprocessing, alignment, peak
+detection, peak model fitting, peak table construction, and data
+visualization.
 
 ## Details
 
@@ -17,7 +19,7 @@ Chromatogram alignment is implemented using parametric time warping
 Peak detection is based on zero-crossings in smoothed derivatives. Peaks
 are then modeled using Gaussian, exponential-Gaussian hybrid, or
 bidirectional exponentially modified Gaussian peak functions via
-nonlinear least squares.
+nonlinear least squares, or integrated directly from the signal.
 
 Further details and example workflows are provided in the package
 vignettes.
@@ -29,6 +31,15 @@ vignettes.
 
 - [`preprocess()`](https://ethanbass.github.io/chromatographR/reference/preprocess.md):
   Preprocess chromatographic matrices.
+
+- [`correct_baseline()`](https://ethanbass.github.io/chromatographR/reference/correct_baseline.md):
+  Estimate and subtract a baseline.
+
+- [`crop_chroms()`](https://ethanbass.github.io/chromatographR/reference/crop_chroms.md):
+  Restrict chromatograms to a range of times or wavelengths.
+
+- [`subtract_blanks()`](https://ethanbass.github.io/chromatographR/reference/subtract_blanks.md):
+  Subtract blank chromatograms.
 
 - [`correct_rt()`](https://ethanbass.github.io/chromatographR/reference/correct_rt.md):
   Align chromatograms.
@@ -47,6 +58,9 @@ vignettes.
 
 - [`normalize_data()`](https://ethanbass.github.io/chromatographR/reference/normalize_data.md):
   Normalize `peak_table` or `chrom_list`.
+
+- [`get_purity()`](https://ethanbass.github.io/chromatographR/reference/get_purity.md):
+  Calculate peak purity.
 
 ## Peak refinement
 
@@ -78,6 +92,9 @@ vignettes.
 
 - [`mirror_plot()`](https://ethanbass.github.io/chromatographR/reference/mirror_plot.md):
   Plot chromatograms as mirror plots.
+
+- [`plot_baseline()`](https://ethanbass.github.io/chromatographR/reference/plot_baseline.md):
+  Plot an estimated baseline over its trace.
 
 - [`plot.ptw_list()`](https://ethanbass.github.io/chromatographR/reference/plot.ptw_list.md):
   Plot parametric time warping (PTW) alignment object.
@@ -114,6 +131,12 @@ vignettes.
 
 - [`get_lambdas()`](https://ethanbass.github.io/chromatographR/reference/get_lambdas.md):
   Return wavelengths from a peak table or a list of chromatograms.
+
+- [`get_time_resolution()`](https://ethanbass.github.io/chromatographR/reference/get_time_resolution.md):
+  Return the sampling interval of a chromatogram.
+
+- [`get_baseline()`](https://ethanbass.github.io/chromatographR/reference/get_baseline.md):
+  Retrieve a baseline retained by preprocessing.
 
 - [`write_peaktable()`](https://ethanbass.github.io/chromatographR/reference/write_peaktable.md):
   Export peak table to CSV or XLSX format.

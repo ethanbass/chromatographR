@@ -25,15 +25,18 @@ plot(
 
 - what:
 
-  What type of plot to return. Either `traces` or `heatmap`.
+  What type of plot to return. Either `"traces"` (default) or
+  `"heatmap"`.
 
 - engine:
 
-  What plotting engine to use. One of `base`, `ggplot`, or `plotly`.
+  What plotting engine to use. One of `"base"` (default), `"ggplot"`, or
+  `"plotly"`.
 
 - lambdas:
 
-  Which lambdas to plot.
+  Wavelengths to plot, from among those used for warping. Defaults to
+  all of them. The heatmap shows only the first.
 
 - show_legend:
 
@@ -41,7 +44,7 @@ plot(
 
 - ...:
 
-  Additional arguments (placeholder).
+  Ignored.
 
 ## Value
 
@@ -51,7 +54,7 @@ A `plotly` or `ggplot` object when `engine = "plotly"` or
 
 ## Details
 
-Plots PTW alignments at the specified wavelength (`lambda`) either as
+Plots raw and warped chromatograms, one above the other, either as
 individual traces or as a heatmap, according to the value of `what`. The
 plot can be produced using either base R graphics, `ggplot2`, or
 `plotly`, according to the value of the `engine` argument.
@@ -67,9 +70,7 @@ Ethan Bass
 ## Examples
 
 ``` r
-if (FALSE) { # interactive()
 data(Sa_pr)
 warp <- correct_rt(chrom_list = Sa_pr, what = "models", lambdas = 210)
 plot(warp)
-}
 ```

@@ -19,6 +19,7 @@ cluster_spectra(
   parallel = TRUE,
   max.only = FALSE,
   output = c("pvclust", "clusters"),
+  col = palette.colors(palette = "Okabe-Ito")[-c(1, 5, 9)],
   ...
 )
 ```
@@ -32,16 +33,18 @@ cluster_spectra(
 
 - alpha:
 
-  Significance threshold used to select clusters based on bootstrap AU
-  p-values.
+  Significance threshold used to select clusters based on approximately
+  unbiased (AU) bootstrap p-values from
+  [`pvclust`](https://rdrr.io/pkg/pvclust/man/pvclust.html).
 
 - min_size:
 
-  Minimum number of peaks a cluster may have.
+  Clusters must contain more than `min_size` peaks. Defaults to `5`.
 
 - max_size:
 
-  Maximum number of peaks a cluster may have.
+  Clusters must contain fewer than `max_size` peaks. Defaults to the
+  number of peaks in `peak_table`.
 
 - nboot:
 
@@ -63,13 +66,13 @@ cluster_spectra(
 - outfile:
 
   Optional path to an `.RDS` file. If not `NULL`, the `pvclust` object
-  is saved file using
+  is saved to file using
   [`saveRDS()`](https://rdrr.io/r/base/readRDS.html). Existing files are
   overwritten.
 
 - save:
 
-  Logical. If `TRUE`, saves pvclust object to current directory.
+  The `save` argument is deprecated. Please use `outfile` instead.
 
 - parallel:
 
@@ -79,13 +82,22 @@ cluster_spectra(
 - max.only:
 
   Logical. If `TRUE`, returns only highest level cluster from each
-  nested set of clusters.
+  nested set of clusters. Named to match the argument of the same name
+  in [`pvrect`](https://rdrr.io/pkg/pvclust/man/pvpick.html) and
+  [`pvpick`](https://rdrr.io/pkg/pvclust/man/pvpick.html); passed to
+  `pvpick`.
 
 - output:
 
-  What to return. Either `"clusters"` to return list of clusters,
-  `"pvclust"` to return pvclust object, or `"both"` to return both
-  items.
+  What to return: `"pvclust"` for the `pvclust` object, `"clusters"` for
+  the list of clusters, or both (the default).
+
+- col:
+
+  Colors for each cluster's box and number on the dendrogram and the
+  title of its spectra panel, recycled if there are more clusters than
+  colors. Defaults to the Okabe-Ito palette, without black, yellow and
+  grey.
 
 - ...:
 
@@ -94,23 +106,19 @@ cluster_spectra(
 
 ## Value
 
-Returns clusters and/or `pvclust` object according to the value of the
-`output` argument.
-
-- If `output = clusters`, returns a list of S4 `cluster` objects.
-
-- If `output = pvclust`, returns a `pvclust` object.
-
-- If `output = both`, returns a nested list containing `[[1]]` the
-  `pvclust` object, and `[[2]]` the list of S4 `cluster` objects.
+Returns a named list with an element for each value of `output`:
+`pvclust`, the `pvclust` object, and `clusters`, a list of S4 `cluster`
+objects.
 
 The `cluster` objects consist of the following components:
 
 - `peaks`: a character vector containing the names of all peaks
   contained in the given cluster.
 
-- `pval`: a numeric scalar containing the AU bootstrap p-value for the
-  given cluster.
+- `pval`: a numeric scalar containing one minus the approximately
+  unbiased (AU) value that
+  [`pvclust`](https://rdrr.io/pkg/pvclust/man/pvclust.html) reports for
+  the given cluster, so that small values indicate strong support.
 
 ## Details
 
@@ -118,26 +126,22 @@ Before using this function, reference spectra must be attached to the
 `peak_table` using the
 [`attach_ref_spectra`](https://ethanbass.github.io/chromatographR/reference/attach_ref_spectra.md)
 function. These spectra are then used to construct a distance matrix
-derived from pairwise Pearson correlations among peaks. Hierarchical
-clustering with bootstrap resampling is performed on the resulting
-correlation matrix to classify peaks by their spectral similarity as
-implemented in
-[`pvclust`](https://rdrr.io/pkg/pvclust/man/pvclust.html). Finally,
-bootstrap values can be used to select clusters that exceed a certain
-confidence specified by `alpha`.
+from pairwise Pearson correlations among peaks, and
+[`pvclust`](https://rdrr.io/pkg/pvclust/man/pvclust.html) clusters the
+peaks hierarchically, with bootstrap resampling. Clusters whose
+bootstrap support exceeds the confidence set by `alpha` are returned.
+Peaks whose reference spectrum is constant are dropped before
+clustering.
 
-Clusters can be filtered by the minimum and maximum size of the cluster
-using the `min_size` and `max_size` arguments respectively. Users should
-be aware that the clustering algorithm will often return nested
-clusters. Thus, an individual peak could appear in more than one
-cluster. If `max.only` is `TRUE`, only the largest cluster in a nested
-tree of clusters meeting the specified confidence threshold will be
-returned.
+Clusters can be filtered by size using the `min_size` and `max_size`
+arguments. The clustering algorithm often returns nested clusters, so an
+individual peak can appear in more than one. If `max.only` is `TRUE`,
+only the largest cluster in a nested tree of clusters meeting the
+confidence threshold is returned.
 
-It is strongly recommended to use more than 100 bootstraps if you run
-the clustering algorithm on real data even though we use `nboot = 100`
-in the example to reduce run time. The authors of `pvclust` suggest
-using at least 10,000 bootstrap replicates.
+The example uses `nboot = 100` to reduce run time. For real data, the
+`pvclust` authors recommend the default of 1000 replicates for a first
+look, then 10,000 for smaller errors.
 
 ## References
 
@@ -159,16 +163,8 @@ if (requireNamespace("pvclust", quietly = TRUE)) {
 data(pk_tab)
 data(Sa_warp)
 pk_tab <- attach_ref_spectra(pk_tab, Sa_warp, ref = "max.int")
-cl <- cluster_spectra(pk_tab, nboot = 100, max.only = FALSE, 
-save = FALSE, alpha = 0.03)
+cl <- cluster_spectra(pk_tab, nboot = 100, max.only = FALSE, alpha = 0.03)
 }
-
-
-
-
-
-
-
 
 
 

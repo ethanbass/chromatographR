@@ -1,4 +1,4 @@
-# Return dimensions of a `peak_table` object.
+# Return dimensions of a `peak_table` object
 
 Returns the dimensions of a `peak_table`, where the first dimension is
 the number of samples and the second dimension is the number of peaks.

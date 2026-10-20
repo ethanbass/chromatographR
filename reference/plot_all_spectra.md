@@ -1,6 +1,6 @@
 # Plot all spectra for chosen peak
 
-Plot multiple for a given peak in peak table. Wrapper for
+Plot the spectra of a peak from several chromatograms. Wrapper for
 [`plot_spectrum`](https://ethanbass.github.io/chromatographR/reference/plot_spectrum.md).
 
 ## Usage
@@ -37,17 +37,21 @@ plot_all_spectra(
 
 - chrom_list:
 
-  A list of chromatograms in matrix format (timepoints x wavelengths).
+  A list of chromatograms in matrix format (timepoints × wavelengths).
   If no argument is provided here, the function will try to find the
   `chrom_list` object using the pointer in the `peak_table`.
 
 - idx:
 
-  Vector of chromatograms to plot.
+  Vector of chromatograms to plot, or `"all"` (the default).
 
 - engine:
 
-  Which plotting engine to use: `base`, `ggplot2`, or `plotly`.
+  Plotting backend to use. One of `"base"`,
+  [`"ggplot"`](https://ggplot2.tidyverse.org/reference/ggplot2-package.html),
+  or [`"plotly"`](https://rdrr.io/pkg/plotly/man/plotly.html).
+  `"ggplot2"` is also accepted here, for backward compatibility, but
+  `"ggplot"` is the spelling the other plotting functions take.
 
 - plot_spectrum:
 
@@ -56,22 +60,24 @@ plot_all_spectra(
 
 - export_spectrum:
 
-  Logical. If `TRUE`, invisibly returns the spectrum as a `data.frame`.
-  Defaults to `FALSE`.
+  Logical. If `TRUE` (the default), invisibly returns the spectra as a
+  `data.frame`.
 
 - scale_spectrum:
 
-  Logical. If `TRUE`, scales spectrum to unit height. Defaults to
-  `FALSE`.
+  Logical. If `TRUE` (the default), scales each spectrum to the range
+  \[0, 1\].
 
 - overlapping:
 
-  Logical. If `TRUE`, plot spectra in single plot.
+  Logical. If `TRUE` (the default), plots the spectra on a single plot.
+  Used only when `engine = "base"`.
 
 - verbose:
 
-  Logical. If `TRUE`, prints verbose output to console. Defaults to
-  `FALSE`.
+  Logical. If `TRUE`, prints the index and name of each chromatogram
+  plotted, with its retention time, wavelength and absorbance. Defaults
+  to `FALSE`.
 
 - what:
 
@@ -81,20 +87,21 @@ plot_all_spectra(
 
 - peak:
 
-  The name of a peak to plot (in character format).
+  The `peak` argument is deprecated. Please use `loc` instead.
 
 - ...:
 
-  Additional arguments to `plot_spectrum.`
+  Additional arguments to `plot_spectrum`.
 
 ## Value
 
-- If `export_spectrum = FALSE` (default), a `plotly` or `ggplot` object,
-  or nothing if `engine == "base"`.
+- If `export_spectrum = TRUE` (the default), invisibly returns a
+  `data.frame` with wavelengths as rows and one column per sample
+  encoding absorbance at each wavelength (normalized if
+  `scale_spectrum = TRUE`).
 
-- If `export_spectrum = TRUE`, invisibly returns a `data.frame` with
-  wavelengths as rows and one column per sample encoding absorbance at
-  each wavelength (normalized if `scale_spectrum = TRUE`).
+- If `export_spectrum = FALSE`, returns a `plotly` or `ggplot` object,
+  or nothing if `engine == "base"`.
 
 ## Side effects
 
@@ -106,8 +113,11 @@ device.
 Other visualization functions:
 [`boxplot.peak_table()`](https://ethanbass.github.io/chromatographR/reference/boxplot.peak_table.md),
 [`mirror_plot()`](https://ethanbass.github.io/chromatographR/reference/mirror_plot.md),
+[`plot.chrom_list()`](https://ethanbass.github.io/chromatographR/reference/plot.chrom_list.md),
+[`plot.matched_peak_list()`](https://ethanbass.github.io/chromatographR/reference/plot.matched_peak_list.md),
 [`plot.peak_list()`](https://ethanbass.github.io/chromatographR/reference/plot.peak_list.md),
 [`plot.peak_table()`](https://ethanbass.github.io/chromatographR/reference/plot.peak_table.md),
+[`plot_chrom_contour()`](https://ethanbass.github.io/chromatographR/reference/plot_chrom_contour.md),
 [`plot_chroms()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms.md),
 [`plot_chroms_heatmap()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms_heatmap.md),
 [`plot_spectrum()`](https://ethanbass.github.io/chromatographR/reference/plot_spectrum.md),
@@ -120,10 +130,8 @@ Ethan Bass
 ## Examples
 
 ``` r
-if (FALSE) { # interactive()
 data(Sa_warp)
 pks <- get_peaks(Sa_warp, lambda = "220")
 pk_tab <- get_peaktable(pks)
-plot_all_spectra(peak = "V13", peak_table = pk_tab, overlapping = TRUE)
-}
+plot_all_spectra(loc = "V11", peak_table = pk_tab, overlapping = TRUE)
 ```

@@ -1,6 +1,7 @@
 # Get lambdas
 
-Get wavelengths from a list of chromatograms or a `peak_table` object.
+Get wavelengths from a chromatogram, a list of chromatograms, or a
+`peak_table` object.
 
 ## Usage
 
@@ -12,20 +13,19 @@ get_lambdas(x)
 
 - x:
 
-  A list of chromatograms or `peak_table` object.
+  A chromatogram, a list of chromatograms, or a `peak_table` object.
 
 ## Value
 
-A numeric vector of wavelengths.
+A numeric vector of wavelengths, taken from the first chromatogram if
+`x` is a list.
 
 ## See also
 
-Other utility functions:
-[`combine_peaks()`](https://ethanbass.github.io/chromatographR/reference/combine_peaks.md),
-[`get_times()`](https://ethanbass.github.io/chromatographR/reference/get_times.md),
-[`merge_peaks()`](https://ethanbass.github.io/chromatographR/reference/merge_peaks.md),
-[`reshape_chroms()`](https://ethanbass.github.io/chromatographR/reference/reshape_chroms.md),
-[`reshape_peaktable()`](https://ethanbass.github.io/chromatographR/reference/reshape_peaktable.md)
+Other accessors:
+[`get_baseline()`](https://ethanbass.github.io/chromatographR/reference/get_baseline.md),
+[`get_time_resolution()`](https://ethanbass.github.io/chromatographR/reference/get_time_resolution.md),
+[`get_times()`](https://ethanbass.github.io/chromatographR/reference/get_times.md)
 
 ## Examples
 

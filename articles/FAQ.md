@@ -3,9 +3,6 @@
 ``` r
 
 library(chromatographR)
-#> Registered S3 method overwritten by 'chromatographR':
-#>   method      from
-#>   predict.ptw ptw
 ```
 
 ##### 1. How should I format my data for analysis in `chromatographR`?
@@ -27,29 +24,67 @@ them into wide format before proceeding with the analysis.
 
 ##### 2. Some of my peaks aren’t being integrated when I run `get_peaks`.
 
-Try adjusting the value of the `sd.max` argument, especially if you are
-seeing that your wider peaks are the ones that aren’t being integrated.
-This argument controls the maximum peak width. We have tried to set the
-default value (`sd.max = 50`) to a sensible number, but what is
-“sensible” can vary with the resolution of your data. For example, in
-the example shown below, wider peaks will not be picked up with
-`sd.max = 2.5` but if we increase `sd.max` to `10`, we are able to
-successfully integrate all of our peaks. If this fails, try adjusting
-the `smooth_window`.
+`get_peaks` keeps every peak it fits, but `filter_peaks` with `max_fwhm`
+discards peaks wider than that, so your widest peaks are the first to
+go. What counts as a sensible value depends on your data, so measure
+your peak widths first (see the [peak-finding
+article](https://ethanbass.github.io/chromatographR/articles/peak-finding.html)).
+In the example below, `max_fwhm = 0.12` drops many of the wider peaks
+that `get_peaks` found. If peaks are still missing, try adjusting
+`smooth_window`, which is passed to `find_peaks`.
 
 ``` r
 
-data(Sa_pr)
+data(Sa_warp)
 par(mfrow=c(2,1))
-pks <- get_peaks(Sa_warp, lambdas = "210", fit = "egh", sd.max = 2.5)
-#> Warning in resolve_deprecated(sd.max, sd_max): The 'sd.max' function is
-#> deprecated. Please use 'sd_max' instead.
-plot(pks, main = "'sd.max' = 3")
-
-pks <- get_peaks(Sa_warp, lambdas = "210", fit = "egh", sd.max = 10)
-#> Warning in resolve_deprecated(sd.max, sd_max): The 'sd.max' function is
-#> deprecated. Please use 'sd_max' instead.
-plot(pks, main = "'sd.max' = 10")
+pks <- get_peaks(Sa_warp, lambdas = "210", fit = "egh")
+plot(pks, main = "All peaks")
+plot(filter_peaks(pks, max_fwhm = 0.12), main = "`max_fwhm` = 0.12")
 ```
 
 ![](FAQ_files/figure-html/unnamed-chunk-3-1.png)
+
+##### 3. Why don’t my peak areas match ChemStation (or Empower, LabSolutions, Chromeleon)?
+
+Check the units and the signal first. Vendor software usually reports
+areas in mAU·s, while `get_peaks` reports them in the units of the time
+axis, usually mAU·min. Set `time_unit = "s"` in `get_peaks` or multiply
+by 60 before comparing. Vendor signals are also often defined with a
+bandwidth and a reference wavelength (e.g. 229 nm, with a reference at
+360 nm and a bandwidth of 100 nm). Integrate at the same wavelength and
+set `reference_wavelengths` in `preprocess` to the same band (here,
+`c(310, 410)`).
+
+If isolated peaks now agree but peaks in clusters do not, the difference
+is in how the baseline is drawn. Vendor integrators find where each peak
+starts and ends from slope thresholds and draw a straight baseline
+between those points. Peaks that are not resolved to baseline share one
+straight line and are split by vertical drop lines at the valleys, or
+skimmed off the tail of a larger peak. By default, chromatographR
+instead subtracts one baseline across the whole chromatogram
+(`preprocess`) and fits a peak shape to each peak (`get_peaks`), so
+overlapping peaks are separated by their fitted shapes. With
+`baseline = "flat"` or `"sloped"`, `get_peaks` also fits a local
+baseline under each peak, within that peak’s own integration window.
+Unlike in drop-line integration, neighboring peaks never share a
+baseline (see *Local baselines* in
+[`get_peaks`](https://ethanbass.github.io/chromatographR/reference/get_peaks.md)).
+
+The two approaches diverge most in long chains of overlapping peaks. A
+straight baseline shared by the whole chain can run below the background
+on either side of it, adding a roughly fixed amount of area to each peak
+in the chain. This inflates small peaks the most and pulls ratios
+between samples towards one. In ChemStation reports, these peaks have
+the baseline codes BV, VV or VB rather than BB. Vendor software does not
+report where it drew the baseline, but its height under the apex is the
+signal at the apex minus the reported peak height, which you can compare
+with the background before the peak.
+
+Neither result is ground truth. Vendor integration can be tuned with
+timed events (e.g. skims, valley-to-valley baselines, or baseline hold),
+and chromatographR’s baseline estimators have their own failure modes:
+too flexible a baseline absorbs small or broad peaks (see
+[`baseline_estimators`](https://ethanbass.github.io/chromatographR/reference/baseline_estimators.md)).
+A useful check is to compare well-resolved (BB) peaks first. If those
+agree, the remaining differences likely come from how each program
+handles overlapping peaks.

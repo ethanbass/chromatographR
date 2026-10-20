@@ -35,11 +35,14 @@ plot(
 
 - loc:
 
-  A vector specifying the peak(s) or retention time(s) to plot.
+  A vector specifying the peak(s) or retention time(s) to plot. If
+  missing when `what = "peak"`, you are prompted for a peak name. When a
+  value is returned (see below), only the first element of `loc` is
+  used, with a warning.
 
 - chrom_list:
 
-  A list of chromatograms in matrix format (timepoints x wavelengths).
+  A list of chromatograms in matrix format (timepoints × wavelengths).
   If no argument is provided here, the function will try to find the
   `chrom_list` object using the pointer in the `peak_table`.
 
@@ -48,19 +51,19 @@ plot(
   What to look for. Either `peak` to extract spectral information for a
   certain peak, `rt` to scan by retention time, `idx` to scan by numeric
   index, or `click` to manually select retention time by clicking on the
-  chromatogram. Defaults to `"peak"` mode.
+  chromatogram. Defaults to `"peak"` mode. `"click"` requires
+  `engine = "base"`.
 
 - idx:
 
-  Numerical index of chromatogram you wish to plot; "max" to plot the
-  chromatogram with the largest signal; or "all" to plot spectra for all
-  chromatograms.
+  Numerical index of chromatogram you wish to plot; `"max"` (default) to
+  plot the chromatogram with the largest value for the peak in the peak
+  table; or `"all"` to plot spectra for all chromatograms.
 
 - lambda:
 
-  The wavelength you wish to plot the trace at (if `plot_chrom` is
-  `TRUE`. Otherwise, the wavelength to be used for the determination of
-  signal abundance.
+  The wavelength at which to plot the trace. `"max"` (default) selects
+  the wavelength at which the spectrum at `loc` is highest.
 
 - plot_spectrum:
 
@@ -78,7 +81,8 @@ plot(
 
 - vars:
 
-  Independent variables for boxplot. Righthand side of formula.
+  Character vector of column names in the sample metadata, used as the
+  right-hand side of the boxplot formula.
 
 - spectrum_labels:
 
@@ -97,11 +101,17 @@ plot(
 
 - verbose:
 
-  Logical. If `TRUE` (default), prints verbose output to the console.
+  Logical. If `TRUE` (default), prints the index and name of each
+  chromatogram plotted, with its retention time, wavelength and
+  absorbance.
 
 - engine:
 
-  Which plotting engine to use: `base`, `ggplot2`, or `plotly`.
+  Plotting backend to use. One of `"base"`,
+  [`"ggplot"`](https://ggplot2.tidyverse.org/reference/ggplot2-package.html),
+  or [`"plotly"`](https://rdrr.io/pkg/plotly/man/plotly.html).
+  `"ggplot2"` is also accepted here, for backward compatibility, but
+  `"ggplot"` is the spelling the other plotting functions take.
 
 - ...:
 
@@ -113,31 +123,23 @@ plot(
 - If `export_spectrum = FALSE` (default), a `plotly` or `ggplot` object,
   or nothing if `engine == "base"`.
 
-- If `export_spectrum = TRUE`, invisibly returns the spectrum as a
-  `data.frame` with wavelengths as rows and a single column per sample
-  encoding absorbance at each wavelength (normalized if
-  `scale_spectrum = TRUE`). Otherwise, if `engine == "base"`, there is
-  no return value. If `export_spectrum` is `TRUE`, returns the spectrum
-  as a `data.frame` with wavelengths as rows and columns encoding the
-  absorbance (or normalized absorbance, if `scale_spectrum` is `TRUE`)
-  for the specified sample(s).
+- If `export_spectrum = TRUE`, the spectrum as a `data.frame` with
+  wavelengths as rows and one column per sample giving absorbance at
+  each wavelength (normalized if `scale_spectrum = TRUE`).
 
 ## Details
 
-Can be used to confirm the identity of a peak or check that a particular
-column in the peak table represents a single compound. Can also be used
-to create simple box-plots to examine the distribution of a peak with
-respect to variables defined in sample metadata.
+Use it to confirm the identity of a peak, or to check that a particular
+column in the peak table represents a single compound. It also draws
+simple box plots of the distribution of a peak against variables defined
+in sample metadata.
 
-When `plot_trace` is `TRUE`, plots the chromatographic trace of the
-specified chromatogram (`idx`), at the specified wavelength (`lambda`)
-with a dotted red line to indicate the retention time given by `loc`.
-The trace is a single column from the chromatographic matrix. When
-`plot_spectrum` is `TRUE`, plots the spectrum for the specified
-chromatogram at the specified retention time. The spectrum represents a
-single row from the chromatographic matrix. When `box_plot` is `TRUE`,
-produces a [`boxplot`](https://rdrr.io/r/graphics/boxplot.html) from the
-specified peak with groups defined by the `vars` argument.
+When `plot_trace` is `TRUE`, plots the trace of chromatogram `idx` at
+wavelength `lambda`, with a dotted red line at the retention time given
+by `loc`. When `plot_spectrum` is `TRUE`, plots the spectrum of the same
+chromatogram at that retention time. When `box_plot` is `TRUE`, draws a
+[`boxplot`](https://rdrr.io/r/graphics/boxplot.html) of the peak with
+groups defined by `vars`.
 
 ## Side effects
 
@@ -148,8 +150,11 @@ If `engine == "base"`, plots are rendered to the active graphics device.
 Other visualization functions:
 [`boxplot.peak_table()`](https://ethanbass.github.io/chromatographR/reference/boxplot.peak_table.md),
 [`mirror_plot()`](https://ethanbass.github.io/chromatographR/reference/mirror_plot.md),
+[`plot.chrom_list()`](https://ethanbass.github.io/chromatographR/reference/plot.chrom_list.md),
+[`plot.matched_peak_list()`](https://ethanbass.github.io/chromatographR/reference/plot.matched_peak_list.md),
 [`plot.peak_list()`](https://ethanbass.github.io/chromatographR/reference/plot.peak_list.md),
 [`plot_all_spectra()`](https://ethanbass.github.io/chromatographR/reference/plot_all_spectra.md),
+[`plot_chrom_contour()`](https://ethanbass.github.io/chromatographR/reference/plot_chrom_contour.md),
 [`plot_chroms()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms.md),
 [`plot_chroms_heatmap()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms_heatmap.md),
 [`plot_spectrum()`](https://ethanbass.github.io/chromatographR/reference/plot_spectrum.md),

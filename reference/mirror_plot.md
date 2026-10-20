@@ -27,26 +27,28 @@ mirror_plot(
 - x:
 
   The peak table (output from
-  [`get_peaktable`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md).
+  [`get_peaktable`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md)).
 
 - chrom_list:
 
-  A list of chromatograms in matrix format (timepoints x wavelengths).
+  A list of chromatograms in matrix format (timepoints × wavelengths).
   If no argument is provided here, the function will try to find the
   `chrom_list` object used to create the `peak_table`.
 
 - lambdas:
 
-  The wavelength you wish to plot the traces at.
+  The wavelength(s) at which to plot the traces. Required for
+  multi-wavelength chromatograms; ignored for one-dimensional
+  chromatograms.
 
 - var:
 
-  Variable to index chromatograms.
+  Name of the column in the sample metadata that defines the two groups.
 
 - subset:
 
-  Character vector specifying levels to use (if more than two levels are
-  present in `var`).
+  Character vector of the two levels of `var` to compare. Required if
+  `var` has more than two levels.
 
 - print_legend:
 
@@ -58,7 +60,8 @@ mirror_plot(
 
 - legend_pos:
 
-  Legend position.
+  Legend position, used only when `mirror = FALSE`. The mirror layout
+  always places the legends at the top and bottom right.
 
 - legend_size:
 
@@ -79,7 +82,8 @@ mirror_plot(
 
 - ...:
 
-  Additional arguments to `matplot` function.
+  Additional arguments to
+  [`matplot`](https://rdrr.io/r/graphics/matplot.html).
 
 ## Value
 
@@ -87,26 +91,25 @@ No return value, called for side effects.
 
 ## Details
 
-Can be used to confirm the identity of a peak or check that a particular
-column in the peak table represents a single compound. Can also be used
-to create simple box-plots to examine the distribution of a peak with
-respect to variables defined in sample metadata.
+Compares the chromatograms in two groups, defined by the levels of
+`var`. When `mirror` is `TRUE` both are drawn in one panel, with the
+second inverted below the axis; when it is `FALSE` they are drawn in two
+stacked panels.
 
 ## Side effects
 
-Plots are rendered to the active graphics device. If `mirror_plot` is
-`TRUE`, plots a mirror plot comparing two treatments defined by `var`
-and `subset` (if more than two factors are present in `var`). Otherwise,
-if `mirror_plot` is `FALSE`, the treatments are plotted in two separate
-panes.
+Plots are rendered to the active graphics device.
 
 ## See also
 
 Other visualization functions:
 [`boxplot.peak_table()`](https://ethanbass.github.io/chromatographR/reference/boxplot.peak_table.md),
+[`plot.chrom_list()`](https://ethanbass.github.io/chromatographR/reference/plot.chrom_list.md),
+[`plot.matched_peak_list()`](https://ethanbass.github.io/chromatographR/reference/plot.matched_peak_list.md),
 [`plot.peak_list()`](https://ethanbass.github.io/chromatographR/reference/plot.peak_list.md),
 [`plot.peak_table()`](https://ethanbass.github.io/chromatographR/reference/plot.peak_table.md),
 [`plot_all_spectra()`](https://ethanbass.github.io/chromatographR/reference/plot_all_spectra.md),
+[`plot_chrom_contour()`](https://ethanbass.github.io/chromatographR/reference/plot_chrom_contour.md),
 [`plot_chroms()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms.md),
 [`plot_chroms_heatmap()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms_heatmap.md),
 [`plot_spectrum()`](https://ethanbass.github.io/chromatographR/reference/plot_spectrum.md),

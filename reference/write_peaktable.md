@@ -23,7 +23,7 @@ write_peaktable(
 
 - path:
 
-  Path to write file.
+  Path to an existing directory in which to write the files.
 
 - filename:
 
@@ -31,13 +31,13 @@ write_peaktable(
 
 - format:
 
-  File format to export. Either `csv` or `xlsx`.
+  File format to export. Either `"csv"` (default) or `"xlsx"`.
 
 - what:
 
   Which elements of the `peak_table` to export. One or more of `"tab"`,
   `"pk_meta"`, `"sample_meta"`, `"instrument_meta"`, `"ref_spectra"`,
-  and `"args"`.
+  and `"args"`. Defaults to all six.
 
 ## Value
 
@@ -45,8 +45,10 @@ No return value. The function is called for its side effects.
 
 ## Side effects
 
-Exports peak_table object as `.csv` or `.xlsx` file according to the
-value of the `format` argument.
+With `format = "csv"`, writes one file per element of `what`, named
+`<filename>-<element>.csv`. With `format = "xlsx"`, writes a single
+`<filename>.xlsx` workbook with one sheet per element. Requires the
+openxlsx package.
 
 ## Examples
 

@@ -15,7 +15,8 @@
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Frequently asked questions">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
+<meta property="og:title" content="Frequently asked questions">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -25,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">chromatographR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.8.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Released version">0.9.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +42,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/FAQ.html">Frequently asked questions</a></li>
     <li><a class="dropdown-item" href="../articles/GC-FID.html">Analysis of *Polistes* cuticular hydrocarbons with GC-FID</a></li>
+    <li><a class="dropdown-item" href="../articles/peak-finding.html">Choosing peak-finding parameters</a></li>
+    <li><a class="dropdown-item" href="../articles/targeted-analysis.html">Targeted analysis: calibration curves for four benzoxazinoids</a></li>
     <li><a class="dropdown-item" href="../articles/uv_spectra.html">Programmatic analysis of UV spectra</a></li>
   </ul>
 </li>
@@ -66,17 +69,14 @@
       <img src="../logo.png" class="logo" alt=""><h1>Frequently asked questions</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/v0.8.0/vignettes/articles/FAQ.Rmd" class="external-link"><code>vignettes/articles/FAQ.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ethanbass/chromatographR/blob/master/vignettes/articles/FAQ.Rmd" class="external-link"><code>vignettes/articles/FAQ.Rmd</code></a></small>
       <div class="d-none name"><code>FAQ.Rmd</code></div>
     </div>
 
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ethanbass.github.io/chromatographR/">chromatographR</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Registered S3 method overwritten by 'chromatographR':</span></span>
-<span><span class="co">#&gt;   method      from</span></span>
-<span><span class="co">#&gt;   predict.ptw ptw</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ethanbass.github.io/chromatographR/">chromatographR</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level5">
 <h5 id="how-should-i-format-my-data-for-analysis-in-chromatographr">1. How should I format my data for analysis in
 <code>chromatographR</code>?<a class="anchor" aria-label="anchor" href="#how-should-i-format-my-data-for-analysis-in-chromatographr"></a>
@@ -96,29 +96,66 @@ them into wide format before proceeding with the analysis.</p>
 <h5 id="some-of-my-peaks-arent-being-integrated-when-i-run-get_peaks-">2. Some of my peaks aren’t being integrated when I run
 <code>get_peaks</code>.<a class="anchor" aria-label="anchor" href="#some-of-my-peaks-arent-being-integrated-when-i-run-get_peaks-"></a>
 </h5>
-<p>Try adjusting the value of the <code>sd.max</code> argument,
-especially if you are seeing that your wider peaks are the ones that
-aren’t being integrated. This argument controls the maximum peak width.
-We have tried to set the default value (<code>sd.max = 50</code>) to a
-sensible number, but what is “sensible” can vary with the resolution of
-your data. For example, in the example shown below, wider peaks will not
-be picked up with <code>sd.max = 2.5</code> but if we increase
-<code>sd.max</code> to <code>10</code>, we are able to successfully
-integrate all of our peaks. If this fails, try adjusting the
-<code>smooth_window</code>.</p>
+<p><code>get_peaks</code> keeps every peak it fits, but
+<code>filter_peaks</code> with <code>max_fwhm</code> discards peaks
+wider than that, so your widest peaks are the first to go. What counts
+as a sensible value depends on your data, so measure your peak widths
+first (see the <a href="https://ethanbass.github.io/chromatographR/articles/peak-finding.html">peak-finding
+article</a>). In the example below, <code>max_fwhm = 0.12</code> drops
+many of the wider peaks that <code>get_peaks</code> found. If peaks are
+still missing, try adjusting <code>smooth_window</code>, which is passed
+to <code>find_peaks</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Sa_pr</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Sa_warp</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">pks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_peaks.html">get_peaks</a></span><span class="op">(</span><span class="va">Sa_warp</span>, lambdas <span class="op">=</span> <span class="st">"210"</span>, fit <span class="op">=</span> <span class="st">"egh"</span>, sd.max <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in resolve_deprecated(sd.max, sd_max): The 'sd.max' function is</span></span>
-<span><span class="co">#&gt; deprecated. Please use 'sd_max' instead.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pks</span>, main <span class="op">=</span> <span class="st">"'sd.max' = 3"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">pks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_peaks.html">get_peaks</a></span><span class="op">(</span><span class="va">Sa_warp</span>, lambdas <span class="op">=</span> <span class="st">"210"</span>, fit <span class="op">=</span> <span class="st">"egh"</span>, sd.max <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in resolve_deprecated(sd.max, sd_max): The 'sd.max' function is</span></span>
-<span><span class="co">#&gt; deprecated. Please use 'sd_max' instead.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pks</span>, main <span class="op">=</span> <span class="st">"'sd.max' = 10"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">pks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_peaks.html">get_peaks</a></span><span class="op">(</span><span class="va">Sa_warp</span>, lambdas <span class="op">=</span> <span class="st">"210"</span>, fit <span class="op">=</span> <span class="st">"egh"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">pks</span>, main <span class="op">=</span> <span class="st">"All peaks"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu"><a href="../reference/filter_peaks.html">filter_peaks</a></span><span class="op">(</span><span class="va">pks</span>, max_fwhm <span class="op">=</span> <span class="fl">0.12</span><span class="op">)</span>, main <span class="op">=</span> <span class="st">"`max_fwhm` = 0.12"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="FAQ_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="700"></p>
+</div>
+<div class="section level5">
+<h5 id="why-dont-my-peak-areas-match-chemstation-or-empower-labsolutions-chromeleon">3. Why don’t my peak areas match ChemStation (or Empower,
+LabSolutions, Chromeleon)?<a class="anchor" aria-label="anchor" href="#why-dont-my-peak-areas-match-chemstation-or-empower-labsolutions-chromeleon"></a>
+</h5>
+<p>Check the units and the signal first. Vendor software usually reports
+areas in mAU·s, while <code>get_peaks</code> reports them in the units
+of the time axis, usually mAU·min. Set <code>time_unit = "s"</code> in
+<code>get_peaks</code> or multiply by 60 before comparing. Vendor
+signals are also often defined with a bandwidth and a reference
+wavelength (e.g. 229 nm, with a reference at 360 nm and a bandwidth of
+100 nm). Integrate at the same wavelength and set
+<code>reference_wavelengths</code> in <code>preprocess</code> to the
+same band (here, <code>c(310, 410)</code>).</p>
+<p>If isolated peaks now agree but peaks in clusters do not, the
+difference is in how the baseline is drawn. Vendor integrators find
+where each peak starts and ends from slope thresholds and draw a
+straight baseline between those points. Peaks that are not resolved to
+baseline share one straight line and are split by vertical drop lines at
+the valleys, or skimmed off the tail of a larger peak. By default,
+chromatographR instead subtracts one baseline across the whole
+chromatogram (<code>preprocess</code>) and fits a peak shape to each
+peak (<code>get_peaks</code>), so overlapping peaks are separated by
+their fitted shapes. With <code>baseline = "flat"</code> or
+<code>"sloped"</code>, <code>get_peaks</code> also fits a local baseline
+under each peak, within that peak’s own integration window. Unlike in
+drop-line integration, neighboring peaks never share a baseline (see
+<em>Local baselines</em> in <a href="../reference/get_peaks.html"><code>get_peaks</code></a>).</p>
+<p>The two approaches diverge most in long chains of overlapping peaks.
+A straight baseline shared by the whole chain can run below the
+background on either side of it, adding a roughly fixed amount of area
+to each peak in the chain. This inflates small peaks the most and pulls
+ratios between samples towards one. In ChemStation reports, these peaks
+have the baseline codes BV, VV or VB rather than BB. Vendor software
+does not report where it drew the baseline, but its height under the
+apex is the signal at the apex minus the reported peak height, which you
+can compare with the background before the peak.</p>
+<p>Neither result is ground truth. Vendor integration can be tuned with
+timed events (e.g. skims, valley-to-valley baselines, or baseline hold),
+and chromatographR’s baseline estimators have their own failure modes:
+too flexible a baseline absorbs small or broad peaks (see <a href="../reference/baseline_estimators.html"><code>baseline_estimators</code></a>).
+A useful check is to compare well-resolved (BB) peaks first. If those
+agree, the remaining differences likely come from how each program
+handles overlapping peaks.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

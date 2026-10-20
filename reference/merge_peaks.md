@@ -1,7 +1,6 @@
 # Merge split peaks
 
-Utility function to combine split peaks into a single column of the peak
-table.
+Combines split peaks into a single column of the peak table.
 
 ## Usage
 
@@ -22,8 +21,8 @@ merge_peaks(peak_table, peaks, method = c("max", "sum"))
 
 - method:
 
-  Method to merge peaks. Either `max` to select the largest peak from
-  each sample or `sum` to add the peaks together.
+  Method to merge peaks. Either `"max"` to select the largest peak from
+  each sample or `"sum"` to add the peaks together.
 
 ## Value
 
@@ -32,16 +31,15 @@ columns are combined.
 
 ## Details
 
-Merges the specified peaks in peak table, by selecting the largest value
-from each column if `method` is `"max"`. If `method` is `"sum"`, peaks
-will be merged by summing their values.
+In each sample, `method = "max"` keeps the largest of the specified
+peaks and `method = "sum"` adds them. The result replaces the peak with
+the highest mean across samples, whose metadata is retained; the other
+peaks are removed.
 
 ## See also
 
 Other utility functions:
 [`combine_peaks()`](https://ethanbass.github.io/chromatographR/reference/combine_peaks.md),
-[`get_lambdas()`](https://ethanbass.github.io/chromatographR/reference/get_lambdas.md),
-[`get_times()`](https://ethanbass.github.io/chromatographR/reference/get_times.md),
 [`reshape_chroms()`](https://ethanbass.github.io/chromatographR/reference/reshape_chroms.md),
 [`reshape_peaktable()`](https://ethanbass.github.io/chromatographR/reference/reshape_peaktable.md)
 
@@ -53,5 +51,5 @@ Ethan Bass
 
 ``` r
 data(pk_tab)
-pk_tab <- merge_peaks(peak_table = pk_tab, peaks = c("V10","V11"))
+pk_tab <- merge_peaks(peak_table = pk_tab, peaks = c("V8","V9"))
 ```

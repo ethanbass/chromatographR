@@ -3,10 +3,6 @@
 ``` r
 
 library(chromatographR)
-#> Registered S3 method overwritten by 'chromatographR':
-#>   method      from
-#>   predict.ptw ptw
-library(rdryad)
 library(vegan)
 #> Loading required package: permute
 library(ggplot2)
@@ -18,14 +14,14 @@ While the basic workflow is similar for analyzing different types of
 chromatographic data with `chromatographR`, there are a few important
 differences when analyzing GC-FID data (or other 1-dimensional data).
 This vignette highlights some important considerations when using
-chromatographR to analyze GC-FID data (or other 2D chromatography data).
+chromatographR to analyze GC-FID data.
 
-To demonstrate the use of `chromatographR` for the analysis GC-FID data,
-we will analyze a dataset on cuticular hydrocarbons (CHCs) composition
-in four species of paper wasps (*Polistes spp.*) collected by Dr. Andrew
-Legan ([Legan 2022](#ref-legan2022); [Legan et al.
+To demonstrate the use of `chromatographR` for the analysis of GC-FID
+data, we will analyze a dataset on cuticular hydrocarbons (CHCs)
+composition in four species of paper wasps (*Polistes spp.*) collected
+by Dr. Andrew Legan ([Legan 2022](#ref-legan2022); [Legan et al.
 2022](#ref-legan2022a)). The dataset includes CHCs collected from
-*Polistes dominula* (european paper wasp), *Polistes exclamans* (common
+*Polistes dominula* (European paper wasp), *Polistes exclamans* (common
 paper wasp), *P. fuscatus* (northern paper wasp), and *P. metricus*
 (metric paper wasp). As in other social insects, cuticular hydrocarbons
 serve as chemical cues mediating a number of social behaviors in paper
@@ -52,51 +48,88 @@ establishment of social hierarchies ([Jandt et al.
 
 *P. metricus* ([Drabik-Hamshare 2022](#ref-drabik-hamshare2022))
 
-Figure 1: *Polistes* species includes in this study.
+Figure 1: *Polistes* species included in this study.
 
 ``` r
 
-is_github_actions <- Sys.getenv("GITHUB_ACTIONS") == "true"
+# These data are archived on Dryad (doi:10.5061/dryad.wpzgmsbr8), but Dryad's API now
+# requires an authentication token, so we retrieve them from a mirror on GitHub:
+# https://github.com/ethanbass/10_5061_dryad_wpzgmsbr8/releases/tag/v1.0
+tmp <- tempfile(fileext = ".zip")
+curl::curl_download("https://github.com/ethanbass/10_5061_dryad_wpzgmsbr8/archive/refs/tags/v1.0.zip",
+                    destfile = tmp)
 
-if (is_github_actions){
-  # Load files from GitHub (https://github.com/ethanbass/10_5061_dryad_wpzgmsbr8/releases/tag/v1.0)
-  tmp <- tempfile(fileext = ".zip")
-  curl::curl_download("https://github.com/ethanbass/10_5061_dryad_wpzgmsbr8/archive/refs/tags/v1.0.zip", destfile = tmp)
-  unzip(tmp, exdir = "./data/")
-  files <- list.files("./data/10_5061_dryad_wpzgmsbr8-1.0", full.names = TRUE)
-} else{
-  # Load files from Dryad
-  files <- rdryad::dryad_download("10.5061/dryad.wpzgmsbr8")[[1]]
-}
+exdir <- tempfile()
+unzip(tmp, exdir = exdir)
+files <- list.files(exdir, recursive = TRUE, full.names = TRUE)
 
 chrom_paths <- grep("README|METADATA|ANNOTATED", files, invert = TRUE, 
                     value = TRUE)
 dat <- read_chroms(chrom_paths, format_in = "shimadzu_fid")
-#> Downloading uv...Done!
 
 path_to_metadata <- grep("METADATA", files, value = TRUE)
 meta <- read.csv(path_to_metadata, sep = "\t")
 ```
 
-In order to get a good alignment, it is helpful to remove the solvent
-peak. To accomplish this, we can use the `preprocess` function to remove
-the first four minutes of the chromatogram. We also reduce the time-axis
-resolution (from 40 ms to 300 ms) since it drastically reduces
-computation time while seemingly having little effect on the accuracy of
-the integration results.
+Printing `dat` gives an overview of what was read: the number of
+chromatograms, the method they were run with, and the sample name and
+run time recorded in each file.
 
 ``` r
 
-dat.pr <- preprocess(dat, spec.smooth = FALSE, dim1 = seq(from = 4, to = 59.9, by = .005), # .005 minutes = 300 ms
+dat
+#> A chrom_list with 120 chromatograms
+#> method: C:\LabSolutions\Data\A Legan\AWL Nov 6 ladder.gcm
+#>             name  sample_name        run_datetime
+#> 1  ALKANE_LADDER ladder w/ IS 2018-11-15 12:20:51
+#> 2  PDOM_F_CO_001     box13_42 2018-11-29 21:10:51
+#> 3  PDOM_F_CO_002     box13_43 2018-11-29 22:15:46
+#> 4  PDOM_F_CO_003     box13_38 2018-11-29 15:38:47
+#> 5  PDOM_F_CO_004     box13_39 2018-11-29 16:43:42
+#> 6  PDOM_F_CO_005     box13_40 2018-11-29 17:48:32
+#> 7  PDOM_F_CO_006     box13_52 2018-11-29 03:40:16
+#> 8  PDOM_F_CO_007     box13_51 2018-11-29 23:20:35
+#> 9  PDOM_F_CO_008     box13_75 2018-11-29 07:59:34
+#> 10 PDOM_F_CO_009     box13_66 2018-11-30 01:30:22
+#> ... with 110 more chromatograms
+```
+
+The sample names recorded in the files are the original sample labels
+(e.g. `box13_42`), so the species and sex of each wasp come from the
+separate metadata file, matched on file name. The chromatograms also
+differ slightly in length, so they do not share a time axis as read:
+
+``` r
+
+table(sapply(dat, nrow))
+#> 
+#> 89999 90000 
+#>    37    83
+```
+
+In order to get a good alignment, it is helpful to remove the solvent
+peak. We also want to reduce the time-axis resolution (from 40 ms to 300
+ms), which cuts the number of timepoints about 7.5-fold and so reduces
+computation time. The `preprocess` function does both at once:
+interpolating onto a new time axis resamples the signal and restricts it
+to the range of the new axis, so supplying `dim1` starting at four
+minutes drops the solvent peak as a side effect. It also puts every
+chromatogram on the same time points. (If you only want to trim a
+chromatogram, without resampling it, use `crop_chroms` instead — it
+subsets the existing time points rather than interpolating onto new
+ones.)
+
+``` r
+
+dat.pr <- preprocess(dat, smooth_spectra = FALSE, dim1 = seq(from = 4, to = 59.9, by = .005), # .005 minutes = 300 ms
                      cl = 1)
-names(dat.pr) <- gsub(".txt", "", names(dat.pr))
 ```
 
 We can then group the chromatograms by species for further analysis.
 
 ``` r
 
-species <- c(dominula = "DOMINULA", exclamans.= "EXCLAMANS", 
+species <- c(dominula = "DOMINULA", exclamans = "EXCLAMANS", 
              fuscatus = "FUSCATUS", metricus = "METRICUS")
 
 species_idx <- lapply(species, function(sp){
@@ -108,15 +141,12 @@ species_idx <- lapply(species, function(sp){
 We can extract the peaks from the alkane ladder using the `get_peaks`
 function and plot the integrated peak areas. To eliminate small peaks
 that are not part of the alkane ladder, we use the `filter_peaks`
-function to remove features that do not have an amplitude of at least
-10^4 response units.
+function to remove features lower than 10^4 response units.
 
 ``` r
 
 ladder <- grep("LADDER", names(dat.pr))
-pks <- get_peaks(dat.pr[ladder], time.units = "s")
-#> Warning in resolve_deprecated(time.units, time_unit): The 'time.units' function
-#> is deprecated. Please use 'time_unit' instead.
+pks <- get_peaks(dat.pr[ladder], time_unit = "s")
 plot(pks, chrom_list = dat.pr[ladder])
 ```
 
@@ -133,7 +163,7 @@ LabSolutions’, so we can check the integration results provided by
 
 ``` r
 
-path_to_annotated_alkanes <- grep("ANNOTATED", files[[1]], value = TRUE)
+path_to_annotated_alkanes <- grep("ANNOTATED", files, value = TRUE)
 alkanes <- read.csv(path_to_annotated_alkanes, sep="\t")
 ```
 
@@ -153,7 +183,7 @@ legend("bottomright", bty = "n",
        legend = bquote(R^2 == .(format(summary(m)$adj.r.squared, digits = 4))))
 
 plot(pks_f$ALKANE_LADDER[[1]]$height ~ alkanes$Height[-1], pch = 20,
-     xlab = "Area (LabSolutions)", ylab = "Area (chromatographR)", 
+     xlab = "Height (LabSolutions)", ylab = "Height (chromatographR)", 
      main = "Height")
 m <- lm(pks_f$ALKANE_LADDER[[1]]$height ~ alkanes$Height[-1])
 abline(m)
@@ -163,13 +193,13 @@ legend("bottomright", bty = "n",
 
 ![](GC-FID_files/figure-html/compare_alkane_areas-1.png)
 
-Reassuringly, the peak areas and heights estimated by chromatographR are
-very similar to the results provided by LabSolutions.
+The peak areas and heights estimated by chromatographR closely match
+those from LabSolutions (see the R² in each panel).
 
 ### Alignment of chromatograms
 
-We can align chromatograms by species using variable dynamic time
-warping.
+We can align chromatograms by species using variable penalty dynamic
+time warping.
 
 ``` r
 
@@ -177,7 +207,7 @@ warp_dominula <- suppressWarnings(correct_rt(dat.pr[species_idx$dominula],
                                             alg = "vpdtw", 
                                             what = "corrected.values", 
                                             plot_it = TRUE, verbose = TRUE, 
-                                            penalty = 1, maxshift = 100))
+                                            penalty = 1, max_shift = 0.5))
 #> Selected chromatogram 9 as best reference.
 #> Fitting VPdtw warping models.
 ```
@@ -190,24 +220,24 @@ warp_dominula <- suppressWarnings(correct_rt(dat.pr[species_idx$dominula],
                                                 alg = "vpdtw",
                                                 what = "corrected.values",
                                                 plot_it = FALSE, verbose = FALSE,
-                                                penalty = 2, maxshift = 100))
+                                                penalty = 0.5, max_shift = 0.5))
 
     warp_exclamans <- suppressWarnings(correct_rt(dat.pr[species_idx$exclamans],
                                                  alg = "vpdtw",
                                                  what = "corrected.values",
                                                  plot_it = FALSE, verbose = FALSE,
-                                                 penalty = 2, maxshift = 200))
+                                                 penalty = 0.5, max_shift = 1))
 
     warp_fuscatus <- suppressWarnings(correct_rt(dat.pr[species_idx$fuscatus],
                                 alg = "vpdtw", what = "corrected.values",
                                 plot_it = FALSE, verbose = FALSE,
-                                penalty = 2, maxshift = 200))
+                                penalty = 0.5, max_shift = 1))
 
 ``` r
 
 warp_all <- suppressWarnings(correct_rt(dat.pr[-1], alg = "vpdtw",
                        what = "corrected.values", plot_it = FALSE,
-                       verbose = FALSE, penalty = 2, maxshift = 200))
+                       verbose = FALSE, penalty = 0.5, max_shift = 1))
 ```
 
 As a sanity check, we can compare the single species alignments for each
@@ -301,7 +331,7 @@ single species alignments, though the single-species alignments are
 noticeably better in some areas. Since we want to compare CHCs across
 species, we will proceed with the imperfect multi-species alignments.
 
-### Integration and peaktable assembly
+### Integration and peak table assembly
 
 ``` r
 
@@ -325,21 +355,20 @@ m
 #> 
 #> vegan::adonis2(formula = pktab$tab ~ POLISTES_SPECIES + STATE + SEX + LAT + LON, data = pktab$sample_meta, method = "manhattan", by = "margin", na.action = na.omit)
 #>                   Df   SumOfSqs      R2      F Pr(>F)    
-#> POLISTES_SPECIES   3 1.3191e+11 0.12374 9.1912  0.001 ***
-#> STATE              7 1.2344e+11 0.11579 3.6861  0.001 ***
-#> SEX                1 4.1426e+10 0.03886 8.6592  0.001 ***
-#> LAT                1 8.1923e+09 0.00768 1.7124  0.120    
-#> LON                1 1.3227e+10 0.01241 2.7648  0.027 *  
-#> Residual         105 5.0233e+11 0.47119                  
-#> Total            118 1.0661e+12 1.00000                  
+#> POLISTES_SPECIES   3 4.7981e+10 0.09058 5.3513  0.001 ***
+#> STATE              7 5.8241e+10 0.10995 2.7838  0.001 ***
+#> SEX                1 1.1548e+10 0.02180 3.8639  0.001 ***
+#> LAT                1 5.4575e+09 0.01030 1.8260  0.064 .  
+#> LON                1 7.4975e+09 0.01415 2.5086  0.004 ** 
+#> Residual         105 3.1382e+11 0.59244                  
+#> Total            118 5.2971e+11 1.00000                  
 #> ---
 #> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-As one might expect, the permanova results shows that species is the
-largest contributor to the variance in CHC profiles (R²_(marginal) =
-0.12), followed by state of origin (R²_(marginal) = 0.12) and sex
-(R²_(marginal) = 0.04).
+The PERMANOVA attributes variance in CHC profiles to species
+(R²_(marginal) = 0.09), state of origin (R²_(marginal) = 0.11) and sex
+(R²_(marginal) = 0.02).
 
 Modified `ggordiplot` function with added `shape` argument.
 
@@ -468,9 +497,10 @@ gg_ordiplot(ord, groups = pktab$sample_meta[,"POLISTES_SPECIES"],
 
 ![](GC-FID_files/figure-html/pca-1.png)
 
-Principal componenets analysis shows decent separation between species,
-with *P. dominula*, *P. fuscatus* and *P. dominula* separating along PC2
-and *P. exclamans* separating from the other species along PC1.
+Principal components analysis separates *P. exclamans* from the other
+species along PC1 and partly separates *P. metricus* from *P. dominula*
+along PC2, with *P. fuscatus* overlapping both, although the first two
+axes explain only 14% of the variance.
 
 We can get even better separation if we break down our data by sex,
 though there is considerable intraspecific variation.
@@ -590,33 +620,30 @@ sessionInfo()
 #> 
 #> other attached packages:
 #> [1] ggplot2_4.0.3        vegan_2.7-6          permute_0.9-10      
-#> [4] rdryad_1.0.0         chromatographR_0.8.0
+#> [4] chromatographR_0.9.0
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] gtable_0.3.6          xfun_0.61             caTools_1.18.4       
-#>  [4] lattice_0.22-9        generics_0.1.4        vctrs_0.7.3          
-#>  [7] tools_4.6.1           bitops_1.1-0          curl_8.0.0           
+#>  [1] gtable_0.3.6          xfun_0.62             caTools_1.18.4       
+#>  [4] lattice_0.22-9        vctrs_0.7.3           tools_4.6.1          
+#>  [7] bitops_1.1-0          generics_0.1.4        curl_8.1.0           
 #> [10] parallel_4.6.1        tibble_3.3.1          cluster_2.1.8.2      
 #> [13] pkgconfig_2.0.3       Matrix_1.7-5          data.table_1.18.6.1  
-#> [16] RColorBrewer_1.1-3    S7_0.2.2              readxl_1.5.0.1       
+#> [16] RColorBrewer_1.1-3    S7_0.2.2              readxl_1.6.0         
 #> [19] lifecycle_1.0.5       compiler_4.6.1        farver_2.1.2         
 #> [22] stringr_1.6.0         ptw_1.9-17            RcppDE_0.1.9         
 #> [25] minpack.lm_1.2-4      htmltools_0.5.9       yaml_2.3.12          
 #> [28] Formula_1.2-6         pillar_1.11.1         MASS_7.3-65          
-#> [31] RaMS_1.4.3            nlme_3.1-169          mime_0.13            
-#> [34] tidyselect_1.2.1      zip_3.0.2             digest_0.6.39        
-#> [37] stringi_1.8.9         dplyr_1.2.1           purrr_1.2.2          
-#> [40] labeling_0.4.3        VPdtw_2.2.1           splines_4.6.1        
-#> [43] rprojroot_2.1.1       fastmap_1.2.0         grid_4.6.1           
-#> [46] here_1.0.2            cli_3.6.6             chromConverter_0.9.0 
-#> [49] magrittr_2.0.5        base64enc_0.1-6       crul_1.6.0           
-#> [52] dynamicTreeCut_1.63-1 withr_3.0.3           ggordiplots_0.4.3    
-#> [55] scales_1.4.0          rappdirs_0.3.4        bit64_4.8.6          
-#> [58] rmarkdown_2.32        bit_4.6.0             otel_0.2.0           
-#> [61] reticulate_1.47.0     cellranger_1.1.0      fastcluster_1.3.0    
-#> [64] png_0.1-9             pbapply_1.7-5         evaluate_1.0.5       
-#> [67] knitr_1.52            hoardr_0.5.5          mgcv_1.9-4           
-#> [70] rlang_1.3.0           Rcpp_1.1.2            glue_1.8.1           
-#> [73] httpcode_0.3.0        xml2_1.6.0            jsonlite_2.0.0       
-#> [76] R6_2.6.1
+#> [31] RaMS_1.4.3            nlme_3.1-169          tidyselect_1.2.1     
+#> [34] digest_0.6.39         stringi_1.8.9         dplyr_1.2.1          
+#> [37] purrr_1.2.2           labeling_0.4.3        VPdtw_2.2.1          
+#> [40] splines_4.6.1         fastmap_1.2.0         grid_4.6.1           
+#> [43] cli_3.6.6             chromConverter_0.11.1 magrittr_2.0.5       
+#> [46] base64enc_0.1-6       dynamicTreeCut_1.63-1 withr_3.0.3          
+#> [49] ggordiplots_0.4.3     scales_1.4.0          bit64_4.8.6          
+#> [52] rmarkdown_2.32        bit_4.6.0             otel_0.2.0           
+#> [55] reticulate_1.47.0     cellranger_1.1.0      fastcluster_1.3.0    
+#> [58] png_0.1-9             pbapply_1.7-5         evaluate_1.0.5       
+#> [61] knitr_1.52            mgcv_1.9-4            rlang_1.3.0          
+#> [64] Rcpp_1.1.2            glue_1.8.1            xml2_1.6.0           
+#> [67] jsonlite_2.0.0        R6_2.6.1              fs_2.1.0
 ```

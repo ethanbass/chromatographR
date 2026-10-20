@@ -4,16 +4,22 @@
 
 - [`chromatographR`](https://ethanbass.github.io/chromatographR/reference/chromatographR-package.md)
   [`chromatographR-package`](https://ethanbass.github.io/chromatographR/reference/chromatographR-package.md)
-  : chromatographR: Chromatographic Data Analysis Toolset
+  : chromatographR: Chromatographic Data Analysis Toolkit
 
 ## Analysis functions
 
 - [`reexports`](https://ethanbass.github.io/chromatographR/reference/reexports.md)
   [`read_chroms`](https://ethanbass.github.io/chromatographR/reference/reexports.md)
-  : Read chromatograms.
+  : Read chromatograms
 
 - [`preprocess()`](https://ethanbass.github.io/chromatographR/reference/preprocess.md)
   : Preprocess time/wavelength data
+
+- [`correct_baseline()`](https://ethanbass.github.io/chromatographR/reference/correct_baseline.md)
+  : Correct baseline along the time axis
+
+- [`crop_chroms()`](https://ethanbass.github.io/chromatographR/reference/crop_chroms.md)
+  : Crop chromatograms
 
 - [`subtract_blanks()`](https://ethanbass.github.io/chromatographR/reference/subtract_blanks.md)
   : Subtract blank chromatograms
@@ -25,10 +31,16 @@
   : Correct retention time with group-based warping
 
 - [`correct_peaks()`](https://ethanbass.github.io/chromatographR/reference/correct_peaks.md)
-  : Correct peak positions according to a PTW warping model
+  : Correct peak positions according to a warping model
 
 - [`get_peaks()`](https://ethanbass.github.io/chromatographR/reference/get_peaks.md)
   : Get peak list
+
+- [`match_peaks()`](https://ethanbass.github.io/chromatographR/reference/match_peaks.md)
+  : Match peaks across chromatograms
+
+- [`targeted_analysis`](https://ethanbass.github.io/chromatographR/reference/targeted_analysis.md)
+  : Targeted analysis
 
 - [`get_peaktable()`](https://ethanbass.github.io/chromatographR/reference/get_peaktable.md)
   : Convert peak lists into an aligned peak table
@@ -39,13 +51,12 @@
 - [`attach_metadata()`](https://ethanbass.github.io/chromatographR/reference/attach_metadata.md)
   :
 
-  Attaches sample metadata to a `peak_table` object by matching sample
-  names.
+  Attach sample metadata to a `peak_table`
 
 - [`attach_ref_spectra()`](https://ethanbass.github.io/chromatographR/reference/attach_ref_spectra.md)
   :
 
-  Attach reference spectra to a `peak_table` object.
+  Attach reference spectra to a `peak_table` object
 
 - [`normalize_data()`](https://ethanbass.github.io/chromatographR/reference/normalize_data.md)
   : Normalize peak table or chromatograms
@@ -57,6 +68,10 @@
 
 - [`plot_all_spectra()`](https://ethanbass.github.io/chromatographR/reference/plot_all_spectra.md)
   : Plot all spectra for chosen peak
+- [`plot_baseline()`](https://ethanbass.github.io/chromatographR/reference/plot_baseline.md)
+  : Plot an estimated baseline
+- [`plot_chrom_contour()`](https://ethanbass.github.io/chromatographR/reference/plot_chrom_contour.md)
+  : Plot a chromatogram as a contour plot
 - [`plot_chroms()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms.md)
   : Plot traces from list of chromatograms
 - [`plot_chroms_heatmap()`](https://ethanbass.github.io/chromatographR/reference/plot_chroms_heatmap.md)
@@ -68,17 +83,33 @@
 - [`annotate_peaks()`](https://ethanbass.github.io/chromatographR/reference/annotate_peaks.md)
   : Annotate peaks on a chromatogram
 - [`boxplot(`*`<peak_table>`*`)`](https://ethanbass.github.io/chromatographR/reference/boxplot.peak_table.md)
-  : Make boxplot from peak table.
+  : Make boxplot from peak table
 - [`mirror_plot()`](https://ethanbass.github.io/chromatographR/reference/mirror_plot.md)
   : Make mirror plot from peak table
 - [`scan_chrom()`](https://ethanbass.github.io/chromatographR/reference/scan_chrom.md)
   : Plot spectra by clicking on the chromatogram
+- [`plot(`*`<chrom_list>`*`)`](https://ethanbass.github.io/chromatographR/reference/plot.chrom_list.md)
+  : Plot a list of chromatograms
+- [`plot(`*`<matched_peak_list>`*`)`](https://ethanbass.github.io/chromatographR/reference/plot.matched_peak_list.md)
+  [`plot(`*`<matched_peak_list_set>`*`)`](https://ethanbass.github.io/chromatographR/reference/plot.matched_peak_list.md)
+  : Plot matched peak pairs
 - [`plot(`*`<peak_list>`*`)`](https://ethanbass.github.io/chromatographR/reference/plot.peak_list.md)
   : Overlay fitted peak shapes on chromatograms
 - [`plot(`*`<peak_table>`*`)`](https://ethanbass.github.io/chromatographR/reference/plot.peak_table.md)
   : Plot spectrum from peak table
 - [`plot(`*`<ptw_list>`*`)`](https://ethanbass.github.io/chromatographR/reference/plot.ptw_list.md)
   : Plot PTW alignments
+
+## Accessors
+
+- [`get_times()`](https://ethanbass.github.io/chromatographR/reference/get_times.md)
+  : Get retention times
+- [`get_lambdas()`](https://ethanbass.github.io/chromatographR/reference/get_lambdas.md)
+  : Get lambdas
+- [`get_time_resolution()`](https://ethanbass.github.io/chromatographR/reference/get_time_resolution.md)
+  : Get time resolution
+- [`get_baseline()`](https://ethanbass.github.io/chromatographR/reference/get_baseline.md)
+  : Retrieve estimated baseline
 
 ## Utility functions
 
@@ -97,6 +128,11 @@
 - [`write_peaktable()`](https://ethanbass.github.io/chromatographR/reference/write_peaktable.md)
   : Export peak table
 
+## Background
+
+- [`baseline_estimators`](https://ethanbass.github.io/chromatographR/reference/baseline_estimators.md)
+  : Baseline estimators
+
 ## Data structures
 
 - [`peak_table-class`](https://ethanbass.github.io/chromatographR/reference/peak_table-class.md)
@@ -111,8 +147,14 @@
 - [`print(`*`<peak_list>`*`)`](https://ethanbass.github.io/chromatographR/reference/print.peak_list.md)
   : Print peak list
 
+- [`print(`*`<matched_peak_list>`*`)`](https://ethanbass.github.io/chromatographR/reference/print.matched_peak_list.md)
+  : Print matched peak list
+
+- [`print(`*`<matched_peak_list_set>`*`)`](https://ethanbass.github.io/chromatographR/reference/print.matched_peak_list_set.md)
+  : Print a set of matched peak lists
+
 - [`summary(`*`<peak_table>`*`)`](https://ethanbass.github.io/chromatographR/reference/summary.peak_table.md)
-  : Summarize Peak Table
+  : Summarize peak table
 
 - [`` `[`( ``*`<peak_table>`*`)`](https://ethanbass.github.io/chromatographR/reference/sub-.peak_table.md)
   : Subset peak table
@@ -120,21 +162,24 @@
 - [`` `[`( ``*`<peak_list>`*`)`](https://ethanbass.github.io/chromatographR/reference/sub-.peak_list.md)
   : Subset peak list
 
+- [`` `[`( ``*`<matched_peak_list>`*`)`](https://ethanbass.github.io/chromatographR/reference/sub-.matched_peak_list.md)
+  : Subset matched peak list
+
 - [`dim(`*`<peak_table>`*`)`](https://ethanbass.github.io/chromatographR/reference/dim.peak_table.md)
   :
 
-  Return dimensions of a `peak_table` object.
+  Return dimensions of a `peak_table` object
 
 - [`head(`*`<peak_table>`*`)`](https://ethanbass.github.io/chromatographR/reference/head.peak_table.md)
   [`tail(`*`<peak_table>`*`)`](https://ethanbass.github.io/chromatographR/reference/head.peak_table.md)
   :
 
-  Return first or last parts of a `peak_table`.
+  Return first or last parts of a `peak_table`
 
 - [`row.names(`*`<peak_table>`*`)`](https://ethanbass.github.io/chromatographR/reference/row.names.peak_table.md)
   :
 
-  Return row names from a `peak_table` object.
+  Return row names from a `peak_table` object
 
 - [`subset(`*`<peak_table>`*`)`](https://ethanbass.github.io/chromatographR/reference/subset.peak_table.md)
   : Subset peak table
@@ -146,6 +191,6 @@
 - [`Sa_pr`](https://ethanbass.github.io/chromatographR/reference/Sa_pr.md)
   : Preprocessed goldenrod root chromatograms
 - [`Sa_warp`](https://ethanbass.github.io/chromatographR/reference/Sa_warp.md)
-  : Warped goldenrod root chromatograms.
+  : Warped goldenrod root chromatograms
 - [`pk_tab`](https://ethanbass.github.io/chromatographR/reference/pk_tab.md)
   : Goldenrod peak table

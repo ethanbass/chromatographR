@@ -2,7 +2,7 @@
 
 A list of four HPLC-DAD data matrices of *Solidago altissima* roots
 extracted in 90\\ wavelengths are stored in columns. Data were collected
-on a Agilent 1100 HPLC.
+on an Agilent 1100 HPLC.
 
 ## Usage
 
@@ -12,7 +12,7 @@ data(Sa)
 
 ## Format
 
-A list of four matrices (1301 times x 60 wavelengths).
+A list of four matrices (1301 timepoints × 60 wavelengths).
 
 ## See also
 

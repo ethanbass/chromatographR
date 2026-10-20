@@ -1,7 +1,7 @@
 # Get retention times
 
-Get retention times from a list of chromatograms or a `peak_table`
-object.
+Get retention times from a chromatogram, a list of chromatograms, or a
+`peak_table` object.
 
 ## Usage
 
@@ -13,11 +13,12 @@ get_times(x, idx = 1)
 
 - x:
 
-  A list of chromatograms or `peak_table` object.
+  A chromatogram, a list of chromatograms, or a `peak_table` object.
 
 - idx:
 
-  Index of chromatogram from which to extract times.
+  Index of the chromatogram from which to extract times, if `x` is a
+  list or `peak_table`. Defaults to `1`.
 
 ## Value
 
@@ -26,12 +27,10 @@ Numeric vector of retention times from the chromatogram specified by
 
 ## See also
 
-Other utility functions:
-[`combine_peaks()`](https://ethanbass.github.io/chromatographR/reference/combine_peaks.md),
+Other accessors:
+[`get_baseline()`](https://ethanbass.github.io/chromatographR/reference/get_baseline.md),
 [`get_lambdas()`](https://ethanbass.github.io/chromatographR/reference/get_lambdas.md),
-[`merge_peaks()`](https://ethanbass.github.io/chromatographR/reference/merge_peaks.md),
-[`reshape_chroms()`](https://ethanbass.github.io/chromatographR/reference/reshape_chroms.md),
-[`reshape_peaktable()`](https://ethanbass.github.io/chromatographR/reference/reshape_peaktable.md)
+[`get_time_resolution()`](https://ethanbass.github.io/chromatographR/reference/get_time_resolution.md)
 
 ## Examples
 
