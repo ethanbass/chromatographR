@@ -468,7 +468,7 @@ the warping models that `correct_peaks` stored.
     119 0.000000 5.433084 0.6104369 2.0632364 15.065750 0.3051644
     121 0.000000 4.183750 1.0255052 0.5964413  7.830246 0.0000000
     122 3.814608 8.343632 0.6042582 2.0559778 25.787379 1.7809250
-    458 6.797762 6.311539 2.2515294 1.9966940 14.256253 1.2782027
+    458 6.797762 6.311539 2.2515294 1.9966939 14.256253 1.2782027
 
 If you only need a few known compounds, `get_peaks(targets = ...)` fits
 only the peaks at the retention times you list, and `get_peaktable`
@@ -670,11 +670,11 @@ Package for R.” *Metabolomics* 11 (1): 143–54.
 
     R version 4.6.1 (2026-06-24)
     Platform: x86_64-pc-linux-gnu
-    Running under: Ubuntu 24.04.5 LTS
+    Running under: Ubuntu 26.04.1 LTS
 
     Matrix products: default
     BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
-    LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+    LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.32.so;  LAPACK version 3.12.0
 
     locale:
      [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       
@@ -693,27 +693,39 @@ Package for R.” *Metabolomics* 11 (1): 143–54.
     [1] chromatographR_0.9.0 knitr_1.52          
 
     loaded via a namespace (and not attached):
-     [1] gtable_0.3.6          xfun_0.62             bslib_0.12.0         
-     [4] ggplot2_4.0.3         htmlwidgets_1.6.4     caTools_1.18.4       
-     [7] lattice_0.22-9        vctrs_0.7.3           tools_4.6.1          
-    [10] bitops_1.1-0          generics_0.1.4        tibble_3.3.1         
-    [13] pkgconfig_2.0.3       Matrix_1.7-5          data.table_1.18.6.1  
-    [16] RColorBrewer_1.1-3    S7_0.2.2              desc_1.4.3           
-    [19] readxl_1.6.0          lifecycle_1.0.5       compiler_4.6.1       
-    [22] farver_2.1.2          stringr_1.6.0         ptw_1.9-17           
-    [25] textshaping_1.0.5     RcppDE_0.1.9          minpack.lm_1.2-4     
-    [28] htmltools_0.5.9       sass_0.4.10           yaml_2.3.12          
-    [31] Formula_1.2-6         pillar_1.11.1         pkgdown_2.2.1.9000   
-    [34] jquerylib_0.1.4       RaMS_1.4.3            cachem_1.1.0         
-    [37] tidyselect_1.2.1      digest_0.6.39         stringi_1.8.9        
-    [40] dplyr_1.2.1           purrr_1.2.2           labeling_0.4.3       
-    [43] VPdtw_2.2.1           fastmap_1.2.0         grid_4.6.1           
-    [46] cli_3.6.6             chromConverter_0.11.1 magrittr_2.0.5       
-    [49] base64enc_0.1-6       dynamicTreeCut_1.63-1 withr_3.0.3          
-    [52] scales_1.4.0          bit64_4.8.6           rmarkdown_2.32       
-    [55] bit_4.6.0             otel_0.2.0            reticulate_1.47.0    
-    [58] cellranger_1.1.0      fastcluster_1.3.0     ragg_1.5.2           
-    [61] png_0.1-9             pbapply_1.7-5         evaluate_1.0.5       
-    [64] rlang_1.3.0           Rcpp_1.1.2            glue_1.8.1           
-    [67] xml2_1.6.0            jsonlite_2.0.0        R6_2.6.1             
-    [70] systemfonts_1.3.2     fs_2.1.0             
+     [1] gtable_0.3.6               xfun_0.62                 
+     [3] bslib_0.12.0               ggplot2_4.0.3             
+     [5] htmlwidgets_1.6.4          caTools_1.18.4            
+     [7] lattice_0.22-9             vctrs_0.7.3               
+     [9] tools_4.6.1                bitops_1.1-0              
+    [11] generics_0.1.4             tibble_3.3.1              
+    [13] pkgconfig_2.0.3            Matrix_1.7-5              
+    [15] data.table_1.18.6.1        RColorBrewer_1.1-3        
+    [17] S7_0.2.2                   desc_1.4.3                
+    [19] readxl_1.6.0               lifecycle_1.0.5           
+    [21] compiler_4.6.1             farver_2.1.2              
+    [23] stringr_1.6.0              ptw_1.9-17                
+    [25] textshaping_1.0.5          RcppDE_0.1.9              
+    [27] minpack.lm_1.2-4           htmltools_0.5.9           
+    [29] sass_0.4.10                yaml_2.3.12               
+    [31] Formula_1.2-6              pillar_1.11.1             
+    [33] pkgdown_2.2.1.9000         jquerylib_0.1.4           
+    [35] RaMS_1.4.3                 cachem_1.1.0              
+    [37] tidyselect_1.2.1           digest_0.6.39             
+    [39] stringi_1.8.9              dplyr_1.2.1               
+    [41] purrr_1.2.2                labeling_0.4.3            
+    [43] VPdtw_2.2.1                fastmap_1.2.0             
+    [45] grid_4.6.1                 cli_3.6.6                 
+    [47] chromConverter_0.11.2.9000 magrittr_2.0.5            
+    [49] base64enc_0.1-6            dynamicTreeCut_1.63-1     
+    [51] withr_3.0.3                scales_1.4.0              
+    [53] bit64_4.8.6                rmarkdown_2.32            
+    [55] bit_4.6.0                  otel_0.2.0                
+    [57] reticulate_1.47.0          cellranger_1.1.0          
+    [59] fastcluster_1.3.0          ragg_1.5.2                
+    [61] png_0.1-9                  pbapply_1.7-5             
+    [63] evaluate_1.0.5             rlang_1.3.0               
+    [65] Rcpp_1.1.2                 glue_1.8.1                
+    [67] xml2_1.6.0                 jsonlite_2.0.0            
+    [69] R6_2.6.1                   systemfonts_1.3.2         
+    [71] fs_2.1.0                  

@@ -535,11 +535,11 @@ Session info
 sessionInfo()
 #> R version 4.6.1 (2026-06-24)
 #> Platform: x86_64-pc-linux-gnu
-#> Running under: Ubuntu 24.04.5 LTS
+#> Running under: Ubuntu 26.04.1 LTS
 #> 
 #> Matrix products: default
 #> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
-#> LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+#> LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.32.so;  LAPACK version 3.12.0
 #> 
 #> locale:
 #>  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       
@@ -557,24 +557,33 @@ sessionInfo()
 #> [1] chromatographR_0.9.0
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] generics_0.1.4        bitops_1.1-0          xml2_1.6.0           
-#>  [4] fastcluster_1.3.0     stringi_1.8.9         lattice_0.22-9       
-#>  [7] digest_0.6.39         magrittr_2.0.5        caTools_1.18.4       
-#> [10] chromConverter_0.11.1 evaluate_1.0.5        grid_4.6.1           
-#> [13] RColorBrewer_1.1-3    dynamicTreeCut_1.63-1 fastmap_1.2.0        
-#> [16] cellranger_1.1.0      jsonlite_2.0.0        Matrix_1.7-5         
-#> [19] Formula_1.2-6         purrr_1.2.2           scales_1.4.0         
-#> [22] RaMS_1.4.3            pbapply_1.7-5         cli_3.6.6            
-#> [25] rlang_1.3.0           bit64_4.8.6           ptw_1.9-17           
-#> [28] base64enc_0.1-6       yaml_2.3.12           otel_0.2.0           
-#> [31] tools_4.6.1           parallel_4.6.1        minpack.lm_1.2-4     
-#> [34] dplyr_1.2.1           RcppDE_0.1.9          reticulate_1.47.0    
-#> [37] vctrs_0.7.3           R6_2.6.1              png_0.1-9            
-#> [40] lifecycle_1.0.5       stringr_1.6.0         fs_2.1.0             
-#> [43] bit_4.6.0             pkgconfig_2.0.3       pillar_1.11.1        
-#> [46] data.table_1.18.6.1   glue_1.8.1            VPdtw_2.2.1          
-#> [49] Rcpp_1.1.2            tidyselect_1.2.1      xfun_0.62            
-#> [52] tibble_3.3.1          knitr_1.52            farver_2.1.2         
-#> [55] htmltools_0.5.9       rmarkdown_2.32        compiler_4.6.1       
-#> [58] readxl_1.6.0
+#>  [1] generics_0.1.4             bitops_1.1-0              
+#>  [3] xml2_1.6.0                 fastcluster_1.3.0         
+#>  [5] stringi_1.8.9              lattice_0.22-9            
+#>  [7] digest_0.6.39              magrittr_2.0.5            
+#>  [9] caTools_1.18.4             chromConverter_0.11.2.9000
+#> [11] evaluate_1.0.5             grid_4.6.1                
+#> [13] RColorBrewer_1.1-3         dynamicTreeCut_1.63-1     
+#> [15] fastmap_1.2.0              cellranger_1.1.0          
+#> [17] jsonlite_2.0.0             Matrix_1.7-5              
+#> [19] Formula_1.2-6              purrr_1.2.2               
+#> [21] scales_1.4.0               RaMS_1.4.3                
+#> [23] pbapply_1.7-5              cli_3.6.6                 
+#> [25] rlang_1.3.0                bit64_4.8.6               
+#> [27] ptw_1.9-17                 base64enc_0.1-6           
+#> [29] yaml_2.3.12                otel_0.2.0                
+#> [31] tools_4.6.1                parallel_4.6.1            
+#> [33] minpack.lm_1.2-4           dplyr_1.2.1               
+#> [35] RcppDE_0.1.9               reticulate_1.47.0         
+#> [37] vctrs_0.7.3                R6_2.6.1                  
+#> [39] png_0.1-9                  lifecycle_1.0.5           
+#> [41] stringr_1.6.0              fs_2.1.0                  
+#> [43] bit_4.6.0                  pkgconfig_2.0.3           
+#> [45] pillar_1.11.1              data.table_1.18.6.1       
+#> [47] glue_1.8.1                 VPdtw_2.2.1               
+#> [49] Rcpp_1.1.2                 tidyselect_1.2.1          
+#> [51] xfun_0.62                  tibble_3.3.1              
+#> [53] knitr_1.52                 farver_2.1.2              
+#> [55] htmltools_0.5.9            rmarkdown_2.32            
+#> [57] compiler_4.6.1             readxl_1.6.0
 ```

@@ -357,9 +357,9 @@ m
 #>                   Df   SumOfSqs      R2      F Pr(>F)    
 #> POLISTES_SPECIES   3 4.7981e+10 0.09058 5.3513  0.001 ***
 #> STATE              7 5.8241e+10 0.10995 2.7838  0.001 ***
-#> SEX                1 1.1548e+10 0.02180 3.8639  0.002 ** 
-#> LAT                1 5.4575e+09 0.01030 1.8260  0.058 .  
-#> LON                1 7.4975e+09 0.01415 2.5086  0.005 ** 
+#> SEX                1 1.1548e+10 0.02180 3.8639  0.001 ***
+#> LAT                1 5.4575e+09 0.01030 1.8260  0.047 *  
+#> LON                1 7.4975e+09 0.01415 2.5086  0.015 *  
 #> Residual         105 3.1382e+11 0.59244                  
 #> Total            118 5.2971e+11 1.00000                  
 #> ---
@@ -600,11 +600,11 @@ Tunnel.” *Journal of Chemical Ecology* 16 (4): 1277–87.
 sessionInfo()
 #> R version 4.6.1 (2026-06-24)
 #> Platform: x86_64-pc-linux-gnu
-#> Running under: Ubuntu 24.04.5 LTS
+#> Running under: Ubuntu 26.04.1 LTS
 #> 
 #> Matrix products: default
 #> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
-#> LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+#> LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.32.so;  LAPACK version 3.12.0
 #> 
 #> locale:
 #>  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       
@@ -623,27 +623,39 @@ sessionInfo()
 #> [4] chromatographR_0.9.0
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] gtable_0.3.6          xfun_0.62             caTools_1.18.4       
-#>  [4] lattice_0.22-9        vctrs_0.7.3           tools_4.6.1          
-#>  [7] bitops_1.1-0          generics_0.1.4        curl_8.1.0           
-#> [10] parallel_4.6.1        tibble_3.3.1          cluster_2.1.8.2      
-#> [13] pkgconfig_2.0.3       Matrix_1.7-5          data.table_1.18.6.1  
-#> [16] RColorBrewer_1.1-3    S7_0.2.2              readxl_1.6.0         
-#> [19] lifecycle_1.0.5       compiler_4.6.1        farver_2.1.2         
-#> [22] stringr_1.6.0         ptw_1.9-17            RcppDE_0.1.9         
-#> [25] minpack.lm_1.2-4      htmltools_0.5.9       yaml_2.3.12          
-#> [28] Formula_1.2-6         pillar_1.11.1         MASS_7.3-65          
-#> [31] RaMS_1.4.3            nlme_3.1-169          tidyselect_1.2.1     
-#> [34] digest_0.6.39         stringi_1.8.9         dplyr_1.2.1          
-#> [37] purrr_1.2.2           labeling_0.4.3        VPdtw_2.2.1          
-#> [40] splines_4.6.1         fastmap_1.2.0         grid_4.6.1           
-#> [43] cli_3.6.6             chromConverter_0.11.1 magrittr_2.0.5       
-#> [46] base64enc_0.1-6       dynamicTreeCut_1.63-1 withr_3.0.3          
-#> [49] ggordiplots_0.4.3     scales_1.4.0          bit64_4.8.6          
-#> [52] rmarkdown_2.32        bit_4.6.0             otel_0.2.0           
-#> [55] reticulate_1.47.0     cellranger_1.1.0      fastcluster_1.3.0    
-#> [58] png_0.1-9             pbapply_1.7-5         evaluate_1.0.5       
-#> [61] knitr_1.52            mgcv_1.9-4            rlang_1.3.0          
-#> [64] Rcpp_1.1.2            glue_1.8.1            xml2_1.6.0           
-#> [67] jsonlite_2.0.0        R6_2.6.1              fs_2.1.0
+#>  [1] gtable_0.3.6               xfun_0.62                 
+#>  [3] caTools_1.18.4             lattice_0.22-9            
+#>  [5] vctrs_0.7.3                tools_4.6.1               
+#>  [7] bitops_1.1-0               generics_0.1.4            
+#>  [9] curl_8.1.0                 parallel_4.6.1            
+#> [11] tibble_3.3.1               cluster_2.1.8.2           
+#> [13] pkgconfig_2.0.3            Matrix_1.7-5              
+#> [15] data.table_1.18.6.1        RColorBrewer_1.1-3        
+#> [17] S7_0.2.2                   readxl_1.6.0              
+#> [19] lifecycle_1.0.5            compiler_4.6.1            
+#> [21] farver_2.1.2               stringr_1.6.0             
+#> [23] ptw_1.9-17                 RcppDE_0.1.9              
+#> [25] minpack.lm_1.2-4           htmltools_0.5.9           
+#> [27] yaml_2.3.12                Formula_1.2-6             
+#> [29] pillar_1.11.1              MASS_7.3-65               
+#> [31] RaMS_1.4.3                 nlme_3.1-169              
+#> [33] tidyselect_1.2.1           digest_0.6.39             
+#> [35] stringi_1.8.9              dplyr_1.2.1               
+#> [37] purrr_1.2.2                labeling_0.4.3            
+#> [39] VPdtw_2.2.1                splines_4.6.1             
+#> [41] fastmap_1.2.0              grid_4.6.1                
+#> [43] cli_3.6.6                  chromConverter_0.11.2.9000
+#> [45] magrittr_2.0.5             base64enc_0.1-6           
+#> [47] dynamicTreeCut_1.63-1      withr_3.0.3               
+#> [49] ggordiplots_0.4.3          scales_1.4.0              
+#> [51] bit64_4.8.6                rmarkdown_2.32            
+#> [53] bit_4.6.0                  otel_0.2.0                
+#> [55] reticulate_1.47.0          cellranger_1.1.0          
+#> [57] fastcluster_1.3.0          png_0.1-9                 
+#> [59] pbapply_1.7-5              evaluate_1.0.5            
+#> [61] knitr_1.52                 mgcv_1.9-4                
+#> [63] rlang_1.3.0                Rcpp_1.1.2                
+#> [65] glue_1.8.1                 xml2_1.6.0                
+#> [67] jsonlite_2.0.0             R6_2.6.1                  
+#> [69] fs_2.1.0
 ```

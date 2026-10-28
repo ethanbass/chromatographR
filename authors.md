@@ -14,7 +14,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/ethanbass/chromatographR/blob/master/inst/CITATION)
+[`inst/CITATION`](https://github.com/ethanbass/chromatographR/blob/v0.9.0/inst/CITATION)
 
 Bass, E. (2026). chromatographR: Chromatographic Data Analysis Toolkit
 (version 0.9.0). https://doi.org/10.5281/zenodo.6944334

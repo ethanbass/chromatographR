@@ -168,7 +168,5 @@ cl <- cluster_spectra(pk_tab, nboot = 100, max.only = FALSE, alpha = 0.03)
 
 
 
-
-
 # }
 ```
